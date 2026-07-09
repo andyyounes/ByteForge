@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Exercise — ByteForge</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <style>
+    body { padding-top:64px; background:var(--bg); }
+    .page { max-width:780px; margin:0 auto; padding:32px 24px 80px; }
+
+    /* ── Header ── */
+    .ex-header { margin-bottom:28px; }
+    .breadcrumb { font-size:13px; color:var(--fg-dim); margin-bottom:10px; }
+    .breadcrumb a { color:var(--orange); text-decoration:none; }
+    .ex-progress-row { display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
+    .ex-progress-bar { flex:1; min-width:120px; background:rgba(255,255,255,.07); border-radius:999px; height:6px; overflow:hidden; }
+    .ex-progress-fill { height:6px; border-radius:999px; background:linear-gradient(90deg,var(--orange),#a855f7); transition:width .4s ease; }
+    .ex-counter { font-size:13px; color:var(--fg-dim); white-space:nowrap; }
+    .xp-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; background:rgba(234,179,8,.1); border:1px solid rgba(234,179,8,.2); font-size:12px; font-weight:700; color:#eab308; }
+
+    /* ── Exercise card ── */
+    .ex-card { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:32px 36px; margin-bottom:20px; }
+    .ex-type-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; margin-bottom:16px; }
+    .chip-mcq      { background:rgba(59,130,246,.12); color:#60a5fa; }
+    .chip-written  { background:rgba(168,85,247,.12); color:#c084fc; }
+    .chip-exam     { background:rgba(249,115,22,.12); color:var(--orange); }
+    .ex-title-main { font-size:22px; font-weight:800; letter-spacing:-.02em; margin-bottom:8px; }
+    .ex-meta { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
+    .meta-pill { font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; background:var(--bg-raised); color:var(--fg-dim); }
+
+    /* Question text */
+    .question-box { font-size:16px; line-height:1.75; color:var(--fg); white-space:pre-wrap; margin-bottom:28px; padding:20px 24px; background:var(--bg); border-radius:12px; border-left:3px solid var(--orange); }
+
+    /* ── MCQ options ── */
+    .options-grid { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
+    .opt-btn { display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:12px; border:2px solid var(--border); background:var(--bg); cursor:pointer; transition:.15s; text-align:left; width:100%; }
+    .opt-btn:hover:not(:disabled) { border-color:var(--border-hi); background:rgba(255,255,255,.04); }
+    .opt-btn.selected { border-color:var(--orange); background:rgba(249,115,22,.07); }
+    .opt-btn.correct  { border-color:#22c55e; background:rgba(34,197,94,.08); }
+    .opt-btn.wrong    { border-color:#ef4444; background:rgba(239,68,68,.07); }
+    .opt-btn:disabled { cursor:default; }
+    .opt-letter { width:30px; height:30px; border-radius:50%; background:var(--bg-raised); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex-shrink:0; transition:.15s; }
+    .opt-btn.selected .opt-letter { background:var(--orange); color:#fff; }
+    .opt-btn.correct  .opt-letter { background:#22c55e; color:#fff; }
+    .opt-btn.wrong    .opt-letter { background:#ef4444; color:#fff; }
+    .opt-text { font-size:15px; flex:1; }
+
+    /* ── Feedback ── */
+    .feedback { border-radius:12px; padding:16px 20px; margin-bottom:20px; font-size:14px; line-height:1.6; display:none; }
+    .feedback.show { display:block; }
+    .fb-correct { background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); }
+    .fb-wrong   { background:rgba(239,68,68,.07); border:1px solid rgba(239,68,68,.2); }
+    .fb-icon    { font-size:20px; margin-bottom:6px; }
+    .fb-title   { font-size:15px; font-weight:800; margin-bottom:4px; }
+    .fb-body    { color:var(--fg-dim); }
+
+    /* ── Written answer ── */
+    .written-area { width:100%; min-height:160px; padding:14px 18px; border-radius:12px; background:var(--bg); border:2px solid var(--border); color:var(--fg); font-size:15px; font-family:inherit; line-height:1.7; resize:vertical; outline:none; transition:.2s; box-sizing:border-box; margin-bottom:16px; }
+    .written-area:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(249,115,22,.1); }
+    .mark-scheme { background:rgba(34,197,94,.05); border:1px solid rgba(34,197,94,.15); border-radius:12px; padding:18px 22px; margin-bottom:20px; display:none; }
+    .mark-scheme.show { display:block; }
+    .ms-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#22c55e; margin-bottom:10px; }
+    .ms-body  { font-size:14px; color:var(--fg-dim); line-height:1.75; white-space:pre-wrap; }
+    .self-assess { display:none; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .self-assess.show { display:flex; }
+    .sa-btn { padding:10px 20px; border-radius:9px; font-size:14px; font-weight:700; cursor:pointer; border:none; transition:.15s; }
+    .sa-correct { background:rgba(34,197,94,.15); color:#22c55e; border:1px solid rgba(34,197,94,.25); }
+    .sa-correct:hover { background:rgba(34,197,94,.25); }
+    .sa-wrong   { background:rgba(239,68,68,.1);  color:#f87171; border:1px solid rgba(239,68,68,.2); }
+    .sa-wrong:hover { background:rgba(239,68,68,.18); }
+
+    /* ── Action buttons ── */
+    .action-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .btn-primary { padding:13px 28px; border-radius:10px; font-size:15px; font-weight:800; cursor:pointer; border:none; transition:.2s; background:var(--orange); color:#fff; }
+    .btn-primary:hover { background:#ea580c; }
+    .btn-primary:disabled { opacity:.45; cursor:default; }
+    .btn-secondary { padding:13px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; background:var(--bg-raised); border:1px solid var(--border-hi); color:var(--fg); transition:.15s; }
+    .btn-secondary:hover { background:rgba(255,255,255,.08); }
+
+    /* ── XP pop animation ── */
+    @keyframes xpPop { 0%{opacity:0;transform:translateY(0) scale(.6)} 40%{opacity:1;transform:translateY(-32px) scale(1.2)} 100%{opacity:0;transform:translateY(-64px) scale(1)} }
+    .xp-pop { position:fixed; font-size:18px; font-weight:800; color:#eab308; pointer-events:none; animation:xpPop .9s ease forwards; z-index:9999; }
+
+    /* ── Completion screen ── */
+    .completion { text-align:center; padding:48px 24px; background:var(--bg-card); border:1px solid var(--border); border-radius:20px; }
+    .completion-icon { font-size:64px; margin-bottom:16px; }
+    .completion-title { font-size:26px; font-weight:800; margin-bottom:8px; }
+    .completion-sub   { font-size:15px; color:var(--fg-dim); margin-bottom:28px; }
+    .completion-stats { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:32px; }
+    .c-stat { background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:16px 24px; min-width:100px; }
+    .c-stat-num { font-size:28px; font-weight:800; }
+    .c-stat-lbl { font-size:12px; color:var(--fg-dim); margin-top:4px; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
+    .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
+    .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
+    .toast-show    { transform:translateY(0); opacity:1; }
+
+    @media(max-width:600px) { .page { padding:20px 16px 60px; } .ex-card { padding:22px 20px; } }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="logo-icon">⚒</div>
+      <span class="logo-text">Byte<span>Forge</span></span>
+    </div>
+    <div class="nav-links" id="nav-back-link"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a id="nav-notif-bell" href="../dashboard-student.html#notifications-panel" style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border-hi);text-decoration:none;font-size:16px;transition:.15s" title="Notifications">
+        🔔
+        <span id="nav-notif-dot" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid var(--bg)"></span>
+      </a>
+      <button class="nav-cta" onclick="logout()" style="background:var(--bg-raised);border:1px solid var(--border-hi);color:var(--fg)">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="ex-header">
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <div class="ex-progress-row">
+        <div class="ex-progress-bar"><div class="ex-progress-fill" id="prog-fill" style="width:0%"></div></div>
+        <div class="ex-counter" id="ex-counter">Exercise 1 of 1</div>
+        <div class="xp-badge" id="xp-badge">⚡ 0 XP earned</div>
+      </div>
+    </div>
+
+    <div id="exercise-area"></div>
+  </div>
+
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    const me = requireAuth('student');
+    if (!me) throw new Error('Redirecting');
+
+    // ── Parse URL params ──────────────────────────────────────────────────────
+    const params    = new URLSearchParams(location.search);
+    const classId   = params.get('classId');
+    const exerciseId= params.get('exerciseId');  // single exercise
+    const unitId    = params.get('unitId');       // all exercises in a unit
+
+    if (!classId) location.href = '../dashboard-student.html';
+
+    const cls = BF.classById(classId);
+    if (!cls) location.href = '../dashboard-student.html';
+
+    // ── Build exercise list ───────────────────────────────────────────────────
+    // If unitId → all exercises in that unit
+    // If exerciseId → find that single exercise + siblings from same unit
+    let exercises = [];
+    let startIndex = 0;
+    let unitTitle  = '';
+    let unitObj    = null;
+
+    (cls.units || []).forEach(u => {
+      if (unitId && u.id === unitId) {
+        exercises = u.exercises || [];
+        unitTitle = u.title;
+        unitObj   = u;
+      } else if (exerciseId) {
+        const found = (u.exercises || []).find(e => e.id === exerciseId);
+        if (found) {
+          exercises = u.exercises || [];
+          unitTitle = u.title;
+          unitObj   = u;
+          startIndex = exercises.findIndex(e => e.id === exerciseId);
+          if (startIndex < 0) startIndex = 0;
+        }
+      }
+    });
+
+    // Fallback: single exercise lookup without unit context
+    if (!exercises.length && exerciseId) {
+      (cls.units || []).forEach(u => {
+        (u.exercises || []).forEach(e => {
+          if (e.id === exerciseId) {
+            exercises = [e];
+            unitTitle = u.title;
+            unitObj   = u;
+          }
+        });
+      });
+    }
+
+    if (!exercises.length) {
+      document.getElementById('exercise-area').innerHTML = `
+        <div style="text-align:center;padding:60px;color:var(--fg-dim)">
+          <div style="font-size:40px;margin-bottom:12px">😕</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:8px">Exercise not found</div>
+          <a href="../dashboard-student.html" style="color:var(--orange)">← Back to Dashboard</a>
+        </div>`;
+    }
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let currentIdx   = startIndex;
+    let sessionXP    = 0;
+    let correctCount = 0;
+    let selectedOpt  = null;
+    let answered     = false;
+    const prog = BF.progress(me.id);
+
+    // ── Header setup ─────────────────────────────────────────────────────────
+    document.getElementById('breadcrumb').innerHTML =
+      `<a href="../dashboard-student.html">Dashboard</a> › <a href="../dashboard-student.html">${cls.name}</a> › ${unitTitle}`;
+    document.getElementById('nav-back-link').innerHTML =
+      `<a href="../dashboard-student.html">← Back to class</a>`;
+
+    // ── Render ────────────────────────────────────────────────────────────────
+    function render() {
+      if (currentIdx >= exercises.length) { showCompletion(); return; }
+      const ex = exercises[currentIdx];
+      updateProgress();
+      renderExercise(ex);
+    }
+
+    function updateProgress() {
+      const pct = exercises.length > 1 ? Math.round(currentIdx / exercises.length * 100) : 0;
+      document.getElementById('prog-fill').style.width = pct + '%';
+      document.getElementById('ex-counter').textContent =
+        `Exercise ${currentIdx + 1} of ${exercises.length}`;
+      document.getElementById('xp-badge').textContent = `⚡ ${sessionXP} XP earned`;
+    }
+
+    function renderExercise(ex) {
+      selectedOpt = null;
+      answered    = false;
+      const alreadyDone = (BF.progress(me.id).completedExercises || []).includes(ex.id);
+      const type = (ex.type || '').toLowerCase();
+
+      // Determine display type
+      const isMCQ     = ['mcq','multiple-choice','quiz','binary-cards'].includes(type) && (ex.options || ex.config?.options);
+      const isWritten = ['written','exam-style','short-answer','pseudocode'].includes(type) || (!isMCQ && ex.markScheme);
+
+      const diffDots = '●'.repeat(ex.difficulty || 2) + '○'.repeat(5 - (ex.difficulty || 2));
+      const chipClass = isMCQ ? 'chip-mcq' : isWritten ? 'chip-written' : 'chip-exam';
+      const chipLabel = isMCQ ? '📋 Multiple Choice' : isWritten ? '✍️ Written Answer' : '📝 Exam Style';
+
+      // Get question text — handle both field names
+      const questionText = ex.question || ex.description || ex.questionText || '';
+      const options = ex.options || ex.config?.options || [];
+      const correct = ex.correct !== undefined ? ex.correct
+        : (options.indexOf(ex.config?.answer) >= 0 ? options.indexOf(ex.config?.answer) : 0);
+      const explanation = ex.explanation || ex.config?.explanation || '';
+      const markScheme  = ex.markScheme || ex.mark_scheme || '';
+      const marks       = ex.marks || '';
+
+      let html = `
+        <div class="ex-card">
+          <div class="ex-type-chip ${chipClass}">${chipLabel}</div>
+          <div class="ex-title-main">${ex.title || 'Exercise'}</div>
+          <div class="ex-meta">
+            <span class="meta-pill">${diffDots}</span>
+            <span class="meta-pill">⚡ ${ex.xpReward || ex.xp_reward || 50} XP</span>
+            ${marks ? `<span class="meta-pill">📝 ${marks} marks</span>` : ''}
+            ${alreadyDone ? `<span class="meta-pill" style="color:#22c55e">✓ Completed</span>` : ''}
+          </div>
+          <div class="question-box">${questionText}</div>`;
+
+      if (isMCQ) {
+        html += `<div class="options-grid" id="options-grid">`;
+        options.forEach((opt, i) => {
+          const isCorrectOpt = alreadyDone && i === correct;
+          html += `<button class="opt-btn ${alreadyDone && i === correct ? 'correct' : ''}"
+            id="opt-${i}" onclick="selectOption(${i})" ${alreadyDone ? 'disabled' : ''}>
+            <div class="opt-letter">${String.fromCharCode(65 + i)}</div>
+            <div class="opt-text">${opt}</div>
+          </button>`;
+        });
+        html += `</div>`;
+        html += `<div class="feedback" id="feedback"></div>`;
+        html += `<div class="action-row">
+          <button class="btn-primary" id="submit-btn" onclick="submitMCQ(${correct}, '${encodeURIComponent(explanation)}', ${ex.xpReward || ex.xp_reward || 50}, '${ex.id}')" ${alreadyDone ? 'disabled' : ''}>
+            ${alreadyDone ? '✓ Already Completed' : 'Check Answer'}
+          </button>
+          ${currentIdx < exercises.length - 1
+            ? `<button class="btn-secondary" id="next-btn" onclick="nextExercise()" style="display:${alreadyDone ? '' : 'none'}">Next Exercise →</button>`
+            : `<button class="btn-secondary" id="next-btn" onclick="nextExercise()" style="display:${alreadyDone ? '' : 'none'}">Finish →</button>`}
+        </div>`;
+
+        if (alreadyDone && explanation) {
+          html += `<div class="feedback fb-correct show" style="margin-top:16px">
+            <div class="fb-icon">✅</div>
+            <div class="fb-title">Already completed!</div>
+            <div class="fb-body">${explanation}</div>
+          </div>`;
+        }
+      } else {
+        // Written / exam-style
+        html += `
+          <textarea class="written-area" id="answer-area" placeholder="Write your answer here…" ${alreadyDone ? 'disabled' : ''}>${alreadyDone ? '(Already submitted)' : ''}</textarea>
+          <div class="mark-scheme ${alreadyDone ? 'show' : ''}" id="mark-scheme">
+            <div class="ms-title">📗 Mark Scheme</div>
+            <div class="ms-body">${markScheme || 'No mark scheme provided.'}</div>
+          </div>
+          <div class="self-assess ${alreadyDone ? '' : ''}" id="self-assess" style="display:none">
+            <div style="font-size:14px;font-weight:700;width:100%;margin-bottom:4px">How did you do?</div>
+            <button class="sa-btn sa-correct" onclick="markSelf(true, ${ex.xpReward || ex.xp_reward || 100}, '${ex.id}')">✅ I got it right</button>
+            <button class="sa-btn sa-wrong"   onclick="markSelf(false, 0, '${ex.id}')">❌ I need more practice</button>
+          </div>
+          <div class="action-row" id="written-actions">
+            ${alreadyDone
+              ? `<button class="btn-secondary" onclick="nextExercise()">Next Exercise →</button>`
+              : `<button class="btn-primary" onclick="revealMarkScheme()">👁 Show Mark Scheme</button>`}
+          </div>`;
+      }
+
+      html += `</div>`; // close ex-card
+
+      // Hints
+      if (ex.hints && ex.hints.length && !alreadyDone) {
+        html += `<details style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px">
+          <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--fg-dim)">💡 Hints (${ex.hints.length})</summary>
+          <ol style="margin-top:10px;padding-left:20px">
+            ${ex.hints.map(h => `<li style="font-size:13px;color:var(--fg-dim);margin-bottom:6px">${h}</li>`).join('')}
+          </ol>
+        </details>`;
+      }
+
+      document.getElementById('exercise-area').innerHTML = html;
+    }
+
+    // ── MCQ logic ─────────────────────────────────────────────────────────────
+    function selectOption(idx) {
+      if (answered) return;
+      selectedOpt = idx;
+      document.querySelectorAll('.opt-btn').forEach((b, i) => {
+        b.classList.toggle('selected', i === idx);
+      });
+    }
+
+    function submitMCQ(correct, explanationEncoded, xp, exId) {
+      if (selectedOpt === null) { toast('Please select an answer first', 'error'); return; }
+      answered = true;
+      const explanation = decodeURIComponent(explanationEncoded);
+      const isRight = selectedOpt === correct;
+
+      document.querySelectorAll('.opt-btn').forEach((b, i) => {
+        b.disabled = true;
+        if (i === correct)                      b.classList.add('correct');
+        else if (i === selectedOpt && !isRight) b.classList.add('wrong');
+        b.classList.remove('selected');
+      });
+
+      const fb = document.getElementById('feedback');
+      fb.className = `feedback show ${isRight ? 'fb-correct' : 'fb-wrong'}`;
+      fb.innerHTML = isRight
+        ? `<div class="fb-icon">🎉</div><div class="fb-title">Correct! +${xp} XP</div><div class="fb-body">${explanation}</div>`
+        : `<div class="fb-icon">❌</div><div class="fb-title">Not quite — the correct answer was ${String.fromCharCode(65 + correct)}</div><div class="fb-body">${explanation}</div>`;
+
+      document.getElementById('submit-btn').disabled = true;
+
+      const nextBtn = document.getElementById('next-btn');
+      if (nextBtn) nextBtn.style.display = '';
+
+      if (isRight) {
+        awardXP(xp, exId);
+        popXP(xp);
+        correctCount++;
+      } else {
+        // Still record attempt so they can progress
+        BF.recordAttempt(me.id, exId, { passed: false, score: 0 });
+      }
+    }
+
+    // ── Written logic ─────────────────────────────────────────────────────────
+    function revealMarkScheme() {
+      const area = document.getElementById('answer-area');
+      if (!area.value.trim()) { toast('Write something first!', 'error'); return; }
+      document.getElementById('mark-scheme').classList.add('show');
+      document.getElementById('written-actions').innerHTML = '';
+      document.getElementById('self-assess').style.display = 'flex';
+    }
+
+    function markSelf(correct, xp, exId) {
+      document.getElementById('self-assess').style.display = 'none';
+      const msg = correct
+        ? `<div style="color:#22c55e;font-weight:700;font-size:14px;margin-bottom:12px">✅ Great work! +${xp} XP</div>`
+        : `<div style="color:#f87171;font-weight:700;font-size:14px;margin-bottom:12px">Keep practising — review the mark scheme carefully.</div>`;
+
+      document.getElementById('written-actions').innerHTML = msg +
+        `<button class="btn-secondary" onclick="nextExercise()">
+          ${currentIdx < exercises.length - 1 ? 'Next Exercise →' : 'Finish →'}
+        </button>`;
+
+      if (correct) {
+        awardXP(xp, exId); // awardXP already calls recordAttempt(passed:true) — don't double-record
+        popXP(xp);
+        correctCount++;
+      } else {
+        BF.recordAttempt(me.id, exId, { passed: false, score: 40 });
+      }
+    }
+
+    // ── XP & completion ───────────────────────────────────────────────────────
+    function awardXP(amount, exId) {
+      const result = BF.addXP(me.id, amount);
+      if (exId) {
+        const p = BF.progress(me.id);
+        const already = (p.completedExercises || []).includes(exId);
+        if (!already) {
+          BF.recordAttempt(me.id, exId, { passed: true, score: 100 });
+        }
+      }
+      sessionXP += amount;
+      updateProgress();
+    }
+
+    function popXP(amount) {
+      const el = document.createElement('div');
+      el.className = 'xp-pop';
+      el.textContent = `+${amount} XP!`;
+      el.style.left  = (window.innerWidth / 2 - 40) + 'px';
+      el.style.top   = (window.innerHeight / 2) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1000);
+    }
+
+    function nextExercise() {
+      currentIdx++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      render();
+    }
+
+    function showCompletion() {
+      const total    = exercises.length;
+      const pct      = total > 0 ? Math.round(correctCount / total * 100) : 0;
+      const emoji    = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '📚';
+      const message  = pct >= 80 ? 'Excellent work!' : pct >= 50 ? 'Good effort!' : 'Keep practising!';
+
+      document.getElementById('prog-fill').style.width = '100%';
+      document.getElementById('ex-counter').textContent = 'All done!';
+      document.getElementById('xp-badge').textContent = `⚡ +${sessionXP} XP total`;
+
+      document.getElementById('exercise-area').innerHTML = `
+        <div class="completion">
+          <div class="completion-icon">${emoji}</div>
+          <div class="completion-title">${message}</div>
+          <div class="completion-sub">${cls.name} · ${unitTitle}</div>
+          <div class="completion-stats">
+            <div class="c-stat">
+              <div class="c-stat-num" style="color:#22c55e">${correctCount}</div>
+              <div class="c-stat-lbl">Correct</div>
+            </div>
+            <div class="c-stat">
+              <div class="c-stat-num">${total}</div>
+              <div class="c-stat-lbl">Total</div>
+            </div>
+            <div class="c-stat">
+              <div class="c-stat-num" style="color:#eab308">${sessionXP}</div>
+              <div class="c-stat-lbl">XP Earned</div>
+            </div>
+            <div class="c-stat">
+              <div class="c-stat-num" style="color:var(--orange)">${pct}%</div>
+              <div class="c-stat-lbl">Score</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <a href="../dashboard-student.html" class="btn-primary" style="text-decoration:none;padding:13px 28px;border-radius:10px;font-size:15px;font-weight:800;background:var(--orange);color:#fff">
+              ← Back to Dashboard
+            </a>
+            ${pct < 80 && total > 0 ? `<button class="btn-secondary" onclick="restartQuiz()">🔄 Try Again</button>` : ''}
+          </div>
+        </div>`;
+
+      if (sessionXP > 0) confetti();
+    }
+
+    function restartQuiz() {
+      currentIdx   = startIndex;
+      sessionXP    = 0;
+      correctCount = 0;
+      selectedOpt  = null;
+      answered     = false;
+      render();
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    // Notification bell badge
+    try {
+      const unseen = BF.getUnseenCount(me.id);
+      if (unseen > 0) { const d = document.getElementById('nav-notif-dot'); if (d) d.style.display = 'block'; }
+    } catch(e) {}
+
+    if (exercises.length) render();
+  </script>
+</body>
+</html>

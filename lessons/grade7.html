@@ -1,0 +1,1158 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Grade 7 Block + Code</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <!-- CodeMirror 5 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <!-- Blockly 10 -->
+  <script src="https://unpkg.com/blockly@10.4.3/blockly_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/blocks_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/javascript_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/python_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/msg/en.js"></script>
+  <!-- CodeMirror Python mode -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { padding-top:64px; background:var(--bg); color:var(--fg); height:100vh; overflow:hidden; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      height: calc(100vh - 64px);
+      overflow: hidden;
+    }
+
+    /* ── Left: Blockly ── */
+    .blocks-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
+    .panel-header  { padding:11px 16px; background:var(--bg-card); border-bottom:1px solid var(--border);
+                     display:flex; align-items:center; justify-content:space-between; gap:10px; flex-shrink:0; }
+    .panel-title   { font-size:13px; font-weight:700; }
+    .grade-badge   { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+                     background:rgba(99,102,241,.15); color:#818cf8; border:1px solid rgba(99,102,241,.3); }
+    .btn-row { display:flex; gap:6px; }
+    .btn { padding:6px 13px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;
+           transition:.15s; border:none; }
+    .btn-brand  { background:#b8ef4a; color:#0d0f1a; }
+    .btn-brand:hover { background:#a5d83d; }
+    .btn-ghost  { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover { background:rgba(255,255,255,.08); }
+    .btn-danger { background:rgba(239,68,68,.1); color:#f87171; border:1px solid rgba(239,68,68,.25); }
+    .btn-danger:hover { background:rgba(239,68,68,.18); }
+    .btn-stop   { background:rgba(239,68,68,.1); color:#f87171; border:1px solid rgba(239,68,68,.25); display:none; }
+    .btn-stop:hover { background:rgba(239,68,68,.18); }
+    #blockly-div { flex:1; min-height:0; }
+
+    /* ── Right panel ── */
+    .right-panel { display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Challenge header */
+    .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px; }
+    .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
+                 border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
+    .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
+    .ch-pill.active { background:rgba(99,102,241,.12); border-color:#818cf8; color:#818cf8; }
+    .ch-pill.done   { background:rgba(34,197,94,.08); border-color:rgba(34,197,94,.35); color:#4ade80; }
+    .ch-row    { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .ch-text   { font-size:11.5px; color:var(--fg-dim); line-height:1.5; flex:1; }
+    .ch-text strong { color:var(--fg); }
+    .ch-meta   { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .xp-pill   { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
+                 background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); }
+    .hint-btn  { font-size:11px; color:#fbbf24; cursor:pointer; }
+
+    /* Canvas */
+    .canvas-wrap { flex-shrink:0; background:#030510; border-bottom:1px solid var(--border);
+                   display:flex; align-items:center; justify-content:center; height:260px; position:relative; }
+    #output-canvas { display:block; }
+    .pass-badge { position:absolute; top:8px; left:50%; transform:translateX(-50%);
+                  padding:5px 13px; border-radius:8px; font-size:12px; font-weight:700;
+                  background:rgba(34,197,94,.2); border:1px solid rgba(34,197,94,.5); color:#4ade80; display:none; }
+    .canvas-overlay-btns { position:absolute; top:8px; right:10px; display:flex; gap:5px; }
+
+    /* Sync indicator bar */
+    .sync-bar { flex-shrink:0; padding:6px 14px; background:var(--bg-card); border-bottom:1px solid var(--border);
+                display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .sync-dot  { width:8px; height:8px; border-radius:50%; flex-shrink:0; transition:.3s; }
+    .sync-dot.synced { background:#4ade80; box-shadow:0 0 6px #4ade8060; }
+    .sync-dot.text   { background:#fbbf24; box-shadow:0 0 6px #fbbf2460; }
+    .sync-label { font-size:11px; color:var(--fg-dim); }
+    .sync-label strong { color:var(--fg); font-weight:600; }
+    .sync-reset { font-size:11px; color:#818cf8; cursor:pointer; display:none; }
+    .sync-reset:hover { text-decoration:underline; }
+
+    /* CodeMirror container */
+    .editor-wrap { flex:1; overflow:hidden; display:flex; flex-direction:column; min-height:0; }
+    .editor-header { flex-shrink:0; padding:6px 14px; background:var(--bg); border-bottom:1px solid var(--border);
+                     display:flex; justify-content:space-between; align-items:center; }
+    .editor-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-faint); }
+    .cm-wrap { flex:1; overflow:hidden; }
+    .cm-wrap .CodeMirror { height:100%; font-size:12px !important; font-family:var(--mono) !important;
+                           background:#060910 !important; }
+    .cm-wrap .CodeMirror-scroll { background:#060910 !important; }
+
+    /* Output bar */
+    .out-bar { flex-shrink:0; padding:6px 14px; background:#040710; border-top:1px solid var(--border);
+               font-family:var(--mono); font-size:11px; max-height:72px; overflow-y:auto; }
+    .out-line { color:#6b7280; margin-bottom:2px; }
+    .out-line.ok   { color:#4ade80; }
+    .out-line.err  { color:#f87171; }
+    .out-line.info { color:#b8ef4a; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(60px);
+             padding:10px 20px; border-radius:10px; font-size:13px; font-weight:600;
+             background:#1a2e1a; color:#bbf7d0; border:1px solid #16a34a;
+             opacity:0; transition:.3s; z-index:9999; pointer-events:none; }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    /* Blockly theme */
+    .blocklyMainBackground { fill:#0c0f18 !important; }
+
+    /* Challenge lock */
+    .ch-pill.locked { opacity:0.35; cursor:not-allowed !important; }
+
+    /* Language tabs */
+    .lang-tabs { display:flex; }
+    .lang-tab  { padding:3px 11px; font-size:11px; font-weight:700; cursor:pointer;
+                 border:1px solid var(--border); color:var(--fg-faint); background:var(--bg);
+                 transition:.15s; }
+    .lang-tab:first-child { border-radius:6px 0 0 6px; }
+    .lang-tab:last-child  { border-radius:0 6px 6px 0; margin-left:-1px; }
+    .lang-tab.active { background:rgba(99,102,241,.15); color:#818cf8; border-color:#818cf8; z-index:1; }
+    .lang-tab:hover:not(.active) { color:var(--fg); border-color:var(--border-hi); }
+
+    /* AI buttons */
+    .ai-btn { padding:3px 9px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;
+              border:1px solid rgba(168,85,247,.35); color:#c084fc; background:rgba(168,85,247,.08); transition:.15s; }
+    .ai-btn:hover:not(:disabled) { background:rgba(168,85,247,.18); }
+    .ai-btn:disabled { opacity:.45; cursor:not-allowed; }
+
+    /* Pass / fail inline badges */
+    .check-fail { color:#f87171; background:rgba(239,68,68,.07); border:1px solid rgba(239,68,68,.2);
+                  border-radius:6px; padding:2px 8px; font-size:11px; font-weight:600; }
+  </style>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/lesson-saves.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">ByteForge</span>
+  </div>
+  <div class="nav-links"><a href="../dashboard-student.html">← Dashboard</a></div>
+</nav>
+
+<div class="layout">
+
+  <!-- Left: Blockly -->
+  <div class="blocks-panel">
+    <div class="panel-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="panel-title">Block + Code</span>
+        <span class="grade-badge">Grade 7</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="clearWorkspace()">Clear</button>
+        <button class="btn btn-ghost"  onclick="undoBlocks()">Undo</button>
+        <button class="btn btn-stop"   id="stop-btn" onclick="stopLoop()">■ Stop</button>
+        <button class="btn btn-brand"  id="run-btn"  onclick="runCode()">▶ Run</button>
+      </div>
+    </div>
+    <div id="blockly-div"></div>
+  </div>
+
+  <!-- Right -->
+  <div class="right-panel">
+
+    <!-- Challenge bar -->
+    <div class="ch-header">
+      <div class="ch-pills" id="ch-pills"></div>
+      <div class="ch-row">
+        <div class="ch-text"  id="ch-text">Select a challenge above.</div>
+        <div class="ch-meta">
+          <span class="xp-pill" id="xp-pill">+30 XP</span>
+          <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap">
+      <canvas id="output-canvas" width="480" height="260"></canvas>
+      <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
+    </div>
+
+    <!-- Sync indicator -->
+    <div class="sync-bar">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div class="sync-dot synced" id="sync-dot"></div>
+        <span class="sync-label" id="sync-label"><strong>Blocks → Code</strong> — editing in text mode unlocks the code editor</span>
+      </div>
+      <span class="sync-reset" id="sync-reset" onclick="resetToBlocks()">← Sync from blocks</span>
+    </div>
+
+    <!-- CodeMirror -->
+    <div class="editor-wrap">
+      <div class="editor-header">
+        <div class="lang-tabs">
+          <div class="lang-tab active" id="lang-js" onclick="switchLang('js')">JS</div>
+          <div class="lang-tab"        id="lang-py" onclick="switchLang('py')">Python</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span id="ai-status" style="font-size:10px;color:var(--fg-faint);display:none">🤖 Thinking…</span>
+          <button class="ai-btn" id="ai-btn" onclick="checkWithAI()">🤖 Check with AI</button>
+        </div>
+      </div>
+      <div class="cm-wrap">
+        <textarea id="cm-textarea"></textarea>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="out-bar" id="out-bar">
+      <div class="out-line info">Ready — build with blocks, then press Run.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Blockly toolbox -->
+<xml id="toolbox" style="display:none">
+  <category name="Events" colour="#6366f1">
+    <block type="event_on_start"></block>
+    <block type="event_on_update"></block>
+  </category>
+  <category name="Draw" colour="#f97316">
+    <block type="canvas_clear"></block>
+    <block type="canvas_background"></block>
+    <block type="canvas_rect">
+      <value name="X"><shadow type="math_number"><field name="NUM">100</field></shadow></value>
+      <value name="Y"><shadow type="math_number"><field name="NUM">100</field></shadow></value>
+      <value name="W"><shadow type="math_number"><field name="NUM">80</field></shadow></value>
+      <value name="H"><shadow type="math_number"><field name="NUM">50</field></shadow></value>
+    </block>
+    <block type="canvas_circle">
+      <value name="X"><shadow type="math_number"><field name="NUM">240</field></shadow></value>
+      <value name="Y"><shadow type="math_number"><field name="NUM">130</field></shadow></value>
+      <value name="R"><shadow type="math_number"><field name="NUM">40</field></shadow></value>
+    </block>
+    <block type="canvas_line">
+      <value name="X1"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+      <value name="Y1"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+      <value name="X2"><shadow type="math_number"><field name="NUM">480</field></shadow></value>
+      <value name="Y2"><shadow type="math_number"><field name="NUM">260</field></shadow></value>
+    </block>
+    <block type="canvas_text_draw">
+      <value name="STR"><shadow type="text"><field name="TEXT">Hello!</field></shadow></value>
+      <value name="X"><shadow type="math_number"><field name="NUM">100</field></shadow></value>
+      <value name="Y"><shadow type="math_number"><field name="NUM">130</field></shadow></value>
+    </block>
+  </category>
+  <category name="Color" colour="#ec4899">
+    <!-- plain colour picker -->
+    <block type="canvas_fill_picker"></block>
+    <!-- rgb with number shadows — type fixed values -->
+    <block type="canvas_fill_rgb">
+      <value name="R"><shadow type="math_number"><field name="NUM">180</field></shadow></value>
+      <value name="G"><shadow type="math_number"><field name="NUM">239</field></shadow></value>
+      <value name="B"><shadow type="math_number"><field name="NUM">74</field></shadow></value>
+    </block>
+    <!-- rgb template with variable getters pre-connected (shortcut for animating colour) -->
+    <!-- drag this out → creates r, g, b variables automatically; use "change r by 1" to animate -->
+    <block type="canvas_fill_rgb">
+      <value name="R"><block type="variables_get"><field name="VAR">r</field></block></value>
+      <value name="G"><block type="variables_get"><field name="VAR">g</field></block></value>
+      <value name="B"><block type="variables_get"><field name="VAR">b</field></block></value>
+    </block>
+    <block type="canvas_stroke_picker"></block>
+    <block type="canvas_font_size"><value name="SIZE"><shadow type="math_number"><field name="NUM">20</field></shadow></value></block>
+  </category>
+  <category name="Mouse" colour="#06b6d4">
+    <block type="canvas_mouse_x"></block>
+    <block type="canvas_mouse_y"></block>
+  </category>
+  <category name="Keyboard" colour="#a855f7">
+    <block type="canvas_is_key"></block>
+  </category>
+  <category name="Control" colour="#22c55e">
+    <block type="controls_if"></block>
+    <block type="controls_ifelse"></block>
+    <block type="controls_repeat_ext"><value name="TIMES"><shadow type="math_number"><field name="NUM">4</field></shadow></value></block>
+    <block type="controls_whileUntil"></block>
+  </category>
+  <category name="Logic" colour="#3b82f6">
+    <block type="logic_compare">
+      <value name="A"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+      <value name="B"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+    </block>
+    <block type="logic_operation"></block>
+    <block type="logic_negate"></block>
+    <block type="logic_boolean"></block>
+  </category>
+  <category name="Variables" colour="#8b5cf6" custom="VARIABLE"></category>
+  <category name="Math" colour="#eab308">
+    <!-- change [var] by [n] — shortcut for set x to x + n -->
+    <block type="math_change">
+      <value name="DELTA"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <!-- number literal — drag onto any "to" slot to replace the shadow 0 -->
+    <block type="math_number"><field name="NUM">10</field></block>
+    <!-- arithmetic: + − × ÷, pre-filled so it snaps in ready to use -->
+    <block type="math_arithmetic">
+      <field name="OP">ADD</field>
+      <value name="A"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+      <value name="B"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="math_arithmetic">
+      <field name="OP">MINUS</field>
+      <value name="A"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+      <value name="B"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+    </block>
+    <block type="math_arithmetic">
+      <field name="OP">MULTIPLY</field>
+      <value name="A"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+      <value name="B"><shadow type="math_number"><field name="NUM">2</field></shadow></value>
+    </block>
+    <block type="math_arithmetic">
+      <field name="OP">DIVIDE</field>
+      <value name="A"><shadow type="math_number"><field name="NUM">10</field></shadow></value>
+      <value name="B"><shadow type="math_number"><field name="NUM">2</field></shadow></value>
+    </block>
+    <!-- random integer between two values -->
+    <block type="math_random_int">
+      <value name="FROM"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+      <value name="TO"><shadow type="math_number"><field name="NUM">255</field></shadow></value>
+    </block>
+    <!-- remainder / modulo -->
+    <block type="math_modulo">
+      <value name="DIVIDEND"><shadow type="math_number"><field name="NUM">10</field></shadow></value>
+      <value name="DIVISOR"><shadow type="math_number"><field name="NUM">3</field></shadow></value>
+    </block>
+    <!-- round / floor / ceiling -->
+    <block type="math_round">
+      <value name="NUM"><shadow type="math_number"><field name="NUM">3.7</field></shadow></value>
+    </block>
+    <!-- clamp a value between min and max — great for colour channels 0-255 -->
+    <block type="math_constrain">
+      <value name="VALUE"><shadow type="math_number"><field name="NUM">100</field></shadow></value>
+      <value name="LOW"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+      <value name="HIGH"><shadow type="math_number"><field name="NUM">255</field></shadow></value>
+    </block>
+  </category>
+  <category name="Text" colour="#64748b">
+    <block type="text"></block>
+    <block type="text_join"></block>
+    <block type="text_length"></block>
+  </category>
+</xml>
+
+<script>
+'use strict'
+
+// ── Custom Block Definitions ──────────────────────────────────────────────────
+Blockly.defineBlocksWithJsonArray([
+  // Events
+  {
+    type:'event_on_start',
+    message0:'▶ On start %1',
+    args0:[{type:'input_statement', name:'DO'}],
+    colour:'#6366f1',
+    tooltip:'Code inside runs once when you press Run.',
+  },
+  {
+    type:'event_on_update',
+    message0:'↻ On every frame %1',
+    args0:[{type:'input_statement', name:'DO'}],
+    colour:'#6366f1',
+    tooltip:'Code inside runs 60 times per second — use for animations!',
+  },
+  // Draw
+  {
+    type:'canvas_clear',
+    message0:'clear canvas',
+    previousStatement:null, nextStatement:null,
+    colour:'#ea580c',
+    tooltip:'Wipes the canvas so you can redraw from scratch.',
+  },
+  {
+    // Use field_colour (inline picker) so there is no type-mismatch with a
+    // colour_picker shadow block — that mismatch caused the floating black
+    // circle in the flyout and the broken-connection indicator on the block.
+    type:'canvas_background',
+    message0:'set background colour %1',
+    args0:[{type:'field_colour', name:'COLOR', colour:'#1a1a2e'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#ea580c',
+    tooltip:'Fill the whole canvas with this background colour.',
+  },
+  {
+    type:'canvas_rect',
+    message0:'draw rectangle  x %1  y %2  width %3  height %4',
+    args0:[
+      {type:'input_value', name:'X',  check:'Number'},
+      {type:'input_value', name:'Y',  check:'Number'},
+      {type:'input_value', name:'W',  check:'Number'},
+      {type:'input_value', name:'H',  check:'Number'},
+    ],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#ea580c',
+  },
+  {
+    type:'canvas_circle',
+    message0:'draw circle  x %1  y %2  radius %3',
+    args0:[
+      {type:'input_value', name:'X', check:'Number'},
+      {type:'input_value', name:'Y', check:'Number'},
+      {type:'input_value', name:'R', check:'Number'},
+    ],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#ea580c',
+  },
+  {
+    type:'canvas_line',
+    message0:'draw line  from (%1 , %2)  to (%3 , %4)',
+    args0:[
+      {type:'input_value', name:'X1', check:'Number'},
+      {type:'input_value', name:'Y1', check:'Number'},
+      {type:'input_value', name:'X2', check:'Number'},
+      {type:'input_value', name:'Y2', check:'Number'},
+    ],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#ea580c',
+  },
+  {
+    type:'canvas_text_draw',
+    message0:'draw text %1  at x %2  y %3',
+    args0:[
+      {type:'input_value', name:'STR'},
+      {type:'input_value', name:'X', check:'Number'},
+      {type:'input_value', name:'Y', check:'Number'},
+    ],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#ea580c',
+  },
+  // Color
+  {
+    type:'canvas_fill_picker',
+    message0:'set fill color %1',
+    args0:[{type:'field_colour', name:'COLOR', colour:'#b8ef4a'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#db2777',
+  },
+  {
+    type:'canvas_fill_rgb',
+    message0:'set fill  red %1  green %2  blue %3',
+    args0:[
+      {type:'input_value', name:'R', check:'Number'},
+      {type:'input_value', name:'G', check:'Number'},
+      {type:'input_value', name:'B', check:'Number'},
+    ],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#db2777',
+    tooltip:'Set the fill color using red, green, blue values (0–255).',
+  },
+  {
+    type:'canvas_stroke_picker',
+    message0:'set stroke (outline) %1',
+    args0:[{type:'field_colour', name:'COLOR', colour:'#ffffff'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#db2777',
+  },
+  {
+    type:'canvas_font_size',
+    message0:'set text size %1',
+    args0:[{type:'input_value', name:'SIZE', check:'Number'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#db2777',
+  },
+  // Mouse values
+  {
+    type:'canvas_mouse_x',
+    message0:'mouse X',
+    output:'Number',
+    colour:'#0891b2',
+    tooltip:'The current horizontal position of the mouse.',
+  },
+  {
+    type:'canvas_mouse_y',
+    message0:'mouse Y',
+    output:'Number',
+    colour:'#0891b2',
+    tooltip:'The current vertical position of the mouse.',
+  },
+  // Keyboard
+  {
+    type:'canvas_is_key',
+    message0:'key %1 is pressed?',
+    args0:[{
+      type:'field_dropdown', name:'KEY',
+      options:[
+        ['← left',   'ArrowLeft'],
+        ['→ right',  'ArrowRight'],
+        ['↑ up',     'ArrowUp'],
+        ['↓ down',   'ArrowDown'],
+        ['Space',    ' '],
+        ['W',  'w'], ['A', 'a'], ['S', 's'], ['D', 'd'],
+        ['Enter', 'Enter'],
+      ],
+    }],
+    output:'Boolean',
+    colour:'#9333ea',
+    tooltip:'Returns true if the chosen key is currently held down.',
+  },
+])
+
+// ── JavaScript Code Generators ────────────────────────────────────────────────
+const jsGen = Blockly.JavaScript
+
+jsGen.forBlock['event_on_start']     = (b,g) => g.statementToCode(b,'DO')
+jsGen.forBlock['event_on_update']    = (b,g) => `function update() {\n${g.statementToCode(b,'DO')}}\n`
+jsGen.forBlock['canvas_clear']       = ()    => `clear();\n`
+jsGen.forBlock['canvas_background']  = (b)   => `background('${b.getFieldValue('COLOR')}');\n`
+jsGen.forBlock['canvas_rect']        = (b,g) => `rect(${v(b,g,'X',0)},${v(b,g,'Y',0)},${v(b,g,'W',80)},${v(b,g,'H',50)});\n`
+jsGen.forBlock['canvas_circle']      = (b,g) => `circle(${v(b,g,'X',240)},${v(b,g,'Y',130)},${v(b,g,'R',40)});\n`
+jsGen.forBlock['canvas_line']        = (b,g) => `line(${v(b,g,'X1',0)},${v(b,g,'Y1',0)},${v(b,g,'X2',480)},${v(b,g,'Y2',260)});\n`
+jsGen.forBlock['canvas_text_draw']   = (b,g) => `text(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Hello'"},${v(b,g,'X',0)},${v(b,g,'Y',0)});\n`
+jsGen.forBlock['canvas_fill_picker'] = (b)   => `fill('${b.getFieldValue('COLOR')}');\n`
+jsGen.forBlock['canvas_fill_rgb']    = (b,g) => `fillRGB(${v(b,g,'R',180)},${v(b,g,'G',239)},${v(b,g,'B',74)});\n`
+jsGen.forBlock['canvas_stroke_picker']= (b)  => `stroke('${b.getFieldValue('COLOR')}');\n`
+jsGen.forBlock['canvas_font_size']   = (b,g) => `fontSize(${v(b,g,'SIZE',20)});\n`
+jsGen.forBlock['canvas_mouse_x']     = ()    => [`mouseX()`, jsGen.ORDER_FUNCTION_CALL]
+jsGen.forBlock['canvas_mouse_y']     = ()    => [`mouseY()`, jsGen.ORDER_FUNCTION_CALL]
+jsGen.forBlock['canvas_is_key']      = (b)   => [`isKeyDown('${b.getFieldValue('KEY')}')`, jsGen.ORDER_FUNCTION_CALL]
+
+function v(b,g,name,def) { return g.valueToCode(b,name,g.ORDER_NONE)||def }
+
+// ── Blockly Workspace ─────────────────────────────────────────────────────────
+const workspace = Blockly.inject('blockly-div', {
+  toolbox: document.getElementById('toolbox'),
+  theme: Blockly.Theme.defineTheme('byteforge7', {
+    base: Blockly.Themes.Dark,
+    componentStyles: {
+      workspaceBackgroundColour: '#0c0f18',
+      toolboxBackgroundColour:   '#10132a',
+      toolboxForegroundColour:   '#d1d5db',
+      flyoutBackgroundColour:    '#10132a',
+      flyoutForegroundColour:    '#d1d5db',
+      flyoutOpacity: 1,
+    },
+  }),
+  renderer:    'zelos',
+  scrollbars:  true,
+  trashcan:    true,
+  zoom:        { controls:true, wheel:true, startScale:0.85 },
+  grid:        { spacing:24, length:6, colour:'rgba(255,255,255,.05)', snap:true },
+})
+
+// Force Blockly to recalculate its size after the flex layout has settled.
+// Without this, the flyout can be mis-sized (or clipped) on first open.
+requestAnimationFrame(() => {
+  Blockly.svgResize(workspace)
+  // ResizeObserver keeps it correct whenever the panel is resized later
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => Blockly.svgResize(workspace))
+      .observe(document.getElementById('blockly-div'))
+  }
+})
+
+// ── CodeMirror ────────────────────────────────────────────────────────────────
+const editor = CodeMirror.fromTextArea(document.getElementById('cm-textarea'), {
+  mode:        'javascript',
+  theme:       'dracula',
+  lineNumbers:  true,
+  indentUnit:   2,
+  tabSize:      2,
+  lineWrapping: false,
+  extraKeys:    { Tab: cm => cm.execCommand('indentMore') },
+})
+
+editor.setValue('// Build something with blocks on the left.\n// The code will appear here automatically.\n// You can also type here directly!')
+
+// Sync state
+let textMode = false
+
+function setSyncState(state) {
+  const dot   = document.getElementById('sync-dot')
+  const lbl   = document.getElementById('sync-label')
+  const reset = document.getElementById('sync-reset')
+  dot.className  = 'sync-dot ' + state
+  if (state === 'synced') {
+    lbl.innerHTML   = '<strong>Blocks → Code</strong> — your blocks are shown as JavaScript below'
+    reset.style.display = 'none'
+  } else {
+    lbl.innerHTML   = '<strong>Text mode</strong> — you\'re editing code directly (blocks paused)'
+    reset.style.display = 'block'
+  }
+}
+
+// Blockly → CodeMirror live sync
+workspace.addChangeListener(e => {
+  if (textMode) return
+  try {
+    const js = Blockly.JavaScript.workspaceToCode(workspace).trim()
+    editor.setValue(js || '// Start by dragging blocks from the left panel')
+    setSyncState('synced')
+  } catch(_) {}
+})
+
+// CodeMirror edit → switch to text mode
+editor.on('change', (cm, change) => {
+  if (change.origin === 'setValue') return
+  if (!textMode) { textMode = true; setSyncState('text') }
+})
+
+function resetToBlocks() {
+  textMode = false
+  try {
+    const js = Blockly.JavaScript.workspaceToCode(workspace).trim()
+    editor.setValue(js || '// Start by dragging blocks from the left panel')
+  } catch(_) {}
+  setSyncState('synced')
+}
+
+// ── Canvas Drawing API ────────────────────────────────────────────────────────
+const canvas = document.getElementById('output-canvas')
+const ctx    = canvas.getContext('2d')
+const W = canvas.width, H = canvas.height
+
+let _fill    = '#b8ef4a'
+let _stroke  = 'none'
+let _lw      = 2
+let _font    = '18px Plus Jakarta Sans, sans-serif'
+let _fontSize= 18
+let _mX = W/2, _mY = H/2
+const pressedKeys = new Set()
+
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect()
+  _mX = e.clientX - r.left
+  _mY = e.clientY - r.top
+})
+window.addEventListener('keydown', e => pressedKeys.add(e.key))
+window.addEventListener('keyup',   e => pressedKeys.delete(e.key))
+
+function applyFill()   { ctx.fillStyle = _fill }
+function applyStroke() {
+  if (_stroke !== 'none') { ctx.strokeStyle = _stroke; ctx.lineWidth = _lw }
+}
+
+const drawingAPI = {
+  rect(x,y,w,h) {
+    applyFill(); ctx.fillRect(x,y,w,h)
+    if (_stroke !== 'none') { applyStroke(); ctx.strokeRect(x,y,w,h) }
+  },
+  circle(x,y,r) {
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2)
+    applyFill(); ctx.fill()
+    if (_stroke !== 'none') { applyStroke(); ctx.stroke() }
+  },
+  line(x1,y1,x2,y2) {
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2)
+    ctx.strokeStyle = _stroke !== 'none' ? _stroke : _fill
+    ctx.lineWidth = _lw; ctx.stroke()
+  },
+  text(str,x,y) {
+    ctx.font = _font; applyFill(); ctx.fillText(String(str),x,y)
+  },
+  fill(color)   { _fill = color },
+  fillRGB(r,g,b){ _fill = `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})` },
+  stroke(color) { _stroke = color },
+  fontSize(n)   { _fontSize = n; _font = `${n}px Plus Jakarta Sans, sans-serif` },
+  clear()       { ctx.clearRect(0,0,W,H) },
+  background(c) { const old = ctx.fillStyle; ctx.fillStyle = c; ctx.fillRect(0,0,W,H); ctx.fillStyle = old },
+  mouseX()      { return _mX },
+  mouseY()      { return _mY },
+  isKeyDown(k)  { return pressedKeys.has(k) },
+  random(a,b)   { return Math.random()*(b-a)+a },
+  floor: Math.floor,
+  abs:   Math.abs,
+  sin:   Math.sin,
+  cos:   Math.cos,
+  WIDTH:  W,
+  HEIGHT: H,
+  print(...args){ log(args.join(' ')) },
+}
+
+function resetDrawState() {
+  _fill   = '#b8ef4a'
+  _stroke = 'none'
+  _lw     = 2
+  _fontSize = 18
+  _font   = '18px Plus Jakarta Sans, sans-serif'
+}
+
+// ── Initial canvas placeholder ────────────────────────────────────────────────
+// Draws a subtle guide so users can see where their output will appear.
+function drawCanvasPlaceholder() {
+  ctx.fillStyle = '#0c0f1a'
+  ctx.fillRect(0, 0, W, H)
+  // Dashed border
+  ctx.setLineDash([6, 4])
+  ctx.strokeStyle = 'rgba(99,102,241,0.25)'
+  ctx.lineWidth = 1.5
+  ctx.strokeRect(10, 10, W - 20, H - 20)
+  ctx.setLineDash([])
+  // Label
+  ctx.fillStyle = 'rgba(99,102,241,0.35)'
+  ctx.font = '13px monospace'
+  ctx.textAlign = 'center'
+  ctx.fillText('Canvas output — drag Draw blocks and press ▶ Run', W/2, H/2 - 8)
+  ctx.fillStyle = 'rgba(99,102,241,0.2)'
+  ctx.font = '11px monospace'
+  ctx.fillText('e.g.  fill colour → draw circle  →  ▶ Run', W/2, H/2 + 14)
+  ctx.textAlign = 'left'
+}
+drawCanvasPlaceholder()
+
+// ── Execution Engine ──────────────────────────────────────────────────────────
+let rafId      = null
+let loopActive = false
+
+function stopLoop() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null }
+  loopActive = false
+  document.getElementById('stop-btn').style.display = 'none'
+  document.getElementById('run-btn').style.display  = ''
+}
+
+function runCode() {
+  stopLoop()
+  resetDrawState()
+  ctx.clearRect(0,0,W,H)
+  document.getElementById('pass-badge').style.display = 'none'
+
+  const code = editor.getValue()
+  if (!code.trim() || code.startsWith('// Start by dragging')) {
+    log('No code yet — drag some blocks!', 'info'); return
+  }
+
+  // Detect animation: code contains "function update("
+  const isAnimated = /\bfunction\s+update\s*\(/.test(code)
+
+  const scopeKeys = Object.keys(drawingAPI)
+  const scopeVals = Object.values(drawingAPI)
+
+  if (isAnimated) {
+    // Inject a capture hook so we can grab the update function reference
+    const captureCode = code + '\n; if(typeof update==="function")__captureUpdate__(update);'
+    let updateFn = null
+    const extAPI = { ...drawingAPI, __captureUpdate__: fn => { updateFn = fn } }
+    try {
+      new Function(...Object.keys(extAPI), captureCode)(...Object.values(extAPI))
+    } catch(e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
+
+    if (!updateFn) { log('No update() function found.', 'err'); return }
+
+    loopActive = true
+    document.getElementById('stop-btn').style.display = ''
+    document.getElementById('run-btn').style.display  = 'none'
+    log('Animation running — press ■ Stop to halt.', 'ok')
+
+    let execLog = { frames:0, rects:0, circles:0 }
+    const autoClear = true  // could expose as checkbox later
+
+    // Wrap drawing API to count draw calls for validation
+    const monitoredAPI = { ...drawingAPI }
+    const origRect   = drawingAPI.rect.bind(drawingAPI)
+    const origCircle = drawingAPI.circle.bind(drawingAPI)
+    monitoredAPI.rect   = (...a) => { execLog.rects++;   origRect(...a)   }
+    monitoredAPI.circle = (...a) => { execLog.circles++; origCircle(...a) }
+
+    function loop() {
+      if (!loopActive) return
+      if (autoClear) { ctx.clearRect(0,0,W,H) }
+      execLog.frames++
+      try { updateFn() } catch(e) { log('Runtime error: ' + friendlyErr(e.message), 'err'); stopLoop(); return }
+      checkChallenge(execLog)
+      rafId = requestAnimationFrame(loop)
+    }
+    rafId = requestAnimationFrame(loop)
+
+  } else {
+    // Static / run-once
+    let drawLog = { rects:0, circles:0, lines:0, texts:0, hasIf:false }
+    const trackedAPI = { ...drawingAPI }
+    trackedAPI.rect   = (...a) => { drawLog.rects++;   drawingAPI.rect(...a) }
+    trackedAPI.circle = (...a) => { drawLog.circles++; drawingAPI.circle(...a) }
+    trackedAPI.line   = (...a) => { drawLog.lines++;   drawingAPI.line(...a) }
+    trackedAPI.text   = (...a) => { drawLog.texts++;   drawingAPI.text(...a) }
+    // Detect if/else in source
+    drawLog.hasIf = /\bif\s*\(/.test(code)
+    drawLog.hasVar = /\b(var|let|const)\b/.test(code)
+    try {
+      new Function(...Object.keys(trackedAPI), code)(...Object.values(trackedAPI))
+    } catch(e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
+    log('Done.', 'ok')
+    checkChallenge(drawLog)
+  }
+}
+
+function friendlyErr(msg) {
+  if (msg.includes('is not defined')) {
+    const m = msg.match(/(\w+) is not defined/)
+    return m ? `"${m[1]}" isn't recognised. Are you using the right block?` : msg
+  }
+  if (msg.includes('Maximum call stack')) return 'Infinite loop detected! Check your loop conditions.'
+  return msg
+}
+
+// ── Challenges ────────────────────────────────────────────────────────────────
+const CHALLENGES = [
+  // Module 6: Variables & State
+  {
+    mod:'M6', name:'Colour Square', xp:30,
+    text:`<strong>Challenge 1</strong> — Create three variables: <em>r</em>, <em>g</em>, <em>b</em>. Use <em>set fill red/green/blue</em> to color a rectangle. Change the values to make different colors.`,
+    hints:[
+      'Use the Variables category to create r, g, b. Set them to numbers 0–255.',
+      'Use "set fill red r green g blue b" block, then "draw rectangle".',
+      'Try r=255, g=0, b=0 for red. r=0, g=200, b=255 for cyan.',
+    ],
+    check:(log) => log.rects >= 1 && log.hasVar,
+  },
+  {
+    mod:'M6', name:'Growing Circle', xp:35,
+    text:`<strong>Challenge 2</strong> — Create a <em>size</em> variable. Draw a circle whose radius is <em>size</em>. Run it with different size values to watch it grow or shrink.`,
+    hints:[
+      'Create a variable called "size" and set it to a number like 50.',
+      'In the "draw circle" block, put the "size" variable block into the radius input.',
+      'Change the value of size and run again — the circle will be different each time.',
+    ],
+    check:(log) => log.circles >= 1 && log.hasVar,
+  },
+  // Module 7: If / Else
+  {
+    mod:'M7', name:'Traffic Light', xp:40,
+    text:`<strong>Challenge 3</strong> — Create a <em>light</em> variable (1, 2, or 3). Use if/else to draw a red circle if light=1, amber if light=2, green if light=3. Draw a dark rectangle first for the box.`,
+    hints:[
+      'Draw a dark rectangle first (the traffic light box). Then use an if block.',
+      'If light = 1: fill red, draw circle. Else if light = 2: fill orange. Else: fill green.',
+      'Set light = 1 and run. Then change to 2, then 3. Does the correct circle appear?',
+    ],
+    check:(log) => log.circles >= 1 && log.hasIf && log.hasVar,
+  },
+  {
+    mod:'M7', name:'Big or Small', xp:35,
+    text:`<strong>Challenge 4</strong> — Create a <em>number</em> variable. If it's greater than 50, draw a big circle (radius 80). If it's 50 or less, draw a small circle (radius 20).`,
+    hints:[
+      'Use an "if/else" block. The condition is: number > 50.',
+      'In the if branch: draw circle with radius 80. In the else branch: radius 20.',
+      'Try number = 75 (should be big) and number = 30 (should be small).',
+    ],
+    check:(log) => log.circles >= 1 && log.hasIf && log.hasVar,
+  },
+  // Module 8: Events & Interaction
+  {
+    mod:'M8', name:'Mouse Follower', xp:45,
+    text:`<strong>Challenge 5</strong> — Use the <em>On every frame</em> event block. Inside it: clear the canvas, then draw a circle at <em>mouseX</em> / <em>mouseY</em>. Move your mouse over the canvas!`,
+    hints:[
+      'Drag an "On every frame" block. Inside it, put "clear canvas" first.',
+      'Then "draw circle" — for x use the "mouse X" block, for y use "mouse Y".',
+      'Move your mouse over the canvas — the circle should follow it.',
+    ],
+    check:(log) => log.frames >= 5 && (log.circles >= 1 || log.rects >= 1),
+  },
+  {
+    mod:'M8', name:'Move the Box', xp:50,
+    text:`<strong>Challenge 6</strong> — Create <em>x</em> and <em>y</em> variables. Use <em>On every frame</em> + arrow key checks to move a rectangle. If ← key is pressed, x = x − 4. If → key: x = x + 4. Same for up/down.`,
+    hints:[
+      'Create variables x = 200, y = 100. In "on every frame": clear, then draw rectangle at (x, y).',
+      'Add if blocks: if ArrowLeft is pressed → change x by -4. If ArrowRight → x by +4.',
+      'Add ArrowUp → y by -4, ArrowDown → y by +4. Click the canvas first to focus it!',
+    ],
+    check:(log) => log.frames >= 5 && (log.rects >= 1 || log.circles >= 1),
+  },
+]
+
+// -- BF Integration --
+BF.seed();
+// Soft auth: allow access from Next.js/Supabase context (me = null → XP skipped)
+const me = (() => { try { return BF.session() || null; } catch(_) { return null; } })();
+
+const completed = new Set()
+let activeIdx = 0
+let hintIdx   = 0
+
+function renderPills() {
+  const row = document.getElementById('ch-pills')
+  row.innerHTML = ''
+  CHALLENGES.forEach((ch,i) => {
+    // Locked if previous challenge not yet completed (allow going back to done ones)
+    const isLocked = i > 0 && !completed.has(i-1) && !completed.has(i) && i !== activeIdx
+    const el = document.createElement('div')
+    el.className = 'ch-pill'
+      + (i===activeIdx  ? ' active' : '')
+      + (completed.has(i) ? ' done'   : '')
+      + (isLocked         ? ' locked' : '')
+    el.textContent = completed.has(i) ? '✓ ' + ch.mod + ' ' + ch.name
+                   : isLocked         ? '🔒 ' + ch.mod + ' ' + ch.name
+                   :                    ch.mod + ' ' + ch.name
+    if (!isLocked) {
+      el.onclick = () => selectChallenge(i)
+    } else {
+      el.title = 'Complete the previous challenge first!'
+    }
+    row.appendChild(el)
+  })
+}
+
+function selectChallenge(i) {
+  activeIdx = i
+  hintIdx   = 0
+  const ch  = CHALLENGES[i]
+  document.getElementById('ch-text').innerHTML = ch.text
+  document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
+  document.getElementById('pass-badge').style.display = 'none'
+  stopLoop()
+  ctx.clearRect(0,0,W,H)
+  renderPills()
+  log('Challenge: ' + ch.name, 'info')
+}
+
+function checkChallenge(log) {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch || completed.has(activeIdx)) return
+  if (ch.check(log)) {
+    completed.add(activeIdx)
+    renderPills()
+    document.getElementById('pass-badge').style.display = 'block'
+    showToast('Challenge complete! +' + ch.xp + ' XP 🎉')
+    logLine('✅ Challenge complete! +' + ch.xp + ' XP', 'ok')
+    if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g7-c' + activeIdx, { passed: true, score: 100 }); }
+    LessonSaves.save('grade7', activeIdx, { passed: true, xpEarned: ch.xp, code: editor.getValue() })
+    // Auto-unlock next
+    renderPills()
+  } else {
+    // Specific feedback on what's missing
+    const missing = []
+    if (ch.mod === 'M6') {
+      if (!log.hasVar)  missing.push('variable (Variables → set … to …)')
+      if (log.rects < 1 && log.circles < 1) missing.push('a drawn shape (Draw → rectangle or circle)')
+    } else if (ch.mod === 'M7') {
+      if (!log.hasIf)  missing.push('if/else block (Control → if)')
+      if (!log.hasVar) missing.push('a variable')
+      if (log.circles < 1 && log.rects < 1) missing.push('a drawn shape')
+    } else if (ch.mod === 'M8') {
+      if (!log.frames || log.frames < 5) missing.push('"On every frame" event block')
+      if (log.circles < 1 && log.rects < 1) missing.push('a shape drawn inside the frame loop')
+    }
+    if (missing.length) {
+      logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
+    }
+  }
+}
+
+function showHint() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch) return
+  if (hintIdx < ch.hints.length) logLine('Hint ' + (hintIdx+1) + ': ' + ch.hints[hintIdx++], 'info')
+  else logLine('No more hints!', 'info')
+}
+
+function log(msg, cls='')  { logLine(msg, cls) }
+function logLine(msg, cls='') {
+  const bar = document.getElementById('out-bar')
+  const el  = document.createElement('div')
+  el.className = 'out-line' + (cls?' '+cls:'')
+  el.textContent = msg
+  bar.appendChild(el)
+  bar.scrollTop = bar.scrollHeight
+  if (bar.children.length > 40) bar.removeChild(bar.firstChild)
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 3200)
+}
+
+function clearWorkspace() {
+  stopLoop()
+  workspace.clear()
+  resetDrawState()
+  drawCanvasPlaceholder()
+  document.getElementById('pass-badge').style.display = 'none'
+  if (!textMode) editor.setValue('// Workspace cleared — drag new blocks to begin')
+  log('Workspace cleared.', 'info')
+}
+
+function undoBlocks() { workspace.undo(false) }
+
+// ── Python Generators ─────────────────────────────────────────────────────────
+let activeLang = 'js'
+
+try {
+  const pyGen = Blockly.Python
+  pyGen.forBlock['event_on_start']      = (b,g) => g.statementToCode(b,'DO')
+  pyGen.forBlock['event_on_update']     = (b,g) => `def update():\n${g.statementToCode(b,'DO')||'    pass\n'}\n`
+  pyGen.forBlock['canvas_clear']        = ()    => 'canvas.clear()\n'
+  pyGen.forBlock['canvas_background']   = (b)   => `canvas.background('${b.getFieldValue('COLOR')}')\n`
+  pyGen.forBlock['canvas_rect']         = (b,g) => `canvas.rect(${v(b,g,'X',0)}, ${v(b,g,'Y',0)}, ${v(b,g,'W',80)}, ${v(b,g,'H',50)})\n`
+  pyGen.forBlock['canvas_circle']       = (b,g) => `canvas.circle(${v(b,g,'X',240)}, ${v(b,g,'Y',130)}, ${v(b,g,'R',40)})\n`
+  pyGen.forBlock['canvas_line']         = (b,g) => `canvas.line(${v(b,g,'X1',0)}, ${v(b,g,'Y1',0)}, ${v(b,g,'X2',480)}, ${v(b,g,'Y2',260)})\n`
+  pyGen.forBlock['canvas_text_draw']    = (b,g) => `canvas.text(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Hello'"}, ${v(b,g,'X',0)}, ${v(b,g,'Y',0)})\n`
+  pyGen.forBlock['canvas_fill_picker']  = (b)   => `canvas.fill('${b.getFieldValue('COLOR')}')\n`
+  pyGen.forBlock['canvas_fill_rgb']     = (b,g) => `canvas.fill_rgb(${v(b,g,'R',180)}, ${v(b,g,'G',239)}, ${v(b,g,'B',74)})\n`
+  pyGen.forBlock['canvas_stroke_picker']= (b)   => `canvas.stroke('${b.getFieldValue('COLOR')}')\n`
+  pyGen.forBlock['canvas_font_size']    = (b,g) => `canvas.font_size(${v(b,g,'SIZE',20)})\n`
+  pyGen.forBlock['canvas_mouse_x']      = ()    => ['canvas.mouse_x()', pyGen.ORDER_FUNCTION_CALL]
+  pyGen.forBlock['canvas_mouse_y']      = ()    => ['canvas.mouse_y()', pyGen.ORDER_FUNCTION_CALL]
+  pyGen.forBlock['canvas_is_key']       = (b)   => [`canvas.is_key_down('${b.getFieldValue('KEY')}')`, pyGen.ORDER_FUNCTION_CALL]
+} catch(e) { console.warn('[G7] Python generator not loaded:', e.message) }
+
+function switchLang(lang) {
+  activeLang = lang
+  document.getElementById('lang-js').classList.toggle('active', lang === 'js')
+  document.getElementById('lang-py').classList.toggle('active', lang === 'py')
+  editor.setOption('mode', lang === 'py' ? 'python' : 'javascript')
+  if (!textMode) {
+    try {
+      const gen  = lang === 'js' ? Blockly.JavaScript : Blockly.Python
+      const code = gen.workspaceToCode(workspace).trim()
+      editor.setValue(code || (lang === 'js'
+        ? '# Drag blocks to see JavaScript code'
+        : '# Drag blocks to see Python equivalent'))
+    } catch(_) {}
+  }
+  if (lang === 'py') {
+    log('Python mode — see the Python equivalent of your blocks. Click "🤖 Check with AI" to get feedback.', 'info')
+    document.getElementById('run-btn').textContent = '▶ Run (JS)'
+  } else {
+    document.getElementById('run-btn').textContent = '▶ Run'
+  }
+}
+
+// Keep Python in sync when blocks change
+const _origChangeListener = workspace.getTopBlocks  // just a ref to know workspace exists
+workspace.addChangeListener(e => {
+  if (textMode || activeLang !== 'py') return
+  if (![Blockly.Events.BLOCK_CHANGE, Blockly.Events.BLOCK_MOVE,
+        Blockly.Events.BLOCK_DELETE, Blockly.Events.BLOCK_CREATE].includes(e.type)) return
+  try {
+    const py = Blockly.Python.workspaceToCode(workspace).trim()
+    editor.setValue(py || '# Drag blocks to see Python equivalent')
+  } catch(_) {}
+})
+
+// ── Auto-shadow on new variables_set blocks ───────────────────────────────────
+workspace.addChangeListener(e => {
+  if (e.type !== Blockly.Events.BLOCK_CREATE) return
+  try {
+    const ids = e.ids || [e.blockId]
+    ids.forEach(id => {
+      const block = workspace.getBlockById(id)
+      if (!block || block.type !== 'variables_set') return
+      const conn = block.getInput('VALUE')?.connection
+      if (conn && !conn.targetBlock()) {
+        const shadow = workspace.newBlock('math_number')
+        shadow.setFieldValue('0', 'NUM')
+        shadow.setShadow(true)
+        shadow.initSvg(); shadow.render()
+        conn.connect(shadow.outputConnection)
+      }
+    })
+  } catch(_) {}
+})
+
+// ── AI check (proxied via /api/ai-check — key stays server-side) ──────────────
+async function checkWithAI() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch) return
+
+  const code = editor.getValue().trim()
+  if (!code || code.startsWith('// Start') || code.startsWith('# Drag')) {
+    log('Build something with blocks first, then check with AI!', 'err'); return
+  }
+
+  const lang     = activeLang === 'py' ? 'Python' : 'JavaScript'
+  const aiStatus = document.getElementById('ai-status')
+  const aiBtn    = document.getElementById('ai-btn')
+  aiStatus.style.display = ''
+  aiBtn.disabled = true
+
+  const prompt = `You are a friendly coding tutor for kids (ages 11-13).
+Challenge: "${ch.name}" — ${ch.text.replace(/<[^>]+>/g, '')}
+
+The student wrote this ${lang} code. In 2-3 short sentences, say whether it looks correct for the challenge. If not, give ONE specific tip. Be encouraging.`
+
+  try {
+    const res  = await fetch('/api/ai-check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: (typeof ENV !== 'undefined' && ENV.GROQ_MODEL) || 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: prompt },
+          { role: 'user',   content: `\`\`\`${lang.toLowerCase()}\n${code}\n\`\`\`` }
+        ],
+        max_tokens: 150,
+        temperature: 0.4,
+      })
+    })
+    const data = await res.json()
+    if (data.error) throw new Error(data.error.message || data.error)
+    const reply = data.choices?.[0]?.message?.content?.trim() || '(no response)'
+    log('🤖 ' + reply, 'info')
+  } catch(e) {
+    log('AI check failed: ' + e.message, 'err')
+  } finally {
+    aiStatus.style.display = 'none'
+    aiBtn.disabled = false
+  }
+}
+
+// ── Workspace autosave (Blockly → Supabase, debounced 3 s) ──────────────────
+let _g7SaveTimer = null
+workspace.addChangeListener(e => {
+  if (e.type === Blockly.Events.UI || e.type === Blockly.Events.VIEWPORT_CHANGE) return
+  clearTimeout(_g7SaveTimer)
+  _g7SaveTimer = setTimeout(() => {
+    try {
+      const xml = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace))
+      LessonSaves.save('grade7', -1, { saveData: { xml } })
+    } catch(_) {}
+  }, 3000)
+})
+
+// ── Init — restore Supabase saves, then render ───────────────────────────────
+;(async () => {
+  const saves = await LessonSaves.load('grade7')
+  // Restore completed challenges
+  LessonSaves.completedSet().forEach(idx => completed.add(idx))
+  // Restore last saved workspace XML (if any)
+  const ws = LessonSaves.savedWorkspace()
+  if (ws?.xml) {
+    try {
+      Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(ws.xml), workspace)
+    } catch(_) {}
+  }
+  renderPills()
+  selectChallenge(0)
+})()
+</script>
+</body>
+</html>
+
+

@@ -1,0 +1,520 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Turtle Graphics</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <style>
+    body { padding-top:64px; min-height:100vh; }
+    .layout { display:grid; grid-template-columns:1fr 380px; height:calc(100vh - 64px); overflow:hidden; }
+
+    /* ── Left: canvas ── */
+    .canvas-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); }
+    .panel-header { padding:14px 20px; background:var(--bg-card); border-bottom:1px solid var(--border);
+                    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; }
+    .panel-title { font-size:15px; font-weight:700; }
+    .btn-row { display:flex; gap:8px; }
+    .btn { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:.15s; }
+    .btn-brand  { background:#b8ef4a; color:#0d0f1a; }
+    .btn-brand:hover  { background:#a5d83d; }
+    .btn-ghost  { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover  { background:rgba(255,255,255,.08); }
+    .btn-danger { background:rgba(239,68,68,.15); color:#f87171; border:1px solid rgba(239,68,68,.3); }
+    .btn-danger:hover { background:rgba(239,68,68,.25); }
+    .canvas-wrap { flex:1; display:flex; align-items:center; justify-content:center;
+                   background:#05080f; overflow:hidden; position:relative; }
+    #turtle-canvas { display:block; }
+    .speed-row { position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+                 display:flex; align-items:center; gap:10px; background:var(--bg-card);
+                 padding:6px 14px; border-radius:999px; border:1px solid var(--border); }
+    .speed-label { font-size:11px; color:var(--fg-faint); font-weight:600; }
+    input[type=range].speed { width:100px; height:4px; accent-color:#b8ef4a; }
+
+    /* ── Right: editor + challenges ── */
+    .right-panel { display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Challenges */
+    .challenges { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); max-height:180px; overflow-y:auto; }
+    .ch-header { padding:10px 16px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
+                 color:var(--fg-faint); border-bottom:1px solid var(--border); }
+    .ch-item { padding:10px 16px; display:flex; align-items:center; gap:10px;
+               border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; transition:.15s; }
+    .ch-item:hover  { background:rgba(255,255,255,.03); }
+    .ch-item.active { background:rgba(184,239,74,.07); }
+    .ch-dot { width:8px; height:8px; border-radius:50%; background:var(--border-hi); flex-shrink:0; }
+    .ch-dot.done { background:#4ade80; }
+    .ch-name { font-size:13px; font-weight:600; flex:1; }
+    .ch-xp   { font-size:11px; color:#fbbf24; font-weight:700; }
+
+    /* Code editor */
+    .editor-panel { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .editor-header { padding:10px 16px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
+                     color:var(--fg-faint); background:var(--bg); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .block-row { display:flex; flex-wrap:wrap; gap:6px; padding:12px 16px; background:var(--bg-card); border-bottom:1px solid var(--border); flex-shrink:0; }
+    .block-chip { padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; font-family:var(--mono);
+                  cursor:pointer; transition:.15s; user-select:none; }
+    .block-chip:hover { opacity:.75; }
+    .block-chip.move  { background:rgba(59,130,246,.2); color:#93c5fd; border:1px solid rgba(59,130,246,.3); }
+    .block-chip.turn  { background:rgba(168,85,247,.2); color:#c4b5fd; border:1px solid rgba(168,85,247,.3); }
+    .block-chip.color { background:rgba(249,115,22,.2); color:#fdba74; border:1px solid rgba(249,115,22,.3); }
+    .block-chip.ctrl  { background:rgba(34,197,94,.2);  color:#86efac; border:1px solid rgba(34,197,94,.3); }
+
+    textarea#code-editor {
+      flex:1; width:100%; resize:none; padding:16px; background:#070a10;
+      color:#abb2bf; font-family:var(--mono); font-size:13px; line-height:1.6;
+      border:none; outline:none; tab-size:2;
+    }
+
+    /* Output / Hint */
+    .output-panel { flex-shrink:0; max-height:90px; overflow-y:auto; padding:10px 16px;
+                    background:#070a10; border-top:1px solid var(--border); font-family:var(--mono); font-size:12px; }
+    .out-line      { color:#6b7280; margin-bottom:2px; }
+    .out-line.ok   { color:#4ade80; }
+    .out-line.err  { color:#f87171; }
+    .out-line.info { color:#b8ef4a; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px);
+             padding:12px 24px; border-radius:10px; font-size:14px; font-weight:600;
+             background:#1a2e1a; color:#bbf7d0; border:1px solid #16a34a;
+             opacity:0; transition:.3s; z-index:9999; white-space:nowrap; }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    @media(max-width:800px) { .layout { grid-template-columns:1fr; grid-template-rows:45vh 1fr; } }
+  </style>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">ByteForge</span>
+  </div>
+  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+</nav>
+
+<div class="layout">
+
+  <!-- Left: Canvas -->
+  <div class="canvas-panel">
+    <div class="panel-header">
+      <div class="panel-title">Turtle Canvas</div>
+      <div class="btn-row">
+        <button class="btn btn-danger"  onclick="clearAll()">Clear</button>
+        <button class="btn btn-ghost"   onclick="stepRun()" id="step-btn">Step</button>
+        <button class="btn btn-brand"   onclick="runCode()">▶ Run</button>
+      </div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="turtle-canvas" width="600" height="520"></canvas>
+      <div class="speed-row">
+        <span class="speed-label">Speed</span>
+        <input type="range" class="speed" id="speed-slider" min="1" max="10" value="5"/>
+        <span class="speed-label" id="speed-label">5</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Challenges + Editor -->
+  <div class="right-panel">
+
+    <!-- Challenges list -->
+    <div class="challenges">
+      <div class="ch-header">Challenges</div>
+      <div id="ch-list"></div>
+    </div>
+
+    <!-- Code editor -->
+    <div class="editor-panel">
+      <div class="editor-header">
+        <span>Code Editor</span>
+        <span id="hint-btn" onclick="showHint()" style="cursor:pointer;color:#fbbf24;font-size:11px;">💡 Hint</span>
+      </div>
+
+      <!-- Quick-insert blocks -->
+      <div class="block-row">
+        <span class="block-chip move" onclick="insertCode('forward(100)')">forward</span>
+        <span class="block-chip move" onclick="insertCode('backward(50)')">backward</span>
+        <span class="block-chip turn" onclick="insertCode('right(90)')">right(90)</span>
+        <span class="block-chip turn" onclick="insertCode('left(90)')">left(90)</span>
+        <span class="block-chip color" onclick="insertCode('pencolor(\'#b8ef4a\')')">pencolor</span>
+        <span class="block-chip color" onclick="insertCode('pensize(2)')">pensize</span>
+        <span class="block-chip ctrl" onclick="insertCode('for i in range(4):\n  forward(100)\n  right(90)')">loop</span>
+        <span class="block-chip ctrl" onclick="insertCode('penup()\nforward(50)\npendown()')">pen up/down</span>
+      </div>
+
+      <textarea id="code-editor" spellcheck="false" placeholder="# Write your turtle commands here
+# Example:
+forward(100)
+right(90)
+forward(100)"></textarea>
+    </div>
+
+    <!-- Output -->
+    <div class="output-panel" id="output-panel">
+      <div class="out-line info">Ready — write turtle commands and press Run.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// -- BF Integration --
+BF.seed();
+// Soft auth: allow access from Next.js/Supabase context (me = null → XP skipped)
+const me = (() => { try { return BF.session() || null; } catch(_) { return null; } })();
+
+// ── Turtle engine ─────────────────────────────────────────────────────────────
+const canvas = document.getElementById('turtle-canvas')
+const ctx    = canvas.getContext('2d')
+
+let tx, ty, tAngle, tDown, tColor, tSize, steps, stepIdx, animId, runningFast
+
+function resetTurtle() {
+  tx      = canvas.width  / 2
+  ty      = canvas.height / 2
+  tAngle  = -90   // facing up
+  tDown   = true
+  tColor  = '#b8ef4a'
+  tSize   = 2
+}
+
+function clearAll() {
+  cancelAnimationFrame(animId)
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  drawGrid()
+  resetTurtle()
+  drawTurtle()
+  log('Canvas cleared.', 'info')
+}
+
+function drawGrid() {
+  ctx.save()
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)'
+  ctx.lineWidth   = 1
+  for (let x = 0; x <= canvas.width; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke()
+  }
+  for (let y = 0; y <= canvas.height; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke()
+  }
+  // Cross-hair at centre
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+  ctx.setLineDash([4,4])
+  ctx.beginPath(); ctx.moveTo(canvas.width/2,0); ctx.lineTo(canvas.width/2,canvas.height); ctx.stroke()
+  ctx.beginPath(); ctx.moveTo(0,canvas.height/2); ctx.lineTo(canvas.width,canvas.height/2); ctx.stroke()
+  ctx.setLineDash([])
+  ctx.restore()
+}
+
+function drawTurtle() {
+  const rad = tAngle * Math.PI / 180
+  ctx.save()
+  ctx.translate(tx, ty)
+  ctx.rotate(rad + Math.PI/2)
+  ctx.strokeStyle = '#b8ef4a'
+  ctx.fillStyle   = 'rgba(184,239,74,0.2)'
+  ctx.lineWidth   = 1.5
+  ctx.beginPath()
+  ctx.moveTo(0, -10)
+  ctx.lineTo(7, 6)
+  ctx.lineTo(0, 2)
+  ctx.lineTo(-7, 6)
+  ctx.closePath()
+  ctx.fill()
+  ctx.stroke()
+  ctx.restore()
+}
+
+// ── Command parser ────────────────────────────────────────────────────────────
+function parseCode(src) {
+  const cmds = []
+  const lines = src.split('\n')
+  const indent = s => s.match(/^\s*/)[0].length
+
+  let i = 0
+  while (i < lines.length) {
+    const line = lines[i].trim()
+    if (!line || line.startsWith('#')) { i++; continue }
+
+    const forMatch = line.match(/^for\s+\w+\s+in\s+range\((\d+)\)\s*:/)
+    if (forMatch) {
+      const count = parseInt(forMatch[1])
+      const bodyIndent = indent(lines[i])
+      const body = []
+      i++
+      while (i < lines.length && indent(lines[i]) > bodyIndent) {
+        body.push(lines[i].trim())
+        i++
+      }
+      for (let n = 0; n < count; n++) {
+        body.forEach(bl => parseLine(bl, cmds))
+      }
+      continue
+    }
+
+    parseLine(line, cmds)
+    i++
+  }
+  return cmds
+}
+
+function parseLine(line, cmds) {
+  let m
+  if ((m = line.match(/^forward\(([^)]+)\)/)))   cmds.push({ type:'forward',  val: +m[1] })
+  if ((m = line.match(/^backward\(([^)]+)\)/)))  cmds.push({ type:'backward', val: +m[1] })
+  if ((m = line.match(/^right\(([^)]+)\)/)))     cmds.push({ type:'right',    val: +m[1] })
+  if ((m = line.match(/^left\(([^)]+)\)/)))      cmds.push({ type:'left',     val: +m[1] })
+  if ((m = line.match(/^pencolor\(['"](.+)['"]\)/))) cmds.push({ type:'color', val: m[1] })
+  if ((m = line.match(/^pensize\(([^)]+)\)/)))   cmds.push({ type:'size',   val: +m[1] })
+  if (line === 'penup()')   cmds.push({ type:'up' })
+  if (line === 'pendown()') cmds.push({ type:'down' })
+  if (line === 'home()')    cmds.push({ type:'home' })
+}
+
+function execStep(cmd) {
+  if (!cmd) return
+  if (cmd.type === 'forward' || cmd.type === 'backward') {
+    const dist = cmd.type === 'backward' ? -cmd.val : cmd.val
+    const rad  = tAngle * Math.PI / 180
+    const nx   = tx + Math.cos(rad) * dist
+    const ny   = ty + Math.sin(rad) * dist
+    if (tDown) {
+      ctx.beginPath()
+      ctx.strokeStyle = tColor
+      ctx.lineWidth   = tSize
+      ctx.lineCap     = 'round'
+      ctx.moveTo(tx, ty)
+      ctx.lineTo(nx, ny)
+      ctx.stroke()
+    }
+    tx = nx; ty = ny
+  } else if (cmd.type === 'right')  tAngle += cmd.val
+  else if (cmd.type === 'left')     tAngle -= cmd.val
+  else if (cmd.type === 'color')    tColor  = cmd.val
+  else if (cmd.type === 'size')     tSize   = cmd.val
+  else if (cmd.type === 'up')       tDown   = false
+  else if (cmd.type === 'down')     tDown   = true
+  else if (cmd.type === 'home')     { tx = canvas.width/2; ty = canvas.height/2; tAngle = -90 }
+}
+
+// ── Runner ────────────────────────────────────────────────────────────────────
+const SPEED_MS = [0, 400, 250, 150, 80, 40, 20, 10, 5, 2, 0]  // index = slider value
+
+function runCode() {
+  const src = document.getElementById('code-editor').value
+  cancelAnimationFrame(animId)
+  clearCanvas()
+
+  try {
+    steps = parseCode(src)
+  } catch(e) {
+    log('Error: ' + e.message, 'err')
+    return
+  }
+  if (!steps.length) { log('Nothing to draw — write some commands first.', 'info'); return }
+
+  stepIdx = 0
+  const speed = +document.getElementById('speed-slider').value
+  const ms    = SPEED_MS[speed]
+
+  log('Running ' + steps.length + ' steps…', 'info')
+
+  if (ms === 0) {
+    // Instant
+    steps.forEach(s => execStep(s))
+    drawTurtle()
+    log('Done!', 'ok')
+    checkChallenge()
+    return
+  }
+
+  function tick() {
+    if (stepIdx >= steps.length) {
+      drawTurtle()
+      log('Done!', 'ok')
+      checkChallenge()
+      return
+    }
+    execStep(steps[stepIdx++])
+    drawTurtle()
+    animId = setTimeout(tick, ms)
+  }
+  tick()
+}
+
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  drawGrid()
+  resetTurtle()
+}
+
+function stepRun() {
+  if (!steps || stepIdx === undefined) {
+    const src = document.getElementById('code-editor').value
+    steps    = parseCode(src)
+    stepIdx  = 0
+    clearCanvas()
+    log('Step mode — press Step to advance', 'info')
+  }
+  if (stepIdx >= steps.length) { log('Program finished', 'ok'); return }
+  execStep(steps[stepIdx++])
+  drawTurtle()
+  log('Step ' + stepIdx + ' / ' + steps.length, 'info')
+}
+
+// ── Challenges ────────────────────────────────────────────────────────────────
+const CHALLENGES = [
+  {
+    name: 'Draw a Square',
+    xp: 25,
+    hint: 'Use forward(100) and right(90). You need to do this 4 times. Try a for loop!',
+    starter: '# Draw a square using a loop\nfor i in range(4):\n  forward(100)\n  right(90)',
+    check: (cmds) => {
+      const rights = cmds.filter(c => c.type === 'right').reduce((s,c) => s+c.val, 0)
+      const fwds   = cmds.filter(c => c.type === 'forward')
+      return rights >= 360 && fwds.length >= 4
+    }
+  },
+  {
+    name: 'Draw a Triangle',
+    xp: 30,
+    hint: 'A triangle has 3 sides. What angle turns a triangle? Hint: 360 ÷ 3 = 120',
+    starter: '# Draw a triangle\nfor i in range(3):\n  forward(100)\n  right(120)',
+    check: (cmds) => {
+      const rights = cmds.filter(c => c.type === 'right').reduce((s,c) => s+c.val, 0)
+      const fwds   = cmds.filter(c => c.type === 'forward')
+      return rights >= 360 && fwds.length >= 3
+    }
+  },
+  {
+    name: 'Colourful Hexagon',
+    xp: 40,
+    hint: 'A hexagon has 6 sides. Change pencolor() before each side. 360 ÷ 6 = 60 degrees.',
+    starter: '# Colourful hexagon\ncolors = [\'#f87171\',\'#fbbf24\',\'#4ade80\',\'#38bdf8\',\'#a78bfa\',\'#f472b6\']\nfor i in range(6):\n  pencolor(colors[i % 6])\n  forward(80)\n  right(60)',
+    check: (cmds) => {
+      const colors = cmds.filter(c => c.type === 'color')
+      const fwds   = cmds.filter(c => c.type === 'forward')
+      return colors.length >= 3 && fwds.length >= 6
+    }
+  },
+  {
+    name: 'Spiral',
+    xp: 50,
+    hint: 'Make the forward distance increase each step. Try: forward(i * 5) inside a loop.',
+    starter: '# Spiral — the distance grows each step\nfor i in range(36):\n  forward(i * 3)\n  right(45)',
+    check: (cmds) => {
+      const fwds = cmds.filter(c => c.type === 'forward')
+      return fwds.length >= 20
+    }
+  },
+  {
+    name: 'Draw Your Initial',
+    xp: 60,
+    hint: 'Use penup() to lift the pen and move without drawing. Use pendown() to start drawing again.',
+    starter: '# Draw your initial — use forward, right, left, penup, pendown\n# Change to your own initial!\nforward(100)\nright(180)\nforward(50)\nleft(90)\nforward(50)',
+    check: (cmds) => {
+      const fwds = cmds.filter(c => c.type === 'forward' || c.type === 'backward')
+      return fwds.length >= 4
+    }
+  },
+]
+
+const completed = new Set()
+
+function renderChallenges() {
+  const list = document.getElementById('ch-list')
+  list.innerHTML = ''
+  CHALLENGES.forEach((ch, i) => {
+    const el = document.createElement('div')
+    el.className = 'ch-item' + (i === 0 ? ' active' : '')
+    el.id = 'ch-' + i
+    el.innerHTML = `
+      <div class="ch-dot ${completed.has(i) ? 'done' : ''}"></div>
+      <div class="ch-name">${ch.name}</div>
+      <div class="ch-xp">${completed.has(i) ? '✓' : '+' + ch.xp + ' XP'}</div>
+    `
+    el.onclick = () => selectChallenge(i)
+    list.appendChild(el)
+  })
+}
+
+let activeChallenge = 0
+
+function selectChallenge(i) {
+  activeChallenge = i
+  document.querySelectorAll('.ch-item').forEach((el,idx) => el.classList.toggle('active', idx === i))
+  document.getElementById('code-editor').value = CHALLENGES[i].starter
+  clearAll()
+  log('Challenge: ' + CHALLENGES[i].name + ' — edit the code and press Run.', 'info')
+}
+
+function checkChallenge() {
+  const ch = CHALLENGES[activeChallenge]
+  if (!ch || !steps) return
+  if (ch.check(steps)) {
+    if (!completed.has(activeChallenge)) {
+      completed.add(activeChallenge)
+      renderChallenges()
+      showToast('Challenge complete! +' + ch.xp + ' XP')
+      log('Challenge complete! +' + ch.xp + ' XP', 'ok')
+    }
+  }
+}
+
+let hintIdx = 0
+function showHint() {
+  const ch = CHALLENGES[activeChallenge]
+  if (ch) log('Hint: ' + ch.hint, 'info')
+}
+
+// ── Block insert ──────────────────────────────────────────────────────────────
+function insertCode(snippet) {
+  const ta = document.getElementById('code-editor')
+  const start = ta.selectionStart
+  const val   = ta.value
+  ta.value = val.slice(0,start) + '\n' + snippet + val.slice(start)
+  ta.selectionStart = ta.selectionEnd = start + snippet.length + 1
+  ta.focus()
+}
+
+// ── Output ────────────────────────────────────────────────────────────────────
+function log(msg, cls='') {
+  const panel = document.getElementById('output-panel')
+  const div   = document.createElement('div')
+  div.className = 'out-line' + (cls ? ' ' + cls : '')
+  div.textContent = msg
+  panel.appendChild(div)
+  panel.scrollTop = panel.scrollHeight
+  if (panel.children.length > 50) panel.removeChild(panel.firstChild)
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 3000)
+}
+
+// ── Speed ─────────────────────────────────────────────────────────────────────
+document.getElementById('speed-slider').addEventListener('input', function() {
+  document.getElementById('speed-label').textContent = this.value
+})
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderChallenges()
+clearAll()
+selectChallenge(0)
+</script>
+</body>
+</html>
+
+
+

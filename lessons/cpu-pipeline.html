@@ -1,0 +1,478 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — CPU Pipeline</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <style>
+    body { padding-top:64px; min-height:100vh; }
+    .container { max-width:860px; margin:0 auto; padding:0 24px 60px; }
+    .page-header { text-align:center; padding:40px 0 32px; }
+    .page-title { font-size:32px; font-weight:800; letter-spacing:-.03em; margin-bottom:10px; }
+    .page-sub   { font-size:16px; color:var(--fg-dim); max-width:480px; margin:0 auto; }
+
+    .section { background:var(--bg-card); border:1px solid var(--border); border-radius:16px;
+               padding:28px 32px; margin-bottom:24px; }
+    .section-title { font-size:18px; font-weight:700; margin-bottom:6px; }
+    .section-sub   { font-size:14px; color:var(--fg-dim); margin-bottom:24px; line-height:1.5; }
+
+    /* Pipeline diagram */
+    .pipeline-wrap { overflow-x:auto; padding-bottom:8px; }
+    .pipeline { display:flex; align-items:stretch; gap:0; min-width:600px; }
+    .stage { flex:1; display:flex; flex-direction:column; align-items:center; position:relative; }
+    .stage-box { width:100%; padding:18px 8px; border-radius:0; border:1px solid var(--border-hi);
+                 border-right-width:0; text-align:center; position:relative; z-index:1;
+                 transition:background .4s, border-color .4s; cursor:pointer; }
+    .stage:first-child .stage-box { border-radius:12px 0 0 12px; }
+    .stage:last-child  .stage-box { border-right-width:1px; border-radius:0 12px 12px 0; }
+    .stage-num  { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+                  color:var(--fg-faint); margin-bottom:6px; }
+    .stage-name { font-size:15px; font-weight:700; margin-bottom:4px; }
+    .stage-desc { font-size:11px; color:var(--fg-dim); line-height:1.4; }
+    .stage-box.active { background:rgba(184,239,74,.1); border-color:#b8ef4a; }
+    .stage-box.active .stage-name { color:#b8ef4a; }
+    .stage-box.done   { background:rgba(34,197,94,.07); border-color:rgba(34,197,94,.4); }
+    .stage-box.done .stage-name { color:#4ade80; }
+
+    /* Token (the instruction travelling through stages) */
+    .pipeline-token-row { display:flex; align-items:center; min-width:600px; padding:16px 0 0; }
+    .token-slot { flex:1; display:flex; justify-content:center; align-items:center; height:44px; }
+    .token { width:52px; height:44px; border-radius:8px; background:#b8ef4a; color:#0d0f1a;
+             font-family:var(--mono); font-size:11px; font-weight:700; text-align:center;
+             display:flex; align-items:center; justify-content:center; padding:4px;
+             transition:all .5s cubic-bezier(.4,0,.2,1); box-shadow:0 0 16px rgba(184,239,74,.3);
+             line-height:1.2; }
+    .token.hidden { opacity:0; transform:scale(0.4); }
+
+    /* Controls */
+    .ctrl-row { display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap; }
+    .btn { padding:10px 22px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:.15s; }
+    .btn-brand { background:#b8ef4a; color:#0d0f1a; }
+    .btn-brand:hover { background:#a5d83d; }
+    .btn-ghost { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover { background:rgba(255,255,255,.08); }
+
+    /* Stage detail */
+    .stage-detail { background:var(--bg); border:1px solid var(--border-hi); border-radius:12px;
+                    padding:18px 20px; margin-top:20px; min-height:80px; transition:.3s; }
+    .detail-title { font-size:14px; font-weight:700; margin-bottom:6px; }
+    .detail-text  { font-size:13px; color:var(--fg-dim); line-height:1.6; }
+    .detail-code  { font-family:var(--mono); background:rgba(255,255,255,.04); padding:10px 14px;
+                    border-radius:8px; font-size:12px; color:#93c5fd; margin-top:8px; line-height:1.5; }
+
+    /* Instruction memory */
+    .instr-list { display:flex; flex-direction:column; gap:6px; }
+    .instr-row { display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:8px;
+                 border:1px solid var(--border); background:var(--bg); font-family:var(--mono); font-size:12px; }
+    .instr-row.current { background:rgba(184,239,74,.08); border-color:rgba(184,239,74,.4); color:#b8ef4a; }
+    .instr-row.done    { opacity:.4; }
+    .instr-addr { color:var(--fg-faint); width:40px; }
+    .instr-op   { flex:1; }
+    .instr-comment { color:var(--fg-faint); font-size:11px; }
+
+    /* Speed */
+    .speed-row { display:flex; align-items:center; gap:10px; justify-content:center; }
+    .speed-label { font-size:12px; color:var(--fg-dim); }
+    input[type=range] { width:120px; height:4px; accent-color:#b8ef4a; }
+
+    /* Questions */
+    .question-block { background:var(--bg); border:1px solid var(--border-hi); border-radius:12px;
+                      padding:20px 24px; margin-bottom:16px; }
+    .question-text { font-size:15px; font-weight:600; margin-bottom:14px; }
+    .options { display:flex; flex-direction:column; gap:8px; }
+    .option { padding:10px 14px; border-radius:8px; border:1px solid var(--border);
+              font-size:14px; cursor:pointer; transition:.15s; background:var(--bg-card); }
+    .option:hover { border-color:var(--border-hi); }
+    .option.correct  { background:rgba(34,197,94,.12); border-color:#22c55e; color:#4ade80; }
+    .option.wrong    { background:rgba(239,68,68,.12); border-color:#ef4444; color:#f87171; }
+    .option.disabled { pointer-events:none; }
+    .feedback { margin-top:10px; font-size:13px; padding:10px 14px; border-radius:8px; display:none; }
+    .feedback.show { display:block; }
+    .feedback.correct { background:rgba(34,197,94,.1); color:#4ade80; }
+    .feedback.wrong   { background:rgba(239,68,68,.1); color:#f87171; }
+
+    /* Progress */
+    .progress-row { display:flex; justify-content:space-between; align-items:center; margin-top:16px; }
+    .prog-label { font-size:12px; color:var(--fg-dim); }
+    .prog-val   { font-family:var(--mono); font-size:14px; font-weight:700; color:#b8ef4a; }
+  </style>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">ByteForge</span>
+  </div>
+  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">CPU Pipeline</h1>
+    <p class="page-sub">Watch an instruction travel through the four stages of the Fetch–Decode–Execute cycle.</p>
+  </div>
+
+  <!-- Pipeline visualizer -->
+  <div class="section">
+    <div class="section-title">Fetch → Decode → Execute → Write Back</div>
+    <div class="section-sub">
+      Every instruction the CPU runs passes through all four stages. Click a stage to learn what it does,
+      or press <strong>Step</strong> to advance an instruction through the pipeline one stage at a time.
+    </div>
+
+    <div class="pipeline-wrap">
+      <!-- Stage boxes -->
+      <div class="pipeline" id="pipeline">
+        <div class="stage">
+          <div class="stage-box" id="stage-0" onclick="focusStage(0)">
+            <div class="stage-num">Stage 1</div>
+            <div class="stage-name">Fetch</div>
+            <div class="stage-desc">Read instruction from RAM</div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="stage-box" id="stage-1" onclick="focusStage(1)">
+            <div class="stage-num">Stage 2</div>
+            <div class="stage-name">Decode</div>
+            <div class="stage-desc">Interpret the instruction</div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="stage-box" id="stage-2" onclick="focusStage(2)">
+            <div class="stage-num">Stage 3</div>
+            <div class="stage-name">Execute</div>
+            <div class="stage-desc">ALU performs the operation</div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="stage-box" id="stage-3" onclick="focusStage(3)">
+            <div class="stage-num">Stage 4</div>
+            <div class="stage-name">Write Back</div>
+            <div class="stage-desc">Store result in register</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instruction token -->
+      <div class="pipeline-token-row" id="token-row">
+        <div class="token-slot"><div class="token hidden" id="instr-token">ADD<br/>R1,R2</div></div>
+        <div class="token-slot"></div>
+        <div class="token-slot"></div>
+        <div class="token-slot"></div>
+      </div>
+    </div>
+
+    <!-- Stage detail -->
+    <div class="stage-detail" id="stage-detail">
+      <div class="detail-title" id="detail-title">Click a stage to learn what it does</div>
+      <div class="detail-text"  id="detail-text">The CPU processes every instruction through a four-stage pipeline. Click any stage above to see an explanation.</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="ctrl-row">
+      <button class="btn btn-ghost"  onclick="resetPipeline()">↺ Reset</button>
+      <button class="btn btn-ghost"  onclick="stepPipeline()"  id="step-btn">Step →</button>
+      <button class="btn btn-brand"  onclick="autoPipeline()"  id="auto-btn">▶ Auto-play</button>
+    </div>
+    <div style="margin-top:14px;">
+      <div class="speed-row">
+        <span class="speed-label">Speed</span>
+        <input type="range" id="speed" min="1" max="5" value="2"/>
+        <span class="speed-label" id="speed-val">2</span>
+      </div>
+    </div>
+
+    <div class="progress-row">
+      <span class="prog-label">Instructions completed</span>
+      <span class="prog-val" id="instr-count">0</span>
+    </div>
+  </div>
+
+  <!-- Instruction memory -->
+  <div class="section">
+    <div class="section-title">Instruction Memory</div>
+    <div class="section-sub">These are the instructions waiting to be processed. Watch the Program Counter (PC) advance as each instruction is fetched.</div>
+    <div class="instr-list" id="instr-list"></div>
+  </div>
+
+  <!-- Questions -->
+  <div class="section">
+    <div class="section-title">Check your understanding</div>
+    <div class="section-sub">Answer using what you've seen in the pipeline animation above.</div>
+    <div id="questions"></div>
+  </div>
+</div>
+
+<script>
+BF.seed();
+// Soft auth: allow access from Next.js/Supabase context (me = null → XP skipped)
+const me = (() => { try { return BF.session() || null; } catch(_) { return null; } })();
+
+// ── Stage definitions ─────────────────────────────────────────────────────────
+const STAGES = [
+  {
+    name: 'Fetch',
+    color: '#38bdf8',
+    title: 'Stage 1 — Fetch',
+    text: 'The Control Unit reads the next instruction from RAM. It uses the Program Counter (PC) register to know which address to fetch from. After fetching, the PC is automatically incremented to point to the next instruction.',
+    code: 'MAR ← [PC]          // Load address from Program Counter\nMDR ← [MAR]         // Read instruction from that address\nCIR ← [MDR]         // Copy into Current Instruction Register\nPC  ← PC + 1        // Advance Program Counter',
+  },
+  {
+    name: 'Decode',
+    color: '#a78bfa',
+    title: 'Stage 2 — Decode',
+    text: 'The Control Unit examines the binary instruction in the CIR. It splits it into an opcode (what to do) and operands (what to do it with). The decoder figures out: Is this an ADD? A LOAD? A JUMP? Which registers are needed?',
+    code: 'opcode   = CIR[7:4]  // Top 4 bits = operation\noperand1 = CIR[3:2]  // Register 1\noperand2 = CIR[1:0]  // Register 2 or value',
+  },
+  {
+    name: 'Execute',
+    color: '#fb923c',
+    title: 'Stage 3 — Execute',
+    text: 'The ALU (Arithmetic Logic Unit) performs the actual operation. For an ADD instruction, it adds the two values. For a COMPARE, it sets flags in the status register. For a LOAD, data is read from memory into a register.',
+    code: 'if opcode == ADD:\n  result = ACC + operand\nelif opcode == LOAD:\n  ACC = memory[operand]\nelif opcode == COMPARE:\n  set_flags(ACC - operand)',
+  },
+  {
+    name: 'Write Back',
+    color: '#4ade80',
+    title: 'Stage 4 — Write Back',
+    text: 'The result of the operation is written back to the appropriate register (or memory location). For an ADD, the sum is stored in the Accumulator. For a STORE, the value is written from a register back to RAM.',
+    code: 'if opcode == ADD or opcode == SUB:\n  ACC ← result\nelif opcode == STORE:\n  memory[address] ← ACC',
+  },
+]
+
+const INSTRUCTIONS = [
+  { addr:'0x00', op:'LOAD R1, 42',  comment:'// Load value 42 into R1'  },
+  { addr:'0x01', op:'LOAD R2, 18',  comment:'// Load value 18 into R2'  },
+  { addr:'0x02', op:'ADD  R3, R1, R2', comment:'// R3 = R1 + R2 = 60'  },
+  { addr:'0x03', op:'CMP  R3, 50',  comment:'// Compare R3 with 50'    },
+  { addr:'0x04', op:'JGT  0x07',    comment:'// Jump if R3 > 50'       },
+  { addr:'0x05', op:'STORE 0xFF, R3',comment:'// Save R3 to memory'    },
+  { addr:'0x06', op:'HALT',         comment:'// Stop execution'        },
+]
+
+let currentStage  = -1   // -1 = not started
+let currentInstr  = 0
+let autoId        = null
+let instrCompleted = 0
+
+// ── Pipeline state ────────────────────────────────────────────────────────────
+function resetPipeline() {
+  clearInterval(autoId); autoId = null
+  document.getElementById('auto-btn').textContent = '▶ Auto-play'
+  currentStage = -1
+  currentInstr = 0
+  instrCompleted = 0
+  document.getElementById('instr-count').textContent = '0'
+
+  for (let i = 0; i < 4; i++) {
+    const box = document.getElementById('stage-' + i)
+    box.classList.remove('active','done')
+  }
+
+  const token = document.getElementById('instr-token')
+  token.classList.add('hidden')
+
+  updateInstrList()
+  document.getElementById('detail-title').textContent = 'Click a stage to learn what it does'
+  document.getElementById('detail-text').textContent  = 'The CPU processes every instruction through a four-stage pipeline. Click any stage above to see an explanation.'
+  const dc = document.getElementById('detail-code')
+  if (dc) dc.remove()
+}
+
+function stepPipeline() {
+  if (currentInstr >= INSTRUCTIONS.length) { resetPipeline(); return }
+
+  currentStage++
+  if (currentStage === 0) {
+    // New instruction entering pipeline
+    const instr = INSTRUCTIONS[currentInstr]
+    const token = document.getElementById('instr-token')
+    const shortOp = instr.op.split(' ')[0] + '\n' + (instr.op.split(' ')[1] ?? '')
+    token.textContent = shortOp
+    token.classList.remove('hidden')
+  }
+
+  // Move token to current stage slot
+  moveToken(currentStage)
+
+  // Update stage highlights
+  for (let i = 0; i < 4; i++) {
+    const box = document.getElementById('stage-' + i)
+    box.classList.remove('active')
+    if (i < currentStage) box.classList.add('done')
+  }
+  document.getElementById('stage-' + currentStage).classList.remove('done')
+  document.getElementById('stage-' + currentStage).classList.add('active')
+  focusStage(currentStage)
+
+  updateInstrList()
+
+  if (currentStage === 3) {
+    instrCompleted++
+    document.getElementById('instr-count').textContent = instrCompleted
+    currentStage = -1
+    currentInstr++
+    // Hide token briefly
+    setTimeout(() => {
+      const token = document.getElementById('instr-token')
+      token.classList.add('hidden')
+      for (let i = 0; i < 4; i++) document.getElementById('stage-' + i).classList.remove('active','done')
+    }, 400)
+  }
+}
+
+function moveToken(stageIdx) {
+  const tokenRow  = document.getElementById('token-row')
+  const slots     = tokenRow.querySelectorAll('.token-slot')
+  const token     = document.getElementById('instr-token')
+  // Remove from current slot, add to new
+  document.querySelectorAll('.token-slot').forEach(s => {
+    if (s.contains(token)) s.removeChild(token)
+  })
+  slots[stageIdx].appendChild(token)
+}
+
+function autoPipeline() {
+  if (autoId) {
+    clearInterval(autoId); autoId = null
+    document.getElementById('auto-btn').textContent = '▶ Auto-play'
+    return
+  }
+  document.getElementById('auto-btn').textContent = '⏸ Pause'
+  const speed = +document.getElementById('speed').value
+  const ms = [0, 1200, 800, 500, 300, 150][speed]
+  autoId = setInterval(() => {
+    if (currentInstr >= INSTRUCTIONS.length) {
+      clearInterval(autoId); autoId = null
+      document.getElementById('auto-btn').textContent = '↺ Done'
+      return
+    }
+    stepPipeline()
+  }, ms)
+}
+
+function focusStage(i) {
+  const s = STAGES[i]
+  document.getElementById('detail-title').textContent = s.title
+  document.getElementById('detail-text').textContent  = s.text
+
+  const existingCode = document.getElementById('detail-code')
+  if (existingCode) existingCode.remove()
+  if (s.code) {
+    const codeEl = document.createElement('div')
+    codeEl.className = 'detail-code'
+    codeEl.id = 'detail-code'
+    codeEl.textContent = s.code
+    document.getElementById('stage-detail').appendChild(codeEl)
+  }
+}
+
+// ── Instruction list ──────────────────────────────────────────────────────────
+function updateInstrList() {
+  const list = document.getElementById('instr-list')
+  list.innerHTML = ''
+  INSTRUCTIONS.forEach((instr, i) => {
+    const row = document.createElement('div')
+    row.className = 'instr-row'
+    if (i === currentInstr) row.classList.add('current')
+    if (i < currentInstr)  row.classList.add('done')
+    row.innerHTML = `<span class="instr-addr">${instr.addr}</span>
+                     <span class="instr-op">${instr.op}</span>
+                     <span class="instr-comment">${instr.comment}</span>`
+    list.appendChild(row)
+  })
+}
+
+// ── Speed slider ──────────────────────────────────────────────────────────────
+document.getElementById('speed').addEventListener('input', function() {
+  document.getElementById('speed-val').textContent = this.value
+  if (autoId) { autoPipeline(); autoPipeline() } // restart with new speed
+})
+
+// ── Questions ─────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  {
+    text: 'What does the Program Counter (PC) store?',
+    options: [
+      'The address of the next instruction to be fetched',
+      'The result of the last arithmetic operation',
+      'The number of instructions already completed',
+      'The current value in the Accumulator',
+    ],
+    correct: 0,
+    feedback: 'Correct! The PC holds the memory address of the next instruction. After each fetch, it automatically increments.',
+    wrongFeedback: 'The PC (Program Counter) stores the address of the next instruction to be fetched from RAM.',
+  },
+  {
+    text: 'Which stage of the pipeline does the ALU work in?',
+    options: ['Fetch', 'Decode', 'Execute', 'Write Back'],
+    correct: 2,
+    feedback: 'Right! The ALU performs the actual arithmetic or logic operation during the Execute stage.',
+    wrongFeedback: 'The ALU (Arithmetic Logic Unit) operates in the Execute stage — it performs the calculation.',
+  },
+  {
+    text: 'Why is pipelining beneficial?',
+    options: [
+      'It allows the CPU to process multiple instructions simultaneously at different stages',
+      'It makes each individual instruction execute faster',
+      'It removes the need for RAM',
+      'It reduces the number of registers needed',
+    ],
+    correct: 0,
+    feedback: 'Exactly! Pipelining lets the CPU work on instruction 2 (in Fetch) while instruction 1 is in Execute — multiple instructions in flight at once.',
+    wrongFeedback: 'Pipelining overlaps instruction processing — while one instruction executes, the next one is already being decoded.',
+  },
+  {
+    text: 'In the Write Back stage, where is the result stored?',
+    options: [
+      'Back into RAM at a random address',
+      'In a register (such as the Accumulator)',
+      'In the Program Counter',
+      'It is discarded after execution',
+    ],
+    correct: 1,
+    feedback: 'Correct! The result is written back to a register — typically the Accumulator (ACC) — so it can be used by future instructions.',
+    wrongFeedback: 'The result is written back to a register (like ACC). It may also be written to a specific memory address for STORE instructions.',
+  },
+]
+
+function buildQuestions() {
+  const container = document.getElementById('questions')
+  QUESTIONS.forEach((q, qi) => {
+    const block = document.createElement('div')
+    block.className = 'question-block'
+    block.innerHTML = `<div class="question-text">Q${qi+1}. ${q.text}</div>
+      <div class="options" id="opts-${qi}">
+        ${q.options.map((o,oi) => `<div class="option" onclick="answer(${qi},${oi})">${o}</div>`).join('')}
+      </div>
+      <div class="feedback" id="fb-${qi}"></div>`
+    container.appendChild(block)
+  })
+}
+
+function answer(qi, oi) {
+  const q    = QUESTIONS[qi]
+  const opts = document.querySelectorAll(`#opts-${qi} .option`)
+  const fb   = document.getElementById(`fb-${qi}`)
+  opts.forEach(o => o.classList.add('disabled'))
+  opts[oi].classList.add(oi === q.correct ? 'correct' : 'wrong')
+  if (oi !== q.correct) opts[q.correct].classList.add('correct')
+  fb.textContent  = oi === q.correct ? q.feedback : q.wrongFeedback
+  fb.className    = 'feedback show ' + (oi === q.correct ? 'correct' : 'wrong')
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+updateInstrList()
+buildQuestions()
+</script>
+</body>
+</html>
+
+

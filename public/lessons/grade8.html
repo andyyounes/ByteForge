@@ -1,0 +1,745 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Grade 8 Python</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <!-- CodeMirror 5 — Python mode -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.js"></script>
+  <!-- Pyodide — Python in WASM -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { padding-top:64px; background:var(--bg); color:var(--fg); height:100vh; overflow:hidden; }
+
+    .layout {
+      display:grid;
+      grid-template-columns: 1fr 480px;
+      height:calc(100vh - 64px);
+      overflow:hidden;
+    }
+
+    /* ── Left: Python editor ── */
+    .editor-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
+
+    .ed-header { flex-shrink:0; padding:10px 16px; background:var(--bg-card); border-bottom:1px solid var(--border);
+                 display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .ed-title  { display:flex; align-items:center; gap:8px; }
+    .grade-badge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+                   background:rgba(59,130,246,.15); color:#60a5fa; border:1px solid rgba(59,130,246,.3); }
+    .lang-badge  { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+                   background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); }
+    .btn { padding:6px 13px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;
+           transition:.15s; border:none; }
+    .btn-brand  { background:#b8ef4a; color:#0d0f1a; }
+    .btn-brand:hover { background:#a5d83d; }
+    .btn-ghost  { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover { background:rgba(255,255,255,.08); }
+    .btn-danger { background:rgba(239,68,68,.1); color:#f87171; border:1px solid rgba(239,68,68,.25); }
+    .btn-danger:hover { background:rgba(239,68,68,.18); }
+    .btn:disabled { opacity:.4; cursor:not-allowed; }
+    .btn-row { display:flex; gap:6px; }
+
+    .cm-outer { flex:1; overflow:hidden; display:flex; flex-direction:column; }
+    .cm-outer .CodeMirror {
+      height:100% !important;
+      font-size:13px !important;
+      font-family:var(--mono) !important;
+      background:#060912 !important;
+      line-height:1.65 !important;
+    }
+    .cm-outer .CodeMirror-scroll { background:#060912 !important; }
+    .cm-outer .CodeMirror-gutters { background:#090d1c !important; border-right:1px solid var(--border) !important; }
+
+    /* loading overlay */
+    .py-loading { position:absolute; inset:0; background:rgba(6,9,18,.85); z-index:20;
+                  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; }
+    .spinner { width:32px; height:32px; border:3px solid var(--border); border-top-color:#b8ef4a;
+               border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .py-loading-text { font-size:13px; color:var(--fg-dim); }
+
+    /* ── Right panel ── */
+    .right-panel { display:flex; flex-direction:column; overflow:hidden; }
+
+    .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px; }
+    .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
+                 border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
+    .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
+    .ch-pill.active { background:rgba(59,130,246,.12); border-color:#60a5fa; color:#60a5fa; }
+    .ch-pill.done   { background:rgba(34,197,94,.08); border-color:rgba(34,197,94,.35); color:#4ade80; }
+    .ch-row { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .ch-text { font-size:11.5px; color:var(--fg-dim); line-height:1.55; flex:1; }
+    .ch-text strong { color:var(--fg); }
+    .ch-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .xp-pill { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
+               background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); }
+    .hint-btn { font-size:11px; color:#fbbf24; cursor:pointer; }
+
+    .canvas-wrap { flex-shrink:0; background:#030510; border-bottom:1px solid var(--border); position:relative; }
+    #out-canvas  { display:block; }
+    .pass-badge  { position:absolute; top:8px; left:50%; transform:translateX(-50%);
+                   padding:5px 13px; border-radius:8px; font-size:12px; font-weight:700;
+                   background:rgba(34,197,94,.2); border:1px solid rgba(34,197,94,.5); color:#4ade80; display:none; }
+
+    .console-panel { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .console-hdr { flex-shrink:0; padding:7px 14px; background:var(--bg); border-bottom:1px solid var(--border);
+                   display:flex; justify-content:space-between; align-items:center; }
+    .console-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-faint); }
+    pre#console  { flex:1; overflow-y:auto; margin:0; padding:10px 14px; font-family:var(--mono); font-size:11.5px;
+                   line-height:1.65; background:#050710; color:#9ca3af; white-space:pre-wrap; }
+    pre#console .ok   { color:#4ade80; }
+    pre#console .err  { color:#f87171; }
+    pre#console .info { color:#b8ef4a; }
+    pre#console .out  { color:#e2e8f0; }
+
+    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(60px);
+             padding:10px 20px; border-radius:10px; font-size:13px; font-weight:600;
+             background:#1a2e1a; color:#bbf7d0; border:1px solid #16a34a;
+             opacity:0; transition:.3s; z-index:9999; pointer-events:none; }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    @media(max-width:900px) {
+      .layout { grid-template-columns:1fr; grid-template-rows:50vh 1fr; }
+    }
+  </style>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/lesson-saves.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">ByteForge</span>
+  </div>
+  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+</nav>
+
+<div class="layout">
+
+  <!-- Left: Python editor -->
+  <div class="editor-panel" style="position:relative;">
+    <div class="ed-header">
+      <div class="ed-title">
+        <span style="font-size:13px;font-weight:700;">Python Editor</span>
+        <span class="grade-badge">Grade 8</span>
+        <span class="lang-badge">Python 3</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="resetToStarter()">↺ Starter code</button>
+        <button class="btn btn-ghost"  onclick="clearEditor()">Clear</button>
+        <button class="btn btn-brand"  id="run-btn" onclick="runPython()" disabled>⏳ Loading…</button>
+      </div>
+    </div>
+    <div class="cm-outer">
+      <textarea id="py-editor"></textarea>
+    </div>
+    <!-- Pyodide loading overlay -->
+    <div class="py-loading" id="py-loading">
+      <div class="spinner"></div>
+      <div class="py-loading-text">Loading Python 3 (Pyodide)…</div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+
+    <!-- Challenge header -->
+    <div class="ch-header">
+      <div class="ch-pills" id="ch-pills"></div>
+      <div class="ch-row">
+        <div class="ch-text" id="ch-text">Select a challenge to begin.</div>
+        <div class="ch-meta">
+          <span class="xp-pill" id="xp-pill">+40 XP</span>
+          <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap">
+      <canvas id="out-canvas" width="480" height="260"></canvas>
+      <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
+    </div>
+
+    <!-- Console / print output -->
+    <div class="console-panel">
+      <div class="console-hdr">
+        <span class="console-lbl">Output / Console</span>
+        <span style="font-size:10px;color:var(--fg-faint);">print() appears here</span>
+      </div>
+      <pre id="console"><span class="info">Loading Python…</span>
+</pre>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict'
+
+// ── Canvas drawing state ──────────────────────────────────────────────────────
+const canvas = document.getElementById('out-canvas')
+const ctx    = canvas.getContext('2d')
+const W = canvas.width, H = canvas.height
+
+let _fill   = '#b8ef4a'
+let _stroke = 'none'
+let _lw     = 2
+let _fontSz = 16
+let _font   = '16px Plus Jakarta Sans, sans-serif'
+
+// Validation counters (reset each run)
+let drawLog = { rects:0, circles:0, lines:0, texts:0, calls:0 }
+
+function applyFill()   { ctx.fillStyle = _fill }
+function applyStroke() { if (_stroke !== 'none') { ctx.strokeStyle = _stroke; ctx.lineWidth = _lw } }
+
+// Expose JS drawing API as window._bf_* so Python (js module) can call them
+window._bf_set_fill   = c => { _fill = c }
+window._bf_set_stroke = c => { _stroke = c }
+window._bf_set_lw     = n => { _lw = n }
+window._bf_set_font   = n => { _fontSz = n; _font = `${n}px Plus Jakarta Sans, sans-serif` }
+window._bf_clear      = ()        => { ctx.clearRect(0,0,W,H); drawLog.calls++ }
+window._bf_background = c         => { ctx.fillStyle = c; ctx.fillRect(0,0,W,H); drawLog.calls++ }
+window._bf_rect       = (x,y,w,h) => {
+  applyFill(); ctx.fillRect(x,y,w,h)
+  if (_stroke !== 'none') { applyStroke(); ctx.strokeRect(x,y,w,h) }
+  drawLog.rects++; drawLog.calls++
+}
+window._bf_circle     = (x,y,r)   => {
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2)
+  applyFill(); ctx.fill()
+  if (_stroke !== 'none') { applyStroke(); ctx.stroke() }
+  drawLog.circles++; drawLog.calls++
+}
+window._bf_line       = (x1,y1,x2,y2) => {
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2)
+  ctx.strokeStyle = _stroke !== 'none' ? _stroke : _fill
+  ctx.lineWidth = _lw; ctx.stroke()
+  drawLog.lines++; drawLog.calls++
+}
+window._bf_text       = (s,x,y)   => {
+  ctx.font = _font; ctx.fillStyle = _fill; ctx.fillText(String(s),x,y)
+  drawLog.texts++; drawLog.calls++
+}
+
+// ── Byteforge Python module source (installed into sys.modules) ───────────────
+const BYTEFORGE_PY = `
+from js import (
+    _bf_set_fill, _bf_set_stroke, _bf_set_lw, _bf_set_font,
+    _bf_clear, _bf_background, _bf_rect, _bf_circle, _bf_line, _bf_text
+)
+
+WIDTH  = 480
+HEIGHT = 260
+
+def fill(r, g=None, b=None):
+    """Set the fill colour. Use fill(r,g,b) or fill('#hex')."""
+    if g is None:
+        _bf_set_fill(str(r))
+    else:
+        _bf_set_fill(f'rgb({int(r)},{int(g)},{int(b)})')
+
+def stroke(r, g=None, b=None):
+    """Set the outline colour. Use stroke(r,g,b) or stroke('#hex')."""
+    if g is None:
+        _bf_set_stroke(str(r))
+    else:
+        _bf_set_stroke(f'rgb({int(r)},{int(g)},{int(b)})')
+
+def no_stroke():
+    """Remove the outline."""
+    _bf_set_stroke('none')
+
+def stroke_width(n):
+    """Set outline thickness in pixels."""
+    _bf_set_lw(float(n))
+
+def font_size(n):
+    """Set the text size in pixels."""
+    _bf_set_font(float(n))
+
+def rect(x, y, w, h):
+    """Draw a filled rectangle."""
+    _bf_rect(float(x), float(y), float(w), float(h))
+
+def circle(x, y, r):
+    """Draw a filled circle at (x, y) with radius r."""
+    _bf_circle(float(x), float(y), float(r))
+
+def line(x1, y1, x2, y2):
+    """Draw a line from (x1,y1) to (x2,y2)."""
+    _bf_line(float(x1), float(y1), float(x2), float(y2))
+
+def text(s, x, y):
+    """Draw text string s at position (x, y)."""
+    _bf_text(str(s), float(x), float(y))
+
+def clear():
+    """Clear the canvas."""
+    _bf_clear()
+
+def background(r, g=None, b=None):
+    """Fill the canvas with a background colour."""
+    if g is None:
+        _bf_background(str(r))
+    else:
+        _bf_background(f'rgb({int(r)},{int(g)},{int(b)})')
+
+__all__ = [
+    'WIDTH', 'HEIGHT',
+    'fill', 'stroke', 'no_stroke', 'stroke_width', 'font_size',
+    'rect', 'circle', 'line', 'text', 'clear', 'background',
+]
+`
+
+// ── Pyodide init ──────────────────────────────────────────────────────────────
+let pyodide = null
+let pyReady = false
+
+async function initPyodide() {
+  try {
+    clog('Loading Python 3 engine (Pyodide)…', 'info')
+    pyodide = await globalThis.loadPyodide()
+
+    // Install byteforge module into sys.modules
+    pyodide.runPython(`
+import types as _types, sys as _sys
+_bf_mod = _types.ModuleType('byteforge')
+exec(${JSON.stringify(BYTEFORGE_PY)}, _bf_mod.__dict__)
+_sys.modules['byteforge'] = _bf_mod
+del _types, _sys, _bf_mod
+`)
+
+    pyReady = true
+    document.getElementById('py-loading').style.display = 'none'
+    const btn = document.getElementById('run-btn')
+    btn.textContent = '▶ Run'; btn.disabled = false
+    clog('Python 3 ready! Press ▶ Run to execute your code.', 'ok')
+  } catch(e) {
+    clog('Failed to load Python: ' + e.message, 'err')
+    document.getElementById('py-loading').style.display = 'none'
+  }
+}
+
+// ── CodeMirror ────────────────────────────────────────────────────────────────
+const editor = CodeMirror.fromTextArea(document.getElementById('py-editor'), {
+  mode:         'python',
+  theme:        'dracula',
+  lineNumbers:   true,
+  indentUnit:    4,
+  tabSize:       4,
+  indentWithTabs:false,
+  lineWrapping:  false,
+  autofocus:     true,
+  extraKeys: {
+    Tab: cm => {
+      if (cm.somethingSelected()) { cm.indentSelection('add') }
+      else { cm.replaceSelection('    ') }
+    },
+    'Shift-Tab': cm => cm.indentSelection('subtract'),
+  },
+})
+
+// ── Execution ─────────────────────────────────────────────────────────────────
+// Lines injected before user code (for line-number adjustment in errors)
+const PREAMBLE_LINES = 6
+
+const PREAMBLE = `
+import sys as _sys, io as _io
+_stdout_buf = _io.StringIO()
+_sys.stdout = _stdout_buf
+_sys.stderr = _stdout_buf
+from byteforge import *
+`.trim()
+
+async function runPython() {
+  if (!pyReady) { clog('Python is still loading — please wait.', 'info'); return }
+
+  const code = editor.getValue()
+  if (!code.trim()) { clog('Nothing to run — write some Python first!', 'info'); return }
+
+  // Reset canvas & draw counters
+  ctx.clearRect(0,0,W,H)
+  drawLog = { rects:0, circles:0, lines:0, texts:0, calls:0 }
+  _fill='#b8ef4a'; _stroke='none'; _lw=2; _fontSz=16; _font='16px Plus Jakarta Sans, sans-serif'
+  document.getElementById('pass-badge').style.display = 'none'
+
+  const fullCode = PREAMBLE + '\n' + code + '\n_stdout_buf.getvalue()'
+
+  clog('— Running —', 'info')
+  const t0 = Date.now()
+
+  try {
+    const result = await pyodide.runPythonAsync(fullCode)
+    const elapsed = Date.now() - t0
+
+    // Print captured stdout
+    const printed = String(result || '').trim()
+    if (printed) {
+      printed.split('\n').forEach(line => clog(line, 'out'))
+    }
+
+    clog(`Finished in ${elapsed}ms.`, 'ok')
+    validateChallenge(code)
+
+  } catch(rawErr) {
+    const { msg, line } = parsePyError(rawErr.message, code)
+    clog(msg, 'err')
+    if (line > 0) highlightError(line)
+  }
+}
+
+function parsePyError(raw, userCode) {
+  // Adjust line numbers — remove preamble offset
+  const preambleLen = PREAMBLE.split('\n').length + 1
+  let msg = raw
+
+  // Extract line number from traceback
+  const lineMatch = raw.match(/line (\d+)/g)
+  let line = 0
+  if (lineMatch) {
+    const lastLine = lineMatch[lineMatch.length - 1]
+    const n = parseInt(lastLine.replace('line ',''))
+    line = Math.max(0, n - preambleLen)
+    msg = raw.replace(lastLine, `line ${line}`)
+  }
+
+  // Friendly rewrites
+  const friendly = {
+    'NameError': (m) => {
+      const name = m.match(/name '(\w+)' is not defined/)?.[1]
+      return name ? `NameError: "${name}" is not defined. Did you spell it correctly? Remember Python is case-sensitive.` : m
+    },
+    'IndentationError': (m) => `IndentationError: Check your indentation! Python uses 4 spaces to indent code inside if/for/def blocks.`,
+    'SyntaxError': (m) => `SyntaxError: Something's wrong with the structure of your code. Check for missing colons (:) after if/for/def, or mismatched brackets.`,
+    'TypeError': (m) => {
+      if (m.includes("argument")) return `TypeError: Wrong number or type of arguments. Check what your function expects.`
+      return `TypeError: ${m.split('\n').pop()}`
+    },
+    'ZeroDivisionError': () => `ZeroDivisionError: You divided by zero! Make sure your divisor is not 0.`,
+    'IndexError': (m) => `IndexError: You tried to access a list item that doesn't exist. Lists start at index 0.`,
+    'ValueError': (m) => `ValueError: ${m.split('\n').pop()}`,
+  }
+
+  for (const [errType, fn] of Object.entries(friendly)) {
+    if (msg.includes(errType)) {
+      const lastLine = msg.split('\n').filter(Boolean).pop() || msg
+      return { msg: (line>0?`Line ${line}: `:'') + fn(lastLine), line }
+    }
+  }
+
+  // Fallback: last meaningful line
+  const lines = msg.split('\n').filter(l => l.trim() && !l.includes('File') && !l.includes('Traceback'))
+  return { msg: (line>0?`Line ${line}: `:'') + (lines.pop() || msg), line }
+}
+
+function highlightError(line) {
+  editor.addLineClass(line - 1, 'background', 'cm-error-line')
+  setTimeout(() => editor.removeLineClass(line - 1, 'background', 'cm-error-line'), 4000)
+}
+
+// ── Challenges ────────────────────────────────────────────────────────────────
+const CHALLENGES = [
+  {
+    mod:'M9', name:'Smiley Factory', xp:40,
+    text:`<strong>Challenge 1 — Functions & Parameters</strong> — Complete the <code>draw_smiley()</code> function by adding eyes and a mouth. Then call it at least twice with different colors or sizes.`,
+    hints:[
+      'The eyes are small dark circles. Left eye ≈ (x - r//3, y - r//4), right eye ≈ (x + r//3, y - r//4). Use radius 6.',
+      'For the mouth, draw a small circle or oval near (x, y + r//3) in a darker color.',
+      'Call draw_smiley(120, 130, 70, 255, 220, 50) for a big yellow smiley, then another at a different position.',
+    ],
+    starter:`# Grade 8 — Functions & Parameters
+# Complete the function and call it at least twice!
+
+def draw_smiley(x, y, r, color_r, color_g, color_b):
+    """Draw a smiley face centred at (x, y) with radius r."""
+    # Head
+    fill(color_r, color_g, color_b)
+    circle(x, y, r)
+
+    # Eyes — add them here!
+    fill(30, 30, 50)
+    # circle(x - r//3, y - r//4, 6)   # left eye
+    # circle(x + r//3, y - r//4, 6)   # right eye
+
+    # Mouth — draw something below the centre
+    # TODO: add the mouth
+
+# Set up the background
+background(20, 20, 40)
+
+# Call the function (at least twice for full marks!)
+draw_smiley(120, 130, 70, 255, 220, 50)    # big yellow smiley
+# Add another smiley below with different values:
+`,
+    check: (code, log) => {
+      const hasDef  = /def\s+\w+/.test(code)
+      const hasCalls= (code.match(/\w+\s*\(/g) || []).length >= 4
+      return hasDef && log.circles >= 3
+    },
+  },
+  {
+    mod:'M9', name:'Color Grid', xp:45,
+    text:`<strong>Challenge 2 — Functions & Parameters</strong> — Define a <code>colored_tile(r, g, b, x, y, size)</code> function. Call it to build a 3×2 grid of colored squares. Use a loop for the rows.`,
+    hints:[
+      'The function body just does: fill(r, g, b), then rect(x, y, size, size).',
+      'For a 3-column row: call the function 3 times with x = 40, 120, 200 and different colors each time.',
+      'For a 2-row grid, use a for loop over two y values, e.g. for row_y in [50, 160]:',
+    ],
+    starter:`# Grade 8 — Functions & Parameters
+# Define the function, then call it to make a grid!
+
+def colored_tile(r, g, b, x, y, size):
+    """Draw a colored square tile."""
+    fill(r, g, b)
+    rect(x, y, size, size)
+
+background(15, 18, 32)
+tile_size = 70
+
+# Build a grid by calling colored_tile with different colors and positions:
+colored_tile(220, 80,  80,  40,  80, tile_size)   # red
+colored_tile(80,  200, 100, 130, 80, tile_size)   # green
+# Keep adding tiles — try making a full 3-column × 2-row grid!
+`,
+    check: (code, log) => {
+      const hasDef = /def\s+\w+/.test(code)
+      return hasDef && log.rects >= 4
+    },
+  },
+  {
+    mod:'M10', name:'Bar Chart', xp:45,
+    text:`<strong>Challenge 3 — Lists & Loops</strong> — A list of temperatures is given. Loop through the list and draw a bar (rectangle) for each value. Taller bars = higher temperature.`,
+    hints:[
+      'Inside the for loop: bar_height = temp * 5. Then y = 260 - bar_height so bars grow upwards.',
+      'Use rect(x, y, bar_width, bar_height) inside the loop. Move x by bar_width + 10 each step.',
+      'Add fill(80, 160, 220) before drawing each bar, or change the fill based on the temperature.',
+    ],
+    starter:`# Grade 8 — Lists & Loops
+# Complete the bar chart by drawing a rectangle for each temperature!
+
+temperatures = [22, 35, 28, 41, 19, 30, 26]
+
+background(12, 16, 30)
+fill(80, 160, 220)
+
+bar_width = 40
+x = 30
+
+for temp in temperatures:
+    bar_height = temp * 5       # scale: each degree = 5 pixels
+    y = 260 - bar_height        # bars grow upwards from the bottom
+
+    # TODO: draw the bar rectangle here:
+    # rect(x, y, bar_width, bar_height)
+
+    x = x + bar_width + 10     # move right for next bar
+`,
+    check: (code, log) => {
+      const hasList = /\[/.test(code)
+      const hasFor  = /for\s+\w+\s+in\s+/.test(code)
+      return hasList && hasFor && log.rects >= 5
+    },
+  },
+  {
+    mod:'M10', name:'Rainbow Row', xp:40,
+    text:`<strong>Challenge 4 — Lists of Tuples</strong> — Create a list of (r, g, b) colour tuples — at least 6 colors. Loop through it and draw a circle for each color in a row.`,
+    hints:[
+      'Each item in the list is a tuple: (255, 80, 80). Unpack with: r, g, b = color',
+      'Inside the loop: fill(r, g, b), then circle(x, 130, 35). Increment x by 70 each step.',
+      'Add at least 6 colors: red, orange, yellow, green, blue, purple.',
+    ],
+    starter:`# Grade 8 — Lists of Tuples
+# Add at least 6 colours and draw a circle for each!
+
+colors = [
+    (255, 80,  80 ),   # red
+    (255, 165, 0  ),   # orange
+    (255, 255, 60 ),   # yellow
+    # Add more (r, g, b) tuples here!
+]
+
+background(18, 20, 35)
+x = 50
+
+for color in colors:
+    r, g, b = color      # unpack the tuple
+    fill(r, g, b)
+    # TODO: draw a circle at (x, 130) with radius 35
+    x = x + 70
+`,
+    check: (code, log) => {
+      const hasList = /\[/.test(code)
+      const hasFor  = /for\s+\w+\s+in\s+/.test(code)
+      const colorCount = (code.match(/\(\d+,\s*\d+,\s*\d+\)/g) || []).length
+      return hasList && hasFor && log.circles >= 5 && colorCount >= 5
+    },
+  },
+  {
+    mod:'M10', name:'Score Sorter', xp:50,
+    text:`<strong>Challenge 5 — Sorting & Display</strong> — Sort a list of scores and display the top 5 as bars. Use <code>sorted()</code> and list slicing (<code>[-5:]</code> gets the last 5 items). Label each bar with its value.`,
+    hints:[
+      'sorted_scores = sorted(player_scores) gives lowest-first. sorted_scores[-5:] gets the top 5.',
+      'For each score in top_5: draw a bar rect and then draw the score value as text above the bar.',
+      'Bar height = score * 2. Position bars x = 40, 120, 200, 280, 360 with width 60.',
+    ],
+    starter:`# Grade 8 — Sorting & Display
+# Sort the scores and display the top 5 as a bar chart with labels!
+
+player_scores = [87, 45, 92, 63, 78, 55, 99, 41, 76, 88]
+
+# Sort the list (lowest first):
+sorted_scores = sorted(player_scores)
+
+# Get just the top 5 (highest):
+top_5 = sorted_scores[-5:]
+
+print("Top 5 scores:", top_5)
+
+background(10, 14, 28)
+font_size(14)
+
+x = 40
+for score in top_5:
+    bar_h = score * 2
+
+    # Draw bar
+    fill(60 + score, 180, 100)
+    rect(x, 260 - bar_h, 60, bar_h)
+
+    # Label above bar
+    fill(220, 220, 220)
+    # TODO: draw the score value as text above the bar
+    # text(str(score), x + 10, 255 - bar_h)
+
+    x = x + 80
+`,
+    check: (code, log) => {
+      const hasList   = /\[/.test(code)
+      const hasSort   = /sorted\s*\(/.test(code)
+      const hasSlice  = /\[-\d+:\]/.test(code)
+      return hasList && hasSort && (log.rects >= 4 || log.texts >= 4)
+    },
+  },
+]
+
+// -- BF Integration --
+BF.seed();
+// Soft auth: allow access from Next.js/Supabase context (me = null → XP skipped)
+const me = (() => { try { return BF.session() || null; } catch(_) { return null; } })();
+
+const completed = new Set()
+let activeIdx = 0
+let hintIdx   = 0
+
+function renderPills() {
+  const row = document.getElementById('ch-pills')
+  row.innerHTML = ''
+  CHALLENGES.forEach((ch,i) => {
+    const el = document.createElement('div')
+    el.className = 'ch-pill' + (i===activeIdx?' active':'') + (completed.has(i)?' done':'')
+    el.textContent = (completed.has(i)?'✓ ':'') + ch.mod + ' ' + ch.name
+    el.onclick = () => selectChallenge(i)
+    row.appendChild(el)
+  })
+}
+
+function selectChallenge(i) {
+  activeIdx = i
+  hintIdx   = 0
+  const ch  = CHALLENGES[i]
+  document.getElementById('ch-text').innerHTML = ch.text
+  document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
+  document.getElementById('pass-badge').style.display = 'none'
+  editor.setValue(ch.starter || '# Write your Python here\n')
+  editor.focus()
+  ctx.clearRect(0,0,W,H)
+  renderPills()
+  clog('Challenge: ' + ch.name, 'info')
+}
+
+function resetToStarter() {
+  const ch = CHALLENGES[activeIdx]
+  if (ch) editor.setValue(ch.starter || '')
+  ctx.clearRect(0,0,W,H)
+  document.getElementById('pass-badge').style.display = 'none'
+  clog('Reset to starter code.', 'info')
+}
+
+function clearEditor() {
+  editor.setValue('')
+  ctx.clearRect(0,0,W,H)
+  document.getElementById('pass-badge').style.display = 'none'
+}
+
+function validateChallenge(code) {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch || completed.has(activeIdx)) return
+  if (ch.check(code, drawLog)) {
+    completed.add(activeIdx)
+    renderPills()
+    document.getElementById('pass-badge').style.display = 'block'
+    showToast('Challenge complete! +' + ch.xp + ' XP')
+    clog('Challenge complete! +' + ch.xp + ' XP', 'ok')
+    if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g8-c' + activeIdx, { passed: true, score: 100 }); }
+    LessonSaves.save('grade8', activeIdx, { passed: true, xpEarned: ch.xp, code })
+  }
+}
+
+function showHint() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch) return
+  if (hintIdx < ch.hints.length) clog('Hint ' + (hintIdx+1) + ': ' + ch.hints[hintIdx++], 'info')
+  else clog('No more hints!', 'info')
+}
+
+// ── Console ───────────────────────────────────────────────────────────────────
+function clog(msg, cls='') {
+  const pre = document.getElementById('console')
+  const span = document.createElement('span')
+  span.className = cls
+  span.textContent = msg + '\n'
+  pre.appendChild(span)
+  pre.scrollTop = pre.scrollHeight
+  if (pre.children.length > 120) pre.removeChild(pre.firstChild)
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 3200)
+}
+
+// Add a CodeMirror style for error lines
+const style = document.createElement('style')
+style.textContent = `.cm-error-line { background:rgba(239,68,68,.18) !important; }`
+document.head.appendChild(style)
+
+// ── Init — restore Supabase saves, then render ───────────────────────────────
+initPyodide()
+;(async () => {
+  await LessonSaves.load('grade8')
+  LessonSaves.completedSet().forEach(idx => completed.add(idx))
+  renderPills()
+  selectChallenge(0)
+})()
+</script>
+</body>
+</html>
+
+

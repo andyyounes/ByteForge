@@ -1,0 +1,373 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge â€” Blockly Coding</title>
+  <link rel="stylesheet" href="/styles.css"/>
+  <!-- Google Blockly CDN -->
+  <script src="https://unpkg.com/blockly@10.4.3/blockly_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/blocks_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/javascript_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/msg/en.js"></script>
+  <style>
+    * { box-sizing:border-box; }
+    body { padding-top:64px; background:var(--bg); color:var(--fg); min-height:100vh; }
+
+    .layout { display:grid; grid-template-columns:1fr 400px; height:calc(100vh - 64px); overflow:hidden; }
+
+    /* â”€â”€ Left: Blockly workspace â”€â”€ */
+    .blockly-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); }
+    .panel-header { padding:14px 20px; background:var(--bg-card); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; }
+    .panel-title { font-size:15px; font-weight:700; }
+    .btn-row { display:flex; gap:8px; }
+    .btn { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:.15s; }
+    .btn-orange { background:var(--orange); color:#fff; }
+    .btn-orange:hover { background:#ea580c; }
+    .btn-ghost { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover { background:rgba(255,255,255,.08); }
+    .btn-green  { background:rgba(34,197,94,.2); color:var(--green); border:1px solid var(--green); }
+    #blockly-div { flex:1; width:100%; }
+
+    /* â”€â”€ Right: Simulation + Code â”€â”€ */
+    .right-panel { display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Simulation canvas */
+    .sim-panel { background:var(--bg-card); border-bottom:1px solid var(--border); flex-shrink:0; }
+    .sim-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+    .sim-title { font-size:14px; font-weight:700; }
+    canvas { display:block; background:#0a0f1f; }
+
+    /* Challenges */
+    .challenges-panel { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); max-height:160px; overflow-y:auto; }
+    .ch-header { padding:10px 16px; font-size:13px; font-weight:700; color:var(--fg-dim); border-bottom:1px solid var(--border); }
+    .challenge-item { padding:10px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; transition:.15s; }
+    .challenge-item:hover { background:rgba(255,255,255,.03); }
+    .challenge-item.active { background:rgba(249,115,22,.07); }
+    .ch-icon { font-size:16px; }
+    .ch-name { font-size:13px; font-weight:600; flex:1; }
+    .ch-xp   { font-size:11px; color:var(--yellow); font-weight:700; }
+    .ch-done { color:var(--green); font-size:14px; }
+
+    /* Generated code */
+    .code-panel { flex:1; overflow:auto; }
+    .code-header { padding:10px 16px; font-size:13px; font-weight:700; color:var(--fg-dim); background:var(--bg); border-bottom:1px solid var(--border); }
+    pre { margin:0; padding:16px; font-family:var(--mono); font-size:12px; line-height:1.6; color:#abb2bf; white-space:pre-wrap; word-break:break-word; }
+
+    /* Output */
+    .output-panel { background:#0a0c18; border-top:1px solid var(--border); max-height:100px; overflow-y:auto; padding:12px 16px; font-family:var(--mono); font-size:13px; color:#abb2bf; flex-shrink:0; }
+    .output-line { margin-bottom:2px; }
+    .output-line.sys { color:var(--fg-faint); }
+    .output-line.ok  { color:var(--green); }
+    .output-line.err { color:#fca5a5; }
+
+    /* Character */
+    .char { width:20px; height:20px; border-radius:4px; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
+    .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
+    .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
+    .toast-show    { transform:translateY(0); opacity:1; }
+
+    @media(max-width:800px) { .layout { grid-template-columns:1fr; grid-template-rows:55vh 1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo"><div class="logo-icon">âš’</div><span class="logo-text">Byte<span>Forge</span></span></div>
+    <div class="nav-links"><a href="/student/dashboard">â† Dashboard</a></div>
+    <a href="../login.html" class="nav-cta" id="nav-auth">Sign In</a>
+  </nav>
+
+  <div class="layout">
+
+    <!-- Left: Blockly -->
+    <div class="blockly-panel">
+      <div class="panel-header">
+        <div class="panel-title">ðŸ§± Block Coding</div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="clearWorkspace()">Clear</button>
+          <button class="btn btn-orange" onclick="runCode()">â–¶ Run</button>
+        </div>
+      </div>
+      <div id="blockly-div"></div>
+    </div>
+
+    <!-- Right: Simulation + Code output -->
+    <div class="right-panel">
+
+      <!-- Simulation canvas -->
+      <div class="sim-panel">
+        <div class="sim-header">
+          <div class="sim-title">ðŸŽ® Simulation</div>
+          <button class="btn btn-ghost" style="padding:5px 12px;font-size:12px" onclick="resetSim()">Reset</button>
+        </div>
+        <canvas id="sim-canvas" width="400" height="200"></canvas>
+      </div>
+
+      <!-- Challenges -->
+      <div class="challenges-panel">
+        <div class="ch-header">Challenges</div>
+        <div id="challenge-list"></div>
+      </div>
+
+      <!-- Generated code -->
+      <div class="code-panel">
+        <div class="code-header">Generated JavaScript</div>
+        <pre id="generated-code">// Drag blocks onto the workspace and click Run!</pre>
+      </div>
+
+      <!-- Output log -->
+      <div class="output-panel" id="output-panel">
+        <div class="output-line sys">Output will appear hereâ€¦</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Blockly XML toolbox -->
+  <xml id="toolbox" style="display:none">
+    <category name="Movement" colour="#f97316">
+      <block type="bf_move_forward"><field name="STEPS">50</field></block>
+      <block type="bf_move_backward"><field name="STEPS">50</field></block>
+      <block type="bf_turn_left"><field name="DEGREES">90</field></block>
+      <block type="bf_turn_right"><field name="DEGREES">90</field></block>
+      <block type="bf_jump"><field name="HEIGHT">80</field></block>
+      <block type="bf_goto"></block>
+    </category>
+    <category name="Appearance" colour="#a855f7">
+      <block type="bf_set_color"></block>
+      <block type="bf_set_size"><field name="SIZE">20</field></block>
+      <block type="bf_pen_down"></block>
+      <block type="bf_pen_up"></block>
+    </category>
+    <category name="Output" colour="#3b82f6">
+      <block type="bf_print"></block>
+      <block type="bf_say"></block>
+    </category>
+    <category name="Control" colour="#22c55e">
+      <block type="controls_repeat_ext"><value name="TIMES"><shadow type="math_number"><field name="NUM">10</field></shadow></value></block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_if"></block>
+    </category>
+    <category name="Logic" colour="#eab308">
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+    </category>
+    <category name="Math" colour="#06b6d4">
+      <block type="math_number"><field name="NUM">0</field></block>
+      <block type="math_arithmetic"></block>
+      <block type="math_random_int"></block>
+    </category>
+    <category name="Variables" colour="#ef4444" custom="VARIABLE"></category>
+  </xml>
+
+  <script src="/js/db.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    BF.seed();
+    const me = BF.session();
+    if (me) { document.getElementById('nav-auth').textContent='Dashboard'; document.getElementById('nav-auth').href=me.role==='teacher'?'/teacher/dashboard':'/student/dashboard'; }
+
+    // â”€â”€ Simulation state â”€â”€
+    const canvas  = document.getElementById('sim-canvas');
+    const ctx     = canvas.getContext('2d');
+    let sim = { x:200, y:100, angle:0, color:'#f97316', size:20, penDown:false, trail:[], speech:'' };
+
+    function resetSim() {
+      sim = { x:200, y:100, angle:0, color:'#f97316', size:20, penDown:false, trail:[], speech:'' };
+      drawSim();
+    }
+
+    function drawSim() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // Grid
+      ctx.strokeStyle='rgba(255,255,255,0.04)';
+      ctx.lineWidth=1;
+      for(let x=0;x<canvas.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+      for(let y=0;y<canvas.height;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+      // Trail
+      ctx.strokeStyle=sim.color;
+      ctx.lineWidth=2;
+      ctx.lineCap='round';
+      sim.trail.forEach(seg=>{
+        if(seg.draw){ctx.beginPath();ctx.moveTo(seg.x1,seg.y1);ctx.lineTo(seg.x2,seg.y2);ctx.stroke();}
+      });
+      // Character (triangle pointing in direction)
+      const r=sim.size/2;
+      ctx.save();
+      ctx.translate(sim.x,sim.y);
+      ctx.rotate((sim.angle-90)*Math.PI/180);
+      ctx.beginPath();
+      ctx.moveTo(0,-r);
+      ctx.lineTo(r*0.7,r*0.7);
+      ctx.lineTo(-r*0.7,r*0.7);
+      ctx.closePath();
+      ctx.fillStyle=sim.color;
+      ctx.fill();
+      ctx.restore();
+      // Speech bubble
+      if(sim.speech){
+        ctx.fillStyle='rgba(255,255,255,0.9)';
+        const tw=ctx.measureText(sim.speech).width+16;
+        const bx=Math.min(sim.x-tw/2,canvas.width-tw-4); const by=sim.y-sim.size-30;
+        ctx.beginPath();ctx.roundRect(bx,by,tw,26,6);ctx.fill();
+        ctx.fillStyle='#0d0f1a'; ctx.font='bold 13px Inter,sans-serif'; ctx.textAlign='left';
+        ctx.fillText(sim.speech,bx+8,by+17);
+      }
+    }
+
+    resetSim();
+
+    // â”€â”€ Custom Blockly blocks â”€â”€
+    Blockly.Blocks['bf_move_forward'] = {
+      init() { this.appendValueInput('STEPS').setCheck('Number').appendField('move forward'); this.appendDummyInput().appendField('steps'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(30); }
+    };
+    Blockly.Blocks['bf_move_backward'] = {
+      init() { this.appendValueInput('STEPS').setCheck('Number').appendField('move backward'); this.appendDummyInput().appendField('steps'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(30); }
+    };
+    Blockly.Blocks['bf_turn_left'] = {
+      init() { this.appendDummyInput().appendField('turn left').appendField(new Blockly.FieldNumber(90,0,360),'DEGREES').appendField('degrees'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(30); }
+    };
+    Blockly.Blocks['bf_turn_right'] = {
+      init() { this.appendDummyInput().appendField('turn right').appendField(new Blockly.FieldNumber(90,0,360),'DEGREES').appendField('degrees'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(30); }
+    };
+    Blockly.Blocks['bf_jump'] = {
+      init() { this.appendDummyInput().appendField('jump').appendField(new Blockly.FieldNumber(80,10,200),'HEIGHT').appendField('pixels high'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(30); }
+    };
+    Blockly.Blocks['bf_goto'] = {
+      init() { this.appendDummyInput().appendField('go to x:').appendField(new Blockly.FieldNumber(200,0,400),'X').appendField('y:').appendField(new Blockly.FieldNumber(100,0,200),'Y'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(30); }
+    };
+    Blockly.Blocks['bf_set_color'] = {
+      init() { this.appendDummyInput().appendField('set color').appendField(new Blockly.FieldColour('#f97316'),'COLOR'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(270); }
+    };
+    Blockly.Blocks['bf_set_size'] = {
+      init() { this.appendDummyInput().appendField('set size').appendField(new Blockly.FieldNumber(20,5,80),'SIZE'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(270); }
+    };
+    Blockly.Blocks['bf_pen_down'] = {
+      init() { this.appendDummyInput().appendField('pen down (draw trail)'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(270); }
+    };
+    Blockly.Blocks['bf_pen_up'] = {
+      init() { this.appendDummyInput().appendField('pen up'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(270); }
+    };
+    Blockly.Blocks['bf_print'] = {
+      init() { this.appendValueInput('TEXT').setCheck(null).appendField('print'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(200); }
+    };
+    Blockly.Blocks['bf_say'] = {
+      init() { this.appendValueInput('TEXT').setCheck(null).appendField('say'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(200); }
+    };
+
+    // â”€â”€ Code generators â”€â”€
+    Blockly.JavaScript['bf_move_forward']  = b => `BF_move(${Blockly.JavaScript.valueToCode(b,'STEPS',0)||50});\n`;
+    Blockly.JavaScript['bf_move_backward'] = b => `BF_move(-(${Blockly.JavaScript.valueToCode(b,'STEPS',0)||50}));\n`;
+    Blockly.JavaScript['bf_turn_left']     = b => `BF_turn(-${b.getFieldValue('DEGREES')});\n`;
+    Blockly.JavaScript['bf_turn_right']    = b => `BF_turn(${b.getFieldValue('DEGREES')});\n`;
+    Blockly.JavaScript['bf_jump']          = b => `BF_jump(${b.getFieldValue('HEIGHT')});\n`;
+    Blockly.JavaScript['bf_goto']          = b => `BF_goto(${b.getFieldValue('X')},${b.getFieldValue('Y')});\n`;
+    Blockly.JavaScript['bf_set_color']     = b => `BF_setColor('${b.getFieldValue('COLOR')}');\n`;
+    Blockly.JavaScript['bf_set_size']      = b => `BF_setSize(${b.getFieldValue('SIZE')});\n`;
+    Blockly.JavaScript['bf_pen_down']      = ()=> `BF_penDown();\n`;
+    Blockly.JavaScript['bf_pen_up']        = ()=> `BF_penUp();\n`;
+    Blockly.JavaScript['bf_print']         = b => `BF_print(${Blockly.JavaScript.valueToCode(b,'TEXT',0)||'""'});\n`;
+    Blockly.JavaScript['bf_say']           = b => `BF_say(${Blockly.JavaScript.valueToCode(b,'TEXT',0)||'""'});\n`;
+
+    // â”€â”€ Simulation API â”€â”€
+    const STEPS = [];
+    function BF_move(d) {
+      const r=sim.angle*Math.PI/180;
+      const nx=sim.x+d*Math.cos(r); const ny=sim.y+d*Math.sin(r);
+      if(sim.penDown) sim.trail.push({draw:true,x1:sim.x,y1:sim.y,x2:nx,y2:ny});
+      sim.x=Math.max(0,Math.min(canvas.width,nx)); sim.y=Math.max(0,Math.min(canvas.height,ny));
+    }
+    function BF_turn(deg)      { sim.angle=(sim.angle+deg+360)%360; }
+    function BF_jump(h)        { sim.y=Math.max(sim.size,sim.y-h); }
+    function BF_goto(x,y)      { if(sim.penDown) sim.trail.push({draw:true,x1:sim.x,y1:sim.y,x2:x,y2:y}); sim.x=x; sim.y=y; }
+    function BF_setColor(c)    { sim.color=c; }
+    function BF_setSize(s)     { sim.size=s; }
+    function BF_penDown()      { sim.penDown=true; }
+    function BF_penUp()        { sim.penDown=false; }
+    function BF_print(t)       { addOutput(String(t)); }
+    function BF_say(t)         { sim.speech=String(t); setTimeout(()=>{sim.speech='';drawSim();},2000); }
+
+    // â”€â”€ Workspace â”€â”€
+    const workspace = Blockly.inject('blockly-div', {
+      toolbox: document.getElementById('toolbox'),
+      theme: Blockly.Theme.defineTheme('byteforge', {
+        base:Blockly.Themes.Classic,
+        componentStyles:{ workspaceBackgroundColour:'#0d0f1a', toolboxBackgroundColour:'#13162a', toolboxForegroundColour:'#e8eaf0', flyoutBackgroundColour:'#1a1e35', flyoutForegroundColour:'#e8eaf0', flyoutOpacity:1, scrollbarOpacity:0.4 }
+      }),
+      grid:{ spacing:30, length:8, colour:'rgba(255,255,255,0.04)', snap:true },
+      zoom:{ controls:true, wheel:true, startScale:0.9 },
+      trashcan:true
+    });
+
+    workspace.addChangeListener(() => {
+      const code = Blockly.JavaScript.workspaceToCode(workspace);
+      document.getElementById('generated-code').textContent = code || '// Add blocks to generate code';
+    });
+
+    function clearWorkspace()  { workspace.clear(); }
+
+    function runCode() {
+      resetSim();
+      clearOutput();
+      const code = Blockly.JavaScript.workspaceToCode(workspace);
+      if (!code.trim()) { addOutput('No blocks to run! Drag some blocks onto the workspace.','sys'); return; }
+      addOutput('â–¶ Runningâ€¦','sys');
+      try {
+        // eslint-disable-next-line no-new-func
+        new Function('BF_move','BF_turn','BF_jump','BF_goto','BF_setColor','BF_setSize','BF_penDown','BF_penUp','BF_print','BF_say', code)(BF_move,BF_turn,BF_jump,BF_goto,BF_setColor,BF_setSize,BF_penDown,BF_penUp,BF_print,BF_say);
+        drawSim();
+        addOutput('âœ“ Done','ok');
+        checkChallenge();
+      } catch(e) { addOutput('Error: '+e.message,'err'); }
+    }
+
+    // â”€â”€ Output log â”€â”€
+    function addOutput(msg, type='') {
+      const p = document.getElementById('output-panel');
+      const d = document.createElement('div');
+      d.className='output-line '+type; d.textContent=msg;
+      p.appendChild(d); p.scrollTop=p.scrollHeight;
+    }
+    function clearOutput() { document.getElementById('output-panel').innerHTML=''; }
+
+    // â”€â”€ Challenges â”€â”€
+    const CHALLENGES = [
+      { id:'sq', name:'Draw a square', xp:30, check:()=>sim.trail.length>=4 },
+      { id:'tri', name:'Draw a triangle', xp:40, check:()=>sim.trail.length>=3 },
+      { id:'color', name:'Move in a custom color', xp:20, check:()=>sim.color!=='#f97316' && sim.trail.length>0 },
+      { id:'trail100', name:'Travel 100+ pixels', xp:25, check:()=>{ const d=sim.trail.reduce((s,t)=>s+Math.hypot(t.x2-t.x1,t.y2-t.y1),0);return d>=100; } },
+      { id:'say', name:'Make the character say something', xp:15, check:()=>!!sim.speech || document.getElementById('output-panel').textContent.length > 30 },
+    ];
+    let completedChallenges = [];
+
+    function renderChallenges() {
+      document.getElementById('challenge-list').innerHTML = CHALLENGES.map(c => `
+        <div class="challenge-item ${completedChallenges.includes(c.id)?'active':''}">
+          <span class="ch-icon">${completedChallenges.includes(c.id)?'âœ…':'ðŸŽ¯'}</span>
+          <span class="ch-name">${c.name}</span>
+          <span class="ch-xp">âš¡${c.xp} XP</span>
+        </div>`).join('');
+    }
+
+    function checkChallenge() {
+      CHALLENGES.forEach(c => {
+        if (!completedChallenges.includes(c.id) && c.check()) {
+          completedChallenges.push(c.id);
+          toast(`Challenge: "${c.name}" complete! +${c.xp} XP`);
+          if (me) BF.addXP(me.id, c.xp);
+          renderChallenges();
+        }
+      });
+    }
+
+    renderChallenges();
+  </script>
+</body>
+</html>
+

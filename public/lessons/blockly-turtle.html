@@ -1,0 +1,772 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Grade 6 Block Coding</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <!-- Blockly 10 -->
+  <script src="https://unpkg.com/blockly@10.4.3/blockly_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/blocks_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/javascript_compressed.js"></script>
+  <script src="https://unpkg.com/blockly@10.4.3/msg/en.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    body { padding-top:64px; background:var(--bg); color:var(--fg); min-height:100vh; }
+
+    .layout {
+      display:grid;
+      grid-template-columns:1fr 460px;
+      height:calc(100vh - 64px);
+      overflow:hidden;
+    }
+
+    /* ── Left: Blockly workspace ── */
+    .blocks-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); }
+    .panel-header { padding:12px 18px; background:var(--bg-card); border-bottom:1px solid var(--border);
+                    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; }
+    .panel-title { font-size:14px; font-weight:700; }
+    .panel-badge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+                   background:rgba(34,197,94,.12); color:#4ade80; border:1px solid rgba(34,197,94,.25); }
+    .btn-row { display:flex; gap:7px; }
+    .btn { padding:7px 14px; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; transition:.15s; }
+    .btn-brand  { background:#b8ef4a; color:#0d0f1a; }
+    .btn-brand:hover  { background:#a5d83d; }
+    .btn-ghost  { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover  { background:rgba(255,255,255,.08); }
+    .btn-danger { background:rgba(239,68,68,.12); color:#f87171; border:1px solid rgba(239,68,68,.3); }
+    .btn-danger:hover { background:rgba(239,68,68,.2); }
+
+    #blockly-div { flex:1; }
+
+    /* ── Right panel ── */
+    .right-panel { display:flex; flex-direction:column; overflow:hidden; }
+
+    /* Challenge header */
+    .challenge-header { background:var(--bg-card); border-bottom:1px solid var(--border); padding:12px 16px; flex-shrink:0; }
+    .ch-select-row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .ch-pill { padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700;
+               border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
+    .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
+    .ch-pill.active { background:rgba(184,239,74,.12); border-color:#b8ef4a; color:#b8ef4a; }
+    .ch-pill.done   { background:rgba(34,197,94,.1); border-color:rgba(34,197,94,.4); color:#4ade80; }
+    .ch-info { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .ch-text { font-size:12px; color:var(--fg-dim); line-height:1.5; flex:1; }
+    .ch-text strong { color:var(--fg); }
+    .hint-btn { font-size:11px; color:#fbbf24; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+    .xp-pill { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+               background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); white-space:nowrap; }
+
+    /* Canvas */
+    .canvas-area { flex-shrink:0; border-bottom:1px solid var(--border); position:relative;
+                   display:flex; align-items:center; justify-content:center; background:#05080f;
+                   height:340px; }
+    #turtle-canvas { display:block; }
+    .canvas-controls { position:absolute; bottom:8px; right:10px; display:flex; gap:6px; align-items:center; }
+    .speed-wrap { display:flex; align-items:center; gap:6px; background:rgba(0,0,0,.4);
+                  padding:4px 10px; border-radius:999px; border:1px solid var(--border); }
+    .speed-lbl { font-size:10px; color:var(--fg-faint); }
+    input[type=range].speed { width:80px; height:3px; accent-color:#b8ef4a; }
+    .pass-badge { position:absolute; top:10px; left:50%; transform:translateX(-50%);
+                  padding:6px 14px; border-radius:8px; font-size:13px; font-weight:700;
+                  background:rgba(34,197,94,.2); border:1px solid rgba(34,197,94,.5); color:#4ade80;
+                  display:none; }
+
+    /* Python code panel */
+    .code-panel { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .code-header { padding:9px 14px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+                   color:var(--fg-faint); background:var(--bg); border-bottom:1px solid var(--border);
+                   display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+    .code-label { display:flex; align-items:center; gap:8px; }
+    .readonly-badge { font-size:9px; padding:1px 6px; border-radius:3px; background:rgba(255,255,255,.06);
+                      color:var(--fg-faint); border:1px solid var(--border); }
+    pre#py-code { flex:1; overflow:auto; margin:0; padding:14px 16px; font-family:var(--mono); font-size:12px;
+                  line-height:1.7; color:#abb2bf; background:#070a10; white-space:pre-wrap; }
+
+    /* Output bar */
+    .output-bar { flex-shrink:0; padding:8px 14px; background:#050710; border-top:1px solid var(--border);
+                  font-family:var(--mono); font-size:11px; max-height:80px; overflow-y:auto; }
+    .out-line { margin-bottom:2px; color:#6b7280; }
+    .out-line.ok   { color:#4ade80; }
+    .out-line.err  { color:#f87171; }
+    .out-line.info { color:#b8ef4a; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px);
+             padding:11px 22px; border-radius:10px; font-size:13px; font-weight:600;
+             background:#1a2e1a; color:#bbf7d0; border:1px solid #16a34a;
+             opacity:0; transition:.3s; z-index:9999; white-space:nowrap; }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    /* Blockly theme overrides */
+    .blocklyMainBackground { fill:#0c0f18 !important; }
+    .blocklyScrollbarBackground { opacity:.3; }
+
+    @media(max-width:900px) { .layout { grid-template-columns:1fr; grid-template-rows:45vh 1fr; } }
+  </style>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/lesson-saves.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">ByteForge</span>
+  </div>
+  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+</nav>
+
+<div class="layout">
+
+  <!-- Left: Blockly -->
+  <div class="blocks-panel">
+    <div class="panel-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="panel-title">Block Coding</span>
+        <span class="panel-badge">Grade 6</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="clearWorkspace()">Clear</button>
+        <button class="btn btn-ghost"  onclick="undoAction()">Undo</button>
+        <button class="btn btn-brand"  onclick="runBlocks()">▶ Run</button>
+      </div>
+    </div>
+    <div id="blockly-div"></div>
+  </div>
+
+  <!-- Right: Canvas + Code -->
+  <div class="right-panel">
+
+    <!-- Challenge selector + info -->
+    <div class="challenge-header">
+      <div class="ch-select-row" id="ch-pills"></div>
+      <div class="ch-info">
+        <div class="ch-text" id="ch-text">Select a challenge above.</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+          <span class="xp-pill" id="xp-pill">+25 XP</span>
+          <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Turtle canvas (two-layer: draw-layer + marker-overlay) -->
+    <div class="canvas-area">
+      <div style="position:relative;display:inline-block;">
+        <canvas id="draw-canvas"   width="460" height="340" style="display:block;"></canvas>
+        <canvas id="marker-canvas" width="460" height="340" style="position:absolute;top:0;left:0;pointer-events:none;"></canvas>
+      </div>
+      <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
+      <div class="canvas-controls">
+        <div class="speed-wrap">
+          <span class="speed-lbl">Speed</span>
+          <input type="range" class="speed" id="speed-slider" min="1" max="10" value="6"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Python code display (read-only) -->
+    <div class="code-panel">
+      <div class="code-header">
+        <div class="code-label">
+          <span>Python equivalent</span>
+          <span class="readonly-badge">read-only</span>
+        </div>
+        <span style="font-size:10px;color:var(--fg-faint);">This is what your blocks look like as real code</span>
+      </div>
+      <pre id="py-code"># Your block code will appear here as Python.
+# Use the blocks on the left to build a program.</pre>
+    </div>
+
+    <!-- Output bar -->
+    <div class="output-bar" id="output-bar">
+      <div class="out-line info">Ready — drag blocks and press Run.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Blockly toolbox XML -->
+<xml id="toolbox" style="display:none">
+  <category name="Motion" colour="#3b82f6">
+    <block type="turtle_forward"><value name="STEPS"><shadow type="math_number"><field name="NUM">100</field></shadow></value></block>
+    <block type="turtle_backward"><value name="STEPS"><shadow type="math_number"><field name="NUM">50</field></shadow></value></block>
+    <block type="turtle_right"><value name="DEGREES"><shadow type="math_number"><field name="NUM">90</field></shadow></value></block>
+    <block type="turtle_left"><value name="DEGREES"><shadow type="math_number"><field name="NUM">90</field></shadow></value></block>
+    <block type="turtle_goto"><value name="X"><shadow type="math_number"><field name="NUM">0</field></shadow><value name="Y"><shadow type="math_number"><field name="NUM">0</field></shadow></value></block>
+  </category>
+  <category name="Pen" colour="#f97316">
+    <block type="turtle_pendown"></block>
+    <block type="turtle_penup"></block>
+    <block type="turtle_pensize"><value name="SIZE"><shadow type="math_number"><field name="NUM">2</field></shadow></value></block>
+    <block type="turtle_pencolor"></block>
+  </category>
+  <category name="Control" colour="#22c55e">
+    <block type="controls_repeat_ext"><value name="TIMES"><shadow type="math_number"><field name="NUM">4</field></shadow></value></block>
+    <block type="controls_whileUntil"></block>
+  </category>
+  <category name="Variables" colour="#a855f7" custom="VARIABLE"></category>
+  <category name="Math" colour="#eab308">
+    <block type="math_number"></block>
+    <block type="math_arithmetic"></block>
+    <block type="math_random_int"><value name="FROM"><shadow type="math_number"><field name="NUM">1</field></shadow></value><value name="TO"><shadow type="math_number"><field name="NUM">100</field></shadow></value></block>
+  </category>
+</xml>
+
+<script>
+'use strict'
+
+// ── Custom Turtle Blocks ──────────────────────────────────────────────────────
+
+// Block definitions
+Blockly.defineBlocksWithJsonArray([
+  {
+    type:'turtle_forward',
+    message0:'move forward %1 steps',
+    args0:[{type:'input_value',name:'STEPS',check:'Number'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#2563eb', tooltip:'Move the turtle forward.',
+  },
+  {
+    type:'turtle_backward',
+    message0:'move backward %1 steps',
+    args0:[{type:'input_value',name:'STEPS',check:'Number'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#2563eb', tooltip:'Move the turtle backward.',
+  },
+  {
+    type:'turtle_right',
+    message0:'turn right %1 degrees',
+    args0:[{type:'input_value',name:'DEGREES',check:'Number'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#7c3aed', tooltip:'Turn the turtle clockwise.',
+  },
+  {
+    type:'turtle_left',
+    message0:'turn left %1 degrees',
+    args0:[{type:'input_value',name:'DEGREES',check:'Number'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#7c3aed', tooltip:'Turn the turtle counter-clockwise.',
+  },
+  {
+    type:'turtle_pendown',
+    message0:'pen down ✏',
+    previousStatement:null, nextStatement:null,
+    colour:'#c2410c', tooltip:'Put the pen down — turtle will draw as it moves.',
+  },
+  {
+    type:'turtle_penup',
+    message0:'pen up ↑',
+    previousStatement:null, nextStatement:null,
+    colour:'#c2410c', tooltip:'Lift the pen — turtle moves without drawing.',
+  },
+  {
+    type:'turtle_pensize',
+    message0:'pen size %1',
+    args0:[{type:'input_value',name:'SIZE',check:'Number'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#c2410c',
+  },
+  {
+    type:'turtle_pencolor',
+    message0:'pen color %1',
+    args0:[{type:'field_colour',name:'COLOR',colour:'#b8ef4a'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#c2410c', tooltip:'Change the drawing color.',
+  },
+  {
+    type:'turtle_goto',
+    message0:'go to x: %1 y: %2',
+    args0:[
+      {type:'input_value',name:'X',check:'Number'},
+      {type:'input_value',name:'Y',check:'Number'},
+    ],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#2563eb',
+  },
+])
+
+// JavaScript code generators
+const jsGen = Blockly.JavaScript
+
+jsGen.forBlock['turtle_forward']  = (b,g) => `forward(${g.valueToCode(b,'STEPS',g.ORDER_NONE)||100});\n`
+jsGen.forBlock['turtle_backward'] = (b,g) => `backward(${g.valueToCode(b,'STEPS',g.ORDER_NONE)||50});\n`
+jsGen.forBlock['turtle_right']    = (b,g) => `right(${g.valueToCode(b,'DEGREES',g.ORDER_NONE)||90});\n`
+jsGen.forBlock['turtle_left']     = (b,g) => `left(${g.valueToCode(b,'DEGREES',g.ORDER_NONE)||90});\n`
+jsGen.forBlock['turtle_pendown']  = ()    => `pendown();\n`
+jsGen.forBlock['turtle_penup']    = ()    => `penup();\n`
+jsGen.forBlock['turtle_pensize']  = (b,g) => `pensize(${g.valueToCode(b,'SIZE',g.ORDER_NONE)||2});\n`
+jsGen.forBlock['turtle_pencolor'] = (b)   => `pencolor('${b.getFieldValue('COLOR')}');\n`
+jsGen.forBlock['turtle_goto']     = (b,g) => `goto(${g.valueToCode(b,'X',g.ORDER_NONE)||0},${g.valueToCode(b,'Y',g.ORDER_NONE)||0});\n`
+
+// Python display generators
+const pyGen = new Blockly.Generator('Python_display')
+Blockly.Python_display = pyGen
+
+pyGen.INDENT = '    '
+pyGen.ORDER_ATOMIC  = 0
+pyGen.ORDER_NONE    = 99
+
+// Override all python gen to basic
+function pyNum(b,g,name,def) { return [g.valueToCode(b,name,g.ORDER_ATOMIC)||def, g.ORDER_ATOMIC] }
+pyGen.forBlock['math_number']       = (b) => [b.getFieldValue('NUM'), pyGen.ORDER_ATOMIC]
+pyGen.forBlock['math_arithmetic']   = (b,g) => {
+  const OPS = {ADD:'+',MINUS:'-',MULTIPLY:'*',DIVIDE:'/',POWER:'**'}
+  const op  = OPS[b.getFieldValue('OP')]
+  const a   = g.valueToCode(b,'A',pyGen.ORDER_ATOMIC)||'0'
+  const bv  = g.valueToCode(b,'B',pyGen.ORDER_ATOMIC)||'0'
+  return [`${a} ${op} ${bv}`, pyGen.ORDER_ATOMIC]
+}
+pyGen.forBlock['math_random_int']   = (b,g) => [`random(${g.valueToCode(b,'FROM',pyGen.ORDER_ATOMIC)||1},${g.valueToCode(b,'TO',pyGen.ORDER_ATOMIC)||100})`, pyGen.ORDER_ATOMIC]
+pyGen.forBlock['variables_get']     = (b,g) => [g.getVariableName(b.getFieldValue('VAR')), pyGen.ORDER_ATOMIC]
+pyGen.forBlock['variables_set']     = (b,g) => `${g.getVariableName(b.getFieldValue('VAR'))} = ${g.valueToCode(b,'VALUE',pyGen.ORDER_ATOMIC)||'0'}\n`
+pyGen.forBlock['variables_change']  = (b,g) => {
+  const name = g.getVariableName(b.getFieldValue('VAR'))
+  return `${name} += ${g.valueToCode(b,'DELTA',pyGen.ORDER_ATOMIC)||'1'}\n`
+}
+pyGen.forBlock['controls_repeat_ext']= (b,g) => {
+  const times = g.valueToCode(b,'TIMES',pyGen.ORDER_ATOMIC)||'4'
+  const body  = g.statementToCode(b,'DO') || '    pass\n'
+  return `for i in range(${times}):\n${body}`
+}
+pyGen.forBlock['controls_whileUntil']= (b,g) => {
+  const cond  = g.valueToCode(b,'BOOL',pyGen.ORDER_NONE)||'True'
+  const body  = g.statementToCode(b,'DO') || '    pass\n'
+  const mode  = b.getFieldValue('MODE') === 'WHILE' ? cond : `not (${cond})`
+  return `while ${mode}:\n${body}`
+}
+pyGen.forBlock['turtle_forward']  = (b,g) => `forward(${g.valueToCode(b,'STEPS',pyGen.ORDER_NONE)||100})\n`
+pyGen.forBlock['turtle_backward'] = (b,g) => `backward(${g.valueToCode(b,'STEPS',pyGen.ORDER_NONE)||50})\n`
+pyGen.forBlock['turtle_right']    = (b,g) => `right(${g.valueToCode(b,'DEGREES',pyGen.ORDER_NONE)||90})\n`
+pyGen.forBlock['turtle_left']     = (b,g) => `left(${g.valueToCode(b,'DEGREES',pyGen.ORDER_NONE)||90})\n`
+pyGen.forBlock['turtle_pendown']  = ()    => `pendown()\n`
+pyGen.forBlock['turtle_penup']    = ()    => `penup()\n`
+pyGen.forBlock['turtle_pensize']  = (b,g) => `pensize(${g.valueToCode(b,'SIZE',pyGen.ORDER_NONE)||2})\n`
+pyGen.forBlock['turtle_pencolor'] = (b)   => `pencolor('${b.getFieldValue('COLOR')}')\n`
+pyGen.forBlock['turtle_goto']     = (b,g) => `goto(${g.valueToCode(b,'X',pyGen.ORDER_NONE)||0},${g.valueToCode(b,'Y',pyGen.ORDER_NONE)||0})\n`
+
+// Scrub (connect statements)
+pyGen.scrub_ = function(block, code, thisOnly) {
+  const next     = block.nextConnection && block.nextConnection.targetBlock()
+  const nextCode = thisOnly ? '' : pyGen.blockToCode(next)
+  return code + nextCode
+}
+
+// ── Blockly workspace init ────────────────────────────────────────────────────
+const workspace = Blockly.inject('blockly-div', {
+  toolbox: document.getElementById('toolbox'),
+  theme:   Blockly.Theme.defineTheme('byteforge', {
+    base: Blockly.Themes.Dark,
+    componentStyles: {
+      workspaceBackgroundColour: '#0c0f18',
+      toolboxBackgroundColour:   '#13162a',
+      toolboxForegroundColour:   '#d1d5db',
+      flyoutBackgroundColour:    '#13162a',
+      flyoutForegroundColour:    '#d1d5db',
+      flyoutOpacity:             1,
+    },
+  }),
+  renderer: 'zelos',
+  scrollbars: true,
+  trashcan:   true,
+  zoom:       { controls:true, wheel:true, startScale:0.9 },
+  grid:       { spacing:24, length:6, colour:'rgba(255,255,255,.05)', snap:true },
+})
+
+// Update Python panel whenever blocks change
+workspace.addChangeListener(() => {
+  try {
+    const pyCode = pyGen.workspaceToCode(workspace)
+    document.getElementById('py-code').textContent = pyCode || '# (no blocks yet)'
+  } catch(e) { /* ignore */ }
+})
+
+// ── Turtle Engine (two-layer canvas) ─────────────────────────────────────────
+// draw-canvas  (bottom) : background grid + all turtle lines — never cleared during animation
+// marker-canvas (top)   : only the animated turtle arrow — cleared & redrawn each step
+
+const drawCanvas   = document.getElementById('draw-canvas')
+const markerCanvas = document.getElementById('marker-canvas')
+const ctx  = drawCanvas.getContext('2d')    // for lines + grid
+const mCtx = markerCanvas.getContext('2d')  // for turtle arrow only
+const W = drawCanvas.width, H = drawCanvas.height
+
+let tx, ty, tAngle, tDown, tColor, tSize
+let running = false
+let rafId
+
+// Execution log for validation
+let execLog = { forwards:0, turns:0, colors:[], penUps:0, drawCalls:0, loops:0 }
+
+function resetTurtle() {
+  tx = W/2; ty = H/2; tAngle = -90
+  tDown = true; tColor = '#b8ef4a'; tSize = 2
+  execLog = { forwards:0, turns:0, colors:[], penUps:0, drawCalls:0, loops:0 }
+}
+
+function drawGrid() {
+  ctx.save()
+  ctx.strokeStyle='rgba(255,255,255,.04)'; ctx.lineWidth=1
+  for(let x=0;x<=W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<=H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+  ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.setLineDash([4,4])
+  ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke()
+  ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke()
+  ctx.setLineDash([]); ctx.restore()
+}
+
+// Redraws just the turtle arrow on the transparent overlay canvas
+function drawTurtleMarker() {
+  mCtx.clearRect(0,0,W,H)
+  const rad = tAngle * Math.PI/180
+  mCtx.save(); mCtx.translate(tx,ty); mCtx.rotate(rad + Math.PI/2)
+  mCtx.strokeStyle='#b8ef4a'; mCtx.fillStyle='rgba(184,239,74,.25)'; mCtx.lineWidth=1.5
+  mCtx.beginPath(); mCtx.moveTo(0,-9); mCtx.lineTo(6,5); mCtx.lineTo(0,1); mCtx.lineTo(-6,5); mCtx.closePath()
+  mCtx.fill(); mCtx.stroke()
+  mCtx.restore()
+}
+
+// Full canvas reset (clears both layers, redraws grid)
+function clearCanvas() {
+  ctx.clearRect(0,0,W,H)
+  mCtx.clearRect(0,0,W,H)
+  drawGrid()
+  drawTurtleMarker()
+}
+
+// Build command list from JS code string
+function buildCmds(jsCode) {
+  const cmds = []
+  const api  = {
+    forward : n => cmds.push({t:'fwd',  v:+n}),
+    backward: n => cmds.push({t:'bwd',  v:+n}),
+    right   : n => cmds.push({t:'rt',   v:+n}),
+    left    : n => cmds.push({t:'lt',   v:+n}),
+    penup   : () => cmds.push({t:'up'}),
+    pendown : () => cmds.push({t:'dn'}),
+    pensize : n => cmds.push({t:'sz',   v:+n}),
+    pencolor: c => cmds.push({t:'col',  v:c}),
+    goto    : (x,y) => cmds.push({t:'goto', x:+x, y:+y}),
+    // Expose math for random etc.
+    random  : (a,b) => Math.floor(Math.random()*(b-a+1))+a,
+  }
+  // Expose math built-ins
+  const scope = { ...api,
+    Math, console: { log: () => {} },
+    // Variable declarations passed through
+  }
+  try {
+    const fn = new Function(...Object.keys(scope), jsCode)
+    fn(...Object.values(scope))
+  } catch(e) {
+    log('Error: ' + friendlyError(e.message), 'err')
+    return null
+  }
+  return cmds
+}
+
+function friendlyError(msg) {
+  if (msg.includes('is not defined')) {
+    const name = msg.match(/(\w+) is not defined/)?.[1]
+    return `"${name}" isn't available. Check that you're using the right block.`
+  }
+  if (msg.includes('Maximum call stack')) return 'Your loop might be running forever — check the number of repeats!'
+  return msg
+}
+
+function runCmds(cmds) {
+  if (!cmds || !cmds.length) { log('No blocks yet — drag some onto the workspace!', 'info'); return }
+
+  // Guard against runaway
+  if (cmds.length > 5000) { log('Too many commands! Your loop might be running forever.', 'err'); return }
+
+  running = true
+  cancelAnimationFrame(rafId)
+
+  const speed = +document.getElementById('speed-slider').value
+  const msPerCmd = [0, 600, 400, 250, 150, 80, 40, 20, 10, 5, 0][speed]
+
+  let cmdIdx = 0
+
+  function execOne(cmd) {
+    if (cmd.t === 'fwd' || cmd.t === 'bwd') {
+      const dist = cmd.t === 'bwd' ? -cmd.v : cmd.v
+      const rad  = tAngle * Math.PI/180
+      const nx = tx + Math.cos(rad)*dist
+      const ny = ty + Math.sin(rad)*dist
+      if (tDown) {
+        ctx.beginPath(); ctx.strokeStyle=tColor; ctx.lineWidth=tSize
+        ctx.lineCap='round'; ctx.moveTo(tx,ty); ctx.lineTo(nx,ny); ctx.stroke()
+        execLog.drawCalls++
+      }
+      tx=nx; ty=ny
+      execLog.forwards++
+    } else if (cmd.t === 'rt') { tAngle += cmd.v; execLog.turns++ }
+    else if (cmd.t === 'lt')   { tAngle -= cmd.v; execLog.turns++ }
+    else if (cmd.t === 'up')   { tDown = false; execLog.penUps++ }
+    else if (cmd.t === 'dn')   { tDown = true }
+    else if (cmd.t === 'sz')   { tSize = cmd.v }
+    else if (cmd.t === 'col')  { tColor = cmd.v; execLog.colors.push(cmd.v) }
+    else if (cmd.t === 'goto') {
+      if (tDown) {
+        ctx.beginPath(); ctx.strokeStyle=tColor; ctx.lineWidth=tSize
+        ctx.lineCap='round'; ctx.moveTo(tx,ty); ctx.lineTo(cmd.x,cmd.y); ctx.stroke()
+        execLog.drawCalls++
+      }
+      tx=cmd.x; ty=cmd.y
+    }
+  }
+
+  if (msPerCmd === 0) {
+    // Instant
+    cmds.forEach(c => execOne(c))
+    drawTurtleMarker()
+    running = false
+    log('Done — ' + cmds.length + ' operations.', 'ok')
+    checkChallenge()
+    return
+  }
+
+  function tick() {
+    if (cmdIdx >= cmds.length) {
+      drawTurtleMarker()   // final marker position
+      running = false
+      log('Done — ' + cmds.length + ' operations.', 'ok')
+      checkChallenge()
+      return
+    }
+    execOne(cmds[cmdIdx++])
+    drawTurtleMarker()     // update arrow overlay only — draw-canvas lines are untouched
+    rafId = setTimeout(tick, msPerCmd)
+  }
+
+  // Lines accumulate on draw-canvas; marker-canvas is cleared & redrawn each tick
+  tick()
+}
+
+// ── Run ───────────────────────────────────────────────────────────────────────
+function runBlocks() {
+  cancelAnimationFrame(rafId)
+  clearCanvas()
+  resetTurtle()
+  document.getElementById('pass-badge').style.display = 'none'
+
+  let jsCode
+  try {
+    jsCode = Blockly.JavaScript.workspaceToCode(workspace)
+  } catch(e) { log('Could not compile blocks: ' + e.message, 'err'); return }
+
+  if (!jsCode.trim()) { log('No blocks yet — drag some onto the workspace!', 'info'); return }
+
+  const cmds = buildCmds(jsCode)
+  if (cmds) runCmds(cmds)
+}
+
+function clearWorkspace() {
+  workspace.clear()
+  clearCanvas()
+  resetTurtle()
+  document.getElementById('py-code').textContent = '# (workspace cleared)'
+  document.getElementById('pass-badge').style.display = 'none'
+  log('Workspace cleared.', 'info')
+}
+
+function undoAction() { workspace.undo(false) }
+
+// ── Output ────────────────────────────────────────────────────────────────────
+function log(msg, cls='') {
+  const bar = document.getElementById('output-bar')
+  const el  = document.createElement('div')
+  el.className = 'out-line' + (cls ? ' ' + cls : '')
+  el.textContent = msg
+  bar.appendChild(el)
+  bar.scrollTop = bar.scrollHeight
+  if (bar.children.length > 30) bar.removeChild(bar.firstChild)
+}
+
+// ── Challenges ────────────────────────────────────────────────────────────────
+const CHALLENGES = [
+  // Module 2: Meet the Turtle
+  {
+    module: 'M2', name:'Draw a Square', xp:25,
+    text:`<strong>Challenge 1</strong> — Draw a square using blocks. Use <em>move forward</em> and <em>turn right</em>. Hint: a square has 4 sides and 4 corners.`,
+    hints:[
+      'A square has 4 equal sides. Each corner is a 90 degree turn.',
+      'You need to do forward + right(90) four times. Try using a Repeat block!',
+      'Use: Repeat 4 times { forward 100, right 90 }',
+    ],
+    check: () => execLog.forwards >= 4 && execLog.turns >= 4 && execLog.drawCalls >= 4,
+    starter: null,
+  },
+  {
+    module: 'M2', name:'Draw a Triangle', xp:30,
+    text:`<strong>Challenge 2</strong> — Draw a triangle. 3 sides, 3 turns. What angle turns a triangle? Hint: 360 ÷ 3 = ?`,
+    hints:[
+      'A triangle has 3 sides. You need to turn 3 times.',
+      'For a triangle, each turn is 120 degrees (360 ÷ 3 = 120).',
+      'Use: Repeat 3 times { forward 100, right 120 }',
+    ],
+    check: () => execLog.forwards >= 3 && execLog.turns >= 3 && execLog.drawCalls >= 3,
+  },
+  // Module 3: Loops
+  {
+    module: 'M3', name:'Pentagon with Loop', xp:35,
+    text:`<strong>Challenge 3</strong> — Draw a 5-sided shape (pentagon) using a <em>Repeat</em> block. You must use a loop — no copy-pasting!`,
+    hints:[
+      'A pentagon has 5 sides. What angle do you need? 360 ÷ 5 = 72.',
+      'Build it as: Repeat 5 times { forward, right 72 }.',
+      'The loop should contain exactly 2 blocks: forward and right(72).',
+    ],
+    check: () => {
+      const jsCode = Blockly.JavaScript.workspaceToCode(workspace)
+      const hasLoop = jsCode.includes('for(')
+      return hasLoop && execLog.forwards >= 5 && execLog.drawCalls >= 5
+    },
+  },
+  {
+    module: 'M3', name:'Any Shape (5+ sides)', xp:40,
+    text:`<strong>Challenge 4 (Open)</strong> — Draw any regular shape with at least 5 sides using a loop. Stars, spirals, anything with 5+ forward moves inside a loop.`,
+    hints:[
+      'Any regular polygon: Repeat N times { forward X, right 360/N }.',
+      'Try N=6 (hexagon, 60°), N=8 (octagon, 45°), or N=12 (dodecagon, 30°).',
+      'For a cool star: Repeat 5 times { forward 100, right 144 }.',
+    ],
+    check: () => {
+      const jsCode = Blockly.JavaScript.workspaceToCode(workspace)
+      const hasLoop = jsCode.includes('for(')
+      return hasLoop && execLog.forwards >= 5
+    },
+  },
+  // Module 4: Colors
+  {
+    module: 'M4', name:'Colourful Square', xp:40,
+    text:`<strong>Challenge 5</strong> — Draw a square where each side is a different color. Use the <em>pen color</em> block before each side. 4 sides = 4 colors.`,
+    hints:[
+      'Place a pen color block before each forward block to change the color.',
+      'You need 4 different colors — one before each side of the square.',
+      'Structure: pen color → forward → right(90) — repeated 4 times with different colors.',
+    ],
+    check: () => execLog.drawCalls >= 4 && execLog.colors.length >= 3,
+  },
+  // Module 5: Patterns
+  {
+    module: 'M5', name:'Spiral', xp:50,
+    text:`<strong>Challenge 6</strong> — Create a spiral: each forward step is a bit longer than the last. Use a variable that increases each loop. Combine Repeat, Variables, and Math blocks.`,
+    hints:[
+      'Create a variable called "size". Start it at 5.',
+      'Inside the loop: move forward (size), turn right 90, then increase size by 5.',
+      'Set size = 5. Repeat 30 times: forward(size), right(90), size = size + 5.',
+    ],
+    check: () => {
+      const cmds = execLog.drawCalls
+      const jsCode = Blockly.JavaScript.workspaceToCode(workspace)
+      const hasVar = jsCode.includes('var ') || jsCode.includes('let ')
+      return hasVar && cmds >= 15
+    },
+  },
+]
+
+// -- BF Integration --
+BF.seed();
+// Soft auth: allow access from Next.js/Supabase context (me = null → XP skipped)
+const me = (() => { try { return BF.session() || null; } catch(_) { return null; } })();
+
+const completed = new Set()
+let activeIdx   = 0
+let hintIdx     = 0
+
+function renderPills() {
+  const row = document.getElementById('ch-pills')
+  row.innerHTML = ''
+  CHALLENGES.forEach((ch,i) => {
+    const el = document.createElement('div')
+    el.className = 'ch-pill' + (i===activeIdx ? ' active' : '') + (completed.has(i) ? ' done' : '')
+    el.textContent = (completed.has(i) ? '✓ ' : '') + ch.module + ' ' + ch.name
+    el.onclick = () => selectChallenge(i)
+    row.appendChild(el)
+  })
+}
+
+function selectChallenge(i) {
+  activeIdx = i
+  hintIdx   = 0
+  const ch  = CHALLENGES[i]
+  document.getElementById('ch-text').innerHTML = ch.text
+  document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
+  document.getElementById('pass-badge').style.display = 'none'
+  renderPills()
+  clearCanvas()
+  resetTurtle()
+  log('Challenge: ' + ch.name + ' loaded.', 'info')
+}
+
+function checkChallenge() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch) return
+  if (ch.check()) {
+    if (!completed.has(activeIdx)) {
+      completed.add(activeIdx)
+      renderPills()
+      showToast('Challenge complete! +' + ch.xp + ' XP')
+      log('Challenge complete! +' + ch.xp + ' XP', 'ok')
+      LessonSaves.save('blockly-turtle', activeIdx, { passed: true, xpEarned: ch.xp })
+    }
+    document.getElementById('pass-badge').style.display = 'block'
+  }
+}
+
+function showHint() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch) return
+  if (hintIdx < ch.hints.length) {
+    log('Hint ' + (hintIdx+1) + ': ' + ch.hints[hintIdx++], 'info')
+  } else {
+    log('No more hints for this challenge!', 'info')
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 3000)
+}
+
+// ── Workspace autosave (Blockly → Supabase, debounced 3 s) ──────────────────
+let _turtleSaveTimer = null
+workspace.addChangeListener(e => {
+  if (e.type === Blockly.Events.UI || e.type === Blockly.Events.VIEWPORT_CHANGE) return
+  clearTimeout(_turtleSaveTimer)
+  _turtleSaveTimer = setTimeout(() => {
+    try {
+      const xml = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace))
+      LessonSaves.save('blockly-turtle', -1, { saveData: { xml } })
+    } catch(_) {}
+  }, 3000)
+})
+
+// ── Init — restore Supabase saves, then render ───────────────────────────────
+clearCanvas()
+resetTurtle()
+;(async () => {
+  await LessonSaves.load('blockly-turtle')
+  LessonSaves.completedSet().forEach(idx => completed.add(idx))
+  const ws = LessonSaves.savedWorkspace()
+  if (ws?.xml) {
+    try { Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(ws.xml), workspace) } catch(_) {}
+  }
+  renderPills()
+  selectChallenge(0)
+})()
+</script>
+</body>
+</html>
+
+

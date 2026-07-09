@@ -1,0 +1,1393 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Grade 9 Programming</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/simple.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { padding-top:64px; background:var(--bg); color:var(--fg); height:100vh; overflow:hidden; }
+    .layout { display:grid; grid-template-columns:1fr 460px; height:calc(100vh - 64px); overflow:hidden; }
+
+    /* ── Left: editor panel ── */
+    .ed-panel  { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
+    .ed-header { flex-shrink:0; padding:10px 14px; background:var(--bg-card); border-bottom:1px solid var(--border);
+                 display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .ed-title  { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:700; }
+    .badge     { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+    .badge-9   { background:rgba(168,85,247,.15); color:#c084fc; border:1px solid rgba(168,85,247,.3); }
+
+    .char-toolbar { flex-shrink:0; display:flex; align-items:center; gap:4px; padding:5px 14px;
+                    background:var(--bg); border-bottom:1px solid var(--border); }
+    .char-toolbar span { font-size:10px; color:var(--fg-faint); margin-right:4px; }
+    .char-btn { padding:3px 8px; border-radius:4px; font-size:13px; font-family:var(--mono);
+                border:1px solid var(--border); background:var(--bg-raised); color:var(--fg);
+                cursor:pointer; transition:.1s; }
+    .char-btn:hover { background:rgba(168,85,247,.15); border-color:#c084fc; color:#c084fc; }
+
+    .cm-outer { flex:1; overflow:hidden; display:flex; flex-direction:column; }
+    .cm-outer .CodeMirror {
+      height:100% !important; font-size:13px !important; font-family:var(--mono) !important;
+      background:#070910 !important; line-height:1.7 !important;
+    }
+    .cm-outer .CodeMirror-scroll   { background:#070910 !important; }
+    .cm-outer .CodeMirror-gutters  { background:#0b0e1c !important; border-right:1px solid var(--border) !important; }
+    .cm-error-line { background:rgba(239,68,68,.15) !important; }
+
+    .run-bar { flex-shrink:0; display:flex; gap:6px; padding:8px 14px; background:var(--bg-card);
+               border-top:1px solid var(--border); align-items:center; justify-content:space-between; }
+    .btn { padding:6px 13px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:.15s; border:none; }
+    .btn-brand { background:#b8ef4a; color:#0d0f1a; }
+    .btn-brand:hover { background:#a5d83d; }
+    .btn-ghost { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover { background:rgba(255,255,255,.08); }
+    .btn-danger { background:rgba(239,68,68,.1); color:#f87171; border:1px solid rgba(239,68,68,.25); }
+    .btn-row { display:flex; gap:6px; }
+    .input-section { display:flex; align-items:center; gap:6px; }
+    .input-section label { font-size:11px; color:var(--fg-faint); white-space:nowrap; }
+    .input-section input { padding:4px 8px; border-radius:5px; border:1px solid var(--border);
+                           background:var(--bg-raised); color:var(--fg); font-size:12px; font-family:var(--mono);
+                           width:160px; }
+    .input-section input:focus { outline:none; border-color:#c084fc; }
+
+    /* ── Right panel ── */
+    .right-panel { display:flex; flex-direction:column; overflow:hidden; }
+
+    .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px; }
+    .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
+                 border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
+    .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
+    .ch-pill.active { background:rgba(168,85,247,.12); border-color:#c084fc; color:#c084fc; }
+    .ch-pill.done   { background:rgba(34,197,94,.08); border-color:rgba(34,197,94,.35); color:#4ade80; }
+    .ch-row { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .ch-text { font-size:11.5px; color:var(--fg-dim); line-height:1.55; flex:1; }
+    .ch-text strong { color:var(--fg); }
+    .xp-pill  { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
+                background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); white-space:nowrap; }
+    .hint-btn { font-size:11px; color:#fbbf24; cursor:pointer; }
+    .ch-meta  { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+
+    /* Output */
+    .out-section { flex-shrink:0; border-bottom:1px solid var(--border); }
+    .section-hdr { padding:7px 14px; background:var(--bg); border-bottom:1px solid var(--border);
+                   display:flex; justify-content:space-between; align-items:center; }
+    .section-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-faint); }
+    pre#output   { padding:10px 14px; font-family:var(--mono); font-size:12px; line-height:1.7;
+                   background:#050810; color:#e2e8f0; min-height:60px; max-height:130px;
+                   overflow-y:auto; white-space:pre-wrap; }
+    .out-err { color:#f87171; }
+    .out-ok  { color:#4ade80; }
+
+    /* Trace table */
+    .trace-section { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .trace-toggle  { cursor:pointer; color:#c084fc; font-size:11px; }
+    .trace-scroll  { flex:1; overflow-y:auto; background:#040610; }
+    table.trace { width:100%; border-collapse:collapse; font-size:11px; font-family:var(--mono); }
+    table.trace th { position:sticky; top:0; padding:5px 10px; background:#0d1025;
+                     color:var(--fg-faint); font-weight:700; text-align:left; border-bottom:1px solid var(--border); }
+    table.trace td { padding:4px 10px; border-bottom:1px solid rgba(255,255,255,.04); color:#9ca3af; }
+    table.trace tr.changed td { background:rgba(168,85,247,.06); }
+    table.trace td.changed-val { color:#c084fc; font-weight:600; }
+    table.trace td.out-col { color:#b8ef4a; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(60px);
+             padding:10px 20px; border-radius:10px; font-size:13px; font-weight:600;
+             background:#1a2e1a; color:#bbf7d0; border:1px solid #16a34a;
+             opacity:0; transition:.3s; z-index:9999; pointer-events:none; }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    @media(max-width:900px) { .layout { grid-template-columns:1fr; } }
+  </style>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/lesson-saves.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">ByteForge</span>
+  </div>
+  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+</nav>
+
+<div class="layout">
+
+  <!-- Left: pseudocode editor -->
+  <div class="ed-panel">
+    <div class="ed-header">
+      <div class="ed-title">
+        Pseudocode &amp; Algorithms
+        <span class="badge badge-9">Grade 9</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="resetStarter()">↺ Starter</button>
+        <button class="btn btn-ghost"  onclick="editor.setValue('')">Clear</button>
+        <button class="btn btn-brand"  onclick="runCode()">▶ Run</button>
+      </div>
+    </div>
+    <div class="char-toolbar">
+      <span>Insert:</span>
+      <button class="char-btn" onclick="ins('←')">←</button>
+      <button class="char-btn" onclick="ins('≤')">≤</button>
+      <button class="char-btn" onclick="ins('≥')">≥</button>
+      <button class="char-btn" onclick="ins('<>')"><>≠</button>
+      <button class="char-btn" onclick="ins(' AND ')">AND</button>
+      <button class="char-btn" onclick="ins(' OR ')">OR</button>
+      <button class="char-btn" onclick="ins(' MOD ')">MOD</button>
+      <button class="char-btn" onclick="ins(' DIV ')">DIV</button>
+    </div>
+    <div class="cm-outer"><textarea id="cm-ed"></textarea></div>
+    <div class="run-bar">
+      <div class="input-section">
+        <label>INPUT values (comma-separated):</label>
+        <input id="input-vals" type="text" placeholder="e.g. 5, 10, hello" title="Values consumed by INPUT statements"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+    <div class="ch-header">
+      <div class="ch-pills" id="ch-pills"></div>
+      <div class="ch-row">
+        <div class="ch-text" id="ch-text">Select a challenge.</div>
+        <div class="ch-meta">
+          <span class="xp-pill" id="xp-pill">+40 XP</span>
+          <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="out-section">
+      <div class="section-hdr">
+        <span class="section-lbl">Output</span>
+        <span style="font-size:10px;color:var(--fg-faint);">OUTPUT statements appear here</span>
+      </div>
+      <pre id="output">// Run your pseudocode to see output here</pre>
+    </div>
+
+    <div class="trace-section">
+      <div class="section-hdr">
+        <span class="section-lbl">Trace Table</span>
+        <span class="trace-toggle" onclick="toggleTrace()">▼ show/hide</span>
+      </div>
+      <div class="trace-scroll" id="trace-wrap">
+        <table class="trace" id="trace-table">
+          <thead><tr id="trace-head"></tr></thead>
+          <tbody id="trace-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Grade 9 Pseudocode Interpreter
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Tokenizer ────────────────────────────────────────────────────────────────
+const KEYWORDS = new Set([
+  'DECLARE','IF','THEN','ELSE','ELSEIF','ENDIF',
+  'FOR','TO','STEP','NEXT',
+  'WHILE','DO','ENDWHILE',
+  'REPEAT','UNTIL',
+  'PROCEDURE','ENDPROCEDURE',
+  'FUNCTION','ENDFUNCTION','RETURNS','RETURN',
+  'CALL','OUTPUT','INPUT',
+  'AND','OR','NOT','DIV','MOD',
+  'ARRAY','OF','CASE','OTHERWISE','ENDCASE',
+])
+const TYPES  = new Set(['INTEGER','REAL','STRING','BOOLEAN','CHAR'])
+const BOOLKW = new Set(['TRUE','FALSE'])
+
+function tokenize(src) {
+  // Normalise typed alternatives before tokenising
+  src = src.replace(/<-/g, '←')
+  const toks = []
+  let i = 0, len = src.length
+
+  while (i < len) {
+    const c = src[i]
+
+    // whitespace
+    if (/\s/.test(c)) { i++; continue }
+    // comment
+    if (c === '/' && src[i+1] === '/') break
+
+    // ← assignment
+    if (c === '←') { toks.push({t:'ASSIGN'}); i++; continue }
+    if (c === ':' && src[i+1] === '=') { toks.push({t:'ASSIGN'}); i+=2; continue }
+    // colon (for DECLARE) — but :=  handled above
+    if (c === ':') { toks.push({t:'COLON'}); i++; continue }
+
+    // string literal
+    if (c === '"') {
+      let s='', j=i+1
+      while (j<len && src[j]!=='"') s+=src[j++]
+      toks.push({t:'STR',v:s}); i=j+1; continue
+    }
+    // char literal
+    if (c === "'") {
+      toks.push({t:'STR',v:src[i+1]||''}); i+=3; continue
+    }
+
+    // number (allow leading -)
+    const prevTok = toks[toks.length-1]
+    const negOk = !prevTok || ['ASSIGN','LPAREN','COMMA','OP'].includes(prevTok.t)
+    if (/[0-9]/.test(c) || (c==='-' && negOk && /[0-9]/.test(src[i+1]||''))) {
+      let n = c=== '-' ? (i++, '-') : ''
+      while (i<len && /[0-9.]/.test(src[i])) n+=src[i++]
+      toks.push({t:'NUM',v:parseFloat(n)}); continue
+    }
+
+    // word (keyword / type / identifier)
+    if (/[A-Za-z_]/.test(c)) {
+      let w='', j=i
+      while (j<len && /[\w]/.test(src[j])) w+=src[j++]
+      const u = w.toUpperCase()
+      if      (BOOLKW.has(u))   toks.push({t:'BOOL',v:u==='TRUE'})
+      else if (KEYWORDS.has(u)) toks.push({t:'KW',v:u})
+      else if (TYPES.has(u))    toks.push({t:'TYPE',v:u})
+      else                      toks.push({t:'ID',v:w})
+      i=j; continue
+    }
+
+    // ≤ ≥ (unicode)
+    if (c==='≤') { toks.push({t:'OP',v:'<='}); i++; continue }
+    if (c==='≥') { toks.push({t:'OP',v:'>='}); i++; continue }
+
+    // multi-char ops
+    if (c==='<' && src[i+1]==='>') { toks.push({t:'OP',v:'<>'}); i+=2; continue }
+    if (c==='<' && src[i+1]==='=') { toks.push({t:'OP',v:'<='}); i+=2; continue }
+    if (c==='>' && src[i+1]==='=') { toks.push({t:'OP',v:'>='}); i+=2; continue }
+
+    // single char
+    const single = {'+':'OP','-':'OP','*':'OP','/':'OP','^':'OP','&':'OP','<':'OP','>':'OP','=':'OP',
+                    '(':'LPAREN',')':'RPAREN','[':'LBR',']':'RBR',',':'COMMA'}
+    if (c in single) { toks.push({t:single[c],v:c}); i++; continue }
+    i++
+  }
+  toks.push({t:'EOF'})
+  return toks
+}
+
+// ── Expression Parser ─────────────────────────────────────────────────────────
+class ExprParser {
+  constructor(toks, env, interp) {
+    this.t = toks; this.p = 0; this.env = env; this.interp = interp
+  }
+  peek()    { return this.t[this.p] || {t:'EOF'} }
+  advance() { return this.t[this.p++] || {t:'EOF'} }
+  check(t,v){ const tk=this.peek(); return tk.t===t&&(v===undefined||tk.v===v) }
+  eat(t,v)  { if(this.check(t,v)) return this.advance(); return null }
+
+  parse() { return this.parseBool() }
+
+  parseBool() {
+    let v = this.parseCmp()
+    while (this.check('KW','AND') || this.check('KW','OR')) {
+      const op = this.advance().v
+      const r = this.parseCmp()
+      v = op==='AND' ? v&&r : v||r
+    }
+    return v
+  }
+
+  parseCmp() {
+    let v = this.parseConcat()
+    const ops = ['=','<>','<','>','<=','>=']
+    if (this.check('OP') && ops.includes(this.peek().v)) {
+      const op = this.advance().v
+      const r = this.parseConcat()
+      if (op==='=')  return v===r
+      if (op==='<>') return v!==r
+      if (op==='<')  return v<r
+      if (op==='>') return v>r
+      if (op==='<=') return v<=r
+      if (op==='>=') return v>=r
+    }
+    return v
+  }
+
+  parseConcat() {
+    let v = this.parseAdd()
+    while (this.check('OP','&')) { this.advance(); v = String(v)+String(this.parseAdd()) }
+    return v
+  }
+
+  parseAdd() {
+    let v = this.parseMul()
+    while (this.check('OP','+') || this.check('OP','-')) {
+      const op = this.advance().v; const r = this.parseMul()
+      v = op==='+' ? v+r : v-r
+    }
+    return v
+  }
+
+  parseMul() {
+    let v = this.parseUnary()
+    while (this.check('OP','*')||this.check('OP','/')||this.check('KW','DIV')||this.check('KW','MOD')) {
+      const op = this.advance()
+      const r = this.parseUnary()
+      if (op.v==='*')   v = v*r
+      else if (op.v==='/') { if(r===0)throw new Error('Division by zero'); v=v/r }
+      else if (op.v==='DIV') { if(r===0)throw new Error('Integer division by zero'); v=Math.trunc(v/r) }
+      else if (op.v==='MOD') v=((v%r)+r)%r
+    }
+    return v
+  }
+
+  parseUnary() {
+    if (this.check('KW','NOT')) { this.advance(); return !this.parsePow() }
+    if (this.check('OP','-'))   { this.advance(); return -this.parsePow() }
+    if (this.check('OP','+'))   { this.advance(); return this.parsePow() }
+    return this.parsePow()
+  }
+
+  parsePow() {
+    let v = this.parsePrimary()
+    if (this.check('OP','^')) { this.advance(); v = Math.pow(v, this.parseUnary()) }
+    return v
+  }
+
+  parsePrimary() {
+    const tk = this.peek()
+
+    if (tk.t==='NUM')  { this.advance(); return tk.v }
+    if (tk.t==='STR')  { this.advance(); return tk.v }
+    if (tk.t==='BOOL') { this.advance(); return tk.v }
+
+    if (tk.t==='LPAREN') {
+      this.advance(); const v=this.parse(); this.eat('RPAREN'); return v
+    }
+
+    if (tk.t==='ID') {
+      this.advance(); const name = tk.v
+
+      // Built-in functions
+      const builtins = {
+        LENGTH:  args => Array.isArray(args[0]) ? args[0].length : String(args[0]).length,
+        LCASE:   args => String(args[0]).toLowerCase(),
+        UCASE:   args => String(args[0]).toUpperCase(),
+        INT:     args => Math.trunc(args[0]),
+        ROUND:   args => Number(parseFloat(args[0]).toFixed(args[1]||0)),
+        LEFT:    args => String(args[0]).slice(0, args[1]),
+        RIGHT:   args => String(args[0]).slice(-args[1]),
+        SUBSTR:  args => String(args[0]).substr(args[1]-1, args[2]),
+        RAND:    args => Math.random()*(args[0]||1),
+        NUM_TO_STR: args => String(args[0]),
+        STR_TO_NUM: args => parseFloat(args[0]),
+        IS_NUM:  args => !isNaN(parseFloat(args[0])),
+        SQRT:    args => Math.sqrt(args[0]),
+        ABS:     args => Math.abs(args[0]),
+      }
+
+      // Function call  name(…)
+      if (this.check('LPAREN')) {
+        this.advance(); const args=[]
+        if (!this.check('RPAREN')) {
+          args.push(this.parse())
+          while (this.eat('COMMA')) args.push(this.parse())
+        }
+        this.eat('RPAREN')
+        const upper = name.toUpperCase()
+        if (upper in builtins) return builtins[upper](args)
+        return this.interp.callFunc(name, args, this.env)
+      }
+
+      // Array access  name[expr]
+      if (this.check('LBR')) {
+        this.advance(); const idx=this.parse(); this.eat('RBR')
+        const arr = this.env.get(name)
+        if (!Array.isArray(arr._data)) throw new Error(`'${name}' is not an array`)
+        const i = Math.round(idx) - arr._base
+        if (i<0||i>=arr._data.length) throw new Error(`Array index ${idx} out of bounds for '${name}'`)
+        return arr._data[i]
+      }
+
+      // Variable
+      return this.env.get(name)
+    }
+
+    throw new Error(`Unexpected token "${tk.v||tk.t}" in expression`)
+  }
+
+  parseArgs() {
+    const args = []
+    if (!this.check('RPAREN')) {
+      args.push(this.parse())
+      while (this.eat('COMMA')) args.push(this.parse())
+    }
+    return args
+  }
+}
+
+function evalExpr(src, env, interp) {
+  const toks = tokenize(src)
+  return new ExprParser(toks, env, interp).parse()
+}
+
+// ── Environment (variable scoping) ───────────────────────────────────────────
+class Env {
+  constructor(parent=null) { this.vars={}; this.parent=parent }
+
+  get(name) {
+    const k = name.toUpperCase()
+    if (k in this.vars) return this.vars[k]
+    if (this.parent) return this.parent.get(name)
+    throw new Error(`Variable '${name}' has not been declared. Add: DECLARE ${name} : INTEGER`)
+  }
+  set(name, value) {
+    const k = name.toUpperCase()
+    if (k in this.vars) { this.vars[k]=value; return }
+    if (this.parent && this.parent.has(name)) { this.parent.set(name,value); return }
+    // auto-declare
+    this.vars[k] = value
+  }
+  setLocal(name,value) { this.vars[name.toUpperCase()]=value }
+  has(name) { const k=name.toUpperCase(); return k in this.vars||(this.parent&&this.parent.has(name)) }
+
+  snapshot() {
+    const snap = {}
+    if (this.parent) Object.assign(snap, this.parent.snapshot())
+    Object.assign(snap, this.vars)
+    return snap
+  }
+}
+
+// ── Block structure parser ────────────────────────────────────────────────────
+// Returns a tree of statement nodes
+
+function parseBlock(rawLines, pos, stopAt) {
+  const block = []; const stops = stopAt || []
+  while (pos < rawLines.length) {
+    const {text,n} = rawLines[pos]
+    const u = text.toUpperCase().trim()
+    if (stops.some(s=>u===s||u.startsWith(s+' ')||u.startsWith(s+'('))) break
+
+    if      (u.startsWith('IF '))          { const [s,p]=parseIf(rawLines,pos);    block.push(s); pos=p }
+    else if (u.startsWith('FOR '))         { const [s,p]=parseFor(rawLines,pos);   block.push(s); pos=p }
+    else if (u.startsWith('WHILE '))       { const [s,p]=parseWhile(rawLines,pos); block.push(s); pos=p }
+    else if (u==='REPEAT')                 { const [s,p]=parseRepeat(rawLines,pos);block.push(s); pos=p }
+    else if (u.startsWith('PROCEDURE '))   { const [s,p]=parseProc(rawLines,pos);  block.push(s); pos=p }
+    else if (u.startsWith('FUNCTION '))    { const [s,p]=parseFunc(rawLines,pos);  block.push(s); pos=p }
+    else { block.push({type:'STMT',text,n}); pos++ }
+  }
+  return [block, pos]
+}
+
+function parseIf(lines, pos) {
+  const start = lines[pos]; pos++
+  const [tbody, p1] = parseBlock(lines, pos, ['ELSE','ELSEIF','ENDIF'])
+  pos = p1
+  const branches = [{cond: start.text, body: tbody}]
+  while (pos<lines.length && lines[pos].text.toUpperCase().trimStart().startsWith('ELSEIF ')) {
+    const eib = lines[pos]; pos++
+    const [eb, p] = parseBlock(lines, pos, ['ELSE','ELSEIF','ENDIF'])
+    branches.push({cond: eib.text, body: eb}); pos=p
+  }
+  let elsebody = null
+  if (pos<lines.length && lines[pos].text.toUpperCase().trim()==='ELSE') {
+    pos++
+    const [eb, p] = parseBlock(lines, pos, ['ENDIF']); elsebody=eb; pos=p
+  }
+  if (pos<lines.length && lines[pos].text.toUpperCase().trim()==='ENDIF') pos++
+  return [{type:'IF', branches, elsebody, n: start.n}, pos]
+}
+
+function parseFor(lines, pos) {
+  const start = lines[pos]; pos++
+  const [body, p] = parseBlock(lines, pos, ['NEXT'])
+  if (p<lines.length) pos=p+1
+  else pos=p
+  return [{type:'FOR', text: start.text, n: start.n, body}, pos]
+}
+
+function parseWhile(lines, pos) {
+  const start = lines[pos]; pos++
+  const [body, p] = parseBlock(lines, pos, ['ENDWHILE'])
+  pos = p<lines.length ? p+1 : p
+  return [{type:'WHILE', text: start.text, n: start.n, body}, pos]
+}
+
+function parseRepeat(lines, pos) {
+  pos++  // skip REPEAT
+  const [body, p] = parseBlock(lines, pos, ['UNTIL'])
+  const cond = p<lines.length ? lines[p].text : ''
+  pos = p<lines.length ? p+1 : p
+  return [{type:'REPEAT', n: pos, body, untilText: cond}, pos]
+}
+
+function parseProc(lines, pos) {
+  const hdr = lines[pos]; pos++
+  const [body, p] = parseBlock(lines, pos, ['ENDPROCEDURE'])
+  pos = p<lines.length ? p+1 : p
+  return [{type:'PROC_DEF', hdr: hdr.text, n: hdr.n, body}, pos]
+}
+
+function parseFunc(lines, pos) {
+  const hdr = lines[pos]; pos++
+  const [body, p] = parseBlock(lines, pos, ['ENDFUNCTION'])
+  pos = p<lines.length ? p+1 : p
+  return [{type:'FUNC_DEF', hdr: hdr.text, n: hdr.n, body}, pos]
+}
+
+// ── Interpreter ───────────────────────────────────────────────────────────────
+class Interpreter {
+  constructor() { this.reset() }
+
+  reset() {
+    this.globals = new Env()
+    this.procs   = {}   // name → {params, body}
+    this.funcs   = {}   // name → {params, retType, body}
+    this.output  = []
+    this.trace   = []
+    this.inputQ  = []
+    this.steps   = 0
+    this.MAX     = 5000
+  }
+
+  run(code, inputValues=[]) {
+    this.reset()
+    this.inputQ = [...inputValues]
+
+    const rawLines = code.split('\n')
+      .map((text,i)=>({text: text.replace(/\/\/.*$/,'').trim(), n:i+1}))
+      .filter(l=>l.text)
+
+    const [block] = parseBlock(rawLines, 0)
+    this.execBlock(block, this.globals)
+    return {output: this.output, trace: this.trace}
+  }
+
+  evalE(src, env) { return evalExpr(src, env, this) }
+
+  callFunc(name, args, callerEnv) {
+    const u = name.toUpperCase()
+    const def = this.funcs[u]
+    if (!def) throw new Error(`Function '${name}' is not defined. Did you mean a built-in or forget to declare it?`)
+    const local = new Env(this.globals)
+    def.params.forEach((p,i)=>local.setLocal(p.name, args[i]??null))
+    try { this.execBlock(def.body, local) }
+    catch(e) { if(e && e.type==='RETURN') return e.value; throw e }
+    return null
+  }
+
+  record(stmt, env, out=null) {
+    this.trace.push({ step:++this.steps, n: stmt.n||'?',
+                      code: stmt.text||stmt.type, vars: env.snapshot(), out })
+    if (this.steps > this.MAX) throw new Error(`Too many steps (${this.MAX} limit). Check for an infinite loop.`)
+  }
+
+  execBlock(block, env) {
+    for (const stmt of block) this.execStmt(stmt, env)
+  }
+
+  execStmt(stmt, env) {
+    if (stmt.type==='IF')       return this.execIf(stmt, env)
+    if (stmt.type==='FOR')      return this.execFor(stmt, env)
+    if (stmt.type==='WHILE')    return this.execWhile(stmt, env)
+    if (stmt.type==='REPEAT')   return this.execRepeatUntil(stmt, env)
+    if (stmt.type==='PROC_DEF') return this.registerProc(stmt)
+    if (stmt.type==='FUNC_DEF') return this.registerFunc(stmt)
+    if (stmt.type==='STMT')     return this.execSimple(stmt, env)
+  }
+
+  execIf(node, env) {
+    this.record({n:node.n, text: node.branches[0].cond}, env)
+    for (const branch of node.branches) {
+      const condSrc = branch.cond.replace(/^IF\s+/i,'').replace(/^ELSEIF\s+/i,'').replace(/\s+THEN\s*$/i,'').trim()
+      if (this.evalE(condSrc, env)) { this.execBlock(branch.body, env); return }
+    }
+    if (node.elsebody) this.execBlock(node.elsebody, env)
+  }
+
+  execFor(node, env) {
+    // FOR varName ← start TO end [STEP n]
+    const text = node.text.replace(/^FOR\s+/i,'').trim()
+    const stepMatch = text.match(/\bSTEP\s+(.+)$/i)
+    const stepExpr = stepMatch ? stepMatch[1].trim() : '1'
+    const noStep   = stepMatch ? text.slice(0, stepMatch.index).trim() : text
+    const toIdx    = noStep.search(/\bTO\b/i)
+    const lhs      = noStep.slice(0, toIdx).trim()
+    const endExpr  = noStep.slice(toIdx+2).trim()
+    // lhs may be  "varName ← start"
+    const arrowIdx = lhs.indexOf('←') >= 0 ? lhs.indexOf('←') : lhs.indexOf(':=')
+    const varName  = lhs.slice(0, arrowIdx).trim()
+    const startVal = this.evalE(lhs.slice(arrowIdx+1).trim(), env)
+    let endVal     = this.evalE(endExpr, env)
+    const stepVal  = this.evalE(stepExpr, env)
+
+    env.set(varName, startVal)
+    const going = stepVal > 0
+    while (going ? env.get(varName)<=endVal : env.get(varName)>=endVal) {
+      this.record({n:node.n, text:node.text}, env)
+      this.execBlock(node.body, env)
+      env.set(varName, env.get(varName)+stepVal)
+    }
+  }
+
+  execWhile(node, env) {
+    const condSrc = node.text.replace(/^WHILE\s+/i,'').replace(/\s+DO\s*$/i,'').trim()
+    while (this.evalE(condSrc, env)) {
+      this.record({n:node.n, text:node.text}, env)
+      this.execBlock(node.body, env)
+    }
+  }
+
+  execRepeatUntil(node, env) {
+    const condSrc = node.untilText.replace(/^UNTIL\s+/i,'').trim()
+    do {
+      this.record({n:node.n, text:'REPEAT'}, env)
+      this.execBlock(node.body, env)
+    } while (!this.evalE(condSrc, env))
+  }
+
+  registerProc(node) {
+    // PROCEDURE Name(param1 : TYPE, ...)
+    const m = node.hdr.match(/^PROCEDURE\s+(\w+)\s*(?:\(([^)]*)\))?/i)
+    if (!m) throw new Error('Invalid PROCEDURE header: ' + node.hdr)
+    const name = m[1].toUpperCase()
+    const params = m[2] ? parseParams(m[2]) : []
+    this.procs[name] = {params, body: node.body}
+  }
+
+  registerFunc(node) {
+    const m = node.hdr.match(/^FUNCTION\s+(\w+)\s*(?:\(([^)]*)\))?\s*RETURNS\s+(\w+)/i)
+    if (!m) throw new Error('Invalid FUNCTION header: ' + node.hdr)
+    const name = m[1].toUpperCase()
+    const params = m[2] ? parseParams(m[2]) : []
+    this.funcs[name] = {params, retType: m[3], body: node.body}
+  }
+
+  execSimple(stmt, env) {
+    const text = stmt.text
+    const u    = text.toUpperCase()
+
+    // DECLARE
+    if (u.startsWith('DECLARE ')) {
+      this.execDeclare(text, env); this.record(stmt, env); return
+    }
+
+    // RETURN
+    if (u.startsWith('RETURN ') || u==='RETURN') {
+      const val = u==='RETURN' ? null : this.evalE(text.slice(7).trim(), env)
+      throw {type:'RETURN', value: val}
+    }
+
+    // CALL
+    if (u.startsWith('CALL ')) {
+      const rest = text.slice(5).trim()
+      const mCall = rest.match(/^(\w+)\s*(?:\(([^)]*)\))?$/)
+      if (!mCall) throw new Error('Invalid CALL: ' + text)
+      const name = mCall[1].toUpperCase()
+      const def  = this.procs[name]
+      if (!def) throw new Error(`Procedure '${mCall[1]}' is not defined.`)
+      const argSrcs = mCall[2] ? splitArgs(mCall[2]) : []
+      const args = argSrcs.map(a=>this.evalE(a.trim(),env))
+      const local = new Env(this.globals)
+      def.params.forEach((p,i)=>local.setLocal(p.name,args[i]??null))
+      this.execBlock(def.body, local)
+      this.record(stmt, env); return
+    }
+
+    // OUTPUT
+    if (u.startsWith('OUTPUT ')) {
+      const val = this.evalE(text.slice(7).trim(), env)
+      const out = String(val)
+      this.output.push(out)
+      this.record(stmt, env, out); return
+    }
+
+    // INPUT
+    if (u.startsWith('INPUT ')) {
+      const varName = text.slice(6).trim()
+      const raw = this.inputQ.length ? this.inputQ.shift() : '0'
+      env.set(varName, coerceInput(raw))
+      this.record(stmt, env); return
+    }
+
+    // Assignment: varName ← expr  or  varName[idx] ← expr
+    const arrow = text.indexOf('←')
+    const assign = arrow>=0 ? arrow : text.indexOf(':=')
+    if (assign >= 0) {
+      const lhs  = text.slice(0, assign).trim()
+      const rhs  = text.slice(assign + (arrow>=0?1:2)).trim()
+      const val  = this.evalE(rhs, env)
+
+      // Array element assignment: arr[i] ← val
+      const arrM = lhs.match(/^(\w+)\[(.+)\]$/)
+      if (arrM) {
+        const arr = env.get(arrM[1])
+        if (!Array.isArray(arr._data)) throw new Error(`'${arrM[1]}' is not an array`)
+        const idx = Math.round(this.evalE(arrM[2].trim(), env)) - arr._base
+        arr._data[idx] = val
+      } else {
+        env.set(lhs, val)
+      }
+      this.record(stmt, env); return
+    }
+
+    // Standalone function call  (no CALL keyword)
+    const scm = text.match(/^(\w+)\s*\(/)
+    if (scm) {
+      const name = scm[1].toUpperCase()
+      if (this.procs[name]) {
+        const argStr = text.slice(scm[0].length-1).replace(/^\s*\(|\)\s*$/g,'')
+        const args = argStr.trim() ? splitArgs(argStr).map(a=>this.evalE(a.trim(),env)) : []
+        const def  = this.procs[name]
+        const local = new Env(this.globals)
+        def.params.forEach((p,i)=>local.setLocal(p.name,args[i]??null))
+        this.execBlock(def.body, local)
+        this.record(stmt, env); return
+      }
+    }
+
+    // Skip ELSE/ENDIF/ENDWHILE/NEXT/ENDPROCEDURE/ENDFUNCTION/ENDCASE markers
+    const MARKERS = ['ELSE','ENDIF','ENDWHILE','ENDPROCEDURE','ENDFUNCTION','ENDCASE']
+    if (MARKERS.some(m=>u===m||u.startsWith(m+' '))) return
+
+    // Unknown — warn (don't crash)
+    console.warn('Unrecognised statement:', text)
+    this.record(stmt, env)
+  }
+
+  execDeclare(text, env) {
+    // DECLARE varName : TYPE  or  DECLARE arr : ARRAY[lo:hi] OF TYPE
+    const m1 = text.match(/^DECLARE\s+(\w+)\s*:\s*ARRAY\s*\[(\d+)\s*:\s*(\d+)\]\s*OF\s+(\w+)/i)
+    if (m1) {
+      const [,name,,lo,hi] = m1
+      const base = parseInt(lo); const size = parseInt(hi)-base+1
+      const fill = typeDefault(m1[4])
+      env.setLocal(name, {_data: Array(size).fill(fill), _base: base, _hi: parseInt(hi)})
+      return
+    }
+    const m2 = text.match(/^DECLARE\s+(\w+)\s*:\s*(\w+)/i)
+    if (m2) env.setLocal(m2[1], typeDefault(m2[2]))
+  }
+}
+
+function parseParams(src) {
+  if (!src.trim()) return []
+  return splitArgs(src).map(p=>{
+    const m = p.trim().match(/^(\w+)\s*(?::\s*(\w+))?/)
+    return { name: m?.[1]||p.trim(), type: m?.[2]||'ANY' }
+  })
+}
+
+function splitArgs(src) {
+  const result=[]; let depth=0,cur=''
+  for(const c of src){
+    if(c==='('||c==='[') depth++
+    else if(c===')'||c===']') depth--
+    if(c===','&&depth===0){result.push(cur.trim());cur=''}
+    else cur+=c
+  }
+  if(cur.trim()) result.push(cur.trim())
+  return result
+}
+
+function typeDefault(t) {
+  const u=t.toUpperCase()
+  if(u==='INTEGER'||u==='REAL') return 0
+  if(u==='STRING')  return ''
+  if(u==='BOOLEAN') return false
+  if(u==='CHAR')    return ''
+  return null
+}
+
+function coerceInput(v) {
+  if(v.trim().toUpperCase()==='TRUE')  return true
+  if(v.trim().toUpperCase()==='FALSE') return false
+  const n = parseFloat(v)
+  return isNaN(n) ? v.trim() : n
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CodeMirror custom mode for Pseudocode
+// ══════════════════════════════════════════════════════════════════════════════
+CodeMirror.defineSimpleMode('pseudocode', {
+  start: [
+    { regex: /\/\/.*$/,    token: 'comment' },
+    { regex: /"[^"]*"/,    token: 'string'  },
+    { regex: /'[^']*'/,    token: 'string'  },
+    { regex: /\b(?:DECLARE|IF|THEN|ELSE|ELSEIF|ENDIF|FOR|TO|STEP|NEXT|WHILE|DO|ENDWHILE|REPEAT|UNTIL|PROCEDURE|ENDPROCEDURE|FUNCTION|ENDFUNCTION|RETURNS|RETURN|CALL|OUTPUT|INPUT|AND|OR|NOT|DIV|MOD|ARRAY|OF|CASE|OTHERWISE|ENDCASE)\b/, token: 'keyword' },
+    { regex: /\b(?:INTEGER|REAL|STRING|BOOLEAN|CHAR)\b/, token: 'def' },
+    { regex: /\b(?:TRUE|FALSE)\b/,   token: 'atom'    },
+    { regex: /[0-9]+(?:\.[0-9]+)?/,  token: 'number'  },
+    { regex: /←|:=/,                 token: 'operator'},
+    { regex: /[+\-*\/&^<>=≤≥]/,      token: 'operator'},
+    { regex: /[A-Za-z_]\w*/,         token: 'variable'},
+  ],
+  meta: { lineComment: '//' },
+})
+
+const editor = CodeMirror.fromTextArea(document.getElementById('cm-ed'), {
+  mode:         'pseudocode',
+  theme:        'dracula',
+  lineNumbers:   true,
+  indentUnit:    3,
+  tabSize:       3,
+  indentWithTabs:false,
+  autofocus:     true,
+  extraKeys: {
+    Tab: cm => cm.somethingSelected() ? cm.indentSelection('add') : cm.replaceSelection('   '),
+  },
+})
+
+function ins(text) {
+  editor.focus()
+  editor.replaceSelection(text)
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// UI — run, trace table, challenges
+// ══════════════════════════════════════════════════════════════════════════════
+let traceVisible = true
+const interp = new Interpreter()
+
+function normaliseArrows(src) {
+  // Allow students to type <- (two chars) instead of ← (Unicode arrow).
+  // Also accept = as assignment when not part of <=, >=, <>, :=, ==.
+  return src
+    .replace(/<-/g, '←')   // <- → ←  (most common alternative)
+    .replace(/=>/g, '←')   // => just in case (arrow confusion)
+}
+
+function runCode() {
+  const code = normaliseArrows(editor.getValue())
+  if (!code.trim()) { appendOut('// Nothing to run.', 'out'); return }
+  // Autosave code to Supabase (workspace-level save, idx = -1)
+  LessonSaves.save('grade9', -1, { code: editor.getValue() })
+
+  const rawInputs = document.getElementById('input-vals').value
+  const inputVals = rawInputs.trim()
+    ? rawInputs.split(',').map(s=>s.trim()).filter(Boolean)
+    : []
+
+  document.getElementById('output').innerHTML = ''
+  clearTraceTable()
+
+  let result
+  try {
+    result = interp.run(code, inputVals)
+  } catch(e) {
+    const msg = friendlyErr(e)
+    appendOut(msg, 'out-err')
+    return
+  }
+
+  if (result.output.length) {
+    result.output.forEach(line => appendOut(line, 'out'))
+  } else {
+    appendOut('(no OUTPUT statements)', 'out')
+  }
+
+  renderTraceTable(result.trace)
+  validateChallenge(code, result)
+}
+
+function friendlyErr(e) {
+  if (typeof e === 'object' && e.type === 'RETURN') return 'RETURN used outside a function/procedure.'
+  const msg = e?.message || String(e)
+
+  if (msg.includes('not been declared')) return `⚠ ${msg}`
+  if (msg.includes('not defined'))       return `⚠ ${msg}`
+  if (msg.includes('infinite loop')||msg.includes('Too many steps')) return `⚠ ${msg}`
+  if (msg.includes('out of bounds'))     return `⚠ ${msg}`
+  if (msg.includes('not an array'))      return `⚠ ${msg}`
+  if (msg.includes('is not a function')) return `⚠ Function not found. Did you define it above where it's called?`
+  if (msg.includes('Division by zero'))  return `⚠ Division by zero — check your divisor!`
+  if (msg.includes('Unexpected token'))  return `⚠ Syntax error: ${msg}`
+  return `⚠ Error: ${msg}`
+}
+
+function appendOut(text, cls='out') {
+  const pre = document.getElementById('output')
+  const span = document.createElement('span')
+  span.className = cls; span.textContent = text + '\n'
+  pre.appendChild(span)
+}
+
+// ── Trace Table ───────────────────────────────────────────────────────────────
+function clearTraceTable() {
+  document.getElementById('trace-head').innerHTML = ''
+  document.getElementById('trace-body').innerHTML = ''
+}
+
+function renderTraceTable(trace) {
+  if (!trace.length) return
+
+  // Collect all variable names across all steps
+  const allVars = new Set()
+  trace.forEach(s => Object.keys(s.vars).forEach(k => allVars.add(k)))
+  const varNames = [...allVars].filter(v=>!v.startsWith('_'))
+
+  // Header
+  const hdr = document.getElementById('trace-head')
+  hdr.innerHTML = '<th>#</th><th>Line</th><th>Statement</th>' +
+    varNames.map(v=>`<th>${v}</th>`).join('') + '<th>Output</th>'
+
+  // Body
+  const tbody = document.getElementById('trace-body')
+  tbody.innerHTML = ''
+  let prevVars = {}
+
+  trace.forEach((step, i) => {
+    const tr   = document.createElement('tr')
+    const changed = varNames.some(v => step.vars[v] !== prevVars[v])
+    if (changed) tr.className = 'changed'
+
+    const truncCode = step.code.length > 28 ? step.code.slice(0,27)+'…' : step.code
+    tr.innerHTML = `<td>${step.step}</td><td>${step.n}</td><td title="${step.code}">${truncCode}</td>` +
+      varNames.map(v => {
+        const val = step.vars[v]
+        const disp = val===null ? '–' : Array.isArray(val?._data) ? `[${val._data.join(',')}]` : String(val)
+        const cls  = step.vars[v] !== prevVars[v] ? ' changed-val' : ''
+        return `<td class="${cls}">${disp}</td>`
+      }).join('') +
+      `<td class="out-col">${step.out ?? ''}</td>`
+
+    tbody.appendChild(tr)
+    prevVars = {...step.vars}
+  })
+}
+
+function toggleTrace() {
+  traceVisible = !traceVisible
+  document.getElementById('trace-wrap').style.display = traceVisible ? '' : 'none'
+}
+
+// ── Challenges ────────────────────────────────────────────────────────────────
+// Curriculum arc: W6 pseudocode basics → W7 data types → W8 procedures/functions
+//                 → W9 trace tables → W11 sorting → W12 searching
+const CHALLENGES = [
+  // ── Week 6 · Pseudocode Foundations ──────────────────────────────────────
+  {
+    mod:'W6', name:'Temperature Converter', xp:35,
+    text:`<strong>Challenge 1 — First Pseudocode (W6)</strong><br>Complete a temperature converter. Read a Celsius value from INPUT and OUTPUT the Fahrenheit equivalent.<br>Formula: <code>fahrenheit ← (celsius * 9 / 5) + 32</code><br>Use INPUT value <strong>100</strong>. Expected output: <strong>212.0</strong>`,
+    hints:[
+      'DECLARE celsius : REAL  then  DECLARE fahrenheit : REAL',
+      'INPUT celsius — the interpreter will use the first value from the INPUT box above.',
+      'fahrenheit ← (celsius * 9 / 5) + 32  then  OUTPUT fahrenheit',
+    ],
+    starter:`// Challenge 1: Temperature Converter (W6)
+// Run with INPUT value: 100
+DECLARE celsius    : REAL
+DECLARE fahrenheit : REAL
+
+INPUT celsius
+// TODO: calculate fahrenheit using (celsius * 9 / 5) + 32
+// TODO: OUTPUT fahrenheit`,
+    check:(code,res) => res.output.some(o => Math.abs(parseFloat(o.trim()) - 212) < 0.5),
+  },
+  {
+    mod:'W6', name:'Leap Year Checker', xp:45,
+    text:`<strong>Challenge 2 — IF/ELSE (W6)</strong><br>Write a program that reads a year (INPUT) and outputs either <strong>"Leap year"</strong> or <strong>"Not a leap year"</strong>.<br>A year is a leap year if it is divisible by 4 — but not by 100 — unless it is also divisible by 400.<br>Test with INPUT: <strong>2000</strong>. Expected output: <strong>Leap year</strong>`,
+    hints:[
+      'Use MOD to check divisibility: year MOD 4 = 0 means divisible by 4.',
+      'Full rule: (year MOD 4 = 0 AND year MOD 100 <> 0) OR year MOD 400 = 0',
+      'Wrap in an IF … THEN … ELSE … ENDIF block.',
+    ],
+    starter:`// Challenge 2: Leap Year Checker (W6)
+// Run with INPUT value: 2000
+DECLARE year : INTEGER
+
+INPUT year
+IF (year MOD 4 = 0 AND year MOD 100 <> 0) OR year MOD 400 = 0 THEN
+   // TODO: OUTPUT "Leap year"
+ELSE
+   // TODO: OUTPUT "Not a leap year"
+ENDIF`,
+    check:(code,res) => res.output.some(o => o.trim().toLowerCase().includes('leap year')),
+  },
+
+  // ── Week 7 · Data Types & Declarations ───────────────────────────────────
+  {
+    mod:'W7', name:'Password Strength', xp:50,
+    text:`<strong>Challenge 3 — Data Types (W7)</strong><br>Declare three variables: <code>password : STRING</code>, <code>length : INTEGER</code>, <code>valid : BOOLEAN</code>. Set password to any string longer than 8 characters, calculate its length, set valid to TRUE if length ≥ 8, then OUTPUT one of:<br><strong>"Strong"</strong> if length ≥ 12, <strong>"OK"</strong> if length ≥ 8, or <strong>"Weak"</strong> otherwise.`,
+    hints:[
+      'password ← "SecurePass1!" (or any string you like)',
+      'length ← LENGTH(password) — the built-in function returns the string length.',
+      'Use nested IF: IF length >= 12 THEN OUTPUT "Strong" ELSEIF length >= 8 THEN OUTPUT "OK" ELSE OUTPUT "Weak" ENDIF',
+    ],
+    starter:`// Challenge 3: Password Strength Checker (W7)
+DECLARE password : STRING
+DECLARE length   : INTEGER
+DECLARE valid    : BOOLEAN
+
+password ← "SecurePass1!"   // change if you like
+length   ← LENGTH(password)
+valid    ← length >= 8
+
+// TODO: IF/ELSEIF/ELSE to OUTPUT "Strong", "OK", or "Weak"`,
+    check:(code,res) => res.output.some(o => ['strong','ok','weak'].includes(o.trim().toLowerCase())),
+  },
+  {
+    mod:'W7', name:'Array & FOR', xp:50,
+    text:`<strong>Challenge 4 — Arrays (W7)</strong><br>Declare an integer array <code>scores : ARRAY[1:5] OF INTEGER</code>. Fill it with the values 72, 85, 91, 68, 79. Then loop through it and OUTPUT each score. Finally OUTPUT the total.`,
+    hints:[
+      'scores[1] ← 72 then scores[2] ← 85 etc.',
+      'FOR i ← 1 TO 5: OUTPUT scores[i]. NEXT i',
+      'Add a total variable: DECLARE total : INTEGER. total ← 0. total ← total + scores[i] inside the loop. OUTPUT total after.',
+    ],
+    starter:`// Challenge 4: Arrays (W7)
+DECLARE scores : ARRAY[1:5] OF INTEGER
+DECLARE i      : INTEGER
+DECLARE total  : INTEGER
+
+// TODO: fill the array with 72, 85, 91, 68, 79
+// TODO: FOR loop to OUTPUT each score and accumulate total
+// TODO: OUTPUT total`,
+    check:(code,res) => {
+      const out = res.output.map(s => parseInt(s.trim()))
+      return out.includes(72) && out.includes(91) && out.some(v => v === 395)
+    },
+  },
+
+  // ── Week 8 · Procedures & Functions ──────────────────────────────────────
+  {
+    mod:'W8', name:'PrintBorder Procedure', xp:55,
+    text:`<strong>Challenge 5 — PROCEDURE (W8)</strong><br>Write a PROCEDURE <code>PrintBorder(width : INTEGER)</code> that outputs a line of <code>*</code> characters of the given width. Then CALL it with width 5 and again with width 10.<br>Expected outputs: <code>*****</code> and <code>**********</code>`,
+    hints:[
+      'PROCEDURE PrintBorder(width : INTEGER)',
+      'Inside: DECLARE line : STRING, line ← "". FOR i ← 1 TO width: line ← line & "*". NEXT i. OUTPUT line.',
+      'After ENDPROCEDURE: CALL PrintBorder(5)  and  CALL PrintBorder(10)',
+    ],
+    starter:`// Challenge 5: PROCEDURE (W8)
+PROCEDURE PrintBorder(width : INTEGER)
+   DECLARE line : STRING
+   DECLARE i    : INTEGER
+   line ← ""
+   // TODO: FOR loop to concatenate "*" to line, then OUTPUT line
+ENDPROCEDURE
+
+// Call the procedure:
+CALL PrintBorder(5)
+CALL PrintBorder(10)`,
+    check:(code,res) => res.output.some(o=>o.trim()==='*****') && res.output.some(o=>o.trim()==='**********'),
+  },
+  {
+    mod:'W8', name:'Clamp Function', xp:60,
+    text:`<strong>Challenge 6 — FUNCTION (W8)</strong><br>Write a FUNCTION <code>Clamp(value : INTEGER, minVal : INTEGER, maxVal : INTEGER) RETURNS INTEGER</code> that returns:<br>• minVal if value is below the range<br>• maxVal if value is above the range<br>• value if it's within range<br>Test: <code>Clamp(15, 1, 10)</code> → <strong>10</strong>; <code>Clamp(-5, 0, 100)</code> → <strong>0</strong>; <code>Clamp(50, 1, 100)</code> → <strong>50</strong>`,
+    hints:[
+      'FUNCTION Clamp(value : INTEGER, minVal : INTEGER, maxVal : INTEGER) RETURNS INTEGER',
+      'IF value < minVal THEN RETURN minVal ELSEIF value > maxVal THEN RETURN maxVal ELSE RETURN value ENDIF',
+      'Call it: DECLARE result : INTEGER / result ← Clamp(15, 1, 10) / OUTPUT result',
+    ],
+    starter:`// Challenge 6: Clamp FUNCTION (W8)
+FUNCTION Clamp(value : INTEGER, minVal : INTEGER, maxVal : INTEGER) RETURNS INTEGER
+   // TODO: return minVal if too low, maxVal if too high, value otherwise
+   RETURN value
+ENDFUNCTION
+
+DECLARE result : INTEGER
+result ← Clamp(15, 1, 10)
+OUTPUT result   // expected: 10
+
+result ← Clamp(-5, 0, 100)
+OUTPUT result   // expected: 0
+
+result ← Clamp(50, 1, 100)
+OUTPUT result   // expected: 50`,
+    check:(code,res) => res.output[0]?.trim()==='10' && res.output[1]?.trim()==='0' && res.output[2]?.trim()==='50',
+  },
+
+  // ── Week 9 · Trace Tables ─────────────────────────────────────────────────
+  {
+    mod:'W9', name:'Trace & Fix', xp:65,
+    text:`<strong>Challenge 7 — Trace Table (W9)</strong><br>The code below has a bug — it should output the first 5 <em>even</em> numbers (2, 4, 6, 8, 10) but produces wrong output.<br>Trace it mentally to find the bug, fix it, then run to verify.<br><em>Hint: trace the variable <code>n</code> and <code>count</code> step by step.</em>`,
+    hints:[
+      'Trace: n starts at 1. count starts at 0. First check: is 1 even? No. n becomes 2. Is 2 even? Yes. Output 2. count becomes 1. Continue…',
+      'The bug: the loop condition should stop when count = 5, not when n = 5. After outputting 10, count reaches 5 and the loop ends.',
+      'Fix: WHILE count < 5 DO ... — or change the loop condition to count < 5.',
+    ],
+    starter:`// Challenge 7: Find & fix the bug (W9)
+// Should output: 2, 4, 6, 8, 10
+DECLARE n     : INTEGER
+DECLARE count : INTEGER
+
+n     ← 1
+count ← 0
+
+WHILE n <= 10 DO          // BUG: this stops too early
+   IF n MOD 2 = 0 THEN
+      OUTPUT n
+      count ← count + 1
+   ENDIF
+   n ← n + 1
+ENDWHILE`,
+    check:(code,res) => {
+      const nums = res.output.map(s => parseInt(s.trim()))
+      return JSON.stringify(nums) === JSON.stringify([2,4,6,8,10])
+    },
+  },
+  {
+    mod:'W9', name:'Factorial Function', xp:65,
+    text:`<strong>Challenge 8 — Trace the Recursion (W9)</strong><br>A factorial function uses a loop — trace it to understand it. Write a FUNCTION <code>Factorial(n : INTEGER) RETURNS INTEGER</code> that returns n! using a loop (not recursion yet).<br>Test: <code>Factorial(5)</code> → <strong>120</strong>; <code>Factorial(0)</code> → <strong>1</strong>`,
+    hints:[
+      'FUNCTION Factorial(n : INTEGER) RETURNS INTEGER',
+      'DECLARE result : INTEGER / result ← 1 / FOR i ← 1 TO n: result ← result * i. NEXT i / RETURN result',
+      'Edge case: if n = 0, the FOR loop runs 0 times, and result stays at 1. RETURN 1 is correct for 0!',
+    ],
+    starter:`// Challenge 8: Factorial using a loop (W9)
+FUNCTION Factorial(n : INTEGER) RETURNS INTEGER
+   DECLARE result : INTEGER
+   DECLARE i      : INTEGER
+   result ← 1
+   // TODO: FOR loop from 1 TO n: result ← result * i
+   RETURN result
+ENDFUNCTION
+
+OUTPUT Factorial(5)   // expected: 120
+OUTPUT Factorial(0)   // expected: 1`,
+    check:(code,res) => res.output[0]?.trim()==='120' && res.output[1]?.trim()==='1',
+  },
+
+  // ── Week 11 · Sorting ─────────────────────────────────────────────────────
+  {
+    mod:'W11', name:'Bubble Sort', xp:70,
+    text:`<strong>Challenge 9 — Bubble Sort (W11)</strong><br>Declare an array of 6 integers: <code>[64, 34, 25, 12, 22, 11]</code>. Write a bubble sort to put them in ascending order. OUTPUT all 6 values after sorting.<br>Expected: <strong>11 12 22 25 34 64</strong>`,
+    hints:[
+      'Use nested FOR loops: outer i from 1 to 5, inner j from 1 to 6 - i.',
+      'IF arr[j] > arr[j+1] THEN swap using a temp variable.',
+      'temp ← arr[j] / arr[j] ← arr[j+1] / arr[j+1] ← temp',
+    ],
+    starter:`// Challenge 9: Bubble Sort (W11)
+DECLARE arr  : ARRAY[1:6] OF INTEGER
+DECLARE i    : INTEGER
+DECLARE j    : INTEGER
+DECLARE temp : INTEGER
+
+// Fill array: 64, 34, 25, 12, 22, 11
+arr[1]←64; arr[2]←34; arr[3]←25; arr[4]←12; arr[5]←22; arr[6]←11
+
+// Bubble sort:
+FOR i ← 1 TO 5
+   FOR j ← 1 TO 6 - i
+      IF arr[j] > arr[j + 1] THEN
+         // TODO: swap arr[j] and arr[j+1] using temp
+      ENDIF
+   NEXT j
+NEXT i
+
+// Output sorted array:
+FOR i ← 1 TO 6
+   OUTPUT arr[i]
+NEXT i`,
+    check:(code,res) => {
+      const nums = res.output.map(s => parseInt(s.trim()))
+      return JSON.stringify(nums) === JSON.stringify([11,12,22,25,34,64])
+    },
+  },
+
+  // ── Week 12 · Searching ───────────────────────────────────────────────────
+  {
+    mod:'W12', name:'Binary Search', xp:70,
+    text:`<strong>Challenge 10 — Binary Search (W12)</strong><br>Use the sorted array <code>[2, 5, 8, 11, 16, 22, 30, 41, 55, 70]</code>. Write a FUNCTION <code>BinarySearch(target : INTEGER) RETURNS INTEGER</code> that returns the 1-based index of the target, or -1 if not found.<br>Search for <strong>22</strong>. Expected output: <strong>6</strong>`,
+    hints:[
+      'DECLARE low : INTEGER / low ← 1 / DECLARE high : INTEGER / high ← 10',
+      'WHILE low <= high DO: mid ← (low + high) DIV 2. IF arr[mid] = target THEN RETURN mid.',
+      'If target > arr[mid]: low ← mid + 1. If target < arr[mid]: high ← mid - 1. After loop: RETURN -1',
+    ],
+    starter:`// Challenge 10: Binary Search (W12)
+DECLARE arr : ARRAY[1:10] OF INTEGER
+DECLARE i   : INTEGER
+arr[1]←2; arr[2]←5;  arr[3]←8;  arr[4]←11; arr[5]←16
+arr[6]←22;arr[7]←30; arr[8]←41; arr[9]←55; arr[10]←70
+
+FUNCTION BinarySearch(target : INTEGER) RETURNS INTEGER
+   DECLARE low  : INTEGER
+   DECLARE high : INTEGER
+   DECLARE mid  : INTEGER
+   low  ← 1
+   high ← 10
+   WHILE low <= high DO
+      mid ← (low + high) DIV 2
+      IF arr[mid] = target THEN
+         RETURN mid
+      ELSEIF target > arr[mid] THEN
+         // TODO: search right half (low ← mid + 1)
+      ELSE
+         // TODO: search left half (high ← mid - 1)
+      ENDIF
+   ENDWHILE
+   RETURN -1
+ENDFUNCTION
+
+OUTPUT BinarySearch(22)    // expected: 6
+OUTPUT BinarySearch(100)   // expected: -1`,
+    check:(code,res) => res.output[0]?.trim()==='6' && res.output[1]?.trim()==='-1',
+  },
+]
+
+OUTPUT total`,
+    check:(code,res) => res.output.some(o=>o.trim()==='55'),
+  },
+  {
+    mod:'M12', name:'Temperature Function', xp:50,
+    text:`<strong>Challenge 3 — FUNCTION</strong> — Define a function <code>CtoF</code> that takes a Celsius temperature and returns the Fahrenheit equivalent (formula: F = C × 9 / 5 + 32). Call it for 0, 100, and 37°C.`,
+    hints:[
+      'FUNCTION CtoF(celsius : REAL) RETURNS REAL',
+      'Inside: RETURN celsius * 9 / 5 + 32. Then ENDFUNCTION.',
+      'Call it: OUTPUT CtoF(0)  → should output 32. OUTPUT CtoF(100) → should output 212.',
+    ],
+    starter:`// Challenge 3: FUNCTION — Celsius to Fahrenheit
+// Define the function here:
+FUNCTION CtoF(celsius : REAL) RETURNS REAL
+   // TODO: calculate and RETURN the Fahrenheit value
+ENDFUNCTION
+
+// Test it — should output 32, 212, and 98.6:
+OUTPUT CtoF(0)
+OUTPUT CtoF(100)
+OUTPUT CtoF(37)`,
+    check:(code,res) => {
+      const nums = res.output.map(s=>parseFloat(s))
+      return nums.includes(32) && nums.includes(212)
+    },
+  },
+  {
+    mod:'M12', name:'Array Processing', xp:55,
+    text:`<strong>Challenge 4 — Arrays</strong> — Declare an INTEGER array of 5 elements. Fill it with values using FOR. Then loop through it again and OUTPUT each value. The values should be 2, 4, 6, 8, 10.`,
+    hints:[
+      'DECLARE nums : ARRAY[1:5] OF INTEGER',
+      'FOR i ← 1 TO 5: nums[i] ← i * 2. NEXT i',
+      'Then a second FOR loop: FOR i ← 1 TO 5: OUTPUT nums[i]. NEXT i',
+    ],
+    starter:`// Challenge 4: Arrays — store and output even numbers
+DECLARE nums : ARRAY[1:5] OF INTEGER
+DECLARE i : INTEGER
+
+// Fill the array:
+FOR i ← 1 TO 5
+   nums[i] ← i * 2
+NEXT i
+
+// Output each element:
+FOR i ← 1 TO 5
+   // TODO: OUTPUT nums[i]
+NEXT i`,
+    check:(code,res) => {
+      const nums = res.output.map(s=>s.trim())
+      return nums.includes('2')&&nums.includes('4')&&nums.includes('10')
+    },
+  },
+  {
+    mod:'M13', name:'Linear Search', xp:60,
+    text:`<strong>Challenge 5 — Procedure</strong> — Define a PROCEDURE <code>Search</code> that takes an array, its size, and a target value. It should loop through and OUTPUT "Found at position X" or "Not found". Call it to search for 30 in the array [10, 20, 30, 40, 50].`,
+    hints:[
+      'PROCEDURE Search(arr : ARRAY[1:5] OF INTEGER, size : INTEGER, target : INTEGER)',
+      'Use FOR i ← 1 TO size DO: IF arr[i] = target THEN OUTPUT "Found at position " & i. ENDIF. NEXT i.',
+      'CALL Search(nums, 5, 30). Make sure you declare and fill the nums array first.',
+    ],
+    starter:`// Challenge 5: PROCEDURE — Linear Search
+DECLARE nums : ARRAY[1:5] OF INTEGER
+DECLARE i    : INTEGER
+
+// Fill array: 10, 20, 30, 40, 50
+FOR i ← 1 TO 5
+   nums[i] ← i * 10
+NEXT i
+
+// Define the Search procedure:
+PROCEDURE Search(arr : ARRAY[1:5] OF INTEGER, size : INTEGER, target : INTEGER)
+   // TODO: loop and OUTPUT "Found at position X" when arr[i] = target
+ENDPROCEDURE
+
+// Call it to search for 30:
+CALL Search(nums, 5, 30)`,
+    check:(code,res) => res.output.some(o=>o.includes('Found')&&o.includes('3')),
+  },
+]
+
+// -- BF Integration --
+BF.seed();
+// Soft auth: allow access from Next.js/Supabase context (me = null → XP skipped)
+const me = (() => { try { return BF.session() || null; } catch(_) { return null; } })();
+
+const completed = new Set()
+let activeIdx = 0; let hintIdx = 0
+
+function renderPills() {
+  const row = document.getElementById('ch-pills'); row.innerHTML=''
+  CHALLENGES.forEach((ch,i) => {
+    const el = document.createElement('div')
+    el.className = 'ch-pill'+(i===activeIdx?' active':'')+(completed.has(i)?' done':'')
+    el.textContent = (completed.has(i)?'✓ ':'')+ch.mod+' '+ch.name
+    el.onclick = ()=>selectChallenge(i)
+    row.appendChild(el)
+  })
+}
+
+function selectChallenge(i) {
+  activeIdx=i; hintIdx=0
+  const ch=CHALLENGES[i]
+  document.getElementById('ch-text').innerHTML=ch.text
+  document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
+  editor.setValue(ch.starter||'')
+  document.getElementById('output').innerHTML=''
+  clearTraceTable()
+  renderPills()
+}
+
+function resetStarter() {
+  const ch=CHALLENGES[activeIdx]; if(ch) editor.setValue(ch.starter||'')
+  document.getElementById('output').innerHTML=''; clearTraceTable()
+}
+
+function validateChallenge(code, result) {
+  const ch=CHALLENGES[activeIdx]; if(!ch||completed.has(activeIdx)) return
+  if(ch.check(code,result)) {
+    completed.add(activeIdx); renderPills()
+    document.getElementById('pass-badge')?.remove?.()
+    showToast('Challenge complete! +'+ch.xp+' XP')
+    if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + (ch.mod||'c') + activeIdx, { passed: true, score: 100 }); }
+    LessonSaves.save('grade9', activeIdx, { passed: true, xpEarned: ch.xp, code })
+  }
+}
+
+function showHint() {
+  const ch=CHALLENGES[activeIdx]; if(!ch) return
+  if(hintIdx<ch.hints.length) appendOut('Hint '+(hintIdx+1)+': '+ch.hints[hintIdx++],'out-ok')
+  else appendOut('No more hints!','out-ok')
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200)
+}
+
+// ── Init — restore Supabase saves, then render ───────────────────────────────
+;(async () => {
+  await LessonSaves.load('grade9')
+  // Restore completed challenges
+  LessonSaves.completedSet().forEach(idx => completed.add(idx))
+  renderPills()
+  selectChallenge(0)
+  // Restore last saved code (workspace-level save, idx = -1)
+  const savedCode = LessonSaves.savedCode()
+  if (savedCode) editor.setValue(savedCode)
+})()
+</script>
+</body>
+</html>
+
+

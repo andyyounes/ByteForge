@@ -1,0 +1,396 @@
+/* ============================================================
+   ByteForge — Design System v2
+   4-level surface depth · Intentional typography · Minimal effects
+   --accent / --accent-dim injected per-session by StageAccentProvider
+   ============================================================ */
+
+/* ── Fonts (browser-runtime @import — not next/font build-time) ─────────────── */
+/* Inter: primary UI font. JetBrains Mono: code/mono. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ──────────────────────────────────────────────────────────── */
+:root {
+  /* Fonts — set here so Tailwind's font-sans/mono utilities pick them up */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Surfaces — 4-level depth, warm-dark blue-black cast */
+  --s0: #070a10;         /* page base */
+  --s1: #0c0f18;         /* card backgrounds */
+  --s2: #121520;         /* raised / hover states */
+  --s3: #191c2d;         /* tooltips / active / elevated */
+
+  /* Borders — precise hierarchy */
+  --b1: rgba(255, 255, 255, 0.04);   /* hairline */
+  --b2: rgba(255, 255, 255, 0.08);   /* default card borders */
+  --b3: rgba(255, 255, 255, 0.15);   /* emphasis / focus-adjacent */
+
+  /* Identity — Iris (brand before stage override) */
+  --brand:     #b8ef4a;
+  --brand-dim: #8fcf28;
+
+  /* Semantic — desaturated, role-specific */
+  --amber:    #e8a830;    /* XP, streaks, levels — warm reward */
+  --emerald:  #1dc876;    /* mastered, success */
+  --sky:      #3b9fd3;    /* practicing, in-progress */
+  --rose:     #e04f5f;    /* error, danger */
+  --violet:   #8d78e6;    /* achievements, premium */
+
+  /* Text — 3-weight neutral scale */
+  --t1: #dee2f0;          /* primary */
+  --t2: #7a7f97;          /* secondary / descriptions */
+  --t3: #3e4158;          /* tertiary / disabled / placeholder */
+
+  /* Stage accent — defaults to brand, overridden per session */
+  --accent:     var(--brand);
+  --accent-dim: var(--brand-dim);
+
+  /* ── Legacy aliases kept for component compatibility ──────── */
+  --bg:         var(--s0);
+  --bg-card:    var(--s1);
+  --bg-raised:  var(--s2);
+  --border:     var(--b2);
+  --border-hi:  var(--b3);
+  --fg:         var(--t1);
+  --fg-dim:     var(--t2);
+  --fg-faint:   var(--t3);
+  --orange:     #f07428;
+  --blue:       var(--sky);
+  --cyan:       #22c5d4;
+  --green:      var(--emerald);
+  --purple:     var(--violet);
+  --yellow:     var(--amber);
+  --red:        var(--rose);
+
+  /* ── Geometry ─────────────────────────────────────────────── */
+  --r-xs:  3px;
+  --r-sm:  6px;
+  --r:     8px;
+  --r-lg:  8px;
+  --r-xl:  8px;
+  --radius:    var(--r);
+  --radius-sm: var(--r-sm);
+
+  /* ── Motion ───────────────────────────────────────────────── */
+  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-inout:  cubic-bezier(0.45, 0, 0.55, 1);
+  --t-fast:  100ms;
+  --t-base:  180ms;
+  --t-slow:  320ms;
+  --transition: var(--t-base) var(--ease);
+}
+
+/* ── Base reset ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.015), transparent 180px),
+    var(--s0);
+  color: var(--t1);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100dvh;
+}
+
+/* ── Focus ring ─────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar         { width: 5px; height: 5px; }
+::-webkit-scrollbar-track   { background: transparent; }
+::-webkit-scrollbar-thumb   { background: var(--b3); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--t3); }
+
+/* ── Selection ──────────────────────────────────────────────────────────────── */
+::selection {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--t1);
+}
+
+/* ── Typography scale ───────────────────────────────────────────────────────── */
+/* Heavier weights, tighter tracking — reads premium, not generic */
+h1 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: 0;
+  color: var(--t1);
+}
+h2 {
+  font-size: clamp(1.375rem, 3vw, 1.875rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--t1);
+}
+h3 {
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: var(--t1);
+}
+h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--t1);
+}
+h5 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--t1);
+}
+
+p { color: var(--t2); }
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity var(--t-base) ease;
+}
+a:hover { opacity: 0.8; }
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* ── Surface utilities ──────────────────────────────────────────────────────── */
+.card {
+  background:    var(--s1);
+  border:        1px solid var(--b2);
+  border-radius: var(--r);
+}
+
+.card-raised {
+  background:    var(--s2);
+  border:        1px solid var(--b2);
+  border-radius: var(--r);
+}
+
+/* ── Typography utilities ───────────────────────────────────────────────────── */
+/* Only for the logo wordmark — not sprayed on every headline */
+.logo-text {
+  color: var(--t1);
+}
+
+/* Section eyebrow label */
+.label-caps {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.tracking-tighter,
+.tracking-tight,
+.tracking-normal,
+.tracking-wide,
+.tracking-wider,
+.tracking-widest {
+  letter-spacing: 0;
+}
+
+.focus-surface {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 42%),
+    var(--s1);
+  border: 1px solid var(--b2);
+  border-radius: var(--r);
+}
+
+.metric-card {
+  background: var(--s1);
+  border: 1px solid var(--b2);
+  border-radius: var(--r);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.025);
+}
+
+/* ── Status tokens ──────────────────────────────────────────────────────────── */
+.status-locked     { color: var(--t3); }
+.status-available  { color: var(--t2); }
+.status-started    { color: var(--amber); }
+.status-practicing { color: var(--sky); }
+.status-mastered   { color: var(--emerald); }
+
+.ring-mastered   { --ring-color: var(--emerald); }
+.ring-practicing { --ring-color: var(--sky); }
+.ring-started    { --ring-color: var(--amber); }
+.ring-available  { --ring-color: var(--t3); }
+.ring-locked     { --ring-color: var(--b3); }
+
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes xpPop {
+  0%   { transform: scaleX(1); }
+  50%  { transform: scaleX(1.02); }
+  100% { transform: scaleX(1); }
+}
+@keyframes masterFlash {
+  0%   { opacity: 0; transform: scale(0.85); }
+  60%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes ping-slow {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%      { transform: scale(1.15); opacity: 0.6; }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up     { animation: fadeUp       0.32s var(--ease) both; }
+.animate-fade-in     { animation: fadeIn       0.22s ease both; }
+.animate-slide-right { animation: slideInRight 0.28s var(--ease) both; }
+.animate-spin        { animation: spin         0.7s  linear infinite; }
+.animate-master      { animation: masterFlash  0.45s var(--ease) both; }
+.animate-float       { animation: float        3s    ease-in-out infinite; }
+.animate-ping-slow   { animation: ping-slow    2s    ease-in-out infinite; }
+.animate-fade-in-up  { animation: fadeInUp     0.4s  ease both; }
+
+/* Cascade stagger for lists */
+.stagger > *:nth-child(1) { animation-delay:   0ms; }
+.stagger > *:nth-child(2) { animation-delay:  55ms; }
+.stagger > *:nth-child(3) { animation-delay: 110ms; }
+.stagger > *:nth-child(4) { animation-delay: 165ms; }
+.stagger > *:nth-child(5) { animation-delay: 220ms; }
+
+/* ── Skeleton loading ────────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--s1)  25%,
+    var(--s2)  50%,
+    var(--s1)  75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--r-sm);
+}
+
+/* ── XP bar ──────────────────────────────────────────────────────────────────── */
+.xp-bar-track {
+  background:    var(--s2);
+  border-radius: 99px;
+  overflow:      hidden;
+  position:      relative;
+}
+.xp-bar-fill {
+  height:         100%;
+  border-radius:  99px;
+  background:     var(--accent);
+  transition:     width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  position:       relative;
+  will-change:    width;
+}
+/* Subtle surface sheen — replaces cheap gradient */
+.xp-bar-fill::after {
+  content:          '';
+  position:         absolute;
+  inset:            0;
+  border-radius:    inherit;
+  background:       linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.10) 50%,
+    transparent 100%
+  );
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────────────── */
+[data-tooltip] {
+  position: relative;
+  cursor:   default;
+}
+[data-tooltip]::after {
+  content:        attr(data-tooltip);
+  position:       absolute;
+  bottom:         calc(100% + 8px);
+  left:           50%;
+  transform:      translateX(-50%);
+  background:     var(--s3);
+  border:         1px solid var(--b3);
+  color:          var(--t1);
+  font-size:      12px;
+  font-weight:    500;
+  white-space:    nowrap;
+  padding:        5px 10px;
+  border-radius:  var(--r-sm);
+  pointer-events: none;
+  opacity:        0;
+  transition:     opacity var(--t-fast) ease;
+  z-index:        50;
+  box-shadow:     0 6px 16px rgba(0, 0, 0, 0.45);
+}
+[data-tooltip]:hover::after { opacity: 1; }
+
+/* ── Page entry ──────────────────────────────────────────────────────────────── */
+.page-enter {
+  animation: fadeUp 0.28s var(--ease) both;
+}
+
+/* ── Mastery heat colors (for heatmap + concept rings) ───────────────────────── */
+.heat-mastered   { background: var(--emerald); }
+.heat-practicing { background: var(--sky); }
+.heat-started    { background: var(--amber); }
+.heat-locked     { background: var(--s2); }
+
+/* ── Left-accent card variant ────────────────────────────────────────────────── */
+.card-accent-left {
+  border-left: 2px solid var(--accent);
+  border-left-color: var(--accent);
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--b2);
+}

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Flowchart Builder</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <style>
+    body { padding-top:64px; background:var(--bg); overflow:hidden; }
+    .shell { display:grid; grid-template-columns:220px 1fr 280px; height:calc(100vh - 64px); }
+
+    /* ── Left panel: shapes palette ── */
+    .shapes-panel { background:var(--bg-card); border-right:1px solid var(--border); padding:20px 14px; display:flex; flex-direction:column; gap:8px; overflow-y:auto; }
+    .panel-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--fg-faint); margin:12px 0 6px; }
+    .shape-btn { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:var(--bg); cursor:pointer; transition:.15s; font-size:13px; font-weight:600; color:var(--fg-dim); }
+    .shape-btn:hover { background:rgba(255,255,255,.06); color:var(--fg); border-color:var(--border-hi); }
+    .shape-btn svg { flex-shrink:0; }
+    .mode-btn { padding:9px 12px; border-radius:9px; border:1px solid var(--border); background:var(--bg); font-size:13px; font-weight:600; cursor:pointer; width:100%; text-align:left; transition:.15s; color:var(--fg-dim); }
+    .mode-btn.active { background:rgba(249,115,22,.12); border-color:rgba(249,115,22,.4); color:var(--orange); }
+    .mode-btn:hover:not(.active) { background:rgba(255,255,255,.05); }
+
+    /* ── Canvas area ── */
+    .canvas-wrap { position:relative; overflow:hidden; background:#0d1117; cursor:default; }
+    #fc-svg { width:100%; height:100%; }
+    .canvas-toolbar { position:absolute; top:14px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:8px 12px; z-index:10; }
+    .toolbar-btn { padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; border:none; transition:.15s; }
+    .tb-select { background:rgba(59,130,246,.12); color:var(--blue); }
+    .tb-select.active { background:var(--blue); color:#fff; }
+    .tb-connect { background:rgba(168,85,247,.12); color:var(--purple); }
+    .tb-connect.active { background:var(--purple); color:#fff; }
+    .tb-delete { background:rgba(239,68,68,.1); color:#f87171; }
+    .tb-clear  { background:rgba(255,255,255,.06); color:var(--fg-dim); }
+    .tb-run    { background:linear-gradient(135deg,var(--orange),#f59e0b); color:#000; }
+    .tb-export { background:rgba(34,197,94,.1); color:var(--green); }
+
+    /* ── Right panel: properties + pseudocode ── */
+    .right-panel { background:var(--bg-card); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+    .rp-tabs { display:flex; border-bottom:1px solid var(--border); }
+    .rp-tab  { flex:1; padding:12px; text-align:center; font-size:12px; font-weight:700; cursor:pointer; color:var(--fg-dim); transition:.15s; }
+    .rp-tab.active { color:var(--orange); border-bottom:2px solid var(--orange); }
+    .rp-tab:hover:not(.active) { color:var(--fg); }
+    .rp-body { flex:1; overflow-y:auto; padding:16px; }
+
+    .prop-group { margin-bottom:16px; }
+    .prop-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-faint); margin-bottom:6px; }
+    .prop-input { width:100%; padding:9px 12px; border-radius:8px; background:var(--bg); border:1px solid var(--border); color:var(--fg); font-size:13px; font-family:inherit; outline:none; transition:.2s; box-sizing:border-box; }
+    .prop-input:focus { border-color:var(--orange); }
+    .prop-no-selection { text-align:center; padding:32px 16px; color:var(--fg-faint); font-size:13px; }
+
+    .pseudo-area { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; font-family:var(--mono); font-size:12px; line-height:1.8; min-height:200px; white-space:pre; overflow:auto; }
+
+    /* ── Simulation overlay ── */
+    .sim-bar { position:absolute; bottom:0; left:0; right:0; background:rgba(13,17,23,.95); border-top:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; gap:12px; z-index:20; display:none; }
+    .sim-msg { flex:1; font-size:14px; font-weight:600; }
+    .sim-step-btn { padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; border:none; background:var(--orange); color:#fff; }
+    .sim-stop-btn { padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; border:none; background:rgba(255,255,255,.08); color:var(--fg-dim); }
+
+    /* ── Toast ── */
+    .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
+    .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
+    .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
+    .toast-info    { background:#1e3a5f; color:#93c5fd; border:1px solid #3b82f6; }
+    .toast-show    { transform:translateY(0); opacity:1; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="logo-icon">⚒</div>
+      <span class="logo-text">Byte<span>Forge</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="../dashboard-student.html">← Dashboard</a>
+    </div>
+    <button class="nav-cta" onclick="location.href='../dashboard-student.html'" style="background:var(--bg-raised);border:1px solid var(--border-hi);color:var(--fg);">Back</button>
+  </nav>
+
+  <div class="shell">
+    <!-- Left palette -->
+    <div class="shapes-panel">
+      <div style="font-size:15px;font-weight:800">📊 Flowchart</div>
+      <div style="font-size:12px;color:var(--fg-dim);margin-top:2px">Drag shapes onto the canvas</div>
+
+      <div class="panel-label">Shapes</div>
+      <div class="shape-btn" draggable="true" data-type="start">
+        <svg width="32" height="20" viewBox="0 0 32 20"><ellipse cx="16" cy="10" rx="14" ry="8" fill="#22c55e" fill-opacity=".2" stroke="#22c55e" stroke-width="1.5"/></svg>
+        Start / End
+      </div>
+      <div class="shape-btn" draggable="true" data-type="process">
+        <svg width="32" height="20" viewBox="0 0 32 20"><rect x="2" y="3" width="28" height="14" rx="2" fill="#3b82f6" fill-opacity=".2" stroke="#3b82f6" stroke-width="1.5"/></svg>
+        Process
+      </div>
+      <div class="shape-btn" draggable="true" data-type="decision">
+        <svg width="32" height="20" viewBox="0 0 32 20"><polygon points="16,2 30,10 16,18 2,10" fill="#a855f7" fill-opacity=".2" stroke="#a855f7" stroke-width="1.5"/></svg>
+        Decision
+      </div>
+      <div class="shape-btn" draggable="true" data-type="io">
+        <svg width="32" height="20" viewBox="0 0 32 20"><polygon points="6,3 30,3 26,17 2,17" fill="#f97316" fill-opacity=".2" stroke="#f97316" stroke-width="1.5"/></svg>
+        Input / Output
+      </div>
+
+      <div class="panel-label">Templates</div>
+      <button class="mode-btn" onclick="loadTemplate('if')">If/Else block</button>
+      <button class="mode-btn" onclick="loadTemplate('loop')">While loop</button>
+      <button class="mode-btn" onclick="loadTemplate('linear')">Linear sequence</button>
+
+      <div class="panel-label">Actions</div>
+      <button class="mode-btn" onclick="clearCanvas()" style="color:#f87171">🗑️ Clear all</button>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap" id="canvas-wrap">
+      <div class="canvas-toolbar">
+        <button class="toolbar-btn tb-select active" id="btn-select" onclick="setMode('select')">⬆ Select</button>
+        <button class="toolbar-btn tb-connect" id="btn-connect" onclick="setMode('connect')">↗ Connect</button>
+        <button class="toolbar-btn tb-delete" onclick="deleteSelected()">✕ Delete</button>
+        <button class="toolbar-btn tb-run" onclick="startSim()">▶ Simulate</button>
+        <button class="toolbar-btn tb-export" onclick="showTab('pseudo');generatePseudo()">{ } Export</button>
+      </div>
+      <svg id="fc-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#4a5568"/>
+          </marker>
+          <marker id="arrow-active" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#f97316"/>
+          </marker>
+        </defs>
+        <g id="connections-layer"></g>
+        <g id="nodes-layer"></g>
+        <line id="preview-line" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="6,4" style="display:none" marker-end="url(#arrow)"/>
+      </svg>
+      <div class="sim-bar" id="sim-bar">
+        <div class="sim-msg" id="sim-msg">Simulation running...</div>
+        <button class="sim-step-btn" onclick="simStep()">Next Step →</button>
+        <button class="sim-stop-btn" onclick="stopSim()">Stop</button>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="right-panel">
+      <div class="rp-tabs">
+        <div class="rp-tab active" id="rptab-props"  onclick="showTab('props')">Properties</div>
+        <div class="rp-tab"        id="rptab-pseudo" onclick="showTab('pseudo');generatePseudo()">Pseudocode</div>
+      </div>
+      <div class="rp-body" id="rp-body">
+        <div class="prop-no-selection">
+          <div style="font-size:28px;margin-bottom:8px">🔲</div>
+          Click a shape to edit its label,<br>or drag shapes onto the canvas.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+  // ────────────────────────────────────────────────────────────────────
+  // State
+  // ────────────────────────────────────────────────────────────────────
+  let nodes = [];       // { id, type, x, y, w, h, label, branches:{yes,no} }
+  let edges = [];       // { id, from, to, label }
+  let selectedId = null;
+  let mode = 'select';  // 'select' | 'connect'
+  let connectFrom = null;
+  let nextId = 1;
+
+  const svg    = document.getElementById('fc-svg');
+  const nodesG = document.getElementById('nodes-layer');
+  const connsG = document.getElementById('connections-layer');
+  const prevLine = document.getElementById('preview-line');
+  const wrap   = document.getElementById('canvas-wrap');
+
+  const SHAPE_COLORS = { start:'#22c55e', process:'#3b82f6', decision:'#a855f7', io:'#f97316' };
+  const SHAPE_W = { start:120, process:140, decision:130, io:140 };
+  const SHAPE_H = { start:48,  process:52,  decision:64,  io:52  };
+
+  // ── Coordinate helpers ──────────────────────────────────────────────
+  function svgXY(e) {
+    const r = svg.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  // ── Node rendering ──────────────────────────────────────────────────
+  function nodeShape(n) {
+    const c = SHAPE_COLORS[n.type];
+    const cx = n.x + n.w/2, cy = n.y + n.h/2;
+    const selected = selectedId === n.id;
+    const stroke = selected ? '#f97316' : c;
+    const sw = selected ? 2.5 : 1.5;
+    let shape = '';
+    if (n.type === 'start') {
+      shape = `<ellipse cx="${cx}" cy="${cy}" rx="${n.w/2}" ry="${n.h/2}" fill="${c}22" stroke="${stroke}" stroke-width="${sw}"/>`;
+    } else if (n.type === 'process') {
+      shape = `<rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="6" fill="${c}22" stroke="${stroke}" stroke-width="${sw}"/>`;
+    } else if (n.type === 'decision') {
+      const hx = n.w/2, hy = n.h/2;
+      shape = `<polygon points="${cx},${n.y} ${n.x+n.w},${cy} ${cx},${n.y+n.h} ${n.x},${cy}" fill="${c}22" stroke="${stroke}" stroke-width="${sw}"/>`;
+    } else if (n.type === 'io') {
+      const off = 14;
+      shape = `<polygon points="${n.x+off},${n.y} ${n.x+n.w},${n.y} ${n.x+n.w-off},${n.y+n.h} ${n.x},${n.y+n.h}" fill="${c}22" stroke="${stroke}" stroke-width="${sw}"/>`;
+    }
+    return shape;
+  }
+
+  function renderNode(n) {
+    const cx = n.x + n.w/2, cy = n.y + n.h/2;
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('id', 'node-' + n.id);
+    g.setAttribute('cursor', mode === 'connect' ? 'crosshair' : 'grab');
+    g.innerHTML = nodeShape(n) +
+      `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="600" fill="#e2e8f0" style="pointer-events:none;user-select:none;font-family:inherit">${n.label || n.type}</text>`;
+
+    // Drag
+    let dragging = false, dx = 0, dy = 0;
+    g.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      if (mode === 'connect') {
+        handleConnectClick(n.id);
+        return;
+      }
+      selectNode(n.id);
+      dragging = true;
+      dx = e.clientX - n.x;
+      dy = e.clientY - n.y;
+      const onMove = ev => {
+        if (!dragging) return;
+        const r = svg.getBoundingClientRect();
+        n.x = Math.max(0, ev.clientX - dx);
+        n.y = Math.max(0, ev.clientY - dy);
+        rerenderNode(n);
+        rerenderEdges();
+      };
+      const onUp = () => { dragging = false; document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+
+    return g;
+  }
+
+  function rerenderNode(n) {
+    const existing = document.getElementById('node-' + n.id);
+    const g = renderNode(n);
+    if (existing) nodesG.replaceChild(g, existing);
+    else nodesG.appendChild(g);
+  }
+
+  function rerenderEdges() {
+    connsG.innerHTML = '';
+    edges.forEach(e => drawEdge(e));
+  }
+
+  function redrawAll() {
+    nodesG.innerHTML = '';
+    connsG.innerHTML = '';
+    nodes.forEach(n => nodesG.appendChild(renderNode(n)));
+    edges.forEach(e => drawEdge(e));
+  }
+
+  // ── Edge rendering ──────────────────────────────────────────────────
+  function nodeCenter(nid) {
+    const n = nodes.find(x => x.id === nid);
+    if (!n) return {x:0,y:0};
+    return { x: n.x + n.w/2, y: n.y + n.h/2 };
+  }
+  function nodeBottom(nid) {
+    const n = nodes.find(x => x.id === nid);
+    if (!n) return {x:0,y:0};
+    return { x: n.x + n.w/2, y: n.y + n.h };
+  }
+  function nodeTop(nid) {
+    const n = nodes.find(x => x.id === nid);
+    if (!n) return {x:0,y:0};
+    return { x: n.x + n.w/2, y: n.y };
+  }
+
+  function drawEdge(e) {
+    const from = nodeBottom(e.from);
+    const to   = nodeTop(e.to);
+    const midY = (from.y + to.y) / 2;
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.innerHTML = `<path d="M${from.x},${from.y} C${from.x},${midY} ${to.x},${midY} ${to.x},${to.y}"
+      stroke="#4a5568" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      ${e.label ? `<text x="${(from.x+to.x)/2+6}" y="${midY}" font-size="11" fill="#8b90a8">${e.label}</text>` : ''}`;
+    connsG.appendChild(g);
+  }
+
+  // ── Selection ───────────────────────────────────────────────────────
+  function selectNode(id) {
+    selectedId = id;
+    redrawAll();
+    showPropsPanel(id);
+  }
+
+  svg.addEventListener('click', e => {
+    if (e.target === svg || e.target.tagName === 'svg') {
+      selectedId = null;
+      connectFrom = null;
+      redrawAll();
+      showPropsPanel(null);
+    }
+  });
+
+  // ── Connect mode ────────────────────────────────────────────────────
+  function handleConnectClick(id) {
+    if (!connectFrom) {
+      connectFrom = id;
+      toast('Now click the destination node','info');
+    } else if (connectFrom !== id) {
+      const fromNode = nodes.find(n => n.id === connectFrom);
+      let label = '';
+      if (fromNode?.type === 'decision') {
+        const existing = edges.filter(e => e.from === connectFrom).length;
+        label = existing === 0 ? 'Yes' : 'No';
+      }
+      edges.push({ id: nextId++, from: connectFrom, to: id, label });
+      connectFrom = null;
+      rerenderEdges();
+      generatePseudo();
+    }
+  }
+
+  // Follow mouse for connect preview
+  svg.addEventListener('mousemove', e => {
+    if (mode !== 'connect' || !connectFrom) { prevLine.style.display='none'; return; }
+    const from = nodeBottom(connectFrom);
+    const p    = svgXY(e);
+    prevLine.setAttribute('x1', from.x);
+    prevLine.setAttribute('y1', from.y);
+    prevLine.setAttribute('x2', p.x);
+    prevLine.setAttribute('y2', p.y);
+    prevLine.style.display = '';
+  });
+
+  // ── Drop from palette ───────────────────────────────────────────────
+  let draggingType = null;
+  document.querySelectorAll('.shape-btn[data-type]').forEach(btn => {
+    btn.addEventListener('dragstart', e => { draggingType = btn.dataset.type; });
+  });
+
+  wrap.addEventListener('dragover', e => e.preventDefault());
+  wrap.addEventListener('drop', e => {
+    e.preventDefault();
+    if (!draggingType) return;
+    const r = svg.getBoundingClientRect();
+    const x = e.clientX - r.left - SHAPE_W[draggingType]/2;
+    const y = e.clientY - r.top  - SHAPE_H[draggingType]/2;
+    addNode(draggingType, x, y);
+    draggingType = null;
+  });
+
+  function addNode(type, x, y, label) {
+    const n = { id: nextId++, type, x, y, w: SHAPE_W[type], h: SHAPE_H[type], label: label || capitalize(type) };
+    nodes.push(n);
+    nodesG.appendChild(renderNode(n));
+  }
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // ── Mode switching ──────────────────────────────────────────────────
+  function setMode(m) {
+    mode = m;
+    connectFrom = null;
+    prevLine.style.display = 'none';
+    document.getElementById('btn-select').classList.toggle('active', m==='select');
+    document.getElementById('btn-connect').classList.toggle('active', m==='connect');
+    svg.style.cursor = m==='connect' ? 'crosshair' : 'default';
+    redrawAll();
+  }
+
+  // ── Delete ──────────────────────────────────────────────────────────
+  function deleteSelected() {
+    if (!selectedId) return;
+    nodes  = nodes.filter(n => n.id !== selectedId);
+    edges  = edges.filter(e => e.from !== selectedId && e.to !== selectedId);
+    selectedId = null;
+    redrawAll();
+    showPropsPanel(null);
+    generatePseudo();
+  }
+
+  // ── Properties panel ────────────────────────────────────────────────
+  function showPropsPanel(id) {
+    const rp = document.getElementById('rp-body');
+    const tab = document.getElementById('rptab-props');
+    if (!id) {
+      if (tab.classList.contains('active')) {
+        rp.innerHTML = '<div class="prop-no-selection"><div style="font-size:28px;margin-bottom:8px">🔲</div>Click a shape to edit its label,<br>or drag shapes onto the canvas.</div>';
+      }
+      return;
+    }
+    if (!tab.classList.contains('active')) return;
+    const n = nodes.find(x => x.id === id);
+    if (!n) return;
+    const c = SHAPE_COLORS[n.type];
+    rp.innerHTML = `
+      <div class="prop-group">
+        <div class="prop-label">Shape type</div>
+        <div style="padding:8px 12px;border-radius:8px;background:${c}22;border:1px solid ${c}44;font-size:13px;font-weight:700;color:${c}">${capitalize(n.type)}</div>
+      </div>
+      <div class="prop-group">
+        <div class="prop-label">Label text</div>
+        <input class="prop-input" id="prop-label" value="${n.label}" oninput="updateLabel('${n.id}',this.value)"/>
+      </div>
+      <div class="prop-group">
+        <div class="prop-label">Position</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <input class="prop-input" type="number" placeholder="X" value="${Math.round(n.x)}" oninput="updatePos('${n.id}','x',this.value)"/>
+          <input class="prop-input" type="number" placeholder="Y" value="${Math.round(n.y)}" oninput="updatePos('${n.id}','y',this.value)"/>
+        </div>
+      </div>
+      ${n.type==='decision' ? `<div class="prop-group">
+        <div class="prop-label">Decision branches</div>
+        <div style="font-size:12px;color:var(--fg-dim)">Connect arrows from this diamond. The first arrow is "Yes", the second is "No".</div>
+      </div>` : ''}
+      <button class="mode-btn" onclick="deleteSelected()" style="color:#f87171;margin-top:8px">🗑️ Delete shape</button>`;
+  }
+
+  function updateLabel(id, val) {
+    const n = nodes.find(x => x.id == id);
+    if (n) { n.label = val; rerenderNode(n); generatePseudo(); }
+  }
+  function updatePos(id, axis, val) {
+    const n = nodes.find(x => x.id == id);
+    if (n) { n[axis] = parseFloat(val)||0; rerenderNode(n); rerenderEdges(); }
+  }
+
+  // ── Tab switching ────────────────────────────────────────────────────
+  function showTab(name) {
+    document.getElementById('rptab-props').classList.toggle('active', name==='props');
+    document.getElementById('rptab-pseudo').classList.toggle('active', name==='pseudo');
+    if (name === 'props')  { showPropsPanel(selectedId); }
+    if (name === 'pseudo') { generatePseudo(); }
+  }
+
+  // ── Pseudocode generation ─────────────────────────────────────────────
+  function generatePseudo() {
+    const rp = document.getElementById('rp-body');
+    if (!document.getElementById('rptab-pseudo').classList.contains('active')) return;
+
+    // Topological traversal
+    const visited = new Set();
+    const lines = [];
+
+    function traverse(id, indent) {
+      if (!id || visited.has(id)) return;
+      visited.add(id);
+      const n = nodes.find(x => x.id === id);
+      if (!n) return;
+      const pad = '  '.repeat(indent);
+      const outEdges = edges.filter(e => e.from === id);
+
+      if (n.type === 'start') {
+        lines.push(pad + `// ${n.label}`);
+      } else if (n.type === 'process') {
+        lines.push(pad + n.label);
+      } else if (n.type === 'io') {
+        lines.push(pad + (n.label.toLowerCase().includes('input') ? `INPUT ${n.label.replace(/input/i,'').trim() || 'value'}` : `OUTPUT ${n.label.replace(/output/i,'').trim() || 'result'}`));
+      } else if (n.type === 'decision') {
+        const yes = outEdges.find(e => e.label === 'Yes' || e.label === '');
+        const no  = outEdges.find(e => e.label === 'No');
+        lines.push(pad + `IF ${n.label} THEN`);
+        if (yes) traverse(yes.to, indent+1);
+        if (no)  { lines.push(pad + 'ELSE'); traverse(no.to, indent+1); }
+        lines.push(pad + 'ENDIF');
+        // After the diamond – skip default traversal
+        return;
+      }
+
+      // Follow first outgoing edge
+      const next = outEdges[0];
+      if (next) traverse(next.to, indent);
+    }
+
+    // Find start node(s)
+    const starts = nodes.filter(n => n.type === 'start');
+    if (starts.length === 0) {
+      rp.innerHTML = '<div class="prop-no-selection">Add a Start shape to generate pseudocode.</div>';
+      return;
+    }
+    starts.forEach(s => traverse(s.id, 0));
+    rp.innerHTML = `<div class="prop-label" style="margin-bottom:10px">Generated Pseudocode</div>
+      <div class="pseudo-area">${lines.map(l=>`<span>${escHtml(l)}</span>`).join('\n')}</div>
+      <button class="mode-btn" onclick="copyPseudo()" style="margin-top:10px">📋 Copy</button>`;
+  }
+
+  function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function copyPseudo() {
+    const el = document.querySelector('.pseudo-area');
+    navigator.clipboard.writeText(el.textContent).then(() => toast('Pseudocode copied!'));
+  }
+
+  // ── Simulation ────────────────────────────────────────────────────────
+  let simQueue = [];
+  let simIndex = 0;
+
+  function buildSimPath() {
+    const path = [];
+    const visited = new Set();
+    function walk(id) {
+      if (!id || visited.has(id) || visited.size > 50) return;
+      visited.add(id);
+      path.push(id);
+      const n = nodes.find(x => x.id === id);
+      if (!n) return;
+      const outs = edges.filter(e => e.from === id);
+      if (n.type === 'decision') {
+        // Simulate: always take "Yes" branch for demo
+        const yes = outs.find(e => e.label==='Yes') || outs[0];
+        if (yes) walk(yes.to);
+      } else {
+        if (outs[0]) walk(outs[0].to);
+      }
+    }
+    const start = nodes.find(n => n.type === 'start');
+    if (start) walk(start.id);
+    return path;
+  }
+
+  const SIM_MSGS = {
+    start: n => `▶ Program starts — "${n.label}"`,
+    process: n => `⚙️ Executing: ${n.label}`,
+    io: n => n.label.toLowerCase().includes('input') ? `📥 Waiting for input: ${n.label}` : `📤 Output: ${n.label}`,
+    decision: n => `❓ Checking condition: ${n.label} → taking YES branch`,
+  };
+
+  function startSim() {
+    if (nodes.length === 0) { toast('Add shapes first!','error'); return; }
+    simQueue = buildSimPath();
+    if (simQueue.length === 0) { toast('No connected path found. Start from a Start shape.','error'); return; }
+    simIndex = 0;
+    document.getElementById('sim-bar').style.display = 'flex';
+    simStep();
+  }
+
+  function simStep() {
+    // Clear previous highlight
+    document.querySelectorAll('.sim-highlight').forEach(el => {
+      el.firstChild?.setAttribute('stroke', SHAPE_COLORS[nodes.find(n=>n.id==el.id.replace('node-',''))?.type] || '#4a5568');
+      el.classList.remove('sim-highlight');
+    });
+
+    if (simIndex >= simQueue.length) {
+      document.getElementById('sim-msg').textContent = '✅ Simulation complete!';
+      return;
+    }
+
+    const id = simQueue[simIndex++];
+    const n  = nodes.find(x => x.id === id);
+    if (!n) { simStep(); return; }
+
+    // Highlight node
+    const g = document.getElementById('node-' + id);
+    if (g) {
+      g.classList.add('sim-highlight');
+      const shape = g.querySelector('ellipse,rect,polygon');
+      if (shape) shape.setAttribute('stroke', '#f97316');
+    }
+    document.getElementById('sim-msg').textContent = (SIM_MSGS[n.type] || (nn => nn.label))(n);
+    if (simIndex >= simQueue.length) document.getElementById('sim-msg').textContent += '  ✅ Done!';
+  }
+
+  function stopSim() {
+    document.getElementById('sim-bar').style.display = 'none';
+    document.querySelectorAll('.sim-highlight').forEach(el => el.classList.remove('sim-highlight'));
+    redrawAll();
+  }
+
+  // ── Templates ────────────────────────────────────────────────────────
+  function loadTemplate(type) {
+    clearCanvas();
+    if (type === 'if') {
+      addNode('start',    200, 40,  'Start');
+      addNode('process',  200, 130, 'Initialise variable');
+      addNode('decision', 200, 230, 'Condition true?');
+      addNode('process',  80,  360, 'True branch');
+      addNode('process',  340, 360, 'False branch');
+      addNode('start',    200, 470, 'End');
+      // edges
+      edges.push({id:nextId++,from:nodes[0].id,to:nodes[1].id,label:''});
+      edges.push({id:nextId++,from:nodes[1].id,to:nodes[2].id,label:''});
+      edges.push({id:nextId++,from:nodes[2].id,to:nodes[3].id,label:'Yes'});
+      edges.push({id:nextId++,from:nodes[2].id,to:nodes[4].id,label:'No'});
+      edges.push({id:nextId++,from:nodes[3].id,to:nodes[5].id,label:''});
+      edges.push({id:nextId++,from:nodes[4].id,to:nodes[5].id,label:''});
+    } else if (type === 'loop') {
+      addNode('start',    220, 40,  'Start');
+      addNode('process',  220, 130, 'count ← 1');
+      addNode('decision', 220, 230, 'count ≤ 10?');
+      addNode('process',  220, 360, 'Process iteration');
+      addNode('process',  220, 450, 'count ← count + 1');
+      addNode('start',    220, 560, 'End');
+      edges.push({id:nextId++,from:nodes[0].id,to:nodes[1].id,label:''});
+      edges.push({id:nextId++,from:nodes[1].id,to:nodes[2].id,label:''});
+      edges.push({id:nextId++,from:nodes[2].id,to:nodes[3].id,label:'Yes'});
+      edges.push({id:nextId++,from:nodes[3].id,to:nodes[4].id,label:''});
+      edges.push({id:nextId++,from:nodes[4].id,to:nodes[2].id,label:''});
+      edges.push({id:nextId++,from:nodes[2].id,to:nodes[5].id,label:'No'});
+    } else if (type === 'linear') {
+      addNode('start',    220, 40,  'Start');
+      addNode('io',       220, 130, 'INPUT value');
+      addNode('process',  220, 220, 'Process value');
+      addNode('io',       220, 310, 'OUTPUT result');
+      addNode('start',    220, 400, 'End');
+      for (let i=0;i<4;i++) edges.push({id:nextId++,from:nodes[i].id,to:nodes[i+1].id,label:''});
+    }
+    redrawAll();
+    generatePseudo();
+    toast('Template loaded!');
+  }
+
+  function clearCanvas() {
+    nodes = []; edges = []; selectedId = null; connectFrom = null;
+    nodesG.innerHTML = ''; connsG.innerHTML = '';
+    showPropsPanel(null);
+  }
+
+  // Load linear template by default
+  loadTemplate('linear');
+  </script>
+</body>
+</html>

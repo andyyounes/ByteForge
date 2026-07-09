@@ -1,0 +1,677 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge â€” Pseudocode Sandbox</title>
+  <link rel="stylesheet" href="/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <style>
+    body { padding-top:64px; background:var(--bg); color:var(--fg); }
+    .layout { display:grid; grid-template-columns:260px 1fr 320px; height:calc(100vh - 64px); overflow:hidden; }
+
+    /* â”€â”€ Left: exercises â”€â”€ */
+    .ex-sidebar { background:var(--bg-card); border-right:1px solid var(--border); overflow-y:auto; padding:12px; }
+    .sidebar-title { font-size:13px; font-weight:700; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.08em; padding:4px 8px 10px; }
+    .ex-item { padding:12px; border-radius:9px; cursor:pointer; transition:.15s; border:1px solid transparent; margin-bottom:6px; }
+    .ex-item:hover  { background:rgba(255,255,255,.04); }
+    .ex-item.active { background:rgba(34,197,94,.07); border-color:rgba(34,197,94,.2); }
+    .ex-title { font-size:13px; font-weight:700; margin-bottom:4px; }
+    .ex-meta  { font-size:11px; color:var(--fg-faint); }
+    .diff-row { display:flex; gap:3px; margin-top:4px; }
+    .diff-dot { width:6px; height:6px; border-radius:50%; background:var(--border-hi); }
+    .diff-dot.on { background:var(--green); }
+
+    /* â”€â”€ Editor â”€â”€ */
+    .editor-col { display:flex; flex-direction:column; overflow:hidden; }
+    .editor-header { padding:10px 16px; background:var(--bg-card); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .spacer { flex:1; }
+    .btn { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:.15s; }
+    .btn-green  { background:rgba(34,197,94,.15); color:var(--green); border:1px solid rgba(34,197,94,.3); }
+    .btn-green:hover { background:rgba(34,197,94,.25); }
+    .btn-ghost  { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover { background:rgba(255,255,255,.08); }
+    .btn-orange { background:var(--orange); color:#fff; }
+    .btn-orange:hover { background:#ea580c; }
+    #editor-wrap { flex:1; overflow:hidden; }
+    .CodeMirror { height:100% !important; font-size:14px; font-family:var(--mono); background:#0a0c18; }
+    .CodeMirror-scroll { overflow:auto !important; }
+
+    /* â”€â”€ Right: desc + output â”€â”€ */
+    .right-col { display:flex; flex-direction:column; border-left:1px solid var(--border); background:var(--bg-card); overflow:hidden; }
+    .desc-panel { flex:1; overflow-y:auto; padding:20px; border-bottom:1px solid var(--border); }
+    .desc-title { font-size:18px; font-weight:800; margin-bottom:10px; }
+    .desc-body  { font-size:14px; color:var(--fg-dim); line-height:1.7; }
+    .desc-body code { background:var(--bg); padding:1px 5px; border-radius:4px; font-family:var(--mono); font-size:13px; color:var(--fg); }
+    .desc-body pre  { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; font-family:var(--mono); font-size:13px; margin:10px 0; white-space:pre-wrap; }
+
+    /* Test cases */
+    .tc-section { margin-top:16px; }
+    .tc-title   { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-faint); margin-bottom:8px; }
+    .tc-row     { display:flex; align-items:flex-start; gap:12px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:6px; font-size:13px; }
+    .tc-label   { font-size:11px; font-weight:700; text-transform:uppercase; color:var(--fg-faint); min-width:50px; margin-top:1px; }
+    .tc-val     { font-family:var(--mono); flex:1; }
+    .tc-pass    { color:var(--green); }
+    .tc-fail    { color:#fca5a5; }
+
+    /* Output */
+    .output-panel { height:180px; flex-shrink:0; display:flex; flex-direction:column; }
+    .output-header { padding:10px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:700; color:var(--fg-dim); display:flex; justify-content:space-between; align-items:center; }
+    .output-body   { flex:1; overflow-y:auto; padding:12px 16px; font-family:var(--mono); font-size:13px; line-height:1.6; background:#0a0c18; }
+    .out-line      { margin-bottom:2px; white-space:pre-wrap; }
+    .out-line.sys  { color:var(--fg-faint); }
+    .out-line.ok   { color:var(--green); }
+    .out-line.err  { color:#fca5a5; }
+    .out-line.out  { color:#abb2bf; }
+
+    /* Reference panel */
+    .ref-toggle { font-size:12px; color:var(--orange); cursor:pointer; text-decoration:underline; }
+    .ref-panel  { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-top:12px; font-size:12px; color:var(--fg-dim); line-height:1.8; display:none; }
+    .ref-panel.open { display:block; }
+    .ref-kw { color:var(--green); font-weight:700; font-family:var(--mono); }
+
+    /* XP popup */
+    .xp-popup { position:fixed; bottom:80px; right:24px; background:var(--bg-card); border:1px solid var(--border-hi); border-radius:12px; padding:14px 20px; font-weight:700; color:var(--orange); display:flex; align-items:center; gap:8px; transform:translateY(80px); opacity:0; transition:.4s; z-index:999; pointer-events:none; }
+    .xp-popup.show { transform:translateY(0); opacity:1; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
+    .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
+    .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
+    .toast-show    { transform:translateY(0); opacity:1; }
+
+    @media(max-width:900px) { .layout { grid-template-columns:1fr 280px; } .ex-sidebar { display:none; } }
+    @media(max-width:640px) { .layout { grid-template-columns:1fr; } .right-col { display:none; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo"><div class="logo-icon">âš’</div><span class="logo-text">Byte<span>Forge</span></span></div>
+    <div class="nav-links"><a href="/student/dashboard">â† Dashboard</a></div>
+    <a href="../login.html" class="nav-cta" id="nav-auth">Sign In</a>
+  </nav>
+
+  <div class="layout">
+
+    <!-- Exercise list -->
+    <div class="ex-sidebar">
+      <div class="sidebar-title">Exercises</div>
+      <div id="ex-list"></div>
+    </div>
+
+    <!-- Editor -->
+    <div class="editor-col">
+      <div class="editor-header">
+        <span style="font-family:var(--mono);font-size:13px;color:var(--fg-dim)">pseudocode.txt</span>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost" onclick="resetEditor()">Reset</button>
+        <button class="btn btn-green" onclick="runPseudocode()">â–¶ Run</button>
+      </div>
+      <div id="editor-wrap"></div>
+    </div>
+
+    <!-- Description + Output -->
+    <div class="right-col">
+      <div class="desc-panel">
+        <div class="desc-title" id="desc-title">Cambridge Pseudocode</div>
+        <div class="desc-body" id="desc-body">
+          <p>This sandbox runs <strong>Cambridge A-Level pseudocode</strong> â€” the standard used in CIE Computer Science exams.</p>
+          <p>Supported: <code>DECLARE</code>, <code>OUTPUT</code>, <code>INPUT</code>, <code>IF/THEN/ELSE/ENDIF</code>, <code>FOR/TO/NEXT</code>, <code>WHILE/DO/ENDWHILE</code>, <code>PROCEDURE</code>, <code>FUNCTION</code>, arrays, and more.</p>
+          <div><span class="ref-toggle" onclick="toggleRef()">Show syntax reference â–¼</span>
+          <div class="ref-panel" id="ref-panel">
+            <span class="ref-kw">DECLARE</span> x : INTEGER<br>
+            <span class="ref-kw">OUTPUT</span> "Hello, " &amp; name<br>
+            <span class="ref-kw">INPUT</span> x<br>
+            <span class="ref-kw">IF</span> x &gt; 0 <span class="ref-kw">THEN</span><br>
+            &nbsp;&nbsp;<span class="ref-kw">OUTPUT</span> "positive"<br>
+            <span class="ref-kw">ELSE</span><br>
+            &nbsp;&nbsp;<span class="ref-kw">OUTPUT</span> "negative"<br>
+            <span class="ref-kw">ENDIF</span><br>
+            <span class="ref-kw">FOR</span> i â† 1 <span class="ref-kw">TO</span> 10<br>
+            &nbsp;&nbsp;<span class="ref-kw">OUTPUT</span> i<br>
+            <span class="ref-kw">NEXT</span> i<br>
+            <span class="ref-kw">WHILE</span> x &lt; 10 <span class="ref-kw">DO</span><br>
+            &nbsp;&nbsp;x â† x + 1<br>
+            <span class="ref-kw">ENDWHILE</span><br>
+            <span class="ref-kw">DECLARE</span> arr : <span class="ref-kw">ARRAY</span>[1:5] OF INTEGER<br>
+            arr[1] â† 42
+          </div></div>
+        </div>
+      </div>
+      <div class="output-panel">
+        <div class="output-header"><span>Output</span><button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="clearOutput()">Clear</button></div>
+        <div class="output-body" id="output-body"><div class="out-line sys">Write pseudocode and click â–¶ Run</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="xp-popup" id="xp-popup">âš¡ <span id="xp-amount">+100 XP</span></div>
+
+  <script src="/js/db.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/lesson-saves.js"></script>
+  <script>
+    BF.seed();
+    const me = BF.session();
+    if (me) { document.getElementById('nav-auth').textContent='Dashboard'; document.getElementById('nav-auth').href=me.role==='teacher'?'/teacher/dashboard':'/student/dashboard'; }
+
+    // â”€â”€ Exercises â”€â”€
+    const EXERCISES = [
+      { id:'pc1', title:'Hello World', difficulty:1, xp:25, starter:'OUTPUT "Hello, World!"', desc:'<p>Write a single line of pseudocode to output <code>Hello, World!</code></p>', tests:[{expected:'Hello, World!'}] },
+      { id:'pc2', title:'Sum Two Numbers', difficulty:1, xp:40, starter:'DECLARE a : INTEGER\nDECLARE b : INTEGER\na â† 5\nb â† 3\n// OUTPUT a + b', desc:'<p>Declare two INTEGER variables, assign values 5 and 3, then OUTPUT their sum.</p>', tests:[{expected:'8'}] },
+      { id:'pc3', title:'Count 1 to 10', difficulty:1, xp:40, starter:'// Use FOR loop to output 1 to 10\n', desc:'<p>Use a <code>FOR</code> loop to output the numbers 1 through 10, each on a new line.</p>', tests:[{expected:'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'}] },
+      { id:'pc4', title:'FizzBuzz', difficulty:2, xp:75, starter:'FOR i â† 1 TO 20\n  // FizzBuzz logic here\nNEXT i\n', desc:'<p>Output 1â€“20. Print <code>Fizz</code> for multiples of 3, <code>Buzz</code> for multiples of 5, <code>FizzBuzz</code> for both.</p>', tests:[{expected:'FizzBuzz'}] },
+      { id:'pc5', title:'Array Average', difficulty:2, xp:75, starter:'DECLARE scores : ARRAY[1:5] OF INTEGER\nscores[1] â† 80\nscores[2] â† 90\nscores[3] â† 70\nscores[4] â† 85\nscores[5] â† 95\n// Calculate and OUTPUT the average\n', desc:'<p>Declare an array of 5 scores, sum them using a FOR loop, then OUTPUT the average.</p>', tests:[{expected:'84'}] },
+      { id:'pc6', title:'Bubble Sort', difficulty:3, xp:100, starter:'DECLARE arr : ARRAY[1:5] OF INTEGER\narr[1] â† 64\narr[2] â† 34\narr[3] â† 25\narr[4] â† 12\narr[5] â† 22\n// Implement bubble sort and OUTPUT sorted array\n', desc:'<p>Implement the bubble sort algorithm on the given array. Output each element of the sorted array on a new line.</p>', tests:[{expected:'12'}] },
+      { id:'pc7', title:'Function: Factorial', difficulty:3, xp:100, starter:'FUNCTION Factorial(n : INTEGER) RETURNS INTEGER\n  // TODO: implement recursive factorial\nENDFUNCTION\n\nOUTPUT Factorial(5)\n', desc:'<p>Write a <code>FUNCTION</code> called <code>Factorial</code> that takes an integer n and returns n! (n factorial). Call it with n=5.</p>', tests:[{expected:'120'}] },
+    ];
+
+    let currentEx = null;
+
+    // â”€â”€ Editor â”€â”€
+    const DEFAULT_CODE = `// Cambridge A-Level Pseudocode Sandbox
+// Try the exercises on the left, or write your own!
+
+DECLARE name : STRING
+name â† "ByteForge"
+OUTPUT "Welcome to " & name & "!"
+
+FOR i â† 1 TO 5
+    OUTPUT i * i
+NEXT i`;
+
+    const editor = CodeMirror(document.getElementById('editor-wrap'), {
+      value: DEFAULT_CODE,
+      mode: 'text/plain',
+      theme: 'dracula',
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4,
+      lineWrapping: true,
+      extraKeys: { 'Ctrl-Enter': runPseudocode, 'Cmd-Enter': runPseudocode },
+    });
+    editor.setSize('100%','100%');
+
+    // ── Tracks which exercises have been completed (populated from Supabase on load)
+    const _pcCompleted = new Set()
+
+    function markExCompleted() {
+      const items = document.getElementById('ex-list').querySelectorAll('.ex-item')
+      EXERCISES.forEach((e, i) => {
+        if (!_pcCompleted.has(i)) return
+        const meta = items[i]?.querySelector('.ex-meta')
+        if (meta) meta.innerHTML = '<span style="color:#22c55e;font-weight:700">&#10003; Done</span>'
+      })
+    }
+
+    function renderExList() {
+      document.getElementById('ex-list').innerHTML = EXERCISES.map(e => `
+        <div class="ex-item ${currentEx?.id===e.id?'active':''}" onclick="loadEx('${e.id}')">
+          <div class="ex-title">${e.title}</div>
+          <div class="diff-row">${Array.from({length:5},(_,i)=>`<div class="diff-dot ${i<e.difficulty?'on':''}"></div>`).join('')}</div>
+          <div class="ex-meta">âš¡ ${e.xp} XP</div>
+        </div>`).join('');
+    }
+
+    function loadEx(id) {
+      currentEx = EXERCISES.find(e=>e.id===id);
+      if (!currentEx) return;
+      editor.setValue(currentEx.starter);
+      document.getElementById('desc-title').textContent = currentEx.title;
+      let html = currentEx.desc || '';
+      if (currentEx.tests?.length) {
+        html += '<div class="tc-section"><div class="tc-title">Expected Output</div>';
+        currentEx.tests.forEach((t,i) => { html+=`<div class="tc-row"><span class="tc-label">Test ${i+1}</span><span class="tc-val">${t.expected||''}</span></div>`; });
+        html += '</div>';
+      }
+      document.getElementById('desc-body').innerHTML = html;
+      renderExList();
+      markExCompleted();
+    }
+
+    function resetEditor() { editor.setValue(currentEx?.starter || DEFAULT_CODE); }
+    function toggleRef()   { document.getElementById('ref-panel').classList.toggle('open'); }
+
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    //  Cambridge Pseudocode Interpreter
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    function runPseudocode() {
+      clearOutput();
+      const code = editor.getValue();
+      try {
+        const interp = new PseudocodeInterpreter();
+        interp.run(code);
+        const output = interp.output.join('\n');
+        if (output) output.split('\n').forEach(l => addOutput(l,'out'));
+        else addOutput('(no output)','sys');
+        addOutput('âœ“ Done','ok');
+        checkTests(output);
+      } catch(e) { addOutput('Error: ' + e.message, 'err'); }
+    }
+
+    function checkTests(actualOutput) {
+      if (!currentEx?.tests?.length) return;
+      const pass = currentEx.tests.every(t => !t.expected || actualOutput.trim().includes(t.expected.trim()));
+      const exIdx = EXERCISES.findIndex(e => e.id === currentEx?.id);
+      if (pass) {
+        addOutput('âœ… All tests passed!','ok');
+        if (me) {
+          const already = BF.progress(me.id).completedExercises.includes(currentEx.id);
+          BF.recordAttempt(me.id, currentEx.id, {passed:true,score:100,code:editor.getValue()});
+          if (!already) {
+            showXP(currentEx.xp);
+            _pcCompleted.add(exIdx);
+            renderExList();
+          }
+        }
+        // Persist to Supabase (awards XP only on first pass)
+        LessonSaves.save('pseudocode', exIdx, { passed: true, xpEarned: currentEx.xp, code: editor.getValue() });
+      } else { addOutput('âœ— Output does not match expected â€” keep trying!','err'); }
+    }
+
+    function showXP(xp) { document.getElementById('xp-amount').textContent='+'+xp+' XP'; const el=document.getElementById('xp-popup'); el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000); }
+
+    function addOutput(text, type='') {
+      const el=document.getElementById('output-body');
+      const d=document.createElement('div'); d.className='out-line '+type; d.textContent=text;
+      el.appendChild(d); el.scrollTop=el.scrollHeight;
+    }
+    function clearOutput() { document.getElementById('output-body').innerHTML=''; }
+
+    // ── Init — restore Supabase saves, mark completed exercises ─────────────
+    ;(async () => {
+      await LessonSaves.load('pseudocode')
+      LessonSaves.completedSet().forEach(idx => _pcCompleted.add(idx))
+      renderExList()
+      markExCompleted()
+    })()
+
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    //  Pseudocode Interpreter Implementation
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    class PseudocodeInterpreter {
+      constructor() {
+        this.vars   = {};
+        this.funcs  = {};
+        this.procs  = {};
+        this.output = [];
+        this.inputQ = [];
+        this._callStack = 0;
+      }
+
+      run(src) {
+        const lines = src.split('\n');
+        this._exec(lines, 0, lines.length - 1);
+      }
+
+      _exec(lines, start, end) {
+        let i = start;
+        while (i <= end) {
+          const raw = lines[i];
+          const line = raw.trim();
+          i++;
+
+          if (!line || line.startsWith('//') || line.startsWith('#')) continue;
+
+          // DECLARE
+          if (/^DECLARE\s+/i.test(line)) { this._declare(line); continue; }
+
+          // OUTPUT
+          if (/^OUTPUT\s+/i.test(line)) { this._output(line); continue; }
+
+          // INPUT
+          if (/^INPUT\s+/i.test(line)) { this._input(line); continue; }
+
+          // Assignment: var â† expr or var := expr or var = expr
+          if (/^[A-Za-z_]\w*(\[[^\]]+\])?\s*(â†|:=|=(?!=))\s*/.test(line)) { this._assign(line); continue; }
+
+          // IF / THEN
+          if (/^IF\s+/i.test(line)) {
+            const result = this._findBlock(lines, i-1, 'IF', 'ENDIF');
+            i = result.end + 1;
+            this._execIf(lines, result.start, result.end);
+            continue;
+          }
+
+          // FOR
+          if (/^FOR\s+/i.test(line)) {
+            const result = this._findBlock(lines, i-1, 'FOR', 'NEXT');
+            i = result.end + 1;
+            this._execFor(lines, result.start, result.end);
+            continue;
+          }
+
+          // WHILE
+          if (/^WHILE\s+/i.test(line)) {
+            const result = this._findBlock(lines, i-1, 'WHILE', 'ENDWHILE');
+            i = result.end + 1;
+            this._execWhile(lines, result.start, result.end);
+            continue;
+          }
+
+          // REPEAT
+          if (/^REPEAT$/i.test(line)) {
+            const result = this._findBlock(lines, i-1, 'REPEAT', 'UNTIL');
+            i = result.end + 1;
+            this._execRepeat(lines, result.start, result.end);
+            continue;
+          }
+
+          // PROCEDURE def
+          if (/^PROCEDURE\s+/i.test(line)) {
+            const result = this._findBlock(lines, i-1, 'PROCEDURE', 'ENDPROCEDURE');
+            i = result.end + 1;
+            this._defineProc(lines, result.start, result.end);
+            continue;
+          }
+
+          // FUNCTION def
+          if (/^FUNCTION\s+/i.test(line)) {
+            const result = this._findBlock(lines, i-1, 'FUNCTION', 'ENDFUNCTION');
+            i = result.end + 1;
+            this._defineFunc(lines, result.start, result.end);
+            continue;
+          }
+
+          // CALL proc
+          if (/^CALL\s+/i.test(line)) { this._callProc(line); continue; }
+
+          // RETURN (inside func)
+          if (/^RETURN\s+/i.test(line)) { throw { isReturn: true, value: this._eval(line.replace(/^RETURN\s+/i,'')) }; }
+        }
+      }
+
+      _declare(line) {
+        const m = line.match(/^DECLARE\s+([A-Za-z_]\w*)\s*(?::\s*ARRAY\[(\d+):(\d+)\]\s*OF\s*(\w+)|:\s*(\w+))/i);
+        if (!m) return;
+        const name = m[1];
+        if (m[2] !== undefined) {
+          const lo=parseInt(m[2]), hi=parseInt(m[3]);
+          const arr = new Array(hi-lo+1).fill(0);
+          arr._lo = lo;
+          this.vars[name] = arr;
+        } else {
+          const t=(m[5]||'').toUpperCase();
+          this.vars[name] = t==='INTEGER'||t==='REAL'?0:t==='BOOLEAN'?false:'';
+        }
+      }
+
+      _assign(line) {
+        const m = line.match(/^([A-Za-z_]\w*)(\[([^\]]+)\])?\s*(?:â†|:=|=(?!=))\s*(.+)$/);
+        if (!m) return;
+        const [,name,,idxExpr,valExpr] = m;
+        const val = this._eval(valExpr.trim());
+        if (idxExpr !== undefined) {
+          if (!Array.isArray(this.vars[name])) this.vars[name] = [];
+          const idx = this._eval(idxExpr) - (this.vars[name]._lo||1);
+          this.vars[name][idx] = val;
+        } else {
+          this.vars[name] = val;
+        }
+      }
+
+      _output(line) {
+        const expr = line.replace(/^OUTPUT\s+/i,'').trim();
+        this.output.push(String(this._evalConcat(expr)));
+      }
+
+      _input(line) {
+        const name = line.replace(/^INPUT\s+/i,'').trim();
+        const val  = this.inputQ.shift() ?? '';
+        this.vars[name] = isNaN(val) ? val : Number(val);
+      }
+
+      _findBlock(lines, start, keyword, endKeyword) {
+        let depth = 0;
+        for (let j=start; j<lines.length; j++) {
+          const t=lines[j].trim().toUpperCase();
+          if (t.startsWith(keyword.toUpperCase())) depth++;
+          if (t.startsWith(endKeyword.toUpperCase())) { depth--; if(depth===0) return {start,end:j}; }
+        }
+        throw new Error(`Missing ${endKeyword} for ${keyword} at line ${start+1}`);
+      }
+
+      _execIf(lines, start, end) {
+        const header = lines[start].trim();
+        const condM  = header.match(/^IF\s+(.+?)\s+THEN/i);
+        if (!condM) throw new Error('Invalid IF at line '+(start+1));
+        const cond = this._evalBool(condM[1]);
+
+        // find ELSE if any
+        let elseIdx = -1, depth=0;
+        for (let j=start; j<=end; j++) {
+          const t=lines[j].trim().toUpperCase();
+          if(/^IF\b/.test(t)) depth++;
+          if(/^ENDIF$/.test(t)) depth--;
+          if(/^ELSE$/.test(t) && depth===1) { elseIdx=j; break; }
+        }
+
+        if (cond) {
+          this._exec(lines, start+1, elseIdx>-1 ? elseIdx-1 : end-1);
+        } else if (elseIdx>-1) {
+          this._exec(lines, elseIdx+1, end-1);
+        }
+      }
+
+      _execFor(lines, start, end) {
+        const header = lines[start].trim();
+        const m = header.match(/^FOR\s+([A-Za-z_]\w*)\s*â†\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i);
+        if (!m) throw new Error('Invalid FOR at line '+(start+1));
+        const [,v,fromE,toE,stepE]=m;
+        const from=Number(this._eval(fromE.trim()));
+        const to  =Number(this._eval(toE.trim()));
+        const step=stepE?Number(this._eval(stepE.trim())):(from<=to?1:-1);
+        for (let val=from; step>0?val<=to:val>=to; val+=step) {
+          this.vars[v]=val;
+          this._exec(lines, start+1, end-1);
+          if (this._callStack > 10000) throw new Error('Infinite loop detected');
+          this._callStack++;
+        }
+        this._callStack=0;
+      }
+
+      _execWhile(lines, start, end) {
+        const header = lines[start].trim();
+        const m = header.match(/^WHILE\s+(.+?)\s+DO$/i);
+        if (!m) throw new Error('Invalid WHILE at line '+(start+1));
+        let count=0;
+        while (this._evalBool(m[1])) {
+          this._exec(lines, start+1, end-1);
+          if (++count > 10000) throw new Error('Infinite loop â€” check your condition');
+        }
+      }
+
+      _execRepeat(lines, start, end) {
+        const until = lines[end].trim().replace(/^UNTIL\s+/i,'');
+        let count=0;
+        do {
+          this._exec(lines, start+1, end-1);
+          if (++count > 10000) throw new Error('Infinite loop in REPEAT');
+        } while (!this._evalBool(until));
+      }
+
+      _defineFunc(lines, start, end) {
+        const m = lines[start].trim().match(/^FUNCTION\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s+RETURNS\s+\w+/i);
+        if (!m) throw new Error('Invalid FUNCTION at line '+(start+1));
+        this.funcs[m[1]] = { params: m[2].split(',').map(p=>p.trim().replace(/:.*$/,'')).filter(Boolean), body: lines.slice(start+1, end) };
+      }
+
+      _defineProc(lines, start, end) {
+        const m = lines[start].trim().match(/^PROCEDURE\s+([A-Za-z_]\w*)\s*(?:\(([^)]*)\))?/i);
+        if (!m) throw new Error('Invalid PROCEDURE at line '+(start+1));
+        this.procs[m[1]] = { params: (m[2]||'').split(',').map(p=>p.trim().replace(/:.*$/,'')).filter(Boolean), body: lines.slice(start+1, end) };
+      }
+
+      _callProc(line) {
+        const m = line.match(/^CALL\s+([A-Za-z_]\w*)\s*(?:\(([^)]*)\))?/i);
+        if (!m) return;
+        const fn = this.procs[m[1]];
+        if (!fn) throw new Error('Unknown procedure: '+m[1]);
+        const args = m[2] ? m[2].split(',').map(a=>this._eval(a.trim())) : [];
+        const saved = {...this.vars};
+        fn.params.forEach((p,i)=>{ this.vars[p]=args[i]??0; });
+        this._exec(fn.body, 0, fn.body.length-1);
+        fn.params.forEach(p=>delete this.vars[p]);
+        Object.assign(this.vars, saved);
+      }
+
+      _callFunc(name, argExprs) {
+        const fn = this.funcs[name];
+        if (!fn) throw new Error('Unknown function: '+name);
+        const args = argExprs.map(a=>this._eval(a.trim()));
+        const saved = {...this.vars};
+        fn.params.forEach((p,i)=>{ this.vars[p]=args[i]??0; });
+        let ret = 0;
+        try { this._exec(fn.body, 0, fn.body.length-1); }
+        catch(e) { if(e.isReturn) ret=e.value; else throw e; }
+        fn.params.forEach(p=>delete this.vars[p]);
+        Object.assign(this.vars, saved);
+        return ret;
+      }
+
+      _evalConcat(expr) {
+        // split on & (string concat), but not inside quotes
+        const parts = this._splitOnAmpersand(expr);
+        return parts.map(p=>this._eval(p.trim())).join('');
+      }
+
+      _splitOnAmpersand(s) {
+        const parts=[]; let cur='', depth=0, inStr=false, strChar='';
+        for (let i=0;i<s.length;i++) {
+          const c=s[i];
+          if (!inStr && (c==='"'||c==="'")) { inStr=true; strChar=c; cur+=c; continue; }
+          if (inStr && c===strChar) { inStr=false; cur+=c; continue; }
+          if (inStr) { cur+=c; continue; }
+          if (c==='(') { depth++; cur+=c; continue; }
+          if (c===')') { depth--; cur+=c; continue; }
+          if (c==='&' && depth===0) { parts.push(cur); cur=''; continue; }
+          cur+=c;
+        }
+        if (cur.trim()) parts.push(cur);
+        return parts.length ? parts : [s];
+      }
+
+      _eval(expr) {
+        expr = (expr||'').trim();
+        if (!expr) return '';
+
+        // string literal
+        if ((expr.startsWith('"')&&expr.endsWith('"'))||(expr.startsWith("'")&&expr.endsWith("'"))) return expr.slice(1,-1);
+
+        // boolean literals
+        if (expr.toUpperCase()==='TRUE')  return true;
+        if (expr.toUpperCase()==='FALSE') return false;
+
+        // number literal
+        if (/^-?\d+(\.\d+)?$/.test(expr)) return Number(expr);
+
+        // string concat (& operator)
+        if (expr.includes('&')) return this._evalConcat(expr);
+
+        // array access
+        const arrM = expr.match(/^([A-Za-z_]\w*)\[(.+)\]$/);
+        if (arrM) {
+          const arr = this.vars[arrM[1]];
+          if (!Array.isArray(arr)) throw new Error(`${arrM[1]} is not an array`);
+          const idx = Number(this._eval(arrM[2])) - (arr._lo||1);
+          return arr[idx] ?? 0;
+        }
+
+        // built-in functions
+        const biM = expr.match(/^([A-Za-z_]\w*)\(([^)]*)\)$/);
+        if (biM) {
+          const fname=biM[1].toUpperCase();
+          const argStr=biM[2];
+          const args=argStr?argStr.split(',').map(a=>this._eval(a.trim())):[];
+          if (fname==='LENGTH')  return String(args[0]).length;
+          if (fname==='INT')     return Math.floor(Number(args[0]));
+          if (fname==='REAL')    return Number(args[0]);
+          if (fname==='STRING')  return String(args[0]);
+          if (fname==='LCASE')   return String(args[0]).toLowerCase();
+          if (fname==='UCASE')   return String(args[0]).toUpperCase();
+          if (fname==='SUBSTR')  return String(args[0]).slice(args[1]-1, args[1]-1+args[2]);
+          if (fname==='MOD')     return Number(args[0]) % Number(args[1]);
+          if (fname==='DIV')     return Math.floor(Number(args[0]) / Number(args[1]));
+          if (fname==='ROUND')   return Number(Number(args[0]).toFixed(args[1]||0));
+          if (fname==='ABS')     return Math.abs(Number(args[0]));
+          if (fname==='SQRT')    return Math.sqrt(Number(args[0]));
+          // user function
+          if (this.funcs[biM[1]]) return this._callFunc(biM[1], argStr?argStr.split(','):[]);
+        }
+
+        // arithmetic â€” safe eval via JS (avoid eval, use expression parser)
+        const jsExpr = expr
+          .replace(/MOD/gi, '%').replace(/DIV/gi, 'Math.floor(({0})/({1}))'.slice(0,14))
+          .replace(/\^/g,'**')
+          .replace(/([A-Za-z_]\w*)(\[[^\]]+\])?/g, (match,name,idx) => {
+            if (idx) { const arr=this.vars[name]; if(Array.isArray(arr)){ const i=Number(this._eval(idx.slice(1,-1)))-(arr._lo||1); return arr[i]??0; } }
+            if (name in this.vars) return JSON.stringify(this.vars[name]);
+            return match;
+          });
+        try { return Function('"use strict";return ('+jsExpr+')')(); }
+        catch { return expr; }
+      }
+
+      _evalBool(expr) {
+        expr = expr.trim();
+        // AND / OR / NOT
+        const parts = this._splitLogical(expr);
+        if (parts.op==='AND') return this._evalBool(parts.left) && this._evalBool(parts.right);
+        if (parts.op==='OR')  return this._evalBool(parts.left) || this._evalBool(parts.right);
+        if (expr.match(/^NOT\s+/i)) return !this._evalBool(expr.replace(/^NOT\s+/i,''));
+
+        // comparison
+        const ops=['<>','<=','>=','=','<','>'];
+        for (const op of ops) {
+          const idx=this._findOp(expr,op);
+          if (idx>-1) {
+            const l=this._eval(expr.slice(0,idx).trim());
+            const r=this._eval(expr.slice(idx+op.length).trim());
+            if(op==='=')  return l==r;
+            if(op==='<>') return l!=r;
+            if(op==='<')  return l<r;
+            if(op==='>')  return l>r;
+            if(op==='<=') return l<=r;
+            if(op==='>=') return l>=r;
+          }
+        }
+        return !!this._eval(expr);
+      }
+
+      _findOp(expr, op) {
+        let depth=0,inStr=false,sc='';
+        for(let i=0;i<expr.length-op.length+1;i++){
+          const c=expr[i];
+          if(!inStr&&(c==='"'||c==="'")){inStr=true;sc=c;continue;}
+          if(inStr&&c===sc){inStr=false;continue;}
+          if(inStr)continue;
+          if(c==='(')depth++;
+          if(c===')')depth--;
+          if(depth===0&&expr.slice(i,i+op.length)===op) return i;
+        }
+        return -1;
+      }
+
+      _splitLogical(expr) {
+        for (const op of ['AND','OR']) {
+          let depth=0,inStr=false,sc='';
+          for(let i=0;i<expr.length;i++){
+            const c=expr[i];
+            if(!inStr&&(c==='"'||c==="'")){inStr=true;sc=c;continue;}
+            if(inStr&&c===sc){inStr=false;continue;}
+            if(inStr)continue;
+            if(c==='(')depth++;if(c===')')depth--;
+            if(depth===0&&expr.slice(i,i+op.length+1).toUpperCase()===op+' ') return {op,left:expr.slice(0,i).trim(),right:expr.slice(i+op.length).trim()};
+          }
+        }
+        return {op:null};
+      }
+    }
+  </script>
+</body>
+</html>
+

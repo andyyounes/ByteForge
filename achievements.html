@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Achievements</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    body { padding-top:64px; }
+    .app { display:grid; grid-template-columns:240px 1fr; min-height:calc(100vh - 64px); }
+    .sidebar { background:var(--bg-card); border-right:1px solid var(--border); padding:24px 16px; position:sticky; top:64px; height:calc(100vh - 64px); overflow-y:auto; display:flex; flex-direction:column; }
+    .sidebar-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-faint); padding:0 12px; margin-bottom:6px; }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; font-size:14px; font-weight:500; color:var(--fg-dim); cursor:pointer; transition:.15s; text-decoration:none; }
+    .sidebar-link:hover, .sidebar-link.active { background:rgba(255,255,255,.06); color:var(--fg); }
+    .sidebar-link.active { color:var(--orange); }
+    .sidebar-link .icon { font-size:17px; width:20px; text-align:center; }
+    .sidebar-avatar { display:flex; align-items:center; gap:10px; padding:14px 12px; border-top:1px solid var(--border); margin-top:auto; }
+    .avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#f97316,#a855f7); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0; }
+    .main { padding:36px 40px; overflow:auto; }
+
+    /* ── Header ── */
+    .page-header { margin-bottom:32px; }
+    .page-title  { font-size:28px; font-weight:800; letter-spacing:-.03em; }
+    .page-sub    { font-size:15px; color:var(--fg-dim); margin-top:4px; }
+
+    /* ── XP / rank summary ── */
+    .summary-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:32px; }
+    .stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:18px 20px; }
+    .stat-num  { font-size:26px; font-weight:800; letter-spacing:-.03em; }
+    .stat-lbl  { font-size:12px; color:var(--fg-dim); margin-top:2px; }
+    .stat-icon { font-size:20px; margin-bottom:8px; }
+
+    /* ── Achievement grid ── */
+    .section-title { font-size:18px; font-weight:700; margin-bottom:16px; }
+    .ach-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; margin-bottom:36px; }
+    .ach-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:20px; display:flex; align-items:flex-start; gap:16px; transition:.2s; }
+    .ach-card.unlocked { border-color:rgba(249,115,22,.3); background:linear-gradient(135deg,rgba(249,115,22,.05),var(--bg-card)); }
+    .ach-card.locked   { opacity:.55; }
+    .ach-card.unlocked:hover { transform:translateY(-2px); border-color:rgba(249,115,22,.5); }
+    .ach-icon-wrap { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+    .ach-card.unlocked .ach-icon-wrap { background:rgba(249,115,22,.12); border:1px solid rgba(249,115,22,.2); }
+    .ach-card.locked   .ach-icon-wrap { background:rgba(255,255,255,.04); border:1px solid var(--border); filter:grayscale(1); }
+    .ach-info { flex:1; min-width:0; }
+    .ach-name { font-size:15px; font-weight:700; margin-bottom:4px; }
+    .ach-desc { font-size:13px; color:var(--fg-dim); line-height:1.5; }
+    .ach-xp   { font-size:12px; font-weight:700; color:#eab308; margin-top:8px; }
+    .ach-date { font-size:11px; color:var(--fg-faint); margin-top:4px; }
+    .ach-locked-label { font-size:11px; font-weight:600; color:var(--fg-faint); margin-top:8px; padding:4px 10px; background:rgba(255,255,255,.04); border-radius:6px; display:inline-block; }
+
+    /* ── XP History timeline ── */
+    .timeline { margin-bottom:36px; }
+    .timeline-item { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+    .timeline-item:last-child { border-bottom:none; }
+    .timeline-dot { width:10px; height:10px; border-radius:50%; background:var(--orange); flex-shrink:0; }
+    .timeline-info { flex:1; }
+    .timeline-label { font-size:14px; font-weight:500; }
+    .timeline-time  { font-size:12px; color:var(--fg-faint); margin-top:1px; }
+    .timeline-xp    { font-size:13px; font-weight:700; color:#eab308; }
+
+    /* ── Leaderboard ── */
+    .leaderboard { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:36px; }
+    .lb-header { padding:18px 24px; border-bottom:1px solid var(--border); font-size:16px; font-weight:700; }
+    .lb-row { display:flex; align-items:center; gap:16px; padding:14px 24px; border-bottom:1px solid rgba(255,255,255,.04); transition:.15s; }
+    .lb-row:last-child { border-bottom:none; }
+    .lb-row.me { background:rgba(249,115,22,.06); }
+    .lb-rank { font-size:16px; font-weight:800; width:28px; text-align:center; flex-shrink:0; color:var(--fg-dim); }
+    .lb-rank.gold   { color:#eab308; }
+    .lb-rank.silver { color:#9ca3af; }
+    .lb-rank.bronze { color:#cd7c3a; }
+    .lb-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#f97316,#a855f7); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0; }
+    .lb-name  { flex:1; font-size:14px; font-weight:600; }
+    .lb-level { font-size:12px; color:var(--fg-dim); }
+    .lb-xp    { font-size:14px; font-weight:800; color:var(--orange); }
+    .lb-me-tag { font-size:10px; font-weight:700; padding:2px 8px; border-radius:6px; background:rgba(249,115,22,.15); color:var(--orange); }
+
+    /* ── Toast ── */
+    .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
+    .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
+    .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
+    .toast-show    { transform:translateY(0); opacity:1; }
+
+    @media(max-width:900px)  { .app { grid-template-columns:1fr; } .sidebar { display:none; } .summary-row { grid-template-columns:1fr 1fr; } }
+    @media(max-width:600px)  { .main { padding:20px 16px; } .summary-row { grid-template-columns:1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="logo-icon">⚒</div>
+      <span class="logo-text">Byte<span>Forge</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="pathway.html">Skill Tree</a>
+      <a href="lessons/ide.html">IDE</a>
+    </div>
+    <button class="nav-cta" onclick="logout()" style="background:var(--bg-raised);border:1px solid var(--border-hi);color:var(--fg);">Sign Out</button>
+  </nav>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div>
+        <div class="sidebar-label" style="margin-bottom:10px">Navigation</div>
+        <a class="sidebar-link" href="dashboard-student.html"><span class="icon">🏠</span> Home</a>
+        <a class="sidebar-link" href="pathway.html"><span class="icon">🗺️</span> Skill Tree</a>
+        <a class="sidebar-link active" href="achievements.html"><span class="icon">🏆</span> Achievements</a>
+      </div>
+      <div style="margin-top:24px">
+        <div class="sidebar-label" style="margin-bottom:10px">Sandboxes</div>
+        <a class="sidebar-link" href="lessons/binary-cards.html"><span class="icon">🃏</span> Binary Cards</a>
+        <a class="sidebar-link" href="lessons/blockly.html"><span class="icon">🧱</span> Blockly</a>
+        <a class="sidebar-link" href="lessons/ide.html"><span class="icon">💻</span> Code IDE</a>
+        <a class="sidebar-link" href="lessons/pseudocode.html"><span class="icon">📄</span> Pseudocode</a>
+      </div>
+      <div style="flex:1"></div>
+      <div class="sidebar-avatar">
+        <div class="avatar" id="s-avatar">?</div>
+        <div>
+          <div style="font-size:14px;font-weight:600" id="s-name">—</div>
+          <div style="font-size:11px;color:var(--fg-faint)" id="s-role">Student</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <div class="page-title">🏆 Achievements</div>
+        <div class="page-sub">Collect badges, climb the leaderboard, and track your XP journey</div>
+      </div>
+
+      <div class="summary-row" id="summary-row"></div>
+
+      <div class="section-title">Unlocked Badges</div>
+      <div class="ach-grid" id="unlocked-grid"></div>
+
+      <div class="section-title">Locked Badges</div>
+      <div class="ach-grid" id="locked-grid"></div>
+
+      <div class="section-title">🏅 Class Leaderboard</div>
+      <div class="leaderboard" id="leaderboard"></div>
+    </main>
+  </div>
+
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/concepts.js"></script>
+  <script src="js/mastery.js"></script>
+  <script src="js/adaptive.js"></script>
+  <script>
+    BFA.seedDemoMastery();
+    const me = requireAuth('student');
+    if (!me) throw new Error('Redirecting');
+
+    document.getElementById('s-avatar').textContent = me.name.charAt(0).toUpperCase();
+    document.getElementById('s-name').textContent   = me.name;
+
+    // Check for newly unlocked achievements
+    const newAch = BFA.checkAchievements(me.id);
+    newAch.forEach(a => {
+      setTimeout(() => toast(`🏆 Achievement unlocked: ${a.name}!`), 400);
+    });
+
+    const stored   = BFA.getAchievements(me.id);
+    const unlockedMap = new Map(stored.unlocked.map(u => [u.id, u]));
+    const user     = BF.userById(me.id);
+    const xp       = user?.xp || 0;
+    const level    = user?.level || 1;
+    const streak   = user?.streak || 0;
+    const bar      = xpBar(xp, level);
+
+    // Summary stats
+    document.getElementById('summary-row').innerHTML = `
+      <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-num" style="color:var(--orange)">${stored.unlocked.length}</div><div class="stat-lbl">Achievements earned</div></div>
+      <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-num" style="color:#eab308">${xp.toLocaleString()}</div><div class="stat-lbl">Total XP</div></div>
+      <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-num">Lv.${level}</div><div class="stat-lbl">${levelTitle(level)}</div></div>
+      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-num" style="color:#eab308">${streak}</div><div class="stat-lbl">Day streak</div></div>
+    `;
+
+    // Achievement grids
+    const unlocked = BFC.ACHIEVEMENTS.filter(a => unlockedMap.has(a.id));
+    const locked   = BFC.ACHIEVEMENTS.filter(a => !unlockedMap.has(a.id));
+
+    function achCard(ach, isUnlocked, unlockedAt) {
+      const dateStr = unlockedAt ? `Unlocked ${timeAgo(unlockedAt)}` : '';
+      return `<div class="ach-card ${isUnlocked?'unlocked':'locked'}">
+        <div class="ach-icon-wrap">${ach.icon}</div>
+        <div class="ach-info">
+          <div class="ach-name">${ach.name}</div>
+          <div class="ach-desc">${ach.description}</div>
+          ${ach.xp > 0 ? `<div class="ach-xp">+${ach.xp} XP</div>` : ''}
+          ${isUnlocked ? `<div class="ach-date">${dateStr}</div>` : `<div class="ach-locked-label">🔒 Keep going!</div>`}
+        </div>
+      </div>`;
+    }
+
+    document.getElementById('unlocked-grid').innerHTML = unlocked.length
+      ? unlocked.map(a => achCard(a, true, unlockedMap.get(a.id)?.unlockedAt)).join('')
+      : '<div style="color:var(--fg-dim);font-size:14px;padding:8px 0">No achievements yet — start learning to earn your first badge!</div>';
+
+    document.getElementById('locked-grid').innerHTML = locked.length
+      ? locked.map(a => achCard(a, false, null)).join('')
+      : '<div style="color:var(--fg-dim);font-size:14px;padding:8px 0">🎉 You\'ve unlocked all achievements!</div>';
+
+    // Leaderboard — all students sorted by XP
+    const allStudents = BF.users().filter(u => u.role === 'student');
+    allStudents.sort((a,b) => (b.xp||0) - (a.xp||0));
+
+    const rankMedals = ['🥇','🥈','🥉'];
+    const rankClasses = ['gold','silver','bronze'];
+
+    document.getElementById('leaderboard').innerHTML =
+      `<div class="lb-header">🏅 Top Students — All Time</div>` +
+      (allStudents.length === 0 ? '<div style="padding:20px 24px;color:var(--fg-dim)">No students yet</div>' :
+        allStudents.slice(0, 20).map((u, i) => {
+          const rank  = i + 1;
+          const isMe  = u.id === me.id;
+          const lv    = u.level || 1;
+          const uxp   = u.xp || 0;
+          const medal = i < 3 ? rankMedals[i] : rank;
+          const cls   = i < 3 ? rankClasses[i] : '';
+          return `<div class="lb-row ${isMe?'me':''}">
+            <div class="lb-rank ${cls}">${medal}</div>
+            <div class="lb-avatar">${u.name.charAt(0).toUpperCase()}</div>
+            <div class="lb-name">${u.name} ${isMe?'<span class="lb-me-tag">you</span>':''}</div>
+            <div class="lb-level">Lv.${lv} · ${levelTitle(lv)}</div>
+            <div class="lb-xp">${uxp.toLocaleString()} XP</div>
+          </div>`;
+        }).join('')
+      );
+
+    // If current user not in top 20, show their rank at bottom
+    const myRank = allStudents.findIndex(u => u.id === me.id);
+    if (myRank >= 20) {
+      document.getElementById('leaderboard').innerHTML +=
+        `<div style="padding:10px 24px;font-size:13px;color:var(--fg-dim);border-top:1px solid var(--border)">Your rank: #${myRank+1}</div>`;
+    }
+  </script>
+</body>
+</html>

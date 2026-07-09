@@ -1,0 +1,382 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Data Compression</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <style>
+    body { padding-top:64px; min-height:100vh; }
+    .container { max-width:860px; margin:0 auto; padding:0 24px 60px; }
+    .page-header { text-align:center; padding:40px 0 32px; }
+    .page-title { font-size:32px; font-weight:800; letter-spacing:-.03em; margin-bottom:10px; }
+    .page-sub   { font-size:16px; color:var(--fg-dim); max-width:480px; margin:0 auto; }
+
+    /* Sections */
+    .section { background:var(--bg-card); border:1px solid var(--border); border-radius:16px;
+               padding:28px 32px; margin-bottom:24px; }
+    .section-title { font-size:18px; font-weight:700; margin-bottom:6px; }
+    .section-sub   { font-size:14px; color:var(--fg-dim); margin-bottom:24px; line-height:1.5; }
+
+    /* RLE demo */
+    textarea.rle-input {
+      width:100%; height:80px; background:var(--bg); border:1px solid var(--border-hi);
+      border-radius:10px; padding:14px 16px; font-family:var(--mono); font-size:15px;
+      color:var(--fg); resize:vertical; outline:none; transition:.2s;
+    }
+    textarea.rle-input:focus { border-color:#b8ef4a; }
+
+    .vis-row { display:flex; gap:24px; align-items:flex-start; margin-top:20px; flex-wrap:wrap; }
+    .vis-block { flex:1; min-width:220px; }
+    .vis-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+                 color:var(--fg-faint); margin-bottom:10px; }
+    .char-row { display:flex; flex-wrap:wrap; gap:4px; min-height:40px; }
+    .char-tile { width:28px; height:32px; border-radius:6px; display:flex; align-items:center;
+                 justify-content:center; font-family:var(--mono); font-size:13px; font-weight:700;
+                 border:1px solid rgba(255,255,255,.1); transition:.3s; }
+
+    .rle-output { display:flex; flex-wrap:wrap; gap:6px; min-height:40px; }
+    .rle-group { display:flex; align-items:center; gap:3px; padding:5px 8px;
+                 border-radius:8px; border:1px solid rgba(255,255,255,.08); }
+    .rle-count { font-family:var(--mono); font-size:12px; font-weight:700; color:var(--fg-dim); }
+    .rle-char  { font-family:var(--mono); font-size:14px; font-weight:700; }
+
+    .stats-row { display:flex; gap:16px; margin-top:20px; flex-wrap:wrap; }
+    .stat-box  { flex:1; min-width:120px; background:var(--bg); border:1px solid var(--border-hi);
+                 border-radius:10px; padding:14px 16px; text-align:center; }
+    .stat-num  { font-size:28px; font-weight:800; font-family:var(--mono); }
+    .stat-lbl  { font-size:11px; color:var(--fg-dim); margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; }
+    .stat-num.saving { color:#b8ef4a; }
+    .stat-num.original { color:var(--fg); }
+    .stat-num.compressed { color:#38bdf8; }
+
+    .saving-bar { margin-top:16px; }
+    .saving-bar-track { height:8px; background:var(--bg); border-radius:999px; overflow:hidden; }
+    .saving-bar-fill  { height:8px; background:linear-gradient(90deg,#38bdf8,#b8ef4a); border-radius:999px; transition:width .5s ease; }
+    .saving-bar-label { font-size:12px; color:var(--fg-dim); margin-top:6px; }
+
+    /* Binary image demo */
+    .img-demo { display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:start; }
+    .img-arrow { font-size:24px; color:var(--fg-dim); padding-top:40px; text-align:center; }
+    .pixel-img { display:grid; gap:2px; }
+    .px-row { display:flex; gap:2px; }
+    .px { width:20px; height:20px; border-radius:3px; cursor:pointer; transition:.15s; border:1px solid rgba(255,255,255,.1); }
+    .px:hover { transform:scale(1.15); border-color:rgba(255,255,255,.3); }
+
+    /* Questions */
+    .question-block { background:var(--bg); border:1px solid var(--border-hi); border-radius:12px;
+                      padding:20px 24px; margin-bottom:16px; }
+    .question-text { font-size:15px; font-weight:600; margin-bottom:14px; }
+    .options { display:flex; flex-direction:column; gap:8px; }
+    .option { padding:10px 14px; border-radius:8px; border:1px solid var(--border);
+              font-size:14px; cursor:pointer; transition:.15s; background:var(--bg-card); }
+    .option:hover { border-color:var(--border-hi); }
+    .option.correct  { background:rgba(34,197,94,.12); border-color:#22c55e; color:#4ade80; }
+    .option.wrong    { background:rgba(239,68,68,.12); border-color:#ef4444; color:#f87171; }
+    .option.disabled { pointer-events:none; }
+    .feedback { margin-top:10px; font-size:13px; padding:10px 14px; border-radius:8px; display:none; }
+    .feedback.show { display:block; }
+    .feedback.correct { background:rgba(34,197,94,.1); color:#4ade80; }
+    .feedback.wrong   { background:rgba(239,68,68,.1);  color:#f87171; }
+
+    .btn { padding:10px 22px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:.15s; }
+    .btn-brand { background:#b8ef4a; color:#0d0f1a; }
+    .btn-brand:hover { background:#a5d83d; }
+  </style>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">ByteForge</span>
+  </div>
+  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">Data Compression</h1>
+    <p class="page-sub">See how computers squeeze large files into smaller ones — without losing any data.</p>
+  </div>
+
+  <!-- RLE Interactive Demo -->
+  <div class="section">
+    <div class="section-title">Run-Length Encoding (RLE)</div>
+    <div class="section-sub">
+      Type any text below. Watch how repeated characters get collapsed into shorter "count + character" pairs.
+      The more repetition, the better the compression.
+    </div>
+
+    <textarea class="rle-input" id="rle-input" placeholder="Try: AAAAAABBBCCDDDDDDDDDD"
+              oninput="updateRLE(this.value)">AAAAAABBBCCDDDDDDDDDD</textarea>
+
+    <div class="vis-row">
+      <div class="vis-block">
+        <div class="vis-label">Original characters</div>
+        <div class="char-row" id="orig-chars"></div>
+      </div>
+      <div class="vis-block">
+        <div class="vis-label">RLE compressed</div>
+        <div class="rle-output" id="rle-out"></div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num original" id="orig-size">—</div>
+        <div class="stat-lbl">Original bytes</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num compressed" id="comp-size">—</div>
+        <div class="stat-lbl">Compressed bytes</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num saving" id="saving-pct">—</div>
+        <div class="stat-lbl">Space saved</div>
+      </div>
+    </div>
+
+    <div class="saving-bar">
+      <div class="saving-bar-track">
+        <div class="saving-bar-fill" id="saving-fill" style="width:0%"></div>
+      </div>
+      <div class="saving-bar-label" id="saving-label">Enter some text above to see the compression.</div>
+    </div>
+  </div>
+
+  <!-- Binary image demo -->
+  <div class="section">
+    <div class="section-title">Images are just arrays of pixels</div>
+    <div class="section-sub">
+      Click pixels to toggle them on/off. Watch how the RLE encoding on the right changes.
+      Solid blocks compress far better than scattered patterns.
+    </div>
+    <div class="img-demo">
+      <div>
+        <div class="vis-label" style="margin-bottom:10px">Click to toggle pixels</div>
+        <div id="pixel-grid"></div>
+      </div>
+      <div class="img-arrow">→</div>
+      <div>
+        <div class="vis-label" style="margin-bottom:10px">RLE encoding (1 = white, 0 = black)</div>
+        <div id="img-rle" style="font-family:var(--mono);font-size:12px;color:var(--fg-dim);line-height:1.8;"></div>
+        <div style="margin-top:12px;font-size:13px;color:var(--fg-dim)">
+          Total: <strong id="img-orig-bits" style="color:var(--fg)">—</strong> bits →
+          RLE: <strong id="img-comp-bits" style="color:#b8ef4a">—</strong> bits
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div class="section">
+    <div class="section-title">Check your understanding</div>
+    <div class="section-sub">Answer these questions using what you've seen in the demos above.</div>
+    <div id="questions"></div>
+  </div>
+</div>
+
+<script>
+BF.seed();
+// Soft auth: allow access from Next.js/Supabase context (me = null → XP skipped)
+const me = (() => { try { return BF.session() || null; } catch(_) { return null; } })();
+
+// ── RLE Demo ──────────────────────────────────────────────────────────────────
+const COLORS = ['#f87171','#fbbf24','#4ade80','#38bdf8','#a78bfa','#f472b6','#fb923c','#34d399']
+
+function charColor(ch) {
+  if (!ch.trim()) return '#374151'
+  let code = ch.charCodeAt(0) % COLORS.length
+  return COLORS[code]
+}
+
+function rleEncode(str) {
+  if (!str) return []
+  const groups = []
+  let i = 0
+  while (i < str.length) {
+    let j = i
+    while (j < str.length && str[j] === str[i]) j++
+    groups.push({ char: str[i], count: j - i })
+    i = j
+  }
+  return groups
+}
+
+function updateRLE(val) {
+  val = val.replace(/\n/g, '')
+
+  // Original chars
+  const origEl = document.getElementById('orig-chars')
+  origEl.innerHTML = ''
+  val.split('').forEach(ch => {
+    const div = document.createElement('div')
+    div.className = 'char-tile'
+    div.style.background = charColor(ch) + '33'
+    div.style.borderColor = charColor(ch) + '66'
+    div.style.color        = charColor(ch)
+    div.textContent = ch === ' ' ? '·' : ch
+    origEl.appendChild(div)
+  })
+
+  // RLE groups
+  const groups  = rleEncode(val)
+  const rleEl   = document.getElementById('rle-out')
+  rleEl.innerHTML = ''
+  groups.forEach(g => {
+    const div = document.createElement('div')
+    div.className = 'rle-group'
+    div.style.background   = charColor(g.char) + '1a'
+    div.style.borderColor  = charColor(g.char) + '44'
+    if (g.count > 1) {
+      const cnt = document.createElement('span')
+      cnt.className = 'rle-count'
+      cnt.textContent = g.count + '×'
+      div.appendChild(cnt)
+    }
+    const ch = document.createElement('span')
+    ch.className = 'rle-char'
+    ch.style.color = charColor(g.char)
+    ch.textContent = g.char === ' ' ? '·' : g.char
+    div.appendChild(ch)
+    rleEl.appendChild(div)
+  })
+
+  // Stats — each original char = 1 byte; each RLE group = 2 bytes (count + char)
+  const origBytes = val.length
+  const compBytes = groups.reduce((s,g) => s + (g.count > 9 ? 3 : 2), 0)
+  const saving    = origBytes > 0 ? Math.max(0, Math.round((1 - compBytes/origBytes) * 100)) : 0
+
+  document.getElementById('orig-size').textContent    = origBytes
+  document.getElementById('comp-size').textContent    = compBytes
+  document.getElementById('saving-pct').textContent   = saving + '%'
+  document.getElementById('saving-fill').style.width  = saving + '%'
+
+  if (saving > 0) {
+    document.getElementById('saving-label').textContent =
+      `Compressed to ${compBytes} bytes — ${saving}% smaller than the original ${origBytes} bytes.`
+  } else if (compBytes > origBytes) {
+    document.getElementById('saving-label').textContent =
+      `RLE is ${compBytes - origBytes} bytes BIGGER here — this text has too little repetition to compress well!`
+  } else {
+    document.getElementById('saving-label').textContent = 'No savings when every character is different.'
+  }
+}
+
+// ── Pixel grid demo ───────────────────────────────────────────────────────────
+const GRID_SIZE = 8
+let imgPixels = Array(GRID_SIZE * GRID_SIZE).fill(0) // 0=black, 1=white
+
+function buildPixelGrid() {
+  const container = document.getElementById('pixel-grid')
+  container.innerHTML = ''
+  for (let r = 0; r < GRID_SIZE; r++) {
+    const row = document.createElement('div')
+    row.className = 'px-row'
+    for (let c = 0; c < GRID_SIZE; c++) {
+      const px = document.createElement('div')
+      px.className = 'px'
+      px.style.background = imgPixels[r * GRID_SIZE + c] ? '#e8eaf0' : '#1a1d2e'
+      px.onclick = () => { imgPixels[r * GRID_SIZE + c] ^= 1; buildPixelGrid(); updateImgRLE() }
+      row.appendChild(px)
+    }
+    container.appendChild(row)
+  }
+}
+
+function updateImgRLE() {
+  const flat = imgPixels.join('')
+  const groups = rleEncode(flat)
+  const totalBits = imgPixels.length
+  const rleBits   = groups.reduce((s,g) => s + Math.ceil(Math.log2(g.count+1)) + 1, 0)
+
+  document.getElementById('img-rle').innerHTML = groups.map(g =>
+    `<span style="color:${g.char==='1'?'#e8eaf0':'#6b7280'}">${g.count}×${g.char==='1'?'white':'black'}</span>`
+  ).join(' <span style="color:var(--border-hi)">·</span> ')
+
+  document.getElementById('img-orig-bits').textContent = totalBits + ' bits'
+  document.getElementById('img-comp-bits').textContent =
+    groups.reduce((s,g) => s + String(g.count).length + 1, 0) + ' chars'
+}
+
+// ── Questions ─────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  {
+    text: 'What does "lossless compression" mean?',
+    options: [
+      'The original data can be perfectly reconstructed',
+      'Some data is permanently removed to save space',
+      'The file is split into smaller pieces',
+      'Only images can be compressed',
+    ],
+    correct: 0,
+    feedback: 'Correct! Lossless means no data is lost — the original can be fully restored. ZIP and PNG use lossless compression.',
+    wrongFeedback: 'Not quite. Lossless means the compressed file can be fully decompressed back to the original.',
+  },
+  {
+    text: 'RLE compression works best on data that has…',
+    options: [
+      'Many different characters all mixed together',
+      'Long runs of the same character repeated',
+      'Only numbers, not letters',
+      'At least 1000 characters',
+    ],
+    correct: 1,
+    feedback: 'Exactly! RLE shines when data has long repeating sequences — like a solid-colour image.',
+    wrongFeedback: 'RLE works best on repeated sequences. Try typing "AAAAAAAAAA" in the demo above.',
+  },
+  {
+    text: 'JPEG images use lossy compression. This means…',
+    options: [
+      'They can be decompressed perfectly with no loss',
+      'Some image detail is permanently discarded for a smaller file',
+      'They are larger than uncompressed images',
+      'They only work in black and white',
+    ],
+    correct: 1,
+    feedback: 'Right! JPEG throws away some fine detail — which is why very compressed JPEGs look blurry or blocky.',
+    wrongFeedback: 'Lossy means some data is lost forever. That\'s why a JPEG looks slightly different from the original.',
+  },
+]
+
+function buildQuestions() {
+  const container = document.getElementById('questions')
+  QUESTIONS.forEach((q, qi) => {
+    const block = document.createElement('div')
+    block.className = 'question-block'
+    block.innerHTML = `<div class="question-text">Q${qi+1}. ${q.text}</div>
+      <div class="options" id="opts-${qi}">
+        ${q.options.map((o,oi) => `<div class="option" onclick="answer(${qi},${oi})">${o}</div>`).join('')}
+      </div>
+      <div class="feedback" id="fb-${qi}"></div>`
+    container.appendChild(block)
+  })
+}
+
+function answer(qi, oi) {
+  const q    = QUESTIONS[qi]
+  const opts = document.querySelectorAll(`#opts-${qi} .option`)
+  const fb   = document.getElementById(`fb-${qi}`)
+  opts.forEach(o => o.classList.add('disabled'))
+  opts[oi].classList.add(oi === q.correct ? 'correct' : 'wrong')
+  if (oi !== q.correct) opts[q.correct].classList.add('correct')
+  fb.textContent  = oi === q.correct ? q.feedback : q.wrongFeedback
+  fb.className    = 'feedback show ' + (oi === q.correct ? 'correct' : 'wrong')
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+updateRLE(document.getElementById('rle-input').value)
+buildPixelGrid()
+updateImgRLE()
+buildQuestions()
+</script>
+</body>
+</html>
+
+

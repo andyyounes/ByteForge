@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — Binary Cards</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <style>
+    body { padding-top:64px; min-height:100vh; }
+    .container { max-width:900px; margin:0 auto; padding:0 24px; }
+    .page-header { text-align:center; padding:40px 0 32px; }
+    .page-title  { font-size:32px; font-weight:800; letter-spacing:-.03em; margin-bottom:10px; }
+    .page-sub    { font-size:16px; color:var(--fg-dim); }
+
+    /* ── Mode tabs ── */
+    .modes { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:36px; }
+    .mode-btn { padding:10px 22px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; background:var(--bg-card); border:1px solid var(--border); color:var(--fg-dim); transition:.2s; }
+    .mode-btn:hover  { border-color:var(--border-hi); color:var(--fg); }
+    .mode-btn.active { background:var(--orange); border-color:var(--orange); color:#fff; }
+
+    /* ── Cards grid ── */
+    .cards-grid { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:28px; }
+    .bit-card {
+      width:88px; perspective:600px; cursor:pointer;
+    }
+    .bit-card-inner {
+      position:relative; width:88px; height:110px; transform-style:preserve-3d; transition:transform .45s cubic-bezier(.4,0,.2,1);
+    }
+    .bit-card.on .bit-card-inner { transform:rotateY(180deg); }
+    .bit-face {
+      position:absolute; inset:0; border-radius:14px; backface-visibility:hidden;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+      border:2px solid var(--border);
+    }
+    .bit-face-front { background:var(--bg-card); }
+    .bit-face-back  { background:linear-gradient(135deg,#f97316,#ea580c); border-color:#f97316; transform:rotateY(180deg); }
+    .bit-value { font-size:22px; font-weight:800; letter-spacing:-.02em; }
+    .bit-face-front .bit-value { color:var(--fg-dim); }
+    .bit-face-back  .bit-value { color:#fff; }
+    .bit-digit { font-family:var(--mono); font-size:28px; font-weight:700; }
+    .bit-face-front .bit-digit { color:var(--fg-faint); }
+    .bit-face-back  .bit-digit { color:#fff; }
+    .bit-card:hover .bit-face-front { border-color:var(--orange); }
+
+    /* ── Display ── */
+    .display-row { display:flex; align-items:center; justify-content:center; gap:32px; margin-bottom:28px; flex-wrap:wrap; }
+    .display-block { text-align:center; }
+    .display-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--fg-faint); margin-bottom:6px; }
+    .display-value { font-family:var(--mono); font-size:40px; font-weight:800; letter-spacing:-.02em; }
+    .display-value.dec { color:var(--orange); }
+    .display-value.bin { color:var(--blue); }
+    .display-value.hex { color:var(--purple); }
+    .display-sep { font-size:24px; color:var(--border-hi); }
+
+    /* ── Challenge panel ── */
+    .challenge-box { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:28px 32px; text-align:center; margin-bottom:28px; max-width:600px; margin-left:auto; margin-right:auto; }
+    .challenge-question { font-size:20px; font-weight:700; margin-bottom:8px; }
+    .challenge-target { font-size:48px; font-weight:900; letter-spacing:-.04em; color:var(--orange); margin-bottom:20px; font-family:var(--mono); }
+    .answer-row { display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; }
+    .answer-input { width:120px; padding:12px; border-radius:10px; background:var(--bg); border:2px solid var(--border); color:var(--fg); font-size:20px; font-family:var(--mono); font-weight:700; text-align:center; outline:none; transition:.2s; }
+    .answer-input:focus { border-color:var(--orange); }
+    .btn { padding:12px 24px; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:.15s; }
+    .btn-orange { background:var(--orange); color:#fff; box-shadow:0 4px 16px rgba(249,115,22,.3); }
+    .btn-orange:hover { background:#ea580c; transform:translateY(-1px); }
+    .btn-ghost { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover { background:rgba(255,255,255,.07); }
+
+    /* ── Feedback ── */
+    .feedback { padding:14px 20px; border-radius:12px; font-size:15px; font-weight:600; text-align:center; margin-bottom:16px; display:none; }
+    .feedback.correct { background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.3); color:var(--green); display:block; }
+    .feedback.wrong   { background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.3); color:#fca5a5; display:block; }
+
+    /* ── Progress ── */
+    .progress-bar { background:rgba(255,255,255,.07); border-radius:999px; height:8px; margin-bottom:20px; overflow:hidden; }
+    .progress-fill { height:8px; border-radius:999px; background:linear-gradient(90deg,var(--orange),#f59e0b); transition:width .5s ease; }
+    .round-info { font-size:13px; color:var(--fg-dim); text-align:center; margin-bottom:16px; }
+
+    /* ── Score ── */
+    .score-board { display:flex; gap:20px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
+    .score-item { text-align:center; padding:12px 20px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); }
+    .score-num { font-size:24px; font-weight:800; letter-spacing:-.02em; }
+    .score-lbl { font-size:11px; color:var(--fg-dim); margin-top:2px; }
+
+    /* ── Addition mode ── */
+    .addition-wrap { max-width:600px; margin:0 auto; }
+    .addition-row  { display:flex; gap:10px; align-items:center; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
+    .num-input { width:80px; padding:10px; border-radius:8px; background:var(--bg); border:2px solid var(--border); color:var(--fg); font-size:18px; font-family:var(--mono); font-weight:700; text-align:center; outline:none; transition:.2s; }
+    .num-input:focus { border-color:var(--orange); }
+    .plus-sign { font-size:28px; font-weight:800; color:var(--fg-dim); }
+
+    /* ── Help tooltip ── */
+    .help-bar { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:14px 20px; font-size:14px; color:var(--fg-dim); line-height:1.6; margin-bottom:24px; max-width:700px; margin-left:auto; margin-right:auto; }
+    .help-bar strong { color:var(--fg); }
+
+    /* ── Toast ── */
+    .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
+    .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
+    .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
+    .toast-show    { transform:translateY(0); opacity:1; }
+
+    @media(max-width:640px) { .bit-card { width:72px; } .bit-card-inner { width:72px; height:90px; } .bit-value { font-size:16px; } .bit-digit { font-size:22px; } .display-value { font-size:28px; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo"><div class="logo-icon">⚒</div><span class="logo-text">Byte<span>Forge</span></span></div>
+    <div class="nav-links">
+      <a href="../dashboard-student.html">← Dashboard</a>
+    </div>
+    <a href="../login.html" class="nav-cta" id="nav-auth">Sign In</a>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="section-label">Binary & Number Systems</div>
+      <div class="page-title">🃏 Binary Cards</div>
+      <div class="page-sub">Flip cards to explore binary numbers, then try the challenges!</div>
+    </div>
+
+    <!-- Mode selector -->
+    <div class="modes">
+      <button class="mode-btn active" onclick="setMode('explore')">🔍 Explore</button>
+      <button class="mode-btn" onclick="setMode('dec2bin')">🎯 Decimal → Binary</button>
+      <button class="mode-btn" onclick="setMode('bin2dec')">🔢 Binary → Decimal</button>
+      <button class="mode-btn" onclick="setMode('addition')">➕ Binary Addition</button>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards-grid" id="cards-grid"></div>
+
+    <!-- Display -->
+    <div class="display-row">
+      <div class="display-block">
+        <div class="display-label">Decimal</div>
+        <div class="display-value dec" id="dec-display">0</div>
+      </div>
+      <div class="display-sep">=</div>
+      <div class="display-block">
+        <div class="display-label">Binary</div>
+        <div class="display-value bin" id="bin-display">00000000</div>
+      </div>
+      <div class="display-sep">=</div>
+      <div class="display-block">
+        <div class="display-label">Hex</div>
+        <div class="display-value hex" id="hex-display">00</div>
+      </div>
+    </div>
+
+    <!-- Help bar -->
+    <div class="help-bar" id="help-bar">
+      <strong>How it works:</strong> Each card represents a power of 2. Click a card to flip it <strong>ON</strong> (orange). The decimal value is the sum of all ON cards. Try flipping the <strong>1</strong>, <strong>2</strong>, and <strong>4</strong> cards to make <strong>7</strong>!
+    </div>
+
+    <!-- Challenge box (hidden in explore mode) -->
+    <div id="challenge-area" style="display:none">
+      <div class="score-board" id="score-board">
+        <div class="score-item"><div class="score-num" id="sc-correct">0</div><div class="score-lbl">Correct</div></div>
+        <div class="score-item"><div class="score-num" id="sc-wrong">0</div><div class="score-lbl">Wrong</div></div>
+        <div class="score-item"><div class="score-num" id="sc-xp">0</div><div class="score-lbl">XP earned</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="round-info" id="round-info">Round 1 / 5</div>
+      <div class="feedback" id="feedback"></div>
+      <div class="challenge-box">
+        <div class="challenge-question" id="challenge-question">Convert to binary:</div>
+        <div class="challenge-target" id="challenge-target">—</div>
+        <div class="answer-row" id="answer-row"></div>
+      </div>
+    </div>
+
+    <!-- Addition mode -->
+    <div id="addition-area" style="display:none">
+      <div class="addition-wrap">
+        <div class="help-bar" style="margin-bottom:24px">
+          <strong>Binary Addition:</strong> Enter two decimal numbers. Watch how they combine in binary. Carry the 1 when you get 1+1=10!
+        </div>
+        <div class="addition-row">
+          <input type="number" id="add-a" class="num-input" value="6" min="0" max="127" oninput="renderAddition()"/>
+          <div class="plus-sign">+</div>
+          <input type="number" id="add-b" class="num-input" value="5" min="0" max="127" oninput="renderAddition()"/>
+          <div class="plus-sign">=</div>
+          <div style="text-align:center">
+            <div style="font-size:28px;font-weight:800;color:var(--orange);font-family:var(--mono)" id="add-sum">11</div>
+            <div style="font-size:12px;color:var(--fg-dim)">decimal</div>
+          </div>
+        </div>
+        <div id="addition-visual" style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:24px;font-family:var(--mono);font-size:16px;text-align:right;line-height:2"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    // Auth (optional - sandboxes work without login)
+    BF.seed();
+    const me = BF.session();
+    if (me) {
+      document.getElementById('nav-auth').textContent = 'Dashboard';
+      document.getElementById('nav-auth').href = me.role==='teacher' ? '../dashboard-teacher.html' : '../dashboard-student.html';
+    }
+
+    // ── State ──
+    const BITS   = [128, 64, 32, 16, 8, 4, 2, 1];
+    let state    = [0,0,0,0,0,0,0,0]; // 0=off, 1=on
+    let mode     = 'explore';
+    let round    = 0;
+    const ROUNDS = 5;
+    let target   = 0;
+    let score    = { correct:0, wrong:0, xp:0 };
+    let cardsLocked = false;
+
+    // ── Render cards ──
+    function buildCards() {
+      const grid = document.getElementById('cards-grid');
+      grid.innerHTML = BITS.map((v,i) => `
+        <div class="bit-card" id="card-${i}" onclick="flipCard(${i})">
+          <div class="bit-card-inner">
+            <div class="bit-face bit-face-front">
+              <div class="bit-value">${v}</div>
+              <div class="bit-digit">0</div>
+            </div>
+            <div class="bit-face bit-face-back">
+              <div class="bit-value">${v}</div>
+              <div class="bit-digit">1</div>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function flipCard(i) {
+      if (cardsLocked) return;
+      state[i] = state[i] ? 0 : 1;
+      updateCard(i);
+      updateDisplay();
+      if (mode === 'bin2dec') checkBin2Dec();
+    }
+
+    function updateCard(i) {
+      const card = document.getElementById('card-'+i);
+      card.classList.toggle('on', !!state[i]);
+    }
+
+    function updateDisplay() {
+      const dec = getDecimal();
+      document.getElementById('dec-display').textContent = dec;
+      document.getElementById('bin-display').textContent = state.join('');
+      document.getElementById('hex-display').textContent = dec.toString(16).toUpperCase().padStart(2,'0');
+    }
+
+    function getDecimal() {
+      return BITS.reduce((s,v,i) => s + (state[i] ? v : 0), 0);
+    }
+
+    function resetCards() {
+      state = [0,0,0,0,0,0,0,0];
+      BITS.forEach((_,i) => { state[i]=0; updateCard(i); });
+      updateDisplay();
+    }
+
+    // ── Mode switching ──
+    function setMode(m) {
+      mode = m;
+      document.querySelectorAll('.mode-btn').forEach((b,i) => {
+        b.classList.toggle('active', ['explore','dec2bin','bin2dec','addition'][i] === m);
+      });
+      resetCards();
+      score = { correct:0, wrong:0, xp:0 };
+      updateScore();
+      round = 0;
+      cardsLocked = false;
+
+      const ca = document.getElementById('challenge-area');
+      const aa = document.getElementById('addition-area');
+      const hb = document.getElementById('help-bar');
+
+      if (m === 'explore') {
+        ca.style.display = 'none';
+        aa.style.display = 'none';
+        hb.style.display = '';
+        hb.innerHTML = '<strong>Explore mode:</strong> Click any card to flip it ON/OFF. The decimal, binary, and hex values update live. Try making the number <strong>42</strong>, <strong>255</strong>, or your age!';
+      } else if (m === 'addition') {
+        ca.style.display = 'none';
+        aa.style.display = '';
+        hb.style.display = 'none';
+        renderAddition();
+        // lock cards in addition mode – just show the values
+        cardsLocked = true;
+        showAdditionCards(6);
+      } else {
+        ca.style.display = '';
+        aa.style.display = 'none';
+        hb.style.display = 'none';
+        nextChallenge();
+      }
+    }
+
+    // ── Dec → Bin challenge ──
+    function nextChallenge() {
+      if (round >= ROUNDS) { endGame(); return; }
+      resetCards();
+      hideFeedback();
+      cardsLocked = false;
+      document.getElementById('round-info').textContent = `Round ${round+1} / ${ROUNDS}`;
+      document.getElementById('prog-fill').style.width = (round/ROUNDS*100)+'%';
+
+      if (mode === 'dec2bin') {
+        target = Math.floor(Math.random() * 200) + 1;
+        document.getElementById('challenge-question').textContent = 'Flip the cards to make this decimal:';
+        document.getElementById('challenge-target').textContent   = target;
+        document.getElementById('answer-row').innerHTML = `<button class="btn btn-orange" onclick="checkDec2Bin()">Check ✓</button><button class="btn btn-ghost" onclick="showHint()">Hint 💡</button>`;
+      } else {
+        // Bin → Dec: pick random, set cards, ask for decimal
+        target = Math.floor(Math.random() * 254) + 1;
+        const bits = target.toString(2).padStart(8,'0').split('').map(Number);
+        bits.forEach((b,i) => { state[i]=b; updateCard(i); });
+        updateDisplay();
+        cardsLocked = true;
+        document.getElementById('challenge-question').textContent = 'What is the decimal value of this binary number?';
+        document.getElementById('challenge-target').textContent   = '';
+        document.getElementById('answer-row').innerHTML = `
+          <input type="number" id="user-answer" class="answer-input" placeholder="?" min="0" max="255" autofocus onkeydown="if(event.key==='Enter')checkBin2Dec(true)"/>
+          <button class="btn btn-orange" onclick="checkBin2Dec(true)">Check ✓</button>`;
+        setTimeout(()=>document.getElementById('user-answer')?.focus(), 100);
+      }
+    }
+
+    function checkDec2Bin() {
+      const val = getDecimal();
+      if (val === target) {
+        correct();
+      } else {
+        wrong(`You made ${val}, but the target was ${target}`);
+      }
+    }
+
+    function checkBin2Dec(submit) {
+      if (!submit) return;
+      const ans = parseInt(document.getElementById('user-answer')?.value);
+      if (ans === target) correct();
+      else wrong(`${ans} is wrong. The answer was ${target}`);
+    }
+
+    function correct() {
+      score.correct++;
+      score.xp += 10;
+      updateScore();
+      showFeedback('correct', '✓ Correct! +10 XP');
+      cardsLocked = true;
+      round++;
+      setTimeout(nextChallenge, 1600);
+    }
+
+    function wrong(msg) {
+      score.wrong++;
+      updateScore();
+      showFeedback('wrong', '✗ ' + msg);
+      setTimeout(() => { hideFeedback(); if(mode==='dec2bin'){resetCards(); cardsLocked=false;} else{ const ans=document.getElementById('user-answer'); if(ans){ans.value='';ans.focus();} } }, 2000);
+    }
+
+    function showHint() {
+      // Reveal the most significant bit needed
+      const binStr = target.toString(2).padStart(8,'0');
+      for (let i=0; i<8; i++) {
+        if (binStr[i]==='1' && !state[i]) { state[i]=1; updateCard(i); updateDisplay(); break; }
+      }
+    }
+
+    function endGame() {
+      cardsLocked = true;
+      document.getElementById('prog-fill').style.width = '100%';
+      document.getElementById('round-info').textContent = 'Complete!';
+      showFeedback('correct', `🎉 Game over! ${score.correct}/${ROUNDS} correct · ${score.xp} XP earned`);
+      // Award XP if logged in
+      if (me) {
+        BF.addXP(me.id, score.xp);
+        toast(`+${score.xp} XP added to your account!`);
+      }
+      document.getElementById('answer-row').innerHTML = `<button class="btn btn-orange" onclick="setMode('${mode}')">Play Again</button>`;
+    }
+
+    function showFeedback(type, msg) {
+      const el = document.getElementById('feedback');
+      el.className = 'feedback ' + type;
+      el.textContent = msg;
+    }
+    function hideFeedback() { document.getElementById('feedback').className = 'feedback'; }
+
+    function updateScore() {
+      document.getElementById('sc-correct').textContent = score.correct;
+      document.getElementById('sc-wrong').textContent   = score.wrong;
+      document.getElementById('sc-xp').textContent      = score.xp;
+    }
+
+    // ── Addition mode ──
+    function renderAddition() {
+      const a = parseInt(document.getElementById('add-a').value)||0;
+      const b = parseInt(document.getElementById('add-b').value)||0;
+      const sum = a + b;
+      document.getElementById('add-sum').textContent = sum;
+      showAdditionCards(a);
+
+      const aBin = a.toString(2).padStart(8,'0');
+      const bBin = b.toString(2).padStart(8,'0');
+      const sumBin = sum.toString(2).padStart(9,'0');
+
+      // Carry row
+      let carry = 0;
+      const carries = Array(8).fill(0);
+      for (let i=7; i>=0; i--) {
+        const col = parseInt(aBin[i]) + parseInt(bBin[i]) + carry;
+        carries[i] = carry;
+        carry = col >= 2 ? 1 : 0;
+      }
+
+      const col = n => `<span style="display:inline-block;width:28px;text-align:center">${n}</span>`;
+      const vis = document.getElementById('addition-visual');
+      vis.innerHTML = `
+        <div style="color:var(--fg-faint);font-size:13px;margin-bottom:4px">
+          ${carries.map(c=>`<span style="display:inline-block;width:28px;text-align:center;color:${c?'var(--yellow)':'var(--bg)'}">${c}</span>`).join('')}
+        </div>
+        <div>${col('')}${aBin.split('').map(col).join('')}</div>
+        <div>+${bBin.split('').map(col).join('')}</div>
+        <div style="border-top:2px solid var(--border);padding-top:8px;color:var(--orange)">
+          ${sumBin.split('').map(col).join('')}
+        </div>
+        <div style="font-size:13px;color:var(--fg-dim);text-align:center;margin-top:16px">
+          ${a} + ${b} = <strong style="color:var(--fg)">${sum}</strong> &nbsp;=&nbsp; <span style="color:var(--blue)">${sumBin.replace(/^0+/,'') || '0'}</span> in binary
+        </div>`;
+    }
+
+    function showAdditionCards(val) {
+      const bits = val.toString(2).padStart(8,'0').split('').map(Number);
+      bits.forEach((b,i) => { state[i]=b; updateCard(i); });
+      updateDisplay();
+    }
+
+    // ── Init ──
+    buildCards();
+    updateDisplay();
+
+    // Back link
+    if (!me) {
+      document.querySelectorAll('a[href*="dashboard"]').forEach(a => { a.href='../login.html'; a.textContent='← Back'; });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge â€” Code IDE</title>
+  <link rel="stylesheet" href="/styles.css"/>
+  <!-- CodeMirror -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+  <style>
+    body { padding-top:64px; background:var(--bg); }
+    .ide-layout { display:grid; grid-template-columns:220px 1fr 340px; height:calc(100vh - 64px); overflow:hidden; }
+
+    /* â”€â”€ Sidebar: exercises â”€â”€ */
+    .ex-sidebar { background:var(--bg-card); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+    .ex-sidebar-header { padding:14px 16px; border-bottom:1px solid var(--border); }
+    .ex-sidebar-title { font-size:14px; font-weight:700; margin-bottom:8px; }
+    .lang-btns { display:flex; flex-wrap:wrap; gap:4px; }
+    .lang-btn { padding:4px 8px; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer; background:var(--bg); border:1px solid var(--border); color:var(--fg-dim); transition:.15s; }
+    .lang-btn:hover, .lang-btn.active { background:var(--orange); border-color:var(--orange); color:#fff; }
+    .ex-list { overflow-y:auto; flex:1; padding:8px; }
+    .ex-item { padding:10px 12px; border-radius:8px; cursor:pointer; transition:.15s; border:1px solid transparent; margin-bottom:4px; }
+    .ex-item:hover  { background:rgba(255,255,255,.04); }
+    .ex-item.active { background:rgba(249,115,22,.08); border-color:rgba(249,115,22,.2); }
+    .ex-item-title  { font-size:13px; font-weight:600; margin-bottom:3px; }
+    .ex-item-meta   { font-size:11px; color:var(--fg-faint); }
+    .diff-dots { display:flex; gap:2px; margin-top:4px; }
+    .diff-dot  { width:5px; height:5px; border-radius:50%; background:var(--border-hi); }
+    .diff-dot.on { background:var(--orange); }
+
+    /* â”€â”€ Center: Editor â”€â”€ */
+    .editor-panel { display:flex; flex-direction:column; overflow:hidden; }
+    .editor-header { padding:10px 16px; background:var(--bg-card); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .editor-filename { font-family:var(--mono); font-size:13px; color:var(--fg-dim); }
+    .spacer { flex:1; }
+    .btn { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:.15s; }
+    .btn-orange { background:var(--orange); color:#fff; }
+    .btn-orange:hover { background:#ea580c; }
+    .btn-ghost  { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover { background:rgba(255,255,255,.08); }
+    .btn-green  { background:rgba(34,197,94,.15); color:var(--green); border:1px solid rgba(34,197,94,.3); }
+    .btn-green:hover { background:rgba(34,197,94,.25); }
+    #editor-wrap { flex:1; overflow:hidden; }
+    .CodeMirror { height:100% !important; font-size:14px; font-family:var(--mono); background:#0a0c18; color:#abb2bf; }
+    .CodeMirror-scroll { overflow:auto !important; }
+
+    /* â”€â”€ Right: Description + Output â”€â”€ */
+    .right-panel { display:flex; flex-direction:column; border-left:1px solid var(--border); overflow:hidden; background:var(--bg-card); }
+    .description-panel { flex:1; overflow-y:auto; padding:20px; border-bottom:1px solid var(--border); }
+    .desc-title { font-size:17px; font-weight:800; margin-bottom:8px; }
+    .desc-body  { font-size:14px; color:var(--fg-dim); line-height:1.7; }
+    .desc-body pre { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; font-family:var(--mono); font-size:12px; margin:10px 0; overflow-x:auto; white-space:pre-wrap; }
+    .test-cases { margin-top:16px; }
+    .test-case  { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:8px; }
+    .tc-label   { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-faint); margin-bottom:4px; }
+    .tc-code    { font-family:var(--mono); font-size:13px; }
+    .tc-pass    { color:var(--green); }
+    .tc-fail    { color:#fca5a5; }
+
+    /* Output */
+    .output-panel { flex-shrink:0; height:180px; overflow:hidden; display:flex; flex-direction:column; }
+    .output-header { padding:10px 16px; border-bottom:1px solid var(--border); font-size:13px; font-weight:700; color:var(--fg-dim); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .output-body { flex:1; overflow-y:auto; padding:12px 16px; font-family:var(--mono); font-size:13px; line-height:1.6; background:#0a0c18; }
+    .out-line { margin-bottom:2px; white-space:pre-wrap; word-break:break-word; }
+    .out-line.sys { color:var(--fg-faint); }
+    .out-line.ok  { color:var(--green); }
+    .out-line.err { color:#fca5a5; }
+    .out-line.run { color:#abb2bf; }
+
+    /* spinner */
+    .spin { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.2); border-top-color:var(--orange); border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-left:6px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* xp popup */
+    .xp-popup { position:fixed; bottom:80px; right:24px; background:var(--bg-card); border:1px solid var(--border-hi); border-radius:12px; padding:14px 20px; font-weight:700; color:var(--orange); display:flex; align-items:center; gap:8px; transform:translateY(80px); opacity:0; transition:.4s; z-index:999; }
+    .xp-popup.show { transform:translateY(0); opacity:1; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
+    .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
+    .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
+    .toast-show    { transform:translateY(0); opacity:1; }
+
+    @media(max-width:1000px) { .ide-layout { grid-template-columns:1fr 300px; } .ex-sidebar { display:none; } }
+    @media(max-width:700px)  { .ide-layout { grid-template-columns:1fr; grid-template-rows:55vh 1fr; } .right-panel { display:none; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo"><div class="logo-icon">âš’</div><span class="logo-text">Byte<span>Forge</span></span></div>
+    <div class="nav-links" id="nav-links"></div>
+    <a href="../login.html" class="nav-cta" id="nav-auth">Sign In</a>
+  </nav>
+
+  <div class="ide-layout">
+
+    <!-- Exercise list sidebar -->
+    <div class="ex-sidebar">
+      <div class="ex-sidebar-header">
+        <div class="ex-sidebar-title">Language</div>
+        <div class="lang-btns" id="lang-btns"></div>
+      </div>
+      <div class="ex-list" id="ex-list"></div>
+    </div>
+
+    <!-- Code editor -->
+    <div class="editor-panel">
+      <div class="editor-header">
+        <span class="editor-filename" id="editor-filename">main.py</span>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost" onclick="resetCode()">Reset</button>
+        <button class="btn btn-green" onclick="runCode()" id="run-btn">â–¶ Run</button>
+      </div>
+      <div id="editor-wrap"></div>
+    </div>
+
+    <!-- Description + Output -->
+    <div class="right-panel">
+      <div class="description-panel" id="desc-panel">
+        <div class="desc-title" id="desc-title">Welcome to the IDE</div>
+        <div class="desc-body" id="desc-body">
+          <p>Select an exercise from the left, or just write your own code and click <strong>Run</strong>!</p>
+          <p>Supported languages: <strong>Python, JavaScript, Java, C++, SQL, VB.NET</strong></p>
+          <p style="margin-top:12px;font-size:13px;color:var(--fg-faint)">Code is executed securely using the Piston API. Your code never touches our servers.</p>
+        </div>
+      </div>
+      <div class="output-panel">
+        <div class="output-header">
+          <span>Output</span>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="clearOutput()">Clear</button>
+        </div>
+        <div class="output-body" id="output-body">
+          <div class="out-line sys">Ready. Click â–¶ Run to execute your code.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="xp-popup" id="xp-popup">âš¡ <span id="xp-amount">+50 XP</span></div>
+
+  <script src="/js/db.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    BF.seed();
+    const me = BF.session();
+    if (me) {
+      document.getElementById('nav-auth').textContent = me.role==='teacher'?'Teacher Dashboard':'My Dashboard';
+      document.getElementById('nav-auth').href = me.role==='teacher'?'/teacher/dashboard':'/student/dashboard';
+    }
+
+    // â”€â”€ Language config â”€â”€
+    const LANGS = {
+      python:     { label:'Python',  ext:'py',   cm:'python',    pistonLang:'python',     pistonVer:'3.10.0', starter:'# Python\nprint("Hello, ByteForge!")\n' },
+      javascript: { label:'JS',      ext:'js',   cm:'javascript',pistonLang:'javascript', pistonVer:'18.15.0',starter:'// JavaScript\nconsole.log("Hello, ByteForge!");\n' },
+      java:       { label:'Java',    ext:'java', cm:'text/x-java',pistonLang:'java',      pistonVer:'15.0.2', starter:'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, ByteForge!");\n    }\n}\n' },
+      cpp:        { label:'C++',     ext:'cpp',  cm:'text/x-c++src',pistonLang:'c++',     pistonVer:'10.2.0', starter:'#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello, ByteForge!" << endl;\n    return 0;\n}\n' },
+      sql:        { label:'SQL',     ext:'sql',  cm:'text/x-sql', pistonLang:'sqlite3',   pistonVer:'3.36.0', starter:'-- SQL\nCREATE TABLE students (id INT, name TEXT, grade TEXT);\nINSERT INTO students VALUES (1, "Alice", "A");\nINSERT INTO students VALUES (2, "Bob", "B");\nSELECT * FROM students;\n' },
+      vbnet:      { label:'VB.NET',  ext:'vb',   cm:'vbscript',   pistonLang:'vb',        pistonVer:'5.0.201',starter:'Module Main\n    Sub Main()\n        Console.WriteLine("Hello, ByteForge!")\n    End Sub\nEnd Module\n' },
+    };
+
+    // â”€â”€ Built-in exercises â”€â”€
+    const EXERCISES = {
+      python: [
+        { id:'py1', title:'Hello World',      difficulty:1, xp:20,  desc:'<p>Print <code>Hello, World!</code> to the screen.</p>', starter:'# Print Hello, World!\nprint()\n', tests:[{input:'',expected:'Hello, World!'}] },
+        { id:'py2', title:'Sum of numbers',   difficulty:1, xp:30,  desc:'<p>Ask the user for two numbers and print their sum.</p><pre>a = int(input())\nb = int(input())\n# print a + b</pre>', starter:'a = int(input())\nb = int(input())\n# TODO: print a + b\n', tests:[{input:'3\n5',expected:'8'}] },
+        { id:'py3', title:'FizzBuzz',          difficulty:2, xp:50,  desc:'<p>Print numbers 1â€“20. For multiples of 3 print <code>Fizz</code>, multiples of 5 print <code>Buzz</code>, both print <code>FizzBuzz</code>.</p>', starter:'for i in range(1, 21):\n    # TODO: FizzBuzz logic\n    pass\n', tests:[{input:'',expected:'FizzBuzz'}] },
+        { id:'py4', title:'Fibonacci sequence',difficulty:3, xp:75,  desc:'<p>Print the first 10 Fibonacci numbers, one per line.</p>', starter:'# Generate Fibonacci numbers\na, b = 0, 1\n', tests:[{input:'',expected:'0\n1\n1\n2\n3\n5\n8\n13\n21\n34'}] },
+        { id:'py5', title:'Bubble Sort',       difficulty:4, xp:100, desc:'<p>Given the list <code>[64, 34, 25, 12, 22, 11, 90]</code>, implement bubble sort and print the sorted list.</p>', starter:'arr = [64, 34, 25, 12, 22, 11, 90]\n# TODO: bubble sort\nprint(arr)\n', tests:[{input:'',expected:'[11, 12, 22, 25, 34, 64, 90]'}] },
+      ],
+      javascript: [
+        { id:'js1', title:'Hello World',       difficulty:1, xp:20,  desc:'<p>Log <code>Hello, World!</code> to the console.</p>', starter:'console.log();\n', tests:[{input:'',expected:'Hello, World!'}] },
+        { id:'js2', title:'Even or Odd',       difficulty:1, xp:30,  desc:'<p>Print whether numbers 1â€“10 are Even or Odd.</p>', starter:'for (let i = 1; i <= 10; i++) {\n  // TODO\n}\n', tests:[] },
+        { id:'js3', title:'Reverse a string',  difficulty:2, xp:50,  desc:'<p>Reverse the string <code>"ByteForge"</code> and print it.</p>', starter:'const s = "ByteForge";\n// TODO: reverse and print\n', tests:[{input:'',expected:'egreFÃ©tyB'.replace('Ã©','o')}] },
+      ],
+      java: [
+        { id:'ja1', title:'Hello World',       difficulty:1, xp:20,  desc:'<p>Print <code>Hello, World!</code> using Java.</p>', starter:'public class Main {\n    public static void main(String[] args) {\n        // TODO\n    }\n}\n', tests:[{input:'',expected:'Hello, World!'}] },
+        { id:'ja2', title:'Sum 1 to N',        difficulty:2, xp:50,  desc:'<p>Print the sum of numbers from 1 to 100.</p>', starter:'public class Main {\n    public static void main(String[] args) {\n        int sum = 0;\n        // TODO\n        System.out.println(sum);\n    }\n}\n', tests:[{input:'',expected:'5050'}] },
+      ],
+      cpp: [
+        { id:'cpp1', title:'Hello World',      difficulty:1, xp:20,  desc:'<p>Print <code>Hello, World!</code> using C++.</p>', starter:'#include <iostream>\nusing namespace std;\nint main() {\n    // TODO\n}\n', tests:[{input:'',expected:'Hello, World!'}] },
+      ],
+      sql: [
+        { id:'sq1', title:'Create & Query',    difficulty:1, xp:30,  desc:'<p>Create a <code>students</code> table with columns <code>id</code>, <code>name</code>, <code>grade</code>. Insert 3 rows and SELECT all.</p>', starter:'-- Create the table and insert data\n', tests:[] },
+        { id:'sq2', title:'WHERE clause',      difficulty:2, xp:50,  desc:'<p>From the students table, SELECT only students with grade = "A".</p>', starter:'CREATE TABLE students (id INT, name TEXT, grade TEXT);\nINSERT INTO students VALUES (1,"Alice","A"),(2,"Bob","B"),(3,"Carol","A");\n-- SELECT students with grade A\n', tests:[] },
+      ],
+      vbnet: [
+        { id:'vb1', title:'Hello World',       difficulty:1, xp:20,  desc:'<p>Print <code>Hello, World!</code> using VB.NET.</p>', starter:'Module Main\n    Sub Main()\n        \' TODO\n    End Sub\nEnd Module\n', tests:[{input:'',expected:'Hello, World!'}] },
+      ],
+    };
+
+    let currentLang = 'python';
+    let currentEx   = null;
+    let editor;
+
+    // â”€â”€ Build language buttons â”€â”€
+    Object.entries(LANGS).forEach(([k,v]) => {
+      const btn = document.createElement('button');
+      btn.className = 'lang-btn' + (k===currentLang?' active':'');
+      btn.textContent = v.label;
+      btn.onclick = () => switchLang(k);
+      document.getElementById('lang-btns').appendChild(btn);
+    });
+
+    // â”€â”€ CodeMirror editor â”€â”€
+    editor = CodeMirror(document.getElementById('editor-wrap'), {
+      value: LANGS.python.starter,
+      mode: LANGS.python.cm,
+      theme: 'dracula',
+      lineNumbers: true,
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      indentUnit: 4,
+      tabSize: 4,
+      indentWithTabs: false,
+      lineWrapping: true,
+      extraKeys: { 'Ctrl-Enter': runCode, 'Cmd-Enter': runCode, 'Ctrl-/': (cm)=>cm.execCommand('toggleComment') },
+    });
+    editor.setSize('100%', '100%');
+
+    function switchLang(lang) {
+      currentLang = lang;
+      currentEx = null;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent===LANGS[lang].label));
+      editor.setOption('mode', LANGS[lang].cm);
+      editor.setValue(LANGS[lang].starter);
+      document.getElementById('editor-filename').textContent = `main.${LANGS[lang].ext}`;
+      renderExList();
+      showDefaultDesc();
+    }
+
+    function renderExList() {
+      const exs = EXERCISES[currentLang] || [];
+      document.getElementById('ex-list').innerHTML = exs.map(e => `
+        <div class="ex-item ${currentEx?.id===e.id?'active':''}" onclick="loadExercise('${currentLang}','${e.id}')">
+          <div class="ex-item-title">${e.title}</div>
+          <div class="diff-dots">${Array.from({length:5},(_,i)=>`<div class="diff-dot ${i<e.difficulty?'on':''}"></div>`).join('')}</div>
+          <div class="ex-item-meta">âš¡ ${e.xp} XP</div>
+        </div>`).join('') || '<div style="padding:16px;font-size:13px;color:var(--fg-faint)">No exercises for this language yet</div>';
+    }
+
+    function loadExercise(lang, id) {
+      const ex = (EXERCISES[lang]||[]).find(e=>e.id===id);
+      if (!ex) return;
+      currentEx = ex;
+      if (ex.starter) editor.setValue(ex.starter);
+      document.getElementById('desc-title').textContent = ex.title;
+      let html = ex.desc || '';
+      if (ex.tests?.length) {
+        html += '<div class="test-cases"><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--fg-faint);margin-bottom:8px">Test Cases</div>';
+        ex.tests.forEach((t,i)=>{ html+=`<div class="test-case"><div class="tc-label">Test ${i+1}</div>${t.input?`<div class="tc-code" id="tc-in-${i}">Input: ${t.input}</div>`:''}${t.expected?`<div class="tc-code" id="tc-exp-${i}">Expected: <strong>${t.expected}</strong></div>`:''}${t.result?`<div class="tc-code ${t.pass?'tc-pass':'tc-fail'}">${t.pass?'âœ“':'âœ—'} ${t.result}</div>`:''}</div>`; });
+        html += '</div>';
+      }
+      document.getElementById('desc-body').innerHTML = html;
+      renderExList();
+    }
+
+    function showDefaultDesc() {
+      currentEx = null;
+      document.getElementById('desc-title').textContent = `${LANGS[currentLang].label} Sandbox`;
+      document.getElementById('desc-body').innerHTML = '<p>Select an exercise from the left panel, or write your own code and press <strong>â–¶ Run</strong>.</p><p style="margin-top:8px;font-size:13px;color:var(--fg-faint)">Tip: Press <code>Ctrl+Enter</code> to run.</p>';
+      renderExList();
+    }
+
+    function resetCode() {
+      if (currentEx?.starter) editor.setValue(currentEx.starter);
+      else editor.setValue(LANGS[currentLang].starter);
+    }
+
+    // â”€â”€ Run code via Piston API â”€â”€
+    async function runCode() {
+      const btn = document.getElementById('run-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span> Runningâ€¦';
+      clearOutput();
+      addOutput('â–¶ Executingâ€¦', 'sys');
+
+      const code = editor.getValue();
+      const lang = LANGS[currentLang];
+
+      try {
+        const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            language: lang.pistonLang,
+            version: lang.pistonVer,
+            files: [{ name: `main.${lang.ext}`, content: code }],
+            stdin: currentEx?.tests?.[0]?.input || '',
+          }),
+        });
+        const data = await res.json();
+        const stdout = data.run?.stdout || '';
+        const stderr = data.run?.stderr || '';
+        const out    = stdout || stderr || '(no output)';
+
+        out.split('\n').forEach(line => { if(line||stdout) addOutput(line, stderr&&!stdout?'err':'run'); });
+
+        if (currentEx?.tests?.length) {
+          checkTests(stdout.trim(), currentEx.tests);
+        } else {
+          addOutput('âœ“ Execution complete', 'ok');
+        }
+      } catch(e) {
+        addOutput('Network error â€” check your connection', 'err');
+        addOutput(e.message, 'err');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'â–¶ Run';
+      }
+    }
+
+    function checkTests(actualOutput, tests) {
+      let allPassed = true;
+      tests.forEach((t, i) => {
+        if (!t.expected) return;
+        const pass = actualOutput.includes(t.expected.trim());
+        t.pass   = pass;
+        t.result = pass ? 'Passed' : `Got: ${actualOutput.slice(0,60)}`;
+        if (!pass) allPassed = false;
+      });
+      if (currentEx) loadExercise(currentLang, currentEx.id);
+      if (allPassed) {
+        addOutput(`âœ… All tests passed!`, 'ok');
+        if (me && currentEx) {
+          const gained = BF.recordAttempt(me.id, currentEx.id, { passed:true, score:100, code:editor.getValue() });
+          if (gained.passed && !BF.progress(me.id).completedExercises.includes(currentEx.id)) {
+            showXP(currentEx.xp||50);
+          }
+        }
+      } else {
+        addOutput('âœ— Some tests failed â€” check the expected output', 'err');
+      }
+    }
+
+    function showXP(amount) {
+      const el = document.getElementById('xp-popup');
+      document.getElementById('xp-amount').textContent = `+${amount} XP`;
+      el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'),3000);
+    }
+
+    function addOutput(text, type='') {
+      const el = document.getElementById('output-body');
+      const d  = document.createElement('div');
+      d.className='out-line '+type; d.textContent=text;
+      el.appendChild(d); el.scrollTop=el.scrollHeight;
+    }
+    function clearOutput() { document.getElementById('output-body').innerHTML=''; }
+
+    renderExList();
+  </script>
+</body>
+</html>
+

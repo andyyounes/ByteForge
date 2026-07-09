@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ByteForge — IGCSE Year 1 Theory</title>
+  <link rel="stylesheet" href="../styles.css"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { padding-top:64px; background:var(--bg); color:var(--fg); height:100vh; overflow:hidden; }
+    .layout { display:grid; grid-template-columns:1fr 480px; height:calc(100vh - 64px); overflow:hidden; }
+
+    /* ── Left: answer panel ── */
+    .ans-panel  { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
+    .ans-header { flex-shrink:0; padding:10px 14px; background:var(--bg-card); border-bottom:1px solid var(--border);
+                  display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .ans-title  { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:700; }
+    .badge      { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+    .badge-gy1  { background:rgba(56,189,248,.15); color:#7dd3fc; border:1px solid rgba(56,189,248,.3); }
+    .badge-type { background:rgba(168,85,247,.12); color:#c084fc; border:1px solid rgba(168,85,247,.25); font-size:9px; }
+
+    .ans-body   { flex:1; display:flex; flex-direction:column; padding:16px; gap:12px; overflow-y:auto; }
+    .ans-prompt { font-size:13px; color:var(--fg-dim); line-height:1.6; }
+    .ans-input  { width:100%; padding:8px 12px; border-radius:6px; border:1px solid var(--border);
+                  background:var(--bg-raised); color:var(--fg); font-size:13px; font-family:var(--mono);
+                  resize:vertical; }
+    .ans-input:focus { outline:none; border-color:#7dd3fc; }
+    textarea.ans-input { min-height:120px; line-height:1.6; }
+    .ans-footer { flex-shrink:0; display:flex; gap:8px; padding:10px 14px; background:var(--bg-card);
+                  border-top:1px solid var(--border); align-items:center; justify-content:space-between; }
+    .btn { padding:6px 14px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; transition:.15s; border:none; }
+    .btn-brand  { background:#b8ef4a; color:#0d0f1a; }
+    .btn-brand:hover  { background:#a5d83d; }
+    .btn-ghost  { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
+    .btn-ghost:hover  { background:rgba(255,255,255,.08); }
+    .btn-danger { background:rgba(239,68,68,.1); color:#f87171; border:1px solid rgba(239,68,68,.25); }
+    .btn-danger:hover { background:rgba(239,68,68,.18); }
+    .feedback { font-size:12px; font-weight:600; }
+    .feedback.ok  { color:#4ade80; }
+    .feedback.err { color:#f87171; }
+
+    /* ── Right panel ── */
+    .right-panel { display:flex; flex-direction:column; overflow:hidden; }
+    .ch-header   { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px; }
+    .ch-pills    { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pill     { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
+                   border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
+    .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
+    .ch-pill.active { background:rgba(56,189,248,.12); border-color:#7dd3fc; color:#7dd3fc; }
+    .ch-pill.done   { background:rgba(34,197,94,.08);  border-color:rgba(34,197,94,.35); color:#4ade80; }
+    .ch-row  { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .ch-text { font-size:11.5px; color:var(--fg-dim); line-height:1.55; flex:1; }
+    .ch-text strong { color:var(--fg); }
+    .xp-pill { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
+               background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); white-space:nowrap; }
+    .hint-btn { font-size:11px; color:#fbbf24; cursor:pointer; }
+    .ch-meta  { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+
+    /* Hint / model answer area */
+    .hint-area { flex:1; overflow-y:auto; padding:12px 14px; }
+    .hint-log  { font-size:12px; line-height:1.65; color:var(--fg-dim); }
+    .hint-log .hint-line  { color:#fbbf24; margin-bottom:6px; }
+    .hint-log .model-line { color:#7dd3fc; margin-bottom:6px; }
+    .hint-log .pass-line  { color:#4ade80; font-weight:600; margin-bottom:6px; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(60px);
+             padding:10px 20px; border-radius:10px; font-size:13px; font-weight:600;
+             background:#1a2e1a; color:#bbf7d0; border:1px solid #16a34a;
+             opacity:0; transition:.3s; z-index:9999; pointer-events:none; }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    @media(max-width:900px) { .layout { grid-template-columns:1fr; } }
+  </style>
+  <script src="../js/db.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/lesson-saves.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-text">ByteForge</span>
+  </div>
+  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+</nav>
+
+<div class="layout">
+
+  <!-- Left: answer panel -->
+  <div class="ans-panel">
+    <div class="ans-header">
+      <div class="ans-title">
+        IGCSE Year 1 — Theory
+        <span class="badge badge-gy1">IGCSE Y1</span>
+        <span class="badge badge-type" id="ch-type-badge">THEORY</span>
+      </div>
+      <button class="btn btn-danger" onclick="clearAnswer()">↺ Clear</button>
+    </div>
+
+    <div class="ans-body">
+      <p class="ans-prompt" id="ans-prompt">Select a challenge to begin.</p>
+      <div id="ans-input-wrap">
+        <!-- dynamically becomes <input> or <textarea> -->
+      </div>
+    </div>
+
+    <div class="ans-footer">
+      <span class="feedback" id="feedback"></span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" onclick="showHint()">💡 Hint</button>
+        <button class="btn btn-brand" onclick="checkAnswer()">✓ Check</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+    <div class="ch-header">
+      <div class="ch-pills" id="ch-pills"></div>
+      <div class="ch-row">
+        <div class="ch-text" id="ch-text">Select a challenge.</div>
+        <div class="ch-meta">
+          <span class="xp-pill" id="xp-pill">+30 XP</span>
+          <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint-area">
+      <div class="hint-log" id="hint-log"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict'
+
+// ── BF integration ────────────────────────────────────────────────────────────
+BF.seed()
+const me = (() => { try { return BF.session() || null } catch(_) { return null } })()
+const completed = new Set()
+let activeIdx = 0
+let hintIdx   = 0
+
+// ── Challenges ────────────────────────────────────────────────────────────────
+// type: 'convert' → exact numeric/text match
+//       'theory'  → keyword presence check
+//       'trace'   → comma-separated values match
+const CHALLENGES = [
+  // ── Module 1: Data Representation ─────────────────────────────────────────
+  {
+    mod:'M1', name:'Binary→Decimal', xp:30, type:'convert',
+    text:`<strong>Challenge 1 — Data Representation</strong><br>Convert the binary number <code>11010110</code> to decimal.<br>Type only the decimal number as your answer.`,
+    hints:['Work right to left: position values are 128, 64, 32, 16, 8, 4, 2, 1.', '1×128 + 1×64 + 0×32 + 1×16 + 0×8 + 1×4 + 1×2 + 0×1', 'Answer: 214'],
+    check: ans => parseInt(ans.trim()) === 214,
+  },
+  {
+    mod:'M1', name:'Decimal→Hex', xp:30, type:'convert',
+    text:`<strong>Challenge 2 — Data Representation</strong><br>Convert decimal <code>175</code> to hexadecimal.<br>Type your answer in uppercase (e.g. A3).`,
+    hints:['Divide 175 by 16. 175 ÷ 16 = 10 remainder 15.', '10 = A, 15 = F in hex.', 'Answer: AF'],
+    check: ans => ans.trim().toUpperCase() === 'AF',
+  },
+  {
+    mod:'M1', name:'File Size', xp:40, type:'convert',
+    text:`<strong>Challenge 3 — File Size Calculation</strong><br>An image is <strong>800 × 600</strong> pixels with a colour depth of <strong>24 bits</strong>.<br>Calculate the file size in <strong>megabytes</strong> (1 MB = 1,048,576 bytes).<br>Give your answer to 2 decimal places (e.g. 1.37).`,
+    hints:['Total bits = 800 × 600 × 24', 'Total bytes = total bits ÷ 8', 'MB = bytes ÷ 1,048,576. Answer ≈ 1.37'],
+    check: ans => { const v = parseFloat(ans.trim()); return Math.abs(v - 1.37) < 0.05 },
+  },
+  {
+    mod:'M1', name:'Sound Digitisation', xp:40, type:'theory',
+    text:`<strong>Challenge 4 — Sound Digitisation</strong><br>Explain how sound is digitised. Your answer must mention: <em>analogue</em>, <em>sample</em>, <em>sample rate</em> (or frequency), and <em>bit depth</em> (or sample depth / resolution).`,
+    hints:['Sound is an analogue wave. An ADC (analogue-to-digital converter) takes samples at regular intervals.', 'Sample rate = number of samples per second (Hz). Higher sample rate = better quality.', 'Bit depth = number of bits per sample. Higher bit depth = more amplitude levels = better quality.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('analogue') && (a.includes('sample rate') || a.includes('frequency')) &&
+             (a.includes('bit depth') || a.includes('sample depth') || a.includes('resolution')) &&
+             a.includes('sample')
+    },
+  },
+
+  // ── Module 2: Hardware & Software ─────────────────────────────────────────
+  {
+    mod:'M2', name:'CPU Components', xp:30, type:'theory',
+    text:`<strong>Challenge 5 — Hardware</strong><br>Name the <strong>three main components of a CPU</strong> and state one function of each.<br>Include: ALU, CU, and registers (or cache).`,
+    hints:['ALU = Arithmetic Logic Unit — performs calculations and logical comparisons.', 'CU = Control Unit — fetches, decodes, and coordinates execution of instructions.', 'Registers are tiny, ultra-fast storage locations inside the CPU (e.g. PC, MAR, MDR, ACC).'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return (a.includes('alu') || a.includes('arithmetic')) &&
+             (a.includes('cu') || a.includes('control unit')) &&
+             (a.includes('register') || a.includes('cache'))
+    },
+  },
+  {
+    mod:'M2', name:'RAM vs ROM', xp:30, type:'theory',
+    text:`<strong>Challenge 6 — Memory</strong><br>State <strong>two differences</strong> between RAM and ROM.<br>Your answer should mention volatility and write access.`,
+    hints:['RAM is volatile — it loses data when power is removed. ROM is non-volatile.', 'RAM can be read and written. ROM can only be read (Read-Only Memory).', 'RAM stores running programs; ROM stores firmware/BIOS.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return (a.includes('volatile') || a.includes('loses') || a.includes('power')) &&
+             (a.includes('read') || a.includes('write') || a.includes('written'))
+    },
+  },
+  {
+    mod:'M2', name:'FDE Cycle', xp:40, type:'theory',
+    text:`<strong>Challenge 7 — Fetch-Decode-Execute</strong><br>Describe the three stages of the FDE cycle. Your answer must include the words: <em>fetch</em>, <em>decode</em>, <em>execute</em>, and one register name (PC, MAR, MDR, or CIR).`,
+    hints:['Fetch: The PC holds the address of the next instruction. The address is copied to the MAR, and the instruction is copied from memory to the MDR, then to the CIR.', 'Decode: The CU decodes the instruction in the CIR.', 'Execute: The ALU or other components carry out the decoded instruction.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('fetch') && a.includes('decode') && a.includes('execute') &&
+             (a.includes('pc') || a.includes('mar') || a.includes('mdr') || a.includes('cir'))
+    },
+  },
+  {
+    mod:'M2', name:'Device Types', xp:30, type:'theory',
+    text:`<strong>Challenge 8 — Devices</strong><br>Give <strong>one example</strong> of each: an input device, an output device, and a storage device. Explain the purpose of each.`,
+    hints:['Input: keyboard, mouse, scanner, microphone, webcam.', 'Output: monitor, printer, speaker, projector.', 'Storage: hard disk, SSD, USB drive, optical disc.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      const inputs   = ['keyboard','mouse','scanner','microphone','webcam','touchscreen']
+      const outputs  = ['monitor','printer','speaker','projector','screen']
+      const storages = ['hard disk','ssd','usb','optical','flash','memory card']
+      return inputs.some(x=>a.includes(x)) && outputs.some(x=>a.includes(x)) && storages.some(x=>a.includes(x))
+    },
+  },
+
+  // ── Module 3: Networking ───────────────────────────────────────────────────
+  {
+    mod:'M3', name:'LAN vs WAN', xp:30, type:'theory',
+    text:`<strong>Challenge 9 — Networking</strong><br>State <strong>two differences</strong> between a LAN and a WAN.<br>Your answer should mention <em>geographic area</em> and <em>ownership</em> (or speed/cost).`,
+    hints:['LAN = Local Area Network — covers a small area (e.g. one building). WAN = Wide Area Network — covers large geographic areas.', 'A LAN is usually owned by one organisation. A WAN spans multiple organisations or countries.', 'LANs typically have higher speeds and lower costs than WANs.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('lan') && a.includes('wan') &&
+             (a.includes('area') || a.includes('geographic') || a.includes('small') || a.includes('large') ||
+              a.includes('own') || a.includes('speed') || a.includes('cost'))
+    },
+  },
+  {
+    mod:'M3', name:'Client-Server vs P2P', xp:40, type:'theory',
+    text:`<strong>Challenge 10 — Network Models</strong><br>Describe the difference between a <strong>client-server</strong> network and a <strong>peer-to-peer</strong> network. Include at least one advantage and one disadvantage of each.`,
+    hints:['Client-server: a central server provides resources to clients. Easier to manage security and backups. Server failure affects all clients.', 'Peer-to-peer: all devices are equal, sharing resources directly. No single point of failure. Harder to control security.', 'Example advantage of P2P: no expensive dedicated server required.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return (a.includes('client') && a.includes('server')) &&
+             (a.includes('peer') || a.includes('p2p')) &&
+             (a.includes('advantage') || a.includes('disadvantage') || a.includes('central') || a.includes('equal'))
+    },
+  },
+  {
+    mod:'M3', name:'TCP/IP Layers', xp:40, type:'theory',
+    text:`<strong>Challenge 11 — TCP/IP</strong><br>Name the <strong>four layers</strong> of the TCP/IP model and state the main responsibility of each.`,
+    hints:['Layer 1 — Application: provides network services to apps (HTTP, FTP, SMTP, DNS).', 'Layer 2 — Transport: ensures reliable end-to-end delivery (TCP/UDP), manages ports.', 'Layer 3 — Internet (Network): addressing and routing using IP addresses.', 'Layer 4 — Network Access (Link): physical transmission of data over the local network.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      const layers = ['application','transport','internet','network access','link','network interface']
+      return layers.filter(l=>a.includes(l)).length >= 3
+    },
+  },
+  {
+    mod:'M3', name:'Protocols', xp:30, type:'theory',
+    text:`<strong>Challenge 12 — Protocols</strong><br>State the correct protocol for each use:<br>1. Sending email &nbsp; 2. Browsing a secure website &nbsp; 3. Transferring files between servers.<br>List: SMTP, HTTPS, FTP (match each to its purpose).`,
+    hints:['SMTP = Simple Mail Transfer Protocol — used to send email.', 'HTTPS = HyperText Transfer Protocol Secure — secure web browsing.', 'FTP = File Transfer Protocol — transferring files between servers/hosts.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('smtp') && a.includes('https') && a.includes('ftp')
+    },
+  },
+
+  // ── Module 4: Security & Privacy ──────────────────────────────────────────
+  {
+    mod:'M4', name:'Encryption', xp:40, type:'theory',
+    text:`<strong>Challenge 13 — Encryption</strong><br>Define <em>encryption</em>. Then explain the difference between <strong>symmetric</strong> and <strong>asymmetric</strong> encryption.`,
+    hints:['Encryption converts plaintext into ciphertext using an algorithm and a key.', 'Symmetric: the same key is used for encryption and decryption. Fast but key distribution is a problem.', 'Asymmetric: uses a public key to encrypt and a private key to decrypt. Slower but more secure for key exchange.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return (a.includes('encrypt') || a.includes('cipher') || a.includes('key')) &&
+             a.includes('symmetric') && a.includes('asymmetric')
+    },
+  },
+  {
+    mod:'M4', name:'Malware Types', xp:30, type:'theory',
+    text:`<strong>Challenge 14 — Malware</strong><br>Identify the type of malware in this scenario:<br><em>"A program secretly records every keystroke the user types, including passwords, and sends them to a remote attacker."</em><br>Then name two other types of malware and describe each in one sentence.`,
+    hints:['The scenario describes a keylogger (a type of spyware).', 'Other malware types: virus (attaches to files, replicates), worm (self-replicates across networks), trojan (disguised as legitimate software), ransomware (encrypts files and demands payment), adware (displays unwanted ads).', 'You need to name and describe 2 additional types.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      const types = ['virus','worm','trojan','ransomware','adware','rootkit','spyware','keylogger']
+      return types.filter(t=>a.includes(t)).length >= 3
+    },
+  },
+  {
+    mod:'M4', name:'Network Protection', xp:40, type:'theory',
+    text:`<strong>Challenge 15 — Network Security</strong><br>Describe <strong>three different methods</strong> used to protect a network. For each method, explain how it works and what it protects against.`,
+    hints:['Firewall: monitors incoming/outgoing traffic; blocks unauthorised access based on rules.', 'Encryption: scrambles data in transit so it cannot be read if intercepted.', 'User authentication: passwords, MFA, biometrics — ensures only authorised users access resources.', 'Other options: anti-malware, VPN, network segmentation, intrusion detection systems.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      const methods = ['firewall','encryption','password','authentication','antivirus','anti-malware','vpn','two-factor','2fa','mfa','intrusion','proxy']
+      return methods.filter(m=>a.includes(m)).length >= 3
+    },
+  },
+  {
+    mod:'M4', name:'Ethics Dilemma', xp:40, type:'theory',
+    text:`<strong>Challenge 16 — Ethics</strong><br>A government proposes mass surveillance of all internet traffic to catch criminals. Write 2–3 sentences arguing <strong>for</strong> the proposal and 2–3 sentences arguing <strong>against</strong> it. Use the words <em>privacy</em>, <em>security</em>, and <em>freedom</em>.`,
+    hints:['For: increased security, faster detection of threats, protection of citizens.', 'Against: invasion of privacy, chilling effect on free speech, risk of data misuse by government.', 'Good answers acknowledge both sides without dismissing either.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('privacy') && a.includes('security') && a.includes('freedom')
+    },
+  },
+
+  // ── Module 5: Algorithms (Theory) ─────────────────────────────────────────
+  {
+    mod:'M5', name:'Bubble Sort Trace', xp:50, type:'trace',
+    text:`<strong>Challenge 17 — Bubble Sort</strong><br>Starting array: <code>[5, 3, 8, 1, 6]</code><br>Show the array after each <strong>complete pass</strong> of bubble sort (pass 1, 2, 3, 4).<br>Enter each pass on a new line as comma-separated values, e.g.:<br><code>3, 5, 1, 6, 8</code>`,
+    hints:['Pass 1: compare adjacent pairs. 5,3→swap; 3,5,8,1,6 → 3,5,1,8,6 → 3,5,1,6,8', 'Pass 2: 3,1,5,6,8', 'Pass 3: 1,3,5,6,8 — Pass 4: 1,3,5,6,8 (already sorted)'],
+    check: ans => {
+      const lines = ans.trim().split('\n').map(l=>l.replace(/\s/g,''))
+      const expected = ['3,5,1,6,8','3,1,5,6,8','1,3,5,6,8','1,3,5,6,8']
+      return expected.some(e=>lines[0]===e) && lines.length >= 2
+    },
+  },
+  {
+    mod:'M5', name:'Search Complexity', xp:40, type:'theory',
+    text:`<strong>Challenge 18 — Time Complexity</strong><br>State the <strong>worst-case time complexity</strong> of linear search and binary search. For binary search, explain <em>why</em> it is faster and what condition the data must meet.`,
+    hints:['Linear search: O(n) — must check every element in the worst case.', 'Binary search: O(log n) — halves the search space each time.', 'Binary search requires the data to be sorted first.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return (a.includes('o(n)') || a.includes('linear')) &&
+             (a.includes('o(log') || a.includes('log n')) &&
+             (a.includes('sort') || a.includes('halv') || a.includes('half'))
+    },
+  },
+  {
+    mod:'M5', name:'Stacks (LIFO)', xp:40, type:'theory',
+    text:`<strong>Challenge 19 — Stacks</strong><br>Explain what a <strong>stack</strong> is and what LIFO means. Describe the <code>PUSH</code> and <code>POP</code> operations and give one real-world example of a stack being used in computing.`,
+    hints:['LIFO = Last In, First Out — the last item added is the first to be removed.', 'PUSH adds an item to the top of the stack. POP removes the top item.', 'Real-world uses: undo/redo in editors, function call stack (return addresses), browser back button.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('lifo') &&
+             (a.includes('push') || a.includes('pop')) &&
+             (a.includes('undo') || a.includes('call') || a.includes('back') || a.includes('browser') || a.includes('function') || a.includes('return'))
+    },
+  },
+  {
+    mod:'M5', name:'Trace Table', xp:50, type:'trace',
+    text:`<strong>Challenge 20 — Trace Table</strong><br>Trace this pseudocode and complete the table.<br><pre style="font-size:11px;color:#7dd3fc;margin:8px 0;line-height:1.6">x ← 1\nWHILE x &lt; 5 DO\n   x ← x + 2\n   OUTPUT x\nENDWHILE</pre>Enter the values OUTPUT prints, one per line.`,
+    hints:['x starts at 1. After first iteration: x ← 1+2 = 3. Output: 3.', 'After second iteration: x ← 3+2 = 5. Output: 5. Now x=5 is NOT < 5, so loop ends.', 'Two outputs: 3 and 5.'],
+    check: ans => {
+      const lines = ans.trim().split('\n').map(l=>l.trim())
+      return lines.includes('3') && lines.includes('5') && lines.length === 2
+    },
+  },
+]
+
+// ── State ─────────────────────────────────────────────────────────────────────
+function getAnswer() {
+  const el = document.getElementById('ans-field')
+  return el ? el.value : ''
+}
+
+function clearAnswer() {
+  const el = document.getElementById('ans-field')
+  if (el) el.value = ''
+  document.getElementById('feedback').textContent = ''
+}
+
+function renderAnswerInput(ch) {
+  const wrap = document.getElementById('ans-input-wrap')
+  const multiline = ch.type === 'theory' || ch.type === 'trace'
+  if (multiline) {
+    wrap.innerHTML = `<textarea class="ans-input" id="ans-field" placeholder="Type your answer here…" rows="8"></textarea>`
+  } else {
+    wrap.innerHTML = `<input class="ans-input" id="ans-field" type="text" placeholder="Type your answer here…" />`
+  }
+  document.getElementById('ch-type-badge').textContent = ch.type.toUpperCase()
+}
+
+function renderPills() {
+  const row = document.getElementById('ch-pills'); row.innerHTML = ''
+  CHALLENGES.forEach((ch, i) => {
+    const el = document.createElement('div')
+    el.className = 'ch-pill' + (i === activeIdx ? ' active' : '') + (completed.has(i) ? ' done' : '')
+    el.textContent = (completed.has(i) ? '✓ ' : '') + ch.mod + ' ' + ch.name
+    el.onclick = () => selectChallenge(i)
+    row.appendChild(el)
+  })
+}
+
+function selectChallenge(i) {
+  activeIdx = i; hintIdx = 0
+  const ch = CHALLENGES[i]
+  document.getElementById('ch-text').innerHTML = ch.text
+  document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
+  document.getElementById('ans-prompt').innerHTML = ch.text
+  document.getElementById('hint-log').innerHTML = ''
+  document.getElementById('feedback').textContent = ''
+  renderAnswerInput(ch)
+  renderPills()
+}
+
+function checkAnswer() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch) return
+  const ans = getAnswer().trim()
+  if (!ans) { document.getElementById('feedback').className = 'feedback err'; document.getElementById('feedback').textContent = 'Please type an answer first.'; return }
+
+  if (ch.check(ans)) {
+    document.getElementById('feedback').className = 'feedback ok'
+    document.getElementById('feedback').textContent = '✓ Correct!'
+    if (!completed.has(activeIdx)) {
+      completed.add(activeIdx)
+      renderPills()
+      showToast('Challenge complete! +' + ch.xp + ' XP')
+      if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'gy1-c' + activeIdx, { passed: true, score: 100 }) }
+      LessonSaves.save('igcse-y1', activeIdx, { passed: true, xpEarned: ch.xp, code: ans })
+    }
+  } else {
+    document.getElementById('feedback').className = 'feedback err'
+    document.getElementById('feedback').textContent = '✗ Not quite — check the hint for guidance.'
+  }
+}
+
+function showHint() {
+  const ch = CHALLENGES[activeIdx]; if (!ch) return
+  const log = document.getElementById('hint-log')
+  if (hintIdx < ch.hints.length) {
+    const div = document.createElement('div')
+    div.className = 'hint-line'
+    div.textContent = '💡 Hint ' + (hintIdx + 1) + ': ' + ch.hints[hintIdx++]
+    log.appendChild(div)
+  } else {
+    const div = document.createElement('div')
+    div.className = 'hint-line'
+    div.textContent = '— No more hints!'
+    log.appendChild(div)
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3200)
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+;(async () => {
+  await LessonSaves.load('igcse-y1')
+  LessonSaves.completedSet().forEach(idx => completed.add(idx))
+  renderPills()
+  selectChallenge(0)
+})()
+</script>
+</body>
+</html>

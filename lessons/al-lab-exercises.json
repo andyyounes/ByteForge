@@ -1,0 +1,354 @@
+{
+  "rec": {
+    "name": "🔁 Recursion",
+    "icon": "🔁",
+    "exercises": [
+      {
+        "id": "r1",
+        "title": "Countdown",
+        "xp": 40,
+        "desc": "Write a recursive procedure CountDown(n) that outputs n, n-1 … 1, then \"Go!\". Call it with 5.",
+        "expect": [
+          "5",
+          "4",
+          "3",
+          "2",
+          "1",
+          "Go!"
+        ],
+        "starter": "// Recursive countdown\nPROCEDURE CountDown(n : INTEGER)\n   // TODO: base case — when n = 0, OUTPUT \"Go!\" and stop\n   // TODO: otherwise OUTPUT n, then CALL CountDown(n - 1)\nENDPROCEDURE\n\nCALL CountDown(5)"
+      },
+      {
+        "id": "r2",
+        "title": "Sum 1 to N",
+        "xp": 45,
+        "desc": "Write a recursive function SumTo(n) returning 1+2+…+n. Output SumTo(10).",
+        "expect": [
+          "55"
+        ],
+        "starter": "// Recursive sum of 1..n\nFUNCTION SumTo(n : INTEGER) RETURNS INTEGER\n   // TODO: base case n = 1 → RETURN 1\n   // TODO: otherwise RETURN n + SumTo(n - 1)\n   RETURN 0\nENDFUNCTION\n\nOUTPUT SumTo(10)"
+      },
+      {
+        "id": "r3",
+        "title": "Power",
+        "xp": 55,
+        "desc": "Write a recursive function Power(base, exp) — no ^ operator allowed. Output Power(2, 8).",
+        "expect": [
+          "256"
+        ],
+        "starter": "// Recursive exponentiation (no ^ allowed!)\nFUNCTION Power(base : INTEGER, exp : INTEGER) RETURNS INTEGER\n   // TODO: base case exp = 0 → RETURN 1\n   // TODO: otherwise RETURN base * Power(base, exp - 1)\n   RETURN 0\nENDFUNCTION\n\nOUTPUT Power(2, 8)"
+      },
+      {
+        "id": "r4",
+        "title": "Count Digits",
+        "xp": 60,
+        "desc": "Write a recursive function Digits(n) returning how many digits n has. Output Digits(52407).",
+        "expect": [
+          "5"
+        ],
+        "starter": "// How many digits? (hint: n DIV 10 removes the last digit)\nFUNCTION Digits(n : INTEGER) RETURNS INTEGER\n   // TODO: base case n < 10 → RETURN 1\n   // TODO: otherwise RETURN 1 + Digits(n DIV 10)\n   RETURN 0\nENDFUNCTION\n\nOUTPUT Digits(52407)"
+      },
+      {
+        "id": "r5",
+        "title": "Reverse a String",
+        "xp": 70,
+        "desc": "Write a recursive function Rev(s) that reverses a string. Output Rev(\"PAPER\").",
+        "expect": [
+          "REPAP"
+        ],
+        "starter": "// Recursive string reverse\n// All-but-first char: RIGHT(s, LENGTH(s) - 1); first char: LEFT(s, 1)\nFUNCTION Rev(s : STRING) RETURNS STRING\n   // TODO: base case LENGTH(s) <= 1 → RETURN s\n   // TODO: otherwise RETURN Rev(rest) & first character\n   RETURN s\nENDFUNCTION\n\nOUTPUT Rev(\"PAPER\")"
+      }
+    ]
+  },
+  "srt": {
+    "name": "📊 Search & Sort",
+    "icon": "📊",
+    "exercises": [
+      {
+        "id": "s1",
+        "title": "Linear Search",
+        "xp": 45,
+        "desc": "Search [8,3,9,42,7,15,6] for 42. Output \"Found at <index>\" (1-based) and \"Comparisons: <n>\".",
+        "expect": [
+          "Found at 4",
+          "Comparisons: 4"
+        ],
+        "starter": "// Linear search with comparison count\nDECLARE a : ARRAY[1:7] OF INTEGER\nDECLARE i, comps : INTEGER\na[1] ← 8; a[2] ← 3; a[3] ← 9; a[4] ← 42; a[5] ← 7; a[6] ← 15; a[7] ← 6\ncomps ← 0\n// TODO: loop until found — count every comparison\n// then: OUTPUT \"Found at \" & NUM_TO_STR(i)\n//       OUTPUT \"Comparisons: \" & NUM_TO_STR(comps)"
+      },
+      {
+        "id": "s2",
+        "title": "Minimum + Index",
+        "xp": 50,
+        "desc": "Find the smallest value in [14,7,22,3,19] AND its position. Output \"Min 3 at 4\".",
+        "expect": [
+          "Min 3 at 4"
+        ],
+        "starter": "// Selection-sort building block: min + where it lives\nDECLARE a : ARRAY[1:5] OF INTEGER\nDECLARE i, minVal, minIdx : INTEGER\na[1] ← 14; a[2] ← 7; a[3] ← 22; a[4] ← 3; a[5] ← 19\n// TODO: track minVal AND minIdx in one loop\n// then: OUTPUT \"Min \" & NUM_TO_STR(minVal) & \" at \" & NUM_TO_STR(minIdx)"
+      },
+      {
+        "id": "s3",
+        "title": "Binary Search Trail",
+        "xp": 65,
+        "desc": "Binary search [3,8,12,17,23,31,40] for 31 — output every mid VALUE you inspect, then \"Found at <index>\".",
+        "expect": [
+          "17",
+          "31",
+          "Found at 6"
+        ],
+        "starter": "// Show the search trail — each a[mid] inspected\nDECLARE a : ARRAY[1:7] OF INTEGER\nDECLARE low, high, mid : INTEGER\na[1] ← 3; a[2] ← 8; a[3] ← 12; a[4] ← 17; a[5] ← 23; a[6] ← 31; a[7] ← 40\nlow ← 1\nhigh ← 7\n// TODO: WHILE loop — mid ← (low+high) DIV 2, OUTPUT a[mid],\n// narrow low/high, stop when found → OUTPUT \"Found at \" & NUM_TO_STR(mid)"
+      },
+      {
+        "id": "s4",
+        "title": "Selection Sort",
+        "xp": 75,
+        "desc": "Sort [9,4,8,1,6] with selection sort (find min of the unsorted part, swap it to the front). Output the sorted values on one line, space-separated.",
+        "expect": [
+          "1 4 6 8 9"
+        ],
+        "starter": "// Selection sort\nDECLARE a : ARRAY[1:5] OF INTEGER\nDECLARE i, j, minIdx, temp : INTEGER\nDECLARE line : STRING\na[1] ← 9; a[2] ← 4; a[3] ← 8; a[4] ← 1; a[5] ← 6\n\n// TODO: FOR i ← 1 TO 4 — find minIdx in a[i..5], swap a[i] ↔ a[minIdx]\n\nline ← NUM_TO_STR(a[1])\nFOR i ← 2 TO 5\n   line ← line & \" \" & NUM_TO_STR(a[i])\nNEXT i\nOUTPUT line"
+      },
+      {
+        "id": "s5",
+        "title": "Count the Swaps",
+        "xp": 70,
+        "desc": "Bubble sort [5,1,4,2,8] counting every swap. Output the sorted line, then \"Swaps: 4\".",
+        "expect": [
+          "1 2 4 5 8",
+          "Swaps: 4"
+        ],
+        "starter": "// Bubble sort — how much work was done?\nDECLARE a : ARRAY[1:5] OF INTEGER\nDECLARE i, swaps, temp : INTEGER\nDECLARE swapped : BOOLEAN\nDECLARE line : STRING\na[1] ← 5; a[2] ← 1; a[3] ← 4; a[4] ← 2; a[5] ← 8\nswaps ← 0\n// TODO: REPEAT bubble passes UNTIL no swap — count each swap\n\nline ← NUM_TO_STR(a[1])\nFOR i ← 2 TO 5\n   line ← line & \" \" & NUM_TO_STR(a[i])\nNEXT i\nOUTPUT line\nOUTPUT \"Swaps: \" & NUM_TO_STR(swaps)"
+      }
+    ]
+  },
+  "adt": {
+    "name": "🧱 Stacks, Queues & Lists",
+    "icon": "🧱",
+    "exercises": [
+      {
+        "id": "a1",
+        "title": "Stack Reverse",
+        "xp": 50,
+        "desc": "Push each character of \"STACK\" onto a stack, then pop everything into one string. Output the result.",
+        "expect": [
+          "KCATS"
+        ],
+        "starter": "// LIFO reverses! Character i of s is RIGHT(LEFT(s, i), 1)\nDECLARE stack : ARRAY[1:10] OF STRING\nDECLARE sp, i : INTEGER\nDECLARE word, result : STRING\nword ← \"STACK\"\nsp ← 0\n// TODO: push each character (sp ← sp + 1; stack[sp] ← ch)\n// TODO: pop all into result, then OUTPUT result"
+      },
+      {
+        "id": "a2",
+        "title": "Ticket Queue",
+        "xp": 55,
+        "desc": "Queue A,B,C,D,E. Serve (dequeue + output) two customers, then F joins. Output \"Front: <v>\" and \"Rear: <v>\".",
+        "expect": [
+          "A",
+          "B",
+          "Front: C",
+          "Rear: F"
+        ],
+        "starter": "// FIFO queue with front/rear pointers\nDECLARE q : ARRAY[1:10] OF STRING\nDECLARE front, rear : INTEGER\nfront ← 1\nrear ← 0\n// TODO: enqueue A,B,C,D,E (rear ← rear + 1; q[rear] ← item)\n// TODO: dequeue twice — OUTPUT each served item (front moves)\n// TODO: enqueue F\n// then: OUTPUT \"Front: \" & q[front]\n//       OUTPUT \"Rear: \" & q[rear]"
+      },
+      {
+        "id": "a3",
+        "title": "List Length",
+        "xp": 60,
+        "desc": "A linked list lives in data[]/nxt[] arrays (0 = null). Walk it from startPtr and output \"Length: 4\".",
+        "expect": [
+          "Length: 4"
+        ],
+        "starter": "// Count the nodes by following the pointers\nDECLARE data : ARRAY[1:5] OF INTEGER\nDECLARE nxt : ARRAY[1:5] OF INTEGER\nDECLARE startPtr, p, count : INTEGER\ndata[1] ← 12 : nxt[1] ← 3\ndata[2] ← 99 : nxt[2] ← 0\ndata[3] ← 34 : nxt[3] ← 5\ndata[5] ← 51 : nxt[5] ← 2\nstartPtr ← 1\ncount ← 0\n// TODO: p ← startPtr; walk WHILE p <> 0, counting nodes\n// then: OUTPUT \"Length: \" & NUM_TO_STR(count)"
+      },
+      {
+        "id": "a4",
+        "title": "Running Minimum",
+        "xp": 70,
+        "desc": "Push 7,3,9,2,5 onto a stack, outputting the minimum-so-far after each push.",
+        "expect": [
+          "7",
+          "3",
+          "3",
+          "2",
+          "2"
+        ],
+        "starter": "// Min-tracking stack (a classic interview/exam favourite)\nDECLARE vals : ARRAY[1:5] OF INTEGER\nDECLARE i, minSoFar : INTEGER\nvals[1] ← 7; vals[2] ← 3; vals[3] ← 9; vals[4] ← 2; vals[5] ← 5\n// TODO: loop the pushes — update minSoFar and OUTPUT it each time"
+      },
+      {
+        "id": "a5",
+        "title": "BST Insert Path",
+        "xp": 80,
+        "desc": "A BST holds 50 (root), 30/70, and 20/40 under 30. Trace inserting 45: output the L/R turns taken as one line, e.g. \"L R R\".",
+        "expect": [
+          "L R R"
+        ],
+        "starter": "// Which way at each node? 45 vs 50 → L, vs 30 → R, vs 40 → R\nDECLARE val   : ARRAY[1:5] OF INTEGER\nDECLARE left  : ARRAY[1:5] OF INTEGER\nDECLARE right : ARRAY[1:5] OF INTEGER\nDECLARE node, target : INTEGER\nDECLARE path : STRING\nval[1] ← 50 : left[1] ← 2 : right[1] ← 3\nval[2] ← 30 : left[2] ← 4 : right[2] ← 5\nval[3] ← 70 : left[3] ← 0 : right[3] ← 0\nval[4] ← 20 : left[4] ← 0 : right[4] ← 0\nval[5] ← 40 : left[5] ← 0 : right[5] ← 0\ntarget ← 45\nnode ← 1\npath ← \"\"\n// TODO: walk down — append \"L\" or \"R\" (space-separated) until the\n// child pointer is 0, then OUTPUT path"
+      }
+    ]
+  },
+  "str": {
+    "name": "🔤 String Processing",
+    "icon": "🔤",
+    "exercises": [
+      {
+        "id": "t1",
+        "title": "Vowel Count",
+        "xp": 45,
+        "desc": "Count the vowels in \"COMPUTER SCIENCE\". Output \"Vowels: 6\".",
+        "expect": [
+          "Vowels: 6"
+        ],
+        "starter": "// Character i of s: RIGHT(LEFT(s, i), 1)\nDECLARE s, ch : STRING\nDECLARE i, count : INTEGER\ns ← \"COMPUTER SCIENCE\"\ncount ← 0\n// TODO: loop the characters — count A, E, I, O, U\n// then: OUTPUT \"Vowels: \" & NUM_TO_STR(count)"
+      },
+      {
+        "id": "t2",
+        "title": "Initials",
+        "xp": 55,
+        "desc": "Extract the initials of \"GRACE BREWSTER HOPPER\" → output \"GBH\".",
+        "expect": [
+          "GBH"
+        ],
+        "starter": "// First character + every character after a space\nDECLARE s, ch, initials : STRING\nDECLARE i : INTEGER\ns ← \"GRACE BREWSTER HOPPER\"\ninitials ← LEFT(s, 1)\n// TODO: scan the string — when you see a space, take the NEXT char\n// then: OUTPUT initials"
+      },
+      {
+        "id": "t3",
+        "title": "Word Count",
+        "xp": 50,
+        "desc": "Count the words in \"TO BE OR NOT TO BE\" (words = spaces + 1). Output \"Words: 6\".",
+        "expect": [
+          "Words: 6"
+        ],
+        "starter": "DECLARE s, ch : STRING\nDECLARE i, spaces : INTEGER\ns ← \"TO BE OR NOT TO BE\"\nspaces ← 0\n// TODO: count the spaces, then OUTPUT \"Words: \" & NUM_TO_STR(spaces + 1)"
+      },
+      {
+        "id": "t4",
+        "title": "Caesar Decode",
+        "xp": 70,
+        "desc": "Decrypt \"KHOOR\" (Caesar cipher, shift 3) using an alphabet lookup. Output \"HELLO\".",
+        "expect": [
+          "HELLO"
+        ],
+        "starter": "// Decrypt = shift each letter BACK by 3 (wrap Z→W … C→Z)\nDECLARE alpha, cipher, plain, ch : STRING\nDECLARE i, j, pos : INTEGER\nalpha ← \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\ncipher ← \"KHOOR\"\nplain ← \"\"\n// TODO: for each character find its position in alpha,\n// shift back 3 with MOD 26 wrap: pos ← ((pos - 1 - 3 + 26) MOD 26) + 1\n// then append the new letter — finally OUTPUT plain"
+      },
+      {
+        "id": "t5",
+        "title": "Run-Length Encoding",
+        "xp": 80,
+        "desc": "Compress \"AAABBCDDDD\" with run-length encoding. Output \"A3B2C1D4\".",
+        "expect": [
+          "A3B2C1D4"
+        ],
+        "starter": "// RLE: letter + how many times it repeats consecutively\nDECLARE s, cur, ch, result : STRING\nDECLARE i, runLen : INTEGER\ns ← \"AAABBCDDDD\"\nresult ← \"\"\n// TODO: walk the string tracking the current run — when the character\n// changes (or at the end), append cur & NUM_TO_STR(runLen)\n// then OUTPUT result"
+      }
+    ]
+  },
+  "pp41mj21": {
+    "name": "📄 Paper 4 · 9618/41 M/J 2021",
+    "icon": "📄",
+    "exercises": [
+      {
+        "id": "ppa1",
+        "title": "Q1 — Array Processing",
+        "xp": 80,
+        "desc": "<strong>Q1</strong> <em>(9618/41 M/J 2021 adapted — 8 marks)</em><br>Temperatures for 8 days are stored in <code>temps[1:8]</code> = 21, 25, 19, 30, 27, 30, 18, 24. Write a program that finds the hottest day (the <em>first</em> day the maximum occurs) and the mean temperature.<br>Output exactly: <strong>Hottest: 30 at day 4</strong> then <strong>Average: 24.25</strong>.",
+        "expect": [
+          "Hottest: 30 at day 4",
+          "Average: 24.25"
+        ],
+        "starter": "// Q1 — hottest day + mean of 8 readings\nDECLARE temps : ARRAY[1:8] OF INTEGER\nDECLARE i, maxVal, maxDay, total : INTEGER\ntemps[1] ← 21; temps[2] ← 25; temps[3] ← 19; temps[4] ← 30\ntemps[5] ← 27; temps[6] ← 30; temps[7] ← 18; temps[8] ← 24\n\n// TODO: one loop — find max (first occurrence) and total\n// OUTPUT \"Hottest: \" & NUM_TO_STR(maxVal) & \" at day \" & NUM_TO_STR(maxDay)\n// OUTPUT \"Average: \" & NUM_TO_STR(total / 8)"
+      },
+      {
+        "id": "ppa2",
+        "title": "Q2 — Recursion",
+        "xp": 60,
+        "desc": "<strong>Q2</strong> <em>(9618/41 M/J 2021 adapted — 6 marks)</em><br>A recursive function is defined as:<br><code>Test(X) = 1 when X ≤ 1, otherwise X × Test(X − 2)</code><br>Write <code>Test</code> and output <code>Test(7)</code> then <code>Test(6)</code>. Expected: <strong>105</strong> then <strong>48</strong>.",
+        "expect": [
+          "105",
+          "48"
+        ],
+        "starter": "// Q2 — implement the recursive definition\nFUNCTION Test(X : INTEGER) RETURNS INTEGER\n   // TODO: base case and recursive case (X * Test(X - 2))\n   RETURN 0\nENDFUNCTION\n\nOUTPUT Test(7)   // expected: 105\nOUTPUT Test(6)   // expected: 48"
+      },
+      {
+        "id": "ppa3",
+        "title": "Q3 — Stack Implementation",
+        "xp": 100,
+        "desc": "<strong>Q3</strong> <em>(9618/41 M/J 2021 adapted — 10 marks)</em><br>Implement a stack in <code>stack[1:5]</code> with pointer <code>sp</code> (0 = empty). <code>Push</code> outputs <strong>Stack full</strong> when full; <code>Pop</code> returns the top item.<br>Run this sequence: Push 12, 5, 8 → output Pop() → Push 3, 9, 7 → Push 4 → output Pop().<br>Expected: <strong>8</strong>, <strong>Stack full</strong>, <strong>7</strong>.",
+        "expect": [
+          "8",
+          "Stack full",
+          "7"
+        ],
+        "starter": "// Q3 — array stack with full/empty handling\nDECLARE stack : ARRAY[1:5] OF INTEGER\nDECLARE sp : INTEGER\nsp ← 0\n\nPROCEDURE Push(item : INTEGER)\n   // TODO: full check (sp = 5 → OUTPUT \"Stack full\"), else push\nENDPROCEDURE\n\nFUNCTION Pop() RETURNS INTEGER\n   DECLARE item : INTEGER\n   // TODO: take stack[sp], decrement sp, return it\n   RETURN 0\nENDFUNCTION\n\nCALL Push(12)\nCALL Push(5)\nCALL Push(8)\nOUTPUT Pop()   // expected: 8\nCALL Push(3)\nCALL Push(9)\nCALL Push(7)\nCALL Push(4)   // expected: Stack full\nOUTPUT Pop()   // expected: 7"
+      },
+      {
+        "id": "ppa4",
+        "title": "Q4 — OOP: Ticket Classes",
+        "xp": 120,
+        "desc": "<strong>Q4</strong> <em>(9618/41 M/J 2021 adapted — 12 marks)</em><br>Write, in your exam language, a class <code>Ticket</code> with private attributes <code>rowNumber</code> and <code>price</code>, a constructor that sets both, and a method <code>GetPrice()</code>. Then write a child class <code>VIPTicket</code> that overrides <code>GetPrice()</code> to add a 50% premium. Create one of each (row 5, price 20.00) and print both prices — <strong>20.00</strong> and <strong>30.00</strong>.",
+        "expect": [],
+        "starter": ""
+      },
+      {
+        "id": "ppa5",
+        "title": "Q5 — Text File Processing",
+        "xp": 80,
+        "desc": "<strong>Q5</strong> <em>(9618/41 M/J 2021 adapted — 8 marks)</em><br>Write, in your exam language, a program that opens <code>scores.txt</code> for reading, reads integer scores one per line until end of file, and prints the total and how many scores were read. Handle the file-not-found case with an appropriate message.",
+        "expect": [],
+        "starter": ""
+      }
+    ]
+  },
+  "pp42on22": {
+    "name": "📄 Paper 4 · 9618/42 O/N 2022",
+    "icon": "📄",
+    "exercises": [
+      {
+        "id": "ppb1",
+        "title": "Q1 — Queue Simulation",
+        "xp": 80,
+        "desc": "<strong>Q1</strong> <em>(9618/42 O/N 2022 adapted — 8 marks)</em><br>A help desk queue is stored in <code>q[1:6]</code> with <code>front</code> and <code>rear</code> pointers. Join: Ali, Ben, Cy. Serve one (output the name), join Dee, serve one more (output the name).<br>Then output <strong>Front: Cy</strong> and <strong>Size: 2</strong>.",
+        "expect": [
+          "Ali",
+          "Ben",
+          "Front: Cy",
+          "Size: 2"
+        ],
+        "starter": "// Q1 — linear queue with front/rear\nDECLARE q : ARRAY[1:6] OF STRING\nDECLARE front, rear : INTEGER\nfront ← 1\nrear ← 0\n\n// TODO: join Ali, Ben, Cy\n// TODO: serve one (OUTPUT the name served)\n// TODO: join Dee, serve one more\n// then: OUTPUT \"Front: \" & q[front]\n//       OUTPUT \"Size: \" & NUM_TO_STR(rear - front + 1)"
+      },
+      {
+        "id": "ppb2",
+        "title": "Q2 — Linked List Insert",
+        "xp": 100,
+        "desc": "<strong>Q2</strong> <em>(9618/42 O/N 2022 adapted — 10 marks)</em><br>A sorted linked list 5 → 12 → 19 → 26 is stored in <code>data[1:5]</code>/<code>nxt[1:5]</code> (0 = null, <code>startPtr</code> = 1). Insert <strong>15</strong> at node 5 keeping the list sorted, then traverse from <code>startPtr</code>.<br>Expected: <strong>5 12 15 19 26</strong>.",
+        "expect": [
+          "5 12 15 19 26"
+        ],
+        "starter": "// Q2 — sorted insert into a linked list (arrays, 0 = null)\nDECLARE data : ARRAY[1:5] OF INTEGER\nDECLARE nxt : ARRAY[1:5] OF INTEGER\nDECLARE startPtr, p, newNode : INTEGER\nDECLARE searching : BOOLEAN\ndata[1] ← 5  : nxt[1] ← 2\ndata[2] ← 12 : nxt[2] ← 3\ndata[3] ← 19 : nxt[3] ← 4\ndata[4] ← 26 : nxt[4] ← 0\nstartPtr ← 1\n\nnewNode ← 5\ndata[newNode] ← 15\n// TODO: find the node BEFORE the insertion point, re-link newNode\n\nDECLARE line : STRING\np ← startPtr\nline ← \"\"\nWHILE p <> 0 DO\n   IF line = \"\" THEN\n      line ← NUM_TO_STR(data[p])\n   ELSE\n      line ← line & \" \" & NUM_TO_STR(data[p])\n   ENDIF\n   p ← nxt[p]\nENDWHILE\nOUTPUT line   // expected: 5 12 15 19 26"
+      },
+      {
+        "id": "ppb3",
+        "title": "Q3 — Recursive Character Count",
+        "xp": 60,
+        "desc": "<strong>Q3</strong> <em>(9618/42 O/N 2022 adapted — 6 marks)</em><br>Write a recursive function <code>CountChar(s, ch)</code> that counts how many times character <code>ch</code> appears in string <code>s</code> — no loops allowed.<br>Output CountChar(\"MISSISSIPPI\", \"S\") then CountChar(\"BANANA\", \"A\"). Expected: <strong>4</strong> then <strong>3</strong>.",
+        "expect": [
+          "4",
+          "3"
+        ],
+        "starter": "// Q3 — recursion only, no loops!\nFUNCTION CountChar(s : STRING, ch : STRING) RETURNS INTEGER\n   // TODO: base case (empty string → 0)\n   // TODO: 1 or 0 for LEFT(s,1) = ch, plus CountChar(rest, ch)\n   RETURN 0\nENDFUNCTION\n\nOUTPUT CountChar(\"MISSISSIPPI\", \"S\")   // expected: 4\nOUTPUT CountChar(\"BANANA\", \"A\")        // expected: 3"
+      },
+      {
+        "id": "ppb4",
+        "title": "Q4 — OOP: Bank Accounts",
+        "xp": 120,
+        "desc": "<strong>Q4</strong> <em>(9618/42 O/N 2022 adapted — 12 marks)</em><br>Write, in your exam language, a class <code>Account</code> with a private <code>balance</code>, a constructor, and methods <code>Deposit(amount)</code> and <code>GetBalance()</code>. Write a child class <code>SavingsAccount</code> adding <code>AddInterest()</code> that increases the balance by 2.5%. Create a SavingsAccount with 1000, deposit 200, add interest, and print the balance — <strong>1230.00</strong>.",
+        "expect": [],
+        "starter": ""
+      },
+      {
+        "id": "ppb5",
+        "title": "Q5 — Random-Access File",
+        "xp": 90,
+        "desc": "<strong>Q5</strong> <em>(9618/42 O/N 2022 adapted — 9 marks)</em><br>Write, in your exam language, a program that stores product records (ID : INTEGER, name : STRING×20, stock : INTEGER) in a <em>random-access</em> file. Write a procedure that seeks directly to the record at position <code>ID</code> and updates its stock, without reading the whole file.",
+        "expect": [],
+        "starter": ""
+      }
+    ]
+  }
+}
