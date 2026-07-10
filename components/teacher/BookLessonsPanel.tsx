@@ -490,10 +490,10 @@ export function BookLessonsPanel({ classId, className, teacherId, isALevel = fal
 
   // ── Split lessons into two papers depending on AS or A Level ───────────────
   const paper1Lessons = isALevel
-    ? (lessons ?? []).filter(l => (l.chapter_num ?? 0) >= 16 && (l.chapter_num ?? 0) <= 20)
+    ? (lessons ?? []).filter(l => (l.chapter_num ?? 0) >= 16 && (l.chapter_num ?? 0) <= 22)
     : (lessons ?? []).filter(l => (l.chapter_num ?? 0) >= 1  && (l.chapter_num ?? 0) <= 10)
   const paper2Lessons = isALevel
-    ? (lessons ?? []).filter(l => (l.chapter_num ?? 0) >= 21 && (l.chapter_num ?? 0) <= 25)
+    ? (lessons ?? []).filter(l => (l.chapter_num ?? 0) >= 23 && (l.chapter_num ?? 0) <= 29)
     : (lessons ?? []).filter(l => (l.chapter_num ?? 0) >= 11 && (l.chapter_num ?? 0) <= 15)
 
   function groupByChapter(list: GeneratedLesson[]) {
@@ -523,8 +523,8 @@ export function BookLessonsPanel({ classId, className, teacherId, isALevel = fal
               Upload the Cambridge 9618 textbook PDF. ByteForge generates lessons for{' '}
               {isALevel ? (
                 <>
-                  <strong className="text-fg">Paper 3 (Chapters 16–20)</strong> and{' '}
-                  <strong className="text-fg">Paper 4 (Chapters 21–25)</strong> — the full A Level syllabus.
+                  <strong className="text-fg">Paper 3 (Chapters 16–22)</strong> and{' '}
+                  <strong className="text-fg">Paper 4 (Chapters 23–29)</strong> — the full A Level syllabus.
                 </>
               ) : (
                 <>
@@ -679,8 +679,8 @@ export function BookLessonsPanel({ classId, className, teacherId, isALevel = fal
             {(
               isALevel
                 ? [
-                    { label: 'Paper 3 — Advanced Theory', color: 'text-blue-400', dot: 'bg-blue-400', lessons: paper1Lessons, range: 'Chapters 16–20' },
-                    { label: 'Paper 4 — Advanced Programming', color: 'text-violet-400', dot: 'bg-violet-400', lessons: paper2Lessons, range: 'Chapters 21–25' },
+                    { label: 'Paper 3 — Advanced Theory', color: 'text-blue-400', dot: 'bg-blue-400', lessons: paper1Lessons, range: 'Chapters 16–22' },
+                    { label: 'Paper 4 — Advanced Programming', color: 'text-violet-400', dot: 'bg-violet-400', lessons: paper2Lessons, range: 'Chapters 23–29' },
                   ]
                 : [
                     { label: 'Paper 1 — Theory Fundamentals', color: 'text-blue-400', dot: 'bg-blue-400', lessons: paper1Lessons, range: 'Chapters 1–10' },
