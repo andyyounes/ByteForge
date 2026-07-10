@@ -6,9 +6,9 @@ const html = readFileSync('c:/Users/user/Downloads/ICT website/public/lessons/gr
 const s1 = html.indexOf('function runMaze(')
 const e1 = html.indexOf('// ══', s1 + 10)
 const s2 = html.indexOf('const W1_STAGES = [')
-const e2 = html.indexOf('// ══', s2)
+const e2 = html.indexOf('const ALL_STAGES')
 const ctx = html.slice(s1, e1) + html.slice(s2, e2)
-const { runMaze, W1_STAGES } = new Function(ctx + '\nreturn { runMaze, W1_STAGES }')()
+const { runMaze, W1_STAGES, W2_STAGES } = new Function(ctx + '\nreturn { runMaze, W1_STAGES, W2_STAGES }')()
 
 function optimal(grid) {
   const rows = grid.length, cols = grid[0].length
@@ -56,5 +56,38 @@ for (const st of W1_STAGES) {
     console.log(`✓ ${label} — optimal ${opt} == par`)
   })
 }
+
+// ── World 2 — par is CHIPS (with ×2–×5 repeats). Verify each reference chip
+// solution solves the maze and uses exactly par chips; mazes must be solvable.
+const W2_SOLS = {
+  'w2s1':        [['R',5],['R',4]],
+  'w2s2':        [['R',4],['U',2],['R',3],['U',2]],
+  'w2s3':        [['R',4],['D',3],['L',4]],
+  'w2s4':        [['R',5],['R',2],['D',2],['L',5],['L',2],['D',2]],
+  'w2boss-m1':   [['D',3],['R',2],['U',3],['R',2],['D',3],['R',2],['U',3]],
+  'w2boss-m2':   [['R',5],['R',1],['D',4],['L',5],['L',1]],
+}
+function flatten(chips) {
+  const flat = []
+  for (const [c, n] of chips) for (let k = 0; k < n; k++) flat.push(c)
+  return flat
+}
+for (const st of W2_STAGES) {
+  const mazes = st.boss ? st.mazes : [st]
+  mazes.forEach((m, i) => {
+    const label = st.id + (st.boss ? ' maze' + (i + 1) : '')
+    const solKey = st.boss ? st.id + '-m' + (i + 1) : st.id
+    if (optimal(m.grid) === -1) { fail++; console.log(`✗ ${label} — UNSOLVABLE`); return }
+    const sol = W2_SOLS[solKey]
+    if (!sol) { fail++; console.log(`✗ ${label} — no reference chip solution`); return }
+    const bad = sol.find(([, n]) => n < 1 || n > 5)
+    if (bad) { fail++; console.log(`✗ ${label} — solution uses illegal multiplier`); return }
+    const res = runMaze(m.grid, flatten(sol))
+    if (!res.ok) { fail++; console.log(`✗ ${label} — reference solution fails (${res.reason})`); return }
+    if (sol.length !== m.par) { fail++; console.log(`✗ ${label} — par ${m.par} but solution uses ${sol.length} chips`); return }
+    console.log(`✓ ${label} — ${sol.length} chips == par`)
+  })
+}
+
 console.log(fail ? `\n${fail} problems` : '\nall mazes solvable, all pars honest')
 process.exit(fail ? 1 : 0)

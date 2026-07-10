@@ -187,6 +187,15 @@
           <button class="cmd-btn" onclick="addCmd('L')" title="Left">⬅️</button>
           <button class="cmd-btn" onclick="addCmd('R')" title="Right">➡️</button>
         </div>
+        <div id="rep-row" style="display:none;margin-top:10px;">
+          <div class="deck-title" style="color:#fbbf24;">🔁 REPEAT the last command</div>
+          <div class="cmd-buttons" style="margin-top:4px;">
+            <button class="cmd-btn" style="font-size:14px;font-weight:900;border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.1);" onclick="setRep(2)">×2</button>
+            <button class="cmd-btn" style="font-size:14px;font-weight:900;border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.1);" onclick="setRep(3)">×3</button>
+            <button class="cmd-btn" style="font-size:14px;font-weight:900;border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.1);" onclick="setRep(4)">×4</button>
+            <button class="cmd-btn" style="font-size:14px;font-weight:900;border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.1);" onclick="setRep(5)">×5</button>
+          </div>
+        </div>
       </div>
       <div>
         <div class="deck-title">📜 YOUR PROGRAM — tap a step to remove it</div>
@@ -326,11 +335,70 @@ const W1_STAGES = [
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
-// The quest map — 12 worlds (only World 1 playable in this release)
+// World 2 — Block Basics: commands become repeatable chips (par = CHIPS, not
+// moves — repeats make programs shorter, planting the loops idea)
+// ══════════════════════════════════════════════════════════════════════════════
+const W2_STAGES = [
+  { id: 'w2s1', title: 'The Long Road', emoji: '🛣️', par: 2, xp: 20, repeats: true,
+    goal: 'NEW POWER: tap ×2–×5 to repeat your last command. 9 steps in just 2 chips!',
+    grid: ['############',
+           '#S........G#',
+           '############'] },
+  { id: 'w2s2', title: 'The Staircase', emoji: '🪜', par: 4, xp: 25, repeats: true,
+    goal: 'Climb the staircase — each straight run is ONE chip with a repeat.',
+    grid: ['##########',
+           '########G#',
+           '########.#',
+           '#####....#',
+           '#####.####',
+           '#S....####',
+           '##########'] },
+  { id: 'w2s3', title: 'The Big Square', emoji: '🔲', par: 3, xp: 25, repeats: true,
+    goal: 'All the way around the block — 11 steps in only 3 chips. Feel the power!',
+    grid: ['#######',
+           '#S....#',
+           '#.###.#',
+           '#.###.#',
+           '#G....#',
+           '#######'] },
+  { id: 'w2s4', title: 'Star Runner', emoji: '🌠', par: 6, xp: 30, repeats: true,
+    goal: 'Grab both stars on the long corridors. Plan your repeats!',
+    grid: ['##########',
+           '#S...*...#',
+           '########.#',
+           '#*.......#',
+           '#.########',
+           '#G########',
+           '##########'] },
+  { id: 'w2boss', title: 'BOSS — Block Gauntlet', emoji: '🐲', boss: true, xp: 70, repeats: true,
+    goal: 'Two big mazes. Fewest chips wins the crown.',
+    mazes: [
+      { par: 7,
+        grid: ['#########',
+               '#S#...#G#',
+               '#.#.#.#.#',
+               '#.#.#.#.#',
+               '#...#...#',
+               '#########'] },
+      { par: 5,
+        grid: ['#########',
+               '#S......#',
+               '#.#####.#',
+               '#.#####.#',
+               '#.#####.#',
+               '#G..*...#',
+               '#########'] },
+    ] },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES]
+
+// ══════════════════════════════════════════════════════════════════════════════
+// The quest map — 12 worlds (Worlds 1–2 playable in this release)
 // ══════════════════════════════════════════════════════════════════════════════
 const WORLDS = [
   { id: 'w1',  name: '🤖 Robot Road',        sub: 'Command a robot — no code yet!',            stages: W1_STAGES, live: true },
-  { id: 'w2',  name: '🧩 Block Basics',       sub: 'Your commands become drag-and-drop blocks', count: 5,  live: false },
+  { id: 'w2',  name: '🧩 Block Basics',       sub: 'Repeat chips — your first taste of loops',  stages: W2_STAGES, live: true },
   { id: 'w3',  name: '🎨 Color & Shape Lab',  sub: 'Mix light, draw shapes, code with numbers', count: 6,  live: false },
   { id: 'w4',  name: '🔁 Loop Land',          sub: 'Why write it 10 times? Repeat!',            count: 6,  live: false },
   { id: 'w5',  name: '🐢 Turtle Island',      sub: 'Loops + angles = amazing art',              count: 6,  live: false },
@@ -355,7 +423,7 @@ function stageStars(id) { return (getProg()[id] || {}).stars || 0 }
 function totalStats() {
   const p = getProg()
   let stars = 0, xp = 0, bosses = 0
-  for (const s of W1_STAGES) {
+  for (const s of ALL_STAGES) {
     const e = p[s.id]
     if (!e) continue
     stars += e.stars || 0
@@ -428,7 +496,7 @@ let program = []
 let running = false
 let gauntletCmds = 0        // total commands used across a boss gauntlet
 
-function findStage(id) { return W1_STAGES.find(s => s.id === id) }
+function findStage(id) { return ALL_STAGES.find(s => s.id === id) }
 
 function openStage(id) {
   activeStage = findStage(id)
@@ -452,6 +520,7 @@ function loadMaze() {
   document.getElementById('p-par').textContent = '3★ target: ' + m.par + ' commands'
   program = []
   running = false
+  document.getElementById('rep-row').style.display = activeStage.repeats ? '' : 'none'
   renderBoard(m.grid)
   renderProgram()
   document.getElementById('feedback').textContent = ''
@@ -485,7 +554,12 @@ const CMD_ICON = { U: '⬆️', D: '⬇️', L: '⬅️', R: '➡️' }
 function addCmd(c) {
   if (running) return
   if (program.length >= 40) { toast('That\'s a lot of commands! Try Clear and think shorter 😄'); return }
-  program.push(c)
+  program.push({ c: c, n: 1 })
+  renderProgram()
+}
+function setRep(n) {
+  if (running || !program.length) return
+  program[program.length - 1].n = n
   renderProgram()
 }
 function removeCmd(i) { if (!running) { program.splice(i, 1); renderProgram() } }
@@ -494,12 +568,24 @@ function clearProgram() { if (!running) { program = []; renderProgram(); loadMaz
 function renderProgram() {
   const el = document.getElementById('program')
   el.innerHTML = program.length
-    ? program.map((c, i) => '<div class="chip" id="chip-' + i + '" onclick="removeCmd(' + i + ')">' + CMD_ICON[c] + '</div>').join('')
+    ? program.map((p, i) => '<div class="chip" id="chip-' + i + '" onclick="removeCmd(' + i + ')">'
+        + CMD_ICON[p.c] + (p.n > 1 ? '<span style="font-size:10px;font-weight:900;color:#fbbf24;">×' + p.n + '</span>' : '')
+        + '</div>').join('')
     : '<div class="prog-hint">Add commands, then press RUN ▶</div>'
   const m = currentMaze()
+  const label = activeStage && activeStage.repeats ? 'chip' : 'command'
   document.getElementById('cmd-count').innerHTML = program.length
-    ? '<b>' + program.length + '</b> command' + (program.length !== 1 ? 's' : '') + ' (3★ target: ' + m.par + ')'
+    ? '<b>' + program.length + '</b> ' + label + (program.length !== 1 ? 's' : '') + ' (3★ target: ' + m.par + ')'
     : ''
+}
+
+// Expand repeat chips into single moves; remember which chip each move belongs to
+function flattenProgram() {
+  const flat = [], chipOf = []
+  program.forEach((p, i) => {
+    for (let k = 0; k < p.n; k++) { flat.push(p.c); chipOf.push(i) }
+  })
+  return { flat, chipOf }
 }
 
 async function runProgram() {
@@ -507,17 +593,19 @@ async function runProgram() {
   running = true
   document.getElementById('run-btn').disabled = true
   const m = currentMaze()
-  const result = runMaze(m.grid, program)
+  const { flat, chipOf } = flattenProgram()
+  const result = runMaze(m.grid, flat)
   const fb = document.getElementById('feedback')
   fb.textContent = ''
 
   // animate step by step
   for (let i = 1; i < result.steps.length; i++) {
-    const chip = document.getElementById('chip-' + (i - 1))
+    document.querySelectorAll('.chip.active').forEach(c => c.classList.remove('active'))
+    const chip = document.getElementById('chip-' + chipOf[i - 1])
     if (chip) chip.classList.add('active')
     placeBot(result.steps[i].x, result.steps[i].y)
     const key = result.steps[i].y + ',' + result.steps[i].x
-    await sleep(300)
+    await sleep(280)
     if (result.collected.has(key)) {
       const t = document.getElementById('t-' + result.steps[i].y + '-' + result.steps[i].x)
       if (t && t.textContent === '⭐') { t.textContent = '✨'; }
@@ -573,7 +661,7 @@ function completeStage(stars) {
   saveProg(p)
 
   // server best-effort
-  const idx = W1_STAGES.indexOf(activeStage)
+  const idx = ALL_STAGES.indexOf(activeStage)
   try { LessonSaves.save('grade6-quest', idx, { passed: true, xpEarned: xp }) } catch (e) {}
   try { if (typeof me !== 'undefined' && me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
 
@@ -585,7 +673,7 @@ function completeStage(stars) {
     stars === 2 ? 'Great! Can you find a shorter way for 3 stars?' :
     'Done! Try again with fewer commands for more stars.'
   document.getElementById('win-xp').textContent = xp > 0 ? '+' + xp + ' XP' : 'Already earned — go for more stars!'
-  const next = W1_STAGES[idx + 1]
+  const next = ALL_STAGES[idx + 1]
   document.getElementById('win-next').style.display = next ? '' : 'none'
   document.getElementById('win').classList.add('open')
   running = false
@@ -594,8 +682,8 @@ function completeStage(stars) {
 
 function winNext() {
   document.getElementById('win').classList.remove('open')
-  const idx = W1_STAGES.indexOf(activeStage)
-  const next = W1_STAGES[idx + 1]
+  const idx = ALL_STAGES.indexOf(activeStage)
+  const next = ALL_STAGES[idx + 1]
   if (next) openStage(next.id)
   else winMap()
 }
