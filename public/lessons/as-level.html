@@ -1039,6 +1039,19 @@
     .panel-host { transition:margin-right .38s cubic-bezier(.22,.9,.3,1); }
     @keyframes bfwIn { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:none } }
     .bfw-m { animation:bfwIn .25s ease; }
+    /* The tutor character — bobs, blinks, antenna pulses, wiggles when thinking */
+    .bfw-avatar { flex-shrink:0; animation:bfwBob 3.2s ease-in-out infinite; }
+    @keyframes bfwBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2.5px)} }
+    .bfw-eyes { transform-origin:20px 23px; animation:bfwBlink 4.6s infinite; }
+    @keyframes bfwBlink { 0%,91%,100%{transform:scaleY(1)} 94%{transform:scaleY(.12)} 97%{transform:scaleY(1)} }
+    .bfw-ant { animation:bfwGlow 2s ease-in-out infinite; }
+    @keyframes bfwGlow { 0%,100%{opacity:.45} 50%{opacity:1} }
+    .bfw-thinking .bfw-avatar { animation:bfwWiggle .9s ease-in-out infinite; }
+    @keyframes bfwWiggle { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-9deg) translateY(-2px)} 75%{transform:rotate(9deg) translateY(-2px)} }
+    .bfw-dots i { display:inline-block; width:6px; height:6px; border-radius:50%; background:#a78bfa; margin-right:3px; animation:bfwDot 1s infinite; }
+    .bfw-dots i:nth-child(2) { animation-delay:.15s } .bfw-dots i:nth-child(3) { animation-delay:.3s }
+    @keyframes bfwDot { 0%,100%{transform:translateY(0);opacity:.4} 50%{transform:translateY(-4px);opacity:1} }
+    #bfw-bubble .bfw-avatar { display:block; margin:0 auto; }
     .bfw-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#111320; border-bottom:1px solid rgba(255,255,255,.08); }
     .bfw-hdr-title { font-size:13px; font-weight:800; color:#c4b5fd; }
     .bfw-hdr-sub { font-size:10px; color:#6b7280; max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -7165,6 +7178,15 @@ async function pseudoLabAiCheck() {
 let _bfwCtx = null
 let _bfwBooted = false
 
+// The tutor character — a small SVG robot (bobbing, blinking via CSS)
+const _BFW_AV = '<svg class="bfw-avatar" width="34" height="34" viewBox="0 0 40 40">'
+  + '<circle class="bfw-ant" cx="20" cy="5" r="2.6" fill="#e879f9"/>'
+  + '<line x1="20" y1="7" x2="20" y2="12" stroke="#a78bfa" stroke-width="2"/>'
+  + '<rect x="6" y="12" width="28" height="22" rx="7" fill="#7c3aed"/>'
+  + '<rect x="10" y="16" width="20" height="14" rx="5" fill="#0d0f1a"/>'
+  + '<g class="bfw-eyes"><circle cx="16" cy="23" r="2.6" fill="#b8ef4a"/><circle cx="24" cy="23" r="2.6" fill="#b8ef4a"/></g>'
+  + '</svg>'
+
 function _bfwSetContext(id, topic) {
   _bfwCtx = {
     id: id,
@@ -7180,9 +7202,10 @@ function _bfwBoot() {
   if (_bfwBooted) return
   _bfwBooted = true
   const wrap = document.createElement('div')
-  wrap.innerHTML = '<button id="bfw-bubble" onclick="_bfwToggle()" title="Ask the AI tutor about this lesson">💬</button>'
+  wrap.innerHTML = '<button id="bfw-bubble" onclick="_bfwToggle()" title="Ask the AI tutor about this lesson">' + _BFW_AV + '</button>'
     + '<div id="bfw-panel">'
-    + '<div class="bfw-hdr"><div><div class="bfw-hdr-title">🤖 AI Tutor</div><div class="bfw-hdr-sub" id="bfw-topic">Ask anything about the lesson</div></div>'
+    + '<div class="bfw-hdr"><div style="display:flex;align-items:center;gap:9px;">' + _BFW_AV
+    + '<div><div class="bfw-hdr-title">AI Tutor</div><div class="bfw-hdr-sub" id="bfw-topic">Ask anything about the lesson</div></div></div>'
     + '<button class="bfw-x" onclick="_bfwToggle()">×</button></div>'
     + '<div class="bfw-msgs" id="bfw-msgs"><div class="bfw-m bfw-a">Hi! I can see the lesson you\'re reading — ask me about a term you don\'t get, a worked example, or exam technique. 💡</div></div>'
     + '<div class="bfw-row"><textarea id="bfw-in" rows="1" placeholder="Ask about this lesson…" onkeydown="_bfwKey(event)"></textarea>'
@@ -7213,7 +7236,7 @@ function _bfwToggle() {
     // Slide out — give the lesson its full width back (and remember the choice)
     p.classList.remove('open')
     if (host) host.style.marginRight = ''
-    if (b) { b.style.right = '18px'; b.textContent = '💬'; b.title = 'Ask the AI tutor about this lesson' }
+    if (b) { b.style.right = '18px'; b.innerHTML = _BFW_AV; b.title = 'Ask the AI tutor about this lesson' }
     try { localStorage.setItem('bfw-closed', '1') } catch {}
   } else {
     try { localStorage.removeItem('bfw-closed') } catch {}
@@ -7221,7 +7244,7 @@ function _bfwToggle() {
     _bfwPlaceTop()
     p.classList.add('open')
     if (host) host.style.marginRight = '360px'
-    if (b) { b.style.right = '378px'; b.textContent = '✕'; b.title = 'Close the AI tutor' }
+    if (b) { b.style.right = '378px'; b.innerHTML = '✕'; b.title = 'Close the AI tutor' }
     const i = document.getElementById('bfw-in')
     if (i) setTimeout(function() { i.focus() }, 400)
     const m = document.getElementById('bfw-msgs')
@@ -7248,8 +7271,12 @@ async function _bfwSend() {
   input.value = ''
   btn.disabled = true
   const u = document.createElement('div'); u.className = 'bfw-m bfw-u'; u.textContent = text; msgs.appendChild(u)
-  const a = document.createElement('div'); a.className = 'bfw-m bfw-a'; a.textContent = 'Thinking…'; msgs.appendChild(a)
+  const a = document.createElement('div'); a.className = 'bfw-m bfw-a'
+  a.innerHTML = '<span class="bfw-dots"><i></i><i></i><i></i></span>'
+  msgs.appendChild(a)
   msgs.scrollTop = msgs.scrollHeight
+  const panel = document.getElementById('bfw-panel')
+  if (panel) panel.classList.add('bfw-thinking')
   try {
     const res = await fetch('/api/ai-check', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -7265,6 +7292,7 @@ async function _bfwSend() {
   } catch (_) {
     a.textContent = 'Could not reach the tutor — check your connection.'
   }
+  if (panel) panel.classList.remove('bfw-thinking')
   btn.disabled = false
   msgs.scrollTop = msgs.scrollHeight
 }
