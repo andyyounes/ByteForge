@@ -48,44 +48,58 @@ Computer Systems — mapped per grade below, feeding IGCSE CS (0478).
 
 ---
 
-# GRADE 6 — "The Pattern Explorer" (NEW)
+# GRADE 6 — "The Creator Studio" (NEW — v2)
 
-**36 weeks × 2h = 72h · blocks only · everything is a pattern**
+**36 weeks × 2h = 72h · blocks only · ten creative studios, each shipping something showable**
 
-Identity: computers follow instructions exactly; patterns (sequence, repetition, choice)
-are everywhere. Every concept is drawn, animated or played — nothing purely abstract.
+Identity: this year is a tour of *studios* — art, music, animation, games, robots, AI —
+and code is the paintbrush in every one. The CS concepts (sequence, loops, events,
+variables, decisions, data) are woven through the studios instead of being the headline.
+Modelled on what demonstrably hooks this age group: Code.org's Dance Party & Minecraft
+hours, AI for Oceans, Chrome Music Lab, Lightbot-style robot puzzles, Scratch stories.
 
-**Session format:** Hour 1 = unplugged/plugged concept + quick challenge · Hour 2 = build
-time on the running project.
+**Session format:** Hour 1 = studio skill (PRIMM on a tiny example) · Hour 2 = free build
+in that studio, shared to the class gallery. Every studio ends with a "publish" moment.
 
-### Term 1 — Think Like a Computer (W1–12)
-| Module | Weeks | Content | Platform asset |
-|--------|-------|---------|----------------|
-| M1 Computers & Me | 3 | Parts of a computer, input→process→output, healthy/safe use, strong passwords (e-safety #1) | new lesson page section |
-| M2 Sequences & Algorithms | 4 | Unplugged "robot teacher" (exact instructions), algorithms as recipes, first Blockly sequences, debugging by tracing steps | grade6-patterns.html |
-| M3 Loops & Patterns | 5 | Repeat-loops through turtle art: squares → polygons → spirals; decomposing a picture into repeated parts | blockly-turtle.html ✔ exists |
+### Term 1 — See the Code (W1–12)
+| Studio | Weeks | What they make | CS concepts smuggled in | Platform asset |
+|--------|-------|----------------|------------------------|----------------|
+| 🤖 S1 Robot School | 3 | Guide a virtual robot through mazes (Lightbot-style); design mazes for classmates | Sequencing, exact instructions, debugging | **new: robot-maze widget** |
+| 🎨 S2 Color Lab | 3 | Mix light! RGB sliders → their own palette; colour-by-code pixel art; name a colour after yourself | Numbers as values (0–255), coordinates, hex peek | **new: RGB mixer**, pixel-grid ✔ |
+| 🐢 S3 Turtle Art Studio | 4 | Geometric art posters: polygons → stars → spirals → mandala, in their Color Lab palette | Loops, repetition, decomposition | blockly-turtle ✔ |
+| 🖼 S4 Pixel & Secret Codes | 2 | Pixel art + binary card game — "images are secretly numbers"; hide a message in binary | Binary as a game (spiral seed for G8/9) | pixel-grid ✔, binary-cards ✔ |
 
-### Term 2 — Make It Move (W13–24)
-| Module | Weeks | Content | Platform asset |
-|--------|-------|---------|----------------|
-| M4 Events & Interaction | 4 | Key-press and click events, sprite movement, cause→effect chains | blockly.html |
-| M5 Variables & Score | 4 | A variable is a labelled box; counters, score, simple HUD | blockly.html |
-| M6 Decisions | 4 | If/else in blocks: boundaries, win/lose, touching detection | blockly.html |
+### Term 2 — Make It Alive (W13–24)
+| Studio | Weeks | What they make | CS concepts | Platform asset |
+|--------|-------|----------------|-------------|----------------|
+| 🎵 S5 Music Studio | 4 | Beat grid + melody maker (Chrome-Music-Lab-style step sequencer); loops = drum patterns, a "song" is an algorithm; remix a classmate's track | Loops, patterns, events, layering | **new: music-lab widget (Web Audio)** |
+| 💃 S6 Dance & Animation Party | 4 | Code a dancing character to a beat (Dance Party-style): moves on key-press, costume changes, backgrounds react to "music" | Events, sequences of states, timing | blockly.html + canvas |
+| 🕹 S7 Game Corner | 4 | Catch-the-star mini-game: score counter, lives, speed-up | Variables, decisions (if touching / if score >), win/lose | blockly.html |
 
-### Term 3 — Create & Share (W25–36)
-| Module | Weeks | Content | Platform asset |
-|--------|-------|---------|----------------|
-| M7 Pixels & Pictures | 3 | Images are grids of numbers — pixel art; binary as a yes/no card game (spiral seed for G8/9) | pixel-grid.html, binary-cards.html ✔ exist |
-| M8 Data Detectives | 3 | Tally → table → bar chart; asking questions of data; class survey | new widget |
-| M9 Story Studio (capstone) | 4 | Plan + build an interactive animated story or mini-game in blocks; peer play-testing | blockly.html |
-| M10 Showcase + Text Peek | 2 | Present to class; "here's your blocks program written in Python" (pure exposure, no assessment) — plants the G7 transition | new |
+### Term 3 — Smart & Shared (W25–36)
+| Studio | Weeks | What they make | CS concepts | Platform asset |
+|--------|-------|----------------|-------------|----------------|
+| 🧠 S8 Teach the Machine | 3 | AI-for-Oceans-style trainer: sort examples to teach a classifier, watch it guess, break it with tricky examples | What AI is/isn't, training data, bias (age-appropriate) | **new: teach-machine widget** |
+| 📊 S9 Data Detectives | 3 | Class survey → tally → bar chart → "headline discovery" poster; chart their own XP history | Data collection, representation, questions | **new: chart widget** |
+| 🚀 S10 Capstone Studio | 4 | Choose ANY studio and go big: a game, an animated story, a music video with dancing sprite, a robot maze pack, an art collection | Everything, by choice | all of the above |
+| 🎬 Showcase + Python Peek | 2 | Gallery day, awards; "your blocks written as Python" teaser for Grade 7 | Transition seed | new |
 
-**Badges:** Robot Whisperer (M2) · Pattern Painter (M3) · Event Wizard (M4) · Box Keeper (M5) ·
-Decision Maker (M6) · Pixel Artist (M7) · Data Detective (M8) · Storyteller (M9) ·
-Year 6 Explorer (all).
+**Optional hardware track:** any studio can swap its Hour-2 build for **micro:bit**
+(MakeCode simulator works with zero hardware; real kits if the school buys them) —
+S5 music on the micro:bit speaker, S7 game with tilt controls, S8 clap-sensor.
 
-**0860 strand coverage:** CT ✔(M2,M3,M6) · Programming ✔(M3–M6,M9) · Data ✔(M7,M8) ·
-Networks/Digital comms ✔(M1 e-safety) · Systems ✔(M1,M7).
+**Badges:** Robot Trainer (S1) · Color Mixer (S2) · Turtle Master (S3) · Code Breaker (S4) ·
+Beat Maker (S5) · Choreographer (S6) · Game Maker Jr (S7) · AI Teacher (S8) ·
+Data Detective (S9) · Studio Star (S10) · **Year 6 Creator** (all ten).
+
+**0860 strand coverage:** CT ✔(S1,S3,S7) · Programming ✔(S3,S5–S7,S10) · Data ✔(S2,S4,S9) ·
+Networks/Digital comms ✔(publishing & gallery etiquette, e-safety woven into S1 week 1) ·
+Systems ✔(S4, micro:bit track).
+
+**New widgets to build (all feasible in-platform):** robot-maze.html (canvas grid +
+move/turn blocks), rgb color mixer (three sliders + live swatch + hex), music-lab.html
+(Web Audio API step sequencer — no libraries needed), teach-machine sorter (drag-to-train,
+simple nearest-neighbour under the hood), bar-chart builder.
 
 ---
 
