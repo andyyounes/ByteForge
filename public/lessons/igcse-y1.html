@@ -75,6 +75,7 @@
   <script src="../js/db.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
+  <script src="../js/quest-map.js"></script>
 </head>
 <body>
 
@@ -86,7 +87,7 @@
     </svg>
     <span class="logo-text">ByteForge</span>
   </div>
-  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+  <div class="nav-links"><a href="#" onclick="showQuestMap();return false" style="color:#2dd4bf;font-weight:800;">🗺 Peaks Map</a> &nbsp; <a href="/student/dashboard">← Dashboard</a></div>
 </nav>
 
 <div class="layout">
@@ -447,12 +448,35 @@ function showToast(msg) {
   t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3200)
 }
 
+// ── Quest Map — 🏔 Theory Peaks ──────────────────────────────
+function showQuestMap() {
+  const EMO = {M1:'💾',M2:'🖥',M3:'🌐',M4:'🔐',M5:'🧮'}
+  const stagesFor = mod => CHALLENGES
+    .map((c, i) => ({ c, i }))
+    .filter(x => x.c.mod === mod)
+    .map(x => ({ id: String(x.i), emoji: EMO[mod] || '📘', label: x.c.name, done: completed.has(x.i) }))
+  QuestMap.show({
+    title: '🏔 Theory Peaks — IGCSE Year 1',
+    subtitle: 'Climb five peaks of Cambridge 0478 theory. Every summit counts.',
+    accent: '#2dd4bf',
+    worlds: [
+      { name: '💾 Peak 1 — Data Representation', sub: 'Binary, hex, file sizes, sound', live: true, stages: stagesFor('M1') },
+      { name: '🖥 Peak 2 — Hardware & Software', sub: 'CPU, memory, the FDE cycle', live: true, stages: stagesFor('M2') },
+      { name: '🌐 Peak 3 — Networking', sub: 'LANs, protocols and the TCP/IP stack', live: true, stages: stagesFor('M3') },
+      { name: '🔐 Peak 4 — Security & Privacy', sub: 'Encryption, malware, staying safe', live: true, stages: stagesFor('M4') },
+      { name: '🧮 Peak 5 — Algorithms', sub: 'Sorting, searching, trace tables', live: true, stages: stagesFor('M5') },
+    ],
+    onOpen: id => { selectChallenge(parseInt(id)) },
+  })
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 ;(async () => {
   await LessonSaves.load('igcse-y1')
   LessonSaves.completedSet().forEach(idx => completed.add(idx))
   renderPills()
   selectChallenge(0)
+  showQuestMap()   // land on the map
 })()
 </script>
 </body>

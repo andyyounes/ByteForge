@@ -1084,6 +1084,7 @@
   <script src="../js/db.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
+  <script src="../js/quest-map.js"></script>
 </head>
 <body>
 
@@ -1095,7 +1096,7 @@
     </svg>
     <span class="logo-text">ByteForge</span>
   </div>
-  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+  <div class="nav-links"><a href="#" onclick="showJourney();return false" style="color:#e879f9;font-weight:800;">🗺 Journey</a> &nbsp; <a href="/student/dashboard">← Dashboard</a></div>
 </nav>
 
 <!-- Tab bar -->
@@ -7357,6 +7358,36 @@ async function _bfwSend() {
 _bfwBoot()
 // Docked open by default — closes stay closed (student preference remembered)
 try { if (localStorage.getItem('bfw-closed') !== '1') _bfwToggle() } catch { _bfwToggle() }
+
+// ── 🗺 Journey map — every chapter is an island, every exam a boss ─────
+function showJourney() {
+  const EMO = ['📘','🧠','💡','🧮','🔬','🧩','⚙️','🛰️','🔐','🤖','🗄️','📐','🏗️','📂']
+  const worlds = Object.entries(CHAPTER_TOPICS).map(([num, ids]) => {
+    const first = TOPICS[ids[0]]
+    const stages = ids.map((id, i) => ({
+      id: id, emoji: EMO[i % EMO.length], label: (TOPICS[id] || {}).title || id, done: isTopicDone(id),
+    }))
+    stages.push({ id: 'exam-' + num, emoji: '📝', label: 'Chapter ' + num + ' Exam', boss: true, done: false })
+    return { name: (first ? first.chapter : 'Chapter ' + num), sub: '', live: true, stages: stages }
+  })
+  QuestMap.show({
+    title: '🗺 Your AS Level Journey',
+    subtitle: 'Every chapter is an island — every exam is a boss. Roam free, conquer all.',
+    accent: '#e879f9',
+    freeRoam: true,
+    worlds: worlds,
+    onOpen: function(id) {
+      if (id.indexOf('exam-') === 0) {
+        const n = parseInt(id.slice(5))
+        switchTab(n >= 11 ? 'p2' : 'p1')
+        loadExam(n)
+        return
+      }
+      switchTab(getChapterNum(id) >= 11 ? 'p2' : 'p1')
+      loadTopic(id)
+    },
+  })
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 BF.seed()

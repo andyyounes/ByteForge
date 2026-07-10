@@ -91,6 +91,7 @@
   <script src="../js/db.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
+  <script src="../js/quest-map.js"></script>
 </head>
 <body>
 
@@ -102,7 +103,7 @@
     </svg>
     <span class="logo-text">ByteForge</span>
   </div>
-  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+  <div class="nav-links"><a href="#" onclick="showQuestMap();return false" style="color:#a78bfa;font-weight:800;">🗺 Expedition Map</a> &nbsp; <a href="/student/dashboard">← Dashboard</a></div>
 </nav>
 
 <div class="layout">
@@ -1076,11 +1077,35 @@ function showToast(msg){
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)
 }
 
+// ── Quest Map — 🧭 Code Expedition ───────────────────────────
+function showQuestMap() {
+  const EMO = {M1:'🗃',M2:'⚖',M3:'📂',M4:'📚',M5:'🔀',M6:'🧱'}
+  const stagesFor = mod => CHALLENGES
+    .map((c, i) => ({ c, i }))
+    .filter(x => x.c.mod === mod)
+    .map(x => ({ id: String(x.i), emoji: EMO[mod] || '🐍', label: x.c.name, done: completed.has(x.i) }))
+  QuestMap.show({
+    title: '🧭 Code Expedition — IGCSE Year 2',
+    subtitle: 'Six programming camps on the road to Paper 2. Pseudocode is your gear.',
+    accent: '#a78bfa',
+    worlds: [
+      { name: '🗃 Camp 1 — Arrays & Records', sub: '2D arrays and record types', live: true, stages: stagesFor('M1') },
+      { name: '⚖ Camp 2 — BYVAL & BYREF', sub: 'How parameters really travel', live: true, stages: stagesFor('M2') },
+      { name: '📂 Camp 3 — File Handling', sub: 'OPENFILE, EOF and friends', live: true, stages: stagesFor('M3') },
+      { name: '📚 Camp 4 — Stacks & Queues', sub: 'PUSH, POP and pointers', live: true, stages: stagesFor('M4') },
+      { name: '🔀 Camp 5 — Sorting & Searching', sub: 'Bubble sort and binary search', live: true, stages: stagesFor('M5') },
+      { name: '🧱 Camp 6 — OOP Basics', sub: 'Classes, NEW and inheritance', live: true, stages: stagesFor('M6') },
+    ],
+    onOpen: id => { selectChallenge(parseInt(id)) },
+  })
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 ;(async()=>{
   await LessonSaves.load('igcse-y2')
   LessonSaves.completedSet().forEach(idx=>completed.add(idx))
   renderPills();selectChallenge(0)
+  showQuestMap()   // land on the map
   const savedCode=LessonSaves.savedCode()
   if(savedCode)editor.setValue(savedCode)
 })()
