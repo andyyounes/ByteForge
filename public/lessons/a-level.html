@@ -679,9 +679,9 @@
       background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; font-size:22px; border:none; cursor:pointer;
       z-index:8500; box-shadow:0 6px 20px rgba(124,58,237,.45); transition:.15s; }
     #bfw-bubble:hover { transform:scale(1.07); }
-    #bfw-panel { display:none; position:fixed; right:18px; bottom:80px; width:360px; max-width:calc(100vw - 36px);
-      height:480px; max-height:calc(100vh - 120px); background:#0d0f1a; border:1px solid rgba(167,139,250,.35);
-      border-radius:14px; z-index:8500; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+    #bfw-panel { display:none; position:fixed; right:0; bottom:0; width:360px; max-width:90vw;
+      background:#0d0f1a; border-left:1px solid rgba(167,139,250,.35);
+      z-index:8500; flex-direction:column; overflow:hidden; box-shadow:-12px 0 40px rgba(0,0,0,.45); }
     .bfw-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#111320; border-bottom:1px solid rgba(255,255,255,.08); }
     .bfw-hdr-title { font-size:13px; font-weight:800; color:#c4b5fd; }
     .bfw-hdr-sub { font-size:10px; color:#6b7280; max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -6295,9 +6295,21 @@ function _bfwBoot() {
 function _bfwToggle() {
   _bfwBoot()
   const p = document.getElementById('bfw-panel')
+  const b = document.getElementById('bfw-bubble')
+  const host = document.querySelector('.panel-host')
   const open = p.style.display === 'flex'
-  p.style.display = open ? 'none' : 'flex'
-  if (!open) {
+  if (open) {
+    // Undock — give the lesson its full width back
+    p.style.display = 'none'
+    if (host) host.style.marginRight = ''
+    if (b) { b.style.right = '18px'; b.textContent = '💬'; b.title = 'Ask the AI tutor about this lesson' }
+  } else {
+    // Dock to the right side, below the nav/tab bars, full height
+    const top = host ? Math.max(0, Math.round(host.getBoundingClientRect().top)) : 0
+    p.style.top = top + 'px'
+    p.style.display = 'flex'
+    if (host) host.style.marginRight = '360px'
+    if (b) { b.style.right = '378px'; b.textContent = '✕'; b.title = 'Close the AI tutor' }
     const i = document.getElementById('bfw-in')
     if (i) setTimeout(function() { i.focus() }, 50)
     const m = document.getElementById('bfw-msgs')
