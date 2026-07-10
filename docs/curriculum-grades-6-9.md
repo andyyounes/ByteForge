@@ -48,7 +48,77 @@ Computer Systems — mapped per grade below, feeding IGCSE CS (0478).
 
 ---
 
-# GRADE 6 — "The Creator Studio" (NEW — v2)
+# THE ADVENTURE MAP — progression system for Grades 6–8
+
+Every grade's year is a **winding level map** (Candy-Crush / Duolingo / Code.org style):
+a snake path of small stages the student physically moves along. One mechanic, three
+different worlds so no year feels like a repeat:
+
+| Grade | Map theme | Medium | Difficulty |
+|-------|-----------|--------|------------|
+| 6 | 🏝 **Creator Island** (The Creator Quest) | commands → blocks | discover |
+| 7 | 🌌 **Game Maker Galaxy** (existing 10 modules re-skinned as worlds) | blocks → text | build |
+| 8 | 🏙 **Builder City** (App Builder as districts) | Python text | engineer |
+
+**Map rules (all grades):**
+- The path is made of **stages** (5–15 min each). A stage = one playable challenge.
+- Stages grant **1–3 stars** (works / works efficiently / bonus twist) + XP.
+- Worlds end in a **BOSS stage** (bigger build, no hints) that unlocks the next world's gate.
+- The student's **OBS-01 avatar walks the path**; current position visible to teacher.
+- Locked stages show silhouettes (curiosity pull); completed worlds show a trophy.
+- Optional side-paths: micro:bit versions of stages, bonus hard stages for fast finishers.
+
+---
+
+# GRADE 6 — "The Creator Quest" (v3)
+
+**36 weeks × 2h = 72h · 12 worlds · ~50 stages · commands → drag-and-drop blocks**
+
+The exact progression: robots first (no code at all), then drag-and-drop, then colors/
+shapes/arithmetic, loops, turtle, pixels, ciphers, music, dance, games, AI — ending in a
+free project. Concepts stack: every world uses the previous worlds' skills.
+
+| # | World | Weeks | Stages | What happens | New concepts |
+|---|-------|-------|--------|--------------|--------------|
+| 1 | 🤖 Robot Road | 3 | 5 + boss | Guide a robot through mazes with arrow commands only — no code yet. Fewer commands = more stars. Boss: 3-maze gauntlet + design a maze for a classmate | Sequencing, exact instructions, efficiency, debugging |
+| 2 | 🧩 Block Basics | 2 | 4 + boss | Same robot, but now commands are **drag-and-drop blocks**; longer programs, first deliberate bugs to fix | Programs as editable artefacts, reading code |
+| 3 | 🎨 Color & Shape Lab | 3 | 5 + boss | RGB sliders (light mixing, 0–255), coordinates, drawing shapes by block-code; sizes/positions/angles = **arithmetic smuggled in** (half of 480? angle for a hexagon?) | Values, coordinates, +−×÷ in code, random |
+| 4 | 🔁 Loop Land | 3 | 5 + boss | Repeat-blocks: friendship bracelets patterns, tiled art, countdowns; spot-the-repeat in music & nature; nested-loop peek | Loops, patterns, decomposition |
+| 5 | 🐢 Turtle Island | 3 | 5 + boss | Loops + arithmetic = art: square → polygon (angle = 360÷n!) → star → spiral → mandala in their own palette | Applying loops+math together |
+| 6 | 🖼 Pixel Caves | 2 | 4 + boss | Images are grids of numbers; pixel art by coordinates; binary card game; boss: hidden pixel message | Data representation, binary as a game |
+| 7 | 🕵️ Cipher City | 2 | 4 + boss | Caesar cipher wheel: encode, decode, then CRACK a message without the key (frequency of E); boss: escape-room decode chain | Algorithms on letters, brute force idea |
+| 8 | 🎵 Music Studio | 3 | 5 + boss | Web-Audio beat grid: a drum loop IS a loop; melody maker; layering tracks; remix a classmate; boss: publish a 30-sec track | Loops in time, events, layering |
+| 9 | 💃 Dance Party | 3 | 4 + boss | Code.org Dance-Party formula: character moves on key events, background reacts to the beat (their own Music Studio track!) | Events, state changes, timing |
+| 10 | 🕹 Game Corner | 4 | 6 + boss | Build a real mini-game step by step: sprite control → falling objects → catch detection → score variable → lives → speed-up. Boss: **their own game**, play-tested by the class | Variables, decisions, collision, game loop |
+| 11 | 🧠 AI World | 3 | 5 + boss | Teach-the-machine classifier (sort → train → watch it guess → fool it); "what's inside" — a neural network as layers of tiny voters (visual, no math); **prompt engineering**: writing instructions for the AI tutor is algorithm design for humans+machines — best-prompt contest | ML training data, NN intuition, prompt craft, AI limits/bias |
+| 12 | 🚀 The Final Quest | 4 | project | Pick any world and go big (game / track+dance video / maze pack / art collection / AI experiment); plan → build → showcase gallery; Python peek teaser for Grade 7 | Project skills, presenting |
+
+**Stage math:** 12 worlds ≈ 52 stages + 11 bosses + 1 project = a node on the map roughly
+every 40 minutes of class time — always something to finish and something locked ahead.
+
+**Badges:** one per world (Robot Trainer, Block Builder, Color Mixer, Loop Legend, Turtle
+Master, Pixel Miner, Code Breaker, Beat Maker, Choreographer, Game Maker Jr, AI Whisperer)
+→ **Year 6 Creator** trophy.
+
+**0860 strands:** CT ✔(W1,2,4,7) · Programming ✔(W2–5,8–10) · Data ✔(W3,6,9) ·
+Networks/e-safety ✔(woven into W1 + publishing etiquette in W8–12) · Systems ✔(W6, micro:bit side-path).
+
+**New widgets needed:** robot-maze (W1–2), rgb-mixer (W3), music-lab step sequencer (W8),
+cipher wheel (W7), teach-machine + NN-layers visual (W11), the Adventure Map itself.
+
+---
+
+## Grade 7 & 8 on the map (differentiation, no repeats)
+
+- **G7 Game Maker Galaxy:** the existing 10 modules become 10 worlds (~45 stages). Same
+  map mechanic, but stages transition blocks → text mid-year and every boss is a playable
+  game increment. Concepts G6 met visually (variables, events, decisions) return **in text
+  code at game depth** — spiral, not repeat.
+- **G8 Builder City:** districts instead of worlds (~45 stages), all-Python: Syntax
+  Street → Loop District → Function Quarter → List Lane → String Market → Data Docks
+  (files/CSV) → Machine Hall (binary/hardware) → Net Bridge (internet+HTML) → App Tower
+  (capstone). G6's cipher returns as *code you write*; G6's music/AI return as Python
+  projects. Bosses are working programs, not puzzles.
 
 **36 weeks × 2h = 72h · blocks only · ten creative studios, each shipping something showable**
 
