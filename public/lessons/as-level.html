@@ -7196,11 +7196,13 @@ function _bfwToggle() {
   const host = document.querySelector('.panel-host')
   const open = p.style.display === 'flex'
   if (open) {
-    // Undock — give the lesson its full width back
+    // Undock — give the lesson its full width back (and remember the choice)
     p.style.display = 'none'
     if (host) host.style.marginRight = ''
     if (b) { b.style.right = '18px'; b.textContent = '💬'; b.title = 'Ask the AI tutor about this lesson' }
+    try { localStorage.setItem('bfw-closed', '1') } catch {}
   } else {
+    try { localStorage.removeItem('bfw-closed') } catch {}
     // Dock to the right side, below the nav/tab bars, full height
     const top = host ? Math.max(0, Math.round(host.getBoundingClientRect().top)) : 0
     p.style.top = top + 'px'
@@ -7255,6 +7257,8 @@ async function _bfwSend() {
 }
 
 _bfwBoot()
+// Docked open by default — closes stay closed (student preference remembered)
+try { if (localStorage.getItem('bfw-closed') !== '1') _bfwToggle() } catch { _bfwToggle() }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 BF.seed()
