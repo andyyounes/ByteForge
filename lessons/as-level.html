@@ -1025,6 +1025,19 @@
       box-shadow:0 0 20px rgba(251,191,36,.5); letter-spacing:.04em;
     }
 
+    /* ── XP fun: glow pulse, flying chips, mascot hop, combo badge ────────── */
+    .xp-bar-fill.gain { animation:xpGlowPulse 1.1s ease; }
+    @keyframes xpGlowPulse { 0%{filter:brightness(1)} 35%{filter:brightness(2)} 100%{filter:brightness(1)} }
+    .xp-chip { position:fixed; z-index:9600; font-size:13px; font-weight:900; color:#fbbf24;
+               text-shadow:0 2px 10px rgba(251,191,36,.5); pointer-events:none; font-family:var(--mono,monospace);
+               animation:xpChipFly 1.3s cubic-bezier(.2,.7,.3,1) forwards; }
+    @keyframes xpChipFly { 0%{opacity:0; transform:translateY(10px) scale(.7)} 18%{opacity:1; transform:translateY(0) scale(1.25)}
+                           35%{transform:scale(1)} 100%{opacity:0; transform:translateY(-52px) scale(.95)} }
+    .xp-burst-bot svg { width:52px; height:69px; animation:xpHop 1s ease .15s 2; }
+    @keyframes xpHop { 0%,100%{transform:translateY(0)} 30%{transform:translateY(-12px) rotate(-5deg)} 55%{transform:translateY(0)} 75%{transform:translateY(-5px) rotate(3deg)} }
+    .xp-combo { display:inline-block; margin-top:8px; padding:4px 12px; border-radius:99px;
+                background:rgba(251,146,60,.12); border:1px solid rgba(251,146,60,.4); color:#fb923c; font-size:11px; font-weight:800; }
+
     /* ── Floating AI tutor widget ─────────────────────────────────────────── */
     #bfw-bubble { position:fixed; right:18px; bottom:18px; width:52px; height:52px; border-radius:50%;
       background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; font-size:22px; border:none; cursor:pointer;
@@ -5198,6 +5211,7 @@ function getLocalXP() {
   return xp
 }
 
+let _xpShown = null
 function updateXPBar(prevXP) {
   const xp  = getLocalXP()
   const lvl = LEVELS.find(l => xp >= l.min && xp <= l.max) || LEVELS[0]
@@ -5206,19 +5220,48 @@ function updateXPBar(prevXP) {
   const rangeEnd   = next ? next.min : lvl.min + 100
   const pct = Math.min(100, ((xp - rangeStart) / (rangeEnd - rangeStart)) * 100)
 
+  const bar = document.getElementById('xp-bar-fill')
   document.getElementById('xp-rank-icon').textContent  = lvl.icon
   document.getElementById('xp-rank-label').textContent = lvl.label + ' · Lv ' + lvl.lv
-  document.getElementById('xp-bar-fill').style.width   = pct + '%'
-  document.getElementById('xp-current').textContent    = xp
+  bar.style.width = pct + '%'
   document.getElementById('xp-next').textContent       = next ? next.min : '★ MAX'
 
-  // Level-up toast
-  if (prevXP !== undefined) {
-    const prevLvl = LEVELS.find(l => prevXP >= l.min && prevXP <= l.max) || LEVELS[0]
+  // Animated gain: count-up, glow pulse, flying "+XP" chip
+  const cur  = document.getElementById('xp-current')
+  const from = prevXP !== undefined ? prevXP : (_xpShown !== null ? _xpShown : xp)
+  _xpShown = xp
+  if (xp > from) {
+    _xpCountUp(cur, from, xp)
+    bar.classList.remove('gain'); void bar.offsetWidth; bar.classList.add('gain')
+    _xpChip(xp - from)
+    const prevLvl = LEVELS.find(l => from >= l.min && from <= l.max) || LEVELS[0]
     if (lvl.lv > prevLvl.lv) {
       showToast(lvl.icon + ' Level Up! You\'re now a ' + lvl.label + ' · Lv ' + lvl.lv)
     }
+  } else {
+    cur.textContent = xp
   }
+}
+function _xpCountUp(el, from, to) {
+  const t0 = performance.now(), dur = 700
+  function tick(t) {
+    const k = Math.min(1, (t - t0) / dur)
+    el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)))
+    if (k < 1) requestAnimationFrame(tick)
+  }
+  requestAnimationFrame(tick)
+}
+function _xpChip(amount) {
+  const strip = document.getElementById('xp-strip')
+  if (!strip) return
+  const r = strip.getBoundingClientRect()
+  const chip = document.createElement('div')
+  chip.className = 'xp-chip'
+  chip.textContent = '+' + amount + ' XP'
+  chip.style.left = (r.right - 160) + 'px'
+  chip.style.top  = (r.bottom + 6) + 'px'
+  document.body.appendChild(chip)
+  setTimeout(function() { chip.remove() }, 1400)
 }
 
 // ── Shared helpers ────────────────────────────────────────────────────────────
@@ -5268,7 +5311,7 @@ function ideShowXPBurst(xpEarned, exTitle, prevXP, tid, nextSetId, nextExIdx) {
   overlay.innerHTML = `
     ${starsHTML}
     <div class="xp-burst-card">
-      <span class="xp-burst-icon">${leveledUp ? '🏆' : '✅'}</span>
+      <span class="xp-burst-icon xp-burst-bot">${_BFW_AV}</span>
       <div class="xp-burst-amount">+${xpEarned} XP</div>
       <div class="xp-burst-label">Exercise Complete!</div>
       <div class="xp-burst-exname">${exTitle}</div>
