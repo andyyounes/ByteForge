@@ -1085,6 +1085,7 @@
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
+  <script src="../js/lesson-quest.js"></script>
 </head>
 <body>
 
@@ -3503,6 +3504,7 @@ function completeTopic(id) {
 
   const prevXP = getLocalXP() - TOPIC_XP
   showToast('✅ +' + TOPIC_XP + ' XP — Topic complete!')
+  if (typeof LessonQuest !== 'undefined') LessonQuest.boss(id)
   updateXPBar(prevXP)
   if (DB_TOPICS.includes(id)) {
     // Ch 11 Databases uses db-x IDs — update its own progress badge
@@ -3606,6 +3608,7 @@ function checkAnswers(btn) {
   }
   // Scroll so the feedback is in view
   cards[0]?.querySelector('.answer-feedback')?.scrollIntoView({ behavior:'smooth', block:'nearest' })
+  if (typeof LessonQuest !== 'undefined' && currentTopicId) LessonQuest.markStep(currentTopicId, 'practice')
 }
 
 // ── Render a topic into the main content area ─────────────────────────────────
@@ -3839,6 +3842,14 @@ function renderTopic(id, topic, alreadyDone) {
 
   // Keep the floating AI tutor aware of what the student is reading
   if (typeof _bfwSetContext === 'function') _bfwSetContext(id, topic)
+
+  // LessonQuest — active per-lesson gamification (tracker, reveal cards, checkpoints)
+  if (typeof LessonQuest !== 'undefined') LessonQuest.attach({
+    pageKey: 'as', topicId: id, container: main, alreadyDone: alreadyDone,
+    nextId: _lqNextTopic(id),
+    onOpenNext: function(nid) { switchTab(getChapterNum(nid) >= 11 ? 'p2' : 'p1'); loadTopic(nid) },
+    onXP: _lqAwardXP,
+  })
 }
 
 // ── Load a topic ─────────────────────────────────────────────────────────────
@@ -4954,6 +4965,7 @@ function switchP2Tab(tab) {
   if (tab === 'ai')        renderP2AI()
   if (tab === 'practice')  renderPracticeList()
   if (tab === 'pseudolab') renderPseudoLab()
+  try { if (tab === 'lesson' && _bfwCtx) _bfwEnter(); else if (tab !== 'lesson') _bfwLeave() } catch (e) {}
 }
 
 // ── P2 lesson content per challenge ──────────────────────────────────────────
@@ -5209,6 +5221,7 @@ function getLocalXP() {
       if (localStorage.getItem('bf-pseudo-' + setId + '-' + ex.id)) xp += ex.xp
     }
   }
+  if (typeof LessonQuest !== 'undefined') xp += LessonQuest.totalXP('as')
   return xp
 }
 
@@ -5396,6 +5409,7 @@ function switchP1Tab(which) {
   if (paneI) paneI.classList.toggle('active', which === 'ide')
   if (which === 'practice') renderTheoryList()
   if (which === 'ide') renderIde('p1ide')
+  try { if (which === 'topics' && _bfwCtx) _bfwEnter(); else if (which !== 'topics') _bfwLeave() } catch (e) {}
 }
 
 function switchTab(which) {
@@ -5466,6 +5480,7 @@ async function checkApprovedExams() {
 }
 
 async function loadExam(chapterNum) {
+  try { _bfwLeave() } catch (e) {}
   const main = document.getElementById('p1-main-content')
   if (!main) return
   main.innerHTML = '<div style="padding:40px;text-align:center;color:#9ca3af;font-size:13px;">Loading exam…</div>'
@@ -7254,6 +7269,7 @@ function _bfwSetContext(id, topic) {
   }
   const t = document.getElementById('bfw-topic')
   if (t) t.textContent = 'Reading: ' + _bfwCtx.title
+  try { _bfwEnter() } catch (e) {}
 }
 
 function _bfwBoot() {
@@ -7356,11 +7372,47 @@ async function _bfwSend() {
 }
 
 _bfwBoot()
-// Docked open by default — closes stay closed (student preference remembered)
-try { if (localStorage.getItem('bfw-closed') !== '1') _bfwToggle() } catch { _bfwToggle() }
+// The tutor only appears alongside an open lesson (_bfwEnter / _bfwLeave)
+function _bfwEnter() {
+  const b = document.getElementById('bfw-bubble')
+  if (b) b.style.display = ''
+  let closed = true
+  try { closed = localStorage.getItem('bfw-closed') === '1' } catch (e) {}
+  const p = document.getElementById('bfw-panel')
+  if (!closed && p && !p.classList.contains('open')) _bfwToggle()
+}
+function _bfwLeave() {
+  const p = document.getElementById('bfw-panel')
+  const b = document.getElementById('bfw-bubble')
+  if (p && p.classList.contains('open')) {
+    p.classList.remove('open')
+    const host = document.querySelector('.panel-host')
+    if (host) host.style.marginRight = ''
+    if (b) { b.style.right = '18px'; b.innerHTML = _BFW_AV; b.title = 'Ask the AI tutor about this lesson' }
+  }
+  if (b) b.style.display = 'none'
+}
+_bfwLeave()
 
 // ── 🗺 Journey map — every chapter is an island, every exam a boss ─────
+// ── LessonQuest page glue ─────────────────────────────────────────────────────
+function _lqNextTopic(id) {
+  const flat = []
+  for (const ids of Object.values(CHAPTER_TOPICS)) flat.push(...ids)
+  const i = flat.indexOf(id)
+  return i >= 0 && i < flat.length - 1 ? flat[i + 1] : null
+}
+function _lqAwardXP(amount, label) {
+  try {
+    const prev = getLocalXP() - amount   // step already saved, so subtract for the count-up
+    if (me) BF.addXP(me.id, amount)
+    showToast('✨ +' + amount + ' XP — ' + label)
+    updateXPBar(prev)
+  } catch (e) {}
+}
+
 function showJourney() {
+  try { _bfwLeave() } catch (e) {}
   const EMO = ['📘','🧠','💡','🧮','🔬','🧩','⚙️','🛰️','🔐','🤖','🗄️','📐','🏗️','📂']
   const worlds = Object.entries(CHAPTER_TOPICS).map(([num, ids]) => {
     const first = TOPICS[ids[0]]

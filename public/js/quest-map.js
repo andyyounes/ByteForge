@@ -106,8 +106,12 @@ const QuestMap = (() => {
       }
       const wDone = w.stages.filter(s => s.done).length
       const allDone = wDone === w.stages.length
-      html += '<div class="qm-world"><div class="qm-whead"><div>'
-        + '<div class="qm-wname">' + w.name + '</div><div class="qm-wsub">' + esc(w.sub || '') + '</div></div>'
+      // Clicking the chapter header opens its first unfinished stage
+      const firstOpen = (w.stages.find(s => !s.done) || w.stages[0])
+      html += '<div class="qm-world"><div class="qm-whead" style="cursor:pointer"'
+        + (firstOpen ? ' onclick="QuestMap._open(\'' + esc(firstOpen.id) + '\')"' : '') + '><div>'
+        + '<div class="qm-wname">' + w.name + ' <span style="font-size:11px;color:#6b7280;font-weight:600;">→ open</span></div>'
+        + '<div class="qm-wsub">' + esc(w.sub || '') + '</div></div>'
         + '<div class="qm-wprog">' + (allDone ? '🏆 COMPLETE' : wDone + '/' + w.stages.length) + '</div></div>'
         + '<div class="qm-stages">'
       w.stages.forEach((s, i) => {
