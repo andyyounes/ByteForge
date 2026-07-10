@@ -691,7 +691,7 @@
     /* The tutor character — bobs, blinks, antenna pulses, wiggles when thinking */
     .bfw-avatar { flex-shrink:0; animation:bfwBob 3.2s ease-in-out infinite; }
     @keyframes bfwBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2.5px)} }
-    .bfw-eyes { transform-origin:20px 23px; animation:bfwBlink 4.6s infinite; }
+    .bfw-eyes { transform-origin:36px 29px; animation:bfwBlink 4.6s infinite; }
     @keyframes bfwBlink { 0%,91%,100%{transform:scaleY(1)} 94%{transform:scaleY(.12)} 97%{transform:scaleY(1)} }
     .bfw-ant { animation:bfwGlow 2s ease-in-out infinite; }
     @keyframes bfwGlow { 0%,100%{opacity:.45} 50%{opacity:1} }
@@ -6281,13 +6281,27 @@ async function fetchGeneratedLesson(topicKey) {
 let _bfwCtx = null
 let _bfwBooted = false
 
-// The tutor character — a small SVG robot (bobbing, blinking via CSS)
-const _BFW_AV = '<svg class="bfw-avatar" width="34" height="34" viewBox="0 0 40 40">'
-  + '<circle class="bfw-ant" cx="20" cy="5" r="2.6" fill="#e879f9"/>'
-  + '<line x1="20" y1="7" x2="20" y2="12" stroke="#a78bfa" stroke-width="2"/>'
-  + '<rect x="6" y="12" width="28" height="22" rx="7" fill="#7c3aed"/>'
-  + '<rect x="10" y="16" width="20" height="14" rx="5" fill="#0d0f1a"/>'
-  + '<g class="bfw-eyes"><circle cx="16" cy="23" r="2.6" fill="#b8ef4a"/><circle cx="24" cy="23" r="2.6" fill="#b8ef4a"/></g>'
+// The tutor mascot — OBS-01, recreated from the portfolio robot
+// (dark graphite unit, glowing cyan eyes, purple antenna orb)
+const _BFW_AV = '<svg class="bfw-avatar" width="30" height="40" viewBox="0 0 72 96">'
+  + '<defs><linearGradient id="bfwBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3f52"/><stop offset="1" stop-color="#22242f"/></linearGradient></defs>'
+  + '<line x1="36" y1="14" x2="36" y2="6" stroke="#4b5063" stroke-width="2.5"/>'
+  + '<circle class="bfw-ant" cx="36" cy="5" r="3.4" fill="#a78bfa"/>'
+  + '<rect x="12" y="13" width="48" height="34" rx="10" fill="url(#bfwBody)" stroke="#565d75" stroke-width="1.5"/>'
+  + '<rect x="18" y="19" width="36" height="22" rx="6" fill="#0b0d16"/>'
+  + '<g class="bfw-eyes">'
+  + '<circle cx="28" cy="29" r="5.5" fill="#22d3ee" opacity=".18"/><circle cx="28" cy="29" r="3.4" fill="#67e8f9" opacity=".55"/><circle cx="28" cy="29" r="1.7" fill="#e0faff"/>'
+  + '<circle cx="44" cy="29" r="5.5" fill="#22d3ee" opacity=".18"/><circle cx="44" cy="29" r="3.4" fill="#67e8f9" opacity=".55"/><circle cx="44" cy="29" r="1.7" fill="#e0faff"/>'
+  + '</g>'
+  + '<rect x="30" y="36.5" width="12" height="1.8" rx="0.9" fill="#565d75"/>'
+  + '<rect x="30" y="47" width="12" height="4" fill="#22242f"/>'
+  + '<circle cx="14" cy="56" r="4" fill="#3a3f52" stroke="#565d75" stroke-width="1"/>'
+  + '<circle cx="58" cy="56" r="4" fill="#3a3f52" stroke="#565d75" stroke-width="1"/>'
+  + '<rect x="16" y="51" width="40" height="34" rx="7" fill="url(#bfwBody)" stroke="#565d75" stroke-width="1.5"/>'
+  + '<rect x="22" y="58" width="28" height="22" rx="4" fill="#101321"/>'
+  + '<circle cx="27" cy="63" r="1.6" fill="#a78bfa"/><circle cx="32" cy="63" r="1.6" fill="#3c4157"/><circle cx="37" cy="63" r="1.6" fill="#3c4157"/>'
+  + '<rect x="26" y="70" width="16" height="1.4" rx=".7" fill="#2b3044"/><rect x="26" y="74" width="20" height="1.4" rx=".7" fill="#2b3044"/>'
+  + '<rect x="30" y="85" width="12" height="5" fill="#22242f"/><rect x="22" y="90" width="28" height="4" rx="2" fill="#2b3044"/>'
   + '</svg>'
 
 function _bfwSetContext(id, topic) {
@@ -6308,7 +6322,7 @@ function _bfwBoot() {
   wrap.innerHTML = '<button id="bfw-bubble" onclick="_bfwToggle()" title="Ask the AI tutor about this lesson">' + _BFW_AV + '</button>'
     + '<div id="bfw-panel">'
     + '<div class="bfw-hdr"><div style="display:flex;align-items:center;gap:9px;">' + _BFW_AV
-    + '<div><div class="bfw-hdr-title">AI Tutor</div><div class="bfw-hdr-sub" id="bfw-topic">Ask anything about the lesson</div></div></div>'
+    + '<div><div class="bfw-hdr-title">OBS-01 · AI Tutor</div><div class="bfw-hdr-sub" id="bfw-topic">Ask anything about the lesson</div></div></div>'
     + '<button class="bfw-x" onclick="_bfwToggle()">×</button></div>'
     + '<div class="bfw-msgs" id="bfw-msgs"><div class="bfw-m bfw-a">Hi! I can see the lesson you\'re reading — ask me about a term you don\'t get, a worked example, or exam technique. 💡</div></div>'
     + '<div class="bfw-row"><textarea id="bfw-in" rows="1" placeholder="Ask about this lesson…" onkeydown="_bfwKey(event)"></textarea>'
