@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ByteForge — Grade 6 · The Creator Quest</title>
+<style>
+  :root { --mono:'Cascadia Code','Consolas',monospace; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0d0f1a; color:#e2e8f0; font-family:system-ui,-apple-system,'Segoe UI',sans-serif; }
+
+  /* ── Nav ── */
+  .nav { height:64px; display:flex; align-items:center; justify-content:space-between; padding:0 22px;
+         background:#0a0c17; border-bottom:1px solid rgba(255,255,255,.08); position:sticky; top:0; z-index:50; }
+  .nav-logo { display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; }
+  .nav a { color:#9ca3af; text-decoration:none; font-size:13px; font-weight:600; }
+  .nav a:hover { color:#e2e8f0; }
+
+  /* ── Quest header ── */
+  .quest-hero { text-align:center; padding:26px 16px 10px; }
+  .quest-hero h1 { font-size:26px; font-weight:900; background:linear-gradient(90deg,#fbbf24,#e879f9,#60a5fa);
+                   -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .quest-hero p { color:#9ca3af; font-size:13px; margin-top:6px; }
+  .quest-stats { display:flex; gap:14px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
+  .qstat { background:#111320; border:1px solid rgba(255,255,255,.08); border-radius:99px; padding:6px 16px;
+           font-size:12px; font-weight:800; color:#c4b5fd; }
+  .qstat b { color:#fbbf24; }
+
+  /* ── Map ── */
+  .map { max-width:680px; margin:18px auto 80px; padding:0 16px; }
+  .world { border-radius:18px; border:1px solid rgba(255,255,255,.08); margin-bottom:18px; padding:16px 18px 20px;
+           background:linear-gradient(160deg, rgba(255,255,255,.03), rgba(255,255,255,0)); position:relative; overflow:hidden; }
+  .world.locked { opacity:.55; filter:saturate(.4); }
+  .world-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+  .world-name { font-size:16px; font-weight:900; }
+  .world-sub { font-size:11px; color:#9ca3af; margin-top:2px; }
+  .world-prog { font-size:11px; font-weight:800; color:#fbbf24; background:rgba(251,191,36,.1);
+                border:1px solid rgba(251,191,36,.3); padding:4px 12px; border-radius:99px; white-space:nowrap; }
+  .world-lockmsg { font-size:12px; color:#6b7280; padding:8px 0 2px; }
+
+  /* stage nodes — zigzag path */
+  .stages { display:flex; flex-wrap:wrap; gap:18px 26px; align-items:center; }
+  .stage-node { position:relative; width:64px; height:64px; border-radius:50%; border:3px solid rgba(255,255,255,.14);
+                background:#161927; cursor:pointer; display:flex; flex-direction:column; align-items:center;
+                justify-content:center; transition:transform .15s, box-shadow .15s; flex-shrink:0; }
+  .stage-node:not(.locked):hover { transform:scale(1.1); box-shadow:0 6px 24px rgba(232,121,249,.35); }
+  .stage-node.done { border-color:#4ade80; background:rgba(74,222,128,.1); }
+  .stage-node.current { border-color:#e879f9; background:rgba(232,121,249,.12); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(232,121,249,.4)} 50%{box-shadow:0 0 0 10px rgba(232,121,249,0)} }
+  .stage-node.locked { cursor:default; opacity:.45; }
+  .stage-node.boss { width:80px; height:80px; border-width:4px; border-color:rgba(251,191,36,.5); }
+  .stage-node.boss.done { border-color:#4ade80; }
+  .stage-emoji { font-size:20px; line-height:1; }
+  .stage-node.boss .stage-emoji { font-size:26px; }
+  .stage-num { font-size:9px; font-weight:800; color:#6b7280; margin-top:2px; }
+  .stage-stars { position:absolute; bottom:-14px; font-size:10px; letter-spacing:1px; white-space:nowrap; }
+  .stage-avatar { position:absolute; top:-30px; left:50%; transform:translateX(-50%); animation:bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-4px)} }
+  .stage-arrow { color:#3c4157; font-size:18px; flex-shrink:0; }
+
+  /* ── Stage player overlay ── */
+  .player { display:none; position:fixed; inset:0; z-index:100; background:#0d0f1a; flex-direction:column; }
+  .player.open { display:flex; }
+  .player-bar { display:flex; align-items:center; gap:12px; padding:12px 18px; background:#111320;
+                border-bottom:1px solid rgba(255,255,255,.1); }
+  .back-btn { padding:7px 16px; border-radius:8px; border:1px solid rgba(255,255,255,.14); background:none;
+              color:#9ca3af; font-size:12px; font-weight:700; cursor:pointer; }
+  .back-btn:hover { color:#fff; }
+  .player-title { font-size:15px; font-weight:900; }
+  .player-goal { font-size:11.5px; color:#9ca3af; }
+  .player-par { margin-left:auto; font-size:11px; font-weight:800; color:#fbbf24; white-space:nowrap; }
+
+  .player-body { flex:1; display:flex; gap:22px; align-items:flex-start; justify-content:center; padding:26px 18px;
+                 overflow-y:auto; flex-wrap:wrap; }
+
+  /* maze board */
+  .board-wrap { position:relative; }
+  .board { display:grid; gap:3px; background:#0a0c17; padding:10px; border-radius:14px;
+           border:1px solid rgba(255,255,255,.1); position:relative; }
+  .tile { width:52px; height:52px; border-radius:8px; background:#181c2c; display:flex; align-items:center;
+          justify-content:center; font-size:24px; }
+  .tile.wall { background:#2b3044; box-shadow:inset 0 -4px 0 rgba(0,0,0,.3); }
+  .tile.goal { background:rgba(74,222,128,.12); }
+  .tile.star { background:rgba(251,191,36,.08); }
+  #bot { position:absolute; width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+         transition:left .28s ease, top .28s ease; z-index:5; font-size:30px; filter:drop-shadow(0 3px 6px rgba(0,0,0,.5)); }
+  #bot.crash { animation:shake .4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+  /* command deck */
+  .deck { width:290px; display:flex; flex-direction:column; gap:14px; }
+  .deck-title { font-size:11px; font-weight:800; color:#9ca3af; letter-spacing:.06em; }
+  .cmd-buttons { display:flex; gap:8px; }
+  .cmd-btn { flex:1; padding:14px 0; font-size:22px; border-radius:12px; border:1px solid rgba(232,121,249,.35);
+             background:rgba(232,121,249,.1); cursor:pointer; transition:.12s; color:#fff; }
+  .cmd-btn:hover { background:rgba(232,121,249,.25); transform:translateY(-2px); }
+  .program { min-height:96px; background:#111320; border:1px dashed rgba(255,255,255,.15); border-radius:12px;
+             padding:10px; display:flex; flex-wrap:wrap; gap:6px; align-content:flex-start; }
+  .chip { width:38px; height:38px; border-radius:9px; background:#232840; border:1px solid rgba(255,255,255,.15);
+          display:flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer; position:relative; }
+  .chip:hover { border-color:#f87171; }
+  .chip:hover::after { content:'×'; position:absolute; top:-7px; right:-5px; background:#f87171; color:#fff;
+                       width:14px; height:14px; border-radius:50%; font-size:10px; display:flex; align-items:center;
+                       justify-content:center; font-weight:900; }
+  .chip.active { border-color:#e879f9; background:rgba(232,121,249,.25); }
+  .prog-hint { color:#4b5563; font-size:11px; width:100%; text-align:center; padding:24px 0; }
+  .run-row { display:flex; gap:8px; }
+  .run-btn { flex:1; padding:13px; font-size:15px; font-weight:900; border:none; border-radius:12px;
+             background:linear-gradient(135deg,#b8ef4a,#4ade80); color:#0d1117; cursor:pointer; transition:.15s; }
+  .run-btn:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(74,222,128,.35); }
+  .run-btn:disabled { opacity:.4; transform:none; box-shadow:none; }
+  .clear-btn { padding:13px 18px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:none;
+               color:#9ca3af; font-weight:700; cursor:pointer; }
+  .cmd-count { font-size:11px; color:#6b7280; text-align:center; }
+  .cmd-count b { color:#fbbf24; }
+  .feedback { min-height:22px; font-size:13px; font-weight:700; text-align:center; }
+
+  /* win overlay */
+  .win { display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.72); align-items:center; justify-content:center; }
+  .win.open { display:flex; }
+  .win-card { background:linear-gradient(135deg,#0d0f1a 60%,#1a0d2e); border:2px solid rgba(251,191,36,.45);
+              border-radius:22px; padding:30px 40px; text-align:center; animation:popIn .4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popIn { 0%{transform:scale(.6);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .win-stars { font-size:38px; letter-spacing:6px; margin-bottom:8px; }
+  .win-stars .dim { opacity:.25; }
+  .win-title { font-size:20px; font-weight:900; margin-bottom:4px; }
+  .win-sub { font-size:12px; color:#9ca3af; margin-bottom:18px; }
+  .win-xp { font-size:15px; font-weight:900; color:#fbbf24; margin-bottom:18px; }
+  .win-btn { padding:11px 26px; border:none; border-radius:11px; font-size:14px; font-weight:800; cursor:pointer;
+             background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; margin:0 5px; }
+  .win-btn.ghost { background:none; border:1px solid rgba(255,255,255,.18); color:#9ca3af; }
+
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1a1d2e;
+           border:1px solid rgba(232,121,249,.4); color:#e2e8f0; padding:11px 22px; border-radius:12px; font-size:13px;
+           font-weight:700; transition:transform .3s; z-index:300; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+</style>
+<script src="../js/db.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/lesson-saves.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1.5L18.5 10L10 18.5L1.5 10Z" fill="rgba(184,239,74,.18)" stroke="#b8ef4a" stroke-width="1.25" stroke-linejoin="round"/>
+      <path d="M11.5 6.5L9 10.5H11.5L8.5 14" stroke="#b8ef4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>ByteForge</span>
+  </div>
+  <a href="/student/dashboard">← Dashboard</a>
+</nav>
+
+<div class="quest-hero">
+  <h1>🏝 The Creator Quest</h1>
+  <p>Walk the path. Beat the bosses. Become the Year 6 Creator.</p>
+  <div class="quest-stats">
+    <span class="qstat">⭐ <b id="q-stars">0</b> stars</span>
+    <span class="qstat">🏆 <b id="q-bosses">0</b>/11 bosses</span>
+    <span class="qstat">⚡ <b id="q-xp">0</b> XP</span>
+  </div>
+</div>
+
+<div class="map" id="map"></div>
+
+<!-- Stage player -->
+<div class="player" id="player">
+  <div class="player-bar">
+    <button class="back-btn" onclick="closeStage()">← Map</button>
+    <div>
+      <div class="player-title" id="p-title"></div>
+      <div class="player-goal" id="p-goal"></div>
+    </div>
+    <div class="player-par" id="p-par"></div>
+  </div>
+  <div class="player-body">
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+    </div>
+    <div class="deck">
+      <div>
+        <div class="deck-title">🎮 COMMANDS — tap to add</div>
+        <div class="cmd-buttons">
+          <button class="cmd-btn" onclick="addCmd('U')" title="Up">⬆️</button>
+          <button class="cmd-btn" onclick="addCmd('D')" title="Down">⬇️</button>
+          <button class="cmd-btn" onclick="addCmd('L')" title="Left">⬅️</button>
+          <button class="cmd-btn" onclick="addCmd('R')" title="Right">➡️</button>
+        </div>
+      </div>
+      <div>
+        <div class="deck-title">📜 YOUR PROGRAM — tap a step to remove it</div>
+        <div class="program" id="program"><div class="prog-hint">Add commands, then press RUN ▶</div></div>
+        <div class="cmd-count" id="cmd-count"></div>
+      </div>
+      <div class="run-row">
+        <button class="run-btn" id="run-btn" onclick="runProgram()">▶ RUN</button>
+        <button class="clear-btn" onclick="clearProgram()">Clear</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Win overlay -->
+<div class="win" id="win">
+  <div class="win-card">
+    <div class="win-stars" id="win-stars"></div>
+    <div class="win-title" id="win-title">Stage complete!</div>
+    <div class="win-sub" id="win-sub"></div>
+    <div class="win-xp" id="win-xp"></div>
+    <button class="win-btn" id="win-next" onclick="winNext()">Next stage →</button>
+    <button class="win-btn ghost" onclick="winMap()">Back to map</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Maze engine — pure and testable. Grid legend: #=wall  .=floor  S=start
+// G=goal  *=star (must collect ALL stars before the goal counts)
+// ══════════════════════════════════════════════════════════════════════════════
+function runMaze(grid, commands) {
+  const rows = grid.length, cols = grid[0].length
+  let x = -1, y = -1
+  const starsNeeded = new Set()
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    if (grid[r][c] === 'S') { x = c; y = r }
+    if (grid[r][c] === '*') starsNeeded.add(r + ',' + c)
+  }
+  const collected = new Set()
+  const steps = [{ x, y }]
+  const D = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] }
+  for (const cmd of commands) {
+    const [dx, dy] = D[cmd]
+    const nx = x + dx, ny = y + dy
+    if (nx < 0 || ny < 0 || nx >= cols || ny >= rows || grid[ny][nx] === '#') {
+      return { ok: false, reason: 'wall', steps, crashAt: { x: nx, y: ny }, collected }
+    }
+    x = nx; y = ny
+    steps.push({ x, y })
+    if (grid[y][x] === '*') collected.add(y + ',' + x)
+    if (grid[y][x] === 'G') {
+      if (collected.size === starsNeeded.size) return { ok: true, steps, collected }
+      return { ok: false, reason: 'stars', steps, collected, missing: starsNeeded.size - collected.size }
+    }
+  }
+  return { ok: false, reason: 'short', steps, collected }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// World 1 — Robot Road stages (par = 3★ command count)
+// ══════════════════════════════════════════════════════════════════════════════
+const W1_STAGES = [
+  { id: 'w1s1', title: 'First Steps', emoji: '👣', par: 3, xp: 20,
+    goal: 'Guide Robo ➡ to the flag. Fewer commands = more stars!',
+    grid: ['#######',
+           '#.....#',
+           '#S..G.#',
+           '#.....#',
+           '#######'] },
+  { id: 'w1s2', title: 'The Corner', emoji: '↪️', par: 5, xp: 20,
+    goal: 'Robo needs to turn a corner this time.',
+    grid: ['#######',
+           '#...G.#',
+           '#.###.#',
+           '#S....#',
+           '#######'] },
+  { id: 'w1s3', title: 'The Detour', emoji: '🚧', par: 10, xp: 25,
+    goal: 'The short way is blocked — find the detour.',
+    grid: ['#########',
+           '#S..#..G#',
+           '#.#.#.#.#',
+           '#.#...#.#',
+           '#.#####.#',
+           '#.......#',
+           '#########'] },
+  { id: 'w1s4', title: 'Snake Path', emoji: '🐍', par: 18, xp: 25,
+    goal: 'Wiggle through the walls like a snake. It\'s a long one!',
+    grid: ['#########',
+           '#S#...#G#',
+           '#.#.#.#.#',
+           '#.#.#.#.#',
+           '#...#...#',
+           '#########'] },
+  { id: 'w1s5', title: 'Star Collector', emoji: '⭐', par: 16, xp: 30,
+    goal: 'Collect BOTH stars before reaching the flag!',
+    grid: ['#########',
+           '#S..*...#',
+           '#.#####.#',
+           '#.......#',
+           '#.#####*#',
+           '#G......#',
+           '#########'] },
+  { id: 'w1boss', title: 'BOSS — Maze Gauntlet', emoji: '👾', boss: true, xp: 60,
+    goal: 'Three mazes in a row. No retreat. You can do this!',
+    mazes: [
+      { par: 14,
+        grid: ['#########',
+               '#S......#',
+               '#######.#',
+               '#G......#',
+               '#########'] },
+      { par: 16,
+        grid: ['#########',
+               '#S#.....#',
+               '#.#.###.#',
+               '#.#.#G#.#',
+               '#...#...#',
+               '#.#####.#',
+               '#.......#',
+               '#########'] },
+      { par: 15,
+        grid: ['#########',
+               '#S..#..*#',
+               '#.#.#.#.#',
+               '#.#...#.#',
+               '#.##.##.#',
+               '#..#.#..#',
+               '##...#.G#',
+               '#########'] },
+    ] },
+]
+
+// ══════════════════════════════════════════════════════════════════════════════
+// The quest map — 12 worlds (only World 1 playable in this release)
+// ══════════════════════════════════════════════════════════════════════════════
+const WORLDS = [
+  { id: 'w1',  name: '🤖 Robot Road',        sub: 'Command a robot — no code yet!',            stages: W1_STAGES, live: true },
+  { id: 'w2',  name: '🧩 Block Basics',       sub: 'Your commands become drag-and-drop blocks', count: 5,  live: false },
+  { id: 'w3',  name: '🎨 Color & Shape Lab',  sub: 'Mix light, draw shapes, code with numbers', count: 6,  live: false },
+  { id: 'w4',  name: '🔁 Loop Land',          sub: 'Why write it 10 times? Repeat!',            count: 6,  live: false },
+  { id: 'w5',  name: '🐢 Turtle Island',      sub: 'Loops + angles = amazing art',              count: 6,  live: false },
+  { id: 'w6',  name: '🖼 Pixel Caves',        sub: 'Pictures are secretly numbers',             count: 5,  live: false },
+  { id: 'w7',  name: '🕵️ Cipher City',        sub: 'Secret codes — make them and crack them',   count: 5,  live: false },
+  { id: 'w8',  name: '🎵 Music Studio',       sub: 'Beats are loops you can hear',              count: 6,  live: false },
+  { id: 'w9',  name: '💃 Dance Party',        sub: 'Code a character to dance to YOUR track',   count: 5,  live: false },
+  { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  count: 7,  live: false },
+  { id: 'w11', name: '🧠 AI World',           sub: 'Teach a machine. Then trick it.',           count: 6,  live: false },
+  { id: 'w12', name: '🚀 The Final Quest',    sub: 'Your masterpiece. Any world. Go big.',      count: 1,  live: false },
+]
+
+// ── Progress (localStorage + server best-effort) ─────────────────────────────
+function getProg() {
+  try { return JSON.parse(localStorage.getItem('bf-g6-quest')) || {} } catch { return {} }
+}
+function saveProg(p) {
+  try { localStorage.setItem('bf-g6-quest', JSON.stringify(p)) } catch {}
+}
+function stageStars(id) { return (getProg()[id] || {}).stars || 0 }
+
+function totalStats() {
+  const p = getProg()
+  let stars = 0, xp = 0, bosses = 0
+  for (const s of W1_STAGES) {
+    const e = p[s.id]
+    if (!e) continue
+    stars += e.stars || 0
+    xp += e.xp || 0
+    if (s.boss && e.stars > 0) bosses++
+  }
+  return { stars, xp, bosses }
+}
+
+// ── Map rendering ─────────────────────────────────────────────────────────────
+function renderMap() {
+  const map = document.getElementById('map')
+  const stats = totalStats()
+  document.getElementById('q-stars').textContent = stats.stars
+  document.getElementById('q-xp').textContent = stats.xp
+  document.getElementById('q-bosses').textContent = stats.bosses
+
+  let html = ''
+  let prevWorldDone = true
+  for (const w of WORLDS) {
+    if (!w.live) {
+      html += '<div class="world locked">'
+        + '<div class="world-head"><div><div class="world-name">' + w.name + '</div>'
+        + '<div class="world-sub">' + w.sub + '</div></div>'
+        + '<div class="world-prog">🔒 ' + w.count + ' stages</div></div>'
+        + '<div class="world-lockmsg">Coming soon — finish the worlds before it to be ready!</div>'
+        + '</div>'
+      continue
+    }
+    const done = w.stages.filter(s => stageStars(s.id) > 0).length
+    const allDone = done === w.stages.length
+    html += '<div class="world">'
+      + '<div class="world-head"><div><div class="world-name">' + w.name + '</div>'
+      + '<div class="world-sub">' + w.sub + '</div></div>'
+      + '<div class="world-prog">' + (allDone ? '🏆 COMPLETE' : done + '/' + w.stages.length) + '</div></div>'
+      + '<div class="stages">'
+    let foundCurrent = false
+    w.stages.forEach((s, i) => {
+      const st = stageStars(s.id)
+      const unlocked = prevWorldDone && (i === 0 || stageStars(w.stages[i - 1].id) > 0)
+      const isCurrent = unlocked && st === 0 && !foundCurrent
+      if (isCurrent) foundCurrent = true
+      const cls = 'stage-node' + (s.boss ? ' boss' : '') + (st > 0 ? ' done' : '') + (isCurrent ? ' current' : '') + (unlocked ? '' : ' locked')
+      html += (i > 0 ? '<span class="stage-arrow">›</span>' : '')
+        + '<div class="' + cls + '" ' + (unlocked ? 'onclick="openStage(\'' + s.id + '\')"' : '') + '>'
+        + (isCurrent ? '<span class="stage-avatar">' + BOT_SVG + '</span>' : '')
+        + '<span class="stage-emoji">' + (unlocked ? s.emoji : '🔒') + '</span>'
+        + '<span class="stage-num">' + (s.boss ? 'BOSS' : 'Stage ' + (i + 1)) + '</span>'
+        + (st > 0 ? '<span class="stage-stars">' + '⭐'.repeat(st) + '</span>' : '')
+        + '</div>'
+    })
+    html += '</div></div>'
+    prevWorldDone = allDone
+  }
+  map.innerHTML = html
+}
+
+const BOT_SVG = '<svg width="22" height="29" viewBox="0 0 72 96">'
+  + '<circle cx="36" cy="5" r="3.4" fill="#a78bfa"/><line x1="36" y1="7" x2="36" y2="12" stroke="#4b5063" stroke-width="2.5"/>'
+  + '<rect x="12" y="13" width="48" height="34" rx="10" fill="#3a3f52" stroke="#565d75" stroke-width="1.5"/>'
+  + '<rect x="18" y="19" width="36" height="22" rx="6" fill="#0b0d16"/>'
+  + '<circle cx="28" cy="29" r="3.4" fill="#67e8f9"/><circle cx="44" cy="29" r="3.4" fill="#67e8f9"/>'
+  + '<rect x="16" y="51" width="40" height="34" rx="7" fill="#3a3f52" stroke="#565d75" stroke-width="1.5"/>'
+  + '</svg>'
+
+// ── Stage player ──────────────────────────────────────────────────────────────
+let activeStage = null      // stage object
+let activeMazeIdx = 0       // for boss gauntlets
+let program = []
+let running = false
+let gauntletCmds = 0        // total commands used across a boss gauntlet
+
+function findStage(id) { return W1_STAGES.find(s => s.id === id) }
+
+function openStage(id) {
+  activeStage = findStage(id)
+  if (!activeStage) return
+  activeMazeIdx = 0
+  program = []
+  document.getElementById('player').classList.add('open')
+  gauntletCmds = 0
+  loadMaze()
+}
+
+function currentMaze() {
+  return activeStage.boss ? activeStage.mazes[activeMazeIdx] : activeStage
+}
+
+function loadMaze() {
+  const m = currentMaze()
+  document.getElementById('p-title').textContent = activeStage.title
+    + (activeStage.boss ? ' — maze ' + (activeMazeIdx + 1) + ' of ' + activeStage.mazes.length : '')
+  document.getElementById('p-goal').textContent = activeStage.goal
+  document.getElementById('p-par').textContent = '3★ target: ' + m.par + ' commands'
+  program = []
+  running = false
+  renderBoard(m.grid)
+  renderProgram()
+  document.getElementById('feedback').textContent = ''
+}
+
+function renderBoard(grid) {
+  const board = document.getElementById('board')
+  const rows = grid.length, cols = grid[0].length
+  board.style.gridTemplateColumns = 'repeat(' + cols + ', 52px)'
+  let html = ''
+  let sx = 0, sy = 0
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const ch = grid[r][c]
+    if (ch === 'S') { sx = c; sy = r }
+    const cls = ch === '#' ? 'tile wall' : ch === 'G' ? 'tile goal' : ch === '*' ? 'tile star' : 'tile'
+    const inner = ch === 'G' ? '🚩' : ch === '*' ? '⭐' : ''
+    html += '<div class="' + cls + '" id="t-' + r + '-' + c + '">' + inner + '</div>'
+  }
+  board.innerHTML = html + '<div id="bot">🤖</div>'
+  placeBot(sx, sy)
+}
+
+function placeBot(x, y) {
+  const bot = document.getElementById('bot')
+  bot.style.left = (10 + x * 55) + 'px'
+  bot.style.top = (10 + y * 55) + 'px'
+}
+
+const CMD_ICON = { U: '⬆️', D: '⬇️', L: '⬅️', R: '➡️' }
+
+function addCmd(c) {
+  if (running) return
+  if (program.length >= 40) { toast('That\'s a lot of commands! Try Clear and think shorter 😄'); return }
+  program.push(c)
+  renderProgram()
+}
+function removeCmd(i) { if (!running) { program.splice(i, 1); renderProgram() } }
+function clearProgram() { if (!running) { program = []; renderProgram(); loadMaze() } }
+
+function renderProgram() {
+  const el = document.getElementById('program')
+  el.innerHTML = program.length
+    ? program.map((c, i) => '<div class="chip" id="chip-' + i + '" onclick="removeCmd(' + i + ')">' + CMD_ICON[c] + '</div>').join('')
+    : '<div class="prog-hint">Add commands, then press RUN ▶</div>'
+  const m = currentMaze()
+  document.getElementById('cmd-count').innerHTML = program.length
+    ? '<b>' + program.length + '</b> command' + (program.length !== 1 ? 's' : '') + ' (3★ target: ' + m.par + ')'
+    : ''
+}
+
+async function runProgram() {
+  if (running || !program.length) return
+  running = true
+  document.getElementById('run-btn').disabled = true
+  const m = currentMaze()
+  const result = runMaze(m.grid, program)
+  const fb = document.getElementById('feedback')
+  fb.textContent = ''
+
+  // animate step by step
+  for (let i = 1; i < result.steps.length; i++) {
+    const chip = document.getElementById('chip-' + (i - 1))
+    if (chip) chip.classList.add('active')
+    placeBot(result.steps[i].x, result.steps[i].y)
+    const key = result.steps[i].y + ',' + result.steps[i].x
+    await sleep(300)
+    if (result.collected.has(key)) {
+      const t = document.getElementById('t-' + result.steps[i].y + '-' + result.steps[i].x)
+      if (t && t.textContent === '⭐') { t.textContent = '✨'; }
+    }
+  }
+
+  if (!result.ok) {
+    const bot = document.getElementById('bot')
+    if (result.reason === 'wall') {
+      bot.classList.add('crash'); setTimeout(() => bot.classList.remove('crash'), 450)
+      fb.style.color = '#f87171'; fb.textContent = '💥 Bonk! Robo hit a wall. Fix your program and try again!'
+    } else if (result.reason === 'stars') {
+      fb.style.color = '#fbbf24'; fb.textContent = '⭐ So close! Collect ALL the stars before the flag (' + result.missing + ' left).'
+    } else {
+      fb.style.color = '#9ca3af'; fb.textContent = '🤔 Robo ran out of commands before the flag. Add more!'
+    }
+    running = false
+    document.getElementById('run-btn').disabled = false
+    return
+  }
+
+  // success
+  gauntletCmds += program.length
+  if (activeStage.boss && activeMazeIdx < activeStage.mazes.length - 1) {
+    fb.style.color = '#4ade80'
+    fb.textContent = '✅ Maze ' + (activeMazeIdx + 1) + ' down! Next one…'
+    await sleep(900)
+    activeMazeIdx++
+    running = false
+    document.getElementById('run-btn').disabled = false
+    loadMaze()
+    return
+  }
+
+  // stage complete — stars
+  let stars
+  if (activeStage.boss) {
+    const totalPar = activeStage.mazes.reduce((a, mz) => a + mz.par, 0)
+    stars = gauntletCmds <= totalPar ? 3 : gauntletCmds <= totalPar + 5 ? 2 : 1
+  } else {
+    stars = program.length <= m.par ? 3 : program.length <= m.par + 2 ? 2 : 1
+  }
+  completeStage(stars)
+}
+
+function completeStage(stars) {
+  const p = getProg()
+  const prev = p[activeStage.id] || {}
+  const newBest = stars > (prev.stars || 0)
+  const firstTime = !prev.stars
+  const xp = firstTime ? activeStage.xp + (stars - 1) * 5 : 0
+  p[activeStage.id] = { stars: Math.max(stars, prev.stars || 0), xp: (prev.xp || 0) + xp }
+  saveProg(p)
+
+  // server best-effort
+  const idx = W1_STAGES.indexOf(activeStage)
+  try { LessonSaves.save('grade6-quest', idx, { passed: true, xpEarned: xp }) } catch (e) {}
+  try { if (typeof me !== 'undefined' && me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+
+  document.getElementById('win-stars').innerHTML =
+    '⭐'.repeat(stars) + '<span class="dim">' + '⭐'.repeat(3 - stars) + '</span>'
+  document.getElementById('win-title').textContent = activeStage.boss ? '👾 BOSS DEFEATED!' : 'Stage complete!'
+  document.getElementById('win-sub').textContent = newBest && !firstTime ? 'New best!' :
+    stars === 3 ? 'Perfect run — couldn\'t be shorter!' :
+    stars === 2 ? 'Great! Can you find a shorter way for 3 stars?' :
+    'Done! Try again with fewer commands for more stars.'
+  document.getElementById('win-xp').textContent = xp > 0 ? '+' + xp + ' XP' : 'Already earned — go for more stars!'
+  const next = W1_STAGES[idx + 1]
+  document.getElementById('win-next').style.display = next ? '' : 'none'
+  document.getElementById('win').classList.add('open')
+  running = false
+  document.getElementById('run-btn').disabled = false
+}
+
+function winNext() {
+  document.getElementById('win').classList.remove('open')
+  const idx = W1_STAGES.indexOf(activeStage)
+  const next = W1_STAGES[idx + 1]
+  if (next) openStage(next.id)
+  else winMap()
+}
+function winMap() {
+  document.getElementById('win').classList.remove('open')
+  closeStage()
+}
+function closeStage() {
+  document.getElementById('player').classList.remove('open')
+  renderMap()
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg; t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 2600)
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+BF.seed()
+const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
+;(async () => {
+  if (me) { try { await LessonSaves.load('grade6-quest') } catch (e) {} }
+  renderMap()
+})()
+</script>
+</body>
+</html>

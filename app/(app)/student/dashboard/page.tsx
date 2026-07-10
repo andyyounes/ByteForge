@@ -19,7 +19,7 @@ import type { Profile, ConceptMastery, DailyChallenge, UserAchievement, MasteryM
 
 // ── Grade 6–13 interactive lesson quick-start ────────────────────────────────
 const GRADE_LESSONS: Record<number, { url: string; title: string; subtitle: string; badge: string }> = {
-  6:  { url: '/lessons/blockly-turtle.html', title: 'Turtle Graphics',            subtitle: 'Draw shapes with drag-and-drop blocks and Python',               badge: 'Grade 6'  },
+  6:  { url: '/lessons/grade6.html',         title: 'The Creator Quest',          subtitle: 'Walk the adventure map — robots, art, music, games & AI',        badge: 'Grade 6'  },
   7:  { url: '/lessons/grade7.html',         title: 'Block + Code Editor',        subtitle: 'Build animations and games with Blockly and JavaScript',         badge: 'Grade 7'  },
   8:  { url: '/lessons/grade8.html',         title: 'Python Editor',              subtitle: 'Write real Python 3 code with a live drawing canvas',           badge: 'Grade 8'  },
   9:  { url: '/lessons/grade9.html',         title: 'Pseudocode & Algorithms',    subtitle: 'Master structured programming with pseudocode and trace tables', badge: 'Grade 9'  },
