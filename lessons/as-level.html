@@ -1028,11 +1028,17 @@
     /* ── Floating AI tutor widget ─────────────────────────────────────────── */
     #bfw-bubble { position:fixed; right:18px; bottom:18px; width:52px; height:52px; border-radius:50%;
       background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; font-size:22px; border:none; cursor:pointer;
-      z-index:8500; box-shadow:0 6px 20px rgba(124,58,237,.45); transition:.15s; }
+      z-index:8501; box-shadow:0 6px 20px rgba(124,58,237,.45);
+      transition:right .38s cubic-bezier(.22,.9,.3,1), transform .15s, box-shadow .15s; }
     #bfw-bubble:hover { transform:scale(1.07); }
-    #bfw-panel { display:none; position:fixed; right:0; bottom:0; width:360px; max-width:90vw;
+    #bfw-panel { display:flex; position:fixed; right:0; bottom:0; width:360px; max-width:90vw;
       background:#0d0f1a; border-left:1px solid rgba(167,139,250,.35);
-      z-index:8500; flex-direction:column; overflow:hidden; box-shadow:-12px 0 40px rgba(0,0,0,.45); }
+      z-index:8500; flex-direction:column; overflow:hidden; box-shadow:-12px 0 40px rgba(0,0,0,.45);
+      transform:translateX(105%); transition:transform .38s cubic-bezier(.22,.9,.3,1); }
+    #bfw-panel.open { transform:translateX(0); }
+    .panel-host { transition:margin-right .38s cubic-bezier(.22,.9,.3,1); }
+    @keyframes bfwIn { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:none } }
+    .bfw-m { animation:bfwIn .25s ease; }
     .bfw-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#111320; border-bottom:1px solid rgba(255,255,255,.08); }
     .bfw-hdr-title { font-size:13px; font-weight:800; color:#c4b5fd; }
     .bfw-hdr-sub { font-size:10px; color:#6b7280; max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -7183,10 +7189,18 @@ function _bfwBoot() {
     + '<button class="bfw-send" id="bfw-send" onclick="_bfwSend()">➤</button></div>'
     + '</div>'
   document.body.appendChild(wrap)
+  _bfwPlaceTop()
+  window.addEventListener('resize', _bfwPlaceTop)
   if (_bfwCtx) {
     const t = document.getElementById('bfw-topic')
     if (t) t.textContent = 'Reading: ' + _bfwCtx.title
   }
+}
+
+function _bfwPlaceTop() {
+  const p = document.getElementById('bfw-panel')
+  const host = document.querySelector('.panel-host')
+  if (p && host) p.style.top = Math.max(0, Math.round(host.getBoundingClientRect().top)) + 'px'
 }
 
 function _bfwToggle() {
@@ -7194,23 +7208,22 @@ function _bfwToggle() {
   const p = document.getElementById('bfw-panel')
   const b = document.getElementById('bfw-bubble')
   const host = document.querySelector('.panel-host')
-  const open = p.style.display === 'flex'
+  const open = p.classList.contains('open')
   if (open) {
-    // Undock — give the lesson its full width back (and remember the choice)
-    p.style.display = 'none'
+    // Slide out — give the lesson its full width back (and remember the choice)
+    p.classList.remove('open')
     if (host) host.style.marginRight = ''
     if (b) { b.style.right = '18px'; b.textContent = '💬'; b.title = 'Ask the AI tutor about this lesson' }
     try { localStorage.setItem('bfw-closed', '1') } catch {}
   } else {
     try { localStorage.removeItem('bfw-closed') } catch {}
-    // Dock to the right side, below the nav/tab bars, full height
-    const top = host ? Math.max(0, Math.round(host.getBoundingClientRect().top)) : 0
-    p.style.top = top + 'px'
-    p.style.display = 'flex'
+    // Slide in — dock below the nav/tab bars, full height
+    _bfwPlaceTop()
+    p.classList.add('open')
     if (host) host.style.marginRight = '360px'
     if (b) { b.style.right = '378px'; b.textContent = '✕'; b.title = 'Close the AI tutor' }
     const i = document.getElementById('bfw-in')
-    if (i) setTimeout(function() { i.focus() }, 50)
+    if (i) setTimeout(function() { i.focus() }, 400)
     const m = document.getElementById('bfw-msgs')
     if (m) m.scrollTop = m.scrollHeight
   }
