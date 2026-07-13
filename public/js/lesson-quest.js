@@ -33,12 +33,140 @@ const LessonQuest = (() => {
   }
   const BOSSES = ['👾','🐉','🦑','🤖','👹','🦖','🐙','💀','🛸','🧟','🦂','🕷️','😈','🧌']
 
+  const DAILY_GOAL = 5      // steps per day to open the daily chest (+30 XP)
+  const RUST_DAYS = 14      // stars older than this show as "rusty" on the path
+
   function key(pk, id) { return 'bf-lq-' + pk + '-' + id }
   function load(pk, id) {
     try { return JSON.parse(localStorage.getItem(key(pk, id))) || { steps: {} } }
     catch (e) { return { steps: {} } }
   }
-  function save(pk, id, st) { try { localStorage.setItem(key(pk, id), JSON.stringify(st)) } catch (e) {} }
+  function save(pk, id, st) {
+    try { localStorage.setItem(key(pk, id), JSON.stringify(st)) } catch (e) {}
+    schedulePush()
+  }
+  function jget(k) { try { return JSON.parse(localStorage.getItem(k)) } catch (e) { return null } }
+  function jset(k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) {}; schedulePush() }
+  function today() { return new Date().toISOString().slice(0, 10) }
+
+  // ── 🔥 Streak + daily quest ─────────────────────────────────────────────────
+  function streakInfo(pk) {
+    const s = jget('bf-lqs-' + pk) || { last: '', streak: 0, best: 0 }
+    const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10)
+    // A streak is "alive" if you worked today or yesterday (today still saveable)
+    const alive = s.last === today() || s.last === y
+    return { streak: alive ? s.streak : 0, active: s.last === today(), best: s.best }
+  }
+  function dailyInfo(pk) {
+    return jget('bf-lqd-' + pk + '-' + today()) || { n: 0 }
+  }
+  function bumpDaily() {
+    const pk = cfg.pageKey
+    const t = today()
+    const s = jget('bf-lqs-' + pk) || { last: '', streak: 0, best: 0 }
+    if (s.last !== t) {
+      const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10)
+      s.streak = s.last === y ? s.streak + 1 : 1
+      s.best = Math.max(s.best, s.streak)
+      s.last = t
+      jset('bf-lqs-' + pk, s)
+      if (s.streak > 1) setTimeout(() => confetti(document.getElementById('lq-bar'), ['🔥']), 600)
+    }
+    const dk = 'bf-lqd-' + pk + '-' + t
+    const d = jget(dk) || { n: 0 }
+    d.n++
+    if (d.n >= DAILY_GOAL && !d.chest) {
+      d.chest = 1
+      jset(dk, d)
+      confetti(document.getElementById('lq-bar'), ['🎁','🔥','⭐','🎉'])
+      if (cfg.onXP) setTimeout(() => cfg.onXP(30, '🎯 Daily Quest complete — chest opened!'), 900)
+    } else {
+      jset(dk, d)
+    }
+  }
+
+  // ── 🩹 Wrong-answer bank (fuel for the Revision Boss) ──────────────────────
+  function bankKey(pk) { return 'bf-lqw-' + pk }
+  function bankMiss(pk, pair) {
+    if (!pair || !pair.name || !pair.def) return
+    const bank = jget(bankKey(pk)) || []
+    if (!bank.some(b => b.name === pair.name)) {
+      bank.push({ name: pair.name, def: pair.def })
+      while (bank.length > 40) bank.shift()
+      jset(bankKey(pk), bank)
+    }
+  }
+
+  // ── ☁️ Server sync via /api/lesson-saves (survives device changes) ─────────
+  // All quest keys are mirrored into one lesson_saves row (lesson '<pk>-quest',
+  // challenge_idx -1). Pull once per page, merge generously, push debounced.
+  let _syncStarted = false, _pushT = null, _dirty = false
+  function syncKeys(pk) {
+    const out = []
+    const pre = ['bf-lq-' + pk + '-', 'bf-lqcp-' + pk + '-', 'bf-lqd-' + pk + '-']
+    const exact = ['bf-lqs-' + pk, 'bf-lqw-' + pk, 'bf-lqrb-' + pk]
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i)
+        if (k && (pre.some(p => k.indexOf(p) === 0) || exact.indexOf(k) !== -1)) out.push(k)
+      }
+    } catch (e) {}
+    return out
+  }
+  function schedulePush() {
+    _dirty = true
+    if (_pushT || !cfg) return
+    _pushT = setTimeout(doPush, 4000)
+  }
+  function doPush() {
+    _pushT = null
+    if (!_dirty || !cfg) return
+    _dirty = false
+    const entries = {}
+    syncKeys(cfg.pageKey).forEach(k => { try { entries[k] = localStorage.getItem(k) } catch (e) {} })
+    fetch('/api/lesson-saves', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lesson: cfg.pageKey + '-quest', challengeIdx: -1, passed: false, saveData: { entries } }),
+    }).catch(() => {})
+  }
+  async function pullSync() {
+    if (_syncStarted || !cfg) return
+    _syncStarted = true
+    try {
+      const res = await fetch('/api/lesson-saves?lesson=' + cfg.pageKey + '-quest')
+      if (res.ok) {
+        const rows = (await res.json()).saves || []
+        const ws = rows.find(r => r.challenge_idx === -1)
+        const entries = ws && ws.save_data && ws.save_data.entries
+        if (entries) {
+          for (const [k, v] of Object.entries(entries)) {
+            try {
+              const cur = localStorage.getItem(k)
+              if (cur == null) { localStorage.setItem(k, v); continue }
+              const a = JSON.parse(cur), b = JSON.parse(v)
+              if (a && b && a.steps && b.steps) {              // lesson state: union
+                a.steps = Object.assign({}, b.steps, a.steps)
+                a.stars = Math.max(a.stars || 0, b.stars || 0)
+                a.starsAt = Math.max(a.starsAt || 0, b.starsAt || 0)
+                localStorage.setItem(k, JSON.stringify(a))
+              } else if (a && b && typeof a.streak === 'number' && typeof b.streak === 'number') {
+                if (String(b.last) > String(a.last)) localStorage.setItem(k, v)   // newer streak wins
+              } else if (Array.isArray(a) && Array.isArray(b)) {  // wrong-answer bank: union
+                const names = new Set(a.map(x => x.name))
+                b.forEach(x => { if (x && !names.has(x.name)) a.push(x) })
+                localStorage.setItem(k, JSON.stringify(a.slice(-40)))
+              } else if (a && b && typeof a.n === 'number' && typeof b.n === 'number') {
+                if (b.n > a.n || (b.chest && !a.chest)) localStorage.setItem(k, v)  // daily: best
+              }
+            } catch (e) {}
+          }
+          renderBar()
+        }
+      }
+    } catch (e) {}
+    // Heartbeat covers keys written outside LessonQuest (checkpoints etc.)
+    setInterval(() => { _dirty = true; doPush() }, 60000)
+  }
 
   function ensureStyles() {
     if (styled) return
@@ -240,13 +368,19 @@ const LessonQuest = (() => {
       if (gen !== _ytGen) return
       const players = frames.map(f => { try { return new YT.Player(f.id) } catch (e) { return null } }).filter(Boolean)
       if (!players.length) { fallback(); return }
+      // Cumulative playtime, not furthest point — scrubbing to the end doesn't count
+      const played = players.map(() => 0)
       let best = 0
       _ytTimer = setInterval(() => {
         if (gen !== _ytGen) { clearInterval(_ytTimer); return }
-        players.forEach(p => {
+        players.forEach((p, i) => {
           try {
-            const d = p.getDuration(), t = p.getCurrentTime()
-            if (d > 0) { sawDuration = true; best = Math.max(best, t / d) }
+            const d = p.getDuration()
+            if (d > 0) {
+              sawDuration = true
+              if (p.getPlayerState() === 1) played[i] += 3   // poll interval, playing
+              best = Math.max(best, played[i] / d)
+            }
           } catch (e) {}
         })
         const pct = Math.min(100, Math.round(best * 125))   // 80% watched = 100% of the step
@@ -310,6 +444,7 @@ const LessonQuest = (() => {
             box.innerHTML = '<div class="lq-check-title" style="color:#4ade80">✓ CORRECT — ' + STEP_META[step].label + ' cleared! +5 XP</div>'
           } else {
             chip.classList.add('bad')
+            bankMiss(cfg.pageKey, target)   // missed term → Revision Boss fuel
             setTimeout(ask, 500)   // new random question — retry costs nothing but thought
           }
         }
@@ -364,9 +499,17 @@ const LessonQuest = (() => {
     bar.innerHTML = '<div class="lq-track"><div class="lq-line"><div class="lq-fill" id="lq-fill"></div></div>'
       + nodes + '</div>'
       + '<div class="lq-meta"><span>Quest progress · <b>' + doneCount + '/' + cfg.steps.length + '</b></span>'
+      + (() => {
+        const sk = streakInfo(cfg.pageKey)
+        const dd = dailyInfo(cfg.pageKey)
+        return '<span style="' + (sk.active ? '' : 'filter:grayscale(1);opacity:.7') + '">🔥 <b>'
+          + sk.streak + '</b> day' + (sk.streak === 1 ? '' : 's') + '</span>'
+          + '<span' + (dd.chest ? ' style="color:#fbbf24"' : '') + '>🎯 Daily <b>'
+          + Math.min(dd.n, DAILY_GOAL) + '/' + DAILY_GOAL + '</b>' + (dd.chest ? ' 🎁' : '') + '</span>'
+      })()
       + (cfg.alreadyDone && !Object.keys(st.steps).length
         ? '<span>🏆 <b>Topic complete</b></span>'
-        : '<span>+5 XP per step · <b>' + Object.keys(st.steps).filter(k => k !== 'boss').length * 5 + ' XP</b> banked</span>') + '</div>'
+        : '<span><b>' + Object.keys(st.steps).filter(k => k !== 'boss').length * 5 + ' XP</b> banked</span>') + '</div>'
     requestAnimationFrame(() => {
       const f = document.getElementById('lq-fill')
       if (f) f.style.width = pct + '%'
@@ -377,16 +520,21 @@ const LessonQuest = (() => {
     if (!cfg || cfg.steps.indexOf(step) === -1) return
     const st = state()
     if (st.steps[step]) {
-      if (opts && opts.stars && opts.stars > (st.stars || 0)) { st.stars = opts.stars; save(cfg.pageKey, cfg.topicId, st) }
+      if (opts && opts.stars) {   // a re-fight refreshes rust and can improve stars
+        st.stars = Math.max(st.stars || 0, opts.stars)
+        st.starsAt = Date.now()
+        save(cfg.pageKey, cfg.topicId, st)
+      }
       renderBar()
       return
     }
     st.steps[step] = 1
-    if (opts && opts.stars) st.stars = Math.max(st.stars || 0, opts.stars)
+    if (opts && opts.stars) { st.stars = Math.max(st.stars || 0, opts.stars); st.starsAt = Date.now() }
     save(cfg.pageKey, cfg.topicId, st)
     renderBar(step)
     confetti(document.getElementById('lq-n-' + step))
     if (cfg.onXP && step !== 'boss') cfg.onXP(5, STEP_META[step].label)
+    bumpDaily()
   }
 
   // ── 🔑 Match-Up mini-game ──────────────────────────────────────────────────
@@ -442,6 +590,7 @@ const LessonQuest = (() => {
         }
       } else {
         chip.classList.add('bad'); selTerm.classList.add('bad')
+        bankMiss(cfg.pageKey, pairs[+selTerm.dataset.t])   // missed term → Revision Boss fuel
         const t = selTerm
         setTimeout(() => { chip.classList.remove('bad'); t.classList.remove('bad') }, 400)
       }
@@ -546,6 +695,9 @@ const LessonQuest = (() => {
 
       // ⚔️ boss over practice
       if (steps.indexOf('practice') !== -1) buildBoss(c)
+
+      // ☁️ first attach pulls server progress and starts the heartbeat
+      pullSync()
     },
 
     // checkAnswers hook — plays the boss battle from the rendered verdicts
@@ -596,17 +748,61 @@ const LessonQuest = (() => {
       try {
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i)
-          if (k && k.indexOf('bf-lq-' + pageKey + '-') === 0) {
+          if (!k) continue
+          if (k.indexOf('bf-lq-' + pageKey + '-') === 0) {
             const st = JSON.parse(localStorage.getItem(k))
             xp += Object.keys((st && st.steps) || {}).filter(s => s !== 'boss').length * 5
+          } else if (k.indexOf('bf-lqd-' + pageKey + '-') === 0) {
+            const d = JSON.parse(localStorage.getItem(k))
+            if (d && d.chest) xp += 30                       // daily quest chests
           }
         }
+        xp += parseInt(localStorage.getItem('bf-lqrb-' + pageKey)) || 0   // revision bosses
       } catch (e) {}
       return xp
     },
 
     stars(pageKey, topicId) {
       return load(pageKey, topicId).stars || 0
+    },
+
+    // Stars earned long ago go "rusty" on the Journey path — time to re-fight
+    rusty(pageKey, topicId) {
+      const st = load(pageKey, topicId)
+      return !!(st.stars && st.starsAt && Date.now() - st.starsAt > RUST_DAYS * 864e5)
+    },
+
+    bank(pageKey, pair) { bankMiss(pageKey, pair) },
+    bankSize(pageKey) { return (jget(bankKey(pageKey)) || []).length },
+
+    // 🩹 Revision Boss — a quiz built from this student's own past mistakes.
+    // Terms answered correctly in a passed run leave the bank for good.
+    revBoss(pageKey, hooks) {
+      const bank = jget(bankKey(pageKey)) || []
+      if (bank.length < 4) { if (hooks && hooks.onDone) hooks.onDone(); return }
+      const pick = shuffle(bank).slice(0, Math.min(8, bank.length))
+      const questions = pick.map(t => {
+        const wrong = shuffle(bank.filter(o => o.name !== t.name)).slice(0, 3)
+        const options = shuffle([t, ...wrong])
+        return { q: t.def, options: options.map(o => o.name), a: options.indexOf(t) }
+      })
+      this.quiz({
+        title: '🩹 Revision Boss',
+        sub: 'Built from YOUR past mistakes (' + bank.length + ' banked). Beat it for +40 XP — cleared terms leave the bank.',
+        questions: questions,
+        onPass: () => {
+          const names = new Set(pick.map(t => t.name))
+          jset(bankKey(pageKey), (jget(bankKey(pageKey)) || []).filter(b => !names.has(b.name)))
+          try {
+            const rk = 'bf-lqrb-' + pageKey
+            localStorage.setItem(rk, String((parseInt(localStorage.getItem(rk)) || 0) + 40))
+          } catch (e) {}
+          schedulePush()
+          if (hooks && hooks.onXP) hooks.onXP(40, 'Revision Boss defeated!')
+          if (hooks && hooks.onDone) hooks.onDone()
+        },
+        onClose: () => { if (hooks && hooks.onDone) hooks.onDone() },
+      })
     },
 
     /**
@@ -673,7 +869,11 @@ const LessonQuest = (() => {
             const right = i === q.a
             chip.classList.add(right ? 'ok' : 'bad')
             if (right) confetti(chip, ['✨','🎯'])
-            else { const c2 = ov.querySelectorAll('.lq-chip')[q.a]; if (c2) c2.classList.add('ok') }
+            else {
+              const c2 = ov.querySelectorAll('.lq-chip')[q.a]
+              if (c2) c2.classList.add('ok')
+              if (opts.onMiss) try { opts.onMiss(q) } catch (e) {}
+            }
             results.push(right)
             setTimeout(() => { idx++; step() }, right ? 500 : 1100)
           }

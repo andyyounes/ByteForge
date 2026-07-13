@@ -89,6 +89,10 @@ const QuestMap = (() => {
       .qm-pstars { font-size:10px; margin-top:2px; letter-spacing:-1px; }
       .qm-node.cp { border-style:dashed; border-color:rgba(96,165,250,.55); }
       .qm-node.cp.done { border-color:#4ade80; }
+      .qm-node.rusty { border-color:#f59e0b !important; border-style:dashed !important;
+                       background:linear-gradient(145deg,#78350f,#b45309) !important; }
+      .qm-rusty-tag { position:absolute; top:-10px; right:-10px; font-size:14px;
+                      filter:drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
     `
     const el = document.createElement('style')
     el.textContent = css
@@ -193,15 +197,17 @@ const QuestMap = (() => {
         if (isCurrent) foundCurrent = true
         const soon = cfg.softLock && !s.done && !isCurrent
         const cls = 'qm-node' + (s.boss ? ' boss' : '') + (s.cp ? ' cp' : '') + (s.done ? ' done' : '')
-          + (isCurrent ? ' current' : '') + (soon ? ' soon' : '')
+          + (isCurrent ? ' current' : '') + (soon ? ' soon' : '') + (s.rusty ? ' rusty' : '')
         html += '<div class="qm-pwrap" style="transform:translateX(' + OFF[k % OFF.length] + 'px)">'
           + '<div class="' + cls + '" onclick="QuestMap._open(\'' + esc(s.id) + '\')" title="' + esc(s.label) + '">'
           + (isCurrent && cfg.avatarSvg ? '<span class="qm-avatar">' + cfg.avatarSvg + '</span>' : '')
+          + (s.rusty ? '<span class="qm-rusty-tag">🩹</span>' : '')
           + '<span class="qm-emoji">' + (s.emoji || '📘') + '</span>'
           + (s.done ? '<span class="qm-done-mark">' + (s.stars ? '⭐'.repeat(s.stars) : (s.boss ? '🏆' : '⭐')) + '</span>' : '')
           + '</div>'
           + '<div class="qm-plabel">' + esc(s.label)
-          + (s.stars && !s.done ? '<div class="qm-pstars">' + '⭐'.repeat(s.stars) + '</div>' : '') + '</div>'
+          + (s.rusty ? '<div class="qm-pstars" style="color:#f59e0b">rusty — re-fight the boss!</div>'
+             : s.stars && !s.done ? '<div class="qm-pstars">' + '⭐'.repeat(s.stars) + '</div>' : '') + '</div>'
           + (isCurrent ? '<div class="qm-next-pill">▶ NEXT UP</div>' : '')
           + '</div>'
         k++

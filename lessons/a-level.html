@@ -6599,6 +6599,7 @@ function showJourney() {
       stages.push({
         id: id, emoji: EMO[i % EMO.length], label: (TOPICS[id] || {}).title || id, done: isTopicDone(id),
         stars: (typeof LessonQuest !== 'undefined') ? LessonQuest.stars('al', id) : 0,
+        rusty: (typeof LessonQuest !== 'undefined') ? LessonQuest.rusty('al', id) : false,
       })
       batch.push(id)
       // A 🎯 checkpoint quiz after every 3 topics (needs enough key terms)
@@ -6615,6 +6616,10 @@ function showJourney() {
     stages.push({ id: 'exam-' + num, emoji: '📝', label: 'Chapter ' + num + ' Exam', boss: true, done: false })
     return { name: (first ? first.chapter : 'Chapter ' + num), sub: '', live: true, stages: stages }
   })
+  if (typeof LessonQuest !== 'undefined' && LessonQuest.bankSize('al') >= 4) {
+    worlds.push({ name: '🩹 Revision Den', sub: 'A boss made of your own past mistakes — defeat them for good', live: true,
+      stages: [{ id: 'revboss', emoji: '🩹', label: 'Revision Boss (' + LessonQuest.bankSize('al') + ' mistakes banked)', boss: true, done: false }] })
+  }
   QuestMap.show({
     title: '🗺 Your A Level Journey',
     subtitle: 'One path to Cambridge — lessons, checkpoints, bosses. Clear the NEXT UP node!',
@@ -6623,6 +6628,7 @@ function showJourney() {
     avatarSvg: (typeof _BFW_AV !== 'undefined') ? _BFW_AV : '',
     worlds: worlds,
     onOpen: function(id) {
+      if (id === 'revboss') { _revRun(); return }
       if (id.indexOf('cp-') === 0) { _cpRun(id, cpCovered[id] || []); return }
       if (id.indexOf('exam-') === 0) {
         const n = parseInt(id.slice(5))
@@ -6653,6 +6659,7 @@ function _cpRun(cpId, ids) {
     title: '🎯 Checkpoint',
     sub: 'Match each definition to the right key term — 80%+ clears it (+20 XP)',
     questions: questions,
+    onMiss: function(q) { try { LessonQuest.bank('al', { name: q.options[q.a], def: q.q }) } catch (e) {} },
     onPass: function() {
       try { localStorage.setItem('bf-lqcp-al-' + cpId, '1') } catch (e) {}
       const prev = getLocalXP() - 20
@@ -6662,6 +6669,19 @@ function _cpRun(cpId, ids) {
       showJourney()
     },
     onClose: function() { showJourney() },
+  })
+}
+function _revRun() {
+  LessonQuest.revBoss('al', {
+    onXP: function(amount, label) {
+      try {
+        const prev = getLocalXP() - amount
+        if (me) BF.addXP(me.id, amount)
+        showToast('🩹 +' + amount + ' XP — ' + label)
+        updateXPBar(prev)
+      } catch (e) {}
+    },
+    onDone: function() { showJourney() },
   })
 }
 
