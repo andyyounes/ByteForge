@@ -173,9 +173,11 @@ const LessonQuest = (() => {
     styled = true
     const css = `
       /* ── Quest path ─────────────────────────────────────────────── */
-      .lq-bar { position:sticky; top:0; z-index:6; background:rgba(13,15,26,.96); backdrop-filter:blur(8px);
+      .lq-bar { position:sticky; top:-1px; z-index:30; background:#0d0f1a;
                 border:1px solid rgba(255,255,255,.09); border-radius:14px; padding:14px 16px 10px;
-                margin-bottom:18px; overflow-x:auto; }
+                margin-bottom:18px; overflow-x:auto;
+                /* solid block above the bar hides content scrolling through the pane's top padding */
+                box-shadow:0 -26px 0 0 #0d0f1a, 0 8px 18px rgba(0,0,0,.45); }
       .lq-track { position:relative; display:flex; justify-content:space-between; align-items:flex-start;
                   min-width:340px; padding:14px 10px 0; }
       .lq-line { position:absolute; top:32px; left:28px; right:28px; height:5px; border-radius:99px;
