@@ -13,29 +13,29 @@
 - [ ] Past-paper PDF importer (teacher uploads a real Paper 4 → lab category, verbatim).
 
 ## Gamification
-- [ ] Streak flame in XP strip + streak shields (weekly).
-- [ ] Daily quests (daily_challenges table exists, unused).
+- [x] Streak flame (in quest bar) + daily quest chest (5 steps/day = +30 XP). AS/A only.
 - [ ] XP chests with variable rewards.
 - [ ] Weekly class leaderboard (reset Mondays).
 - [ ] OBS-01 cosmetics unlocked by level.
 - [ ] Badge gallery with locked silhouettes (user_achievements table exists).
-- [ ] **Rusty nodes (spaced repetition):** checkpoint/boss stars fade after ~2 weeks;
-      the Journey path shows a cracked node prompting a quick re-clear (Duolingo's
-      strongest retention mechanic, and it directly serves exam revision).
+- [x] Rusty nodes (spaced repetition): stars >14 days old go amber on the Journey
+      path; re-fighting the boss refreshes them. AS/A only.
 - [ ] Legendary bosses: re-fight a beaten practice boss at a stricter threshold
       (85%+ with fewer attempts) for a gold crown on the path node.
-- [ ] Wrong-answer bank: micro-check/checkpoint misses resurface in a weekly
-      "revision boss" built from each student's own mistakes.
-- [ ] Watch tracking v2: cumulative playtime instead of furthest-point, so
-      scrubbing to the end doesn't count as watching.
+- [x] Wrong-answer bank → 🩹 Revision Boss world on the Journey path (misses from
+      match-up / quick checks / checkpoints; pass = +40 XP, terms leave the bank).
+- [x] Watch tracking v2: cumulative playtime (scrubbing no longer counts).
 
 ## Learning quality
 - [ ] AI-marked practice: replace the keyword scorer with a Groq call against the
       mark scheme (route through /api/ai-check) — boss-fight damage gets fair.
 - [ ] LessonQuest + Journey path for IGCSE Y1/Y2 (engines are page-agnostic).
+- [ ] Streak shields (miss one day without losing the flame) + weekly quests.
 
 ## Platform
-- [ ] Code Lab / quest progress → server (lesson_saves) so it survives device changes.
+- [x] Quest progress → server (lesson_saves row `<pk>-quest`): steps, stars,
+      checkpoints, streak, daily, wrong-answer bank. Pull-merge on lesson open,
+      debounced push + 60s heartbeat. (Code Lab exercise saves still local-only.)
 - [ ] Teacher gradebook: per-class exercise/stage completion grid.
 - [ ] Timed mock-exam mode for the past-paper categories.
 - [ ] Interpreter: short-circuit AND/OR (removes the flag-pattern workaround).
