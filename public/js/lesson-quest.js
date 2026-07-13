@@ -173,11 +173,12 @@ const LessonQuest = (() => {
     styled = true
     const css = `
       /* ── Quest path ─────────────────────────────────────────────── */
-      .lq-bar { position:sticky; top:-1px; z-index:30; background:#0d0f1a;
-                border:1px solid rgba(255,255,255,.09); border-radius:14px; padding:14px 16px 10px;
+      /* Flush full-width sticky header — attach() bleeds it into the pane's
+         padding with negative margins, so nothing scrolls through around it */
+      .lq-bar { position:sticky; top:0; z-index:30; background:#0d0f1a;
+                border-bottom:1px solid rgba(255,255,255,.09); padding:12px 16px 8px;
                 margin-bottom:18px; overflow-x:auto;
-                /* solid block above the bar hides content scrolling through the pane's top padding */
-                box-shadow:0 -26px 0 0 #0d0f1a, 0 8px 18px rgba(0,0,0,.45); }
+                box-shadow:0 8px 18px rgba(0,0,0,.45); }
       .lq-track { position:relative; display:flex; justify-content:space-between; align-items:flex-start;
                   min-width:340px; padding:14px 10px 0; }
       .lq-line { position:absolute; top:32px; left:28px; right:28px; height:5px; border-radius:99px;
@@ -683,6 +684,13 @@ const LessonQuest = (() => {
       bar.className = 'lq-bar'
       bar.id = 'lq-bar'
       lessonPane.insertBefore(bar, lessonPane.firstChild)
+      // Bleed into the scroll pane's padding so the bar spans edge to edge
+      // and no lesson content can scroll through beside/above it
+      try {
+        const cs = getComputedStyle(c)
+        bar.style.margin = '-' + cs.paddingTop + ' -' + cs.paddingRight + ' 16px -' + cs.paddingLeft
+        bar.style.padding = '12px ' + cs.paddingRight + ' 8px ' + cs.paddingLeft
+      } catch (e) {}
       renderBar()
 
       // 🎬 videos — verified by the YouTube API, not an honor button
