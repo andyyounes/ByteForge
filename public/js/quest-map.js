@@ -126,7 +126,8 @@ const QuestMap = (() => {
           + (isCurrent && cfg.avatarSvg ? '<span class="qm-avatar">' + cfg.avatarSvg + '</span>' : '')
           + '<span class="qm-emoji">' + (unlocked ? (s.emoji || '📘') : '🔒') + '</span>'
           + '<span class="qm-label">' + esc(s.label) + '</span>'
-          + (s.done ? '<span class="qm-done-mark">' + (s.boss ? '🏆' : '⭐') + '</span>' : '')
+          + (s.stars ? '<span class="qm-done-mark" style="letter-spacing:-1px">' + '⭐'.repeat(s.stars) + '</span>'
+             : s.done ? '<span class="qm-done-mark">' + (s.boss ? '🏆' : '⭐') + '</span>' : '')
           + '</div>'
       })
       html += '</div></div>'

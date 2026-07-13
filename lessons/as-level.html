@@ -7418,6 +7418,7 @@ function showJourney() {
     const first = TOPICS[ids[0]]
     const stages = ids.map((id, i) => ({
       id: id, emoji: EMO[i % EMO.length], label: (TOPICS[id] || {}).title || id, done: isTopicDone(id),
+      stars: (typeof LessonQuest !== 'undefined') ? LessonQuest.stars('as', id) : 0,
     }))
     stages.push({ id: 'exam-' + num, emoji: '📝', label: 'Chapter ' + num + ' Exam', boss: true, done: false })
     return { name: (first ? first.chapter : 'Chapter ' + num), sub: '', live: true, stages: stages }
