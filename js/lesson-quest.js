@@ -173,11 +173,11 @@ const LessonQuest = (() => {
     styled = true
     const css = `
       /* ── Quest path ─────────────────────────────────────────────── */
-      /* Flush full-width sticky header — attach() bleeds it into the pane's
-         padding with negative margins, so nothing scrolls through around it */
-      .lq-bar { position:sticky; top:0; z-index:30; background:#0d0f1a;
-                border-bottom:1px solid rgba(255,255,255,.09); padding:12px 16px 8px;
-                margin-bottom:18px; overflow-x:auto;
+      /* Fixed header row: lives OUTSIDE the scroll container, as a flex child
+         directly under the Topics/Practice tabs — content scrolls beneath it */
+      .lq-bar { flex-shrink:0; position:relative; z-index:30; background:#0d0f1a;
+                border-bottom:1px solid rgba(255,255,255,.09); padding:10px 24px 6px;
+                margin:0; overflow-x:auto;
                 box-shadow:0 8px 18px rgba(0,0,0,.45); }
       .lq-track { position:relative; display:flex; justify-content:space-between; align-items:flex-start;
                   min-width:340px; padding:14px 10px 0; }
@@ -679,18 +679,19 @@ const LessonQuest = (() => {
       cfg.steps = steps
 
       // Quest path bar at the top of the lesson pane
-      const lessonPane = c.querySelector('.topic-pane') || c
+      // The bar sits OUTSIDE the scroll container, as its previous sibling in
+      // the pane's flex column — permanently visible, flush under the tabs.
+      // (It survives re-renders of c's innerHTML, so remove any old one first.)
+      const oldBar = document.getElementById('lq-bar')
+      if (oldBar) oldBar.remove()
       const bar = document.createElement('div')
       bar.className = 'lq-bar'
       bar.id = 'lq-bar'
-      lessonPane.insertBefore(bar, lessonPane.firstChild)
-      // Bleed into the scroll pane's padding so the bar spans edge to edge
-      // and no lesson content can scroll through beside/above it
-      try {
-        const cs = getComputedStyle(c)
-        bar.style.margin = '-' + cs.paddingTop + ' -' + cs.paddingRight + ' 16px -' + cs.paddingLeft
-        bar.style.padding = '12px ' + cs.paddingRight + ' 8px ' + cs.paddingLeft
-      } catch (e) {}
+      c.parentNode.insertBefore(bar, c)
+      // The scroll container must flex-fill what's left, not claim 100% height
+      c.style.height = 'auto'
+      c.style.flex = '1 1 0%'
+      c.style.minHeight = '0'
       renderBar()
 
       // 🎬 videos — verified by the YouTube API, not an honor button
