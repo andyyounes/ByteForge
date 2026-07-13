@@ -1,12 +1,13 @@
 # ByteForge — Improvements Backlog
 
 ## Content
-- [ ] **Grade 6: harder challenges.** Current Robot Road / Block Basics stages land well but
-      top students clear them fast. Add per-world "bonus hard" side-stages (tighter pars,
-      bigger mazes, command limits, no-repeat runs), and a ★★★-only secret world.
-- [ ] Grade 6: build remaining worlds — Color & Shape Lab (RGB mixer), Loop Land,
-      Turtle Island, Pixel Caves, Cipher City, Music Studio (Web Audio), Dance Party,
-      Game Corner, AI World, Final Quest.
+- [x] Grade 6 harder challenges: W1 got Triple Star (par 26) + The Labyrinth (par 24);
+      W2 got The Spiral (10 chips) + Star Snake (8 chips). Still open: ★★★-only secret world.
+- [x] Grade 6 World 3 — Color & Shape Lab (RGB mixer, 5 stages + Rainbow Gauntlet boss).
+- [ ] Grade 6: build remaining worlds — Loop Land, Turtle Island, Pixel Caves,
+      Cipher City, Music Studio (Web Audio), Dance Party, Game Corner, AI World,
+      Final Quest. (World-boss unlock + per-stage engines are in place; each new
+      world = a stage list + a mini-game engine like the color mixer.)
 - [ ] Grade 7 / Grade 8 curriculum decision pending — quest maps ready to wire once decided
       (shared engine `public/js/quest-map.js` already supports it).
 - [ ] Expand A Level Code Lab sets (5 → 10 per category) + more full past papers.
