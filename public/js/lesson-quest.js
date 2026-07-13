@@ -364,7 +364,9 @@ const LessonQuest = (() => {
     bar.innerHTML = '<div class="lq-track"><div class="lq-line"><div class="lq-fill" id="lq-fill"></div></div>'
       + nodes + '</div>'
       + '<div class="lq-meta"><span>Quest progress · <b>' + doneCount + '/' + cfg.steps.length + '</b></span>'
-      + '<span>+5 XP per step · <b>' + Object.keys(st.steps).filter(k => k !== 'boss').length * 5 + ' XP</b> banked</span></div>'
+      + (cfg.alreadyDone && !Object.keys(st.steps).length
+        ? '<span>🏆 <b>Topic complete</b></span>'
+        : '<span>+5 XP per step · <b>' + Object.keys(st.steps).filter(k => k !== 'boss').length * 5 + ' XP</b> banked</span>') + '</div>'
     requestAnimationFrame(() => {
       const f = document.getElementById('lq-fill')
       if (f) f.style.width = pct + '%'
