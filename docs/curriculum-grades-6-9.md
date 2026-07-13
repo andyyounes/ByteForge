@@ -173,23 +173,79 @@ simple nearest-neighbour under the hood), bar-chart builder.
 
 ---
 
-# GRADE 7 — "The Game Maker" (EXISTING — unchanged)
+# GRADE 7 — "The Game Maker" (v2 — researched 2026-07)
 
-36 weeks, 10 modules: Variables & State → Conditionals → Functions → Keyboard → Mouse →
-Collision → Game State → Game Design → Strings → Capstone. Blocks (M1–2) → text-primary
-(M3–5) → text-only (M6–10). *Validated against the ladder: correct placement — it consumes
-G6's events/variables/decisions in block form and hands G8 a student who has written real
-text code inside a game loop.*
+**36 weeks × 2h = 72h · Game Maker Galaxy · blocks → hybrid → text, inside games**
+
+Identity: one year, one promise — *you will ship real games*. Every world ends in a
+playable boss build (the MakeCode-Arcade model: each unit = a working game increment).
+Concepts G6 met visually (variables, events, decisions) return at game depth — spiral.
+
+**The transition is a bridge, not a cliff.** The systematic-review evidence on
+block→text transition favours *dual-modality* environments (block and text views of
+the same program, EduBlocks/Mindplus-style) over a hard jump; Raspberry Pi's KS3
+curriculum keeps Year 7 in Scratch and only opens Python late in Year 8. So G7 runs a
+three-phase modality arc — earlier than RPF because the games context carries it, but
+never a cliff:
+
+- **Term 1 — Read the Code (blocks + 🩻 x-ray):** build in blocks; an always-on "x-ray
+  pane" shows the equivalent text code live. Students *read* text all term without
+  writing it.
+- **Term 2 — Speak the Code (dual-view):** block ↔ text toggle on the same program;
+  edits allowed in either view. Parson's-style "reassemble the text" warmups.
+- **Term 3 — Own the Code (text-first):** text editor is primary; block view remains
+  as a reference crutch that quietly stops being needed.
+
+### Term 1 — Read the Code (W1–12)
+| World | Weeks | What they build | CS concepts | Boss build |
+|-------|-------|-----------------|-------------|-----------|
+| 🚀 G1 Sprite Start | 2 | Sprites, x/y coordinates, motion, costumes | Coordinates, sequences | Bouncing DVD-logo toy |
+| 🎚 G2 Variables & State | 3 | Score, health, timers, speed-ups | Variables, assignment, update loops | Clicker game with upgrades |
+| 🚦 G3 Decisions | 4 | Touching? Score > 10? Out of bounds? | Conditionals, boolean logic, game rules | Dodge-the-asteroids |
+| 🧰 G4 My Blocks | 3 | jump(), shoot(), spawnEnemy() — powers you define | Functions, parameters, decomposition | Platformer vertical slice |
+
+### Term 2 — Speak the Code (W13–24)
+| World | Weeks | What they build | CS concepts | Boss build |
+|-------|-------|-----------------|-------------|-----------|
+| ⌨️ G5 Player Control | 3 | Keyboard + mouse input schemes, aiming | Events, input handling | Top-down shooter controls |
+| 💥 G6 Collision & Physics | 3 | Hitboxes, bouncing, gravity, knockback | Collision detection, coordinate math | Breakout clone |
+| 🎬 G7 Game States | 3 | Menu → playing → paused → game-over → win | State machines, program structure | Full game loop w/ screens |
+| 🤖 G8 Smart NPCs | 3 | Enemies that chase, flee, patrol; a rule-based chatbot shopkeeper | Game AI: rules → state machines; AI literacy (what's *not* intelligent) | Enemy with 3 behaviours |
+
+### Term 3 — Own the Code (W25–36)
+| World | Weeks | What they build | CS concepts | Boss build |
+|-------|-------|-----------------|-------------|-----------|
+| 💬 G9 Strings & Dialogue | 3 | Player names, dialogue trees, high-score tables | Strings, concatenation, comparison | RPG dialogue scene |
+| 🏆 G10 Design & Capstone | 7 | Design doc → prototype → playtest → iterate → ship their own game | Everything + refining programs from user feedback (CSTA practice) | **Their game, in the class arcade** |
+| 🎪 Arcade Showcase | 2 | Class plays everyone's games, awards; "your game logic in Python" teaser | Transition seed for G8 | — |
+
+**Badges:** Sprite Wrangler · State Keeper · Rule Maker · Block Smith · Controller ·
+Physicist · Director · NPC Trainer · Wordsmith · **Game Maker** (capstone shipped).
+
+**0860 strand coverage:** CT ✔(G3,G6,G7) · Programming ✔(G2–G10) · Data ✔(G2 state,
+G9 high-scores) · Networks/comms ✔(gallery publishing, online-safety week in G1) ·
+Systems ✔(input devices in G5; frames/game-loop timing in G6).
+
+**Why an AI world in a games year:** the field is moving AI literacy into middle school
+(Code.org is succeeding CS Discoveries with *AI Discoveries* for 2026–27). Game NPCs are
+the honest way in at this age: students build rule-based "intelligence" themselves and
+discover what it can't do — inoculation against AI magic-thinking, no black boxes.
 
 ---
 
-# GRADE 8 — "The App Builder" (NEW)
+# GRADE 8 — "The App Builder" (v2 — researched 2026-07)
 
 **36 weeks × 2h = 72h · Python, text-first · from games to useful programs**
 
 Identity: G7 made things fun; G8 makes things *useful*. Real Python in a real editor,
 working with real data. First term shows block-equivalents alongside text (transition
 scaffold), then blocks disappear forever.
+
+*Research note:* full-Python in G8 matches the reference progressions — Raspberry Pi's
+KS3 curriculum introduces Python at the end of Year 8 and runs "Python with sequences
+of data" + data science in Year 9; our G8 = that Y8/Y9 material, reachable because G7
+already banked a hybrid year of text-in-games. PRIMM (Predict-Run-Investigate-Modify-Make)
+is the session skeleton throughout — it exists precisely for this stage of the transition.
 
 **Session format:** Hour 1 = PRIMM cycle on the week's concept · Hour 2 = running project.
 Running project each term is chosen from 3 options (voice & choice sustains motivation).
@@ -205,8 +261,8 @@ Running project each term is chosen from 3 options (voice & choice sustains moti
 ### Term 2 — Data & Systems (W13–24)
 | Module | Weeks | Content | Platform asset |
 |--------|-------|---------|----------------|
-| M5 Strings & Validation | 3 | Slicing, methods, checking user input; username/password validator mini-project | new challenges |
-| M6 Files & Data | 4 | Reading/writing text files, CSV, mean/max/min, drawing a chart from real data | new challenges |
+| M5 Strings & Validation | 3 | Slicing, methods, checking user input; username/password validator; **Caesar cipher in real code** (G6's cipher wheel, now yours to program — CSTA "model encryption") | new challenges |
+| M6 Files & Data | 4 | Reading/writing text files, CSV, mean/max/min, drawing a chart from real data; AI peek: simple predictor over their own CSV (average-based — no black boxes) | new challenges |
 | M7 Inside the Machine | 3 | Binary numbers (light — spiral from G6 cards, before G9 depth), storage units KB→TB, hardware tour, how images/sound are numbers | binary-cards, compression.html ✔ |
 | M8 The Connected World | 2 | How the internet works (packets, IP, DNS — story level), staying safe, build a one-page HTML profile | new |
 
@@ -249,5 +305,21 @@ Python is consolidation + depth rather than first contact. Direct feed into IGCS
 ## Sources
 - PRIMM research (Sentance et al.): primmportal.com/research; ACM SIGCSE'19 "Teachers'
   Experiences of using PRIMM to Teach Programming in School"
-- Cambridge Lower Secondary Computing (0860) curriculum framework — five strands,
-  stages 7–9 progression
+- Cambridge Lower Secondary Computing (0860) curriculum framework — five strands
+  (Computational Thinking, Programming, Managing Data, Networks & Digital Communication,
+  Computer Systems), stages 7–9, ages 11–14
+- Raspberry Pi Foundation "The Computing Curriculum" KS3 (raspberrypi.org/curriculum/key-stage-3):
+  Y7 all-Scratch (parts I & II), Python introduced end of Y8, "Python with sequences of
+  data" + data science + cybersecurity in Y9 — reference point for our G7/G8 pacing
+- "Supporting learners in the transition from block-based to text-based programming, a
+  systematic review" (Computers & Education Open, 2025, sciencedirect.com/science/article/pii/S2590118425000280)
+  — dual-modality/bridging environments beat hard jumps; basis for the G7 x-ray → dual-view →
+  text-first arc (cf. EduBlocks, RPF's own "Scratch to Python" bridge course on FutureLearn)
+- CSTA K-12 CS Standards Level 2, grades 6–8 (csteachers.org/k12standards): computing
+  systems, networks, data & analysis, algorithms & programming, impacts; "model encryption",
+  "refine programs based on feedback" → G8-M5 cipher, G7-G10 playtesting loop
+- Code.org CS Discoveries (grades 6–10) unit themes (web, games/animations, data, physical
+  computing, app design) and its 2026–27 successor **AI Discoveries** — evidence for
+  project-per-unit structure and for adding age-appropriate AI literacy (G7 Smart NPCs world)
+- Microsoft MakeCode Arcade educator curriculum (arcade.makecode.com/educators) — the
+  "every unit ships a playable game increment" model behind G7's boss builds
