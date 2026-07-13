@@ -59,10 +59,11 @@ const LessonQuest = (() => {
       .lq-node { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;
                  gap:4px; cursor:default; min-width:52px; }
       .lq-orb { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-                font-size:17px; background:#161927; border:3px solid #2b3044; transition:.25s; }
-      .lq-node.done .lq-orb { border-color:#4ade80; background:rgba(74,222,128,.15);
-                              box-shadow:0 0 12px rgba(74,222,128,.35); }
-      .lq-node.now .lq-orb { border-color:#e879f9; background:rgba(232,121,249,.14);
+                font-size:17px; background:#1e2233; border:3px solid #2b3044; transition:.25s; }
+      .lq-node.done .lq-orb { border-color:#86efac; background:linear-gradient(145deg,#16a34a,#4ade80);
+                              box-shadow:0 0 14px rgba(74,222,128,.5), inset 0 -3px 6px rgba(0,0,0,.25); }
+      .lq-node.now .lq-orb { border-color:#f0abfc; background:linear-gradient(145deg,#a21caf,#e879f9);
+                             box-shadow:inset 0 -3px 6px rgba(0,0,0,.25);
                              animation:lqGlow 1.8s ease-in-out infinite; }
       @keyframes lqGlow { 0%,100%{box-shadow:0 0 0 0 rgba(232,121,249,.5)} 50%{box-shadow:0 0 0 9px rgba(232,121,249,0)} }
       .lq-node.pop .lq-orb { animation:lqPop .55s cubic-bezier(.34,1.56,.64,1); }

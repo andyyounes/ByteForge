@@ -49,8 +49,10 @@ const QuestMap = (() => {
                  background:#161927; cursor:pointer; display:flex; flex-direction:column; align-items:center;
                  justify-content:center; transition:transform .15s, box-shadow .15s; flex-shrink:0; }
       .qm-node:not(.locked):hover { transform:scale(1.1); box-shadow:0 6px 24px rgba(232,121,249,.35); }
-      .qm-node.done { border-color:#4ade80; background:rgba(74,222,128,.1); }
-      .qm-node.current { border-color:var(--qm-accent,#e879f9); background:rgba(232,121,249,.12); animation:qmPulse 2s infinite; }
+      .qm-node.done { border-color:#86efac; background:linear-gradient(145deg,#16a34a,#4ade80);
+                      box-shadow:0 0 14px rgba(74,222,128,.45), inset 0 -4px 8px rgba(0,0,0,.25); }
+      .qm-node.current { border-color:#f0abfc; background:linear-gradient(145deg,#a21caf,var(--qm-accent,#e879f9));
+                         box-shadow:inset 0 -4px 8px rgba(0,0,0,.25); animation:qmPulse 2s infinite; }
       @keyframes qmPulse { 0%,100%{box-shadow:0 0 0 0 rgba(232,121,249,.4)} 50%{box-shadow:0 0 0 10px rgba(232,121,249,0)} }
       .qm-node.locked { cursor:default; opacity:.45; }
       .qm-node.boss { width:78px; height:78px; border-width:4px; border-color:rgba(251,191,36,.5); }
