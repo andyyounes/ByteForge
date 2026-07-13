@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 9 — Mission IDE · ByteForge</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0d0f1a; color:#e2e8f0; font-family:'Segoe UI',system-ui,sans-serif;
+         height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+  .nav { display:flex; align-items:center; justify-content:space-between; padding:10px 18px;
+         background:#0a0c18; border-bottom:1px solid rgba(255,255,255,.1); flex-shrink:0; }
+  .nav-logo { display:flex; align-items:center; gap:8px; font-weight:800; font-size:15px; }
+  .nav-logo .bolt { color:#b8ef4a; }
+  .nav a { color:#9ca3af; text-decoration:none; font-size:13px; }
+  .nav a:hover { color:#e2e8f0; }
+
+  /* ── Mission bar ── */
+  .mbar { display:flex; align-items:center; gap:14px; padding:10px 18px; background:#111320;
+          border-bottom:1px solid rgba(255,255,255,.08); flex-shrink:0; }
+  .mbar-back { background:none; border:1px solid rgba(255,255,255,.15); color:#9ca3af; border-radius:8px;
+               padding:6px 12px; font-size:12px; cursor:pointer; }
+  .mbar-back:hover { color:#fff; }
+  .mbar-title { font-size:15px; font-weight:800; }
+  .mbar-phase { font-size:10px; font-weight:900; letter-spacing:1px; color:#67e8f9;
+                background:rgba(103,232,249,.1); border:1px solid rgba(103,232,249,.3);
+                padding:3px 10px; border-radius:99px; }
+  .mbar-par { margin-left:auto; font-size:11.5px; font-weight:800; color:#fbbf24; }
+
+  /* ── Split layout ── */
+  .main { flex:1; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; }
+  .left { display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,.1); overflow:hidden; }
+  .scene-wrap { flex:1; display:flex; align-items:center; justify-content:center; background:
+    radial-gradient(ellipse at 30% 20%, rgba(103,232,249,.05), transparent 60%), #0b0d16; overflow:hidden; position:relative; }
+  canvas { max-width:100%; max-height:100%; }
+  .brief { padding:12px 16px; border-top:1px solid rgba(255,255,255,.08); background:#0e1020; flex-shrink:0; }
+  .brief-goal { font-size:12.5px; line-height:1.55; color:#c9d1e3; }
+  .brief-goal b { color:#67e8f9; }
+  .brief-api { margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; }
+  .api-chip { font-family:monospace; font-size:11px; background:#161927; border:1px solid rgba(184,239,74,.25);
+              color:#b8ef4a; border-radius:6px; padding:3px 9px; }
+  .console { min-height:52px; max-height:110px; overflow-y:auto; padding:9px 16px; font-family:monospace;
+             font-size:12px; background:#05060c; border-top:1px solid rgba(255,255,255,.08);
+             color:#9ca3af; white-space:pre-wrap; flex-shrink:0; }
+  .console .ok { color:#4ade80; } .console .err { color:#f87171; } .console .warn { color:#fbbf24; }
+
+  .right { display:flex; flex-direction:column; overflow:hidden; }
+  .ed-head { display:flex; align-items:center; gap:8px; padding:8px 14px; background:#0e1020;
+             border-bottom:1px solid rgba(255,255,255,.08); flex-shrink:0; }
+  .ed-lang { font-size:11px; font-weight:800; color:#67e8f9; background:rgba(103,232,249,.08);
+             border:1px solid rgba(103,232,249,.25); border-radius:6px; padding:4px 10px; }
+  .ed-btns { margin-left:auto; display:flex; gap:8px; }
+  .btn { border:none; border-radius:8px; padding:8px 18px; font-size:12.5px; font-weight:800; cursor:pointer; transition:.15s; }
+  .btn-run { background:#b8ef4a; color:#0d0f1a; }
+  .btn-run:hover { background:#a5d83d; }
+  .btn-run:disabled { opacity:.5; cursor:default; }
+  .btn-reset { background:none; border:1px solid rgba(255,255,255,.18); color:#9ca3af; }
+  .btn-reset:hover { color:#fff; }
+  .btn-submit { background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; }
+  .btn-submit:disabled { opacity:.45; cursor:default; }
+  .ed-body { flex:1; overflow:hidden; }
+  .CodeMirror { height:100%; font-size:14px; font-family:'Cascadia Code',Consolas,monospace; }
+  .cm-error-line { background:rgba(248,113,113,.14) !important; }
+
+  /* ── Mission list overlay ── */
+  .mlist { position:fixed; inset:0; z-index:50; background:#0d0f1a; overflow-y:auto; display:none; }
+  .mlist.open { display:block; }
+  .mlist-hero { text-align:center; padding:30px 16px 10px; }
+  .mlist-hero h1 { font-size:24px; font-weight:900;
+    background:linear-gradient(90deg,#67e8f9,#b8ef4a); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .mlist-hero p { color:#9ca3af; font-size:13px; margin-top:5px; }
+  .mgrid { max-width:640px; margin:20px auto 60px; padding:0 16px; display:flex; flex-direction:column; gap:10px; }
+  .mcard { display:flex; align-items:center; gap:14px; background:#12141f; border:1px solid rgba(255,255,255,.09);
+           border-radius:14px; padding:14px 18px; cursor:pointer; transition:.15s; }
+  .mcard:hover { border-color:rgba(103,232,249,.4); transform:translateY(-1px); }
+  .mcard.locked { opacity:.45; cursor:default; }
+  .mcard.locked:hover { transform:none; border-color:rgba(255,255,255,.09); }
+  .mcard-emoji { font-size:26px; }
+  .mcard-title { font-size:14px; font-weight:800; }
+  .mcard-sub { font-size:11.5px; color:#9ca3af; margin-top:2px; }
+  .mcard-stars { margin-left:auto; font-size:13px; color:#fbbf24; }
+
+  /* ── Win overlay ── */
+  .win { position:fixed; inset:0; z-index:100; background:rgba(6,8,15,.86); backdrop-filter:blur(4px);
+         display:none; align-items:center; justify-content:center; }
+  .win.open { display:flex; }
+  .win-card { background:#141727; border:1px solid rgba(103,232,249,.35); border-radius:20px; padding:30px 40px;
+              text-align:center; max-width:400px; animation:pop .4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes pop { 0%{transform:scale(.6);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .win-stars { font-size:34px; letter-spacing:4px; margin-bottom:8px; }
+  .win-stars .dim { opacity:.22; }
+  .win-title { font-size:20px; font-weight:900; }
+  .win-sub { color:#9ca3af; font-size:13px; margin:8px 0 14px; line-height:1.5; }
+  .win-xp { font-size:15px; font-weight:900; color:#fbbf24; margin-bottom:16px; }
+  .win-btn { border:none; border-radius:10px; padding:11px 24px; font-size:13.5px; font-weight:800; cursor:pointer;
+             background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; margin:0 5px; }
+  .win-btn.ghost { background:none; border:1px solid rgba(255,255,255,.18); color:#9ca3af; }
+</style>
+<script src="../js/db.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/lesson-saves.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><span class="bolt">⚡</span><span>ByteForge · 🌊 Deep Diver</span></div>
+  <a href="/student/dashboard">← Dashboard</a>
+</nav>
+
+<div class="mbar">
+  <button class="mbar-back" onclick="showList()">☰ Missions</button>
+  <span class="mbar-phase" id="m-phase">PHASE 1 · TURTLE</span>
+  <span class="mbar-title" id="m-title"></span>
+  <span class="mbar-par" id="m-par"></span>
+</div>
+
+<div class="main">
+  <div class="left">
+    <div class="scene-wrap"><canvas id="scene" width="640" height="480"></canvas></div>
+    <div class="brief">
+      <div class="brief-goal" id="m-brief"></div>
+      <div class="brief-api" id="m-api"></div>
+    </div>
+    <div class="console" id="console">// Mission console — Run your code to see what happens.</div>
+  </div>
+  <div class="right">
+    <div class="ed-head">
+      <span class="ed-lang">Python 3</span>
+      <div class="ed-btns">
+        <button class="btn btn-reset" onclick="resetMission()">↺ Reset</button>
+        <button class="btn btn-run" id="btn-run" onclick="runMission(false)">▶ Run</button>
+        <button class="btn btn-submit" id="btn-submit" onclick="runMission(true)" disabled>✓ Submit</button>
+      </div>
+    </div>
+    <div class="ed-body"><textarea id="code"></textarea></div>
+  </div>
+</div>
+
+<!-- Mission list -->
+<div class="mlist open" id="mlist">
+  <div class="mlist-hero">
+    <h1>🌊 Deep Diver — Mission IDE</h1>
+    <p>Your code is the pilot. Write it, run it, watch it fly.</p>
+  </div>
+  <div class="mgrid" id="mgrid"></div>
+</div>
+
+<!-- Win overlay -->
+<div class="win" id="win">
+  <div class="win-card">
+    <div class="win-stars" id="win-stars"></div>
+    <div class="win-title" id="win-title">MISSION COMPLETE</div>
+    <div class="win-sub" id="win-sub"></div>
+    <div class="win-xp" id="win-xp"></div>
+    <button class="win-btn" onclick="winNext()">Next mission →</button>
+    <button class="win-btn ghost" onclick="winList()">Mission list</button>
+  </div>
+</div>
+
+<script>
+'use strict'
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Mission configs — schema-driven so new missions are data, not code.
+//   scene:   start pose + target(s); canvas units
+//   api:     commands injected into the student's Python namespace
+//   success: checked post-execution against the pure simulation result
+//   stars:   par = command count for 3★ (efficiency), par+2 = 2★, pass = 1★
+// ══════════════════════════════════════════════════════════════════════════════
+const MISSIONS = [
+  {
+    id: 'p1m1', phase: 'PHASE 1 · TURTLE', emoji: '🛰️', title: 'Dock at the Station', xp: 30,
+    brief: 'Your supply pod <b>starts facing EAST</b> (→). Fly it to the space station 🛰️. '
+      + 'Each <b>forward(distance)</b> moves in the direction you are facing; '
+      + '<b>left(90)</b> / <b>right(90)</b> rotate on the spot. Distances are in pixels — read the grid: one square = 40px.',
+    api: ['forward(d)', 'left(deg)', 'right(deg)'],
+    starter: '# Mission: dock at the station 🛰️\n# You start at the pad, facing EAST →\n# One grid square = 40 pixels\n\nforward(80)\n# your code here…\n',
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 120, y: 360, heading: 0 },      // heading 0 = east, degrees CCW
+             target: { x: 440, y: 160, r: 34 } },
+    success: { type: 'reach' },
+    stars: { par: 3 },
+    hints: ['You need to go RIGHT (east) and then UP (north).',
+            'From facing east, left(90) turns you to face north.',
+            'Count the grid squares between the pad and the station.'],
+  },
+  // Phase 1 continues in the next build session (loops tier, conditionals tier, capstone)
+]
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Pure turtle simulation — testable in Node, no DOM.
+// cmds: [['F', dist] | ['L', deg] | ['R', deg]]  → path points + end pose
+// ══════════════════════════════════════════════════════════════════════════════
+function simTurtle(scene, cmds) {
+  let x = scene.start.x, y = scene.start.y, h = scene.start.heading
+  const path = [{ x, y }]
+  let moves = 0
+  for (const [op, val] of cmds) {
+    if (op === 'L') { h = (h + val) % 360; continue }
+    if (op === 'R') { h = (h - val) % 360; continue }
+    if (op === 'F') {
+      const rad = h * Math.PI / 180
+      x += Math.cos(rad) * val
+      y -= Math.sin(rad) * val          // canvas y grows downward
+      path.push({ x, y })
+      moves++
+      if (x < 0 || y < 0 || x > scene.w || y > scene.h) {
+        return { path, end: { x, y }, lost: true, moves }
+      }
+    }
+  }
+  return { path, end: { x, y }, lost: false, moves }
+}
+
+function evalSuccess(mission, sim) {
+  if (sim.lost) return { ok: false, why: 'lost' }
+  if (mission.success.type === 'reach') {
+    const t = mission.scene.target
+    const d = Math.hypot(sim.end.x - t.x, sim.end.y - t.y)
+    return d <= t.r ? { ok: true } : { ok: false, why: 'missed', dist: Math.round(d) }
+  }
+  return { ok: false, why: 'unknown' }
+}
+
+function starsFor(mission, cmdCount) {
+  const par = mission.stars.par
+  return cmdCount <= par ? 3 : cmdCount <= par + 2 ? 2 : 1
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Progress (same pattern as Grade 6)
+// ══════════════════════════════════════════════════════════════════════════════
+function getProg() { try { return JSON.parse(localStorage.getItem('bf-g9-missions')) || {} } catch (e) { return {} } }
+function saveProg(p) { try { localStorage.setItem('bf-g9-missions', JSON.stringify(p)) } catch (e) {} }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Python execution — Pyodide (pluggable: a pseudocode executor lands in the
+// bridge-toggle session; both share the command-list contract).
+// ══════════════════════════════════════════════════════════════════════════════
+let _pyodide = null, _pyLoading = null
+function ensurePyodide() {
+  if (_pyodide) return Promise.resolve(_pyodide)
+  if (!_pyLoading) {
+    _pyLoading = new Promise((resolve, reject) => {
+      const s = document.createElement('script')
+      s.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js'
+      s.onload = () => globalThis.loadPyodide().then(p => { _pyodide = p; resolve(p) }).catch(reject)
+      s.onerror = () => reject(new Error('Could not load the Python engine — check your connection.'))
+      document.head.appendChild(s)
+    })
+  }
+  return _pyLoading
+}
+
+const PY_PREAMBLE = [
+  '_cmds = []',
+  'def forward(d): _cmds.append(("F", float(d)))',
+  'def backward(d): _cmds.append(("F", -float(d)))',
+  'def left(a): _cmds.append(("L", float(a)))',
+  'def right(a): _cmds.append(("R", float(a)))',
+  '',
+].join('\n')
+const PREAMBLE_LINES = PY_PREAMBLE.split('\n').length   // for traceback line mapping
+
+async function execPython(code) {
+  const py = await ensurePyodide()
+  py.runPython('_cmds = []')
+  try {
+    py.runPython(PY_PREAMBLE + code)
+    const cmds = py.globals.get('_cmds').toJs({ create_proxies: false })
+    return { ok: true, cmds: cmds.map(c => [c[0], c[1]]) }
+  } catch (e) {
+    // Map the Pyodide traceback back to the student's own line number
+    const msg = String(e.message || e)
+    let line = null
+    const matches = [...msg.matchAll(/File "<exec>", line (\d+)/g)]
+    if (matches.length) line = parseInt(matches[matches.length - 1][1]) - PREAMBLE_LINES + 1
+    const lastLine = msg.trim().split('\n').pop()
+    return { ok: false, error: lastLine, line: line && line > 0 ? line : null }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Scene rendering + animation
+// ══════════════════════════════════════════════════════════════════════════════
+const cv = document.getElementById('scene')
+const ctx = cv.getContext('2d')
+let activeMission = null
+let editor = null
+let animating = false
+let lastRunPassed = false
+
+function drawScene(m, pose, tracePath) {
+  const s = m.scene
+  cv.width = s.w; cv.height = s.h
+  ctx.fillStyle = '#0b0d16'
+  ctx.fillRect(0, 0, s.w, s.h)
+  // grid
+  ctx.strokeStyle = 'rgba(255,255,255,.05)'
+  ctx.lineWidth = 1
+  for (let gx = 0; gx <= s.w; gx += s.grid) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, s.h); ctx.stroke() }
+  for (let gy = 0; gy <= s.h; gy += s.grid) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(s.w, gy); ctx.stroke() }
+  // launch pad
+  ctx.strokeStyle = 'rgba(184,239,74,.45)'
+  ctx.setLineDash([5, 4])
+  ctx.strokeRect(s.start.x - 26, s.start.y - 26, 52, 52)
+  ctx.setLineDash([])
+  // target station
+  const t = s.target
+  ctx.strokeStyle = 'rgba(103,232,249,.5)'
+  ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2); ctx.stroke()
+  ctx.font = '30px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillText('🛰️', t.x, t.y)
+  // trace
+  if (tracePath && tracePath.length > 1) {
+    ctx.strokeStyle = '#b8ef4a'
+    ctx.lineWidth = 2.5
+    ctx.beginPath()
+    ctx.moveTo(tracePath[0].x, tracePath[0].y)
+    for (const p of tracePath.slice(1)) ctx.lineTo(p.x, p.y)
+    ctx.stroke()
+  }
+  // pod
+  const rad = pose.heading * Math.PI / 180
+  ctx.save()
+  ctx.translate(pose.x, pose.y)
+  ctx.rotate(-rad)
+  ctx.font = '26px serif'
+  ctx.fillText('🚀', 0, 0)
+  ctx.restore()
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+async function animate(m, sim) {
+  animating = true
+  const pts = sim.path
+  let heading = m.scene.start.heading
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i]
+    heading = Math.atan2(a.y - b.y, b.x - a.x) * 180 / Math.PI
+    const dist = Math.hypot(b.x - a.x, b.y - a.y)
+    const steps = Math.max(6, Math.round(dist / 7))
+    for (let k = 1; k <= steps; k++) {
+      const px = a.x + (b.x - a.x) * k / steps
+      const py = a.y + (b.y - a.y) * k / steps
+      drawScene(m, { x: px, y: py, heading }, pts.slice(0, i).concat([{ x: px, y: py }]))
+      await sleep(14)
+    }
+  }
+  animating = false
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Console + error surfacing
+// ══════════════════════════════════════════════════════════════════════════════
+let _errLine = null
+function clearErrLine() {
+  if (_errLine != null && editor) editor.removeLineClass(_errLine, 'background', 'cm-error-line')
+  _errLine = null
+}
+function logC(msg, cls) {
+  const c = document.getElementById('console')
+  c.innerHTML = cls ? '<span class="' + cls + '">' + msg + '</span>' : msg
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Mission lifecycle
+// ══════════════════════════════════════════════════════════════════════════════
+function openMission(id) {
+  activeMission = MISSIONS.find(m => m.id === id)
+  if (!activeMission) return
+  document.getElementById('mlist').classList.remove('open')
+  document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
+  document.getElementById('m-phase').textContent = activeMission.phase
+  document.getElementById('m-par').textContent = '3★: ' + activeMission.stars.par + ' commands'
+  document.getElementById('m-brief').innerHTML = activeMission.brief
+  document.getElementById('m-api').innerHTML =
+    activeMission.api.map(a => '<span class="api-chip">' + a + '</span>').join('')
+  if (!editor) {
+    editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+      mode: 'python', theme: 'dracula', lineNumbers: true, indentUnit: 4,
+    })
+    editor.on('change', () => { clearErrLine(); setSubmit(false) })
+  }
+  const saved = (getProg()[id] || {}).code
+  editor.setValue(saved || activeMission.starter)
+  setSubmit(false)
+  drawScene(activeMission, activeMission.scene.start, null)
+  logC('// Mission loaded. Write your flight plan and press ▶ Run.')
+  setTimeout(() => editor.refresh(), 50)
+}
+
+function setSubmit(on) {
+  lastRunPassed = on
+  document.getElementById('btn-submit').disabled = !on
+}
+
+function resetMission() {
+  if (animating || !activeMission) return
+  editor.setValue(activeMission.starter)
+  clearErrLine()
+  setSubmit(false)
+  drawScene(activeMission, activeMission.scene.start, null)
+  logC('// Reset. Fresh start!')
+}
+
+async function runMission(isSubmit) {
+  if (animating || !activeMission) return
+  const btn = document.getElementById('btn-run')
+  btn.disabled = true
+  clearErrLine()
+  const code = editor.getValue()
+  if (!_pyodide) logC('⏳ Loading Python engine (first run only — a few seconds)…', 'warn')
+
+  let res
+  try { res = await execPython(code) }
+  catch (e) { logC('✗ ' + e.message, 'err'); btn.disabled = false; return }
+
+  if (!res.ok) {
+    if (res.line != null) {
+      _errLine = res.line - 1
+      editor.addLineClass(_errLine, 'background', 'cm-error-line')
+      logC('✗ Line ' + res.line + ': ' + res.error, 'err')
+    } else {
+      logC('✗ ' + res.error, 'err')
+    }
+    btn.disabled = false
+    return
+  }
+  if (!res.cmds.length) {
+    logC('🤔 Your program ran but gave no commands — call forward() to move!', 'warn')
+    btn.disabled = false
+    return
+  }
+
+  const sim = simTurtle(activeMission.scene, res.cmds)
+  const cmdCount = res.cmds.length
+
+  if (isSubmit && lastRunPassed) {
+    completeMission(cmdCount)
+    btn.disabled = false
+    return
+  }
+
+  await animate(activeMission, sim)
+  const verdict = evalSuccess(activeMission, sim)
+  if (verdict.ok) {
+    const st = starsFor(activeMission, cmdCount)
+    logC('✅ DOCKED! ' + cmdCount + ' commands ' +
+      (st === 3 ? '— perfect efficiency! Press ✓ Submit to claim your stars.'
+                : '(3★ needs ≤ ' + activeMission.stars.par + '). Press ✓ Submit, or trim your flight plan first.'), 'ok')
+    setSubmit(true)
+  } else if (verdict.why === 'lost') {
+    logC('🌌 Your pod drifted off the map! Check your distances and turns.', 'err')
+  } else {
+    logC('✗ Missed the station by ' + verdict.dist + 'px. One grid square = 40px — recount!', 'warn')
+  }
+  btn.disabled = false
+}
+
+function completeMission(cmdCount) {
+  const st = starsFor(activeMission, cmdCount)
+  const p = getProg()
+  const prev = p[activeMission.id] || {}
+  const firstTime = !prev.stars
+  const xp = firstTime ? activeMission.xp + (st - 1) * 10 : 0
+  p[activeMission.id] = {
+    stars: Math.max(st, prev.stars || 0),
+    xp: (prev.xp || 0) + xp,
+    code: editor.getValue(),
+  }
+  saveProg(p)
+  const idx = MISSIONS.indexOf(activeMission)
+  try { LessonSaves.save('grade9-missions', idx, { passed: true, xpEarned: xp, code: editor.getValue() }) } catch (e) {}
+  try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+
+  document.getElementById('win-stars').innerHTML =
+    '⭐'.repeat(st) + '<span class="dim">' + '⭐'.repeat(3 - st) + '</span>'
+  document.getElementById('win-sub').textContent =
+    st === 3 ? 'Perfect flight — minimum commands. That\'s pilot thinking.' :
+    'Docked with ' + cmdCount + ' commands. A shorter flight plan earns more stars — refactor and re-submit!'
+  document.getElementById('win-xp').textContent = xp > 0 ? '+' + xp + ' XP' : 'Already earned — chase the stars!'
+  document.getElementById('win').classList.add('open')
+}
+
+function winNext() {
+  document.getElementById('win').classList.remove('open')
+  const idx = MISSIONS.indexOf(activeMission)
+  if (MISSIONS[idx + 1]) openMission(MISSIONS[idx + 1].id)
+  else showList()
+}
+function winList() {
+  document.getElementById('win').classList.remove('open')
+  showList()
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Mission list
+// ══════════════════════════════════════════════════════════════════════════════
+const COMING = [
+  { emoji: '🔁', title: 'Loops tier', sub: 'Squares, stairs, spirals — repeated patterns need loops' },
+  { emoji: '🚦', title: 'Conditionals tier', sub: 'Branching paths — if wall ahead, turn' },
+  { emoji: '⚔️', title: 'Phase 2 — Agent Battles', sub: 'Your code fights. Turn-based combat.' },
+]
+function showList() {
+  const p = getProg()
+  let html = ''
+  MISSIONS.forEach(m => {
+    const st = (p[m.id] || {}).stars || 0
+    html += '<div class="mcard" onclick="openMission(\'' + m.id + '\')">'
+      + '<span class="mcard-emoji">' + m.emoji + '</span>'
+      + '<div><div class="mcard-title">' + m.title + '</div>'
+      + '<div class="mcard-sub">' + m.phase + ' · 3★ = ' + m.stars.par + ' commands</div></div>'
+      + '<span class="mcard-stars">' + (st ? '⭐'.repeat(st) : '—') + '</span></div>'
+  })
+  COMING.forEach(c => {
+    html += '<div class="mcard locked"><span class="mcard-emoji">' + c.emoji + '</span>'
+      + '<div><div class="mcard-title">' + c.title + '</div>'
+      + '<div class="mcard-sub">' + c.sub + '</div></div>'
+      + '<span class="mcard-stars">🔒</span></div>'
+  })
+  document.getElementById('mgrid').innerHTML = html
+  document.getElementById('mlist').classList.add('open')
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+BF.seed()
+const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
+;(async () => {
+  if (me) { try { await LessonSaves.load('grade9-missions') } catch (e) {} }
+  showList()
+})()
+</script>
+</body>
+</html>
