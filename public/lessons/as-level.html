@@ -5222,6 +5222,7 @@ function getLocalXP() {
     }
   }
   if (typeof LessonQuest !== 'undefined') xp += LessonQuest.totalXP('as')
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.indexOf('bf-lqcp-as-') === 0) xp += 20 } } catch (e) {}
   return xp
 }
 
@@ -7414,22 +7415,40 @@ function _lqAwardXP(amount, label) {
 function showJourney() {
   try { _bfwLeave() } catch (e) {}
   const EMO = ['📘','🧠','💡','🧮','🔬','🧩','⚙️','🛰️','🔐','🤖','🗄️','📐','🏗️','📂']
+  const cpCovered = {}
   const worlds = Object.entries(CHAPTER_TOPICS).map(([num, ids]) => {
     const first = TOPICS[ids[0]]
-    const stages = ids.map((id, i) => ({
-      id: id, emoji: EMO[i % EMO.length], label: (TOPICS[id] || {}).title || id, done: isTopicDone(id),
-      stars: (typeof LessonQuest !== 'undefined') ? LessonQuest.stars('as', id) : 0,
-    }))
+    const stages = []
+    let batch = []
+    ids.forEach((id, i) => {
+      stages.push({
+        id: id, emoji: EMO[i % EMO.length], label: (TOPICS[id] || {}).title || id, done: isTopicDone(id),
+        stars: (typeof LessonQuest !== 'undefined') ? LessonQuest.stars('as', id) : 0,
+      })
+      batch.push(id)
+      // A 🎯 checkpoint quiz after every 3 topics (needs enough key terms)
+      if (batch.length === 3 && i < ids.length - 1) {
+        const cpId = 'cp-' + num + '-' + Math.floor(i / 3)
+        const pool = batch.flatMap(b => (TOPICS[b] || {}).keyTerms || [])
+        if (pool.length >= 6) {
+          cpCovered[cpId] = batch.slice()
+          stages.push({ id: cpId, emoji: '🎯', label: 'Checkpoint — key terms', cp: true, done: _cpDone(cpId) })
+        }
+        batch = []
+      }
+    })
     stages.push({ id: 'exam-' + num, emoji: '📝', label: 'Chapter ' + num + ' Exam', boss: true, done: false })
     return { name: (first ? first.chapter : 'Chapter ' + num), sub: '', live: true, stages: stages }
   })
   QuestMap.show({
     title: '🗺 Your AS Level Journey',
-    subtitle: 'Every chapter is an island — every exam is a boss. Roam free, conquer all.',
+    subtitle: 'One path to Cambridge — lessons, checkpoints, bosses. Clear the NEXT UP node!',
     accent: '#e879f9',
-    freeRoam: true,
+    freeRoam: true, layout: 'path', softLock: true,
+    avatarSvg: (typeof _BFW_AV !== 'undefined') ? _BFW_AV : '',
     worlds: worlds,
     onOpen: function(id) {
+      if (id.indexOf('cp-') === 0) { _cpRun(id, cpCovered[id] || []); return }
       if (id.indexOf('exam-') === 0) {
         const n = parseInt(id.slice(5))
         switchTab(n >= 11 ? 'p2' : 'p1')
@@ -7439,6 +7458,35 @@ function showJourney() {
       switchTab(getChapterNum(id) >= 11 ? 'p2' : 'p1')
       loadTopic(id)
     },
+  })
+}
+
+// ── 🎯 Checkpoint quizzes — auto-built from the covered topics' key terms ─────
+function _cpDone(cpId) {
+  try { return localStorage.getItem('bf-lqcp-as-' + cpId) === '1' } catch (e) { return false }
+}
+function _cpRun(cpId, ids) {
+  const pool = ids.flatMap(id => (TOPICS[id] || {}).keyTerms || []).filter(t => t && t.name && t.def)
+  if (pool.length < 4) { showJourney(); return }
+  const pick = pool.slice().sort(() => Math.random() - 0.5).slice(0, 6)
+  const questions = pick.map(t => {
+    const wrong = pool.filter(o => o.name !== t.name).sort(() => Math.random() - 0.5).slice(0, 3)
+    const options = [t, ...wrong].sort(() => Math.random() - 0.5)
+    return { q: t.def, options: options.map(o => o.name), a: options.indexOf(t) }
+  })
+  LessonQuest.quiz({
+    title: '🎯 Checkpoint',
+    sub: 'Match each definition to the right key term — 80%+ clears it (+20 XP)',
+    questions: questions,
+    onPass: function() {
+      try { localStorage.setItem('bf-lqcp-as-' + cpId, '1') } catch (e) {}
+      const prev = getLocalXP() - 20
+      if (me) BF.addXP(me.id, 20)
+      showToast('🎯 +20 XP — Checkpoint cleared!')
+      updateXPBar(prev)
+      showJourney()
+    },
+    onClose: function() { showJourney() },
   })
 }
 

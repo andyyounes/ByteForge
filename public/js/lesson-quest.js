@@ -126,6 +126,35 @@ const LessonQuest = (() => {
       @keyframes lqDmg { 0%{opacity:1; transform:translateY(0) scale(1)}
                          100%{opacity:0; transform:translateY(-38px) scale(1.35)} }
       .lq-boss-result { margin-top:9px; font-size:12px; font-weight:800; }
+      /* ── Watch tracking ─────────────────────────────────────────── */
+      .lq-watch { display:flex; align-items:center; gap:9px; margin:10px 0 6px; padding:9px 14px;
+                  border-radius:10px; border:1px solid rgba(96,165,250,.3); background:rgba(96,165,250,.07);
+                  font-size:11.5px; font-weight:800; color:#93c5fd; }
+      .lq-watch.ok { border-color:rgba(74,222,128,.4); background:rgba(74,222,128,.08); color:#4ade80; }
+      .lq-watch-bar { flex:1; height:7px; border-radius:99px; background:#232738; overflow:hidden; }
+      .lq-watch-fill { height:100%; width:0%; background:linear-gradient(90deg,#60a5fa,#4ade80);
+                       border-radius:99px; transition:width .6s; }
+      /* ── Micro-check (prove-it question) ────────────────────────── */
+      .lq-check { border:1px solid rgba(251,191,36,.3); border-radius:12px; padding:12px 15px;
+                  background:rgba(251,191,36,.05); margin:10px 0 18px; }
+      .lq-check-title { font-size:10.5px; font-weight:900; letter-spacing:1px; color:#fbbf24; margin-bottom:7px; }
+      .lq-check-q { font-size:12.5px; line-height:1.5; margin-bottom:9px; }
+      .lq-check-opts { display:flex; flex-direction:column; gap:6px; }
+      /* ── Checkpoint quiz overlay ────────────────────────────────── */
+      .lq-quiz { position:fixed; inset:0; z-index:8600; background:rgba(9,10,18,.9); backdrop-filter:blur(6px);
+                 display:flex; align-items:center; justify-content:center; padding:18px; }
+      .lq-quiz-card { width:min(480px,100%); max-height:88vh; overflow-y:auto; background:#12141f;
+                      border:1px solid rgba(96,165,250,.35); border-radius:18px; padding:22px 24px;
+                      box-shadow:0 24px 80px rgba(0,0,0,.6); animation:lqPop .4s; }
+      .lq-quiz-title { font-size:17px; font-weight:900; }
+      .lq-quiz-sub { font-size:11.5px; color:#9ca3af; margin-top:4px; line-height:1.5; }
+      .lq-quiz-prog { display:flex; gap:5px; margin:13px 0; }
+      .lq-quiz-dot { flex:1; height:6px; border-radius:99px; background:#232738; }
+      .lq-quiz-dot.ok { background:#4ade80; }
+      .lq-quiz-dot.bad { background:#f87171; }
+      .lq-quiz-dot.cur { background:#60a5fa; animation:lqGlow 1.5s infinite; }
+      .lq-quiz-q { font-size:13.5px; line-height:1.55; margin:12px 0; font-weight:600; }
+      .lq-quiz-x { float:right; background:none; border:none; color:#6b7280; font-size:16px; cursor:pointer; }
       .lq-next-btn { padding:11px 26px; border:none; border-radius:11px; font-size:14px; font-weight:800;
                      cursor:pointer; background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; margin:0 5px; }
       .lq-stay-btn { background:none; border:1px solid rgba(255,255,255,.18); color:#9ca3af;
@@ -137,6 +166,156 @@ const LessonQuest = (() => {
   }
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;') }
+  function shuffle(a) { return a.slice().sort(() => Math.random() - 0.5) }
+
+  // Key term {name, def} pairs read straight from the rendered lesson
+  function readTerms(c) {
+    return Array.from(c.querySelectorAll('.key-term-card')).map(card => ({
+      name: ((card.querySelector('.key-term-name') || {}).textContent || '').trim(),
+      def: ((card.querySelector('.key-term-def') || {}).textContent || '').trim(),
+    })).filter(p => p.name && p.def)
+  }
+
+  // ── 🎬 Real watch tracking via the YouTube IFrame API ──────────────────────
+  let _ytUid = 0, _ytGen = 0, _ytTimer = null, _ytLoad = null
+  function loadYT() {
+    if (window.YT && window.YT.Player) return Promise.resolve()
+    if (_ytLoad) return _ytLoad
+    _ytLoad = new Promise((resolve, reject) => {
+      const prev = window.onYouTubeIframeAPIReady
+      window.onYouTubeIframeAPIReady = () => { if (prev) prev(); resolve() }
+      const s = document.createElement('script')
+      s.src = 'https://www.youtube.com/iframe_api'
+      s.onerror = reject
+      document.head.appendChild(s)
+      setTimeout(() => reject(new Error('yt timeout')), 10000)
+    })
+    return _ytLoad
+  }
+
+  function setupWatch(c) {
+    const vid = c.querySelector('.video-section')
+    if (!vid) return
+    const gen = ++_ytGen
+    if (_ytTimer) { clearInterval(_ytTimer); _ytTimer = null }
+
+    const chip = document.createElement('div')
+    chip.className = 'lq-watch'
+    vid.appendChild(chip)
+    if (isDone('watch')) {
+      chip.classList.add('ok')
+      chip.innerHTML = '✓ Watched — step cleared'
+      return
+    }
+    chip.innerHTML = '🎬 Watch a video (80%) to clear this step '
+      + '<span class="lq-watch-bar"><span class="lq-watch-fill" id="lq-wfill"></span></span><b id="lq-wpct">0%</b>'
+
+    // Honor-system fallback ONLY if tracking can't work (YouTube blocked etc.)
+    const fallback = () => {
+      if (gen !== _ytGen || isDone('watch')) return
+      chip.innerHTML = ''
+      const b = document.createElement('button')
+      b.className = 'lq-gotit'
+      b.style.margin = '0'
+      b.textContent = '✅ I watched it (+5 XP)'
+      b.onclick = () => { mark('watch'); chip.classList.add('ok'); chip.innerHTML = '✓ Watched — step cleared' }
+      chip.appendChild(b)
+    }
+
+    const frames = Array.from(vid.querySelectorAll('iframe')).filter(f => /youtube\.com\/embed\//.test(f.src))
+    if (!frames.length) { fallback(); return }
+    frames.forEach(f => {
+      try {
+        const u = new URL(f.src)
+        u.searchParams.set('enablejsapi', '1')
+        u.searchParams.set('origin', location.origin)
+        f.src = u.toString()
+      } catch (e) {}
+      if (!f.id) f.id = 'lq-yt-' + (++_ytUid)
+    })
+
+    let sawDuration = false
+    loadYT().then(() => {
+      if (gen !== _ytGen) return
+      const players = frames.map(f => { try { return new YT.Player(f.id) } catch (e) { return null } }).filter(Boolean)
+      if (!players.length) { fallback(); return }
+      let best = 0
+      _ytTimer = setInterval(() => {
+        if (gen !== _ytGen) { clearInterval(_ytTimer); return }
+        players.forEach(p => {
+          try {
+            const d = p.getDuration(), t = p.getCurrentTime()
+            if (d > 0) { sawDuration = true; best = Math.max(best, t / d) }
+          } catch (e) {}
+        })
+        const pct = Math.min(100, Math.round(best * 125))   // 80% watched = 100% of the step
+        const f = document.getElementById('lq-wfill'), l = document.getElementById('lq-wpct')
+        if (f) f.style.width = pct + '%'
+        if (l) l.textContent = pct + '%'
+        if (best >= 0.8) {
+          clearInterval(_ytTimer); _ytTimer = null
+          mark('watch')
+          chip.classList.add('ok')
+          chip.innerHTML = '✓ Watched — step cleared! +5 XP'
+        }
+      }, 3000)
+    }).catch(fallback)
+    // If YouTube never reports a duration (blocked network / no play), offer the fallback
+    setTimeout(() => { if (gen === _ytGen && !sawDuration && !isDone('watch')) fallback() }, 45000)
+  }
+
+  // ── 📚💡 Micro-check: prove it with one quick question ─────────────────────
+  function buildCheck(c, step, anchorSel, mode) {
+    const el = c.querySelector(anchorSel)
+    if (!el || cfg.steps.indexOf(step) === -1) return
+    if (isDone(step)) {
+      const chip = document.createElement('div')
+      chip.className = 'lq-watch ok'
+      chip.style.margin = '10px 0 18px'
+      chip.textContent = '✓ ' + STEP_META[step].label + ' check cleared'
+      el.parentNode.insertBefore(chip, el.nextSibling)
+      return
+    }
+    const pairs = readTerms(c)
+    if (pairs.length < 2) {
+      // Not enough material for a question — keep the simple claim button
+      const b = document.createElement('button')
+      b.className = 'lq-gotit'
+      b.textContent = '✓ Got it (+5 XP)'
+      b.onclick = () => { mark(step); b.classList.add('claimed'); b.textContent = '✓ Got it' }
+      el.parentNode.insertBefore(b, el.nextSibling)
+      return
+    }
+    const box = document.createElement('div')
+    box.className = 'lq-check'
+    el.parentNode.insertBefore(box, el.nextSibling)
+    const ask = () => {
+      const target = pairs[Math.floor(Math.random() * pairs.length)]
+      const others = shuffle(pairs.filter(p => p.name !== target.name)).slice(0, 3)
+      const opts = shuffle([target, ...others])
+      const q = mode === 'term'
+        ? 'Which key term matches: <em>“' + esc(target.def) + '”</em>'
+        : 'What does <b>' + esc(target.name) + '</b> mean?'
+      box.innerHTML = '<div class="lq-check-title">⚡ QUICK CHECK — prove it (+5 XP)</div>'
+        + '<div class="lq-check-q">' + q + '</div><div class="lq-check-opts">'
+        + opts.map((o, i) => '<div class="lq-chip" data-i="' + i + '">'
+          + esc(mode === 'term' ? o.name : (o.def.length > 150 ? o.def.slice(0, 150) + '…' : o.def)) + '</div>').join('')
+        + '</div>'
+      box.querySelectorAll('.lq-chip').forEach((chip, i) => {
+        chip.onclick = () => {
+          if (opts[i].name === target.name) {
+            mark(step)
+            confetti(chip)
+            box.innerHTML = '<div class="lq-check-title" style="color:#4ade80">✓ CORRECT — ' + STEP_META[step].label + ' cleared! +5 XP</div>'
+          } else {
+            chip.classList.add('bad')
+            setTimeout(ask, 500)   // new random question — retry costs nothing but thought
+          }
+        }
+      })
+    }
+    ask()
+  }
 
   // Tiny emoji confetti burst at an element
   function confetti(el, emojis) {
@@ -352,33 +531,15 @@ const LessonQuest = (() => {
       lessonPane.insertBefore(bar, lessonPane.firstChild)
       renderBar()
 
-      // 🎬 videos
-      const vid = c.querySelector('.video-section')
-      if (vid && steps.indexOf('watch') !== -1) {
-        const b = document.createElement('button')
-        const done = isDone('watch')
-        b.className = 'lq-gotit' + (done ? ' claimed' : '')
-        b.textContent = done ? '✅ Watched' : '✅ I watched it — claim +5 XP'
-        b.onclick = () => { mark('watch'); b.classList.add('claimed'); b.textContent = '✅ Watched' }
-        vid.appendChild(b)
-      }
+      // 🎬 videos — verified by the YouTube API, not an honor button
+      if (steps.indexOf('watch') !== -1) setupWatch(c)
 
       // 🔑 match-up
       if (steps.indexOf('terms') !== -1) buildMatchUp(c)
 
-      // 📚 / 💡 checkpoints
-      const addGotIt = (sel, step, label) => {
-        const el = c.querySelector(sel)
-        if (!el || steps.indexOf(step) === -1) return
-        const b = document.createElement('button')
-        const done = isDone(step)
-        b.className = 'lq-gotit' + (done ? ' claimed' : '')
-        b.textContent = done ? '✓ Got it' : label
-        b.onclick = () => { mark(step); b.classList.add('claimed'); b.textContent = '✓ Got it' }
-        el.parentNode.insertBefore(b, el.nextSibling)
-      }
-      addGotIt('.theory-block', 'theory', '✓ Got it — I read the theory (+5 XP)')
-      addGotIt('.example-block', 'example', '✓ Got it — the example makes sense (+5 XP)')
+      // 📚 / 💡 — prove-it micro-checks instead of "Got it" buttons
+      buildCheck(c, 'theory', '.theory-block', 'term')
+      buildCheck(c, 'example', '.example-block', 'def')
 
       // ⚔️ boss over practice
       if (steps.indexOf('practice') !== -1) buildBoss(c)
@@ -443,6 +604,79 @@ const LessonQuest = (() => {
 
     stars(pageKey, topicId) {
       return load(pageKey, topicId).stars || 0
+    },
+
+    /**
+     * Checkpoint quiz overlay (used by the Journey path's 🎯 nodes).
+     * quiz({ title, sub, questions: [{q, options, a}], passRatio?, onPass, onClose })
+     * One question at a time, progress dots; score >= passRatio (default .8) passes.
+     */
+    quiz(opts) {
+      ensureStyles()
+      const old = document.getElementById('lq-quiz')
+      if (old) old.remove()
+      const ov = document.createElement('div')
+      ov.id = 'lq-quiz'
+      ov.className = 'lq-quiz'
+      document.body.appendChild(ov)
+      const qs = opts.questions
+      const need = Math.ceil((opts.passRatio || 0.8) * qs.length)
+      let idx = 0
+      const results = []
+      const close = () => { ov.remove(); if (opts.onClose) opts.onClose() }
+
+      const dots = () => '<div class="lq-quiz-prog">' + qs.map((_, i) =>
+        '<span class="lq-quiz-dot' + (i < results.length ? (results[i] ? ' ok' : ' bad') : (i === idx ? ' cur' : '')) + '"></span>'
+      ).join('') + '</div>'
+
+      const step = () => {
+        if (idx >= qs.length) {
+          const score = results.filter(Boolean).length
+          const passed = score >= need
+          ov.innerHTML = '<div class="lq-quiz-card" style="text-align:center">'
+            + '<div style="font-size:44px">' + (passed ? '🎯' : '🩹') + '</div>'
+            + '<div class="lq-quiz-title">' + (passed ? 'CHECKPOINT CLEARED!' : 'Almost…') + '</div>'
+            + '<div class="lq-quiz-sub">You scored <b>' + score + '/' + qs.length + '</b>'
+            + (passed ? ' — key terms locked in.' : ' — you need ' + need + '. Revisit the lessons and try again, it costs nothing.') + '</div>'
+            + dots()
+            + '<div style="margin-top:14px">'
+            + (passed ? '<button class="lq-next-btn" id="lqq-done">Claim it →</button>'
+                      : '<button class="lq-next-btn" id="lqq-retry">Retry</button>')
+            + '<button class="lq-stay-btn" id="lqq-close">Close</button></div></div>'
+          const done = document.getElementById('lqq-done')
+          if (done) done.onclick = () => { ov.remove(); if (opts.onPass) opts.onPass() }
+          const retry = document.getElementById('lqq-retry')
+          if (retry) retry.onclick = () => { idx = 0; results.length = 0; qs.forEach(q => {
+            const right = q.options[q.a]
+            q.options = shuffle(q.options)
+            q.a = q.options.indexOf(right)
+          }); step() }
+          document.getElementById('lqq-close').onclick = close
+          return
+        }
+        const q = qs[idx]
+        ov.innerHTML = '<div class="lq-quiz-card">'
+          + '<button class="lq-quiz-x" id="lqq-x">✕</button>'
+          + '<div class="lq-quiz-title">' + (opts.title || '🎯 Checkpoint') + '</div>'
+          + '<div class="lq-quiz-sub">' + esc(opts.sub || '') + '</div>'
+          + dots()
+          + '<div class="lq-quiz-q">' + (idx + 1) + '. ' + esc(q.q) + '</div>'
+          + '<div class="lq-check-opts">'
+          + q.options.map((o, i) => '<div class="lq-chip" data-i="' + i + '">' + esc(o) + '</div>').join('')
+          + '</div></div>'
+        document.getElementById('lqq-x').onclick = close
+        ov.querySelectorAll('.lq-chip').forEach((chip, i) => {
+          chip.onclick = () => {
+            const right = i === q.a
+            chip.classList.add(right ? 'ok' : 'bad')
+            if (right) confetti(chip, ['✨','🎯'])
+            else { const c2 = ov.querySelectorAll('.lq-chip')[q.a]; if (c2) c2.classList.add('ok') }
+            results.push(right)
+            setTimeout(() => { idx++; step() }, right ? 500 : 1100)
+          }
+        })
+      }
+      step()
     },
   }
 })()

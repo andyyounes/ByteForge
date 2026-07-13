@@ -63,6 +63,30 @@ const QuestMap = (() => {
       .qm-avatar { position:absolute; top:-30px; left:50%; transform:translateX(-50%); animation:qmBob 2.4s ease-in-out infinite; }
       @keyframes qmBob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-4px)} }
       .qm-arrow { color:#3c4157; font-size:17px; flex-shrink:0; }
+      /* ── Duolingo-style winding path layout ─────────────────────── */
+      .qm-path { max-width:430px; margin:10px auto 90px; padding:0 16px; }
+      .qm-banner { display:flex; align-items:center; justify-content:space-between; gap:10px;
+                   border-radius:14px; padding:12px 16px; margin:26px 0 20px;
+                   background:linear-gradient(135deg, rgba(232,121,249,.14), rgba(96,165,250,.1));
+                   border:1px solid rgba(255,255,255,.12); }
+      .qm-banner .qm-wname { font-size:14px; }
+      .qm-pcol { display:flex; flex-direction:column; align-items:center; gap:26px; position:relative; }
+      .qm-pcol::before { content:''; position:absolute; top:0; bottom:0; left:50%; width:3px;
+                         background:repeating-linear-gradient(#2b3044 0 8px, transparent 8px 16px);
+                         transform:translateX(-50%); }
+      .qm-pwrap { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;
+                  transition:transform .2s; }
+      .qm-node.soon { opacity:.5; filter:saturate(.55); }
+      .qm-node.soon:hover { opacity:.9; }
+      .qm-next-pill { margin-top:6px; font-size:9px; font-weight:900; letter-spacing:1px; color:#0d0f1a;
+                      background:var(--qm-accent,#e879f9); border-radius:99px; padding:3px 11px;
+                      animation:qmBounceIn .5s; white-space:nowrap; }
+      @keyframes qmBounceIn { 0%{transform:scale(0)} 70%{transform:scale(1.15)} 100%{transform:scale(1)} }
+      .qm-plabel { font-size:10px; font-weight:800; color:#9ca3af; margin-top:5px; max-width:130px;
+                   text-align:center; line-height:1.3; }
+      .qm-pstars { font-size:10px; margin-top:2px; letter-spacing:-1px; }
+      .qm-node.cp { border-style:dashed; border-color:rgba(96,165,250,.55); }
+      .qm-node.cp.done { border-color:#4ade80; }
     `
     const el = document.createElement('style')
     el.textContent = css
@@ -92,7 +116,16 @@ const QuestMap = (() => {
       + '<p>' + esc(cfg.subtitle || '') + '</p>'
       + '<button class="qm-close" onclick="QuestMap.hide()">✕</button>'
       + '<div class="qm-stats"><span class="qm-stat">✅ <b>' + done + '</b>/' + total + ' stages</span></div>'
-      + '</div><div class="qm-map">'
+      + '</div>'
+
+    if (cfg.layout === 'path') {
+      overlay.innerHTML = html + renderPath()
+      // Bring the current node into view (the path can be very long)
+      const cur = overlay.querySelector('.qm-node.current')
+      if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center' }), 60)
+      return
+    }
+    html += '<div class="qm-map">'
 
     let prevWorldDone = true
     let foundCurrent = false
@@ -135,6 +168,45 @@ const QuestMap = (() => {
     }
     html += '</div>'
     overlay.innerHTML = html
+  }
+
+  // Duolingo-style single winding path: chapter banners, serpentine nodes,
+  // one glowing "current" node with the avatar. Soft lock: future nodes are
+  // dimmed but stay clickable (exam students revise out of order).
+  function renderPath() {
+    const OFF = [0, 52, 82, 52, 0, -52, -82, -52]
+    let html = '<div class="qm-path">'
+    let foundCurrent = false
+    let k = 0
+    for (const w of cfg.worlds) {
+      const wDone = w.stages ? w.stages.filter(s => s.done).length : 0
+      const allDone = w.stages && wDone === w.stages.length
+      html += '<div class="qm-banner"><div><div class="qm-wname">' + w.name + '</div>'
+        + '<div class="qm-wsub">' + esc(w.sub || '') + '</div></div>'
+        + '<div class="qm-wprog">' + (w.live ? (allDone ? '🏆 COMPLETE' : wDone + '/' + w.stages.length) : '🔒 soon') + '</div></div>'
+      if (!w.live) continue
+      html += '<div class="qm-pcol">'
+      for (const s of w.stages) {
+        const isCurrent = !s.done && !foundCurrent
+        if (isCurrent) foundCurrent = true
+        const soon = cfg.softLock && !s.done && !isCurrent
+        const cls = 'qm-node' + (s.boss ? ' boss' : '') + (s.cp ? ' cp' : '') + (s.done ? ' done' : '')
+          + (isCurrent ? ' current' : '') + (soon ? ' soon' : '')
+        html += '<div class="qm-pwrap" style="transform:translateX(' + OFF[k % OFF.length] + 'px)">'
+          + '<div class="' + cls + '" onclick="QuestMap._open(\'' + esc(s.id) + '\')" title="' + esc(s.label) + '">'
+          + (isCurrent && cfg.avatarSvg ? '<span class="qm-avatar">' + cfg.avatarSvg + '</span>' : '')
+          + '<span class="qm-emoji">' + (s.emoji || '📘') + '</span>'
+          + (s.done ? '<span class="qm-done-mark">' + (s.stars ? '⭐'.repeat(s.stars) : (s.boss ? '🏆' : '⭐')) + '</span>' : '')
+          + '</div>'
+          + '<div class="qm-plabel">' + esc(s.label)
+          + (s.stars && !s.done ? '<div class="qm-pstars">' + '⭐'.repeat(s.stars) + '</div>' : '') + '</div>'
+          + (isCurrent ? '<div class="qm-next-pill">▶ NEXT UP</div>' : '')
+          + '</div>'
+        k++
+      }
+      html += '</div>'
+    }
+    return html + '</div>'
   }
 
   return {
