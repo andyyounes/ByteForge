@@ -19,6 +19,20 @@
 - [ ] Weekly class leaderboard (reset Mondays).
 - [ ] OBS-01 cosmetics unlocked by level.
 - [ ] Badge gallery with locked silhouettes (user_achievements table exists).
+- [ ] **Rusty nodes (spaced repetition):** checkpoint/boss stars fade after ~2 weeks;
+      the Journey path shows a cracked node prompting a quick re-clear (Duolingo's
+      strongest retention mechanic, and it directly serves exam revision).
+- [ ] Legendary bosses: re-fight a beaten practice boss at a stricter threshold
+      (85%+ with fewer attempts) for a gold crown on the path node.
+- [ ] Wrong-answer bank: micro-check/checkpoint misses resurface in a weekly
+      "revision boss" built from each student's own mistakes.
+- [ ] Watch tracking v2: cumulative playtime instead of furthest-point, so
+      scrubbing to the end doesn't count as watching.
+
+## Learning quality
+- [ ] AI-marked practice: replace the keyword scorer with a Groq call against the
+      mark scheme (route through /api/ai-check) — boss-fight damage gets fair.
+- [ ] LessonQuest + Journey path for IGCSE Y1/Y2 (engines are page-agnostic).
 
 ## Platform
 - [ ] Code Lab / quest progress → server (lesson_saves) so it survives device changes.
