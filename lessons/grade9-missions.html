@@ -105,6 +105,12 @@
   .mtier { font-size:11px; font-weight:900; letter-spacing:1.4px; color:#67e8f9; margin:16px 4px 2px; }
   select.ed-lang { cursor:pointer; }
   select.ed-lang option { background:#0e1020; color:#e2e8f0; }
+
+  /* ── Battle replay scrubber ── */
+  .replay-bar { display:none; align-items:center; justify-content:center; gap:12px; padding:7px;
+                background:#0e1020; border-top:1px solid rgba(255,255,255,.08); flex-shrink:0; }
+  .replay-bar .btn { padding:5px 12px; font-size:11.5px; }
+  #replay-label { font-size:11.5px; color:#9ca3af; font-weight:700; min-width:80px; text-align:center; }
 </style>
 <script src="../js/db.js"></script>
 <script src="../js/auth.js"></script>
@@ -127,6 +133,11 @@
 <div class="main">
   <div class="left">
     <div class="scene-wrap"><canvas id="scene" width="640" height="480"></canvas></div>
+    <div class="replay-bar" id="replay-bar">
+      <button class="btn btn-reset" onclick="replayPrev()">⏮ Prev Turn</button>
+      <span id="replay-label">Turn 1 / 1</span>
+      <button class="btn btn-reset" onclick="replayNext()">Next Turn ⏭</button>
+    </div>
     <div class="brief">
       <div class="brief-goal" id="m-brief"></div>
       <div class="brief-api" id="m-api"></div>
@@ -207,7 +218,9 @@ function applyLang() {
   setSubmit(false)
 }
 function parLabel(m) {
-  return (m.stars.metric === 'lines' ? '3★: ≤ ' + m.stars.par + ' code lines' : '3★: ' + m.stars.par + ' commands')
+  if (m.stars.metric === 'lines') return '3★: ≤ ' + m.stars.par + ' code lines'
+  if (m.stars.metric === 'turns') return '3★: ≤ ' + m.stars.par + ' turns'
+  return '3★: ' + m.stars.par + ' commands'
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -416,6 +429,48 @@ const MISSIONS = [
     success: { type: 'waypoints' },
     stars: { par: 7 },
   },
+
+  // ── Phase 2 · Tutorial — agent battles ──────────────────────────────────────
+  // Turn-based: your code is RE-RUN fresh every turn with the latest `state`.
+  // Call attack(id) or wait() — whichever fires first each turn is your move.
+  {
+    id: 'p2m1', type: 'battle', phase: 'PHASE 2 · TUTORIAL', emoji: '🎯', title: 'First Contact', xp: 40,
+    brief: 'A <b>training drone</b> is powering up target locks — it never fires back. Every turn you '
+      + 'receive <b>state</b> describing your ship and the enemy fleet. Call <b>attack(id)</b> to fire, or '
+      + '<b>wait()</b> to hold. Your code runs <b>fresh each turn</b> — read state, decide, act.',
+    api: ['attack(id)', 'wait()'],
+    starter: {
+      py: '# state[\'enemies\'] is a list of dicts: id, name, hp, maxHp, dist\n'
+        + '# state[\'self\'] is your ship: hp, maxHp\n\nenemy = state[\'enemies\'][0]\n# TODO: attack it!\n',
+      ps: '// enemyId[1], enemyHp[1] etc. describe the drone. selfHp is your ship.\n\n'
+        + '// TODO: attack(enemyId[1])\n',
+    },
+    battle: {
+      playerHp: 100, playerAttack: 25,
+      enemies: [{ id: 'e1', name: 'Training Drone', hp: 50, attack: 0, dist: 3 }],
+      maxTurns: 10,
+    },
+    stars: { metric: 'turns', par: 2 },
+  },
+  {
+    id: 'p2m2', type: 'battle', phase: 'PHASE 2 · TUTORIAL', emoji: '⚡', title: 'Counter Fire', xp: 45,
+    brief: 'This one <b>fires back</b> — every turn it survives, it hits your ship. Same shape of '
+      + 'decision, but now hesitation costs HP. Keep an eye on <b>state[\'self\'][\'hp\']</b> and stay '
+      + 'aggressive.',
+    api: ['attack(id)', 'wait()'],
+    starter: {
+      py: '# This enemy attacks back every turn it survives — don\'t waste turns!\n'
+        + '# state[\'enemies\'][0] is your target.\n\nenemy = state[\'enemies\'][0]\n# TODO: attack it, every turn\n',
+      ps: '// This enemy attacks back every turn it survives — don\'t waste turns!\n\n'
+        + '// TODO: attack(enemyId[1]), every turn\n',
+    },
+    battle: {
+      playerHp: 80, playerAttack: 20,
+      enemies: [{ id: 'e1', name: 'Armed Sentinel', hp: 60, attack: 12, dist: 4 }],
+      maxTurns: 10,
+    },
+    stars: { metric: 'turns', par: 3 },
+  },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -485,6 +540,69 @@ function evalSuccess(mission, sim) {
   return { ok: false, why: 'unknown' }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// Pure turn-based combat resolution — testable in Node, no DOM.
+// One turn: player acts (attack a target, or wait), then every enemy still
+// alive after that retaliates for its fixed attack value. Deterministic —
+// no RNG, so results are reproducible and pars can be proven honest.
+//   state:  { turn, playerHp, enemies: [{id,name,hp,maxHp,attack,dist}] }
+//   action: { type:'attack', target:id } | { type:'wait' }
+// ══════════════════════════════════════════════════════════════════════════════
+function simBattleTurn(state, action, mission) {
+  const events = []
+  let playerHp = state.playerHp
+  const enemies = state.enemies.map(e => ({ ...e }))
+  const find = id => enemies.find(e => e.id === id)
+
+  if (action && action.type === 'attack' && action.target) {
+    const t = find(action.target)
+    if (t && t.hp > 0) {
+      t.hp = Math.max(0, t.hp - mission.battle.playerAttack)
+      events.push({ kind: 'playerAttack', target: t.id, name: t.name, dmg: mission.battle.playerAttack, hpAfter: t.hp })
+    } else {
+      events.push({ kind: 'invalidTarget', target: action.target })
+    }
+  } else {
+    events.push({ kind: 'wait' })
+  }
+
+  for (const e of enemies) {
+    if (e.hp <= 0) continue
+    if (e.attack > 0) {
+      playerHp = Math.max(0, playerHp - e.attack)
+      events.push({ kind: 'enemyAttack', from: e.id, name: e.name, dmg: e.attack, playerHpAfter: playerHp })
+    } else {
+      events.push({ kind: 'enemyIdle', from: e.id, name: e.name })
+    }
+  }
+
+  const win = enemies.every(e => e.hp <= 0)
+  const loss = playerHp <= 0 && !win
+  return { playerHp, enemies, events, win, loss }
+}
+
+// Orchestrates a full battle: calls execTurn(state) once per turn (async —
+// it invokes the student's code fresh each turn) until win, loss or timeout.
+async function runBattleSim(mission, execTurn) {
+  let state = {
+    turn: 1, playerHp: mission.battle.playerHp,
+    enemies: mission.battle.enemies.map(e => ({ ...e, maxHp: e.hp })),
+  }
+  const log = []
+  const maxTurns = mission.battle.maxTurns || 20
+  while (state.turn <= maxTurns) {
+    const res = await execTurn(state)
+    if (!res.ok) return { ok: false, error: res.error, line: res.line, log }
+    const result = simBattleTurn(state, res.action, mission)
+    log.push({ turn: state.turn, action: res.action, events: result.events,
+               playerHpAfter: result.playerHp, enemies: result.enemies })
+    state = { turn: state.turn + 1, playerHp: result.playerHp, enemies: result.enemies }
+    if (result.win) return { ok: true, outcome: 'win', turns: log.length, log }
+    if (result.loss) return { ok: true, outcome: 'loss', turns: log.length, log }
+  }
+  return { ok: true, outcome: 'timeout', turns: log.length, log }
+}
+
 // Significant source lines — the star metric for loop/decision missions
 function countLines(code) {
   return code.split('\n').filter(l => {
@@ -494,7 +612,8 @@ function countLines(code) {
 }
 
 function starsFor(mission, stats) {
-  const v = (mission.stars.metric || 'cmds') === 'lines' ? stats.lines : stats.cmds
+  const metric = mission.stars.metric || 'cmds'
+  const v = metric === 'lines' ? stats.lines : metric === 'turns' ? stats.turns : stats.cmds
   const par = mission.stars.par
   return v <= par ? 3 : v <= par + 2 ? 2 : 1
 }
@@ -510,24 +629,37 @@ function checkRequire(mission, code) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// Cambridge-style pseudocode executor (Phase 1 subset) — the second engine of
-// the pluggable pair. Same command-list contract as Python.
+// Cambridge-style pseudocode executor (Phase 1-2 subset) — the second engine of
+// the pluggable pair. Same command-list / action contract as Python.
 //   x ← expr        FOR i ← a TO b [STEP s] … NEXT        IF … THEN / ELSE / ENDIF
 //   forward(e) backward(e) left(e) right(e)   signals[i] (1-based)   LENGTH(a)
+//   attack(id) wait()   (battle missions)
 //   operators: + - * / MOD, = <> < > <= >=, AND OR       OUTPUT e     // comment
+//
+// battleEnv, when passed, switches to battle mode: attack()/wait() replace the
+// turtle command set, and its fields (selfhp, enemyid[], enemyhp[], …) are
+// injected as extra read-only variables for this call only — a fresh call
+// per turn, matching Python's per-turn re-run.
 // ══════════════════════════════════════════════════════════════════════════════
-function execPseudo(src, mission) {
+function execPseudo(src, mission, battleEnv) {
+  const isBattle = mission.type === 'battle'
   const cmds = []
   const outputs = []
-  const allowedList = mission.allowed || ['forward', 'backward', 'left', 'right']
   const fns = {}
-  if (allowedList.includes('forward'))  fns.forward  = d => cmds.push(['F', +d])
-  if (allowedList.includes('backward')) fns.backward = d => cmds.push(['F', -d])
-  if (allowedList.includes('left'))     fns.left     = a => cmds.push(['L', +a])
-  if (allowedList.includes('right'))    fns.right    = a => cmds.push(['R', +a])
+  let action = { type: 'wait' }
+  if (isBattle) {
+    fns.attack = id => { action = { type: 'attack', target: id } }
+    fns.wait   = () => { action = { type: 'wait' } }
+  } else {
+    const allowedList = mission.allowed || ['forward', 'backward', 'left', 'right']
+    if (allowedList.includes('forward'))  fns.forward  = d => cmds.push(['F', +d])
+    if (allowedList.includes('backward')) fns.backward = d => cmds.push(['F', -d])
+    if (allowedList.includes('left'))     fns.left     = a => cmds.push(['L', +a])
+    if (allowedList.includes('right'))    fns.right    = a => cmds.push(['R', +a])
+    fns.get_signals = () => (mission.signals || []).slice()
+  }
   fns.length = a => (Array.isArray(a) || typeof a === 'string')
     ? a.length : (() => { throw { message: 'LENGTH() needs an array or string' } })()
-  fns.get_signals = () => (mission.signals || []).slice()
 
   const lines = []
   src.split('\n').forEach((raw, i) => {
@@ -537,6 +669,7 @@ function execPseudo(src, mission) {
 
   const env = Object.create(null)
   if (mission.signals) env.signals = mission.signals.slice()
+  if (battleEnv) for (const k in battleEnv) env[k] = battleEnv[k]
 
   // ── expression evaluator: tokenizer + precedence climbing ──
   function evalExpr(exprStr, ln) {
@@ -716,7 +849,20 @@ function execPseudo(src, mission) {
 
   try { run(0, lines.length) }
   catch (err) { return { ok: false, error: err.message || String(err), line: err.ln || null } }
-  return { ok: true, cmds, outputs }
+  return isBattle ? { ok: true, action, outputs } : { ok: true, cmds, outputs }
+}
+
+// Flattens one battle turn's state into the pseudocode env's flat/array
+// variables (the interpreter has no nested records, only scalars + 1D arrays).
+function battleEnvFor(mission, state) {
+  const alive = state.enemies.filter(e => e.hp > 0)
+  return {
+    turn: state.turn,
+    selfhp: state.playerHp, selfmaxhp: mission.battle.playerHp,
+    enemycount: alive.length,
+    enemyid: alive.map(e => e.id), enemyhp: alive.map(e => e.hp),
+    enemymaxhp: alive.map(e => e.maxHp), enemydist: alive.map(e => e.dist),
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -775,6 +921,52 @@ async function execPython(code, mission) {
     let line = null
     const matches = [...msg.matchAll(/File "<exec>", line (\d+)/g)]
     if (matches.length) line = parseInt(matches[matches.length - 1][1]) - preLines + 1
+    const lastLine = msg.trim().split('\n').pop()
+    return { ok: false, error: lastLine, line: line && line > 0 ? line : null }
+  }
+}
+
+// Nested dict for Python — battle's `state` is a proper structured object,
+// unlike pseudocode's flat arrays (the interpreter has no records).
+function buildBattleState(mission, state) {
+  const alive = state.enemies.filter(e => e.hp > 0)
+  return {
+    turn: state.turn,
+    self: { hp: state.playerHp, maxHp: mission.battle.playerHp },
+    enemies: alive.map(e => ({ id: e.id, name: e.name, hp: e.hp, maxHp: e.maxHp, dist: e.dist })),
+  }
+}
+
+// One turn = two SEPARATE runPython calls (setup, then student code), so a
+// traceback's line number already matches the student's own source exactly —
+// no preamble-offset arithmetic needed, unlike the turtle missions' one-shot run.
+const BATTLE_SETUP = [
+  "def attack(_id):",
+  "    global _action_type, _action_target",
+  "    _action_type = 'attack'",
+  "    _action_target = _id",
+  "def wait():",
+  "    global _action_type",
+  "    _action_type = 'wait'",
+  "_action_type = 'wait'",
+  "_action_target = None",
+  "",
+].join('\n')
+
+async function execPythonTurn(code, mission, state) {
+  const py = await ensurePyodide()
+  py.runPython(BATTLE_SETUP)
+  py.globals.set('state', py.toPy(buildBattleState(mission, state)))
+  try {
+    py.runPython(code)
+    const type = py.globals.get('_action_type')
+    const target = py.globals.get('_action_target')
+    return { ok: true, action: { type: type || 'wait', target: target == null ? null : target } }
+  } catch (e) {
+    const msg = String(e.message || e)
+    let line = null
+    const matches = [...msg.matchAll(/File "<exec>", line (\d+)/g)]
+    if (matches.length) line = parseInt(matches[matches.length - 1][1])
     const lastLine = msg.trim().split('\n').pop()
     return { ok: false, error: lastLine, line: line && line > 0 ? line : null }
   }
@@ -883,6 +1075,95 @@ async function animate(m, sim) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// Battle scene rendering + animation
+// ══════════════════════════════════════════════════════════════════════════════
+function drawHpBar(x, y, w, hp, maxHp, color) {
+  ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fillRect(x, y, w, 8)
+  ctx.fillStyle = color; ctx.fillRect(x, y, w * Math.max(0, hp / maxHp), 8)
+  ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.strokeRect(x, y, w, 8)
+}
+
+function drawBattleScene(mission, snapshot) {
+  cv.width = 640; cv.height = 480
+  ctx.fillStyle = '#0b0d16'
+  ctx.fillRect(0, 0, 640, 480)
+  // starfield
+  ctx.fillStyle = 'rgba(255,255,255,.15)'
+  for (let i = 0; i < 40; i++) {
+    const sx = (i * 137) % 640, sy = (i * 271) % 480
+    ctx.fillRect(sx, sy, 1.5, 1.5)
+  }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+
+  // player ship, bottom-center
+  const px = 320, py = 400
+  ctx.font = '46px serif'
+  ctx.fillText('🚀', px, py)
+  drawHpBar(px - 40, py + 34, 80, snapshot.playerHp, mission.battle.playerHp, '#4ade80')
+  ctx.font = '11px sans-serif'; ctx.fillStyle = '#c9d1e3'
+  ctx.fillText('YOUR SHIP  ' + Math.max(0, snapshot.playerHp) + '/' + mission.battle.playerHp, px, py + 52)
+
+  // enemy fleet, upper area — stable slot positions even after a kill
+  const total = mission.battle.enemies.length
+  mission.battle.enemies.forEach((base, i) => {
+    const e = snapshot.enemies.find(x => x.id === base.id) || { ...base, hp: 0 }
+    const ex = 640 * (i + 1) / (total + 1), ey = 130
+    ctx.globalAlpha = e.hp > 0 ? 1 : 0.28
+    ctx.font = '40px serif'
+    ctx.fillText(e.hp > 0 ? '👾' : '💥', ex, ey)
+    ctx.globalAlpha = 1
+    if (e.hp > 0) drawHpBar(ex - 36, ey + 30, 72, e.hp, e.maxHp, '#f87171')
+    ctx.font = '10.5px sans-serif'; ctx.fillStyle = '#9ca3af'
+    ctx.fillText(e.name + '  ' + Math.max(0, e.hp) + '/' + e.maxHp, ex, ey + 46)
+  })
+}
+
+async function animateBattle(mission, log) {
+  animating = true
+  let snapshot = { playerHp: mission.battle.playerHp, enemies: mission.battle.enemies.map(e => ({ ...e, maxHp: e.hp })) }
+  drawBattleScene(mission, snapshot)
+  logClear()
+  for (const rec of log) {
+    let msg = 'Turn ' + rec.turn + ': '
+    msg += rec.action.type === 'attack' ? 'you fire at ' + rec.action.target + '. ' : 'you hold fire. '
+    for (const ev of rec.events) {
+      if (ev.kind === 'playerAttack') msg += 'Hit ' + ev.name + ' for ' + ev.dmg + ' dmg (' + ev.hpAfter + ' HP left). '
+      else if (ev.kind === 'enemyAttack') msg += ev.name + ' fires back for ' + ev.dmg + ' dmg! '
+      else if (ev.kind === 'invalidTarget') msg += 'No such target — wasted the turn! '
+    }
+    logAppend(msg)
+    snapshot = { playerHp: rec.playerHpAfter, enemies: rec.enemies }
+    drawBattleScene(mission, snapshot)
+    await sleep(650)
+  }
+  animating = false
+}
+
+// Post-battle scrubber — click through completed turns without re-simulating
+let battleLog = []
+let replayIdx = -1
+function showReplayControls() {
+  replayIdx = battleLog.length - 1
+  document.getElementById('replay-bar').style.display = 'flex'
+  updateReplayLabel()
+}
+function hideReplayControls() {
+  document.getElementById('replay-bar').style.display = 'none'
+  battleLog = []
+  replayIdx = -1
+}
+function replayPrev() { if (replayIdx > 0) { replayIdx--; renderReplayFrame() } }
+function replayNext() { if (replayIdx < battleLog.length - 1) { replayIdx++; renderReplayFrame() } }
+function renderReplayFrame() {
+  const rec = battleLog[replayIdx]
+  drawBattleScene(activeMission, { playerHp: rec.playerHpAfter, enemies: rec.enemies })
+  updateReplayLabel()
+}
+function updateReplayLabel() {
+  document.getElementById('replay-label').textContent = 'Turn ' + (replayIdx + 1) + ' / ' + battleLog.length
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // Console + error surfacing
 // ══════════════════════════════════════════════════════════════════════════════
 let _errLine = null
@@ -893,6 +1174,15 @@ function clearErrLine() {
 function logC(msg, cls) {
   const c = document.getElementById('console')
   c.innerHTML = cls ? '<span class="' + cls + '">' + msg + '</span>' : msg
+}
+function logClear() { document.getElementById('console').innerHTML = '' }
+function logAppend(msg, cls) {
+  const c = document.getElementById('console')
+  const line = document.createElement('div')
+  if (cls) line.className = cls
+  line.textContent = msg
+  c.appendChild(line)
+  c.scrollTop = c.scrollHeight
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -919,9 +1209,23 @@ function openMission(id) {
     })
   }
   applyLang()
-  drawScene(activeMission, activeMission.scene.start, null)
-  logC('// Mission loaded. Write your flight plan and press ▶ Run.')
+  renderInitial()
+  logC(activeMission.type === 'battle'
+    ? '// Mission loaded. Write your tactics and press ▶ Run.'
+    : '// Mission loaded. Write your flight plan and press ▶ Run.')
   setTimeout(() => editor.refresh(), 50)
+}
+
+// Draws each mission type's starting frame — routed by activeMission.type
+function renderInitial() {
+  hideReplayControls()
+  if (activeMission.type === 'battle') {
+    const snap = { playerHp: activeMission.battle.playerHp,
+                   enemies: activeMission.battle.enemies.map(e => ({ ...e, maxHp: e.hp })) }
+    drawBattleScene(activeMission, snap)
+  } else {
+    drawScene(activeMission, activeMission.scene.start, null)
+  }
 }
 
 function setSubmit(on) {
@@ -935,12 +1239,13 @@ function resetMission() {
   try { localStorage.removeItem(draftKey(activeMission.id, lang)) } catch (e) {}
   clearErrLine()
   setSubmit(false)
-  drawScene(activeMission, activeMission.scene.start, null)
+  renderInitial()
   logC('// Reset. Fresh start!')
 }
 
 async function runMission(isSubmit) {
   if (animating || !activeMission) return
+  if (activeMission.type === 'battle') return runBattleMission(isSubmit)
   const btn = document.getElementById('btn-run')
   btn.disabled = true
   clearErrLine()
@@ -1009,6 +1314,62 @@ async function runMission(isSubmit) {
   btn.disabled = false
 }
 
+async function runBattleMission(isSubmit) {
+  const btn = document.getElementById('btn-run')
+  btn.disabled = true
+  clearErrLine()
+  saveDraft()
+  const code = editor.getValue()
+  const mission = activeMission
+  if (lang === 'py' && !_pyodide) logC('⏳ Loading Python engine (first run only — a few seconds)…', 'warn')
+
+  const execTurn = lang === 'py'
+    ? state => execPythonTurn(code, mission, state)
+    : state => execPseudo(code, mission, battleEnvFor(mission, state))
+
+  let res
+  try { res = await runBattleSim(mission, execTurn) }
+  catch (e) { logC('✗ ' + e.message, 'err'); btn.disabled = false; return }
+
+  if (!res.ok) {
+    if (res.line != null) {
+      _errLine = res.line - 1
+      editor.addLineClass(_errLine, 'background', 'cm-error-line')
+      logC('✗ Line ' + res.line + ': ' + res.error, 'err')
+    } else {
+      logC('✗ ' + res.error, 'err')
+    }
+    btn.disabled = false
+    return
+  }
+
+  battleLog = res.log
+  const stats = { turns: res.turns }
+
+  if (isSubmit) {
+    if (res.outcome === 'win') completeMission(stats)
+    else logC('✗ Submit blocked — you must WIN the battle first (press ▶ Run to see why).', 'err')
+    btn.disabled = false
+    return
+  }
+
+  await animateBattle(mission, res.log)
+  showReplayControls()
+
+  if (res.outcome === 'win') {
+    const st = starsFor(mission, stats)
+    logAppend('✅ VICTORY in ' + res.turns + ' turn' + (res.turns > 1 ? 's' : '')
+      + (st === 3 ? ' — perfect!' : ' (3★ needs ≤ ' + mission.stars.par + ' turns)')
+      + '. Press ✓ Submit to claim your stars.', 'ok')
+    setSubmit(true)
+  } else if (res.outcome === 'loss') {
+    logAppend('💀 Your ship was destroyed. Adjust your strategy and try again.', 'err')
+  } else {
+    logAppend('⏱️ Turn limit reached without a decisive result — be more aggressive!', 'warn')
+  }
+  btn.disabled = false
+}
+
 function completeMission(stats) {
   const st = starsFor(activeMission, stats)
   const p = getProg()
@@ -1026,14 +1387,18 @@ function completeMission(stats) {
   try { LessonSaves.save('grade9-missions', idx, { passed: true, xpEarned: xp, code: editor.getValue() }) } catch (e) {}
   try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
 
-  const isLines = activeMission.stars.metric === 'lines'
+  const metric = activeMission.stars.metric || 'cmds'
   document.getElementById('win-stars').innerHTML =
     '⭐'.repeat(st) + '<span class="dim">' + '⭐'.repeat(3 - st) + '</span>'
   document.getElementById('win-sub').textContent =
-    st === 3 ? (isLines ? 'Minimal code — that\'s what loops are for. Beautiful.'
-                        : 'Perfect flight — minimum commands. That\'s pilot thinking.') :
-    (isLines ? 'Completed in ' + stats.lines + ' lines. Tighter code earns more stars — refactor and re-submit!'
-             : 'Docked with ' + stats.cmds + ' commands. A shorter flight plan earns more stars!')
+    metric === 'turns'
+      ? (st === 3 ? 'Flawless victory — minimum turns. Efficient combat!'
+                  : 'Won in ' + stats.turns + ' turns. Fewer turns = more stars — refine your tactics!')
+    : metric === 'lines'
+      ? (st === 3 ? 'Minimal code — that\'s what loops are for. Beautiful.'
+                  : 'Completed in ' + stats.lines + ' lines. Tighter code earns more stars — refactor and re-submit!')
+      : (st === 3 ? 'Perfect flight — minimum commands. That\'s pilot thinking.'
+                  : 'Docked with ' + stats.cmds + ' commands. A shorter flight plan earns more stars!')
   document.getElementById('win-xp').textContent = xp > 0 ? '+' + xp + ' XP' : 'Already earned — chase the stars!'
   document.getElementById('win').classList.add('open')
 }
@@ -1056,11 +1421,15 @@ const TIERS = [
   { name: '🧭 TIER 1 — SEQUENCING', ids: ['p1m1', 'p1m2', 'p1m3'] },
   { name: '🔁 TIER 2 — LOOPS (new: stars count code lines)', ids: ['p1m4', 'p1m5', 'p1m6', 'p1m7'] },
   { name: '🚦 TIER 3 — SIGNALS & DECISIONS', ids: ['p1m8', 'p1m9', 'p1m10'] },
-  { name: '🏆 CAPSTONE', ids: ['p1m11'] },
+  { name: '🏆 PHASE 1 CAPSTONE', ids: ['p1m11'] },
+  { name: '⚔️ PHASE 2 · TUTORIAL — your code fights (new: stars count turns)', ids: ['p2m1', 'p2m2'] },
 ]
 const COMING = [
-  { emoji: '⚔️', title: 'Phase 2 — Agent Battles', sub: 'Your code fights. Turn-based combat, enemy AI, boss missions.' },
-  { emoji: '📊', title: 'Phase 3 — Data Missions', sub: 'Terrain data, enemy stats, hidden weaknesses — read the data or lose.' },
+  { emoji: '🧰', title: 'Phase 2 — Functions Required', sub: 'Factor your logic into named functions, like find_closest_enemy().' },
+  { emoji: '🧠', title: 'Phase 2 — State Tracking', sub: 'Multi-turn strategy: retreat when low, remember enemy patterns.' },
+  { emoji: '👥', title: 'Phase 2 — Multiple Enemies', sub: '2-3 enemies at once — who do you prioritize?' },
+  { emoji: '🤖', title: 'Phase 2 — Adaptive AI', sub: 'The enemy reacts to YOUR pattern.' },
+  { emoji: '👹', title: 'Phase 2 — Boss + Phase 3 Data Missions', sub: 'A gate mission, then terrain/data-driven strategy.' },
   { emoji: '🏟️', title: 'Phase 4-5 — The Tournament', sub: 'Your bot vs the whole class. Bracket. Glory.' },
 ]
 function showList() {

@@ -6,9 +6,12 @@ import { readFileSync } from 'fs'
 const html = readFileSync('c:/Users/user/Downloads/ICT website/public/lessons/grade9-missions.html', 'utf8')
 const s = html.indexOf('const MISSIONS = [')
 const e = html.indexOf('// ═══', html.indexOf('function execPseudo'))
-const { MISSIONS, simTurtle, evalSuccess, starsFor, countLines, checkRequire, execPseudo } =
-  new Function(html.slice(s, e)
-    + '\nreturn { MISSIONS, simTurtle, evalSuccess, starsFor, countLines, checkRequire, execPseudo }')()
+const {
+  MISSIONS, simTurtle, evalSuccess, starsFor, countLines, checkRequire, execPseudo,
+  simBattleTurn, runBattleSim, battleEnvFor,
+} = new Function(html.slice(s, e)
+    + '\nreturn { MISSIONS, simTurtle, evalSuccess, starsFor, countLines, checkRequire, execPseudo, '
+    + 'simBattleTurn, runBattleSim, battleEnvFor }')()
 
 let fail = 0
 const bad = m => { fail++; console.log('✗ ' + m) }
@@ -30,6 +33,7 @@ const SOLUTIONS = {
 }
 
 for (const m of MISSIONS) {
+  if (m.type === 'battle') continue   // validated separately, below
   const sol = SOLUTIONS[m.id]
   if (!sol) { bad(m.id + ' — no reference solution'); continue }
   const sim = simTurtle(m.scene, sol)
@@ -111,6 +115,76 @@ const m8 = MISSIONS.find(m => m.id === 'p1m8')
 const psIdx = execPseudo("IF signals[1] = 'G' THEN\nforward(1)\nELSE\nforward(2)\nENDIF", m8)
 if (!psIdx.ok || psIdx.cmds[0][1] !== 1) bad('ps executor: 1-based signals indexing broken: ' + JSON.stringify(psIdx))
 else ok('ps executor: 1-based array indexing + IF/ELSE')
+
+// ── Phase 2 tutorial battles: pure combat resolution engine ───────────────────
+function constExec(action) { return async () => ({ ok: true, action }) }
+
+for (const id of ['p2m1', 'p2m2']) {
+  const m = MISSIONS.find(x => x.id === id)
+  const target = m.battle.enemies[0].id
+  const res = await runBattleSim(m, constExec({ type: 'attack', target }))
+  if (!res.ok || res.outcome !== 'win') { bad(id + ' — always-attack strategy should win, got ' + (res.outcome || res.error)); continue }
+  if (res.turns !== m.stars.par) { bad(id + ' — par ' + m.stars.par + ' turns but always-attack wins in ' + res.turns); continue }
+  if (starsFor(m, { turns: res.turns }) !== 3) { bad(id + ' — par turns should earn 3★'); continue }
+  ok(id + ' — ' + m.title + ': always-attack wins in ' + res.turns + ' turns (par)')
+}
+
+{
+  const m = MISSIONS.find(x => x.id === 'p2m1')
+  const res = await runBattleSim(m, constExec({ type: 'wait' }))
+  if (res.outcome === 'win') bad('p2m1 — pure waiting should never win against a passive drone')
+  else ok('p2m1 — pure waiting correctly stalls (outcome: ' + res.outcome + ')')
+}
+{
+  const m = MISSIONS.find(x => x.id === 'p2m2')
+  const res = await runBattleSim(m, constExec({ type: 'wait' }))
+  if (res.outcome !== 'loss') bad('p2m2 — pure waiting should lose to counter-fire, got ' + res.outcome)
+  else ok('p2m2 — pure waiting correctly loses in ' + res.turns + ' turns (' + m.battle.playerHp + 'hp vs ' + m.battle.enemies[0].attack + '/turn)')
+}
+{
+  const m = MISSIONS.find(x => x.id === 'p2m1')
+  const state = { turn: 1, playerHp: 100, enemies: m.battle.enemies.map(e => ({ ...e, maxHp: e.hp })) }
+  const r = simBattleTurn(state, { type: 'attack', target: 'ghost' }, m)
+  if (!r.events.some(ev => ev.kind === 'invalidTarget')) bad('invalid target should surface as an event, not throw')
+  else ok('invalid target handled as a harmless no-op event')
+}
+{
+  // A killed enemy must not retaliate the turn it dies (order: player acts, then survivors act)
+  const m = MISSIONS.find(x => x.id === 'p2m2')
+  const state = { turn: 3, playerHp: 80, enemies: [{ id: 'e1', name: 'Armed Sentinel', hp: 20, maxHp: 60, attack: 12, dist: 4 }] }
+  const r = simBattleTurn(state, { type: 'attack', target: 'e1' }, m)
+  if (r.playerHp !== 80 || !r.win) bad('killing blow should not take retaliation damage: ' + JSON.stringify(r))
+  else ok('lethal hit prevents that enemy\'s retaliation the same turn')
+}
+
+// ── Pseudocode battle engine, executed turn-by-turn like the real page does ───
+function simulateWithPseudo(mission, src) {
+  let state = { turn: 1, playerHp: mission.battle.playerHp,
+                enemies: mission.battle.enemies.map(e => ({ ...e, maxHp: e.hp })) }
+  const maxTurns = mission.battle.maxTurns || 20
+  while (state.turn <= maxTurns) {
+    const res = execPseudo(src, mission, battleEnvFor(mission, state))
+    if (!res.ok) return { outcome: 'error', error: res.error, line: res.line }
+    const result = simBattleTurn(state, res.action, mission)
+    state = { turn: state.turn + 1, playerHp: result.playerHp, enemies: result.enemies }
+    if (result.win) return { outcome: 'win', turns: state.turn - 1 }
+    if (result.loss) return { outcome: 'loss', turns: state.turn - 1 }
+  }
+  return { outcome: 'timeout', turns: maxTurns }
+}
+for (const id of ['p2m1', 'p2m2']) {
+  const m = MISSIONS.find(x => x.id === id)
+  const r = simulateWithPseudo(m, 'attack(enemyId[1])')
+  if (r.outcome !== 'win' || r.turns !== m.stars.par)
+    bad(id + ' — ps battle script should win in ' + m.stars.par + ' turns, got ' + r.outcome + '/' + r.turns + (r.error ? ' (' + r.error + ')' : ''))
+  else ok(id + ' — pseudocode battle script (attack(enemyId[1])) wins in ' + r.turns + ' turns (par)')
+}
+{
+  const m = MISSIONS.find(x => x.id === 'p2m1')
+  const bad1 = execPseudo('forward(10)', m, battleEnvFor(m, { turn: 1, playerHp: 100, enemies: m.battle.enemies.map(e => ({ ...e, maxHp: e.hp })) }))
+  if (bad1.ok) bad('battle mode should not expose forward() — turtle commands must be unavailable')
+  else ok('battle mode correctly rejects turtle-only commands (forward)')
+}
 
 console.log(fail ? '\n' + fail + ' problems' : '\nall missions verified — both engines honest')
 process.exit(fail ? 1 : 0)
