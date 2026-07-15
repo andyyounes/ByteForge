@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/simple.min.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:#0d0f1a; color:#e2e8f0; font-family:'Segoe UI',system-ui,sans-serif;
@@ -100,6 +101,10 @@
   .win-btn { border:none; border-radius:10px; padding:11px 24px; font-size:13.5px; font-weight:800; cursor:pointer;
              background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; margin:0 5px; }
   .win-btn.ghost { background:none; border:1px solid rgba(255,255,255,.18); color:#9ca3af; }
+
+  .mtier { font-size:11px; font-weight:900; letter-spacing:1.4px; color:#67e8f9; margin:16px 4px 2px; }
+  select.ed-lang { cursor:pointer; }
+  select.ed-lang option { background:#0e1020; color:#e2e8f0; }
 </style>
 <script src="../js/db.js"></script>
 <script src="../js/auth.js"></script>
@@ -130,7 +135,10 @@
   </div>
   <div class="right">
     <div class="ed-head">
-      <span class="ed-lang">Python 3</span>
+      <select class="ed-lang" id="ed-lang" onchange="switchLang(this.value)" title="The same mission, two languages — write in either">
+        <option value="py">Python 3</option>
+        <option value="ps">Pseudocode</option>
+      </select>
       <div class="ed-btns">
         <button class="btn btn-reset" onclick="resetMission()">↺ Reset</button>
         <button class="btn btn-run" id="btn-run" onclick="runMission(false)">▶ Run</button>
@@ -165,6 +173,43 @@
 <script>
 'use strict'
 
+// Editor highlighting for the pseudocode side of the bridge
+CodeMirror.defineSimpleMode('pseudog9', {
+  start: [
+    { regex: /\/\/.*/, token: 'comment' },
+    { regex: /'[^']*'|"[^"]*"/, token: 'string' },
+    { regex: /\b(FOR|TO|STEP|NEXT|IF|THEN|ELSE|ENDIF|MOD|AND|OR|NOT|OUTPUT|CALL|TRUE|FALSE|WHILE|ENDWHILE)\b/i, token: 'keyword' },
+    { regex: /\d+(\.\d+)?/, token: 'number' },
+    { regex: /←|<-|<>|<=|>=|[=<>+\-*/]/, token: 'operator' },
+    { regex: /[A-Za-z_]\w*(?=\s*\()/, token: 'def' },
+  ],
+})
+
+// ── Language bridge: the same mission, written in Python or pseudocode ────────
+let lang = (() => { try { return localStorage.getItem('bf-g9-lang') || 'py' } catch (e) { return 'py' } })()
+function draftKey(id, l) { return 'bf-g9-draft-' + id + '-' + l }
+function loadDraft(id, l) { try { return localStorage.getItem(draftKey(id, l)) } catch (e) { return null } }
+function saveDraft() {
+  if (activeMission && editor) try { localStorage.setItem(draftKey(activeMission.id, lang), editor.getValue()) } catch (e) {}
+}
+function switchLang(l) {
+  saveDraft()
+  lang = l
+  try { localStorage.setItem('bf-g9-lang', l) } catch (e) {}
+  applyLang()
+}
+function applyLang() {
+  document.getElementById('ed-lang').value = lang
+  if (!editor || !activeMission) return
+  editor.setOption('mode', lang === 'py' ? 'python' : 'pseudog9')
+  editor.setValue(loadDraft(activeMission.id, lang) || activeMission.starter[lang])
+  clearErrLine()
+  setSubmit(false)
+}
+function parLabel(m) {
+  return (m.stars.metric === 'lines' ? '3★: ≤ ' + m.stars.par + ' code lines' : '3★: ' + m.stars.par + ' commands')
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // Mission configs — schema-driven so new missions are data, not code.
 //   scene:   start pose + target(s); canvas units
@@ -173,23 +218,204 @@
 //   stars:   par = command count for 3★ (efficiency), par+2 = 2★, pass = 1★
 // ══════════════════════════════════════════════════════════════════════════════
 const MISSIONS = [
+  // ── Tier 1 — Sequencing ──────────────────────────────────────────────────────
   {
     id: 'p1m1', phase: 'PHASE 1 · TURTLE', emoji: '🛰️', title: 'Dock at the Station', xp: 30,
     brief: 'Your supply pod <b>starts facing EAST</b> (→). Fly it to the space station 🛰️. '
-      + 'Each <b>forward(distance)</b> moves in the direction you are facing; '
-      + '<b>left(90)</b> / <b>right(90)</b> rotate on the spot. Distances are in pixels — read the grid: one square = 40px.',
+      + '<b>forward(distance)</b> moves in the direction you face; <b>left(90)</b> / <b>right(90)</b> '
+      + 'rotate on the spot. One grid square = <b>40px</b>.',
     api: ['forward(d)', 'left(deg)', 'right(deg)'],
-    starter: '# Mission: dock at the station 🛰️\n# You start at the pad, facing EAST →\n# One grid square = 40 pixels\n\nforward(80)\n# your code here…\n',
+    starter: {
+      py: '# Mission: dock at the station 🛰️\n# You start at the pad, facing EAST →\n# One grid square = 40 pixels\n\nforward(80)\n# your code here…\n',
+      ps: '// Mission: dock at the station\n// You start at the pad, facing EAST →\n// One grid square = 40 pixels\n\nforward(80)\n// your code here…\n',
+    },
     scene: { w: 640, h: 480, grid: 40,
              start: { x: 120, y: 360, heading: 0 },      // heading 0 = east, degrees CCW
              target: { x: 440, y: 160, r: 34 } },
     success: { type: 'reach' },
     stars: { par: 3 },
-    hints: ['You need to go RIGHT (east) and then UP (north).',
-            'From facing east, left(90) turns you to face north.',
-            'Count the grid squares between the pad and the station.'],
   },
-  // Phase 1 continues in the next build session (loops tier, conditionals tier, capstone)
+  {
+    id: 'p1m2', phase: 'PHASE 1 · TURTLE', emoji: '🪨', title: 'The Detour', xp: 35,
+    brief: 'An <b>asteroid wall</b> blocks the direct route — touching it destroys the pod. '
+      + 'Fly over the top. Plan the whole route <b>before</b> you run.',
+    api: ['forward(d)', 'left(deg)', 'right(deg)'],
+    starter: {
+      py: '# An asteroid wall blocks the way — go OVER it.\n# You start facing EAST. Crashing = mission failed!\n\n',
+      ps: '// An asteroid wall blocks the way — go OVER it.\n// You start facing EAST. Crashing = mission failed!\n\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 80, y: 240, heading: 0 },
+             target: { x: 520, y: 240, r: 34 },
+             walls: [{ x: 280, y: 160, w: 40, h: 320 }] },
+    success: { type: 'reach' },
+    stars: { par: 6 },
+  },
+  {
+    id: 'p1m3', phase: 'PHASE 1 · TURTLE', emoji: '🔙', title: 'Reverse Thrusters', xp: 30,
+    brief: 'Steering is <b>damaged</b> — no turning today! You only have <b>forward()</b> and '
+      + '<b>backward()</b>… and the station is <b>behind</b> you. One command can do this.',
+    api: ['forward(d)', 'backward(d)'],
+    allowed: ['forward', 'backward'],
+    starter: {
+      py: '# Steering offline! Only forward() and backward() work.\n# The station is BEHIND you…\n\n',
+      ps: '// Steering offline! Only forward() and backward() work.\n// The station is BEHIND you…\n\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 400, y: 240, heading: 0 },
+             target: { x: 160, y: 240, r: 30 } },
+    success: { type: 'reach' },
+    stars: { par: 1 },
+  },
+
+  // ── Tier 2 — Loops (star metric = lines of code) ────────────────────────────
+  {
+    id: 'p1m4', phase: 'PHASE 1 · LOOPS', emoji: '🔁', title: 'Square Patrol', xp: 40,
+    brief: 'Patrol all <b>4 checkpoints</b> and return to the pad — a perfect square, '
+      + '<b>160px per side</b>. This mission <b>requires a loop</b>, and stars now count your '
+      + '<b>lines of code</b>, not commands. Loops = shorter code!',
+    api: ['forward(d)', 'left(deg)', 'right(deg)'],
+    require: 'loop',
+    starter: {
+      py: '# Patrol all 4 checkpoints and return to the pad.\n# The square is 160px per side — use a loop!\n\nfor i in range(4):\n    # TODO: one side + one turn\n    pass\n',
+      ps: '// Patrol all 4 checkpoints and return to the pad.\n// The square is 160px per side — use a loop!\n\nFOR i ← 1 TO 4\n    // TODO: one side + one turn\nNEXT i\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 240, y: 320, heading: 0 },
+             waypoints: [{ x: 400, y: 320 }, { x: 400, y: 160 }, { x: 240, y: 160 }, { x: 240, y: 320 }] },
+    success: { type: 'waypoints' },
+    stars: { metric: 'lines', par: 4 },
+  },
+  {
+    id: 'p1m5', phase: 'PHASE 1 · LOOPS', emoji: '🪜', title: 'The Staircase', xp: 40,
+    brief: 'Climb the <b>5-step staircase</b> to the station. Every step is the same '
+      + 'pattern: <b>40px across, 40px up</b>. One loop, one step pattern.',
+    api: ['forward(d)', 'left(deg)', 'right(deg)'],
+    require: 'loop',
+    starter: {
+      py: '# Climb 5 identical steps: 40px across, 40px up.\n# Facing EAST. Pattern per step: forward, turn, forward, turn.\n\nfor i in range(5):\n    forward(40)\n    left(90)\n    # TODO: finish the step\n',
+      ps: '// Climb 5 identical steps: 40px across, 40px up.\n// Pattern per step: forward, turn, forward, turn.\n\nFOR i ← 1 TO 5\n    forward(40)\n    left(90)\n    // TODO: finish the step\nNEXT i\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 120, y: 400, heading: 0 },
+             target: { x: 320, y: 200, r: 28 } },
+    success: { type: 'reach' },
+    stars: { metric: 'lines', par: 6 },
+  },
+  {
+    id: 'p1m6', phase: 'PHASE 1 · LOOPS', emoji: '🌀', title: 'Spiral Scan', xp: 45,
+    brief: 'Scan the sector in an <b>expanding spiral</b>: each leg is <b>40px longer</b> than '
+      + 'the last (40, 80, 120 … 240), turning left between legs. The <b>loop variable</b> is the key.',
+    api: ['forward(d)', 'left(deg)', 'right(deg)'],
+    require: 'loop',
+    starter: {
+      py: '# Spiral outward: leg 1 = 40px, leg 2 = 80px … leg 6 = 240px.\n# Turn LEFT 90 between legs. Use the loop variable!\n\nfor i in range(1, 7):\n    # TODO: forward(40 * i), then turn\n    pass\n',
+      ps: '// Spiral outward: leg 1 = 40px, leg 2 = 80px … leg 6 = 240px.\n// Turn LEFT 90 between legs. Use the loop variable!\n\nFOR i ← 1 TO 6\n    // TODO: forward(40 * i), then turn\nNEXT i\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 320, y: 240, heading: 0 },
+             target: { x: 440, y: 80, r: 30 } },
+    success: { type: 'reach' },
+    stars: { metric: 'lines', par: 4 },
+  },
+  {
+    id: 'p1m7', phase: 'PHASE 1 · LOOPS', emoji: '☄️', title: 'Comet Chain', xp: 45,
+    brief: 'Collect all <b>6 comets</b> around the hexagon ring: 6 sides of <b>120px</b>, '
+      + 'turning <b>LEFT 60°</b> at each corner. No starter this time — you know the pattern.',
+    api: ['forward(d)', 'left(deg)', 'right(deg)'],
+    require: 'loop',
+    starter: {
+      py: '# Six comets on a hexagon ring: 6 × (120px side + LEFT 60° turn).\n# Write the whole loop yourself — you\'ve got this!\n\n',
+      ps: '// Six comets on a hexagon ring: 6 × (120px side + LEFT 60° turn).\n// Write the whole loop yourself — you\'ve got this!\n\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 200, y: 320, heading: 0 },
+             waypoints: [{ x: 320, y: 320 }, { x: 380, y: 216 }, { x: 320, y: 112 },
+                         { x: 200, y: 112 }, { x: 140, y: 216 }, { x: 200, y: 320 }] },
+    success: { type: 'waypoints' },
+    stars: { metric: 'lines', par: 4 },
+  },
+
+  // ── Tier 3 — Signals & decisions ─────────────────────────────────────────────
+  {
+    id: 'p1m8', phase: 'PHASE 1 · SIGNALS', emoji: '🚦', title: 'Signal Run', xp: 50,
+    brief: 'Navigation beacons line the corridor — <b>get_signals()</b> gives you their colours in order. '
+      + 'Protocol: fly <b>120px</b>, then <b>G = turn LEFT</b>, <b>R = turn RIGHT</b>. After the last beacon, '
+      + 'one final <b>forward(120)</b> docks you. An <b>if</b> decision is required.',
+    api: ['forward(d)', 'left(deg)', 'right(deg)', 'get_signals()'],
+    require: 'if',
+    signals: ['G', 'R', 'G'],
+    starter: {
+      py: '# Beacon protocol: G = LEFT, R = RIGHT. Corridors are 120px.\n# One final forward(120) after the last beacon.\n\nfor s in get_signals():\n    forward(120)\n    if s == \'G\':\n        left(90)\n    # TODO: what about red?\n\nforward(120)\n',
+      ps: '// Beacon protocol: G = LEFT, R = RIGHT. Corridors are 120px.\n// The beacon colours are in the signals array (1-based).\n\nFOR i ← 1 TO LENGTH(signals)\n    forward(120)\n    IF signals[i] = \'G\' THEN\n        left(90)\n    ENDIF\n    // TODO: what about red?\nNEXT i\n\nforward(120)\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 120, y: 400, heading: 0 },
+             target: { x: 360, y: 160, r: 30 },
+             beacons: [{ x: 240, y: 400, c: 'G' }, { x: 240, y: 280, c: 'R' }, { x: 360, y: 280, c: 'G' }] },
+    success: { type: 'reach' },
+    stars: { metric: 'lines', par: 9 },
+  },
+  {
+    id: 'p1m9', phase: 'PHASE 1 · SIGNALS', emoji: '🌃', title: 'Night Convoy', xp: 55,
+    brief: 'A new beacon colour joins the protocol: <b>B (blue) = fly straight through</b>, no turn. '
+      + 'Full protocol: <b>R = RIGHT, G = LEFT, B = nothing</b>. 120px corridors, final forward to dock. '
+      + 'Three-way decisions — think <b>if / elif</b>.',
+    api: ['forward(d)', 'left(deg)', 'right(deg)', 'get_signals()'],
+    require: 'if',
+    signals: ['R', 'B', 'G', 'B'],
+    starter: {
+      py: '# Protocol: R = RIGHT, G = LEFT, B = straight through.\n# 120px corridors, final forward(120) to dock.\n\nfor s in get_signals():\n    forward(120)\n    # TODO: three-way decision (if / elif)\n\nforward(120)\n',
+      ps: '// Protocol: R = RIGHT, G = LEFT, B = straight through.\n// 120px corridors, final forward(120) to dock.\n\nFOR i ← 1 TO LENGTH(signals)\n    forward(120)\n    // TODO: IF … THEN … ELSE … ENDIF (nest for 3 ways)\nNEXT i\n\nforward(120)\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 80, y: 120, heading: 0 },
+             target: { x: 440, y: 360, r: 30 },
+             beacons: [{ x: 200, y: 120, c: 'R' }, { x: 200, y: 240, c: 'B' },
+                       { x: 200, y: 360, c: 'G' }, { x: 320, y: 360, c: 'B' }] },
+    success: { type: 'reach' },
+    stars: { metric: 'lines', par: 11 },
+  },
+  {
+    id: 'p1m10', phase: 'PHASE 1 · SIGNALS', emoji: '🛸', title: 'Asteroid Slalom', xp: 60,
+    brief: 'The beacons now transmit <b>DISTANCES</b> in grid squares (1 square = 40px). '
+      + 'Fly that many squares, then turn — <b>1st turn RIGHT, 2nd LEFT, 3rd RIGHT…</b> alternating. '
+      + 'You need the beacon <b>number</b> as well as its value (odd/even — think <b>MOD</b> / <b>%</b>).',
+    api: ['forward(d)', 'left(deg)', 'right(deg)', 'get_signals()'],
+    require: 'if',
+    signals: [4, 2, 3, 2, 3],
+    starter: {
+      py: '# Beacons send DISTANCES in 40px grid squares.\n# Alternate turns: 1st RIGHT, 2nd LEFT, 3rd RIGHT…\n# enumerate() gives you (index, value)!\n\nfor i, d in enumerate(get_signals()):\n    forward(d * 40)\n    # TODO: even i → right(90), odd i → left(90)\n',
+      ps: '// Beacons send DISTANCES in 40px grid squares.\n// Alternate turns: beacon 1 RIGHT, beacon 2 LEFT, beacon 3 RIGHT…\n\nFOR i ← 1 TO LENGTH(signals)\n    d ← signals[i]\n    forward(d * 40)\n    // TODO: IF i MOD 2 = 1 THEN … ELSE … ENDIF\nNEXT i\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 80, y: 80, heading: 0 },
+             target: { x: 480, y: 240, r: 30 },
+             beacons: [{ x: 240, y: 80, c: '1' }, { x: 240, y: 160, c: '2' },
+                       { x: 360, y: 160, c: '3' }, { x: 360, y: 240, c: '4' }] },
+    success: { type: 'reach' },
+    stars: { metric: 'lines', par: 9 },
+  },
+
+  // ── Capstone ─────────────────────────────────────────────────────────────────
+  {
+    id: 'p1m11', phase: 'PHASE 1 · CAPSTONE', emoji: '🏆', title: 'The Grand Tour', xp: 80,
+    brief: '<b>Everything at once:</b> collect all <b>3 comets</b>, dodge the asteroid wall, dock at '
+      + 'the station. Stars are back to <b>fewest COMMANDS</b> — every move and every turn counts. '
+      + 'Plan on paper first; the perfect run is tight.',
+    api: ['forward(d)', 'left(deg)', 'right(deg)'],
+    starter: {
+      py: '# THE GRAND TOUR — 3 comets, one asteroid wall, one station.\n# Stars = fewest COMMANDS (moves + turns). Plan before you fly!\n\n',
+      ps: '// THE GRAND TOUR — 3 comets, one asteroid wall, one station.\n// Stars = fewest COMMANDS (moves + turns). Plan before you fly!\n\n',
+    },
+    scene: { w: 640, h: 480, grid: 40,
+             start: { x: 120, y: 400, heading: 0 },
+             target: { x: 440, y: 80, r: 30 },
+             walls: [{ x: 360, y: 300, w: 40, h: 180 }],
+             waypoints: [{ x: 280, y: 400 }, { x: 280, y: 240 }, { x: 440, y: 240 }] },
+    success: { type: 'waypoints' },
+    stars: { par: 7 },
+  },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -198,38 +424,299 @@ const MISSIONS = [
 // ══════════════════════════════════════════════════════════════════════════════
 function simTurtle(scene, cmds) {
   let x = scene.start.x, y = scene.start.y, h = scene.start.heading
+  const walls = scene.walls || []
+  const wps = scene.waypoints || []
+  const visited = new Set()
   const path = [{ x, y }]
-  let moves = 0
+  const mark = (px, py) => wps.forEach((w, i) => {
+    if (Math.hypot(px - w.x, py - w.y) <= (w.r || 22)) visited.add(i)
+  })
+  const inWall = (px, py) => walls.some(r =>
+    px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h)
+  mark(x, y)
   for (const [op, val] of cmds) {
     if (op === 'L') { h = (h + val) % 360; continue }
     if (op === 'R') { h = (h - val) % 360; continue }
     if (op === 'F') {
       const rad = h * Math.PI / 180
-      x += Math.cos(rad) * val
-      y -= Math.sin(rad) * val          // canvas y grows downward
-      path.push({ x, y })
-      moves++
-      if (x < 0 || y < 0 || x > scene.w || y > scene.h) {
-        return { path, end: { x, y }, lost: true, moves }
+      const nx = x + Math.cos(rad) * val
+      const ny = y - Math.sin(rad) * val          // canvas y grows downward
+      // sample the segment so walls, bounds and waypoints see every step
+      const dist = Math.hypot(nx - x, ny - y)
+      const steps = Math.max(1, Math.ceil(dist / 4))
+      for (let k = 1; k <= steps; k++) {
+        const px = x + (nx - x) * k / steps
+        const py = y + (ny - y) * k / steps
+        if (inWall(px, py)) {
+          path.push({ x: px, y: py })
+          return { path, end: { x: px, y: py }, crash: true, lost: false, visitedCount: visited.size }
+        }
+        if (px < 0 || py < 0 || px > scene.w || py > scene.h) {
+          path.push({ x: px, y: py })
+          return { path, end: { x: px, y: py }, crash: false, lost: true, visitedCount: visited.size }
+        }
+        mark(px, py)
       }
+      x = nx; y = ny
+      path.push({ x, y })
     }
   }
-  return { path, end: { x, y }, lost: false, moves }
+  return { path, end: { x, y }, crash: false, lost: false, visitedCount: visited.size }
 }
 
 function evalSuccess(mission, sim) {
+  if (sim.crash) return { ok: false, why: 'crash' }
   if (sim.lost) return { ok: false, why: 'lost' }
+  const sc = mission.scene
+  if (mission.success.type === 'waypoints') {
+    const total = (sc.waypoints || []).length
+    if (sim.visitedCount < total) return { ok: false, why: 'waypoints', missing: total - sim.visitedCount }
+    if (sc.target) {
+      const d = Math.hypot(sim.end.x - sc.target.x, sim.end.y - sc.target.y)
+      if (d > sc.target.r) return { ok: false, why: 'missed', dist: Math.round(d) }
+    }
+    return { ok: true }
+  }
   if (mission.success.type === 'reach') {
-    const t = mission.scene.target
+    const t = sc.target
     const d = Math.hypot(sim.end.x - t.x, sim.end.y - t.y)
     return d <= t.r ? { ok: true } : { ok: false, why: 'missed', dist: Math.round(d) }
   }
   return { ok: false, why: 'unknown' }
 }
 
-function starsFor(mission, cmdCount) {
+// Significant source lines — the star metric for loop/decision missions
+function countLines(code) {
+  return code.split('\n').filter(l => {
+    const t = l.trim()
+    return t && !t.startsWith('#') && !t.startsWith('//')
+  }).length
+}
+
+function starsFor(mission, stats) {
+  const v = (mission.stars.metric || 'cmds') === 'lines' ? stats.lines : stats.cmds
   const par = mission.stars.par
-  return cmdCount <= par ? 3 : cmdCount <= par + 2 ? 2 : 1
+  return v <= par ? 3 : v <= par + 2 ? 2 : 1
+}
+
+// Mission requirements — a route that "works" without the concept doesn't pass
+function checkRequire(mission, code) {
+  if (!mission.require) return null
+  if (mission.require === 'loop' && !/\b(for|while)\b/i.test(code))
+    return 'this mission requires a LOOP — rewrite the repeated commands with one.'
+  if (mission.require === 'if' && !/\bif\b/i.test(code))
+    return 'this mission requires an IF decision — react to the signals instead of hardcoding the route.'
+  return null
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Cambridge-style pseudocode executor (Phase 1 subset) — the second engine of
+// the pluggable pair. Same command-list contract as Python.
+//   x ← expr        FOR i ← a TO b [STEP s] … NEXT        IF … THEN / ELSE / ENDIF
+//   forward(e) backward(e) left(e) right(e)   signals[i] (1-based)   LENGTH(a)
+//   operators: + - * / MOD, = <> < > <= >=, AND OR       OUTPUT e     // comment
+// ══════════════════════════════════════════════════════════════════════════════
+function execPseudo(src, mission) {
+  const cmds = []
+  const outputs = []
+  const allowedList = mission.allowed || ['forward', 'backward', 'left', 'right']
+  const fns = {}
+  if (allowedList.includes('forward'))  fns.forward  = d => cmds.push(['F', +d])
+  if (allowedList.includes('backward')) fns.backward = d => cmds.push(['F', -d])
+  if (allowedList.includes('left'))     fns.left     = a => cmds.push(['L', +a])
+  if (allowedList.includes('right'))    fns.right    = a => cmds.push(['R', +a])
+  fns.length = a => (Array.isArray(a) || typeof a === 'string')
+    ? a.length : (() => { throw { message: 'LENGTH() needs an array or string' } })()
+  fns.get_signals = () => (mission.signals || []).slice()
+
+  const lines = []
+  src.split('\n').forEach((raw, i) => {
+    const t = raw.trim()
+    if (t && !t.startsWith('//')) lines.push({ t, ln: i + 1 })
+  })
+
+  const env = Object.create(null)
+  if (mission.signals) env.signals = mission.signals.slice()
+
+  // ── expression evaluator: tokenizer + precedence climbing ──
+  function evalExpr(exprStr, ln) {
+    const str = exprStr.trim()
+    const toks = []
+    const re = /\s*(<=|>=|<>|<-|←|[-+*/(),\[\]=<>]|\d+\.?\d*|'[^']*'|"[^"]*"|[A-Za-z_]\w*)/y
+    let pos = 0
+    while (pos < str.length) {
+      re.lastIndex = pos
+      const m = re.exec(str)
+      if (!m) throw { message: 'Cannot read: "' + str.slice(pos).trim() + '"', ln }
+      toks.push(m[1]); pos = re.lastIndex
+    }
+    let i = 0
+    const peek = () => toks[i]
+    const low = t => (t && /^[A-Za-z_]/.test(t)) ? t.toLowerCase() : null
+    function primary() {
+      const t = toks[i++]
+      if (t === undefined) throw { message: 'Unexpected end of expression', ln }
+      if (t === '(') { const v = orExpr(); if (toks[i++] !== ')') throw { message: 'Missing )', ln }; return v }
+      if (t === '-') return -primary()
+      if (/^\d/.test(t)) return parseFloat(t)
+      if (/^['"]/.test(t)) return t.slice(1, -1)
+      if (/^[A-Za-z_]/.test(t)) {
+        const name = t.toLowerCase()
+        if (name === 'true') return true
+        if (name === 'false') return false
+        if (name === 'not') return !truthy(primary())
+        if (peek() === '(') {           // function call
+          i++
+          const args = []
+          if (peek() !== ')') { args.push(orExpr()); while (peek() === ',') { i++; args.push(orExpr()) } }
+          if (toks[i++] !== ')') throw { message: 'Missing ) after ' + t, ln }
+          const f = fns[name]
+          if (!f) throw { message: 'Unknown function ' + t + '()', ln }
+          return f(...args)
+        }
+        if (!(name in env)) throw { message: 'Unknown variable "' + t + '"', ln }
+        let v = env[name]
+        while (peek() === '[') {        // 1-based array indexing
+          i++
+          const idx = orExpr()
+          if (toks[i++] !== ']') throw { message: 'Missing ]', ln }
+          if (!Array.isArray(v)) throw { message: t + ' is not an array', ln }
+          if (idx < 1 || idx > v.length) throw { message: 'Index ' + idx + ' is outside ' + t + ' (1..' + v.length + ')', ln }
+          v = v[idx - 1]
+        }
+        return v
+      }
+      throw { message: 'Unexpected "' + t + '"', ln }
+    }
+    function mulExpr() {
+      let v = primary()
+      for (;;) {
+        const t = peek()
+        if (t === '*') { i++; v = v * primary() }
+        else if (t === '/') { i++; v = v / primary() }
+        else if (low(t) === 'mod') { i++; v = v % primary() }
+        else return v
+      }
+    }
+    function addExpr() {
+      let v = mulExpr()
+      for (;;) {
+        const t = peek()
+        if (t === '+') { i++; v = v + mulExpr() }
+        else if (t === '-') { i++; v = v - mulExpr() }
+        else return v
+      }
+    }
+    function cmpExpr() {
+      const v = addExpr()
+      const t = peek()
+      if (t === '=' || t === '<>' || t === '<=' || t === '>=' || t === '<' || t === '>') {
+        i++
+        const b = addExpr()
+        if (t === '=') return v === b
+        if (t === '<>') return v !== b
+        if (t === '<=') return v <= b
+        if (t === '>=') return v >= b
+        if (t === '<') return v < b
+        return v > b
+      }
+      return v
+    }
+    function andExpr() {
+      let v = cmpExpr()
+      while (low(peek()) === 'and') { i++; v = truthy(v) && truthy(cmpExpr()) }
+      return v
+    }
+    function orExpr() {
+      let v = andExpr()
+      while (low(peek()) === 'or') { i++; v = truthy(v) || truthy(andExpr()) }
+      return v
+    }
+    const result = orExpr()
+    if (i < toks.length) throw { message: 'Unexpected "' + toks[i] + '"', ln }
+    return result
+  }
+  function truthy(v) { return v === true || (typeof v === 'number' && v !== 0) || (typeof v === 'string' && v !== '') }
+
+  // ── block matching ──
+  function matchEnd(start, opener, closer) {
+    let depth = 1
+    for (let j = start + 1; j < lines.length; j++) {
+      const up = lines[j].t.toUpperCase()
+      if (up.startsWith(opener + ' ')) depth++
+      else if (up === closer || up.startsWith(closer + ' ')) { depth--; if (depth === 0) return j }
+    }
+    throw { message: lines[start].t.split(' ')[0] + ' without a matching ' + closer, ln: lines[start].ln }
+  }
+  function findElse(start, endIdx) {
+    let depth = 0
+    for (let j = start + 1; j < endIdx; j++) {
+      const up = lines[j].t.toUpperCase()
+      if (up.startsWith('IF ')) depth++
+      else if (up === 'ENDIF') depth--
+      else if (up === 'ELSE' && depth === 0) return j
+    }
+    return -1
+  }
+
+  // ── statement execution ──
+  let ops = 0
+  function run(i, end) {
+    while (i < end) {
+      const { t, ln } = lines[i]
+      if (++ops > 100000) throw { message: 'Program ran too long — check for an infinite loop', ln }
+      const up = t.toUpperCase()
+      if (up.startsWith('FOR ')) {
+        const m = t.match(/^FOR\s+([A-Za-z_]\w*)\s*(?:←|<-)\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i)
+        if (!m) throw { message: 'Bad FOR — expected: FOR i ← 1 TO 4', ln }
+        const nxt = matchEnd(i, 'FOR', 'NEXT')
+        const a = evalExpr(m[2], ln), b = evalExpr(m[3], ln)
+        const st = m[4] ? evalExpr(m[4], ln) : 1
+        if (st === 0) throw { message: 'STEP 0 never ends', ln }
+        const vn = m[1].toLowerCase()
+        for (let v = a; st > 0 ? v <= b : v >= b; v += st) {
+          env[vn] = v
+          run(i + 1, nxt)
+        }
+        i = nxt + 1
+        continue
+      }
+      if (up.startsWith('IF ')) {
+        const m = t.match(/^IF\s+(.+?)\s+THEN\s*$/i)
+        if (!m) throw { message: 'Bad IF — put THEN at the end of the line', ln }
+        const endif = matchEnd(i, 'IF', 'ENDIF')
+        const els = findElse(i, endif)
+        if (truthy(evalExpr(m[1], ln))) run(i + 1, els === -1 ? endif : els)
+        else if (els !== -1) run(els + 1, endif)
+        i = endif + 1
+        continue
+      }
+      if (up === 'ELSE' || up === 'ENDIF' || up === 'NEXT' || up.startsWith('NEXT '))
+        throw { message: '"' + t + '" has no matching opener here', ln }
+      if (up.startsWith('OUTPUT')) {
+        const rest = t.slice(6).trim()
+        if (rest) outputs.push(rest.split(',').map(p => String(evalExpr(p, ln))).join(' '))
+        i++
+        continue
+      }
+      const am = t.match(/^([A-Za-z_]\w*)\s*(?:←|<-)\s*(.+)$/)
+      if (am) { env[am[1].toLowerCase()] = evalExpr(am[2], ln); i++; continue }
+      const cm = t.match(/^(?:CALL\s+)?([A-Za-z_]\w*)\s*\((.*)\)$/i)
+      if (cm) {
+        const f = fns[cm[1].toLowerCase()]
+        if (!f) throw { message: 'Unknown command ' + cm[1] + '() — is it allowed in this mission?', ln }
+        const args = cm[2].trim() ? cm[2].split(',').map(a => evalExpr(a, ln)) : []
+        f(...args)
+        i++
+        continue
+      }
+      throw { message: 'Cannot understand this line — check the pseudocode reference in the brief', ln }
+    }
+  }
+
+  try { run(0, lines.length) }
+  catch (err) { return { ok: false, error: err.message || String(err), line: err.ln || null } }
+  return { ok: true, cmds, outputs }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -257,21 +744,29 @@ function ensurePyodide() {
   return _pyLoading
 }
 
-const PY_PREAMBLE = [
-  '_cmds = []',
-  'def forward(d): _cmds.append(("F", float(d)))',
-  'def backward(d): _cmds.append(("F", -float(d)))',
-  'def left(a): _cmds.append(("L", float(a)))',
-  'def right(a): _cmds.append(("R", float(a)))',
-  '',
-].join('\n')
-const PREAMBLE_LINES = PY_PREAMBLE.split('\n').length   // for traceback line mapping
+// Preamble is built per mission: only the allowed commands exist (calling a
+// forbidden one is a honest NameError), and signals are injected when present.
+function buildPreamble(m) {
+  const defs = {
+    forward:  'def forward(d): _cmds.append(("F", float(d)))',
+    backward: 'def backward(d): _cmds.append(("F", -float(d)))',
+    left:     'def left(a): _cmds.append(("L", float(a)))',
+    right:    'def right(a): _cmds.append(("R", float(a)))',
+  }
+  let p = '_cmds = []\n'
+  for (const a of (m.allowed || ['forward', 'backward', 'left', 'right'])) p += defs[a] + '\n'
+  if (m.signals) p += '_signals = ' + JSON.stringify(m.signals)
+    + '\ndef get_signals(): return list(_signals)\n'
+  return p + '\n'
+}
 
-async function execPython(code) {
+async function execPython(code, mission) {
   const py = await ensurePyodide()
+  const preamble = buildPreamble(mission)
+  const preLines = preamble.split('\n').length
   py.runPython('_cmds = []')
   try {
-    py.runPython(PY_PREAMBLE + code)
+    py.runPython(preamble + code)
     const cmds = py.globals.get('_cmds').toJs({ create_proxies: false })
     return { ok: true, cmds: cmds.map(c => [c[0], c[1]]) }
   } catch (e) {
@@ -279,7 +774,7 @@ async function execPython(code) {
     const msg = String(e.message || e)
     let line = null
     const matches = [...msg.matchAll(/File "<exec>", line (\d+)/g)]
-    if (matches.length) line = parseInt(matches[matches.length - 1][1]) - PREAMBLE_LINES + 1
+    if (matches.length) line = parseInt(matches[matches.length - 1][1]) - preLines + 1
     const lastLine = msg.trim().split('\n').pop()
     return { ok: false, error: lastLine, line: line && line > 0 ? line : null }
   }
@@ -310,12 +805,43 @@ function drawScene(m, pose, tracePath) {
   ctx.setLineDash([5, 4])
   ctx.strokeRect(s.start.x - 26, s.start.y - 26, 52, 52)
   ctx.setLineDash([])
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  // asteroid walls
+  for (const r of (s.walls || [])) {
+    ctx.fillStyle = 'rgba(120,90,60,.25)'
+    ctx.fillRect(r.x, r.y, r.w, r.h)
+    ctx.strokeStyle = 'rgba(248,113,113,.5)'
+    ctx.strokeRect(r.x, r.y, r.w, r.h)
+    ctx.font = '22px serif'
+    const n = Math.max(1, Math.floor(r.h / 60))
+    for (let i = 0; i < n; i++) ctx.fillText('🪨', r.x + r.w / 2, r.y + (i + 0.5) * r.h / n)
+  }
+  // waypoint comets
+  for (const w of (s.waypoints || [])) {
+    ctx.strokeStyle = 'rgba(251,191,36,.45)'
+    ctx.setLineDash([3, 3])
+    ctx.beginPath(); ctx.arc(w.x, w.y, w.r || 22, 0, Math.PI * 2); ctx.stroke()
+    ctx.setLineDash([])
+    ctx.font = '20px serif'
+    ctx.fillText('☄️', w.x, w.y)
+  }
+  // signal beacons
+  const BEACON_COLORS = { G: '#4ade80', R: '#f87171', B: '#60a5fa' }
+  for (const b of (s.beacons || [])) {
+    ctx.fillStyle = BEACON_COLORS[b.c] || '#fbbf24'
+    ctx.beginPath(); ctx.arc(b.x, b.y, 9, 0, Math.PI * 2); ctx.fill()
+    ctx.fillStyle = '#0b0d16'
+    ctx.font = 'bold 10px monospace'
+    ctx.fillText(String(b.c), b.x, b.y + 0.5)
+  }
   // target station
-  const t = s.target
-  ctx.strokeStyle = 'rgba(103,232,249,.5)'
-  ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2); ctx.stroke()
-  ctx.font = '30px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-  ctx.fillText('🛰️', t.x, t.y)
+  if (s.target) {
+    const t = s.target
+    ctx.strokeStyle = 'rgba(103,232,249,.5)'
+    ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2); ctx.stroke()
+    ctx.font = '30px serif'
+    ctx.fillText('🛰️', t.x, t.y)
+  }
   // trace
   if (tracePath && tracePath.length > 1) {
     ctx.strokeStyle = '#b8ef4a'
@@ -378,7 +904,7 @@ function openMission(id) {
   document.getElementById('mlist').classList.remove('open')
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
   document.getElementById('m-phase').textContent = activeMission.phase
-  document.getElementById('m-par').textContent = '3★: ' + activeMission.stars.par + ' commands'
+  document.getElementById('m-par').textContent = parLabel(activeMission)
   document.getElementById('m-brief').innerHTML = activeMission.brief
   document.getElementById('m-api').innerHTML =
     activeMission.api.map(a => '<span class="api-chip">' + a + '</span>').join('')
@@ -386,11 +912,13 @@ function openMission(id) {
     editor = CodeMirror.fromTextArea(document.getElementById('code'), {
       mode: 'python', theme: 'dracula', lineNumbers: true, indentUnit: 4,
     })
-    editor.on('change', () => { clearErrLine(); setSubmit(false) })
+    let _saveT = null
+    editor.on('change', () => {
+      clearErrLine(); setSubmit(false)
+      clearTimeout(_saveT); _saveT = setTimeout(saveDraft, 800)
+    })
   }
-  const saved = (getProg()[id] || {}).code
-  editor.setValue(saved || activeMission.starter)
-  setSubmit(false)
+  applyLang()
   drawScene(activeMission, activeMission.scene.start, null)
   logC('// Mission loaded. Write your flight plan and press ▶ Run.')
   setTimeout(() => editor.refresh(), 50)
@@ -403,7 +931,8 @@ function setSubmit(on) {
 
 function resetMission() {
   if (animating || !activeMission) return
-  editor.setValue(activeMission.starter)
+  editor.setValue(activeMission.starter[lang])
+  try { localStorage.removeItem(draftKey(activeMission.id, lang)) } catch (e) {}
   clearErrLine()
   setSubmit(false)
   drawScene(activeMission, activeMission.scene.start, null)
@@ -415,11 +944,12 @@ async function runMission(isSubmit) {
   const btn = document.getElementById('btn-run')
   btn.disabled = true
   clearErrLine()
+  saveDraft()
   const code = editor.getValue()
-  if (!_pyodide) logC('⏳ Loading Python engine (first run only — a few seconds)…', 'warn')
+  if (lang === 'py' && !_pyodide) logC('⏳ Loading Python engine (first run only — a few seconds)…', 'warn')
 
   let res
-  try { res = await execPython(code) }
+  try { res = lang === 'py' ? await execPython(code, activeMission) : execPseudo(code, activeMission) }
   catch (e) { logC('✗ ' + e.message, 'err'); btn.disabled = false; return }
 
   if (!res.ok) {
@@ -440,32 +970,47 @@ async function runMission(isSubmit) {
   }
 
   const sim = simTurtle(activeMission.scene, res.cmds)
-  const cmdCount = res.cmds.length
+  const stats = { cmds: res.cmds.length, lines: countLines(code) }
+  const verdict = evalSuccess(activeMission, sim)
+  const reqErr = verdict.ok ? checkRequire(activeMission, code) : null
 
-  if (isSubmit && lastRunPassed) {
-    completeMission(cmdCount)
+  if (isSubmit) {
+    // Submit re-checks everything headlessly and records the result
+    if (verdict.ok && !reqErr) completeMission(stats)
+    else logC('✗ Submit blocked — fix the run first (press ▶ Run to see why).', 'err')
     btn.disabled = false
     return
   }
 
   await animate(activeMission, sim)
-  const verdict = evalSuccess(activeMission, sim)
-  if (verdict.ok) {
-    const st = starsFor(activeMission, cmdCount)
-    logC('✅ DOCKED! ' + cmdCount + ' commands ' +
-      (st === 3 ? '— perfect efficiency! Press ✓ Submit to claim your stars.'
-                : '(3★ needs ≤ ' + activeMission.stars.par + '). Press ✓ Submit, or trim your flight plan first.'), 'ok')
+  if (res.outputs && res.outputs.length) logC('» ' + res.outputs.join('\n» '))
+
+  if (verdict.ok && reqErr) {
+    logC('🟡 The route works… but ' + reqErr, 'warn')
+    setSubmit(false)
+  } else if (verdict.ok) {
+    const st = starsFor(activeMission, stats)
+    const metric = activeMission.stars.metric === 'lines'
+      ? stats.lines + ' code lines (3★ needs ≤ ' + activeMission.stars.par + ')'
+      : stats.cmds + ' commands (3★ needs ≤ ' + activeMission.stars.par + ')'
+    logC('✅ MISSION ACCOMPLISHED — ' + metric
+      + (st === 3 ? ' — perfect! ' : '. ') + 'Press ✓ Submit to claim your stars.', 'ok')
     setSubmit(true)
+  } else if (verdict.why === 'crash') {
+    logC('💥 CRASH — you flew into an asteroid! Plot a route around it.', 'err')
   } else if (verdict.why === 'lost') {
     logC('🌌 Your pod drifted off the map! Check your distances and turns.', 'err')
+  } else if (verdict.why === 'waypoints') {
+    logC('☄️ ' + verdict.missing + ' checkpoint' + (verdict.missing > 1 ? 's' : '')
+      + ' missed — your route must pass through every comet ring.', 'warn')
   } else {
     logC('✗ Missed the station by ' + verdict.dist + 'px. One grid square = 40px — recount!', 'warn')
   }
   btn.disabled = false
 }
 
-function completeMission(cmdCount) {
-  const st = starsFor(activeMission, cmdCount)
+function completeMission(stats) {
+  const st = starsFor(activeMission, stats)
   const p = getProg()
   const prev = p[activeMission.id] || {}
   const firstTime = !prev.stars
@@ -474,17 +1019,21 @@ function completeMission(cmdCount) {
     stars: Math.max(st, prev.stars || 0),
     xp: (prev.xp || 0) + xp,
     code: editor.getValue(),
+    lang: lang,
   }
   saveProg(p)
   const idx = MISSIONS.indexOf(activeMission)
   try { LessonSaves.save('grade9-missions', idx, { passed: true, xpEarned: xp, code: editor.getValue() }) } catch (e) {}
   try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
 
+  const isLines = activeMission.stars.metric === 'lines'
   document.getElementById('win-stars').innerHTML =
     '⭐'.repeat(st) + '<span class="dim">' + '⭐'.repeat(3 - st) + '</span>'
   document.getElementById('win-sub').textContent =
-    st === 3 ? 'Perfect flight — minimum commands. That\'s pilot thinking.' :
-    'Docked with ' + cmdCount + ' commands. A shorter flight plan earns more stars — refactor and re-submit!'
+    st === 3 ? (isLines ? 'Minimal code — that\'s what loops are for. Beautiful.'
+                        : 'Perfect flight — minimum commands. That\'s pilot thinking.') :
+    (isLines ? 'Completed in ' + stats.lines + ' lines. Tighter code earns more stars — refactor and re-submit!'
+             : 'Docked with ' + stats.cmds + ' commands. A shorter flight plan earns more stars!')
   document.getElementById('win-xp').textContent = xp > 0 ? '+' + xp + ' XP' : 'Already earned — chase the stars!'
   document.getElementById('win').classList.add('open')
 }
@@ -503,22 +1052,37 @@ function winList() {
 // ══════════════════════════════════════════════════════════════════════════════
 // Mission list
 // ══════════════════════════════════════════════════════════════════════════════
+const TIERS = [
+  { name: '🧭 TIER 1 — SEQUENCING', ids: ['p1m1', 'p1m2', 'p1m3'] },
+  { name: '🔁 TIER 2 — LOOPS (new: stars count code lines)', ids: ['p1m4', 'p1m5', 'p1m6', 'p1m7'] },
+  { name: '🚦 TIER 3 — SIGNALS & DECISIONS', ids: ['p1m8', 'p1m9', 'p1m10'] },
+  { name: '🏆 CAPSTONE', ids: ['p1m11'] },
+]
 const COMING = [
-  { emoji: '🔁', title: 'Loops tier', sub: 'Squares, stairs, spirals — repeated patterns need loops' },
-  { emoji: '🚦', title: 'Conditionals tier', sub: 'Branching paths — if wall ahead, turn' },
-  { emoji: '⚔️', title: 'Phase 2 — Agent Battles', sub: 'Your code fights. Turn-based combat.' },
+  { emoji: '⚔️', title: 'Phase 2 — Agent Battles', sub: 'Your code fights. Turn-based combat, enemy AI, boss missions.' },
+  { emoji: '📊', title: 'Phase 3 — Data Missions', sub: 'Terrain data, enemy stats, hidden weaknesses — read the data or lose.' },
+  { emoji: '🏟️', title: 'Phase 4-5 — The Tournament', sub: 'Your bot vs the whole class. Bracket. Glory.' },
 ]
 function showList() {
   const p = getProg()
   let html = ''
-  MISSIONS.forEach(m => {
-    const st = (p[m.id] || {}).stars || 0
-    html += '<div class="mcard" onclick="openMission(\'' + m.id + '\')">'
-      + '<span class="mcard-emoji">' + m.emoji + '</span>'
-      + '<div><div class="mcard-title">' + m.title + '</div>'
-      + '<div class="mcard-sub">' + m.phase + ' · 3★ = ' + m.stars.par + ' commands</div></div>'
-      + '<span class="mcard-stars">' + (st ? '⭐'.repeat(st) : '—') + '</span></div>'
-  })
+  let prevDone = true                          // sequential unlock down the list
+  for (const tier of TIERS) {
+    html += '<div class="mtier">' + tier.name + '</div>'
+    for (const id of tier.ids) {
+      const m = MISSIONS.find(x => x.id === id)
+      const st = (p[id] || {}).stars || 0
+      const unlocked = st > 0 || prevDone
+      html += '<div class="mcard' + (unlocked ? '' : ' locked') + '"'
+        + (unlocked ? ' onclick="openMission(\'' + id + '\')"' : '') + '>'
+        + '<span class="mcard-emoji">' + (unlocked ? m.emoji : '🔒') + '</span>'
+        + '<div><div class="mcard-title">' + m.title + '</div>'
+        + '<div class="mcard-sub">' + m.phase + ' · ' + parLabel(m)
+        + (m.require ? ' · requires ' + (m.require === 'loop' ? 'a loop' : 'an if') : '') + '</div></div>'
+        + '<span class="mcard-stars">' + (st ? '⭐'.repeat(st) : (unlocked ? '—' : '')) + '</span></div>'
+      prevDone = st > 0
+    }
+  }
   COMING.forEach(c => {
     html += '<div class="mcard locked"><span class="mcard-emoji">' + c.emoji + '</span>'
       + '<div><div class="mcard-title">' + c.title + '</div>'
