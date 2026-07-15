@@ -6,12 +6,17 @@ import { readFileSync } from 'fs'
 const html = readFileSync('c:/Users/user/Downloads/ICT website/public/lessons/grade9-missions.html', 'utf8')
 const s = html.indexOf('const MISSIONS = [')
 const e = html.indexOf('// ═══', html.indexOf('function execPseudo'))
+// Session 6's tournament engine sits after runBattleSim/battleEnvFor/dataEnvFor
+// but before the DOM-touching UI code — extend the slice to include it.
+const e6 = html.indexOf('// ═══', html.indexOf('function runBracketHeadless') + 40)
 const {
   MISSIONS, simTurtle, evalSuccess, starsFor, countLines, checkRequire, execPseudo,
   simBattleTurn, runBattleSim, battleEnvFor, dataEnvFor, evalDataSuccess,
-} = new Function(html.slice(s, e)
+  resolveDuelTurn, execTurnForBot, runDuel, runBracketHeadless, DUEL_CONFIG, PRACTICE_BOTS,
+} = new Function(html.slice(s, e6)
     + '\nreturn { MISSIONS, simTurtle, evalSuccess, starsFor, countLines, checkRequire, execPseudo, '
-    + 'simBattleTurn, runBattleSim, battleEnvFor, dataEnvFor, evalDataSuccess }')()
+    + 'simBattleTurn, runBattleSim, battleEnvFor, dataEnvFor, evalDataSuccess, '
+    + 'resolveDuelTurn, execTurnForBot, runDuel, runBracketHeadless, DUEL_CONFIG, PRACTICE_BOTS }')()
 
 let fail = 0
 const bad = m => { fail++; console.log('✗ ' + m) }
@@ -480,6 +485,129 @@ for (const [id, src] of Object.entries(P3_BATTLE_REF)) {
   })
   if (r.outcome === 'win') bad('Ghost Squadron — ignoring intel and guessing should not reliably win')
   else ok('Ghost Squadron — ignoring intel (wrong priority guess) correctly fails')
+}
+
+// ── Session 6: symmetric duel resolution (pure, no Pyodide needed) ────────────
+{
+  const r = resolveDuelTurn({ hp: 60, attack: 15, action: 'attack' }, { hp: 60, attack: 15, action: 'attack' })
+  if (r.dmgToA !== 15 || r.dmgToB !== 15) bad('attack vs attack: both should take full damage: ' + JSON.stringify(r))
+  else ok('attack vs attack: both take full damage')
+}
+{
+  const r = resolveDuelTurn({ hp: 60, attack: 15, action: 'attack' }, { hp: 60, attack: 15, action: 'defend' })
+  if (r.dmgToB !== 7 || r.dmgToA !== 0) bad('attack vs defend: defender should take HALF (floored), attacker takes 0: ' + JSON.stringify(r))
+  else ok('attack vs defend: defender takes half (floored) damage, no damage dealt back')
+}
+{
+  const r = resolveDuelTurn({ hp: 60, attack: 15, action: 'attack' }, { hp: 60, attack: 15, action: 'wait' })
+  if (r.dmgToB !== 15 || r.dmgToA !== 0) bad('attack vs wait: waiter should take full damage: ' + JSON.stringify(r))
+  else ok('attack vs wait: waiter takes full damage')
+}
+{
+  const r = resolveDuelTurn({ hp: 60, attack: 15, action: 'defend' }, { hp: 60, attack: 15, action: 'wait' })
+  if (r.dmgToA !== 0 || r.dmgToB !== 0) bad('defend vs wait: neither attacks, no damage should be dealt: ' + JSON.stringify(r))
+  else ok('defend vs wait: no damage exchanged when neither attacks')
+}
+
+// ── Session 6: runDuel orchestration ───────────────────────────────────────────
+{
+  // Identical mirror match must draw at the exact same turn both sides die
+  const rush = { name: 'Rush', decide: () => ({ type: 'attack' }) }
+  const rush2 = { name: 'Rush2', decide: () => ({ type: 'attack' }) }
+  const res = await runDuel(rush, rush2, { hp: 60, attack: 15, maxTurns: 10 })
+  if (res.winner !== 'draw' || res.reason !== 'mutual') bad('mirror match should be a mutual draw: ' + JSON.stringify(res.winner) + '/' + res.reason)
+  else ok('identical always-attack bots mutually KO in a draw')
+}
+{
+  const rush = { name: 'Rush', decide: () => ({ type: 'attack' }) }
+  const waiter = { name: 'Waiter', decide: () => ({ type: 'wait' }) }
+  const res = await runDuel(rush, waiter, { hp: 60, attack: 15, maxTurns: 15 })
+  if (res.winner !== 'A' || res.reason !== 'ko' || res.log.some(r => r.dmgToA > 0))
+    bad('rush vs a pure waiter should win cleanly with zero damage taken: ' + JSON.stringify(res.winner) + '/' + res.reason)
+  else ok('attacker beats a pure waiter cleanly, taking zero damage')
+}
+{
+  // Regression test for the maxHp bug: self.maxHp exposed to a bot's own code
+  // must stay CONSTANT turn to turn, not shrink to match current hp.
+  const myBot = { name: 'My Bot', lang: 'ps', code: 'IF selfHp < 20 THEN\n    defend()\nELSE\n    attack(enemyId[1])\nENDIF' }
+  const rusher = { name: 'Rusher', hp: 60, attack: 20, decide: () => ({ type: 'attack' }) }
+  const res = await runDuel(myBot, rusher, { hp: 70, attack: 16, maxTurns: 15 })
+  if (!res.log.every(r => r.maxHpA === 70 && r.maxHpB === 60))
+    bad('maxHp should stay constant across all turns (regression): ' + JSON.stringify(res.log.map(r => [r.maxHpA, r.maxHpB])))
+  else ok('self.maxHp stays constant across turns (does not shrink with current hp)')
+  // and the reactive defend at low hp actually fired (proves state['self']['hp'] updates correctly)
+  const lastA = res.log[res.log.length - 1].actionA
+  if (res.log.some(r => r.hpAAfter < 20) && !res.log.some(r => r.actionA === 'defend'))
+    bad('bot never defended despite dropping below its own 20hp threshold')
+  else ok('pseudocode bot correctly reacts to its own shrinking current hp mid-duel')
+}
+{
+  // A bot whose code errors should lose that side of the duel, not crash it
+  // (Python isn't runnable in this Node harness — same precedent as the rest
+  // of this suite — so the error path is proven via the pseudocode engine.)
+  const badBot = { name: 'Broken', lang: 'ps', code: 'attack(nonexistentVariable)' }
+  const rush = { name: 'Rush', decide: () => ({ type: 'attack' }) }
+  const res = await runDuel(badBot, rush, DUEL_CONFIG)
+  if (res.winner !== 'B' || res.reason !== 'error' || res.errSide !== 'A')
+    bad('a script-error bot should lose immediately, not crash the duel: ' + JSON.stringify(res))
+  else ok('a bot with broken code loses cleanly (duel does not throw)')
+}
+{
+  // Timeout with unequal remaining hp should be decided by hp, not called a draw
+  const tank = { name: 'Tank', hp: 200, attack: 5, decide: () => ({ type: 'attack' }) }
+  const glass = { name: 'Glass', hp: 200, attack: 3, decide: () => ({ type: 'attack' }) }
+  const res = await runDuel(tank, glass, { hp: 200, attack: 5, maxTurns: 5 })
+  if (res.reason !== 'timeout-hp' || res.winner !== 'A')
+    bad('higher-damage side should win an unresolved fight on remaining hp at the turn limit: ' + JSON.stringify(res))
+  else ok('turn-limit timeout is broken by remaining hp, not left as an automatic draw')
+}
+
+// ── Session 6: bracket (headless, deterministic) ───────────────────────────────
+{
+  const entrants = [
+    { name: 'A', decide: () => ({ type: 'attack' }) },
+    { name: 'B', decide: () => ({ type: 'wait' }) },
+    { name: 'C', decide: () => ({ type: 'attack' }) },
+    { name: 'D', decide: () => ({ type: 'wait' }) },
+  ]
+  const bracket = await runBracketHeadless(entrants, DUEL_CONFIG)
+  if (bracket.rounds.length !== 2) bad('4 entrants should produce a 2-round bracket (semis + final): got ' + bracket.rounds.length)
+  else ok('4-entrant bracket has the correct depth (2 rounds)')
+  if (bracket.champion.name !== 'A' && bracket.champion.name !== 'C')
+    bad('the champion should be one of the two attackers, not a waiter: ' + bracket.champion.name)
+  else ok('bracket champion is a genuinely-winning bot, not an also-ran')
+}
+{
+  // Odd entrant count: the last one gets a bye and auto-advances
+  const entrants = [
+    { name: 'A', decide: () => ({ type: 'attack' }) },
+    { name: 'B', decide: () => ({ type: 'wait' }) },
+    { name: 'C', decide: () => ({ type: 'attack' }) },
+  ]
+  const bracket = await runBracketHeadless(entrants, DUEL_CONFIG)
+  const firstRound = bracket.rounds[0]
+  if (!firstRound.some(m => m.bye)) bad('an odd entrant count should produce exactly one bye in round 1')
+  else ok('odd entrant count correctly produces a bye')
+}
+{
+  // A true draw (identical mirror bots) is broken deterministically — the
+  // earlier-listed bot advances, not decided by chance.
+  const entrants = [
+    { name: 'Mirror1', decide: () => ({ type: 'attack' }) },
+    { name: 'Mirror2', decide: () => ({ type: 'attack' }) },
+  ]
+  const bracket = await runBracketHeadless(entrants, DUEL_CONFIG)
+  if (bracket.champion.name !== 'Mirror1') bad('a drawn match should deterministically advance the first-listed bot, got ' + bracket.champion.name)
+  else ok('drawn matches are broken deterministically (first-listed bot advances), not by chance')
+}
+
+// ── Session 6: all 6 PRACTICE_BOTS are well-formed ─────────────────────────────
+for (const pb of PRACTICE_BOTS) {
+  if (typeof pb.decide !== 'function') { bad(pb.id + ' — practice bot has no decide() function'); continue }
+  const rush = { name: 'Baseline', decide: () => ({ type: 'attack' }) }
+  const res = await runDuel(pb, rush, DUEL_CONFIG)
+  if (res.reason === 'error') bad(pb.id + ' (' + pb.name + ') — errored against a baseline opponent: ' + res.error)
+  else ok(pb.id + ' (' + pb.name + ', ' + pb.group + ') — plays a full duel without error, outcome: ' + res.winner + '/' + res.reason)
 }
 
 console.log(fail ? '\n' + fail + ' problems' : '\nall missions verified — both engines honest')

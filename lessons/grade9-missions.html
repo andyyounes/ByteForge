@@ -123,6 +123,42 @@
   .data-answer { margin-top:18px; padding:12px 16px; border-radius:10px; background:rgba(184,239,74,.06);
                  border:1px solid rgba(184,239,74,.25); font-size:12.5px; color:#c9d1e3; }
   .data-answer b { color:#b8ef4a; }
+
+  /* ── Tournament Hub ── */
+  .ty-wrap { max-width:900px; margin:0 auto 60px; padding:0 16px; display:flex; flex-direction:column; gap:16px; }
+  .ty-card { background:#12141f; border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:18px 20px; }
+  .ty-card h2 { font-size:14px; font-weight:900; margin-bottom:4px; }
+  .ty-card .ty-hint { font-size:11.5px; color:#9ca3af; margin-bottom:12px; line-height:1.5; }
+  .ty-editor-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .ty-status { font-size:11px; font-weight:800; padding:3px 10px; border-radius:99px; }
+  .ty-status.unlocked { color:#fbbf24; background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.3); }
+  .ty-status.locked { color:#4ade80; background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3); }
+  .ty-editor-body { height:220px; border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,.08); }
+  .ty-editor-body .CodeMirror { height:100%; font-size:13px; }
+  .ty-editor-foot { display:flex; gap:8px; margin-top:10px; }
+  .ty-bot-cards { display:flex; flex-direction:column; gap:8px; }
+  .ty-bot-card { display:flex; align-items:center; gap:12px; background:#161927; border:1px solid rgba(255,255,255,.08);
+                 border-radius:12px; padding:10px 14px; cursor:pointer; transition:.15s; }
+  .ty-bot-card:hover { border-color:rgba(103,232,249,.4); }
+  .ty-bot-card.disabled { opacity:.4; cursor:default; }
+  .ty-bot-card.disabled:hover { border-color:rgba(255,255,255,.08); }
+  .ty-bot-name { font-size:13px; font-weight:800; }
+  .ty-bot-desc { font-size:11px; color:#9ca3af; margin-top:2px; }
+  .ty-bot-fight { margin-left:auto; font-size:11px; font-weight:800; color:#67e8f9; }
+  .ty-bracket-round { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+  .ty-bracket-round-title { font-size:10.5px; font-weight:900; letter-spacing:1px; color:#67e8f9; }
+  .ty-match { display:flex; align-items:center; gap:10px; background:#161927; border:1px solid rgba(255,255,255,.08);
+              border-radius:10px; padding:9px 14px; cursor:pointer; font-size:12px; }
+  .ty-match:hover { border-color:rgba(103,232,249,.4); }
+  .ty-match b.win { color:#4ade80; }
+  .ty-champion { text-align:center; padding:18px; margin-top:8px; border-radius:14px;
+                 background:linear-gradient(135deg, rgba(251,191,36,.12), rgba(232,121,249,.1));
+                 border:1px solid rgba(251,191,36,.35); font-size:15px; font-weight:900; }
+
+  /* Duel viewer — hijacks the main mission layout (editor hidden, canvas full width) */
+  body.duel-mode .right { display:none; }
+  body.duel-mode .main { grid-template-columns:1fr; }
+  .duel-hp-row { display:flex; justify-content:space-between; padding:0 20px; font-size:12px; font-weight:800; }
 </style>
 <script src="../js/db.js"></script>
 <script src="../js/auth.js"></script>
@@ -136,7 +172,7 @@
 </nav>
 
 <div class="mbar">
-  <button class="mbar-back" onclick="showList()">☰ Missions</button>
+  <button class="mbar-back" id="mbar-back-btn" onclick="mbarBack()">☰ Missions</button>
   <span class="mbar-phase" id="m-phase">PHASE 1 · TURTLE</span>
   <span class="mbar-title" id="m-title"></span>
   <span class="mbar-par" id="m-par"></span>
@@ -183,6 +219,54 @@
     <p>Your code is the pilot. Write it, run it, watch it fly.</p>
   </div>
   <div class="mgrid" id="mgrid"></div>
+</div>
+
+<!-- Tournament Hub -->
+<div class="mlist" id="tourney">
+  <div class="mlist-hero">
+    <button class="mbar-back" style="position:absolute;left:20px;top:24px;" onclick="closeTourney()">☰ Missions</button>
+    <h1>🏟 Tournament</h1>
+    <p>Write one bot. Lock it in. Fight.</p>
+  </div>
+  <div class="ty-wrap">
+    <div class="ty-card">
+      <h2>🤖 Your Bot</h2>
+      <p class="ty-hint">One script, reused for every stress test, scrimmage, and bracket match. <b>attack()</b> /
+        <b>defend()</b> / <b>wait()</b> — same as a Phase 2 boss fight, just always exactly one opponent.</p>
+      <div class="ty-editor-head">
+        <select class="ed-lang" id="ty-lang" onchange="tySwitchLang(this.value)">
+          <option value="py">Python 3</option>
+          <option value="ps">Pseudocode</option>
+        </select>
+        <span class="ty-status" id="ty-status">unlocked</span>
+      </div>
+      <div class="ty-editor-body"><textarea id="ty-code"></textarea></div>
+      <div class="ty-editor-foot">
+        <button class="btn btn-reset" onclick="tyResetBot()">↺ Reset</button>
+        <button class="btn btn-run" id="ty-lock-btn" onclick="tyLockBot()">🔒 Lock In</button>
+        <button class="btn btn-reset" id="ty-unlock-btn" style="display:none;" onclick="tyUnlockBot()">🔓 Unlock to edit</button>
+      </div>
+    </div>
+
+    <div class="ty-card">
+      <h2>🧪 Stress Tests</h2>
+      <p class="ty-hint">Fixed scenarios, unusual stats — diagnostic, not new content. See how your bot generalizes.</p>
+      <div class="ty-bot-cards" id="ty-stress-cards"></div>
+    </div>
+
+    <div class="ty-card">
+      <h2>🤺 Scrimmage</h2>
+      <p class="ty-hint">Free practice against standard-stat opponents. Not scored — iterate as much as you like.</p>
+      <div class="ty-bot-cards" id="ty-scrim-cards"></div>
+    </div>
+
+    <div class="ty-card">
+      <h2>🏆 Bracket</h2>
+      <p class="ty-hint">Your locked bot vs 3 practice bots — single elimination, resolved instantly. Click any match to watch the replay.</p>
+      <button class="btn btn-run" id="ty-run-bracket-btn" onclick="tyRunBracket()">▶ Run Tournament</button>
+      <div id="ty-bracket-view"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Win overlay -->
@@ -1561,6 +1645,139 @@ async function execPythonTurn(code, mission, state) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// Phase 4-5 · Tournament — symmetric bot-vs-bot duels, reusing the EXACT Phase 2
+// battle executors (execPythonTurn / execPseudo battle-mode / battleEnvFor) by
+// wrapping each side's turn in the same {turn, playerHp, enemies:[one entry]}
+// shape a normal battle mission already uses. No new interpreter surface.
+//
+// Duel resolution (pure, no Pyodide — testable in Node):
+//   attack vs attack  -> both take full damage
+//   attack vs defend  -> defender takes HALF (floored), no damage dealt back
+//   attack vs wait    -> waiter takes full, no damage dealt back
+//   defend/wait vs defend/wait -> nothing happens
+// ══════════════════════════════════════════════════════════════════════════════
+function resolveDuelTurn(a, b) {
+  let dmgToB = 0, dmgToA = 0
+  if (a.action === 'attack') dmgToB = b.action === 'defend' ? Math.floor(a.attack / 2) : a.attack
+  if (b.action === 'attack') dmgToA = a.action === 'defend' ? Math.floor(b.attack / 2) : b.attack
+  return { dmgToA, dmgToB, newHpA: Math.max(0, a.hp - dmgToA), newHpB: Math.max(0, b.hp - dmgToB) }
+}
+
+// bot: { name, hp?, attack?, decide(state) } for a scripted opponent (sync, no
+// interpreter at all), or { name, code, lang } for a real student bot (reuses
+// the Phase 2 executors via a throwaway "mission" wrapper).
+// state.maxHp is the bot's own fixed starting hp (distinct from state.playerHp,
+// which shrinks turn to turn) — self.maxHp must stay constant for the student.
+async function execTurnForBot(bot, state) {
+  if (bot.decide) return { ok: true, action: bot.decide(state) }
+  const fakeMission = { type: 'battle', battle: { playerHp: state.maxHp } }
+  if (bot.lang === 'py') return execPythonTurn(bot.code, fakeMission, state)
+  return execPseudo(bot.code, fakeMission, battleEnvFor(fakeMission, state))
+}
+
+async function runDuel(botA, botB, config) {
+  let hpA = botA.hp || config.hp, hpB = botB.hp || config.hp
+  const maxHpA = hpA, maxHpB = hpB
+  const atkA = botA.attack || config.attack, atkB = botB.attack || config.attack
+  const log = []
+  for (let turn = 1; turn <= config.maxTurns; turn++) {
+    const stateA = { turn, playerHp: hpA, maxHp: maxHpA, enemies: [{ id: 'opp', name: botB.name, hp: hpB, maxHp: maxHpB, dist: 1, attack: atkB }] }
+    const stateB = { turn, playerHp: hpB, maxHp: maxHpB, enemies: [{ id: 'opp', name: botA.name, hp: hpA, maxHp: maxHpA, dist: 1, attack: atkA }] }
+    const resA = await execTurnForBot(botA, stateA)
+    const resB = await execTurnForBot(botB, stateB)
+    if (!resA.ok) return { winner: 'B', reason: 'error', errSide: 'A', error: resA.error, turns: turn, log }
+    if (!resB.ok) return { winner: 'A', reason: 'error', errSide: 'B', error: resB.error, turns: turn, log }
+    const r = resolveDuelTurn({ hp: hpA, attack: atkA, action: resA.action.type }, { hp: hpB, attack: atkB, action: resB.action.type })
+    log.push({ turn, nameA: botA.name, nameB: botB.name, actionA: resA.action.type, actionB: resB.action.type,
+               dmgToA: r.dmgToA, dmgToB: r.dmgToB, hpAAfter: r.newHpA, hpBAfter: r.newHpB, maxHpA, maxHpB })
+    hpA = r.newHpA; hpB = r.newHpB
+    const aDead = hpA <= 0, bDead = hpB <= 0
+    if (aDead && bDead) return { winner: 'draw', reason: 'mutual', turns: turn, log }
+    if (aDead) return { winner: 'B', reason: 'ko', turns: turn, log }
+    if (bDead) return { winner: 'A', reason: 'ko', turns: turn, log }
+  }
+  if (hpA > hpB) return { winner: 'A', reason: 'timeout-hp', turns: config.maxTurns, log }
+  if (hpB > hpA) return { winner: 'B', reason: 'timeout-hp', turns: config.maxTurns, log }
+  return { winner: 'draw', reason: 'timeout-tie', turns: config.maxTurns, log }
+}
+
+// ── Bracket: single elimination, headless (no animation — just fast resolution
+// for every match). An odd-length round gives the last entrant a bye. A true
+// draw is broken deterministically by seed (the earlier-listed bot advances) —
+// documented, not a coin flip, so results stay reproducible.
+function pairRound(entrants) {
+  const matches = []
+  for (let i = 0; i < entrants.length; i += 2) matches.push({ a: entrants[i], b: entrants[i + 1] || null })
+  return matches
+}
+
+async function runBracketHeadless(entrants, config) {
+  let round = entrants.slice()
+  const rounds = []
+  while (round.length > 1) {
+    const results = []
+    for (const { a, b } of pairRound(round)) {
+      if (!b) { results.push({ a, b: null, bye: true, winner: a }); continue }
+      const result = await runDuel(a, b, config)
+      const winner = result.winner === 'A' ? a : result.winner === 'B' ? b : a
+      results.push({ a, b, result, winner })
+    }
+    rounds.push(results)
+    round = results.map(m => m.winner)
+  }
+  return { rounds, champion: round[0] }
+}
+
+const DUEL_CONFIG = { hp: 70, attack: 16, maxTurns: 15 }
+
+// Fixed scripted opponents. 'stress' = diagnostic fights with unusual stats
+// (Phase 4 — reveals how a general bot handles a matchup it wasn't tuned
+// for). 'scrimmage' = standard-stat practice partners, also used to pad the
+// bracket to a clean power of 2 until real classmate submissions exist.
+const PRACTICE_BOTS = [
+  { id: 'rusher', name: '🔥 The Rusher', group: 'stress', hp: 60, attack: 20,
+    desc: 'Hits hard, dies fast — a pure damage race against your standard stats.',
+    decide: () => ({ type: 'attack' }) },
+  { id: 'fortress', name: '🏰 The Fortress', group: 'stress', hp: 90, attack: 10,
+    desc: 'Tanky and slow. Can your bot close it out before the turn limit?',
+    decide: () => ({ type: 'attack' }) },
+  { id: 'trickster', name: '🎭 The Trickster', group: 'stress', hp: 70, attack: 16,
+    desc: 'Defends every other turn — don\'t waste attacks into a raised shield.',
+    decide: state => (state.turn % 2 === 0 ? { type: 'defend' } : { type: 'attack' }) },
+  { id: 'rushbot', name: '🤖 RushBot', group: 'scrimmage', hp: 70, attack: 16,
+    desc: 'Always attacks. The baseline every bot should be able to handle.',
+    decide: () => ({ type: 'attack' }) },
+  { id: 'turtlebot', name: '🐢 TurtleBot', group: 'scrimmage', hp: 70, attack: 16,
+    desc: 'Defends on every 3rd turn — the Shields Up pattern, in a duel.',
+    decide: state => (state.turn % 3 === 0 ? { type: 'defend' } : { type: 'attack' }) },
+  { id: 'smartbot', name: '🧠 SmartBot', group: 'scrimmage', hp: 70, attack: 16,
+    desc: 'Alternates attack/wait — a disciplined, steady opponent.',
+    decide: state => (state.turn % 2 === 1 ? { type: 'attack' } : { type: 'wait' }) },
+]
+
+// ── Bot storage: one saved script per language, plus a submission lock. When
+// real classmate submissions exist (a server-backed extension), they'd slot
+// into the bracket entrant list the exact same shape as a PRACTICE_BOTS entry
+// ({ name, code, lang }) — nothing else in this engine would need to change.
+function tyBotCode(l) { try { return localStorage.getItem('bf-g9-bot-code-' + l) } catch (e) { return null } }
+function tySaveBotCode(l, code) { try { localStorage.setItem('bf-g9-bot-code-' + l, code) } catch (e) {} }
+function tyBotLang() { try { return localStorage.getItem('bf-g9-bot-lang') || 'py' } catch (e) { return 'py' } }
+function tyBotLocked() { try { return localStorage.getItem('bf-g9-bot-locked') === '1' } catch (e) { return false } }
+const TY_STARTER = {
+  py: '# Your tournament bot. 1v1 duel — state[\'enemies\'][0] is always your opponent.\n'
+    + "# This code runs fresh every turn, just like a Phase 2 boss fight.\n"
+    + "if state['self']['hp'] < 20:\n    # TODO: maybe defend when you're low?\n    pass\n\n"
+    + "attack(state['enemies'][0]['id'])\n",
+  ps: '// Your tournament bot. 1v1 duel — enemyId[1] is always your opponent.\n'
+    + '// This code runs fresh every turn, just like a Phase 2 boss fight.\n\n'
+    + 'IF selfHp < 20 THEN\n    // TODO: maybe defend when you\'re low?\nENDIF\n\nattack(enemyId[1])\n',
+}
+function tyStudentBot() {
+  const lang = tyBotLang()
+  return { name: 'My Bot', lang, code: tyBotCode(lang) || TY_STARTER[lang] }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // Scene rendering + animation
 // ══════════════════════════════════════════════════════════════════════════════
 const cv = document.getElementById('scene')
@@ -1732,25 +1949,29 @@ async function animateBattle(mission, log) {
 // Post-battle scrubber — click through completed turns without re-simulating
 let battleLog = []
 let replayIdx = -1
+let replayMode = 'battle'   // 'battle' | 'duel' — which log/renderer the scrubber drives
+function currentReplayLog() { return replayMode === 'duel' ? duelLog : battleLog }
 function showReplayControls() {
-  replayIdx = battleLog.length - 1
+  replayIdx = currentReplayLog().length - 1
   document.getElementById('replay-bar').style.display = 'flex'
   updateReplayLabel()
 }
 function hideReplayControls() {
   document.getElementById('replay-bar').style.display = 'none'
   battleLog = []
+  duelLog = []
   replayIdx = -1
 }
 function replayPrev() { if (replayIdx > 0) { replayIdx--; renderReplayFrame() } }
-function replayNext() { if (replayIdx < battleLog.length - 1) { replayIdx++; renderReplayFrame() } }
+function replayNext() { if (replayIdx < currentReplayLog().length - 1) { replayIdx++; renderReplayFrame() } }
 function renderReplayFrame() {
+  if (replayMode === 'duel') { replayDuelFrame(replayIdx); updateReplayLabel(); return }
   const rec = battleLog[replayIdx]
   drawBattleScene(activeMission, { playerHp: rec.playerHpAfter, enemies: rec.enemies })
   updateReplayLabel()
 }
 function updateReplayLabel() {
-  document.getElementById('replay-label').textContent = 'Turn ' + (replayIdx + 1) + ' / ' + battleLog.length
+  document.getElementById('replay-label').textContent = 'Turn ' + (replayIdx + 1) + ' / ' + currentReplayLog().length
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1968,6 +2189,7 @@ async function runBattleMission(isSubmit) {
   }
 
   battleLog = res.log
+  replayMode = 'battle'
   const stats = { turns: res.turns }
   const reqErr = res.outcome === 'win' ? checkRequire(mission, code) : null
 
@@ -2114,9 +2336,7 @@ const TIERS = [
   { name: '🔭 PHASE 3 · FULL STRATEGY — data feeds a live battle', ids: ['p3m6', 'p3m7', 'p3m8'] },
   { name: '🛰️ PHASE 3 CAPSTONE', ids: ['p3m9'] },
 ]
-const COMING = [
-  { emoji: '🏟️', title: 'Phase 4-5 — The Tournament', sub: 'Your bot vs the whole class. Bracket. Glory.' },
-]
+const COMING = []
 function showList() {
   const p = getProg()
   let html = ''
@@ -2137,6 +2357,14 @@ function showList() {
       prevDone = st > 0
     }
   }
+  // Tournament unlocks once the Phase 3 capstone is beaten
+  const p3done = (p['p3m9'] || {}).stars > 0
+  html += '<div class="mtier">🏟 PHASE 4-5 — TOURNAMENT</div>'
+  html += '<div class="mcard' + (p3done ? '' : ' locked') + '"' + (p3done ? ' onclick="openTourney()"' : '') + '>'
+    + '<span class="mcard-emoji">' + (p3done ? '🏟️' : '🔒') + '</span>'
+    + '<div><div class="mcard-title">The Tournament</div>'
+    + '<div class="mcard-sub">Write one bot, lock it in, run the bracket</div></div>'
+    + '<span class="mcard-stars">' + (p3done ? '—' : '') + '</span></div>'
   COMING.forEach(c => {
     html += '<div class="mcard locked"><span class="mcard-emoji">' + c.emoji + '</span>'
       + '<div><div class="mcard-title">' + c.title + '</div>'
@@ -2145,6 +2373,218 @@ function showList() {
   })
   document.getElementById('mgrid').innerHTML = html
   document.getElementById('mlist').classList.add('open')
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Tournament Hub UI — bot editor, stress tests, scrimmage, bracket
+// ══════════════════════════════════════════════════════════════════════════════
+let tyEditor = null
+
+function openTourney() {
+  document.getElementById('mlist').classList.remove('open')
+  document.getElementById('tourney').classList.add('open')
+  if (!tyEditor) {
+    tyEditor = CodeMirror.fromTextArea(document.getElementById('ty-code'), {
+      mode: 'python', theme: 'dracula', lineNumbers: true, indentUnit: 4,
+    })
+    tyEditor.on('change', () => { if (!tyBotLocked()) tySaveBotCode(tyBotLang(), tyEditor.getValue()) })
+  }
+  document.getElementById('ty-lang').value = tyBotLang()
+  tyApplyLang()
+  tyRenderStatus()
+  tyRenderCards('ty-stress-cards', 'stress')
+  tyRenderCards('ty-scrim-cards', 'scrimmage')
+  document.getElementById('ty-bracket-view').innerHTML = ''
+  setTimeout(() => tyEditor.refresh(), 50)
+}
+function closeTourney() {
+  document.getElementById('tourney').classList.remove('open')
+  document.body.classList.remove('duel-mode')   // defensive — should already be off
+  showList()
+}
+
+function tySwitchLang(l) {
+  try { localStorage.setItem('bf-g9-bot-lang', l) } catch (e) {}
+  tyApplyLang()
+}
+function tyApplyLang() {
+  const l = tyBotLang()
+  tyEditor.setOption('mode', l === 'py' ? 'python' : 'pseudog9')
+  tyEditor.setValue(tyBotCode(l) || TY_STARTER[l])
+  tyEditor.setOption('readOnly', tyBotLocked())
+}
+function tyRenderStatus() {
+  const locked = tyBotLocked()
+  const badge = document.getElementById('ty-status')
+  badge.textContent = locked ? '🔒 locked in' : '✎ unlocked'
+  badge.className = 'ty-status ' + (locked ? 'locked' : 'unlocked')
+  document.getElementById('ty-lock-btn').style.display = locked ? 'none' : ''
+  document.getElementById('ty-unlock-btn').style.display = locked ? '' : 'none'
+  document.getElementById('ty-run-bracket-btn').disabled = !locked
+  document.getElementById('ty-run-bracket-btn').title = locked ? '' : 'Lock in your bot first'
+}
+function tyResetBot() {
+  if (tyBotLocked()) return
+  const l = tyBotLang()
+  tyEditor.setValue(TY_STARTER[l])
+  tySaveBotCode(l, TY_STARTER[l])
+}
+function tyLockBot() {
+  tySaveBotCode(tyBotLang(), tyEditor.getValue())
+  try { localStorage.setItem('bf-g9-bot-locked', '1') } catch (e) {}
+  tyEditor.setOption('readOnly', true)
+  tyRenderStatus()
+}
+function tyUnlockBot() {
+  try { localStorage.removeItem('bf-g9-bot-locked') } catch (e) {}
+  tyEditor.setOption('readOnly', false)
+  tyRenderStatus()
+}
+
+function tyRenderCards(elId, group) {
+  const html = PRACTICE_BOTS.filter(b => b.group === group).map(b =>
+    '<div class="ty-bot-card" onclick="tyFight(\'' + b.id + '\')">'
+    + '<div><div class="ty-bot-name">' + b.name + '</div><div class="ty-bot-desc">' + b.desc + '</div></div>'
+    + '<span class="ty-bot-fight">▶ Fight</span></div>'
+  ).join('')
+  document.getElementById(elId).innerHTML = html
+}
+function tyFight(botId) {
+  const opp = PRACTICE_BOTS.find(b => b.id === botId)
+  openDuel(tyStudentBot(), opp, null)
+}
+
+async function tyRunBracket() {
+  if (!tyBotLocked()) return
+  const btn = document.getElementById('ty-run-bracket-btn')
+  btn.disabled = true
+  btn.textContent = '⏳ Running…'
+  const entrants = [tyStudentBot(), ...PRACTICE_BOTS.filter(b => b.group === 'scrimmage')]
+  const bracket = await runBracketHeadless(entrants, DUEL_CONFIG)
+  tyLastBracket = bracket
+  renderBracketView(bracket)
+  btn.disabled = false
+  btn.textContent = '▶ Run Tournament'
+}
+
+let tyLastBracket = null
+function renderBracketView(bracket) {
+  let html = ''
+  bracket.rounds.forEach((round, ri) => {
+    const label = bracket.rounds.length - ri === 1 ? 'FINAL'
+      : bracket.rounds.length - ri === 2 ? 'SEMIFINAL' : 'ROUND ' + (ri + 1)
+    html += '<div class="ty-bracket-round"><div class="ty-bracket-round-title">' + label + '</div>'
+    round.forEach((m, mi) => {
+      if (m.bye) {
+        html += '<div class="ty-match">' + m.a.name + ' <span style="margin-left:auto;color:#6b7280;">bye — advances</span></div>'
+        return
+      }
+      const aWin = m.winner === m.a
+      html += '<div class="ty-match" onclick="tyWatchMatch(' + ri + ',' + mi + ')">'
+        + '<b class="' + (aWin ? 'win' : '') + '">' + m.a.name + '</b>'
+        + '<span style="color:#6b7280;">vs</span>'
+        + '<b class="' + (!aWin ? 'win' : '') + '">' + m.b.name + '</b>'
+        + '<span style="margin-left:auto;color:#9ca3af;">' + m.result.turns + ' turns · ▶ replay</span></div>'
+    })
+    html += '</div>'
+  })
+  html += '<div class="ty-champion">🏆 CHAMPION: ' + bracket.champion.name + '</div>'
+  document.getElementById('ty-bracket-view').innerHTML = html
+}
+function tyWatchMatch(ri, mi) {
+  const m = tyLastBracket.rounds[ri][mi]
+  if (m.bye) return
+  openDuel(m.a, m.b, m.result)
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Duel viewer — hijacks the main mission layout (.scene-wrap / .console /
+// .replay-bar) the same way a battle mission does, so no new canvas/console
+// is needed. Closing returns to the Tournament Hub, not the mission list.
+// ══════════════════════════════════════════════════════════════════════════════
+let duelLog = []
+function drawDuelScene(nameA, nameB, hpA, maxHpA, hpB, maxHpB) {
+  cv.width = 640; cv.height = 320
+  ctx.fillStyle = '#0b0d16'
+  ctx.fillRect(0, 0, 640, 320)
+  ctx.fillStyle = 'rgba(255,255,255,.15)'
+  for (let i = 0; i < 24; i++) { const sx = (i * 149) % 640, sy = (i * 97) % 320; ctx.fillRect(sx, sy, 1.5, 1.5) }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.font = '52px serif'
+  ctx.fillText('🤖', 170, 170)
+  ctx.save(); ctx.translate(470, 170); ctx.scale(-1, 1); ctx.fillText('🤖', 0, 0); ctx.restore()
+  ctx.font = '15px sans-serif'; ctx.fillStyle = '#e2e8f0'
+  ctx.fillText(nameA, 170, 230)
+  ctx.fillText(nameB, 470, 230)
+  drawHpBar(110, 245, 120, hpA, maxHpA, '#4ade80')
+  drawHpBar(410, 245, 120, hpB, maxHpB, '#f87171')
+  ctx.font = '11px sans-serif'; ctx.fillStyle = '#9ca3af'
+  ctx.fillText(Math.max(0, hpA) + '/' + maxHpA, 170, 262)
+  ctx.fillText(Math.max(0, hpB) + '/' + maxHpB, 470, 262)
+  ctx.font = '34px sans-serif'; ctx.fillText('⚔️', 320, 170)
+}
+
+async function openDuel(botA, botB, precomputed) {
+  document.getElementById('tourney').classList.remove('open')
+  document.body.classList.add('duel-mode')
+  document.getElementById('mbar-back-btn').textContent = '🏟 Tournament'
+  document.getElementById('m-title').textContent = '⚔️ ' + botA.name + ' vs ' + botB.name
+  document.getElementById('m-phase').textContent = 'TOURNAMENT'
+  document.getElementById('m-par').textContent = ''
+  document.getElementById('m-brief').textContent = precomputed ? 'Replaying a stored match.' : 'Live duel — running your bot now…'
+  document.getElementById('m-api').innerHTML = ''
+  document.getElementById('m-intel').style.display = 'none'
+  document.getElementById('scene').style.display = ''
+  document.getElementById('data-wrap').style.display = 'none'
+  hideReplayControls()
+  drawDuelScene(botA.name, botB.name, DUEL_CONFIG.hp, botA.hp || DUEL_CONFIG.hp, DUEL_CONFIG.hp, botB.hp || DUEL_CONFIG.hp)
+  logClear()
+  logAppend(precomputed ? '// Loading replay…' : '// Fight starting…')
+
+  const result = precomputed || await runDuel(botA, botB, DUEL_CONFIG)
+  duelLog = result.log
+  replayMode = 'duel'
+  await animateDuel(result.log)
+  showReplayControls()
+  const verdictText = result.winner === 'draw' ? '🤝 DRAW (' + result.reason + ')'
+    : result.winner === 'A' ? '🏆 ' + botA.name + ' WINS (' + result.reason + ')'
+    : '🏆 ' + botB.name + ' WINS (' + result.reason + ')'
+  if (result.reason === 'error') {
+    const badSide = result.errSide === 'A' ? botA.name : botB.name
+    logAppend('✗ ' + badSide + '\'s code errored: ' + result.error, 'err')
+  }
+  logAppend(verdictText, 'ok')
+}
+
+async function animateDuel(log) {
+  animating = true
+  let hpA = DUEL_CONFIG.hp, hpB = DUEL_CONFIG.hp
+  if (log.length) { hpA = log[0].maxHpA; hpB = log[0].maxHpB }
+  for (const rec of log) {
+    let msg = 'Turn ' + rec.turn + ': ' + rec.nameA + ' ' + rec.actionA + 's, ' + rec.nameB + ' ' + rec.actionB + 's. '
+    if (rec.dmgToB > 0) msg += rec.nameB + ' takes ' + rec.dmgToB + ' dmg. '
+    if (rec.dmgToA > 0) msg += rec.nameA + ' takes ' + rec.dmgToA + ' dmg. '
+    if (!rec.dmgToA && !rec.dmgToB) msg += 'No damage this turn.'
+    logAppend(msg)
+    drawDuelScene(rec.nameA, rec.nameB, rec.hpAAfter, rec.maxHpA, rec.hpBAfter, rec.maxHpB)
+    await sleep(600)
+  }
+  animating = false
+}
+
+function replayDuelFrame(idx) {
+  const rec = duelLog[idx]
+  drawDuelScene(rec.nameA, rec.nameB, rec.hpAAfter, rec.maxHpA, rec.hpBAfter, rec.maxHpB)
+}
+
+function closeDuel() {
+  document.body.classList.remove('duel-mode')
+  document.getElementById('mbar-back-btn').textContent = '☰ Missions'
+  document.getElementById('tourney').classList.add('open')
+}
+function mbarBack() {
+  if (document.body.classList.contains('duel-mode')) closeDuel()
+  else showList()
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
