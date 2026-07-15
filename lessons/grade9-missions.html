@@ -471,6 +471,200 @@ const MISSIONS = [
     },
     stars: { metric: 'turns', par: 3 },
   },
+
+  // ── Phase 2 · Functions Required — a mission checker enforces decomposition ──
+  {
+    id: 'p2m3', type: 'battle', phase: 'PHASE 2 · FUNCTIONS', emoji: '🧰', title: 'Twin Threats', xp: 50,
+    brief: 'Two enemies now! From here on, missions require you to <b>write your own function</b> to '
+      + 'decide who to attack — don\'t just inline the logic. Python: <code>def</code>. Pseudocode: '
+      + '<code>FUNCTION … RETURNS</code>.',
+    api: ['attack(id)', 'wait()'],
+    require: 'function',
+    starter: {
+      py: '# Write a function that picks a target, then CALL it.\ndef pick_target():\n'
+        + "    # TODO: return an enemy's id — state['enemies'][0]['id'] works\n    pass\n\nattack(pick_target())\n",
+      ps: 'FUNCTION PickTarget() RETURNS STRING\n'
+        + "    // TODO: RETURN an enemy's id — enemyId[1] works\n    RETURN enemyId[1]\nENDFUNCTION\n\nattack(PickTarget())\n",
+    },
+    battle: {
+      playerHp: 60, playerAttack: 20,
+      enemies: [{ id: 'e1', name: 'Scout', hp: 20, attack: 5, dist: 3 }, { id: 'e2', name: 'Gunner', hp: 40, attack: 8, dist: 5 }],
+      maxTurns: 10,
+    },
+    stars: { metric: 'turns', par: 3 },
+  },
+  {
+    id: 'p2m4', type: 'battle', phase: 'PHASE 2 · FUNCTIONS', emoji: '🎯', title: 'Weakest First', xp: 55,
+    brief: 'Write a <b>FindWeakest()</b>-style function that scans the enemy fleet and returns the one '
+      + 'with the <b>lowest hp</b> — killing the cheapest target first keeps you out of danger longest.',
+    api: ['attack(id)', 'wait()'],
+    require: 'function',
+    starter: {
+      py: "def find_weakest():\n    enemies = state['enemies']\n"
+        + '    # TODO: loop through enemies, track the one with the lowest hp, return its id\n'
+        + "    return enemies[0]['id']\n\nattack(find_weakest())\n",
+      ps: 'FUNCTION FindWeakest() RETURNS STRING\n    weakest ← enemyId[1]\n    lowest ← enemyHp[1]\n'
+        + '    FOR i ← 2 TO enemyCount\n        // TODO: if enemyHp[i] < lowest, update weakest and lowest\n'
+        + '    NEXT i\n    RETURN weakest\nENDFUNCTION\n\nattack(FindWeakest())\n',
+    },
+    battle: {
+      playerHp: 70, playerAttack: 18,
+      enemies: [{ id: 'e1', name: 'Wisp', hp: 18, attack: 6, dist: 2 }, { id: 'e2', name: 'Brute', hp: 45, attack: 9, dist: 6 }],
+      maxTurns: 10,
+    },
+    stars: { metric: 'turns', par: 4 },
+  },
+
+  // ── Phase 2 · State Tracking — new action: defend() halves incoming damage ──
+  {
+    id: 'p2m5', type: 'battle', phase: 'PHASE 2 · STATE TRACKING', emoji: '🛡', title: 'Shields Up', xp: 55,
+    brief: 'NEW ACTION: <b>defend()</b> halves ALL incoming damage this turn (but you don\'t attack). '
+      + 'This enemy <b>charges up every 3rd turn</b> for a devastating hit — read <b>state[\'turn\']</b> '
+      + '(pseudocode: <b>turn</b>) to see it coming and defend just in time.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    starter: {
+      py: "# Charges a big attack every 3rd turn — check state['turn'] % 3 == 0\n"
+        + "enemy = state['enemies'][0]\nif state['turn'] % 3 == 0:\n    # TODO: defend()!\n    pass\n"
+        + 'else:\n    attack(enemy[\'id\'])\n',
+      ps: '// Charges a big attack every 3rd turn — check turn MOD 3 = 0\nIF turn MOD 3 = 0 THEN\n'
+        + '    // TODO: defend()!\nELSE\n    attack(enemyId[1])\nENDIF\n',
+    },
+    battle: {
+      playerHp: 50, playerAttack: 12,
+      enemies: [{ id: 'e1', name: 'Charger', hp: 60, attack: ctx => (ctx.turn % 3 === 0 ? 40 : 5), dist: 4 }],
+      maxTurns: 12,
+    },
+    stars: { metric: 'turns', par: 6 },
+  },
+  {
+    id: 'p2m6', type: 'battle', phase: 'PHASE 2 · STATE TRACKING', emoji: '⚡', title: 'Pulsar Watch', xp: 60,
+    brief: 'Same idea, different rhythm — this one charges on <b>EVEN</b> turns instead of every 3rd. '
+      + 'No starter this time: read the pattern and write the full IF yourself.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    starter: {
+      py: "# Charges a big attack on EVEN turns — check state['turn'] % 2 == 0\n\n",
+      ps: '// Charges a big attack on EVEN turns — check turn MOD 2 = 0\n\n',
+    },
+    battle: {
+      playerHp: 65, playerAttack: 14,
+      enemies: [{ id: 'e1', name: 'Pulsar', hp: 70, attack: ctx => (ctx.turn % 2 === 0 ? 30 : 4), dist: 5 }],
+      maxTurns: 14,
+    },
+    stars: { metric: 'turns', par: 6 },
+  },
+
+  // ── Phase 2 · Multiple Enemies — must prioritize or the pile-on kills you ───
+  {
+    id: 'p2m7', type: 'battle', phase: 'PHASE 2 · MULTIPLE ENEMIES', emoji: '👥', title: 'Double Trouble', xp: 60,
+    brief: 'Two enemies, very different threats. One is <b>cheap to kill but hits HARD</b>; the other is '
+      + '<b>tanky but weak</b>. Kill the wrong one first and you won\'t survive — <b>prioritize the '
+      + 'biggest threat</b>, not just whoever\'s closest.',
+    api: ['attack(id)', 'wait()'],
+    starter: {
+      py: "# state['enemies'][i]['attack'] is now visible — cheap hp + high attack = biggest threat.\n"
+        + "enemies = state['enemies']\n# TODO: attack the most dangerous one first\n",
+      ps: '// enemyId[], enemyHp[], enemyAttack[] — cheap hp + high attack = biggest threat.\n'
+        + '// TODO: attack the most dangerous one first\n',
+    },
+    battle: {
+      playerHp: 60, playerAttack: 20,
+      enemies: [{ id: 'e1', name: 'Viper', hp: 20, attack: 25, dist: 3 }, { id: 'e2', name: 'Hulk', hp: 60, attack: 5, dist: 6 }],
+      maxTurns: 10,
+    },
+    stars: { metric: 'turns', par: 4 },
+  },
+  {
+    id: 'p2m8', type: 'battle', phase: 'PHASE 2 · MULTIPLE ENEMIES', emoji: '⚔️', title: 'Triple Threat', xp: 65,
+    brief: 'Three enemies. Rank them by threat (cheap-and-dangerous first, tanky-and-weak last) and work '
+      + 'down the list — get it wrong and the pile-on damage finishes you before you finish them. '
+      + 'Write a <b>MostDangerous()</b> function.',
+    api: ['attack(id)', 'wait()'],
+    require: 'function',
+    starter: {
+      py: "def most_dangerous():\n    enemies = state['enemies']\n"
+        + "    # TODO: loop through enemies, track the one with the HIGHEST attack, return its id\n"
+        + "    return enemies[0]['id']\n\nattack(most_dangerous())\n",
+      ps: 'FUNCTION MostDangerous() RETURNS STRING\n    best ← enemyId[1]\n    bestAtk ← enemyAttack[1]\n'
+        + '    FOR i ← 2 TO enemyCount\n        // TODO: if enemyAttack[i] > bestAtk, update best and bestAtk\n'
+        + '    NEXT i\n    RETURN best\nENDFUNCTION\n\nattack(MostDangerous())\n',
+    },
+    battle: {
+      playerHp: 80, playerAttack: 20,
+      enemies: [{ id: 'e1', name: 'Viper', hp: 20, attack: 20, dist: 3 }, { id: 'e2', name: 'Brute', hp: 40, attack: 10, dist: 5 },
+                { id: 'e3', name: 'Tank', hp: 40, attack: 5, dist: 7 }],
+      maxTurns: 10,
+    },
+    stars: { metric: 'turns', par: 5 },
+  },
+
+  // ── Phase 2 · Adaptive AI — the enemy reacts to what you just did ────────────
+  {
+    id: 'p2m9', type: 'battle', phase: 'PHASE 2 · ADAPTIVE AI', emoji: '🔰', title: 'Shield Recharge', xp: 65,
+    brief: 'This enemy has a <b>shield that blocks two attacks in a row</b> — if you attacked LAST turn, '
+      + 'this turn\'s attack is wasted. Alternate <b>attack()</b> and <b>wait()</b> to land every hit.',
+    api: ['attack(id)', 'wait()', 'defend()'],
+    starter: {
+      py: "# state['turn'] tells you which turn it is — odd turns attack, even turns wait.\n"
+        + "if state['turn'] % 2 == 1:\n    attack(state['enemies'][0]['id'])\nelse:\n"
+        + '    # TODO: wait() to let the shield drop\n    pass\n',
+      ps: '// turn tells you which turn it is — odd turns attack, even turns wait.\n'
+        + 'IF turn MOD 2 = 1 THEN\n    attack(enemyId[1])\nELSE\n    // TODO: wait() to let the shield drop\nENDIF\n',
+    },
+    battle: {
+      playerHp: 60, playerAttack: 15,
+      enemies: [{ id: 'e1', name: 'Warden', hp: 45, attack: 10, dist: 4 }],
+      shield: true,
+      maxTurns: 12,
+    },
+    stars: { metric: 'turns', par: 5 },
+  },
+  {
+    id: 'p2m10', type: 'battle', phase: 'PHASE 2 · ADAPTIVE AI', emoji: '😡', title: 'Enrage', xp: 70,
+    brief: 'This one gets ANGRIER as it takes damage — past half health its attack roughly triples. '
+      + 'The lesson here is the OPPOSITE of Shields Up: don\'t stall, don\'t defend — <b>rush it down '
+      + 'before the rage compounds</b>.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    starter: {
+      py: "# Getting angrier as it's hurt — every turn you delay makes it worse. Full send.\n"
+        + "attack(state['enemies'][0]['id'])\n",
+      ps: "// Getting angrier as it's hurt — every turn you delay makes it worse. Full send.\n"
+        + 'attack(enemyId[1])\n',
+    },
+    battle: {
+      playerHp: 48, playerAttack: 14,
+      enemies: [{ id: 'e1', name: 'Berserker', hp: 50, attack: ctx => (ctx.hpFrac < 0.5 ? 18 : 6), dist: 3 }],
+      maxTurns: 12,
+    },
+    stars: { metric: 'turns', par: 4 },
+  },
+
+  // ── Phase 2 · Boss — everything at once, gates entry to Phase 3 ─────────────
+  {
+    id: 'p2m11', type: 'battle', phase: 'PHASE 2 · BOSS', emoji: '👹', title: 'The Gauntlet', xp: 100, boss: true,
+    brief: '<b>Boss fight.</b> Two enemies, a shield that blocks back-to-back attacks, AND a charge '
+      + 'attack every 3rd turn. Everything from this tier, at once. Kill the cheap-and-dangerous one '
+      + 'first, alternate your attacks to beat the shield, and watch the turn counter. Beat this to '
+      + 'unlock Phase 3.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    require: 'function',
+    starter: {
+      py: 'def pick_target():\n    # TODO: which enemy should die first? (hint: the cheap, dangerous one)\n'
+        + "    return state['enemies'][0]['id']\n\n# TODO: alternate attack()/wait() so the shield never blocks you\n"
+        + 'attack(pick_target())\n',
+      ps: 'FUNCTION PickTarget() RETURNS STRING\n'
+        + '    // TODO: which enemy should die first? (hint: the cheap, dangerous one)\n'
+        + '    RETURN enemyId[1]\nENDFUNCTION\n\n// TODO: alternate attack()/wait() so the shield never blocks you\n'
+        + 'attack(PickTarget())\n',
+    },
+    battle: {
+      playerHp: 90, playerAttack: 16,
+      shield: true,
+      enemies: [{ id: 'e1', name: 'Vanguard', hp: 32, attack: ctx => (ctx.turn % 3 === 0 ? 26 : 6), dist: 3 },
+                { id: 'e2', name: 'Core', hp: 48, attack: 8, dist: 6 }],
+      maxTurns: 14,
+    },
+    stars: { metric: 'turns', par: 9 },
+  },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -542,35 +736,53 @@ function evalSuccess(mission, sim) {
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Pure turn-based combat resolution — testable in Node, no DOM.
-// One turn: player acts (attack a target, or wait), then every enemy still
-// alive after that retaliates for its fixed attack value. Deterministic —
-// no RNG, so results are reproducible and pars can be proven honest.
-//   state:  { turn, playerHp, enemies: [{id,name,hp,maxHp,attack,dist}] }
-//   action: { type:'attack', target:id } | { type:'wait' }
+// One turn: player acts (attack/defend/wait), then every enemy still alive
+// retaliates. Deterministic — no RNG, so results are reproducible and pars
+// can be proven honest.
+//   state:  { turn, playerHp, prevType, enemies: [{id,name,hp,maxHp,attack,dist}] }
+//   action: { type:'attack', target:id } | { type:'defend' } | { type:'wait' }
+//   mission.battle.shield: true blocks an attack whose PREVIOUS turn was also
+//     an attack (forces alternating rhythm — used by the Adaptive AI tier)
+//   enemy.attack may be a NUMBER, or a FUNCTION(ctx) → number where
+//     ctx = { turn, actionType, hpFrac } (hpFrac uses the enemy's OWN maxHp,
+//     evaluated AFTER this turn's player attack lands)
 // ══════════════════════════════════════════════════════════════════════════════
 function simBattleTurn(state, action, mission) {
   const events = []
   let playerHp = state.playerHp
   const enemies = state.enemies.map(e => ({ ...e }))
   const find = id => enemies.find(e => e.id === id)
+  const shield = !!mission.battle.shield
+  const defending = !!(action && action.type === 'defend')
+  const actionType = action ? action.type : 'wait'
 
   if (action && action.type === 'attack' && action.target) {
-    const t = find(action.target)
-    if (t && t.hp > 0) {
-      t.hp = Math.max(0, t.hp - mission.battle.playerAttack)
-      events.push({ kind: 'playerAttack', target: t.id, name: t.name, dmg: mission.battle.playerAttack, hpAfter: t.hp })
+    if (shield && state.prevType === 'attack') {
+      events.push({ kind: 'shieldBlock', target: action.target })
     } else {
-      events.push({ kind: 'invalidTarget', target: action.target })
+      const t = find(action.target)
+      if (t && t.hp > 0) {
+        t.hp = Math.max(0, t.hp - mission.battle.playerAttack)
+        events.push({ kind: 'playerAttack', target: t.id, name: t.name, dmg: mission.battle.playerAttack, hpAfter: t.hp })
+      } else {
+        events.push({ kind: 'invalidTarget', target: action.target })
+      }
     }
+  } else if (defending) {
+    events.push({ kind: 'defend' })
   } else {
     events.push({ kind: 'wait' })
   }
 
   for (const e of enemies) {
     if (e.hp <= 0) continue
-    if (e.attack > 0) {
-      playerHp = Math.max(0, playerHp - e.attack)
-      events.push({ kind: 'enemyAttack', from: e.id, name: e.name, dmg: e.attack, playerHpAfter: playerHp })
+    let dmg = typeof e.attack === 'function'
+      ? e.attack({ turn: state.turn, actionType, hpFrac: e.hp / e.maxHp })
+      : e.attack
+    if (defending) dmg = Math.floor(dmg / 2)
+    if (dmg > 0) {
+      playerHp = Math.max(0, playerHp - dmg)
+      events.push({ kind: 'enemyAttack', from: e.id, name: e.name, dmg, playerHpAfter: playerHp })
     } else {
       events.push({ kind: 'enemyIdle', from: e.id, name: e.name })
     }
@@ -578,7 +790,7 @@ function simBattleTurn(state, action, mission) {
 
   const win = enemies.every(e => e.hp <= 0)
   const loss = playerHp <= 0 && !win
-  return { playerHp, enemies, events, win, loss }
+  return { playerHp, enemies, events, win, loss, prevType: actionType }
 }
 
 // Orchestrates a full battle: calls execTurn(state) once per turn (async —
@@ -587,6 +799,7 @@ async function runBattleSim(mission, execTurn) {
   let state = {
     turn: 1, playerHp: mission.battle.playerHp,
     enemies: mission.battle.enemies.map(e => ({ ...e, maxHp: e.hp })),
+    prevType: null,
   }
   const log = []
   const maxTurns = mission.battle.maxTurns || 20
@@ -596,7 +809,7 @@ async function runBattleSim(mission, execTurn) {
     const result = simBattleTurn(state, res.action, mission)
     log.push({ turn: state.turn, action: res.action, events: result.events,
                playerHpAfter: result.playerHp, enemies: result.enemies })
-    state = { turn: state.turn + 1, playerHp: result.playerHp, enemies: result.enemies }
+    state = { turn: state.turn + 1, playerHp: result.playerHp, enemies: result.enemies, prevType: result.prevType }
     if (result.win) return { ok: true, outcome: 'win', turns: log.length, log }
     if (result.loss) return { ok: true, outcome: 'loss', turns: log.length, log }
   }
@@ -625,6 +838,16 @@ function checkRequire(mission, code) {
     return 'this mission requires a LOOP — rewrite the repeated commands with one.'
   if (mission.require === 'if' && !/\bif\b/i.test(code))
     return 'this mission requires an IF decision — react to the signals instead of hardcoding the route.'
+  if (mission.require === 'function') {
+    const pyDef = code.match(/\bdef\s+(\w+)\s*\(/i)
+    const psDef = code.match(/\b(?:FUNCTION|PROCEDURE)\s+(\w+)\s*\(/i)
+    const def = pyDef || psDef
+    if (!def) return 'this mission requires you to define your OWN function or procedure (Python def, or FUNCTION/PROCEDURE in pseudocode) — don\'t just inline the logic.'
+    const escaped = def[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const matches = code.match(new RegExp('\\b' + escaped + '\\s*\\(', 'gi')) || []
+    if (matches.length < 2)
+      return 'you defined ' + def[1] + '() but never called it — call your own function instead of just declaring it.'
+  }
   return null
 }
 
@@ -650,6 +873,7 @@ function execPseudo(src, mission, battleEnv) {
   if (isBattle) {
     fns.attack = id => { action = { type: 'attack', target: id } }
     fns.wait   = () => { action = { type: 'wait' } }
+    fns.defend = () => { action = { type: 'defend' } }
   } else {
     const allowedList = mission.allowed || ['forward', 'backward', 'left', 'right']
     if (allowedList.includes('forward'))  fns.forward  = d => cmds.push(['F', +d])
@@ -667,9 +891,28 @@ function execPseudo(src, mission, battleEnv) {
     if (t && !t.startsWith('//')) lines.push({ t, ln: i + 1 })
   })
 
-  const env = Object.create(null)
-  if (mission.signals) env.signals = mission.signals.slice()
-  if (battleEnv) for (const k in battleEnv) env[k] = battleEnv[k]
+  // ── Scope chain: FUNCTION/PROCEDURE calls push a local scope; lookups walk
+  // outward so battle state (selfHp, enemyId[]…) stays visible inside a
+  // student-written helper without needing to pass it as a parameter.
+  const scopes = [Object.create(null)]
+  if (mission.signals) scopes[0].signals = mission.signals.slice()
+  if (battleEnv) for (const k in battleEnv) scopes[0][k] = battleEnv[k]
+  function getVar(name, ln) {
+    for (let i = scopes.length - 1; i >= 0; i--) if (name in scopes[i]) return scopes[i][name]
+    throw { message: 'Unknown variable "' + name + '"', ln }
+  }
+  function setVar(name, val) {
+    for (let i = scopes.length - 1; i >= 0; i--) if (name in scopes[i]) { scopes[i][name] = val; return }
+    scopes[scopes.length - 1][name] = val
+  }
+
+  // ── FUNCTION/PROCEDURE — pre-scanned so a call can appear before its
+  // definition; bodies are SKIPPED during normal top-to-bottom flow and only
+  // run via CALL/expression invocation, matching Cambridge pseudocode style.
+  //   FUNCTION Name(a, b) RETURNS TYPE  …  RETURN expr  ENDFUNCTION
+  //   PROCEDURE Name(a, b)  …  ENDPROCEDURE
+  const userFns = Object.create(null)
+  function RetSignal(v) { this.value = v }
 
   // ── expression evaluator: tokenizer + precedence climbing ──
   function evalExpr(exprStr, ln) {
@@ -703,12 +946,13 @@ function execPseudo(src, mission, battleEnv) {
           const args = []
           if (peek() !== ')') { args.push(orExpr()); while (peek() === ',') { i++; args.push(orExpr()) } }
           if (toks[i++] !== ')') throw { message: 'Missing ) after ' + t, ln }
+          const uf = callUserFn(name, args, ln)
+          if (uf.found) return uf.value
           const f = fns[name]
           if (!f) throw { message: 'Unknown function ' + t + '()', ln }
           return f(...args)
         }
-        if (!(name in env)) throw { message: 'Unknown variable "' + t + '"', ln }
-        let v = env[name]
+        let v = getVar(name, ln)
         while (peek() === '[') {        // 1-based array indexing
           i++
           const idx = orExpr()
@@ -792,6 +1036,44 @@ function execPseudo(src, mission, battleEnv) {
     return -1
   }
 
+  // Pre-scan: register every FUNCTION/PROCEDURE so calls can appear anywhere
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].t
+    const fm = t.match(/^FUNCTION\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*RETURNS\s+\w+\s*$/i)
+    const pm = !fm && t.match(/^PROCEDURE\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*$/i)
+    if (!fm && !pm) continue
+    const m = fm || pm
+    const kind = fm ? 'function' : 'procedure'
+    const opener = fm ? 'FUNCTION' : 'PROCEDURE'
+    const closer = fm ? 'ENDFUNCTION' : 'ENDPROCEDURE'
+    const end = matchEnd(i, opener, closer)
+    const params = m[2].trim()
+      ? m[2].split(',').map(p => p.trim().replace(/^BYREF\s+|^BYVAL\s+/i, '').split(':')[0].trim().toLowerCase())
+      : []
+    userFns[m[1].toLowerCase()] = { kind, params, start: i + 1, end, declLn: lines[i].ln }
+  }
+
+  function callUserFn(name, args, ln) {
+    const uf = userFns[name]
+    if (!uf) return { found: false }
+    if (args.length !== uf.params.length)
+      throw { message: name + '() expects ' + uf.params.length + ' argument(s), got ' + args.length, ln }
+    const local = Object.create(null)
+    uf.params.forEach((p, idx) => { local[p] = args[idx] })
+    scopes.push(local)
+    let value = null
+    try {
+      run(uf.start, uf.end)
+    } catch (sig) {
+      if (sig instanceof RetSignal) value = sig.value
+      else { scopes.pop(); throw sig }
+    }
+    scopes.pop()
+    if (uf.kind === 'function' && value === null)
+      throw { message: name + '() must RETURN a value', ln }
+    return { found: true, value }
+  }
+
   // ── statement execution ──
   let ops = 0
   function run(i, end) {
@@ -799,6 +1081,17 @@ function execPseudo(src, mission, battleEnv) {
       const { t, ln } = lines[i]
       if (++ops > 100000) throw { message: 'Program ran too long — check for an infinite loop', ln }
       const up = t.toUpperCase()
+      if (up.startsWith('FUNCTION ') || up.startsWith('PROCEDURE ')) {
+        // Already registered by the pre-scan — skip over the body in normal flow
+        const isF = up.startsWith('FUNCTION ')
+        const nxt = matchEnd(i, isF ? 'FUNCTION' : 'PROCEDURE', isF ? 'ENDFUNCTION' : 'ENDPROCEDURE')
+        i = nxt + 1
+        continue
+      }
+      if (up === 'RETURN' || up.startsWith('RETURN ')) {
+        const rest = t.slice(6).trim()
+        throw new RetSignal(rest ? evalExpr(rest, ln) : null)
+      }
       if (up.startsWith('FOR ')) {
         const m = t.match(/^FOR\s+([A-Za-z_]\w*)\s*(?:←|<-)\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i)
         if (!m) throw { message: 'Bad FOR — expected: FOR i ← 1 TO 4', ln }
@@ -808,7 +1101,7 @@ function execPseudo(src, mission, battleEnv) {
         if (st === 0) throw { message: 'STEP 0 never ends', ln }
         const vn = m[1].toLowerCase()
         for (let v = a; st > 0 ? v <= b : v >= b; v += st) {
-          env[vn] = v
+          setVar(vn, v)
           run(i + 1, nxt)
         }
         i = nxt + 1
@@ -833,12 +1126,15 @@ function execPseudo(src, mission, battleEnv) {
         continue
       }
       const am = t.match(/^([A-Za-z_]\w*)\s*(?:←|<-)\s*(.+)$/)
-      if (am) { env[am[1].toLowerCase()] = evalExpr(am[2], ln); i++; continue }
+      if (am) { setVar(am[1].toLowerCase(), evalExpr(am[2], ln)); i++; continue }
       const cm = t.match(/^(?:CALL\s+)?([A-Za-z_]\w*)\s*\((.*)\)$/i)
       if (cm) {
-        const f = fns[cm[1].toLowerCase()]
-        if (!f) throw { message: 'Unknown command ' + cm[1] + '() — is it allowed in this mission?', ln }
+        const nm = cm[1].toLowerCase()
         const args = cm[2].trim() ? cm[2].split(',').map(a => evalExpr(a, ln)) : []
+        const uf = callUserFn(nm, args, ln)
+        if (uf.found) { i++; continue }
+        const f = fns[nm]
+        if (!f) throw { message: 'Unknown command ' + cm[1] + '() — is it allowed in this mission?', ln }
         f(...args)
         i++
         continue
@@ -848,7 +1144,10 @@ function execPseudo(src, mission, battleEnv) {
   }
 
   try { run(0, lines.length) }
-  catch (err) { return { ok: false, error: err.message || String(err), line: err.ln || null } }
+  catch (err) {
+    if (err instanceof RetSignal) return { ok: false, error: 'RETURN can only be used inside a FUNCTION or PROCEDURE', line: null }
+    return { ok: false, error: err.message || String(err), line: err.ln || null }
+  }
   return isBattle ? { ok: true, action, outputs } : { ok: true, cmds, outputs }
 }
 
@@ -862,6 +1161,9 @@ function battleEnvFor(mission, state) {
     enemycount: alive.length,
     enemyid: alive.map(e => e.id), enemyhp: alive.map(e => e.hp),
     enemymaxhp: alive.map(e => e.maxHp), enemydist: alive.map(e => e.dist),
+    // Numeric attack only — adaptive enemies' attack is a formula, not a
+    // fixed stat, so it's 0 here and meant to be read from the pattern instead.
+    enemyattack: alive.map(e => (typeof e.attack === 'number' ? e.attack : 0)),
   }
 }
 
@@ -933,7 +1235,12 @@ function buildBattleState(mission, state) {
   return {
     turn: state.turn,
     self: { hp: state.playerHp, maxHp: mission.battle.playerHp },
-    enemies: alive.map(e => ({ id: e.id, name: e.name, hp: e.hp, maxHp: e.maxHp, dist: e.dist })),
+    // 'attack' is only present for enemies with a fixed stat — adaptive
+    // enemies' damage is a formula, meant to be read from the pattern instead.
+    enemies: alive.map(e => ({
+      id: e.id, name: e.name, hp: e.hp, maxHp: e.maxHp, dist: e.dist,
+      attack: typeof e.attack === 'number' ? e.attack : null,
+    })),
   }
 }
 
@@ -948,6 +1255,9 @@ const BATTLE_SETUP = [
   "def wait():",
   "    global _action_type",
   "    _action_type = 'wait'",
+  "def defend():",
+  "    global _action_type",
+  "    _action_type = 'defend'",
   "_action_type = 'wait'",
   "_action_target = None",
   "",
@@ -1125,9 +1435,11 @@ async function animateBattle(mission, log) {
   logClear()
   for (const rec of log) {
     let msg = 'Turn ' + rec.turn + ': '
-    msg += rec.action.type === 'attack' ? 'you fire at ' + rec.action.target + '. ' : 'you hold fire. '
+    msg += rec.action.type === 'attack' ? 'you fire at ' + rec.action.target + '. '
+      : rec.action.type === 'defend' ? 'you brace for impact. ' : 'you hold fire. '
     for (const ev of rec.events) {
       if (ev.kind === 'playerAttack') msg += 'Hit ' + ev.name + ' for ' + ev.dmg + ' dmg (' + ev.hpAfter + ' HP left). '
+      else if (ev.kind === 'shieldBlock') msg += '🛡 Blocked — you attacked two turns in a row! '
       else if (ev.kind === 'enemyAttack') msg += ev.name + ' fires back for ' + ev.dmg + ' dmg! '
       else if (ev.kind === 'invalidTarget') msg += 'No such target — wasted the turn! '
     }
@@ -1345,9 +1657,11 @@ async function runBattleMission(isSubmit) {
 
   battleLog = res.log
   const stats = { turns: res.turns }
+  const reqErr = res.outcome === 'win' ? checkRequire(mission, code) : null
 
   if (isSubmit) {
-    if (res.outcome === 'win') completeMission(stats)
+    if (res.outcome === 'win' && !reqErr) completeMission(stats)
+    else if (reqErr) logC('✗ Submit blocked — ' + reqErr, 'err')
     else logC('✗ Submit blocked — you must WIN the battle first (press ▶ Run to see why).', 'err')
     btn.disabled = false
     return
@@ -1356,7 +1670,10 @@ async function runBattleMission(isSubmit) {
   await animateBattle(mission, res.log)
   showReplayControls()
 
-  if (res.outcome === 'win') {
+  if (res.outcome === 'win' && reqErr) {
+    logAppend('🟡 Victory! But ' + reqErr, 'warn')
+    setSubmit(false)
+  } else if (res.outcome === 'win') {
     const st = starsFor(mission, stats)
     logAppend('✅ VICTORY in ' + res.turns + ' turn' + (res.turns > 1 ? 's' : '')
       + (st === 3 ? ' — perfect!' : ' (3★ needs ≤ ' + mission.stars.par + ' turns)')
@@ -1423,13 +1740,14 @@ const TIERS = [
   { name: '🚦 TIER 3 — SIGNALS & DECISIONS', ids: ['p1m8', 'p1m9', 'p1m10'] },
   { name: '🏆 PHASE 1 CAPSTONE', ids: ['p1m11'] },
   { name: '⚔️ PHASE 2 · TUTORIAL — your code fights (new: stars count turns)', ids: ['p2m1', 'p2m2'] },
+  { name: '🧰 TIER — FUNCTIONS REQUIRED', ids: ['p2m3', 'p2m4'] },
+  { name: '🛡 TIER — STATE TRACKING (new: defend() action)', ids: ['p2m5', 'p2m6'] },
+  { name: '👥 TIER — MULTIPLE ENEMIES', ids: ['p2m7', 'p2m8'] },
+  { name: '🔰 TIER — ADAPTIVE AI', ids: ['p2m9', 'p2m10'] },
+  { name: '👹 PHASE 2 BOSS', ids: ['p2m11'] },
 ]
 const COMING = [
-  { emoji: '🧰', title: 'Phase 2 — Functions Required', sub: 'Factor your logic into named functions, like find_closest_enemy().' },
-  { emoji: '🧠', title: 'Phase 2 — State Tracking', sub: 'Multi-turn strategy: retreat when low, remember enemy patterns.' },
-  { emoji: '👥', title: 'Phase 2 — Multiple Enemies', sub: '2-3 enemies at once — who do you prioritize?' },
-  { emoji: '🤖', title: 'Phase 2 — Adaptive AI', sub: 'The enemy reacts to YOUR pattern.' },
-  { emoji: '👹', title: 'Phase 2 — Boss + Phase 3 Data Missions', sub: 'A gate mission, then terrain/data-driven strategy.' },
+  { emoji: '📊', title: 'Phase 3 — Data Missions', sub: 'Terrain data, enemy stats, hidden weaknesses — read the data or lose.' },
   { emoji: '🏟️', title: 'Phase 4-5 — The Tournament', sub: 'Your bot vs the whole class. Bracket. Glory.' },
 ]
 function showList() {
