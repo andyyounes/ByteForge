@@ -8,10 +8,10 @@ const s = html.indexOf('const MISSIONS = [')
 const e = html.indexOf('// ═══', html.indexOf('function execPseudo'))
 const {
   MISSIONS, simTurtle, evalSuccess, starsFor, countLines, checkRequire, execPseudo,
-  simBattleTurn, runBattleSim, battleEnvFor,
+  simBattleTurn, runBattleSim, battleEnvFor, dataEnvFor, evalDataSuccess,
 } = new Function(html.slice(s, e)
     + '\nreturn { MISSIONS, simTurtle, evalSuccess, starsFor, countLines, checkRequire, execPseudo, '
-    + 'simBattleTurn, runBattleSim, battleEnvFor }')()
+    + 'simBattleTurn, runBattleSim, battleEnvFor, dataEnvFor, evalDataSuccess }')()
 
 let fail = 0
 const bad = m => { fail++; console.log('✗ ' + m) }
@@ -33,7 +33,7 @@ const SOLUTIONS = {
 }
 
 for (const m of MISSIONS) {
-  if (m.type === 'battle') continue   // validated separately, below
+  if (m.type === 'battle' || m.type === 'data') continue   // validated separately, below
   const sol = SOLUTIONS[m.id]
   if (!sol) { bad(m.id + ' — no reference solution'); continue }
   const sim = simTurtle(m.scene, sol)
@@ -371,6 +371,115 @@ function simulateFixed(mission, strategyFn) {
   const r = simulateFixed(m, () => ({ type: 'attack', target: m.battle.enemies[0].id }))
   if (r.outcome === 'win') bad('Shield Recharge — spamming attack should NOT win (shield blocks every other hit)')
   else ok('Shield Recharge — attack-spam correctly fails against the shield')
+}
+
+// ── Session 5: Data mission engine (Phase 3) ───────────────────────────────────
+{
+  // Exact numeric match, and a wrong answer correctly fails
+  if (!evalDataSuccess({ answer: 41 }, 41).ok) bad('evalDataSuccess: exact number match should pass')
+  else ok('evalDataSuccess: exact number match passes')
+  if (!evalDataSuccess({ answer: 41 }, '41').ok) bad('evalDataSuccess: numeric string should coerce and pass')
+  else ok('evalDataSuccess: numeric string coerces correctly')
+  if (evalDataSuccess({ answer: 41 }, 40).ok) bad('evalDataSuccess: wrong number should fail')
+  else ok('evalDataSuccess: wrong number correctly fails')
+  if (!evalDataSuccess({ answer: 'Bex' }, 'bex').ok) bad('evalDataSuccess: string match should be case-insensitive')
+  else ok('evalDataSuccess: string match is case-insensitive')
+  if (evalDataSuccess({ answer: 41 }, undefined).ok) bad('evalDataSuccess: no answer() call should fail, not pass')
+  else ok('evalDataSuccess: never calling answer() correctly fails as "noanswer"')
+}
+
+// Runs a data mission's pseudocode source once (no turn loop) and returns its answer
+function runData(mission, src) {
+  return execPseudo(src, mission, dataEnvFor(mission))
+}
+
+const DATA_REF = {
+  p3m1: 'total ← 0\nFOR i ← 1 TO dataCount\n    total ← total + dataWeight[i]\nNEXT i\n\nanswer(total)',
+  p3m2: 'best ← dataName[1]\nbestSkill ← dataSkill[1]\nFOR i ← 1 TO dataCount\n'
+    + '    IF dataSkill[i] > bestSkill THEN\n        best ← dataName[i]\n        bestSkill ← dataSkill[i]\n    ENDIF\nNEXT i\n\nanswer(best)',
+  p3m3: 'cheapest ← dataRoute[1]\nlowCost ← dataCost[1]\nFOR i ← 1 TO dataCount\n'
+    + '    IF dataCost[i] < lowCost THEN\n        cheapest ← dataRoute[i]\n        lowCost ← dataCost[i]\n    ENDIF\nNEXT i\n\nanswer(cheapest)',
+  p3m4: 'count ← 0\nFOR i ← 1 TO dataCount\n    IF dataHp[i] > 50 THEN\n        count ← count + 1\n    ENDIF\nNEXT i\n\nanswer(count)',
+  p3m5: 'budget ← 80\nFOR i ← 1 TO dataCount\n    budget ← budget - dataCost[i]\nNEXT i\n\nanswer(budget)',
+}
+for (const [id, src] of Object.entries(DATA_REF)) {
+  const m = MISSIONS.find(x => x.id === id)
+  if (!m) { bad(id + ' — mission not found'); continue }
+  const res = runData(m, src)
+  if (!res.ok) { bad(id + ' — ' + m.title + ': reference errored: ' + res.error); continue }
+  const v = evalDataSuccess(m, res.answer)
+  if (!v.ok) { bad(id + ' — ' + m.title + ': reference answer(' + JSON.stringify(res.answer) + ') != expected ' + JSON.stringify(m.answer)); continue }
+  const reqErr = m.require === 'loop' ? checkRequire(m, src) : null
+  if (reqErr) { bad(id + ' — ' + m.title + ': reference should satisfy its own require(loop) check: ' + reqErr); continue }
+  ok(id + ' — ' + m.title + ': reference computes ' + JSON.stringify(res.answer) + ' correctly, require satisfied')
+}
+{
+  // A hardcoded, non-loop "cheat" must fail p3m2's require check (loop is genuinely needed)
+  const m = MISSIONS.find(x => x.id === 'p3m2')
+  const cheat = checkRequire(m, "answer('Bex')")
+  if (!cheat) bad('p3m2 — hardcoding the known answer with no loop should fail the require(loop) check')
+  else ok('p3m2 — hardcoded non-loop answer correctly fails require(loop)')
+}
+{
+  // Wrong aggregation logic must fail the actual numeric check, not just run without error
+  const m = MISSIONS.find(x => x.id === 'p3m4')
+  const wrong = 'count ← 0\nFOR i ← 1 TO dataCount\n    IF dataHp[i] > 90 THEN\n        count ← count + 1\n    ENDIF\nNEXT i\n\nanswer(count)'
+  const res = runData(m, wrong)
+  if (evalDataSuccess(m, res.answer).ok) bad('p3m4 — a wrong threshold should not coincidentally pass')
+  else ok('p3m4 — wrong aggregation logic correctly produces a wrong (rejected) answer')
+}
+
+// ── Session 5: hidden attack (hideAttack) + intel exposure ────────────────────
+{
+  const m = MISSIONS.find(x => x.id === 'p3m6')
+  const state = { turn: 1, playerHp: m.battle.playerHp, enemies: m.battle.enemies.map(e => ({ ...e, maxHp: e.hp })) }
+  const env = battleEnvFor(m, state)
+  if (env.enemyattack.some(a => a !== 0)) bad('p3m6 — hideAttack should blank enemyAttack[] to all zeros: ' + JSON.stringify(env.enemyattack))
+  else ok('p3m6 — hideAttack correctly hides enemyAttack[] from the pseudocode state')
+  if (!env.intelid || env.intelid.length !== 2) bad('p3m6 — intel should expose intelId[] with 2 entries: ' + JSON.stringify(env.intelid))
+  else ok('p3m6 — intel report is exposed via intelId[]/intelContact[]/intelTrueAttack[]')
+  if (env.inteltrueattack.join(',') !== '25,5') bad('p3m6 — intelTrueAttack[] should carry the real attack values: ' + env.inteltrueattack)
+  else ok('p3m6 — intelTrueAttack[] carries the true (otherwise-hidden) attack values')
+}
+
+// ── Session 5: all 4 Phase 3 battle missions (intel + optional shield) ────────
+const P3_BATTLE_REF = {
+  // Intel is STATIC (doesn't drop dead enemies) — the correct pattern loops the
+  // LIVE enemyId[] and looks up each one's true attack via intel, not the other
+  // way round (looping intel directly can pick an already-destroyed contact).
+  p3m6: 'FUNCTION TrueAttackOf(id) RETURNS INTEGER\n    FOR i ← 1 TO intelCount\n        IF intelId[i] = id THEN\n'
+    + '            RETURN intelTrueAttack[i]\n        ENDIF\n    NEXT i\n    RETURN 0\nENDFUNCTION\n\n'
+    + 'best ← enemyId[1]\nbestAtk ← TrueAttackOf(enemyId[1])\nFOR i ← 2 TO enemyCount\n'
+    + '    atk ← TrueAttackOf(enemyId[i])\n    IF atk > bestAtk THEN\n        best ← enemyId[i]\n        bestAtk ← atk\n    ENDIF\nNEXT i\n\nattack(best)',
+  p3m7: 'FUNCTION TrueAttackOf(id) RETURNS INTEGER\n    FOR i ← 1 TO intelCount\n        IF intelId[i] = id THEN\n'
+    + '            RETURN intelTrueAttack[i]\n        ENDIF\n    NEXT i\n    RETURN 0\nENDFUNCTION\n\n'
+    + 'FUNCTION MostDangerous() RETURNS STRING\n    best ← enemyId[1]\n    bestAtk ← TrueAttackOf(enemyId[1])\n'
+    + '    FOR i ← 2 TO enemyCount\n        atk ← TrueAttackOf(enemyId[i])\n        IF atk > bestAtk THEN\n'
+    + '            best ← enemyId[i]\n            bestAtk ← atk\n        ENDIF\n    NEXT i\n    RETURN best\nENDFUNCTION\n\nattack(MostDangerous())',
+  p3m8: 'IF turn = 1 THEN\n    attack(intelId[1])\nELSE\n'
+    + '    IF turn MOD 2 = 1 THEN\n        attack(intelId[2])\n    ELSE\n        wait()\n    ENDIF\nENDIF',
+  p3m9: 'FUNCTION PickTarget() RETURNS STRING\n    RETURN enemyId[1]\nENDFUNCTION\n\n'
+    + 'IF turn MOD 2 = 1 THEN\n    attack(PickTarget())\nELSE\n    wait()\nENDIF',
+}
+for (const [id, src] of Object.entries(P3_BATTLE_REF)) {
+  const m = MISSIONS.find(x => x.id === id)
+  const r = simulateWithPseudo(m, src)
+  if (r.outcome !== 'win') { bad(id + ' — ' + m.title + ': reference should WIN, got ' + r.outcome + (r.error ? ' (' + r.error + ')' : '')); continue }
+  if (r.turns !== m.stars.par) { bad(id + ' — ' + m.title + ': par ' + m.stars.par + ' turns but reference wins in ' + r.turns); continue }
+  const reqErr = m.require === 'function' ? checkRequire(m, src) : null
+  if (reqErr) { bad(id + ' — ' + m.title + ': reference should satisfy its own require(function) check: ' + reqErr); continue }
+  ok(id + ' — ' + m.title + ': reference wins in ' + r.turns + ' turns (par), require satisfied')
+}
+{
+  // Wrong priority (guessing from the visible-but-hidden state instead of intel) must lose
+  const m = MISSIONS.find(x => x.id === 'p3m7')
+  const r = simulateFixed(m, st => {
+    // "attack whichever is listed last" — ignores intel entirely, a plausible wrong guess
+    const alive = st.enemies.filter(e => e.hp > 0)
+    return { type: 'attack', target: alive[alive.length - 1].id }
+  })
+  if (r.outcome === 'win') bad('Ghost Squadron — ignoring intel and guessing should not reliably win')
+  else ok('Ghost Squadron — ignoring intel (wrong priority guess) correctly fails')
 }
 
 console.log(fail ? '\n' + fail + ' problems' : '\nall missions verified — both engines honest')

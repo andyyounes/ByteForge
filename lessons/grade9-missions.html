@@ -111,6 +111,18 @@
                 background:#0e1020; border-top:1px solid rgba(255,255,255,.08); flex-shrink:0; }
   .replay-bar .btn { padding:5px 12px; font-size:11.5px; }
   #replay-label { font-size:11.5px; color:#9ca3af; font-weight:700; min-width:80px; text-align:center; }
+
+  /* ── Data mission table ── */
+  .data-wrap { width:100%; height:100%; overflow-y:auto; padding:22px; }
+  .data-wrap h3 { font-size:12px; font-weight:900; letter-spacing:1px; color:#67e8f9; margin-bottom:12px; }
+  .data-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .data-table th { text-align:left; padding:8px 12px; background:#111320; color:#9ca3af;
+                   font-size:10.5px; letter-spacing:.5px; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,.1); }
+  .data-table td { padding:7px 12px; border-bottom:1px solid rgba(255,255,255,.05); color:#e2e8f0; font-family:monospace; }
+  .data-table tr:nth-child(even) td { background:rgba(255,255,255,.02); }
+  .data-answer { margin-top:18px; padding:12px 16px; border-radius:10px; background:rgba(184,239,74,.06);
+                 border:1px solid rgba(184,239,74,.25); font-size:12.5px; color:#c9d1e3; }
+  .data-answer b { color:#b8ef4a; }
 </style>
 <script src="../js/db.js"></script>
 <script src="../js/auth.js"></script>
@@ -132,7 +144,10 @@
 
 <div class="main">
   <div class="left">
-    <div class="scene-wrap"><canvas id="scene" width="640" height="480"></canvas></div>
+    <div class="scene-wrap">
+      <canvas id="scene" width="640" height="480"></canvas>
+      <div class="data-wrap" id="data-wrap" style="display:none;"></div>
+    </div>
     <div class="replay-bar" id="replay-bar">
       <button class="btn btn-reset" onclick="replayPrev()">⏮ Prev Turn</button>
       <span id="replay-label">Turn 1 / 1</span>
@@ -141,6 +156,7 @@
     <div class="brief">
       <div class="brief-goal" id="m-brief"></div>
       <div class="brief-api" id="m-api"></div>
+      <div id="m-intel" style="display:none;"></div>
     </div>
     <div class="console" id="console">// Mission console — Run your code to see what happens.</div>
   </div>
@@ -218,6 +234,7 @@ function applyLang() {
   setSubmit(false)
 }
 function parLabel(m) {
+  if (m.stars.metric === 'pass') return '★★★ correct answer'
   if (m.stars.metric === 'lines') return '3★: ≤ ' + m.stars.par + ' code lines'
   if (m.stars.metric === 'turns') return '3★: ≤ ' + m.stars.par + ' turns'
   return '3★: ' + m.stars.par + ' commands'
@@ -665,6 +682,200 @@ const MISSIONS = [
     },
     stars: { metric: 'turns', par: 9 },
   },
+
+  // ── Phase 3 · Read & Report — new mission type, no battle: parse the report,
+  // call answer(v) once. Isolates the data skill before it's combined with combat.
+  {
+    id: 'p3m1', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '📦', title: 'Cargo Count', xp: 40,
+    brief: 'NEW MISSION TYPE. No battle this time — just a <b>data table</b>. Loop through <b>data</b> '
+      + '(a list of records) and call <b>answer(value)</b> ONCE to report the total cargo weight.',
+    api: ['answer(value)'],
+    dataTitle: 'Cargo Manifest', dataFields: ['item', 'weight'],
+    data: [{ item: 'Water', weight: 12 }, { item: 'Food', weight: 8 }, { item: 'Tools', weight: 15 }, { item: 'Spare Parts', weight: 6 }],
+    starter: {
+      py: "# data is a list of dicts — data[i]['item'], data[i]['weight']\ntotal = 0\nfor row in data:\n"
+        + "    # TODO: add row['weight'] to total\n    pass\n\nanswer(total)\n",
+      ps: '// dataItem[i], dataWeight[i] — 1-based, dataCount rows total\ntotal ← 0\nFOR i ← 1 TO dataCount\n'
+        + '    // TODO: total ← total + dataWeight[i]\nNEXT i\n\nanswer(total)\n',
+    },
+    answer: 41,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p3m2', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '👩‍🚀', title: 'Crew Roster', xp: 45,
+    brief: 'Find the crew member with the <b>highest skill rating</b> and report their name. This mission '
+      + '<b>requires a LOOP</b> — hardcoding "the third one" doesn\'t scale to a bigger crew.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Crew Roster', dataFields: ['name', 'skill'],
+    data: [{ name: 'Aria', skill: 72 }, { name: 'Bex', skill: 91 }, { name: 'Cole', skill: 58 }, { name: 'Dee', skill: 85 }],
+    starter: {
+      py: "best = data[0]['name']\nbestSkill = data[0]['skill']\nfor row in data:\n"
+        + "    # TODO: if row['skill'] > bestSkill, update best and bestSkill\n    pass\n\nanswer(best)\n",
+      ps: 'best ← dataName[1]\nbestSkill ← dataSkill[1]\nFOR i ← 1 TO dataCount\n'
+        + '    // TODO: IF dataSkill[i] > bestSkill THEN update best and bestSkill\nNEXT i\n\nanswer(best)\n',
+    },
+    answer: 'Bex',
+    stars: { metric: 'pass' },
+  },
+
+  // ── Phase 3 · One Decision — the data determines a single choice ────────────
+  {
+    id: 'p3m3', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '🗺️', title: 'Route Planner', xp: 45,
+    brief: 'Three hyperspace routes, three fuel costs. Report the name of the <b>CHEAPEST</b> route.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Route Options', dataFields: ['route', 'cost'],
+    data: [{ route: 'Alpha', cost: 34 }, { route: 'Beta', cost: 19 }, { route: 'Gamma', cost: 27 }],
+    starter: {
+      py: "cheapest = data[0]['route']\nlowCost = data[0]['cost']\nfor row in data:\n"
+        + "    # TODO: if row['cost'] < lowCost, update cheapest and lowCost\n    pass\n\nanswer(cheapest)\n",
+      ps: 'cheapest ← dataRoute[1]\nlowCost ← dataCost[1]\nFOR i ← 1 TO dataCount\n'
+        + '    // TODO: IF dataCost[i] < lowCost THEN update cheapest and lowCost\nNEXT i\n\nanswer(cheapest)\n',
+    },
+    answer: 'Beta',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p3m4', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '📡', title: 'Threat Count', xp: 50,
+    brief: 'Sensor sweep picked up 5 contacts. Report <b>how many</b> have more than <b>50 hp</b> — '
+      + 'that\'s your real threat count for the mission ahead.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Sensor Contacts', dataFields: ['contact', 'hp'],
+    data: [{ contact: 'C1', hp: 45 }, { contact: 'C2', hp: 82 }, { contact: 'C3', hp: 30 }, { contact: 'C4', hp: 95 }, { contact: 'C5', hp: 60 }],
+    starter: {
+      py: "count = 0\nfor row in data:\n    # TODO: if row['hp'] > 50, add 1 to count\n    pass\n\nanswer(count)\n",
+      ps: 'count ← 0\nFOR i ← 1 TO dataCount\n    // TODO: IF dataHp[i] > 50 THEN count ← count + 1\nNEXT i\n\nanswer(count)\n',
+    },
+    answer: 3,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p3m5', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '⛽', title: 'Fuel Budget', xp: 50,
+    brief: 'Budget: <b>80 fuel</b>. Four legs of the journey, each with a cost. Report how much fuel '
+      + '<b>remains</b> after every leg.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Flight Legs', dataFields: ['leg', 'cost'],
+    data: [{ leg: 'L1', cost: 14 }, { leg: 'L2', cost: 22 }, { leg: 'L3', cost: 9 }, { leg: 'L4', cost: 17 }],
+    starter: {
+      py: 'budget = 80\nfor row in data:\n'
+        + "    # TODO: subtract row['cost'] from budget\n    pass\n\nanswer(budget)\n",
+      ps: 'budget ← 80\nFOR i ← 1 TO dataCount\n    // TODO: budget ← budget - dataCost[i]\nNEXT i\n\nanswer(budget)\n',
+    },
+    answer: 18,
+    stars: { metric: 'pass' },
+  },
+
+  // ── Phase 3 · Full Strategy — data feeds directly into a live battle ────────
+  // Enemy 'attack' is hidden (hideAttack:true) — the ONLY way to know who's
+  // dangerous is to read the static intel report before writing your tactics.
+  {
+    id: 'p3m6', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '🔭', title: 'Blind Contact', xp: 65,
+    brief: 'Sensors are jammed — <b>state[\'enemies\'][i][\'attack\']</b> reads as hidden this time. Before '
+      + 'you fly, an intelligence report reveals each contact\'s TRUE attack power. Read it, then prioritize '
+      + 'the cheap-but-dangerous one — same idea as Double Trouble, but now YOU have to find the danger first. '
+      + '<b>Watch out:</b> intel doesn\'t update as enemies die — check <b>state[\'enemies\']</b> too, so you '
+      + 'never target something already destroyed.',
+    api: ['attack(id)', 'wait()'],
+    intelTitle: 'Recon Report', intelFields: ['contact', 'trueAttack'],
+    intel: [{ id: 'e1', contact: 'Viper', trueAttack: 25 }, { id: 'e2', contact: 'Hulk', trueAttack: 5 }],
+    starter: {
+      py: "# state['enemies'][i]['attack'] is hidden — read state['intel'] instead!\n"
+        + "# intel doesn't update as enemies die — only pick from state['enemies'] (still alive).\n"
+        + "def true_attack(id):\n    for row in state['intel']:\n        if row['id'] == id:\n            return row['trueAttack']\n    return 0\n\n"
+        + "best = state['enemies'][0]['id']\n# TODO: loop state['enemies'], use true_attack() to find the highest, attack it\n"
+        + 'attack(best)\n',
+      ps: '// enemyAttack[] is hidden (0) — read intelContact[]/intelTrueAttack[] instead.\n'
+        + '// intel does NOT update as enemies die — only pick from enemyId[] (still alive)!\n\n'
+        + 'FUNCTION TrueAttackOf(id) RETURNS INTEGER\n    FOR i ← 1 TO intelCount\n        IF intelId[i] = id THEN\n'
+        + '            RETURN intelTrueAttack[i]\n        ENDIF\n    NEXT i\n    RETURN 0\nENDFUNCTION\n\n'
+        + 'best ← enemyId[1]\n// TODO: loop enemyId[], use TrueAttackOf() to find the highest, attack it\n\nattack(best)\n',
+    },
+    battle: {
+      playerHp: 60, playerAttack: 20, hideAttack: true,
+      enemies: [{ id: 'e1', name: 'Viper', hp: 20, attack: 25, dist: 3 }, { id: 'e2', name: 'Hulk', hp: 60, attack: 5, dist: 6 }],
+      maxTurns: 10,
+    },
+    stars: { metric: 'turns', par: 4 },
+  },
+  {
+    id: 'p3m7', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '👻', title: 'Ghost Squadron', xp: 70,
+    brief: 'Three contacts, all attack values hidden. Recon reveals the truth — write a <b>MostDangerous()</b> '
+      + 'function that ranks the still-ALIVE enemies by their intel attack value. Intel doesn\'t update as '
+      + 'enemies die, so cross-check against <b>state[\'enemies\']</b> — don\'t target a destroyed contact.',
+    api: ['attack(id)', 'wait()'],
+    require: 'function',
+    intelTitle: 'Recon Report', intelFields: ['contact', 'trueAttack'],
+    intel: [{ id: 'e1', contact: 'Viper', trueAttack: 20 }, { id: 'e2', contact: 'Brute', trueAttack: 10 }, { id: 'e3', contact: 'Tank', trueAttack: 5 }],
+    starter: {
+      py: "def true_attack(id):\n    for row in state['intel']:\n        if row['id'] == id:\n            return row['trueAttack']\n    return 0\n\n"
+        + "def most_dangerous():\n    enemies = state['enemies']\n"
+        + '    # TODO: loop enemies (still alive!), use true_attack() to find the HIGHEST, return its id\n'
+        + "    return enemies[0]['id']\n\nattack(most_dangerous())\n",
+      ps: 'FUNCTION TrueAttackOf(id) RETURNS INTEGER\n    FOR i ← 1 TO intelCount\n        IF intelId[i] = id THEN\n'
+        + '            RETURN intelTrueAttack[i]\n        ENDIF\n    NEXT i\n    RETURN 0\nENDFUNCTION\n\n'
+        + 'FUNCTION MostDangerous() RETURNS STRING\n    best ← enemyId[1]\n    bestAtk ← TrueAttackOf(enemyId[1])\n'
+        + '    FOR i ← 2 TO enemyCount\n        // TODO: compare TrueAttackOf(enemyId[i]) against bestAtk, update best\n'
+        + '    NEXT i\n    RETURN best\nENDFUNCTION\n\nattack(MostDangerous())\n',
+    },
+    battle: {
+      playerHp: 80, playerAttack: 20, hideAttack: true,
+      enemies: [{ id: 'e1', name: 'Viper', hp: 20, attack: 20, dist: 3 }, { id: 'e2', name: 'Brute', hp: 40, attack: 10, dist: 5 },
+                { id: 'e3', name: 'Tank', hp: 40, attack: 5, dist: 7 }],
+      maxTurns: 10,
+    },
+    stars: { metric: 'turns', par: 5 },
+  },
+  {
+    id: 'p3m8', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '🎯', title: 'The Weak Point', xp: 75,
+    brief: 'Two contacts, hidden attack values, AND a shield that blocks back-to-back attacks. Read the '
+      + 'recon report to find the priority target, then alternate <b>attack()</b>/<b>wait()</b> to beat the shield.',
+    api: ['attack(id)', 'wait()'],
+    intelTitle: 'Recon Report', intelFields: ['contact', 'trueAttack'],
+    intel: [{ id: 'e1', contact: 'Viper', trueAttack: 25 }, { id: 'e2', contact: 'Hulk', trueAttack: 5 }],
+    starter: {
+      py: "# Hidden attack values + a shield this time. Check state['intel'], and alternate\n"
+        + '# attack()/wait() so the shield never blocks you.\n\n',
+      ps: '// Hidden attack values + a shield this time. Check intelContact[]/intelTrueAttack[],\n'
+        + '// and alternate attack()/wait() so the shield never blocks you.\n\n',
+    },
+    battle: {
+      playerHp: 60, playerAttack: 20, shield: true, hideAttack: true,
+      enemies: [{ id: 'e1', name: 'Viper', hp: 20, attack: 25, dist: 3 }, { id: 'e2', name: 'Hulk', hp: 60, attack: 5, dist: 6 }],
+      maxTurns: 12,
+    },
+    stars: { metric: 'turns', par: 7 },
+  },
+
+  // ── Phase 3 capstone — gates entry to Phase 4 ────────────────────────────────
+  {
+    id: 'p3m9', type: 'battle', phase: 'PHASE 3 · CAPSTONE', emoji: '🛰️', title: 'Full Spectrum Scan', xp: 110, boss: true,
+    brief: '<b>Capstone.</b> Everything: hidden stats, a shield, a timed charge attack, two enemies. The '
+      + 'recon report is the only way to know Core\'s real attack power — misread it and you\'ll prioritize '
+      + 'wrong and lose. Write a real targeting function, alternate for the shield, and win in 9.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    require: 'function',
+    intelTitle: 'Recon Report', intelFields: ['contact', 'trueAttack', 'notes'],
+    intel: [{ id: 'e1', contact: 'Vanguard', trueAttack: 6, notes: 'charges to 26 dmg every 3rd turn!' },
+            { id: 'e2', contact: 'Core', trueAttack: 8, notes: 'steady, no surprises' }],
+    starter: {
+      py: 'def pick_target():\n    # TODO: which contact should die first? Check state[\'intel\'] for the real danger\n'
+        + "    return state['enemies'][0]['id']\n\n# TODO: alternate attack()/wait() so the shield never blocks you\n"
+        + 'attack(pick_target())\n',
+      ps: 'FUNCTION PickTarget() RETURNS STRING\n    // TODO: which contact should die first? Check intelContact[]/intelNotes[]\n'
+        + '    RETURN enemyId[1]\nENDFUNCTION\n\n// TODO: alternate attack()/wait() so the shield never blocks you\n'
+        + 'attack(PickTarget())\n',
+    },
+    battle: {
+      playerHp: 90, playerAttack: 16, shield: true, hideAttack: true,
+      enemies: [{ id: 'e1', name: 'Vanguard', hp: 32, attack: ctx => (ctx.turn % 3 === 0 ? 26 : 6), dist: 3 },
+                { id: 'e2', name: 'Core', hp: 48, attack: 8, dist: 6 }],
+      maxTurns: 14,
+    },
+    stars: { metric: 'turns', par: 9 },
+  },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -826,9 +1037,23 @@ function countLines(code) {
 
 function starsFor(mission, stats) {
   const metric = mission.stars.metric || 'cmds'
+  if (metric === 'pass') return 3   // data missions: a correct answer is a correct answer
   const v = metric === 'lines' ? stats.lines : metric === 'turns' ? stats.turns : stats.cmds
   const par = mission.stars.par
   return v <= par ? 3 : v <= par + 2 ? 2 : 1
+}
+
+// A data mission's answer, checked with numeric tolerance or a case-insensitive
+// string match — the mission fails cleanly if answer() was never called.
+function evalDataSuccess(mission, val) {
+  if (val === undefined || val === null) return { ok: false, why: 'noanswer' }
+  const exp = mission.answer
+  if (typeof exp === 'number') {
+    const got = Number(val)
+    return (!isNaN(got) && Math.abs(got - exp) < 1e-6) ? { ok: true } : { ok: false, why: 'wrong', got: val }
+  }
+  return String(val).trim().toLowerCase() === String(exp).trim().toLowerCase()
+    ? { ok: true } : { ok: false, why: 'wrong', got: val }
 }
 
 // Mission requirements — a route that "works" without the concept doesn't pass
@@ -866,14 +1091,18 @@ function checkRequire(mission, code) {
 // ══════════════════════════════════════════════════════════════════════════════
 function execPseudo(src, mission, battleEnv) {
   const isBattle = mission.type === 'battle'
+  const isData = mission.type === 'data'
   const cmds = []
   const outputs = []
   const fns = {}
   let action = { type: 'wait' }
+  let answerVal
   if (isBattle) {
     fns.attack = id => { action = { type: 'attack', target: id } }
     fns.wait   = () => { action = { type: 'wait' } }
     fns.defend = () => { action = { type: 'defend' } }
+  } else if (isData) {
+    fns.answer = v => { answerVal = v }
   } else {
     const allowedList = mission.allowed || ['forward', 'backward', 'left', 'right']
     if (allowedList.includes('forward'))  fns.forward  = d => cmds.push(['F', +d])
@@ -884,6 +1113,8 @@ function execPseudo(src, mission, battleEnv) {
   }
   fns.length = a => (Array.isArray(a) || typeof a === 'string')
     ? a.length : (() => { throw { message: 'LENGTH() needs an array or string' } })()
+  fns.round  = a => Math.round(a)
+  fns.sum    = a => (Array.isArray(a) ? a : (() => { throw { message: 'SUM() needs an array' } })()).reduce((x, y) => x + y, 0)
 
   const lines = []
   src.split('\n').forEach((raw, i) => {
@@ -1148,14 +1379,16 @@ function execPseudo(src, mission, battleEnv) {
     if (err instanceof RetSignal) return { ok: false, error: 'RETURN can only be used inside a FUNCTION or PROCEDURE', line: null }
     return { ok: false, error: err.message || String(err), line: err.ln || null }
   }
-  return isBattle ? { ok: true, action, outputs } : { ok: true, cmds, outputs }
+  if (isBattle) return { ok: true, action, outputs }
+  if (isData) return { ok: true, answer: answerVal, outputs }
+  return { ok: true, cmds, outputs }
 }
 
 // Flattens one battle turn's state into the pseudocode env's flat/array
 // variables (the interpreter has no nested records, only scalars + 1D arrays).
 function battleEnvFor(mission, state) {
   const alive = state.enemies.filter(e => e.hp > 0)
-  return {
+  const env = {
     turn: state.turn,
     selfhp: state.playerHp, selfmaxhp: mission.battle.playerHp,
     enemycount: alive.length,
@@ -1163,8 +1396,28 @@ function battleEnvFor(mission, state) {
     enemymaxhp: alive.map(e => e.maxHp), enemydist: alive.map(e => e.dist),
     // Numeric attack only — adaptive enemies' attack is a formula, not a
     // fixed stat, so it's 0 here and meant to be read from the pattern instead.
-    enemyattack: alive.map(e => (typeof e.attack === 'number' ? e.attack : 0)),
+    // hideAttack missions blank this out too — read intel[] instead.
+    enemyattack: alive.map(e => (mission.battle.hideAttack || typeof e.attack !== 'number') ? 0 : e.attack),
   }
+  // Static pre-battle intel report — same every turn, doesn't track live hp.
+  // 'id' always flattens too, even if not listed in intelFields, so it can be
+  // cross-referenced against enemyId[] to know WHICH live enemy a row is about.
+  if (mission.intel && mission.intelFields) {
+    env.intelcount = mission.intel.length
+    env.intelid = mission.intel.map(r => r.id)
+    for (const f of mission.intelFields) env['intel' + f.toLowerCase()] = mission.intel.map(r => r[f])
+  }
+  return env
+}
+
+// Flattens a data mission's records into parallel arrays — 'weight' becomes
+// dataWeight[1..n], alongside dataCount. Mirrors battleEnvFor's approach,
+// since the pseudocode interpreter only has scalars and 1D arrays.
+function dataEnvFor(mission) {
+  const rows = mission.data
+  const env = { datacount: rows.length }
+  for (const f of mission.dataFields) env['data' + f.toLowerCase()] = rows.map(r => r[f])
+  return env
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1228,20 +1481,45 @@ async function execPython(code, mission) {
   }
 }
 
+// Data missions run ONCE (no turn loop) with `data` as a list of dicts and an
+// `answer(v)` call to report the result — same two-separate-calls line-number
+// trick as the battle executor.
+async function execPythonData(code, mission) {
+  const py = await ensurePyodide()
+  py.runPython("_answer = None\ndef answer(v):\n    global _answer\n    _answer = v\n")
+  py.globals.set('data', py.toPy(mission.data))
+  try {
+    py.runPython(code)
+    const val = py.globals.get('_answer')
+    return { ok: true, answer: val }
+  } catch (e) {
+    const msg = String(e.message || e)
+    let line = null
+    const matches = [...msg.matchAll(/File "<exec>", line (\d+)/g)]
+    if (matches.length) line = parseInt(matches[matches.length - 1][1])
+    const lastLine = msg.trim().split('\n').pop()
+    return { ok: false, error: lastLine, line: line && line > 0 ? line : null }
+  }
+}
+
 // Nested dict for Python — battle's `state` is a proper structured object,
 // unlike pseudocode's flat arrays (the interpreter has no records).
 function buildBattleState(mission, state) {
   const alive = state.enemies.filter(e => e.hp > 0)
-  return {
+  const out = {
     turn: state.turn,
     self: { hp: state.playerHp, maxHp: mission.battle.playerHp },
     // 'attack' is only present for enemies with a fixed stat — adaptive
     // enemies' damage is a formula, meant to be read from the pattern instead.
+    // hideAttack missions blank this out too — read state['intel'] instead.
     enemies: alive.map(e => ({
       id: e.id, name: e.name, hp: e.hp, maxHp: e.maxHp, dist: e.dist,
-      attack: typeof e.attack === 'number' ? e.attack : null,
+      attack: (mission.battle.hideAttack || typeof e.attack !== 'number') ? null : e.attack,
     })),
   }
+  // Static pre-battle intel report — same every turn, doesn't track live hp.
+  if (mission.intel) out.intel = mission.intel
+  return out
 }
 
 // One turn = two SEPARATE runPython calls (setup, then student code), so a
@@ -1510,6 +1788,18 @@ function openMission(id) {
   document.getElementById('m-brief').innerHTML = activeMission.brief
   document.getElementById('m-api').innerHTML =
     activeMission.api.map(a => '<span class="api-chip">' + a + '</span>').join('')
+  const intelEl = document.getElementById('m-intel')
+  if (activeMission.type === 'battle' && activeMission.intel) {
+    intelEl.style.display = ''
+    intelEl.innerHTML = '<h3 style="font-size:11px;font-weight:900;letter-spacing:1px;color:#67e8f9;margin:12px 0 6px;">'
+      + '🔍 ' + (activeMission.intelTitle || 'Intel Report') + '</h3><table class="data-table"><thead><tr>'
+      + activeMission.intelFields.map(f => '<th>' + f + '</th>').join('') + '</tr></thead><tbody>'
+      + activeMission.intel.map(row => '<tr>' + activeMission.intelFields.map(f => '<td>' + row[f] + '</td>').join('') + '</tr>').join('')
+      + '</tbody></table>'
+  } else {
+    intelEl.style.display = 'none'
+    intelEl.innerHTML = ''
+  }
   if (!editor) {
     editor = CodeMirror.fromTextArea(document.getElementById('code'), {
       mode: 'python', theme: 'dracula', lineNumbers: true, indentUnit: 4,
@@ -1531,6 +1821,16 @@ function openMission(id) {
 // Draws each mission type's starting frame — routed by activeMission.type
 function renderInitial() {
   hideReplayControls()
+  const canvas = document.getElementById('scene')
+  const dataWrap = document.getElementById('data-wrap')
+  if (activeMission.type === 'data') {
+    canvas.style.display = 'none'
+    dataWrap.style.display = ''
+    drawDataTable(activeMission)
+    return
+  }
+  canvas.style.display = ''
+  dataWrap.style.display = 'none'
   if (activeMission.type === 'battle') {
     const snap = { playerHp: activeMission.battle.playerHp,
                    enemies: activeMission.battle.enemies.map(e => ({ ...e, maxHp: e.hp })) }
@@ -1538,6 +1838,17 @@ function renderInitial() {
   } else {
     drawScene(activeMission, activeMission.scene.start, null)
   }
+}
+
+function drawDataTable(mission) {
+  const fields = mission.dataFields
+  let html = '<h3>📋 ' + (mission.dataTitle || 'Data Report') + '</h3><table class="data-table"><thead><tr>'
+    + fields.map(f => '<th>' + f + '</th>').join('') + '</tr></thead><tbody>'
+  for (const row of mission.data) {
+    html += '<tr>' + fields.map(f => '<td>' + row[f] + '</td>').join('') + '</tr>'
+  }
+  html += '</tbody></table>'
+  document.getElementById('data-wrap').innerHTML = html
 }
 
 function setSubmit(on) {
@@ -1558,6 +1869,7 @@ function resetMission() {
 async function runMission(isSubmit) {
   if (animating || !activeMission) return
   if (activeMission.type === 'battle') return runBattleMission(isSubmit)
+  if (activeMission.type === 'data') return runDataMission(isSubmit)
   const btn = document.getElementById('btn-run')
   btn.disabled = true
   clearErrLine()
@@ -1687,6 +1999,57 @@ async function runBattleMission(isSubmit) {
   btn.disabled = false
 }
 
+async function runDataMission(isSubmit) {
+  const btn = document.getElementById('btn-run')
+  btn.disabled = true
+  clearErrLine()
+  saveDraft()
+  const code = editor.getValue()
+  const mission = activeMission
+  if (lang === 'py' && !_pyodide) logC('⏳ Loading Python engine (first run only — a few seconds)…', 'warn')
+
+  let res
+  try { res = lang === 'py' ? await execPythonData(code, mission) : execPseudo(code, mission, dataEnvFor(mission)) }
+  catch (e) { logC('✗ ' + e.message, 'err'); btn.disabled = false; return }
+
+  if (!res.ok) {
+    if (res.line != null) {
+      _errLine = res.line - 1
+      editor.addLineClass(_errLine, 'background', 'cm-error-line')
+      logC('✗ Line ' + res.line + ': ' + res.error, 'err')
+    } else {
+      logC('✗ ' + res.error, 'err')
+    }
+    btn.disabled = false
+    return
+  }
+
+  const verdict = evalDataSuccess(mission, res.answer)
+  const reqErr = verdict.ok ? checkRequire(mission, code) : null
+
+  if (isSubmit) {
+    if (verdict.ok && !reqErr) completeMission({})
+    else logC('✗ Submit blocked — fix the run first (press ▶ Run to see why).', 'err')
+    btn.disabled = false
+    return
+  }
+
+  if (res.outputs && res.outputs.length) logC('» ' + res.outputs.join('\n» '))
+
+  if (verdict.ok && reqErr) {
+    logC('🟡 Correct answer… but ' + reqErr, 'warn')
+    setSubmit(false)
+  } else if (verdict.ok) {
+    logC('✅ Correct! answer(' + JSON.stringify(res.answer) + ') matches. Press ✓ Submit to claim your stars.', 'ok')
+    setSubmit(true)
+  } else if (verdict.why === 'noanswer') {
+    logC('🤔 Your program ran but never called answer() — that\'s how you report your result.', 'warn')
+  } else {
+    logC('✗ Not quite — answer(' + JSON.stringify(res.answer) + ') doesn\'t match. Check your logic and try again.', 'err')
+  }
+  btn.disabled = false
+}
+
 function completeMission(stats) {
   const st = starsFor(activeMission, stats)
   const p = getProg()
@@ -1708,7 +2071,8 @@ function completeMission(stats) {
   document.getElementById('win-stars').innerHTML =
     '⭐'.repeat(st) + '<span class="dim">' + '⭐'.repeat(3 - st) + '</span>'
   document.getElementById('win-sub').textContent =
-    metric === 'turns'
+    metric === 'pass' ? 'Correct answer, straight from the data. Nicely read.'
+    : metric === 'turns'
       ? (st === 3 ? 'Flawless victory — minimum turns. Efficient combat!'
                   : 'Won in ' + stats.turns + ' turns. Fewer turns = more stars — refine your tactics!')
     : metric === 'lines'
@@ -1745,9 +2109,12 @@ const TIERS = [
   { name: '👥 TIER — MULTIPLE ENEMIES', ids: ['p2m7', 'p2m8'] },
   { name: '🔰 TIER — ADAPTIVE AI', ids: ['p2m9', 'p2m10'] },
   { name: '👹 PHASE 2 BOSS', ids: ['p2m11'] },
+  { name: '📦 PHASE 3 · READ & REPORT — new mission type: data, no battle', ids: ['p3m1', 'p3m2'] },
+  { name: '🗺️ PHASE 3 · ONE DECISION', ids: ['p3m3', 'p3m4', 'p3m5'] },
+  { name: '🔭 PHASE 3 · FULL STRATEGY — data feeds a live battle', ids: ['p3m6', 'p3m7', 'p3m8'] },
+  { name: '🛰️ PHASE 3 CAPSTONE', ids: ['p3m9'] },
 ]
 const COMING = [
-  { emoji: '📊', title: 'Phase 3 — Data Missions', sub: 'Terrain data, enemy stats, hidden weaknesses — read the data or lose.' },
   { emoji: '🏟️', title: 'Phase 4-5 — The Tournament', sub: 'Your bot vs the whole class. Bracket. Glory.' },
 ]
 function showList() {
