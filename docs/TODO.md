@@ -63,6 +63,19 @@
       IGCSE teachers saw a nonsensical AS-Level chapter list. Now gated to
       `classType.id === 'as-level' || 'a-level'` (tab visibility, panel
       render, and the Resources-tab nudge banner).
+- [x] Fixed "Chapter Exams"/"Cambridge Papers" quick-links on the student
+      dashboard appearing for every grade: Chapter Exams only ever has
+      content for AS/A Level (ties to the Book Lessons upload, now gated to
+      those two types), and "Cambridge Papers" was a misleading label for
+      Grade 6-9 even though the underlying Past Papers feature is generic.
+      Now gated/relabeled by grade.
+- [x] Fixed a class-creation bug where the Year/Grade dropdown in
+      CreateClassModal was fully independent of the selected class-type
+      button: a teacher could end up with level='grade9' but grade='10' (or
+      any mismatch). The student dashboard picks lesson content purely off
+      the numeric `grade` column, so this silently showed "IGCSE Year 1 —
+      Theory" to students in what the teacher's own view still correctly
+      called a Grade 9 class. Dropdown now only offers valid grades per type.
 - [ ] Cosmetic-only: each class type's teacher-facing "Syllabus" preview
       (lib/class-types.ts `syllabus` field, shown in Resources tab) is
       hand-written marketing copy and doesn't mirror the actual built map
