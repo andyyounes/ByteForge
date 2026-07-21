@@ -14,7 +14,10 @@
       "read the code" arc) and quest-map.js. Worlds 4-10 stubbed locked on the
       map. Next: G4 My Blocks (needs custom-block/function support in the
       toolbox), then G5-G10 content + boss builds.
-- [ ] Grade 8 curriculum decision pending — quest map ready to wire once needed.
+- [x] Grade 8 wiring started: Builder City map live for Modules 1-4 (From Blocks
+      to Text, Choices & Loops - both new; Functions, Lists - rehomed pre-existing
+      Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked. Next:
+      M5 Strings & Validation (the Caesar cipher in real code).
 - [ ] Expand A Level Code Lab sets (5 → 10 per category) + more full past papers.
 - [ ] Past-paper PDF importer (teacher uploads a real Paper 4 → lab category, verbatim).
 
