@@ -153,6 +153,7 @@
 <script src="../js/db.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/lesson-saves.js"></script>
+<script src="../js/quest-map.js"></script>
 </head>
 <body>
 
@@ -547,54 +548,27 @@ function totalStats() {
   return { stars, xp, bosses }
 }
 
-// ── Map rendering ─────────────────────────────────────────────────────────────
-function renderMap() {
-  const map = document.getElementById('map')
-  const stats = totalStats()
-  document.getElementById('q-stars').textContent = stats.stars
-  document.getElementById('q-xp').textContent = stats.xp
-  document.getElementById('q-bosses').textContent = stats.bosses
-
-  let html = ''
-  let prevWorldDone = true
-  for (const w of WORLDS) {
-    if (!w.live) {
-      html += '<div class="world locked">'
-        + '<div class="world-head"><div><div class="world-name">' + w.name + '</div>'
-        + '<div class="world-sub">' + w.sub + '</div></div>'
-        + '<div class="world-prog">🔒 ' + w.count + ' stages</div></div>'
-        + '<div class="world-lockmsg">Coming soon — finish the worlds before it to be ready!</div>'
-        + '</div>'
-      continue
-    }
-    const done = w.stages.filter(s => stageStars(s.id) > 0).length
-    const allDone = done === w.stages.length
-    html += '<div class="world">'
-      + '<div class="world-head"><div><div class="world-name">' + w.name + '</div>'
-      + '<div class="world-sub">' + w.sub + '</div></div>'
-      + '<div class="world-prog">' + (allDone ? '🏆 COMPLETE' : done + '/' + w.stages.length) + '</div></div>'
-      + '<div class="stages">'
-    let foundCurrent = false
-    w.stages.forEach((s, i) => {
-      const st = stageStars(s.id)
-      // Already-beaten stages never re-lock (new stages can appear mid-world)
-      const unlocked = st > 0 || (prevWorldDone && (i === 0 || stageStars(w.stages[i - 1].id) > 0))
-      const isCurrent = unlocked && st === 0 && !foundCurrent
-      if (isCurrent) foundCurrent = true
-      const cls = 'stage-node' + (s.boss ? ' boss' : '') + (st > 0 ? ' done' : '') + (isCurrent ? ' current' : '') + (unlocked ? '' : ' locked')
-      html += (i > 0 ? '<span class="stage-arrow">›</span>' : '')
-        + '<div class="' + cls + '" ' + (unlocked ? 'onclick="openStage(\'' + s.id + '\')"' : '') + '>'
-        + (isCurrent ? '<span class="stage-avatar">' + BOT_SVG + '</span>' : '')
-        + '<span class="stage-emoji">' + (unlocked ? s.emoji : '🔒') + '</span>'
-        + '<span class="stage-num">' + (s.boss ? 'BOSS' : 'Stage ' + (i + 1)) + '</span>'
-        + (st > 0 ? '<span class="stage-stars">' + '⭐'.repeat(st) + '</span>' : '')
-        + '</div>'
-    })
-    html += '</div></div>'
-    // Beating the BOSS opens the next world; the full-clear badge still needs every stage
-    prevWorldDone = w.stages.some(s => s.boss && stageStars(s.id) > 0)
-  }
-  map.innerHTML = html
+// ── Map rendering — shared QuestMap engine, same winding-path shape every
+// other grade/IGCSE/AS-A page uses now. Soft lock: already-beaten stages never
+// re-lock even if a new one appears mid-world; nothing is ever hard-blocked.
+function showJourney() {
+  const worlds = WORLDS.map(w => {
+    if (!w.live) return { name: w.name, sub: w.sub, live: false, count: w.count }
+    const stages = w.stages.map(s => ({
+      id: s.id, emoji: s.emoji, label: s.title,
+      done: stageStars(s.id) > 0, boss: !!s.boss, stars: stageStars(s.id),
+    }))
+    return { name: w.name, sub: w.sub, live: true, stages }
+  })
+  QuestMap.show({
+    title: '🏝 The Creator Quest',
+    subtitle: 'Walk the path. Beat the bosses. Become the Year 6 Creator.',
+    accent: '#e879f9',
+    layout: 'path', softLock: true,
+    avatarSvg: BOT_SVG,
+    worlds,
+    onOpen: (id) => openStage(id),
+  })
 }
 
 const BOT_SVG = '<svg width="22" height="29" viewBox="0 0 72 96">'
@@ -893,7 +867,7 @@ function winMap() {
 }
 function closeStage() {
   document.getElementById('player').classList.remove('open')
-  renderMap()
+  showJourney()
 }
 
 function toast(msg) {
@@ -908,7 +882,7 @@ BF.seed()
 const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
 ;(async () => {
   if (me) { try { await LessonSaves.load('grade6-quest') } catch (e) {} }
-  renderMap()
+  showJourney()
 })()
 </script>
 </body>

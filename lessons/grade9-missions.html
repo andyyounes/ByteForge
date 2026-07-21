@@ -163,6 +163,7 @@
 <script src="../js/db.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/lesson-saves.js"></script>
+<script src="../js/quest-map.js"></script>
 </head>
 <body>
 
@@ -210,15 +211,6 @@
     </div>
     <div class="ed-body"><textarea id="code"></textarea></div>
   </div>
-</div>
-
-<!-- Mission list -->
-<div class="mlist open" id="mlist">
-  <div class="mlist-hero">
-    <h1>🌊 Deep Diver — Mission IDE</h1>
-    <p>Your code is the pilot. Write it, run it, watch it fly.</p>
-  </div>
-  <div class="mgrid" id="mgrid"></div>
 </div>
 
 <!-- Tournament Hub -->
@@ -2046,7 +2038,6 @@ function logAppend(msg, cls) {
 function openMission(id) {
   activeMission = MISSIONS.find(m => m.id === id)
   if (!activeMission) return
-  document.getElementById('mlist').classList.remove('open')
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
   document.getElementById('m-phase').textContent = activeMission.phase
   document.getElementById('m-par').textContent = parLabel(activeMission)
@@ -2354,11 +2345,11 @@ function winNext() {
   document.getElementById('win').classList.remove('open')
   const idx = MISSIONS.indexOf(activeMission)
   if (MISSIONS[idx + 1]) openMission(MISSIONS[idx + 1].id)
-  else showList()
+  else showJourney()
 }
 function winList() {
   document.getElementById('win').classList.remove('open')
-  showList()
+  showJourney()
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2380,43 +2371,32 @@ const TIERS = [
   { name: '🔭 PHASE 3 · FULL STRATEGY — data feeds a live battle', ids: ['p3m6', 'p3m7', 'p3m8'] },
   { name: '🛰️ PHASE 3 CAPSTONE', ids: ['p3m9'] },
 ]
-const COMING = []
-function showList() {
+// Shared QuestMap engine, same winding-path shape every other grade/IGCSE/
+// AS-A page uses — each TIER becomes a chapter banner on the path (exactly
+// like AS/A Level's CHAPTER_TOPICS). Soft lock: dimmed but still clickable,
+// same trade-off AS/A Level makes for revision-friendly navigation.
+function showJourney() {
   const p = getProg()
-  let html = ''
-  let prevDone = true                          // sequential unlock down the list
-  for (const tier of TIERS) {
-    html += '<div class="mtier">' + tier.name + '</div>'
-    for (const id of tier.ids) {
+  const worlds = TIERS.map(tier => ({
+    name: tier.name, sub: '', live: true,
+    stages: tier.ids.map(id => {
       const m = MISSIONS.find(x => x.id === id)
       const st = (p[id] || {}).stars || 0
-      const unlocked = st > 0 || prevDone
-      html += '<div class="mcard' + (unlocked ? '' : ' locked') + '"'
-        + (unlocked ? ' onclick="openMission(\'' + id + '\')"' : '') + '>'
-        + '<span class="mcard-emoji">' + (unlocked ? m.emoji : '🔒') + '</span>'
-        + '<div><div class="mcard-title">' + m.title + '</div>'
-        + '<div class="mcard-sub">' + m.phase + ' · ' + parLabel(m)
-        + (m.require ? ' · requires ' + (m.require === 'loop' ? 'a loop' : 'an if') : '') + '</div></div>'
-        + '<span class="mcard-stars">' + (st ? '⭐'.repeat(st) : (unlocked ? '—' : '')) + '</span></div>'
-      prevDone = st > 0
-    }
-  }
-  // Tournament unlocks once the Phase 3 capstone is beaten
-  const p3done = (p['p3m9'] || {}).stars > 0
-  html += '<div class="mtier">🏟 PHASE 4-5 — TOURNAMENT</div>'
-  html += '<div class="mcard' + (p3done ? '' : ' locked') + '"' + (p3done ? ' onclick="openTourney()"' : '') + '>'
-    + '<span class="mcard-emoji">' + (p3done ? '🏟️' : '🔒') + '</span>'
-    + '<div><div class="mcard-title">The Tournament</div>'
-    + '<div class="mcard-sub">Write one bot, lock it in, run the bracket</div></div>'
-    + '<span class="mcard-stars">' + (p3done ? '—' : '') + '</span></div>'
-  COMING.forEach(c => {
-    html += '<div class="mcard locked"><span class="mcard-emoji">' + c.emoji + '</span>'
-      + '<div><div class="mcard-title">' + c.title + '</div>'
-      + '<div class="mcard-sub">' + c.sub + '</div></div>'
-      + '<span class="mcard-stars">🔒</span></div>'
+      return { id: m.id, emoji: m.emoji, label: m.title, done: st > 0, boss: !!m.boss, stars: st }
+    }),
+  }))
+  worlds.push({
+    name: '🏟 PHASE 4-5 — TOURNAMENT', sub: 'Write one bot, lock it in, run the bracket', live: true,
+    stages: [{ id: 'tourney', emoji: '🏟️', label: 'The Tournament', done: false, boss: true }],
   })
-  document.getElementById('mgrid').innerHTML = html
-  document.getElementById('mlist').classList.add('open')
+  QuestMap.show({
+    title: '🌊 Deep Diver — Mission IDE',
+    subtitle: 'Your code is the pilot. Write it, run it, watch it fly.',
+    accent: '#67e8f9',
+    layout: 'path', softLock: true,
+    worlds,
+    onOpen: (id) => { if (id === 'tourney') openTourney(); else openMission(id) },
+  })
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2445,7 +2425,7 @@ function openTourney() {
 function closeTourney() {
   document.getElementById('tourney').classList.remove('open')
   document.body.classList.remove('duel-mode')   // defensive — should already be off
-  showList()
+  showJourney()
 }
 
 function tySwitchLang(l) {
@@ -2642,7 +2622,7 @@ function closeDuel() {
 }
 function mbarBack() {
   if (document.body.classList.contains('duel-mode')) closeDuel()
-  else showList()
+  else showJourney()
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -2650,7 +2630,7 @@ BF.seed()
 const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
 ;(async () => {
   if (me) { try { await LessonSaves.load('grade9-missions') } catch (e) {} }
-  showList()
+  showJourney()
 })()
 </script>
 </body>

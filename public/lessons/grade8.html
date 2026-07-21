@@ -785,7 +785,8 @@ function showJourney() {
     title: '🏙 Builder City',
     subtitle: 'Real Python, a real editor, real data. From your first print() to a shipped app.',
     accent: '#60a5fa',
-    freeRoam: false,
+    layout: 'path', softLock: true,
+    avatarSvg: '<span style="font-size:22px;">🐍</span>',
     worlds,
     onOpen: (id) => selectChallenge(STAGE_INDEX[id]),
   })
@@ -890,8 +891,7 @@ initPyodide()
   await LessonSaves.load('grade8')
   LessonSaves.completedSet().forEach(idx => completed.add(idx))
   renderPills()
-  selectChallenge(0)
-  showJourney()
+  showJourney()   // land on the map — nothing else renders until a stage is picked
 })()
 </script>
 </body>

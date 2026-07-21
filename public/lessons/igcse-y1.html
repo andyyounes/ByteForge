@@ -459,6 +459,8 @@ function showQuestMap() {
     title: '🏔 Theory Peaks — IGCSE Year 1',
     subtitle: 'Climb five peaks of Cambridge 0478 theory. Every summit counts.',
     accent: '#2dd4bf',
+    layout: 'path', softLock: true,
+    avatarSvg: '<span style="font-size:22px;">🏔</span>',
     worlds: [
       { name: '💾 Peak 1 — Data Representation', sub: 'Binary, hex, file sizes, sound', live: true, stages: stagesFor('M1') },
       { name: '🖥 Peak 2 — Hardware & Software', sub: 'CPU, memory, the FDE cycle', live: true, stages: stagesFor('M2') },
@@ -475,8 +477,7 @@ function showQuestMap() {
   await LessonSaves.load('igcse-y1')
   LessonSaves.completedSet().forEach(idx => completed.add(idx))
   renderPills()
-  selectChallenge(0)
-  showQuestMap()   // land on the map
+  showQuestMap()   // land on the map — nothing else renders until a stage is picked
 })()
 </script>
 </body>

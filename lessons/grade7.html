@@ -957,7 +957,8 @@ function showJourney() {
     title: '🌌 Game Maker Galaxy',
     subtitle: 'One world, one boss build. Ship real games — block by block.',
     accent: '#818cf8',
-    freeRoam: false,
+    layout: 'path', softLock: true,
+    avatarSvg: '<span style="font-size:22px;">🚀</span>',
     worlds,
     onOpen: (id) => selectChallenge(STAGE_INDEX[id]),
   })
@@ -1221,8 +1222,7 @@ workspace.addChangeListener(e => {
     } catch(_) {}
   }
   renderPills()
-  selectChallenge(0)
-  showJourney()
+  showJourney()   // land on the map — nothing else renders until a stage is picked
 })()
 </script>
 </body>

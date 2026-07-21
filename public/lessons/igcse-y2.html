@@ -1088,6 +1088,8 @@ function showQuestMap() {
     title: '🧭 Code Expedition — IGCSE Year 2',
     subtitle: 'Six programming camps on the road to Paper 2. Pseudocode is your gear.',
     accent: '#a78bfa',
+    layout: 'path', softLock: true,
+    avatarSvg: '<span style="font-size:22px;">🧭</span>',
     worlds: [
       { name: '🗃 Camp 1 — Arrays & Records', sub: '2D arrays and record types', live: true, stages: stagesFor('M1') },
       { name: '⚖ Camp 2 — BYVAL & BYREF', sub: 'How parameters really travel', live: true, stages: stagesFor('M2') },
@@ -1104,10 +1106,8 @@ function showQuestMap() {
 ;(async()=>{
   await LessonSaves.load('igcse-y2')
   LessonSaves.completedSet().forEach(idx=>completed.add(idx))
-  renderPills();selectChallenge(0)
-  showQuestMap()   // land on the map
-  const savedCode=LessonSaves.savedCode()
-  if(savedCode)editor.setValue(savedCode)
+  renderPills()
+  showQuestMap()   // land on the map — nothing else renders until a stage is picked
 })()
 </script>
 </body>
