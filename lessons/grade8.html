@@ -111,6 +111,7 @@
   <script src="../js/db.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
+  <script src="../js/quest-map.js"></script>
 </head>
 <body>
 
@@ -122,7 +123,10 @@
     </svg>
     <span class="logo-text">ByteForge</span>
   </div>
-  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+  <div class="nav-links">
+    <a href="#" onclick="showJourney(); return false;" style="color:#e879f9;font-weight:700;">🏙 Builder City Map</a>
+    <a href="/student/dashboard">← Dashboard</a>
+  </div>
 </nav>
 
 <div class="layout">
@@ -452,10 +456,122 @@ function highlightError(line) {
   setTimeout(() => editor.removeLineClass(line - 1, 'background', 'cm-error-line'), 4000)
 }
 
-// ── Challenges ────────────────────────────────────────────────────────────────
-const CHALLENGES = [
-  {
-    mod:'M9', name:'Smiley Factory', xp:40,
+// ── Builder City — 10 modules, Python-first (from-blocks-to-text -> a real
+// data app capstone). M1-M4 are live this session; M5-M10 stubbed locked on
+// the map. check(code, log) gets the raw source text plus drawLog
+// {rects,circles,lines,texts,calls} from the just-finished run — validation
+// is deliberately structural (right constructs used + it ran clean), same
+// leniency as the pre-existing M9/M10 content below.
+const MODULES = [
+  { id:'m1', name:'🔤 M1 — From Blocks to Text', sub:'print, input, variables, types — the G7 skills, now in real Python', live:true, stages:[
+    { id:'m1s1', name:'Say Hello', xp:20,
+      text:`<strong>Challenge 1 — Your First Line</strong> — Use <code>print()</code> to say hello. Then print it again with your own message.`,
+      hints:[
+        'print("Hello, World!") — the classic first line of code in any language.',
+        'Add a second print() with a different message, like your name.',
+        'Run it — you should see both lines in the console below.',
+      ],
+      starter:`# Grade 8 — Your first Python lines
+# Use print() to display a message
+
+print("Hello, World!")
+# TODO: add a second print() with your own message
+`,
+      check:(code) => (code.match(/print\s*\(/g) || []).length >= 2,
+    },
+    { id:'m1s2', name:'About Me', xp:30,
+      text:`<strong>Challenge 2 — Variables</strong> — Create THREE variables: your name (text), your age (a number), and a favourite thing (text). Print all three using an f-string like <code>f"My name is {name}"</code>.`,
+      hints:[
+        'A variable is just: name = "Alex". Text needs quotes, numbers don\'t.',
+        'Make three variables: name, age, favourite.',
+        'An f-string looks like: print(f"My name is {name} and I am {age}").',
+      ],
+      starter:`# Grade 8 — Variables & f-strings
+name = "Alex"
+age = 13
+# TODO: create a "favourite" variable (a text, e.g. a game or food)
+
+print(f"My name is {name} and I am {age} years old.")
+# TODO: print favourite using an f-string too
+`,
+      check:(code) => {
+        const assigns = (code.match(/^\s*\w+\s*=\s*.+$/gm) || []).length
+        const fstrings = (code.match(/f['"]/g) || []).length
+        return assigns >= 3 && fstrings >= 2
+      },
+    },
+    { id:'m1s3', name:'Type Detective', xp:35,
+      text:`<strong>Challenge 3 — Types</strong> — Every value in Python has a TYPE. Create an int, a float, a string, and a boolean. Use <code>type()</code> and print the result for each one.`,
+      hints:[
+        'int: whole numbers like 7. float: decimals like 7.5. str: text in quotes. bool: True or False.',
+        'type(x) tells you the type — try print(type(7)), print(type(7.5)), print(type("hi")).',
+        'Make 4 variables (one of each type) and print(type(...)) for all four.',
+      ],
+      starter:`# Grade 8 — Types: int, float, str, bool
+whole_number = 7
+decimal_number = 7.5
+# TODO: make a string variable and a boolean variable
+
+print(type(whole_number))
+print(type(decimal_number))
+# TODO: print the type() of your string and boolean too
+`,
+      check:(code) => (code.match(/type\s*\(/g) || []).length >= 4 && (code.match(/print\s*\(/g) || []).length >= 4,
+    },
+  ]},
+
+  { id:'m2', name:'🚦 M2 — Choices & Loops', sub:'if/elif/else, while, for-range — predict the drawing before you run it', live:true, stages:[
+    { id:'m2s1', name:'Odd or Even', xp:35,
+      text:`<strong>Challenge 1 — If / Else</strong> — Create a <em>number</em> variable. Use <code>%</code> (the remainder operator) and an if/else to print whether it's odd or even.`,
+      hints:[
+        'number % 2 gives the remainder after dividing by 2. If it\'s 0, the number is even.',
+        'if number % 2 == 0: print("even")  else: print("odd")',
+        'Try number = 7 (odd), then number = 12 (even) — does it print correctly both times?',
+      ],
+      starter:`# Grade 8 — If / Else
+number = 7
+
+# TODO: use % 2 and an if/else to print "even" or "odd"
+`,
+      check:(code) => /if\s+/.test(code) && /%\s*2/.test(code) && /print\s*\(/.test(code),
+    },
+    { id:'m2s2', name:'FizzBuzz Lite', xp:45,
+      text:`<strong>Challenge 2 — For Loops + Chained Decisions</strong> — Loop from 1 to 10. If the number divides by 3, print "Fizz". If it divides by 5, print "Buzz". Otherwise print the number.`,
+      hints:[
+        'for i in range(1, 11): loops i = 1, 2, ... 10.',
+        'Inside the loop: if i % 3 == 0: print("Fizz")  elif i % 5 == 0: print("Buzz")  else: print(i)',
+        'Run it — you should see 10 lines, with Fizz on 3, 6, 9 and Buzz on 5, 10.',
+      ],
+      starter:`# Grade 8 — For loops + elif chains
+for i in range(1, 11):
+    # TODO: if i % 3 == 0, print "Fizz"
+    # TODO: elif i % 5 == 0, print "Buzz"
+    # TODO: else, print i
+    pass
+`,
+      check:(code) => /for\s+\w+\s+in\s+range/.test(code) && /elif\s+/.test(code) && /%\s*3/.test(code),
+    },
+    { id:'m2s3', name:'Countdown Circles', xp:45,
+      text:`<strong>Challenge 3 — While Loops</strong> — Start with <em>size = 100</em>. While size is greater than 0, draw a circle with that radius, then shrink size by 20. Watch the circles count down!`,
+      hints:[
+        'A while loop keeps going until its condition is False: while size > 0:',
+        'Inside: circle(240, 130, size), then size = size - 20.',
+        'Draw a background(...) first so the circles are easy to see over each other.',
+      ],
+      starter:`# Grade 8 — While loops
+background(15, 18, 32)
+fill(184, 239, 74)
+size = 100
+
+# TODO: while size > 0: draw a circle(240, 130, size), then shrink size by 20
+`,
+      check:(code, log) => /while\s+/.test(code) && log.circles >= 3,
+    },
+  ]},
+
+  { id:'m3', name:'🧰 M3 — Functions', sub:'def, parameters, return — refactor copy-paste into reusable powers', live:true, stages:[
+    {
+    id:'m3s1', mod:'M9', name:'Smiley Factory', xp:40,
     text:`<strong>Challenge 1 — Functions & Parameters</strong> — Complete the <code>draw_smiley()</code> function by adding eyes and a mouth. Then call it at least twice with different colors or sizes.`,
     hints:[
       'The eyes are small dark circles. Left eye ≈ (x - r//3, y - r//4), right eye ≈ (x + r//3, y - r//4). Use radius 6.',
@@ -493,7 +609,7 @@ draw_smiley(120, 130, 70, 255, 220, 50)    # big yellow smiley
     },
   },
   {
-    mod:'M9', name:'Color Grid', xp:45,
+    id:'m3s2', mod:'M9', name:'Color Grid', xp:45,
     text:`<strong>Challenge 2 — Functions & Parameters</strong> — Define a <code>colored_tile(r, g, b, x, y, size)</code> function. Call it to build a 3×2 grid of colored squares. Use a loop for the rows.`,
     hints:[
       'The function body just does: fill(r, g, b), then rect(x, y, size, size).',
@@ -521,8 +637,11 @@ colored_tile(80,  200, 100, 130, 80, tile_size)   # green
       return hasDef && log.rects >= 4
     },
   },
+  ]},
+
+  { id:'m4', name:'📋 M4 — Lists', sub:'Creating, indexing, appending, looping — list + loop = superpower', live:true, stages:[
   {
-    mod:'M10', name:'Bar Chart', xp:45,
+    id:'m4s1', mod:'M10', name:'Bar Chart', xp:45,
     text:`<strong>Challenge 3 — Lists & Loops</strong> — A list of temperatures is given. Loop through the list and draw a bar (rectangle) for each value. Taller bars = higher temperature.`,
     hints:[
       'Inside the for loop: bar_height = temp * 5. Then y = 260 - bar_height so bars grow upwards.',
@@ -556,7 +675,7 @@ for temp in temperatures:
     },
   },
   {
-    mod:'M10', name:'Rainbow Row', xp:40,
+    id:'m4s2', mod:'M10', name:'Rainbow Row', xp:40,
     text:`<strong>Challenge 4 — Lists of Tuples</strong> — Create a list of (r, g, b) colour tuples — at least 6 colors. Loop through it and draw a circle for each color in a row.`,
     hints:[
       'Each item in the list is a tuple: (255, 80, 80). Unpack with: r, g, b = color',
@@ -590,7 +709,7 @@ for color in colors:
     },
   },
   {
-    mod:'M10', name:'Score Sorter', xp:50,
+    id:'m4s3', mod:'M10', name:'Score Sorter', xp:50,
     text:`<strong>Challenge 5 — Sorting & Display</strong> — Sort a list of scores and display the top 5 as bars. Use <code>sorted()</code> and list slicing (<code>[-5:]</code> gets the last 5 items). Label each bar with its value.`,
     hints:[
       'sorted_scores = sorted(player_scores) gives lowest-first. sorted_scores[-5:] gets the top 5.',
@@ -635,7 +754,42 @@ for score in top_5:
       return hasList && hasSort && (log.rects >= 4 || log.texts >= 4)
     },
   },
+  ]},
+
+  { id:'m5',  name:'✂️ M5 — Strings & Validation',   sub:'Slicing, methods, checking input — the Caesar cipher in real code',        count:3, live:false },
+  { id:'m6',  name:'🗂 M6 — Files & Data',            sub:'Reading/writing CSV, mean/max/min, a chart from real data',              count:4, live:false },
+  { id:'m7',  name:'⚙️ M7 — Inside the Machine',      sub:'Binary numbers, storage units, how images/sound are numbers',           count:3, live:false },
+  { id:'m8',  name:'🌐 M8 — The Connected World',     sub:'How the internet works, staying safe, a one-page HTML profile',        count:2, live:false },
+  { id:'m9w', name:'🖥 M9 — Interactive Apps',        sub:'A canvas app with real state: menu -> running -> results',              count:4, live:false },
+  { id:'m10', name:'🏆 M10 — Capstone: Data App',     sub:'Plan -> build -> test -> ship a data-driven app of your own',           count:6, live:false },
 ]
+
+const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({ ...s, mod: m.id.toUpperCase() })))
+const STAGE_INDEX = {}
+CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.id] = i })
+
+// ── Builder City map — sequential unlock, same intent as the pill list below
+// (any pill is currently clickable regardless of order; the map itself is the
+// paced/sequential front door, matching Grade 6/7's landing-map convention).
+function showJourney() {
+  const STAGE_EMO = ['🐍', '📗', '🧩']
+  const worlds = MODULES.map(m => {
+    if (!m.live) return { name: m.name, sub: m.sub, live: false, count: m.count }
+    const stages = m.stages.map((s, i) => ({
+      id: s.id, emoji: STAGE_EMO[i % STAGE_EMO.length], label: s.name,
+      done: completed.has(STAGE_INDEX[s.id]),
+    }))
+    return { name: m.name, sub: m.sub, live: true, stages }
+  })
+  QuestMap.show({
+    title: '🏙 Builder City',
+    subtitle: 'Real Python, a real editor, real data. From your first print() to a shipped app.',
+    accent: '#60a5fa',
+    freeRoam: false,
+    worlds,
+    onOpen: (id) => selectChallenge(STAGE_INDEX[id]),
+  })
+}
 
 // -- BF Integration --
 BF.seed();
@@ -737,6 +891,7 @@ initPyodide()
   LessonSaves.completedSet().forEach(idx => completed.add(idx))
   renderPills()
   selectChallenge(0)
+  showJourney()
 })()
 </script>
 </body>
