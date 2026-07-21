@@ -62,12 +62,13 @@ const PAPER_STYLES = [
 ]
 
 export function ClassTabs({ cls, classType, studentData, topics, draftExercises, teacherId }: ClassTabsProps) {
+  const isBookLevel = classType.id === 'as-level' || classType.id === 'a-level'
   const [tab, setTab] = useState<Tab>('students')
   const [showInvite, setShowInvite] = useState(false)
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: 'students',  label: 'Students',       icon: <UserIcon     size={13} /> },
-    { id: 'lessons',   label: '📚 Book Lessons', icon: null },
+    ...(isBookLevel ? [{ id: 'lessons' as Tab, label: '📚 Book Lessons', icon: null }] : []),
     { id: 'resources', label: 'Resources',       icon: <BookIcon     size={13} /> },
     { id: 'exercises', label: 'Exercises',       icon: <ZapIcon      size={13} /> },
     { id: 'settings',  label: 'Settings',        icon: <ChartBarIcon size={13} /> },
@@ -107,7 +108,7 @@ export function ClassTabs({ cls, classType, studentData, topics, draftExercises,
       )}
 
       {/* ── Book Lessons tab ─────────────────────────────────────────────── */}
-      {tab === 'lessons' && (
+      {tab === 'lessons' && isBookLevel && (
         <div className="pt-4">
           <div className="mb-4">
             <h2 className="text-base font-semibold text-fg">Book Lessons</h2>
@@ -431,14 +432,16 @@ function ResourcesTab({ cls, classType, topics }: {
         <PastPapersPanel classId={cls.id} />
       </Card>
 
-      {/* Nudge toward the Book Lessons tab */}
-      <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-accent/5 border border-accent/20 text-sm text-fg-dim">
-        <span className="text-base">📚</span>
-        <span>
-          To upload a textbook and auto-generate lessons for your students, use the{' '}
-          <strong className="text-accent">Book Lessons</strong> tab.
-        </span>
-      </div>
+      {/* Nudge toward the Book Lessons tab (AS/A Level only) */}
+      {(classType.id === 'as-level' || classType.id === 'a-level') && (
+        <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-accent/5 border border-accent/20 text-sm text-fg-dim">
+          <span className="text-base">📚</span>
+          <span>
+            To upload a textbook and auto-generate lessons for your students, use the{' '}
+            <strong className="text-accent">Book Lessons</strong> tab.
+          </span>
+        </div>
+      )}
     </div>
   )
 }

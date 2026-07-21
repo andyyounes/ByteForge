@@ -45,6 +45,30 @@
 - [x] Quest progress → server (lesson_saves row `<pk>-quest`): steps, stars,
       checkpoints, streak, daily, wrong-answer bank. Pull-merge on lesson open,
       debounced push + 60s heartbeat. (Code Lab exercise saves still local-only.)
+- [x] Map unification: grade6/7/8/9-missions + igcse-y1/y2 all now use
+      quest-map.js's `layout:'path'` (previously only AS/A Level). Fixed the
+      "flash the first lesson before showing the map" bug present across all
+      of them (grade9-missions had it hardcoded `open` in static markup).
+- [x] Fixed a critical TDZ crash on as-level.html/a-level.html: every logged-out
+      visitor hit "Cannot access X before initialization" because the init
+      IIFE's only `await` sat inside an `if (me)` block, so it ran fully
+      synchronously and outran later `const`/`let` declarations. Fixed with an
+      unconditional `await null` as the first line of the IIFE.
+- [x] Applied the long-dormant `supabase/past_papers.sql` migration to the live
+      DB (file existed in-repo, was never run — every class's Past Papers tab
+      was 500ing).
+- [x] Fixed "Book Lessons" tab showing on every class type: it's 100% AS/A
+      Level content (default-lessons.json is Cambridge 9618 chapters 1-29
+      only), but ClassTabs.tsx rendered it unconditionally — Grade 6-9 and
+      IGCSE teachers saw a nonsensical AS-Level chapter list. Now gated to
+      `classType.id === 'as-level' || 'a-level'` (tab visibility, panel
+      render, and the Resources-tab nudge banner).
+- [ ] Cosmetic-only: each class type's teacher-facing "Syllabus" preview
+      (lib/class-types.ts `syllabus` field, shown in Resources tab) is
+      hand-written marketing copy and doesn't mirror the actual built map
+      content (e.g. Grade 6 syllabus says "Artist's Toolkit" while the live
+      map is Robot Road → Block Basics → Color Lab). Not a functional bug,
+      but worth reconciling if a teacher notices the mismatch.
 - [ ] Teacher gradebook: per-class exercise/stage completion grid.
 - [ ] Timed mock-exam mode for the past-paper categories.
 - [ ] Interpreter: short-circuit AND/OR (removes the flag-pattern workaround).
