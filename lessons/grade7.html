@@ -143,6 +143,7 @@
   <script src="../js/auth.js"></script>
   <script src="../js/config.js"></script>
   <script src="../js/lesson-saves.js"></script>
+  <script src="../js/quest-map.js"></script>
 </head>
 <body>
 
@@ -154,7 +155,10 @@
     </svg>
     <span class="logo-text">ByteForge</span>
   </div>
-  <div class="nav-links"><a href="../dashboard-student.html">← Dashboard</a></div>
+  <div class="nav-links">
+    <a href="#" onclick="showJourney(); return false;" style="color:#e879f9;font-weight:700;">🌌 Galaxy Map</a>
+    <a href="../dashboard-student.html">← Dashboard</a>
+  </div>
 </nav>
 
 <div class="layout">
@@ -818,72 +822,146 @@ function friendlyErr(msg) {
   return msg
 }
 
-// ── Challenges ────────────────────────────────────────────────────────────────
-const CHALLENGES = [
-  // Module 6: Variables & State
-  {
-    mod:'M6', name:'Colour Square', xp:30,
-    text:`<strong>Challenge 1</strong> — Create three variables: <em>r</em>, <em>g</em>, <em>b</em>. Use <em>set fill red/green/blue</em> to color a rectangle. Change the values to make different colors.`,
-    hints:[
-      'Use the Variables category to create r, g, b. Set them to numbers 0–255.',
-      'Use "set fill red r green g blue b" block, then "draw rectangle".',
-      'Try r=255, g=0, b=0 for red. r=0, g=200, b=255 for cyan.',
-    ],
-    check:(log) => log.rects >= 1 && log.hasVar,
-  },
-  {
-    mod:'M6', name:'Growing Circle', xp:35,
-    text:`<strong>Challenge 2</strong> — Create a <em>size</em> variable. Draw a circle whose radius is <em>size</em>. Run it with different size values to watch it grow or shrink.`,
-    hints:[
-      'Create a variable called "size" and set it to a number like 50.',
-      'In the "draw circle" block, put the "size" variable block into the radius input.',
-      'Change the value of size and run again — the circle will be different each time.',
-    ],
-    check:(log) => log.circles >= 1 && log.hasVar,
-  },
-  // Module 7: If / Else
-  {
-    mod:'M7', name:'Traffic Light', xp:40,
-    text:`<strong>Challenge 3</strong> — Create a <em>light</em> variable (1, 2, or 3). Use if/else to draw a red circle if light=1, amber if light=2, green if light=3. Draw a dark rectangle first for the box.`,
-    hints:[
-      'Draw a dark rectangle first (the traffic light box). Then use an if block.',
-      'If light = 1: fill red, draw circle. Else if light = 2: fill orange. Else: fill green.',
-      'Set light = 1 and run. Then change to 2, then 3. Does the correct circle appear?',
-    ],
-    check:(log) => log.circles >= 1 && log.hasIf && log.hasVar,
-  },
-  {
-    mod:'M7', name:'Big or Small', xp:35,
-    text:`<strong>Challenge 4</strong> — Create a <em>number</em> variable. If it's greater than 50, draw a big circle (radius 80). If it's 50 or less, draw a small circle (radius 20).`,
-    hints:[
-      'Use an "if/else" block. The condition is: number > 50.',
-      'In the if branch: draw circle with radius 80. In the else branch: radius 20.',
-      'Try number = 75 (should be big) and number = 30 (should be small).',
-    ],
-    check:(log) => log.circles >= 1 && log.hasIf && log.hasVar,
-  },
-  // Module 8: Events & Interaction
-  {
-    mod:'M8', name:'Mouse Follower', xp:45,
-    text:`<strong>Challenge 5</strong> — Use the <em>On every frame</em> event block. Inside it: clear the canvas, then draw a circle at <em>mouseX</em> / <em>mouseY</em>. Move your mouse over the canvas!`,
-    hints:[
-      'Drag an "On every frame" block. Inside it, put "clear canvas" first.',
-      'Then "draw circle" — for x use the "mouse X" block, for y use "mouse Y".',
-      'Move your mouse over the canvas — the circle should follow it.',
-    ],
-    check:(log) => log.frames >= 5 && (log.circles >= 1 || log.rects >= 1),
-  },
-  {
-    mod:'M8', name:'Move the Box', xp:50,
-    text:`<strong>Challenge 6</strong> — Create <em>x</em> and <em>y</em> variables. Use <em>On every frame</em> + arrow key checks to move a rectangle. If ← key is pressed, x = x − 4. If → key: x = x + 4. Same for up/down.`,
-    hints:[
-      'Create variables x = 200, y = 100. In "on every frame": clear, then draw rectangle at (x, y).',
-      'Add if blocks: if ArrowLeft is pressed → change x by -4. If ArrowRight → x by +4.',
-      'Add ArrowUp → y by -4, ArrowDown → y by +4. Click the canvas first to focus it!',
-    ],
-    check:(log) => log.frames >= 5 && (log.rects >= 1 || log.circles >= 1),
-  },
+// ── Game Maker Galaxy — 10 worlds, each ending in a playable boss build ────────
+// Worlds 1-3 are live this session (Sprite Start, Variables & State, Decisions);
+// Worlds 4-10 are stubbed (map shows them locked/"coming soon") for a later pass.
+// Each stage keeps the exact check(log) contract runCode() already produces:
+// static runs → {rects,circles,lines,texts,hasIf,hasVar}; animated (on-every-
+// frame code) runs → {frames,rects,circles} only — no hasVar/hasIf there yet.
+const WORLDS = [
+  { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
+    { id:'g1s1', name:'First Sprite', xp:20,
+      text:`<strong>Challenge 1</strong> — Draw a single circle anywhere on the canvas. That's your first "sprite"!`,
+      hints:[
+        'Open the Draw category and drag out "draw circle".',
+        'Give it an X and a Y — try X=240, Y=130 (near the middle).',
+        'Press ▶ Run to see it appear.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => log.circles >= 1,
+    },
+    { id:'g1s2', name:'Four Corners', xp:25,
+      text:`<strong>Challenge 2</strong> — Draw FOUR shapes (circles or rectangles), one in each corner of the canvas. Practice reading X/Y coordinates.`,
+      hints:[
+        'The canvas is 480 wide, 260 tall. Corners are roughly (20,20), (440,20), (20,220), (440,220).',
+        'Drag out 4 "draw circle" or "draw rectangle" blocks, one per corner.',
+        'Run it — you should see four shapes, one near each corner.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => (log.rects + log.circles) >= 4,
+    },
+    { id:'g1boss', name:'Sprite Follows You', xp:45, boss:true,
+      text:`<strong>🚀 BOSS — Sprite Follows You</strong> — Use <em>On every frame</em>. Inside it: clear the canvas, then draw a circle at <em>mouseX</em> / <em>mouseY</em>. Move your mouse over the canvas — your sprite follows it!`,
+      hints:[
+        'Drag an "On every frame" block. Inside it, put "clear canvas" first.',
+        'Then "draw circle" — for x use the "mouse X" block, for y use "mouse Y".',
+        'Move your mouse over the canvas — the circle should follow it.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:true,
+      check:(log) => log.frames >= 5 && (log.circles >= 1 || log.rects >= 1),
+    },
+  ]},
+
+  { id:'g2', name:'🎚 G2 — Variables & State', sub:'Score, health, timers — numbers that change', live:true, stages:[
+    { id:'g2s1', name:'Colour Square', xp:30,
+      text:`<strong>Challenge 1</strong> — Create three variables: <em>r</em>, <em>g</em>, <em>b</em>. Use <em>set fill red/green/blue</em> to color a rectangle. Change the values to make different colors.`,
+      hints:[
+        'Use the Variables category to create r, g, b. Set them to numbers 0–255.',
+        'Use "set fill red r green g blue b" block, then "draw rectangle".',
+        'Try r=255, g=0, b=0 for red. r=0, g=200, b=255 for cyan.',
+      ],
+      needsVar:true, needsIf:false, needsFrames:false,
+      check:(log) => log.rects >= 1 && log.hasVar,
+    },
+    { id:'g2s2', name:'Growing Circle', xp:35,
+      text:`<strong>Challenge 2</strong> — Create a <em>size</em> variable. Draw a circle whose radius is <em>size</em>. Run it with different size values to watch it grow or shrink.`,
+      hints:[
+        'Create a variable called "size" and set it to a number like 50.',
+        'In the "draw circle" block, put the "size" variable block into the radius input.',
+        'Change the value of size and run again — the circle will be different each time.',
+      ],
+      needsVar:true, needsIf:false, needsFrames:false,
+      check:(log) => log.circles >= 1 && log.hasVar,
+    },
+    { id:'g2boss', name:'Clicker Upgrade', xp:50, boss:true,
+      text:`<strong>🎚 BOSS — Clicker Upgrade</strong> — Create a <em>score</em> variable starting at 0. Use <em>On every frame</em>: if the SPACE key is down, add 1 to score. Draw a circle whose radius grows with score (radius = 20 + score).`,
+      hints:[
+        'Create "score" = 0. In "on every frame": clear canvas first.',
+        'Add an if block: if key "Space" is down → change score by 1.',
+        'Draw a circle with radius = 20 + score (use the + math block). Hold Space to watch it grow!',
+      ],
+      needsVar:false, needsIf:false, needsFrames:true,
+      check:(log) => log.frames >= 5 && (log.circles >= 1 || log.rects >= 1),
+    },
+  ]},
+
+  { id:'g3', name:'🚦 G3 — Decisions', sub:'Touching? Score > 10? Out of bounds?', live:true, stages:[
+    { id:'g3s1', name:'Traffic Light', xp:40,
+      text:`<strong>Challenge 1</strong> — Create a <em>light</em> variable (1, 2, or 3). Use if/else to draw a red circle if light=1, amber if light=2, green if light=3. Draw a dark rectangle first for the box.`,
+      hints:[
+        'Draw a dark rectangle first (the traffic light box). Then use an if block.',
+        'If light = 1: fill red, draw circle. Else if light = 2: fill orange. Else: fill green.',
+        'Set light = 1 and run. Then change to 2, then 3. Does the correct circle appear?',
+      ],
+      needsVar:true, needsIf:true, needsFrames:false,
+      check:(log) => log.circles >= 1 && log.hasIf && log.hasVar,
+    },
+    { id:'g3s2', name:'Big or Small', xp:35,
+      text:`<strong>Challenge 2</strong> — Create a <em>number</em> variable. If it's greater than 50, draw a big circle (radius 80). If it's 50 or less, draw a small circle (radius 20).`,
+      hints:[
+        'Use an "if/else" block. The condition is: number > 50.',
+        'In the if branch: draw circle with radius 80. In the else branch: radius 20.',
+        'Try number = 75 (should be big) and number = 30 (should be small).',
+      ],
+      needsVar:true, needsIf:true, needsFrames:false,
+      check:(log) => log.circles >= 1 && log.hasIf && log.hasVar,
+    },
+    { id:'g3boss', name:'Dodge at the Edges', xp:55, boss:true,
+      text:`<strong>🚦 BOSS — Dodge at the Edges</strong> — Create <em>x</em> and <em>y</em> variables. Use <em>On every frame</em> + arrow key checks to move a rectangle. If ← key is pressed, x = x − 4. If → key: x = x + 4. Same for up/down.`,
+      hints:[
+        'Create variables x = 200, y = 100. In "on every frame": clear, then draw rectangle at (x, y).',
+        'Add if blocks: if ArrowLeft is pressed → change x by -4. If ArrowRight → x by +4.',
+        'Add ArrowUp → y by -4, ArrowDown → y by +4. Click the canvas first to focus it!',
+      ],
+      needsVar:false, needsIf:false, needsFrames:true,
+      check:(log) => log.frames >= 5 && (log.rects >= 1 || log.circles >= 1),
+    },
+  ]},
+
+  { id:'g4',  name:'🧰 G4 — My Blocks',           sub:'jump(), shoot(), spawnEnemy() — powers you define',        count:4, live:false },
+  { id:'g5',  name:'⌨️ G5 — Player Control',       sub:'Keyboard + mouse input schemes, aiming',                  count:4, live:false },
+  { id:'g6',  name:'💥 G6 — Collision & Physics',  sub:'Hitboxes, bouncing, gravity, knockback',                  count:4, live:false },
+  { id:'g7w', name:'🎬 G7 — Game States',          sub:'Menu → playing → paused → game-over → win',              count:4, live:false },
+  { id:'g8',  name:'🤖 G8 — Smart NPCs',           sub:'Enemies that chase, flee, patrol; a rule-based chatbot', count:4, live:false },
+  { id:'g9w', name:'💬 G9 — Strings & Dialogue',   sub:'Player names, dialogue trees, high-score tables',        count:4, live:false },
+  { id:'g10', name:'🏆 G10 — Design & Capstone',   sub:'Plan → build → test → ship YOUR game',                   count:2, live:false },
 ]
+
+const CHALLENGES = WORLDS.filter(w => w.live).flatMap(w => w.stages.map(s => ({ ...s, mod: w.id.toUpperCase() })))
+const STAGE_INDEX = {}
+CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.id] = i })
+
+// ── Galaxy Map — sequential unlock (matches the existing pill-lock intent);
+// clicking a stage hides the map and opens it in the existing workspace player.
+function showJourney() {
+  const STAGE_EMO = ['🎯', '⭐', '🔷']
+  const worlds = WORLDS.map(w => {
+    if (!w.live) return { name: w.name, sub: w.sub, live: false, count: w.count }
+    const stages = w.stages.map((s, i) => ({
+      id: s.id, emoji: s.boss ? '👑' : STAGE_EMO[i % STAGE_EMO.length], label: s.name,
+      done: completed.has(STAGE_INDEX[s.id]), boss: !!s.boss,
+    }))
+    return { name: w.name, sub: w.sub, live: true, stages }
+  })
+  QuestMap.show({
+    title: '🌌 Game Maker Galaxy',
+    subtitle: 'One world, one boss build. Ship real games — block by block.',
+    accent: '#818cf8',
+    freeRoam: false,
+    worlds,
+    onOpen: (id) => selectChallenge(STAGE_INDEX[id]),
+  })
+}
 
 // -- BF Integration --
 BF.seed();
@@ -944,19 +1022,13 @@ function checkChallenge(log) {
     // Auto-unlock next
     renderPills()
   } else {
-    // Specific feedback on what's missing
+    // Specific feedback on what's missing — driven by each stage's own
+    // needsVar/needsIf/needsFrames flags, so new worlds don't need a new branch here.
     const missing = []
-    if (ch.mod === 'M6') {
-      if (!log.hasVar)  missing.push('variable (Variables → set … to …)')
-      if (log.rects < 1 && log.circles < 1) missing.push('a drawn shape (Draw → rectangle or circle)')
-    } else if (ch.mod === 'M7') {
-      if (!log.hasIf)  missing.push('if/else block (Control → if)')
-      if (!log.hasVar) missing.push('a variable')
-      if (log.circles < 1 && log.rects < 1) missing.push('a drawn shape')
-    } else if (ch.mod === 'M8') {
-      if (!log.frames || log.frames < 5) missing.push('"On every frame" event block')
-      if (log.circles < 1 && log.rects < 1) missing.push('a shape drawn inside the frame loop')
-    }
+    if (ch.needsFrames && (!log.frames || log.frames < 5)) missing.push('"On every frame" event block')
+    if (ch.needsVar && !log.hasVar) missing.push('a variable (Variables → set … to …)')
+    if (ch.needsIf && !log.hasIf) missing.push('an if/else block (Control → if)')
+    if ((log.circles || 0) < 1 && (log.rects || 0) < 1) missing.push('a drawn shape (Draw → rectangle or circle)')
     if (missing.length) {
       logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
     }
@@ -1150,6 +1222,7 @@ workspace.addChangeListener(e => {
   }
   renderPills()
   selectChallenge(0)
+  showJourney()
 })()
 </script>
 </body>

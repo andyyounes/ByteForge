@@ -8,8 +8,13 @@
       Cipher City, Music Studio (Web Audio), Dance Party, Game Corner, AI World,
       Final Quest. (World-boss unlock + per-stage engines are in place; each new
       world = a stage list + a mini-game engine like the color mixer.)
-- [ ] Grade 7 / Grade 8 curriculum decision pending — quest maps ready to wire once decided
-      (shared engine `public/js/quest-map.js` already supports it).
+- [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
+      Start, Variables & State, Decisions) in grade7.html, reusing the existing
+      Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
+      "read the code" arc) and quest-map.js. Worlds 4-10 stubbed locked on the
+      map. Next: G4 My Blocks (needs custom-block/function support in the
+      toolbox), then G5-G10 content + boss builds.
+- [ ] Grade 8 curriculum decision pending — quest map ready to wire once needed.
 - [ ] Expand A Level Code Lab sets (5 → 10 per category) + more full past papers.
 - [ ] Past-paper PDF importer (teacher uploads a real Paper 4 → lab category, verbatim).
 
