@@ -18,6 +18,24 @@ function randomJoinCode() {
   return Math.random().toString(36).slice(2, 8).toUpperCase()
 }
 
+// Valid Year/Grade values per class type — prevents a class from ending up with
+// a `level` (e.g. 'grade9') and a numeric `grade` (e.g. '10') that disagree.
+// The student dashboard picks lesson content purely off the numeric `grade`
+// column, so a mismatch here silently shows the wrong grade's content to
+// every student in the class even though the teacher's own view looks right.
+function validGradesFor(classTypeId: string): string[] {
+  switch (classTypeId) {
+    case 'grade6': return ['6']
+    case 'grade7': return ['7']
+    case 'grade8': return ['8']
+    case 'grade9': return ['9']
+    case 'igcse':  return ['10', '11']
+    case 'as-level': return ['12']
+    case 'a-level':  return ['13']
+    default: return ['6','7','8','9','10','11','12','13']
+  }
+}
+
 export function CreateClassModal({ open, onClose, teacherId }: CreateClassModalProps) {
   const { supabase } = useSupabase()
   const router       = useRouter()
@@ -103,7 +121,7 @@ export function CreateClassModal({ open, onClose, teacherId }: CreateClassModalP
             onChange={e => setGrade(e.target.value)}
             className="w-full h-10 px-3 rounded-lg bg-s2 border border-b2 text-fg text-sm focus:border-accent focus:outline-none"
           >
-            {['6','7','8','9','10','11','12','13'].map(g => (
+            {validGradesFor(level).map(g => (
               <option key={g} value={g}>Grade / Year {g}</option>
             ))}
           </select>

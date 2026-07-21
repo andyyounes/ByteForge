@@ -203,6 +203,10 @@ export default async function StudentDashboardPage() {
   // If in a class with an incomplete exercise, show that as the primary CTA
   const showCurriculumCallout = hasClass && !!nextExercise
 
+  // Chapter Exams only ever has content for AS/A Level (the only class type that
+  // can upload a Cambridge textbook via the Book Lessons tab and generate them).
+  const isCambridgeLevel = effectiveGrade >= 10   // IGCSE Y1/Y2, AS Level, A Level
+
   return (
     <div className="max-w-6xl mx-auto space-y-7">
 
@@ -344,32 +348,34 @@ export default async function StudentDashboardPage() {
 
           {/* ── Exams + Past Papers quick-links (only when in a class) ─── */}
           {hasClass && membership?.class_id && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Card className="border-b2">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-accent/10 text-accent shrink-0 text-lg">📝</div>
-                    <div>
-                      <p className="text-xs font-bold text-accent uppercase tracking-wider">Unit Exams</p>
-                      <p className="text-sm font-semibold text-fg">Chapter Exams</p>
-                      <p className="text-xs text-fg-faint mt-0.5">Self-mark with mark scheme</p>
+            <div className={`grid grid-cols-1 gap-3 ${isCambridgeLevel ? 'sm:grid-cols-2' : ''}`}>
+              {isCambridgeLevel && (
+                <Card className="border-b2">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-accent/10 text-accent shrink-0 text-lg">📝</div>
+                      <div>
+                        <p className="text-xs font-bold text-accent uppercase tracking-wider">Unit Exams</p>
+                        <p className="text-sm font-semibold text-fg">Chapter Exams</p>
+                        <p className="text-xs text-fg-faint mt-0.5">Self-mark with mark scheme</p>
+                      </div>
                     </div>
+                    <Link
+                      href="/student/exams"
+                      className="py-2 px-3 text-sm font-semibold rounded-lg bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors shrink-0 flex items-center gap-1.5"
+                    >
+                      Open <ChevronRightIcon size={14} />
+                    </Link>
                   </div>
-                  <Link
-                    href="/student/exams"
-                    className="py-2 px-3 text-sm font-semibold rounded-lg bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors shrink-0 flex items-center gap-1.5"
-                  >
-                    Open <ChevronRightIcon size={14} />
-                  </Link>
-                </div>
-              </Card>
+                </Card>
+              )}
               <Card className="border-b2">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-violet-400/10 text-violet-400 shrink-0 text-lg">📋</div>
                     <div>
                       <p className="text-xs font-bold text-violet-400 uppercase tracking-wider">Past Papers</p>
-                      <p className="text-sm font-semibold text-fg">Cambridge Papers</p>
+                      <p className="text-sm font-semibold text-fg">{isCambridgeLevel ? 'Cambridge Papers' : 'Practice Papers'}</p>
                       <p className="text-xs text-fg-faint mt-0.5">AI-marked instantly</p>
                     </div>
                   </div>
