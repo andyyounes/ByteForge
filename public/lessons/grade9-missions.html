@@ -1777,6 +1777,50 @@ function tyStudentBot() {
   return { name: 'My Bot', lang, code: tyBotCode(lang) || TY_STARTER[lang] }
 }
 
+// ── Server sync — bot code/lang/lock + last tournament result ride the same
+// lesson_saves row every other page uses for workspace autosave (challengeIdx
+// -1). Reserved indices past the real mission list award one-time XP through
+// the SAME /api/lesson-saves path missions already use — no schema change.
+const BOT_LOCK_IDX = MISSIONS.length
+const CHAMPION_IDX = MISSIONS.length + 1
+let _tySyncT = null
+function tySyncPush() {
+  clearTimeout(_tySyncT)
+  _tySyncT = setTimeout(() => {
+    try {
+      LessonSaves.save('grade9-missions', -1, {
+        saveData: {
+          botCodePy: tyBotCode('py'), botCodePs: tyBotCode('ps'),
+          botLang: tyBotLang(), botLocked: tyBotLocked(),
+          lastBracket: (() => { try { return JSON.parse(localStorage.getItem('bf-g9-last-bracket')) } catch (e) { return null } })(),
+        },
+      })
+    } catch (e) {}
+  }, 600)
+}
+// Pull once on page load — only fills in gaps (never overwrites a bot the
+// student has already started locally), so this is safe to call unconditionally.
+function tySyncPull() {
+  let ws
+  try { ws = LessonSaves.savedWorkspace() } catch (e) { ws = null }
+  if (!ws) return
+  if (ws.botCodePy && !tyBotCode('py')) tySaveBotCode('py', ws.botCodePy)
+  if (ws.botCodePs && !tyBotCode('ps')) tySaveBotCode('ps', ws.botCodePs)
+  if (ws.botLang && !localStorage.getItem('bf-g9-bot-lang')) { try { localStorage.setItem('bf-g9-bot-lang', ws.botLang) } catch (e) {} }
+  if (ws.botLocked && !tyBotLocked()) { try { localStorage.setItem('bf-g9-bot-locked', '1') } catch (e) {} }
+  if (ws.lastBracket && !localStorage.getItem('bf-g9-last-bracket')) {
+    try { localStorage.setItem('bf-g9-last-bracket', JSON.stringify(ws.lastBracket)) } catch (e) {}
+  }
+}
+function tyAwardOnce(idx, xp) {
+  const key = 'bf-g9-award-' + idx
+  try { if (localStorage.getItem(key) === '1') return false } catch (e) { return false }
+  try { localStorage.setItem(key, '1') } catch (e) {}
+  try { LessonSaves.save('grade9-missions', idx, { passed: true, xpEarned: xp }) } catch (e) {}
+  try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+  return true
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // Scene rendering + animation
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2387,8 +2431,9 @@ function openTourney() {
     tyEditor = CodeMirror.fromTextArea(document.getElementById('ty-code'), {
       mode: 'python', theme: 'dracula', lineNumbers: true, indentUnit: 4,
     })
-    tyEditor.on('change', () => { if (!tyBotLocked()) tySaveBotCode(tyBotLang(), tyEditor.getValue()) })
+    tyEditor.on('change', () => { if (!tyBotLocked()) { tySaveBotCode(tyBotLang(), tyEditor.getValue()); tySyncPush() } })
   }
+  tySyncPull()
   document.getElementById('ty-lang').value = tyBotLang()
   tyApplyLang()
   tyRenderStatus()
@@ -2406,6 +2451,7 @@ function closeTourney() {
 function tySwitchLang(l) {
   try { localStorage.setItem('bf-g9-bot-lang', l) } catch (e) {}
   tyApplyLang()
+  tySyncPush()
 }
 function tyApplyLang() {
   const l = tyBotLang()
@@ -2428,17 +2474,21 @@ function tyResetBot() {
   const l = tyBotLang()
   tyEditor.setValue(TY_STARTER[l])
   tySaveBotCode(l, TY_STARTER[l])
+  tySyncPush()
 }
 function tyLockBot() {
   tySaveBotCode(tyBotLang(), tyEditor.getValue())
   try { localStorage.setItem('bf-g9-bot-locked', '1') } catch (e) {}
   tyEditor.setOption('readOnly', true)
   tyRenderStatus()
+  tyAwardOnce(BOT_LOCK_IDX, 25)
+  tySyncPush()
 }
 function tyUnlockBot() {
   try { localStorage.removeItem('bf-g9-bot-locked') } catch (e) {}
   tyEditor.setOption('readOnly', false)
   tyRenderStatus()
+  tySyncPush()
 }
 
 function tyRenderCards(elId, group) {
@@ -2463,6 +2513,14 @@ async function tyRunBracket() {
   const bracket = await runBracketHeadless(entrants, DUEL_CONFIG)
   tyLastBracket = bracket
   renderBracketView(bracket)
+  const isChampion = bracket.champion && bracket.champion.name === 'My Bot'
+  try {
+    localStorage.setItem('bf-g9-last-bracket', JSON.stringify({
+      champion: bracket.champion.name, isChampion, rounds: bracket.rounds.length, at: Date.now(),
+    }))
+  } catch (e) {}
+  if (isChampion) tyAwardOnce(CHAMPION_IDX, 50)
+  tySyncPush()
   btn.disabled = false
   btn.textContent = '▶ Run Tournament'
 }

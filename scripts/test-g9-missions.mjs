@@ -610,5 +610,16 @@ for (const pb of PRACTICE_BOTS) {
   else ok(pb.id + ' (' + pb.name + ', ' + pb.group + ') — plays a full duel without error, outcome: ' + res.winner + '/' + res.reason)
 }
 
+// ── Session 7: teacher API's TOTAL_MISSIONS constant must not silently drift ──
+{
+  const apiSrc = readFileSync('c:/Users/user/Downloads/ICT website/app/api/teacher/g9-progress/route.ts', 'utf8')
+  const m = apiSrc.match(/const TOTAL_MISSIONS = (\d+)/)
+  if (!m) bad('g9-progress route.ts — TOTAL_MISSIONS constant not found')
+  else if (parseInt(m[1]) !== MISSIONS.length)
+    bad('g9-progress route.ts — TOTAL_MISSIONS is ' + m[1] + ' but MISSIONS.length is ' + MISSIONS.length
+      + ' (bot-lock/champion XP rows would miscount as real missions in the teacher view)')
+  else ok('g9-progress route.ts — TOTAL_MISSIONS (' + m[1] + ') matches the real MISSIONS.length')
+}
+
 console.log(fail ? '\n' + fail + ' problems' : '\nall missions verified — both engines honest')
 process.exit(fail ? 1 : 0)

@@ -13,6 +13,7 @@ import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { InviteModal } from '@/components/teacher/InviteModal'
 import { BookLessonsPanel } from '@/components/teacher/BookLessonsPanel'
 import { PastPapersPanel } from '@/components/teacher/PastPapersPanel'
+import { G9MissionsPanel } from '@/components/teacher/G9MissionsPanel'
 import {
   UserIcon, BookIcon, ZapIcon, ChartBarIcon,
   FlameIcon, ArrowRightIcon,
@@ -146,6 +147,7 @@ export function ClassTabs({ cls, classType, studentData, topics, draftExercises,
               </a>
             </div>
           )}
+          {classType.id === 'grade9' && <G9MissionsPanel classId={cls.id} />}
           <ExercisesTab
             cls={cls}
             classType={classType}
