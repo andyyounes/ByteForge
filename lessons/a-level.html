@@ -1192,6 +1192,14 @@
 <script>
 'use strict'
 
+// Declared here (not just further down near renderTheoryList) because the
+// init IIFE calls renderTheoryList() synchronously when the visitor isn't
+// logged in (its only `await` sits inside an `if (me)` block that gets
+// skipped) — reaching that call before this line executed threw
+// "Cannot access '_tpracFilter' before initialization" for every anonymous visitor.
+let _tpracFilter = 'all'
+let _tpracOpen   = null
+
 // ══════════════════════════════════════════════════════════════════════════════
 // Paper 3 — Topic data (A Level)
 // ══════════════════════════════════════════════════════════════════════════════
@@ -6715,6 +6723,12 @@ BF.seed()
 const me = (() => { try { return BF.session() || null } catch (_) { return null } })()
 
 ;(async () => {
+  // Unconditional yield: without it, an anonymous visitor (me == null) skips
+  // the only await below and this whole IIFE runs synchronously to
+  // completion during the initial script pass — racing ahead of const/let
+  // declarations (THEORY_EXERCISES, _tpracFilter, …) that appear later in
+  // this same file and crashing with "Cannot access X before initialization".
+  await null
   if (me) {
     await LessonSaves.load('al-paper4')
     LessonSaves.completedSet().forEach(i => p2Completed.add(i))
@@ -7591,9 +7605,8 @@ const THEORY_EXERCISES = [
   }
 ]
 
-// ── Theory Practice UI functions ──────────────────────────────────────────────
-let _tpracFilter = 'all'
-let _tpracOpen   = null
+// ── Theory Practice UI functions ─ _tpracFilter/_tpracOpen declared near the
+// top of the script (see comment there) ───────────────────────────────────────
 
 function filterTheoryPractice(ch) {
   _tpracFilter = ch
