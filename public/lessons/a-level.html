@@ -649,6 +649,19 @@
     .tprac-feedback.partial { background:rgba(251,191,36,.08);  border:1px solid rgba(251,191,36,.2);   color:#fde68a; }
     .tprac-feedback.wrong   { background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.2);  color:#fca5a5; }
 
+    /* ── Fill-in-the-blank theory exercises ── */
+    .tprac-scenario { font-size:11.5px; color:#93a5c4; background:rgba(125,211,252,.05);
+      border:1px solid rgba(125,211,252,.15); border-radius:8px; padding:8px 11px; margin-bottom:10px; line-height:1.55; }
+    .tprac-blank-code { font-family:var(--mono,'SF Mono',Consolas,monospace); font-size:12.5px; line-height:2;
+      color:#d1d5db; background:#070910; border:1px solid rgba(255,255,255,.08); border-radius:8px;
+      padding:12px 14px; white-space:pre-wrap; margin-bottom:10px; }
+    .tprac-blank-input { display:inline-block; width:auto; min-width:56px; max-width:160px;
+      padding:2px 7px; margin:0 2px; border-radius:5px; background:#111726; border:1px solid rgba(125,211,252,.35);
+      color:#7dd3fc; font-family:inherit; font-size:inherit; font-weight:700; text-align:center; transition:.15s; }
+    .tprac-blank-input:focus { border-color:#7dd3fc; outline:none; background:#0d1420; }
+    .tprac-blank-input.blank-correct { border-color:#4ade80; background:rgba(74,222,128,.12); color:#86efac; }
+    .tprac-blank-input.blank-wrong   { border-color:#f87171; background:rgba(248,113,113,.12); color:#fca5a5; }
+
     /* Toast */
     .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(60px);
              padding:10px 20px; border-radius:10px; font-size:13px; font-weight:600;
@@ -7602,6 +7615,26 @@ const THEORY_EXERCISES = [
     ],
     "answer": "Separate chaining",
     "ms": "Separate chaining (chaining): each array bucket holds a pointer to a linked list of all keys that hash to that index. Linear/quadratic probing and double hashing are open addressing methods — they find another slot within the same array."
+  },
+  {
+    "id": "t80",
+    "ch": 23,
+    "title": "Delivery App Package Arrangements",
+    "type": "blank",
+    "scenario": "A delivery app calculates how many ways N packages can be loaded into a van, using recursive factorial.",
+    "q": "FUNCTION Factorial(n : INTEGER) RETURNS INTEGER\n    ___ n <= 1 ___\n        RETURN 1\n    ___\n        RETURN n * ___(n - 1)\n    ENDIF\nENDFUNCTION",
+    "blanks": [["IF"], ["THEN"], ["ELSE"], ["Factorial"]],
+    "ms": "The base case (n <= 1) stops the recursion and returns 1. The recursive case calls Factorial again with a smaller argument (n - 1) — every recursive function needs both a base case and a call to itself that moves toward it."
+  },
+  {
+    "id": "t81",
+    "ch": 26,
+    "title": "Banking App Withdrawal Guard",
+    "type": "blank",
+    "scenario": "A banking app must handle an invalid withdrawal amount gracefully instead of crashing.",
+    "q": "___\n    INPUT amount\n    balance ← balance - amount\n___ InvalidAmount\n    OUTPUT \"Please enter a valid amount\"\nENDTRY",
+    "blanks": [["TRY"], ["CATCH"]],
+    "ms": "TRY ... CATCH ... ENDTRY runs the risky code inside TRY; if it raises the named exception, control jumps to the matching CATCH block instead of crashing the program — exactly what's needed so a bad withdrawal amount doesn't take down the whole app."
   }
 ]
 
@@ -7637,7 +7670,8 @@ function chBadgeClass(ch) {
 }
 
 function renderTheoryCard(e) {
-  const typeBadge = e.type === 'mcq' ? '🔘 MCQ' : e.type === 'convert' ? '🔢 Convert' : '📝 Short'
+  const typeBadge = e.type === 'mcq' ? '🔘 MCQ' : e.type === 'convert' ? '🔢 Convert'
+    : e.type === 'blank' ? '✏️ Fill the Blank' : '📝 Short'
   const isOpen    = _tpracOpen === e.id
   return `<div class="tprac-card${isOpen?' open':''}" id="tcard-${e.id}"${isOpen?'':` onclick="tpracToggle('${e.id}')"`}>
     <div class="tprac-q-title">${e.title}</div>
@@ -7671,6 +7705,15 @@ function tpracBodyHTML(e) {
       ${e.hint ? `<p style="font-size:11px;color:#6b7280;margin-bottom:8px;">💡 ${e.hint}</p>` : ''}
       <input type="text" class="tprac-q-input tprac-single-input" id="tinput-${e.id}" placeholder="Your answer…" />
       <button class="tprac-q-check" onclick="checkTheoryConvert(event,'${e.id}')">Check Answer</button>
+      <div class="tprac-feedback" id="tprac-fb-${e.id}" style="display:none;"></div>
+      ${closeBtn}
+    </div>`
+  }
+  if (e.type === 'blank') {
+    return `<div class="tprac-q-body" onclick="event.stopPropagation()">
+      ${e.scenario ? `<div class="tprac-scenario">🏢 ${e.scenario}</div>` : ''}
+      <div class="tprac-blank-code">${blankCodeHTML(e)}</div>
+      <button class="tprac-q-check" onclick="checkTheoryBlank(event,'${e.id}')">Check Answer</button>
       <div class="tprac-feedback" id="tprac-fb-${e.id}" style="display:none;"></div>
       ${closeBtn}
     </div>`
@@ -7726,6 +7769,56 @@ function checkTheoryConvert(evt, id) {
     fb.innerHTML = ok
       ? `✅ Correct! The answer is ${ex.answer}.`
       : `❌ Not quite. The answer is <strong>${ex.answer}</strong>.${ex.hint ? ' <span style="font-size:11px;display:block;margin-top:4px;">'+ex.hint+'</span>' : ''}`
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+
+// Splits e.q on '___' and interleaves an inline <input> per gap, sized to its
+// expected answer so short keywords (IF/THEN) don't get a giant empty box.
+function blankCodeHTML(e) {
+  const parts = e.q.split('___')
+  return parts.map((part, i) => {
+    const text = escapeHtml(part)
+    if (i === parts.length - 1) return text
+    const expected = (e.blanks[i] && e.blanks[i][0]) || ''
+    const width = Math.max(3, expected.length + 2)
+    return `${text}<input type="text" class="tprac-blank-input" id="tblank-${e.id}-${i}"
+      style="width:${width}ch;" autocomplete="off" spellcheck="false" onclick="event.stopPropagation()" />`
+  }).join('')
+}
+
+function checkTheoryBlank(evt, id) {
+  evt.stopPropagation()
+  const ex = THEORY_EXERCISES.find(e => e.id === id)
+  if (!ex) return
+  const fb = document.getElementById('tprac-fb-' + id)
+  let correctCount = 0
+  ex.blanks.forEach((accepted, i) => {
+    const inp = document.getElementById(`tblank-${id}-${i}`)
+    if (!inp) return
+    const val = inp.value.trim().toLowerCase()
+    const ok  = accepted.some(a => a.toLowerCase() === val)
+    inp.classList.remove('blank-correct', 'blank-wrong')
+    inp.classList.add(ok ? 'blank-correct' : 'blank-wrong')
+    if (ok) correctCount++
+  })
+  const total = ex.blanks.length
+  const pct   = Math.round((correctCount / total) * 100)
+  if (fb) {
+    fb.style.display = 'block'
+    if (pct === 100) {
+      fb.className = 'tprac-feedback correct'
+      fb.innerHTML = `✅ All ${total} correct! <span style="display:block;margin-top:5px;font-size:11px;opacity:.85;">${ex.ms}</span>`
+    } else if (pct >= 50) {
+      fb.className = 'tprac-feedback partial'
+      fb.innerHTML = `⚠️ ${correctCount}/${total} correct. <span style="display:block;margin-top:5px;font-size:11px;">${ex.ms}</span>`
+    } else {
+      fb.className = 'tprac-feedback wrong'
+      fb.innerHTML = `❌ ${correctCount}/${total} correct. <span style="display:block;margin-top:5px;font-size:11px;">${ex.ms}</span>`
+    }
   }
 }
 
