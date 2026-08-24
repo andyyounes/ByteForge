@@ -702,6 +702,19 @@
     .tprac-feedback.partial { background:rgba(251,191,36,.08);  border:1px solid rgba(251,191,36,.2);   color:#fde68a; }
     .tprac-feedback.wrong   { background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.2);  color:#fca5a5; }
 
+    /* ── Fill-in-the-blank theory exercises ── */
+    .tprac-scenario { font-size:11.5px; color:#93a5c4; background:rgba(125,211,252,.05);
+      border:1px solid rgba(125,211,252,.15); border-radius:8px; padding:8px 11px; margin-bottom:10px; line-height:1.55; }
+    .tprac-blank-code { font-family:var(--mono,'SF Mono',Consolas,monospace); font-size:12.5px; line-height:2;
+      color:#d1d5db; background:#070910; border:1px solid rgba(255,255,255,.08); border-radius:8px;
+      padding:12px 14px; white-space:pre-wrap; margin-bottom:10px; }
+    .tprac-blank-input { display:inline-block; width:auto; min-width:56px; max-width:160px;
+      padding:2px 7px; margin:0 2px; border-radius:5px; background:#111726; border:1px solid rgba(125,211,252,.35);
+      color:#7dd3fc; font-family:inherit; font-size:inherit; font-weight:700; text-align:center; transition:.15s; }
+    .tprac-blank-input:focus { border-color:#7dd3fc; outline:none; background:#0d1420; }
+    .tprac-blank-input.blank-correct { border-color:#4ade80; background:rgba(74,222,128,.12); color:#86efac; }
+    .tprac-blank-input.blank-wrong   { border-color:#f87171; background:rgba(248,113,113,.12); color:#fca5a5; }
+
     /* ── SQL Lab ── */
     .sql-lab { margin-top:24px; border:1px solid rgba(167,139,250,.25); border-radius:14px; overflow:hidden; }
     .sql-lab-header { padding:10px 16px; background:rgba(167,139,250,.08); border-bottom:1px solid rgba(167,139,250,.15);
@@ -8004,6 +8017,31 @@ const THEORY_EXERCISES = [
     q:'Describe declarative programming and state how it differs from imperative programming. [2]',
     keywords:['facts','rules','goal','logic','Prolog','what','how','state','describe','query','solution'],
     ms:'Declarative: define facts/rules describing the problem — system finds the solution (e.g. Prolog). Imperative: specify step-by-step how to solve the problem using explicit instructions, loops and assignments.' },
+
+  // ── Fill-in-the-blank — real-life scenarios (2026-08-24) ───────────────────
+  { id:'t76', ch:11, title:'Bank Login Check', type:'blank',
+    scenario: "You're writing the login check for a banking app. If the entered password matches the stored password, grant access — otherwise deny it.",
+    q: 'DECLARE password, storedPassword : STRING\nstoredPassword ← "Secure123"\nINPUT password\n___ password = storedPassword ___\n    OUTPUT "Access granted"\n___\n    OUTPUT "Access denied"\nENDIF',
+    blanks: [['IF'], ['THEN'], ['ELSE']],
+    ms: 'IF ... THEN ... ELSE ... ENDIF is the standard Cambridge pseudocode selection construct — THEN introduces the branch taken when the condition is true, ELSE the branch taken when it is false.' },
+
+  { id:'t77', ch:9, title:'Shopping Basket Discount', type:'blank',
+    scenario: 'An online shop applies a 10% discount to every item in a customer’s 5-item basket, then totals the bill.',
+    q: 'DECLARE total, price : REAL\ntotal ← 0\n___ item = 1 ___ 5\n    INPUT price\n    total ← total + (price * 0.9)\n___\nOUTPUT total',
+    blanks: [['FOR'], ['TO'], ['NEXT item','NEXT']],
+    ms: 'A count-controlled FOR ... TO ... NEXT loop runs a known number of times (once per basket item) — exactly the case when you know in advance how many iterations are needed.' },
+
+  { id:'t78', ch:13, title:'Coffee Shop Order Queue', type:'blank',
+    scenario: 'A coffee shop takes orders in a queue — the first customer in line is served first (FIFO).',
+    q: 'DECLARE orderQueue : QUEUE\n___ orderQueue, "Flat White"\n___ orderQueue, "Latte"\nDECLARE nextOrder : STRING\nnextOrder ← ___(orderQueue)\nOUTPUT nextOrder',
+    blanks: [['ENQUEUE'], ['ENQUEUE'], ['DEQUEUE']],
+    ms: 'A queue is First-In-First-Out (FIFO). ENQUEUE adds an item to the back of the queue; DEQUEUE removes and returns the item at the front — "Flat White", the first one added, is what nextOrder receives here.' },
+
+  { id:'t79', ch:12, title:'Fitness App Age Validator', type:'blank',
+    scenario: "A fitness app must keep asking for the user's age until they enter a value between 13 and 120.",
+    q: 'DECLARE age : INTEGER\n___\n    INPUT age\n___ (age >= 13) AND (age <= 120)\nOUTPUT "Age accepted"',
+    blanks: [['REPEAT'], ['UNTIL']],
+    ms: 'REPEAT ... UNTIL is a post-condition loop — the body always runs at least once, then the condition is checked. That fits input validation perfectly: you must ask at least once before you can check what was entered.' },
 ]
 
 // ── Theory Practice UI functions ─ _tpracFilter/_tpracOpen declared near the
@@ -8037,7 +8075,8 @@ function chBadgeClass(ch) {
 }
 
 function renderTheoryCard(e) {
-  const typeBadge = e.type === 'mcq' ? '🔘 MCQ' : e.type === 'convert' ? '🔢 Convert' : '📝 Short'
+  const typeBadge = e.type === 'mcq' ? '🔘 MCQ' : e.type === 'convert' ? '🔢 Convert'
+    : e.type === 'blank' ? '✏️ Fill the Blank' : '📝 Short'
   const isOpen    = _tpracOpen === e.id
   return `<div class="tprac-card${isOpen?' open':''}" id="tcard-${e.id}"${isOpen?'':` onclick="tpracToggle('${e.id}')"`}>
     <div class="tprac-q-title">${e.title}</div>
@@ -8071,6 +8110,15 @@ function tpracBodyHTML(e) {
       ${e.hint ? `<p style="font-size:11px;color:#6b7280;margin-bottom:8px;">💡 ${e.hint}</p>` : ''}
       <input type="text" class="tprac-q-input tprac-single-input" id="tinput-${e.id}" placeholder="Your answer…" />
       <button class="tprac-q-check" onclick="checkTheoryConvert(event,'${e.id}')">Check Answer</button>
+      <div class="tprac-feedback" id="tprac-fb-${e.id}" style="display:none;"></div>
+      ${closeBtn}
+    </div>`
+  }
+  if (e.type === 'blank') {
+    return `<div class="tprac-q-body" onclick="event.stopPropagation()">
+      ${e.scenario ? `<div class="tprac-scenario">🏢 ${e.scenario}</div>` : ''}
+      <div class="tprac-blank-code">${blankCodeHTML(e)}</div>
+      <button class="tprac-q-check" onclick="checkTheoryBlank(event,'${e.id}')">Check Answer</button>
       <div class="tprac-feedback" id="tprac-fb-${e.id}" style="display:none;"></div>
       ${closeBtn}
     </div>`
@@ -8126,6 +8174,56 @@ function checkTheoryConvert(evt, id) {
     fb.innerHTML = ok
       ? `✅ Correct! The answer is ${ex.answer}.`
       : `❌ Not quite. The answer is <strong>${ex.answer}</strong>.${ex.hint ? ' <span style="font-size:11px;display:block;margin-top:4px;">'+ex.hint+'</span>' : ''}`
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+
+// Splits e.q on '___' and interleaves an inline <input> per gap, sized to its
+// expected answer so short keywords (IF/THEN) don't get a giant empty box.
+function blankCodeHTML(e) {
+  const parts = e.q.split('___')
+  return parts.map((part, i) => {
+    const text = escapeHtml(part)
+    if (i === parts.length - 1) return text
+    const expected = (e.blanks[i] && e.blanks[i][0]) || ''
+    const width = Math.max(3, expected.length + 2)
+    return `${text}<input type="text" class="tprac-blank-input" id="tblank-${e.id}-${i}"
+      style="width:${width}ch;" autocomplete="off" spellcheck="false" onclick="event.stopPropagation()" />`
+  }).join('')
+}
+
+function checkTheoryBlank(evt, id) {
+  evt.stopPropagation()
+  const ex = THEORY_EXERCISES.find(e => e.id === id)
+  if (!ex) return
+  const fb = document.getElementById('tprac-fb-' + id)
+  let correctCount = 0
+  ex.blanks.forEach((accepted, i) => {
+    const inp = document.getElementById(`tblank-${id}-${i}`)
+    if (!inp) return
+    const val = inp.value.trim().toLowerCase()
+    const ok  = accepted.some(a => a.toLowerCase() === val)
+    inp.classList.remove('blank-correct', 'blank-wrong')
+    inp.classList.add(ok ? 'blank-correct' : 'blank-wrong')
+    if (ok) correctCount++
+  })
+  const total = ex.blanks.length
+  const pct   = Math.round((correctCount / total) * 100)
+  if (fb) {
+    fb.style.display = 'block'
+    if (pct === 100) {
+      fb.className = 'tprac-feedback correct'
+      fb.innerHTML = `✅ All ${total} correct! <span style="display:block;margin-top:5px;font-size:11px;opacity:.85;">${ex.ms}</span>`
+    } else if (pct >= 50) {
+      fb.className = 'tprac-feedback partial'
+      fb.innerHTML = `⚠️ ${correctCount}/${total} correct. <span style="display:block;margin-top:5px;font-size:11px;">${ex.ms}</span>`
+    } else {
+      fb.className = 'tprac-feedback wrong'
+      fb.innerHTML = `❌ ${correctCount}/${total} correct. <span style="display:block;margin-top:5px;font-size:11px;">${ex.ms}</span>`
+    }
   }
 }
 
