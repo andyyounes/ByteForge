@@ -76,6 +76,11 @@
       the numeric `grade` column, so this silently showed "IGCSE Year 1 —
       Theory" to students in what the teacher's own view still correctly
       called a Grade 9 class. Dropdown now only offers valid grades per type.
+- [x] Fixed cross-grade leakage in the student dashboard's "Up Next"/Pathways
+      widgets: conceptsForGrade/pathwaysForGrade used a cumulative filter, so
+      a Grade 9 student saw Grade 6/7/8's own concepts and pathways (Artist's
+      Toolkit, Game Maker, Systems Builder) mixed into their suggestions.
+      Grade-tagged concepts/pathways are now exclusive to their own grade.
 - [ ] Cosmetic-only: each class type's teacher-facing "Syllabus" preview
       (lib/class-types.ts `syllabus` field, shown in Resources tab) is
       hand-written marketing copy and doesn't mirror the actual built map
