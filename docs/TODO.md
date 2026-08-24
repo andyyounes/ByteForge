@@ -81,6 +81,16 @@
       a Grade 9 student saw Grade 6/7/8's own concepts and pathways (Artist's
       Toolkit, Game Maker, Systems Builder) mixed into their suggestions.
       Grade-tagged concepts/pathways are now exclusive to their own grade.
+- [x] Added a new `type:'blank'` (fill-in-the-blank) theory-practice exercise
+      type to AS Level and A Level's Code Lab (previously only mcq/short/
+      convert/ai existed). Renders a monospace pseudocode block with inline
+      inputs per gap, each checked independently (case-insensitive, accepts
+      alternate answers) with green/red per-blank coloring on submit. Added
+      6 real-life-scenario exercises (banking login, shop discount loop,
+      coffee-shop queue, fitness-app validator, delivery-app recursion,
+      banking withdrawal exception guard) instead of abstract examples, per
+      explicit user request. Not yet in IGCSE Y1/Y2 or Grade 9-13 lower
+      grades — those don't have this theory-practice system at all.
 - [ ] Cosmetic-only: each class type's teacher-facing "Syllabus" preview
       (lib/class-types.ts `syllabus` field, shown in Resources tab) is
       hand-written marketing copy and doesn't mirror the actual built map
