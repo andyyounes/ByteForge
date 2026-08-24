@@ -352,17 +352,45 @@ export function stageToGrade(stage: string): number {
   return map[stage] ?? 13
 }
 
-/** All concepts visible to a student at this grade (gradeMin ≤ studentGrade). */
+/**
+ * All concepts visible to a student at this grade.
+ *
+ * A concept tagged with a specific `gradeN` (its own dedicated, self-contained
+ * curriculum — e.g. Grade 6's Creator Quest, Grade 8's rehomed Systems Builder
+ * challenges) is exclusive to that grade: a Grade 9 student has already moved
+ * past Grade 6/7/8's own map and shouldn't see their concepts resurface here.
+ * Concepts with no gradeN tag are the older shared foundational pool (pseudocode,
+ * search/sort, etc.) meant to build up cumulatively from their gradeMin onward.
+ */
 export function conceptsForGrade(grade: number): Concept[] {
-  return CONCEPTS.filter(c => (c.gradeMin ?? 0) <= grade)
+  return CONCEPTS.filter(c => {
+    const gradeTag = c.tags.find(t => /^grade[6-9]$/.test(t))
+    if (gradeTag) return gradeTag === `grade${grade}`
+    return (c.gradeMin ?? 0) <= grade
+  })
 }
 
-/** All pathways visible to a student at this grade. */
+/** Parse a pathway's `tier` string (e.g. "Grade 6", "Grade 9–10", "Grade 10–AS Level")
+ *  into an inclusive [minGrade, maxGrade] range. */
+function tierRange(tier: string | undefined): [number, number] {
+  if (!tier) return [6, 6]
+  const nums = tier.match(/\d+/g)?.map(Number) ?? []
+  const min = nums[0] ?? 6
+  if (nums.length >= 2) return [min, nums[1]]
+  if (/AS Level/.test(tier)) return [min, 12]
+  if (/A Level/.test(tier))  return [min, 13]
+  return [min, min]
+}
+
+/**
+ * All pathways visible to a student at this grade — inclusive of the pathway's
+ * full tier range, not just "at or below" the tier's starting grade (which
+ * previously let e.g. a Grade-6-only pathway leak into every higher grade).
+ */
 export function pathwaysForGrade(grade: number): typeof PATHWAYS {
   return PATHWAYS.filter(p => {
-    const m = p.tier?.match(/(\d+)/)
-    const tierGrade = m ? parseInt(m[1]) : 6
-    return tierGrade <= grade
+    const [min, max] = tierRange(p.tier)
+    return grade >= min && grade <= max
   })
 }
 
