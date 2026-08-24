@@ -328,13 +328,39 @@ App Builder (M9) · Year 8 Shipper (M10).
 
 ---
 
-# GRADE 9 — "The Deep Diver" (EXISTING — unchanged)
+# GRADE 9 — "The Deep Diver" (mostly unchanged — one gap closed below)
 
 30 weeks, 3 terms: Think & Plan (unplugged→binary→hex→flowcharts→pseudocode→trace tables)
 → Go Deeper (sorting, searching, cyber, hardware, AI) → Build & Create (Python properly →
 files → data viz → project). *Validated against the ladder: G8 graduates arrive already
 writing Python, so G9's Term 1 pseudocode discipline lands on fertile ground, and Term 3
 Python is consolidation + depth rather than first contact. Direct feed into IGCSE 0478.*
+
+## IGCSE 0478 alignment audit (2026-08-24)
+
+Grade 9 doesn't map onto an 0860 Lower Secondary stage — 0860 stops at Stage 9 (our
+Grade 8). Grade 9 sits above it, feeding straight into **IGCSE Computer Science (0478)**,
+so it's audited against 0478's 8 syllabus units instead (see `lib/class-types.ts`'s
+`igcse` entry for the exact unit list). Result: 7 of 8 units are already strongly covered
+(Programming especially — flowcharts, pseudocode, data types, procedures, trace tables,
+files, arrays all land somewhere in the week list). One unit is a complete gap, matching
+the exact same weak spot found across Grades 6–8:
+
+- **Databases (0478 Unit 8 — SQL, data validation, relational databases): missing
+  entirely.** Closed by extending **Mission IDE Phase 3 "Data missions"** (already
+  reusing G8's CSV patterns) to include simple SQL-style querying — `SELECT`/`WHERE`-
+  style filtering over their own CSV — and linking two datasets by a shared key. This
+  completes the spiral started in this audit: G6 W11 (primary-key concept) → G8 M6
+  (linking two CSVs by a shared column) → **G9 Phase 3 (real SQL-style querying)**
+  `[0478: Unit 8 — SQL, relational databases]`.
+
+Two smaller gaps noted but **not closed** (lower confidence on where they fit inside the
+mission structure, and Grade 9's system is already mature/actively built — flagging for a
+decision rather than guessing):
+- **Software (0478 Unit 4 — OS, high/low-level languages, translators):** no dedicated
+  content; only a light spiral-seed exists via G8 M7's new compiler-vs-interpreter aside.
+- **Logic Gates (0478 Unit 3 — part of Hardware):** G6 W6 now has a light AND/OR touch,
+  but 0478's fuller treatment (truth tables, simple circuits) has no home in Grade 9 yet.
 
 ---
 
