@@ -1146,7 +1146,134 @@ print(html)
       },
     },
   ]},
-  { id:'m9w', name:'🖥 M9 — Interactive Apps',        sub:'A canvas app with real state: menu -> running -> results',              count:4, live:false },
+  { id:'m9w', name:'🖥 M9 — Interactive Apps', sub:'A canvas app with real state: menu -> running -> results', live:true, stages:[
+    {
+      id:'m9s1', name:'Name That Error', xp:45,
+      text:`<strong>Challenge 1 — Syntax, Logic &amp; Runtime Errors</strong> — Not all bugs are the same. A <strong>syntax error</strong> means Python can't even understand your code's structure. A <strong>logic error</strong> means it runs fine but gives the wrong answer. A <strong>runtime error</strong> means it crashes partway through, on some inputs but not others. Fix all three functions below — and label each fix with a comment naming which type of error it was.`,
+      hints:[
+        'check_win is missing a colon (:) at the end of its if line — that\'s a syntax error, Python can\'t parse the structure at all.',
+        'is_even always returns the wrong answer for every input — that\'s a logic error, the code runs but the condition is backwards.',
+        'average crashes only when scores is empty (dividing by zero) — that\'s a runtime error. Guard it: if len(scores) == 0: return 0',
+      ],
+      starter:`# Grade 8 — Name That Error (fix all three, label the error type)
+
+def check_win(score):
+    if score >= 100
+        return True
+    return False
+# TODO: fix the syntax error above, then add a comment: # syntax error - ...
+
+def is_even(n):
+    return n % 2 == 1
+# TODO: fix the logic error above, then add a comment: # logic error - ...
+
+def average(scores):
+    return sum(scores) / len(scores)
+# TODO: fix the runtime error above (what happens with an empty list?), then add a comment: # runtime error - ...
+
+print(check_win(120))
+print(is_even(4))
+print(average([]))
+`,
+      check:(code) => {
+        const fixedSyntax = /if\s+score\s*>=\s*100\s*:/.test(code)
+        const fixedLogic  = /n\s*%\s*2\s*==\s*0/.test(code)
+        const fixedRuntime = /len\s*\(\s*scores\s*\)\s*==\s*0/.test(code) || /if\s+not\s+scores/.test(code)
+        const namesTypes = /syntax/i.test(code) && /logic/i.test(code) && /runtime/i.test(code)
+        return fixedSyntax && fixedLogic && fixedRuntime && namesTypes
+      },
+    },
+    {
+      id:'m9s2', name:'Trace It', xp:45,
+      text:`<strong>Challenge 2 — Trace Tables</strong> — When code doesn't do what you expect, the fix isn't guessing — it's <strong>tracing</strong>: stepping through line by line and writing down every variable's value as it changes, exactly like filling in a trace table on paper. Add a print statement inside the loop below so you can watch <code>total</code> and <code>count</code> change on every single pass.`,
+      hints:[
+        'Put your print() INSIDE the for loop (indented the same as the lines above it) so it runs every time round.',
+        'Print all the changing variables together: print(score, total, count) — that\'s one row of a trace table.',
+        'Run it and read the rows top to bottom — that\'s exactly what a paper trace table records.',
+      ],
+      starter:`# Grade 8 — Trace It
+scores = [45, 82, 19, 67, 90, 33]
+total = 0
+count = 0
+
+for score in scores:
+    total = total + score
+    count = count + 1
+    # TODO: print a trace-table row here — score, total, count so far
+
+average = total / count
+print(f"Final average: {average}")
+`,
+      check:(code) => {
+        const printCount = (code.match(/print\s*\(/g) || []).length
+        return printCount >= 2
+      },
+    },
+    {
+      id:'m9s3', name:'Menu, Running, Results', xp:50,
+      text:`<strong>Challenge 3 — An App With State</strong> — Real apps aren't just one screen — they move between <strong>states</strong>: a menu, the app actually running, then a results screen. One variable, <code>app_state</code>, controls which screen draws. Add a fourth branch: what should happen if <code>app_state</code> is something unexpected?`,
+      hints:[
+        'Change app_state to "running" or "results" at the top and re-run to see each screen.',
+        'elif app_state == "results": lets you add as many states as you need, checked in order.',
+        'An else: at the end catches anything that isn\'t "menu", "running", or "results" — a safety net for unexpected state.',
+      ],
+      starter:`# Grade 8 — An App With State (Menu -> Running -> Results)
+app_state = "menu"   # try changing this to "running" or "results"!
+
+background(15, 18, 30)
+
+if app_state == "menu":
+    fill(255, 255, 255)
+    text("QUIZ APP", 150, 100)
+    text("Change app_state above to begin!", 60, 140)
+elif app_state == "running":
+    fill(120, 200, 255)
+    text("Question 3 of 5", 130, 100)
+    text("Score: 40", 150, 140)
+elif app_state == "results":
+    fill(120, 255, 150)
+    text("Final Score: 80", 110, 100)
+    text("Great job!", 150, 140)
+
+# TODO: add an else: branch for an unexpected app_state — draw an error message
+`,
+      check:(code) => {
+        const elifCount = (code.match(/\belif\b/g) || []).length
+        const hasElse   = /\belse\s*:/.test(code)
+        return elifCount >= 2 && hasElse
+      },
+    },
+    {
+      id:'m9s4', name:'Ship the Quiz App', xp:65,
+      text:`<strong>Challenge 4 — Bringing It Together</strong> — Combine everything from this module: track a real score across questions, guard against the runtime error of dividing by zero questions, and use <code>app_state</code> to show the right screen for the result.`,
+      hints:[
+        'percentage = (correct / total_questions) * 100 — but guard it: if total_questions == 0, skip straight to 0 instead of crashing.',
+        'Pick app_state based on the percentage: "results" always works, but you could add a special "perfect" state for 100%.',
+        'Use fill() and text() to actually draw the score on screen, the same way Challenge 3 did.',
+      ],
+      starter:`# Grade 8 — Ship the Quiz App
+correct = 4
+total_questions = 5
+
+# TODO: guard against total_questions being 0 (that would crash!)
+percentage = (correct / total_questions) * 100
+
+app_state = "results"
+
+background(15, 18, 30)
+if app_state == "results":
+    fill(120, 255, 150)
+    text(f"Score: {round(percentage)}%", 120, 100)
+    # TODO: add a second line of text with encouragement based on the score
+`,
+      check:(code) => {
+        const hasGuard = /total_questions\s*==\s*0/.test(code) || /if\s+total_questions/.test(code)
+        const hasPercent = /percentage/.test(code)
+        const hasTextTwice = (code.match(/\btext\s*\(/g) || []).length >= 2
+        return hasGuard && hasPercent && hasTextTwice
+      },
+    },
+  ]},
   { id:'m10', name:'🏆 M10 — Capstone: Data App',     sub:'Plan -> build -> test -> ship a data-driven app of your own',           count:6, live:false },
 ]
 
