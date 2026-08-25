@@ -1082,7 +1082,70 @@ print("That's interpretation: one line at a time, not all-or-nothing like a comp
       },
     },
   ]},
-  { id:'m8',  name:'🌐 M8 — The Connected World',     sub:'How the internet works, staying safe, a one-page HTML profile',        count:2, live:false },
+  { id:'m8', name:'🌐 M8 — The Connected World', sub:'How the internet works, staying safe, a one-page HTML profile', live:true, stages:[
+    {
+      id:'m8s1', name:'Packets & Protocols', xp:45,
+      text:`<strong>Challenge 1 — Packets Don't Arrive in Order</strong> — When you send a message over the internet, it's chopped into numbered <strong>packets</strong> and sent separately — they can arrive in any order, or even take different routes! This is what the <strong>TCP/IP</strong> protocol handles: TCP numbers and reassembles the packets, IP gets each one to the right address. <strong>HTTP</strong> is the protocol layered on top that web pages actually speak. Simulate it: split a message into packets, shuffle their arrival order, then put them back together correctly.<br><br>
+      <span style="opacity:.8;font-size:12px;">💡 This is also why your school's wifi needs more than one router: a <strong>star topology</strong> (every device connects to one central point) means each router can only reach so many devices before it gets overloaded — a bigger building needs several, linked together.</span>`,
+      hints:[
+        'range(0, len(message), packet_size) steps through the message in chunks of packet_size characters.',
+        'Each packet is a tuple: (index, chunk). Build the list with packets.append((index, chunk)).',
+        'sorted(arrived) sorts tuples by their first item automatically — that\'s the packet index. Then join the chunks: "".join(chunk for index, chunk in sorted_packets)',
+      ],
+      starter:`# Grade 8 — Packets & Protocols
+message = "MEET ME AT THE LIBRARY AT NOON"
+packet_size = 5
+
+# Step 1: split the message into numbered packets
+packets = []
+for i in range(0, len(message), packet_size):
+    chunk = message[i:i + packet_size]
+    index = i // packet_size
+    packets.append((index, chunk))
+
+# Step 2: simulate the packets arriving OUT OF ORDER — this really happens!
+arrived = [packets[2], packets[5], packets[0], packets[4], packets[1], packets[3]]
+print("Arrived (out of order):", arrived)
+
+# TODO: sort "arrived" back into the correct order using the index,
+# then join the chunks back into the original message and print it
+`,
+      check:(code) => {
+        const hasSort = /sorted\s*\(/.test(code) || /\.sort\s*\(/.test(code)
+        const hasJoin = /\.join\s*\(/.test(code)
+        return hasSort && hasJoin
+      },
+    },
+    {
+      id:'m8s2', name:'Build a Profile Page', xp:45,
+      text:`<strong>Challenge 2 — Generating a Real Web Page</strong> — Every web page is really just a text file written in <strong>HTML</strong>. Servers often build that text on the fly using a real programming language — exactly what you're about to do: use Python to generate the HTML source for your own one-page profile.<br><br>
+      <span style="opacity:.8;font-size:12px;">💡 Staying safe online: never put your real full name, address, or school in a public profile page — this one's just practice, so keep it to a first name or nickname.</span>`,
+      hints:[
+        'An HTML page needs tags around content: <h1>Heading</h1>, <p>A paragraph</p>.',
+        'Build the string with an f-string so your variables slot right in: f"<h1>{name}</h1>"',
+        'You can build it as one f-string with \\n between each line, e.g. f"<h1>{name}</h1>\\n<p>{bio}</p>"',
+      ],
+      starter:`# Grade 8 — Build a Profile Page (Python generating real HTML)
+name = "Alex"
+favorite = "robotics"
+bio = "I love building things and solving puzzles."
+
+# TODO: build an HTML string using an f-string:
+# - an <h1> with your name
+# - a <p> with your bio
+# - a <p> mentioning your favorite thing
+html = ""
+
+print(html)
+`,
+      check:(code) => {
+        const hasH1 = /<h1>/.test(code)
+        const hasP  = /<p>/.test(code)
+        const hasFString = /f['"]/.test(code)
+        return hasH1 && hasP && hasFString
+      },
+    },
+  ]},
   { id:'m9w', name:'🖥 M9 — Interactive Apps',        sub:'A canvas app with real state: menu -> running -> results',              count:4, live:false },
   { id:'m10', name:'🏆 M10 — Capstone: Data App',     sub:'Plan -> build -> test -> ship a data-driven app of your own',           count:6, live:false },
 ]
