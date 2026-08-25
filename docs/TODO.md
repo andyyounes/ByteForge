@@ -27,9 +27,17 @@
       read, not simulated). 4 stages: reading a CSV register, mean/max/min/
       count stats, binary search over a sorted name list, and linking two
       CSVs by a shared id column (relational-database idea). Verified live
-      through actual Pyodide file reads. Modules 7-10 still stubbed locked —
-      next up is M7 Inside the Machine (needs the compiler-vs-interpreter +
-      Fetch-Decode-Execute teaser from the 0860 realignment).
+      through actual Pyodide file reads.
+- [x] Grade 8 M7 — Inside the Machine built. 3 stages: storage units + binary
+      (spiral from Grade 6's binary cards, bin() to see real representation),
+      images-as-numbers (grayscale via RGB averaging, spirals from Pixel Caves
+      and M4's Rainbow Row), and compiler-vs-interpreter (the 0860-audit
+      addition — students catch a deliberate error in try/except and observe
+      partial output already printed, proving line-by-line interpretation;
+      Fetch-Decode-Execute introduced as a one-paragraph teaser per spec).
+      Verified live. Modules 8-10 still stubbed locked — next up is M8 The
+      Connected World (needs the TCP/IP/HTTP protocol names + topology sketch
+      from the 0860 realignment).
 - [ ] Expand A Level Code Lab sets (5 → 10 per category) + more full past papers.
 - [ ] Past-paper PDF importer (teacher uploads a real Paper 4 → lab category, verbatim).
 
