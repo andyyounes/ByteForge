@@ -756,7 +756,100 @@ for score in top_5:
   },
   ]},
 
-  { id:'m5',  name:'✂️ M5 — Strings & Validation',   sub:'Slicing, methods, checking input — the Caesar cipher in real code',        count:3, live:false },
+  { id:'m5', name:'✂️ M5 — Strings & Validation', sub:'Slicing, methods, checking input — the Caesar cipher in real code', live:true, stages:[
+    {
+      id:'m5s1', name:'Clean the Username', xp:30,
+      text:`<strong>Challenge 1 — String Methods & Slicing</strong> — A sign-up form just received a messy username. Clean it up: strip the extra spaces, make it lowercase, then print just the first 3 characters (used as an avatar initials badge).`,
+      hints:[
+        '.strip() removes leading/trailing spaces. .lower() makes everything lowercase. Chain them: messy.strip().lower()',
+        'Slicing a string works just like a list: name[0:3] or name[:3] gets the first 3 characters.',
+        'Use len(cleaned) to print how many characters are left after cleaning.',
+      ],
+      starter:`# Grade 8 — String Methods & Slicing
+# A real sign-up form: the username arrives messy — clean it up!
+
+messy_username = "   AlexTheCoder   "
+
+# TODO: use .strip() and .lower() to clean it up
+cleaned = messy_username
+
+print(f"Cleaned: '{cleaned}'")
+print(f"Length: {len(cleaned)}")
+
+# TODO: print just the first 3 characters (slicing) — the avatar initials
+`,
+      check:(code) => {
+        const hasStrip = /\.strip\s*\(/.test(code)
+        const hasLower = /\.lower\s*\(/.test(code)
+        const hasSlice = /\[\s*:?\s*\d*\s*:?\s*\d*\s*\]/.test(code) && /\[[^\]]*\d[^\]]*\]/.test(code)
+        return hasStrip && hasLower && hasSlice
+      },
+    },
+    {
+      id:'m5s2', name:'Password Checker', xp:40,
+      text:`<strong>Challenge 2 — Input Validation</strong> — Real apps never trust user input blindly. Write a checker that only accepts a password if it's at least 8 characters long <em>and</em> contains at least one digit.`,
+      hints:[
+        'len(password) >= 8 checks the length requirement.',
+        'To check for a digit, loop through each character: for ch in password: if ch.isdigit(): ...',
+        'Combine both checks with "and" inside one if statement, e.g. if long_enough and has_digit:',
+      ],
+      starter:`# Grade 8 — Password Validation
+# Accept the password only if: length >= 8 AND it contains at least one digit
+
+password = "coder2026"
+
+long_enough = len(password) >= 8
+
+has_digit = False
+for ch in password:
+    # TODO: if ch.isdigit(), set has_digit = True
+    pass
+
+# TODO: if long_enough and has_digit, print "Password accepted"
+# otherwise print "Password too weak"
+`,
+      check:(code) => {
+        const hasLen    = /len\s*\(/.test(code)
+        const hasDigit  = /\.isdigit\s*\(/.test(code)
+        const hasAnd    = /\band\b/.test(code)
+        const hasIf     = /\bif\b/.test(code)
+        return hasLen && hasDigit && hasAnd && hasIf
+      },
+    },
+    {
+      id:'m5s3', name:'Caesar Cipher — In Real Code', xp:60,
+      text:`<strong>Challenge 3 — The Caesar Cipher, Coded</strong> — Remember the cipher wheel from Grade 6? You turned it by hand. Now you're writing the function that does the turning: shift every letter of a message forward by a fixed number of places in the alphabet.`,
+      hints:[
+        'ord(ch) turns a letter into its number code; chr(n) turns a number back into a letter. ord("a") is 97.',
+        'Shift within the alphabet: shifted = (ord(ch) - ord("a") + shift) % 26 + ord("a") — the %26 wraps z back to a.',
+        'Loop over every character in the message, shift only the letters, and build up the result with result = result + chr(shifted).',
+      ],
+      starter:`# Grade 8 — Caesar Cipher (the cipher wheel, now in code!)
+# Shift every letter of "message" forward by "shift" places in the alphabet.
+
+def caesar_encode(message, shift):
+    result = ""
+    for ch in message:
+        if ch.isalpha():
+            base = ord("a")
+            # TODO: shifted = (ord(ch) - base + shift) % 26 + base
+            shifted = 0
+            result = result + chr(shifted)
+        else:
+            result = result + ch
+    return result
+
+secret = caesar_encode("attack at dawn", 3)
+print(secret)
+`,
+      check:(code) => {
+        const hasDef    = /def\s+caesar_encode\s*\(/.test(code)
+        const hasOrdChr = /ord\s*\(/.test(code) && /chr\s*\(/.test(code)
+        const hasMod    = /%\s*26/.test(code)
+        return hasDef && hasOrdChr && hasMod
+      },
+    },
+  ]},
   { id:'m6',  name:'🗂 M6 — Files & Data',            sub:'Reading/writing CSV, mean/max/min, a chart from real data',              count:4, live:false },
   { id:'m7',  name:'⚙️ M7 — Inside the Machine',      sub:'Binary numbers, storage units, how images/sound are numbers',           count:3, live:false },
   { id:'m8',  name:'🌐 M8 — The Connected World',     sub:'How the internet works, staying safe, a one-page HTML profile',        count:2, live:false },
