@@ -8,7 +8,7 @@ const e1 = html.indexOf('// ══', s1 + 10)
 const s2 = html.indexOf('const W1_STAGES = [')
 const e2 = html.indexOf('const ALL_STAGES')
 const ctx = html.slice(s1, e1) + html.slice(s2, e2)
-const { runMaze, W1_STAGES, W2_STAGES } = new Function(ctx + '\nreturn { runMaze, W1_STAGES, W2_STAGES }')()
+const { runMaze, W1_STAGES, W2_STAGES, W4_STAGES } = new Function(ctx + '\nreturn { runMaze, W1_STAGES, W2_STAGES, W4_STAGES }')()
 
 function optimal(grid) {
   const rows = grid.length, cols = grid[0].length
@@ -74,22 +74,38 @@ function flatten(chips) {
   for (const [c, n] of chips) for (let k = 0; k < n; k++) flat.push(c)
   return flat
 }
-for (const st of W2_STAGES) {
-  const mazes = st.boss ? st.mazes : [st]
-  mazes.forEach((m, i) => {
-    const label = st.id + (st.boss ? ' maze' + (i + 1) : '')
-    const solKey = st.boss ? st.id + '-m' + (i + 1) : st.id
-    if (optimal(m.grid) === -1) { fail++; console.log(`✗ ${label} — UNSOLVABLE`); return }
-    const sol = W2_SOLS[solKey]
-    if (!sol) { fail++; console.log(`✗ ${label} — no reference chip solution`); return }
-    const bad = sol.find(([, n]) => n < 1 || n > 5)
-    if (bad) { fail++; console.log(`✗ ${label} — solution uses illegal multiplier`); return }
-    const res = runMaze(m.grid, flatten(sol))
-    if (!res.ok) { fail++; console.log(`✗ ${label} — reference solution fails (${res.reason})`); return }
-    if (sol.length !== m.par) { fail++; console.log(`✗ ${label} — par ${m.par} but solution uses ${sol.length} chips`); return }
-    console.log(`✓ ${label} — ${sol.length} chips == par`)
-  })
+function checkChipWorld(stages, sols, worldLabel) {
+  for (const st of stages) {
+    const mazes = st.boss ? st.mazes : [st]
+    mazes.forEach((m, i) => {
+      const label = st.id + (st.boss ? ' maze' + (i + 1) : '')
+      const solKey = st.boss ? st.id + '-m' + (i + 1) : st.id
+      if (optimal(m.grid) === -1) { fail++; console.log(`✗ ${label} — UNSOLVABLE`); return }
+      const sol = sols[solKey]
+      if (!sol) { fail++; console.log(`✗ ${label} — no reference chip solution`); return }
+      const bad = sol.find(([, n]) => n < 1 || n > 5)
+      if (bad) { fail++; console.log(`✗ ${label} — solution uses illegal multiplier`); return }
+      const res = runMaze(m.grid, flatten(sol))
+      if (!res.ok) { fail++; console.log(`✗ ${label} — reference solution fails (${res.reason})`); return }
+      if (sol.length !== m.par) { fail++; console.log(`✗ ${label} — par ${m.par} but solution uses ${sol.length} chips`); return }
+      console.log(`✓ [${worldLabel}] ${label} — ${sol.length} chips == par`)
+    })
+  }
 }
+
+checkChipWorld(W2_STAGES, W2_SOLS, 'W2')
+
+// ── World 4 — Loop Land. Same chip-par rules as World 2, bigger legs.
+const W4_SOLS = {
+  'w4s1':      [['R',5],['R',4],['D',3]],
+  'w4s2':      [['R',5],['D',3],['R',5]],
+  'w4s3':      [['R',5],['D',4],['L',5]],
+  'w4s4':      [['R',5],['R',2],['D',3],['L',5],['L',2]],
+  'w4s5':      [['R',5],['D',3],['R',4],['D',2]],
+  'w4boss-m1': [['R',5],['D',3],['R',4],['D',2],['L',3]],
+  'w4boss-m2': [['R',5],['R',1],['D',5],['D',1],['L',5],['L',1]],
+}
+checkChipWorld(W4_STAGES, W4_SOLS, 'W4')
 
 console.log(fail ? `\n${fail} problems` : '\nall mazes solvable, all pars honest')
 process.exit(fail ? 1 : 0)

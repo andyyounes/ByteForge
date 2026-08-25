@@ -506,16 +506,90 @@ const W3_STAGES = [
     targets: [[255, 100, 0], [40, 200, 120], [180, 60, 220]] },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 4 — Loop Land: same repeat-chip engine as Block Basics, bigger legs,
+// deeper patterns. New this world: flowchart notation (predict the route
+// before you build it) and a first peek at nested loops (still built as a
+// flat repeat here — true nesting is a Grade 7 idea).
+// ══════════════════════════════════════════════════════════════════════════════
+const W4_STAGES = [
+  { id: 'w4s1', title: 'Bracelet Loom', emoji: '🧵', par: 3, xp: 25, repeats: true,
+    goal: 'FLOWCHART TIME: before you place a single chip, picture this route as boxes and arrows — a rectangle for each move, a diamond if you ever need to ask a question like "wall ahead?". This route is simple: right, then down. Draw it in your head, then build it in 3 chips.',
+    grid: ['############',
+           '#S.........#',
+           '##########.#',
+           '##########.#',
+           '##########G#'] },
+  { id: 'w4s2', title: 'Tiled Floor', emoji: '🧱', par: 3, xp: 25, repeats: true,
+    goal: 'A tiled floor pattern repeats the same tile over and over. This path repeats the same idea: right, down, right. Predict the shape the flowchart would draw before you press a single chip.',
+    grid: ['#############',
+           '#S.....######',
+           '######.######',
+           '######.######',
+           '######.....G#',
+           '#############'] },
+  { id: 'w4s3', title: 'Countdown Corridor', emoji: '⏱️', par: 3, xp: 30, repeats: true,
+    goal: 'Right, down, left — a U-turn around the block in the middle. Three chips, three legs, like counting down: 3, 2, 1.',
+    grid: ['########',
+           '#S.....#',
+           '######.#',
+           '######.#',
+           '######.#',
+           '#G.....#',
+           '########'] },
+  { id: 'w4s4', title: 'Rhythm Repeat', emoji: '🥁', par: 5, xp: 35, repeats: true,
+    goal: 'Spot the repeat, just like a drum beat repeats: two long straight sections with a star hiding in each one. Grab both on your way to the goal.',
+    grid: ['##########',
+           '#S.....*.#',
+           '########.#',
+           '########.#',
+           '#G......*#',
+           '##########'] },
+  { id: 'w4s5', title: 'Deeper Repeats', emoji: '🔁', par: 4, xp: 35, repeats: true,
+    goal: 'Four legs this time — the pattern is the same skill as Block Basics, just longer. Plan every chip before you place the first one.',
+    grid: ['############',
+           '#S.....#####',
+           '######.#####',
+           '######.#####',
+           '######.....#',
+           '##########.#',
+           '##########G#',
+           '############'] },
+  { id: 'w4boss', title: 'BOSS — Loop Master Gauntlet', emoji: '🌀', boss: true, xp: 75, repeats: true,
+    goal: 'Two tough mazes. PEEK AHEAD: if you could put a repeat chip INSIDE another repeat chip (a "nested" loop), a maze like this could take even fewer chips — Grade 7 is where you\'ll actually get to do that. For now, fewest flat chips wins the crown.',
+    mazes: [
+      { par: 5,
+        grid: ['############',
+               '#S.....#####',
+               '######.#####',
+               '######.#####',
+               '######..*..#',
+               '##########.#',
+               '#######G...#',
+               '############'] },
+      { par: 6,
+        grid: ['#########',
+               '#S......#',
+               '#######.#',
+               '#######.#',
+               '#######.#',
+               '#######.#',
+               '#######.#',
+               '#G......#',
+               '#########'] },
+    ] },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
-// The quest map — 12 worlds (Worlds 1–2 playable in this release)
+// The quest map — 12 worlds (Worlds 1–4 playable in this release)
 // ══════════════════════════════════════════════════════════════════════════════
 const WORLDS = [
   { id: 'w1',  name: '🤖 Robot Road',        sub: 'Command a robot — no code yet!',            stages: W1_STAGES, live: true },
   { id: 'w2',  name: '🧩 Block Basics',       sub: 'Repeat chips — your first taste of loops',  stages: W2_STAGES, live: true },
   { id: 'w3',  name: '🎨 Color & Shape Lab',  sub: 'Mix light — colors are secretly numbers!',  stages: W3_STAGES, live: true },
-  { id: 'w4',  name: '🔁 Loop Land',          sub: 'Why write it 10 times? Repeat!',            count: 6,  live: false },
+  { id: 'w4',  name: '🔁 Loop Land',          sub: 'Why write it 10 times? Repeat!',            stages: W4_STAGES, live: true },
   { id: 'w5',  name: '🐢 Turtle Island',      sub: 'Loops + angles = amazing art',              count: 6,  live: false },
   { id: 'w6',  name: '🖼 Pixel Caves',        sub: 'Pictures are secretly numbers',             count: 5,  live: false },
   { id: 'w7',  name: '🕵️ Cipher City',        sub: 'Secret codes — make them and crack them',   count: 5,  live: false },
