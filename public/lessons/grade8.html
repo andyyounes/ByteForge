@@ -992,7 +992,96 @@ for line in roster_lines[1:]:
       },
     },
   ]},
-  { id:'m7',  name:'⚙️ M7 — Inside the Machine',      sub:'Binary numbers, storage units, how images/sound are numbers',           count:3, live:false },
+  { id:'m7', name:'⚙️ M7 — Inside the Machine', sub:'Binary numbers, storage units, how images/sound are numbers', live:true, stages:[
+    {
+      id:'m7s1', name:'Storage Units & Binary', xp:35,
+      text:`<strong>Challenge 1 — Storage Units & Binary</strong> — Your phone says a video is "250 MB", but the file system actually counts every single byte. Convert between bytes, KB, MB and GB — then use Python's <code>bin()</code> to see a number the way the computer actually stores it (remember the binary cards from Grade 6? Same idea — just typed instead of flipped).`,
+      hints:[
+        '1 KB = 1024 bytes. 1 MB = 1024 KB = 1024 * 1024 bytes. Divide to convert down to a bigger unit.',
+        'bin(42) returns the string \'0b101010\' — the 0b just means "this is binary", the digits after it are the actual binary number.',
+        'Round your KB/MB values so they\'re readable: round(value, 2).',
+      ],
+      starter:`# Grade 8 — Storage Units & Binary
+# A video file is this many bytes:
+size_in_bytes = 262144000
+
+# TODO: convert to kilobytes (divide by 1024) and print it
+# TODO: convert to megabytes (divide by 1024*1024) and print it
+
+# Every number is stored as binary underneath — see it for yourself:
+small_number = 42
+# TODO: print bin(small_number)
+`,
+      check:(code) => {
+        const has1024 = /1024/.test(code)
+        const hasBin  = /\bbin\s*\(/.test(code)
+        const hasPrint = (code.match(/print\s*\(/g) || []).length >= 3
+        return has1024 && hasBin && hasPrint
+      },
+    },
+    {
+      id:'m7s2', name:'Images Are Numbers', xp:45,
+      text:`<strong>Challenge 2 — Images Are Numbers</strong> — Remember Pixel Caves and Rainbow Row? Every pixel is really just three numbers: (red, green, blue). A photo-editing app converts a color photo to grayscale by averaging those three numbers into one — build that converter.`,
+      hints:[
+        'Each pixel is a tuple: (r, g, b). Unpack it with r, g, b = pixel inside your loop.',
+        'Grayscale value = (r + g + b) // 3 — the average brightness of the three colour channels.',
+        'Build a new list of the grayscale numbers with .append() as you loop through the pixels.',
+      ],
+      starter:`# Grade 8 — Images Are Numbers (color -> grayscale)
+# A tiny 5-pixel "photo" — each pixel is (red, green, blue)
+photo = [
+    (220, 40,  40 ),   # a red pixel
+    (40,  200, 60 ),   # a green pixel
+    (50,  90,  230),   # a blue pixel
+    (245, 220, 30 ),   # a yellow pixel
+    (30,  30,  30 ),   # a near-black pixel
+]
+
+grayscale = []
+for pixel in photo:
+    r, g, b = pixel
+    # TODO: average r, g, b into one gray value and .append() it to grayscale
+
+print("Grayscale values:", grayscale)
+`,
+      check:(code) => {
+        const hasUnpack = /\w+\s*,\s*\w+\s*,\s*\w+\s*=\s*pixel/.test(code)
+        const hasAvg    = /\(\s*r\s*\+\s*g\s*\+\s*b\s*\)/.test(code) || /r\s*\+\s*g\s*\+\s*b/.test(code)
+        const hasAppend = /\.append\s*\(/.test(code)
+        return hasUnpack && hasAvg && hasAppend
+      },
+    },
+    {
+      id:'m7s3', name:'How Your Code Actually Runs', xp:40,
+      text:`<strong>Challenge 3 — Compiler vs. Interpreter</strong> — Python (the engine running your code right now) is an <strong>interpreter</strong>: it translates and runs your program one line at a time. A <strong>compiler</strong> instead translates the <em>entire</em> program to machine code first, and refuses to produce anything if there's an error anywhere in it. Prove it to yourself: catch an error partway through your program and notice everything printed <em>before</em> it still ran.<br><br>
+      <span style="opacity:.8;font-size:12px;">💡 Peek ahead: underneath both, the CPU itself runs a tight loop called <strong>Fetch–Decode–Execute</strong> — fetch the next instruction, decode what it means, execute it, repeat. You'll go much deeper on this in Grade 9.</span>`,
+      hints:[
+        'A try/except block lets you keep running even after something breaks: try: risky_code() except ErrorType: handle_it()',
+        'Deliberately dividing by zero (1 / 0) raises a ZeroDivisionError — catch it with except ZeroDivisionError:',
+        'Notice: every print() BEFORE the try block, and even inside it before the error line, already ran — that line-by-line behaviour is what "interpreted" means.',
+      ],
+      starter:`# Grade 8 — Compiler vs. Interpreter
+print("Starting the temperature converter...")
+celsius = 100
+fahrenheit = celsius * 9 / 5 + 32
+print(f"{celsius}C is {fahrenheit}F")
+
+print("Now let's deliberately cause an error inside a try block...")
+try:
+    # TODO: cause a ZeroDivisionError on purpose, e.g. result = 1 / 0
+    pass
+except ZeroDivisionError:
+    print("Caught it! Notice everything above still printed just fine.")
+
+print("That's interpretation: one line at a time, not all-or-nothing like a compiler.")
+`,
+      check:(code) => {
+        const hasTry    = /\btry\s*:/.test(code)
+        const hasExcept = /\bexcept\b/.test(code)
+        return hasTry && hasExcept
+      },
+    },
+  ]},
   { id:'m8',  name:'🌐 M8 — The Connected World',     sub:'How the internet works, staying safe, a one-page HTML profile',        count:2, live:false },
   { id:'m9w', name:'🖥 M9 — Interactive Apps',        sub:'A canvas app with real state: menu -> running -> results',              count:4, live:false },
   { id:'m10', name:'🏆 M10 — Capstone: Data App',     sub:'Plan -> build -> test -> ship a data-driven app of your own',           count:6, live:false },
