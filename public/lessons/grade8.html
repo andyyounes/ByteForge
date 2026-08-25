@@ -1274,7 +1274,136 @@ if app_state == "results":
       },
     },
   ]},
-  { id:'m10', name:'🏆 M10 — Capstone: Data App',     sub:'Plan -> build -> test -> ship a data-driven app of your own',           count:6, live:false },
+  { id:'m10', name:'🏆 M10 — Capstone: Data App', sub:'Plan -> build -> test -> ship a data-driven app of your own', live:true, stages:[
+    {
+      id:'m10s1', name:'Plan & Load Your Quiz', xp:50,
+      files: { 'quiz.csv': 'question,answer\nWhat is 5+3?,8\nCapital of France?,Paris\nColor of the sky?,Blue\n' },
+      text:`<strong>Challenge 1 — Plan &amp; Load</strong> — Every real app starts with data. Your capstone: a quiz app that saves high scores — like the class survey analyser or habit tracker options, it's built on the same skills, just pointed at a different question. Load <code>quiz.csv</code> into two parallel lists: one of questions, one of correct answers.`,
+      hints:[
+        'Skip the header row (index 0), same as every other CSV challenge this module.',
+        'Split each line by comma into q and a, then questions.append(q) and answers.append(a).',
+        'len(questions) should equal len(answers) once you\'re done — same number of each.',
+      ],
+      starter:`# Grade 8 Capstone — Plan & Load Your Quiz
+file = open("quiz.csv")
+lines = file.readlines()
+file.close()
+
+questions = []
+answers = []
+for line in lines[1:]:
+    q, a = line.strip().split(",")
+    # TODO: append q to questions and a to answers
+
+print(f"Loaded {len(questions)} questions.")
+`,
+      check:(code) => {
+        const hasOpen  = /open\s*\(/.test(code)
+        const hasSplit = /\.split\s*\(/.test(code)
+        const appendCount = (code.match(/\.append\s*\(/g) || []).length
+        return hasOpen && hasSplit && appendCount >= 2
+      },
+    },
+    {
+      id:'m10s2', name:'Run the Quiz & Score It', xp:55,
+      text:`<strong>Challenge 2 — Marking Answers</strong> — With the questions loaded, run through them and mark a student's answers against the correct ones. Guard against the runtime error you fixed back in M9: what if there were zero questions?`,
+      hints:[
+        'Loop with an index: for i in range(len(answers)): so you can compare student_answers[i] to answers[i].',
+        'Every time they match, add 1 to a score counter.',
+        'percentage = (score / len(answers)) * 100 — but only if len(answers) > 0, otherwise the app would crash.',
+      ],
+      starter:`# Grade 8 Capstone — Run the Quiz & Score It
+answers = ["8", "Paris", "Blue"]
+student_answers = ["8", "London", "Blue"]   # one wrong answer on purpose
+
+score = 0
+for i in range(len(answers)):
+    # TODO: if student_answers[i] == answers[i], add 1 to score
+    pass
+
+# TODO: guard against len(answers) being 0, then compute percentage = (score / len(answers)) * 100
+percentage = 0
+
+print(f"Score: {score}/{len(answers)} ({percentage}%)")
+`,
+      check:(code) => {
+        const hasCompare = /student_answers\s*\[\s*i\s*\]\s*==\s*answers\s*\[\s*i\s*\]/.test(code)
+        const hasGuard   = /len\s*\(\s*answers\s*\)\s*(==|>)\s*0/.test(code)
+        const hasPercent = /score\s*\/\s*len\s*\(\s*answers\s*\)/.test(code)
+        return hasCompare && hasGuard && hasPercent
+      },
+    },
+    {
+      id:'m10s3', name:'Save the High Score', xp:55,
+      text:`<strong>Challenge 3 — Writing a File</strong> — So far every file you've opened, you've only read. Now write one: save a high score to <code>highscores.txt</code>, then read it straight back to prove it really saved. This is exactly how a real quiz app remembers your best score between sessions.`,
+      hints:[
+        'open("highscores.txt", "w") opens a file for WRITING — "w" instead of the default read mode.',
+        'file.write("Alex: 85\\n") writes a line. Always file.close() when you\'re done writing.',
+        'Open it again — open("highscores.txt") with no mode reads by default — and print(file.read()) to see it saved.',
+      ],
+      starter:`# Grade 8 Capstone — Save the High Score
+player_name = "Alex"
+score = 85
+
+# TODO: open "highscores.txt" in write mode ("w"), write f"{player_name}: {score}\\n", then close it
+
+# TODO: now open "highscores.txt" again (read mode) and print its contents to prove it saved
+`,
+      check:(code) => {
+        const hasWriteMode = /open\s*\(\s*["']highscores\.txt["']\s*,\s*["']w["']\s*\)/.test(code)
+        const hasWrite = /\.write\s*\(/.test(code)
+        const opensCount = (code.match(/open\s*\(/g) || []).length
+        return hasWriteMode && hasWrite && opensCount >= 2
+      },
+    },
+    {
+      id:'m10s4', name:'Ship the Full App', xp:80,
+      files: { 'quiz.csv': 'question,answer\nWhat is 5+3?,8\nCapital of France?,Paris\nColor of the sky?,Blue\n' },
+      text:`<strong>Challenge 4 — Ship It</strong> — Combine everything: load the quiz from a file, score a student's answers, and save the result to a high-score file. This is the whole App Builder year in one program — files, loops, conditions, functions, all pointed at real data.<br><br>
+      <span style="opacity:.8;font-size:12px;">💡 Your quiz.csv has 3 rows. A real company's user database might have 3 <em>billion</em> — that's the jump from ordinary data to <strong>Big Data</strong>: the same ideas (rows, columns, reading, filtering) but at a scale where you need entirely different tools to even store it, let alone search it. Everything you just built still works the same way underneath.</span>`,
+      hints:[
+        'Reuse your Challenge 1 loading code, your Challenge 2 scoring code, and your Challenge 3 saving code — copy each piece in, in order.',
+        'Load questions/answers from quiz.csv first, then compare to a student_answers list, then write the result to highscores.txt.',
+        'Print the final percentage AND the reloaded file contents at the end, so you can see the whole pipeline worked.',
+      ],
+      starter:`# Grade 8 Capstone — Ship the Full App
+# Step 1: load the quiz
+file = open("quiz.csv")
+lines = file.readlines()
+file.close()
+
+questions = []
+answers = []
+for line in lines[1:]:
+    q, a = line.strip().split(",")
+    questions.append(q)
+    answers.append(a)
+
+# Step 2: score a student's answers
+student_answers = ["8", "Paris", "Red"]   # one wrong on purpose
+score = 0
+# TODO: loop and compare student_answers[i] to answers[i], counting correct ones
+
+percentage = (score / len(answers)) * 100 if len(answers) > 0 else 0
+
+# Step 3: save the result
+player_name = "Alex"
+# TODO: open "highscores.txt" in write mode, write f"{player_name}: {round(percentage)}%\\n", close it
+
+# Step 4: read it back to confirm
+# TODO: open "highscores.txt" again and print its contents
+
+print(f"Final score: {score}/{len(answers)} ({round(percentage)}%)")
+`,
+      check:(code) => {
+        const hasLoad  = /open\s*\(\s*["']quiz\.csv["']\s*\)/.test(code)
+        const hasScore = /student_answers\s*\[\s*i\s*\]\s*==\s*answers\s*\[\s*i\s*\]/.test(code)
+        const hasSave  = /open\s*\(\s*["']highscores\.txt["']\s*,\s*["']w["']\s*\)/.test(code)
+        const hasReload = (code.match(/open\s*\(\s*["']highscores\.txt["']/g) || []).length >= 2
+        return hasLoad && hasScore && hasSave && hasReload
+      },
+    },
+  ]},
 ]
 
 const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({ ...s, mod: m.id.toUpperCase() })))
