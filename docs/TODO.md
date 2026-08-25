@@ -51,8 +51,16 @@
       statements, an app_state-driven canvas app (menu/running/results per
       the module's original spec), and a capstone combining a guarded score
       calc with state-driven screens. Verified live, trace-table arithmetic
-      checked correct across all 6 rows. Only M10 (capstone) remains —
-      Grade 8 is now 9/10 modules live.
+      checked correct across all 6 rows.
+- [x] Grade 8 M10 — Capstone: Data App built, completing "The App Builder"
+      (10/10 modules live). A quiz app with saved high scores integrating
+      the whole year's skills — file I/O (including real file WRITING for
+      the first time, not just reading), guarded division, loops. 4 stages:
+      load a quiz from CSV, score answers with a zero-guard, write+read back
+      a high-score file, then a full capstone combining all three, closing
+      with a Big Data discussion per the 0860 audit. Verified live including
+      confirming Pyodide's virtual FS supports real writes with zero extra
+      engineering. **Grade 8 is now fully built end to end.**
 - [ ] Expand A Level Code Lab sets (5 → 10 per category) + more full past papers.
 - [ ] Past-paper PDF importer (teacher uploads a real Paper 4 → lab category, verbatim).
 
