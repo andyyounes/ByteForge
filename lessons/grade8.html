@@ -382,6 +382,15 @@ async function runPython() {
   _fill='#b8ef4a'; _stroke='none'; _lw=2; _fontSz=16; _font='16px Plus Jakarta Sans, sans-serif'
   document.getElementById('pass-badge').style.display = 'none'
 
+  // Write any files this challenge declares into Pyodide's virtual filesystem
+  // so open("students.csv") etc. is a real file read, not a simulation.
+  const activeFiles = CHALLENGES[activeIdx]?.files
+  if (activeFiles) {
+    for (const [name, content] of Object.entries(activeFiles)) {
+      pyodide.FS.writeFile(name, content)
+    }
+  }
+
   const fullCode = PREAMBLE + '\n' + code + '\n_stdout_buf.getvalue()'
 
   clog('— Running —', 'info')
@@ -437,6 +446,10 @@ function parsePyError(raw, userCode) {
     'ZeroDivisionError': () => `ZeroDivisionError: You divided by zero! Make sure your divisor is not 0.`,
     'IndexError': (m) => `IndexError: You tried to access a list item that doesn't exist. Lists start at index 0.`,
     'ValueError': (m) => `ValueError: ${m.split('\n').pop()}`,
+    'FileNotFoundError': (m) => {
+      const name = m.match(/'([^']+)'/)?.[1]
+      return `FileNotFoundError: ${name ? `"${name}" doesn't exist.` : 'That file doesn\'t exist.'} Double-check the filename matches exactly, including the .csv or .txt ending.`
+    },
   }
 
   for (const [errType, fn] of Object.entries(friendly)) {
@@ -850,7 +863,135 @@ print(secret)
       },
     },
   ]},
-  { id:'m6',  name:'🗂 M6 — Files & Data',            sub:'Reading/writing CSV, mean/max/min, a chart from real data',              count:4, live:false },
+  { id:'m6', name:'🗂 M6 — Files & Data', sub:'Reading/writing CSV, mean/max/min, a chart from real data', live:true, stages:[
+    {
+      id:'m6s1', name:'Read the Class Register', xp:35,
+      files: { 'students.csv': 'name,grade\nAmara,85\nLiam,72\nSofia,91\nNoah,68\nMaya,77\n' },
+      text:`<strong>Challenge 1 — Reading a Real File</strong> — <code>students.csv</code> holds one student per line as <code>name,grade</code>. Open it, read every line, and print each student's name and grade separately.`,
+      hints:[
+        'open("students.csv") opens the file. .readlines() gives you a list of every line, including the header.',
+        'line.strip() removes the trailing newline. line.split(",") splits "Amara,85" into ["Amara", "85"].',
+        'Skip the header row (index 0) — start your loop from lines[1:] instead of lines.',
+      ],
+      starter:`# Grade 8 — Reading a Real File
+# students.csv has one student per line: name,grade
+
+file = open("students.csv")
+lines = file.readlines()
+file.close()
+
+for line in lines[1:]:      # skip the header row
+    line = line.strip()
+    # TODO: split "line" by comma into name and grade, then print both
+`,
+      check:(code) => {
+        const hasOpen  = /open\s*\(/.test(code)
+        const hasSplit = /\.split\s*\(\s*['"],['"]\s*\)/.test(code)
+        const hasFor   = /for\s+\w+\s+in\s+/.test(code)
+        return hasOpen && hasSplit && hasFor
+      },
+    },
+    {
+      id:'m6s2', name:'Class Stats', xp:45,
+      files: { 'students.csv': 'name,grade\nAmara,85\nLiam,72\nSofia,91\nNoah,68\nMaya,77\n' },
+      text:`<strong>Challenge 2 — Mean, Max, Min, Count</strong> — Read every grade from <code>students.csv</code> into a list of numbers, then work out the class's mean, highest, lowest, and how many students there are — exactly what a spreadsheet's AVERAGE/MAX/MIN/COUNT functions do.`,
+      hints:[
+        'Build a list: grades = [], then grades.append(int(grade_text)) for each row (int() converts text to a number).',
+        'max(grades), min(grades), len(grades) — Python has these built in, no loop needed.',
+        'Mean = sum(grades) / len(grades). Round it for a tidy print: round(mean, 1)',
+      ],
+      starter:`# Grade 8 — Class Stats (mean, max, min, count)
+file = open("students.csv")
+lines = file.readlines()
+file.close()
+
+grades = []
+for line in lines[1:]:
+    name, grade_text = line.strip().split(",")
+    grades.append(int(grade_text))
+
+# TODO: compute and print the mean, max, min, and count of "grades"
+print(f"Students: {len(grades)}")
+`,
+      check:(code) => {
+        const hasMax = /\bmax\s*\(/.test(code)
+        const hasMin = /\bmin\s*\(/.test(code)
+        const hasSum = /\bsum\s*\(/.test(code)
+        const hasLen = /\blen\s*\(/.test(code)
+        return hasMax && hasMin && hasSum && hasLen
+      },
+    },
+    {
+      id:'m6s3', name:'Find the Student (Binary Search)', xp:50,
+      files: { 'sorted_names.csv': 'Amara\nLiam\nMaya\nNoah\nSofia\n' },
+      text:`<strong>Challenge 3 — Binary Search</strong> — <code>sorted_names.csv</code> is already in alphabetical order. Instead of checking every name one by one (linear search), use <strong>binary search</strong>: jump to the middle, and throw away half the list each time depending on whether your target comes before or after it.`,
+      hints:[
+        'low = 0, high = len(names) - 1. While low <= high: mid = (low + high) // 2',
+        'If names[mid] == target: you found it — print the index and stop. If target < names[mid]: search the left half (high = mid - 1). Otherwise search the right half (low = mid + 1).',
+        'Binary search only works because the list is SORTED — that\'s what lets you safely throw away half each time.',
+      ],
+      starter:`# Grade 8 — Binary Search
+file = open("sorted_names.csv")
+names = [line.strip() for line in file.readlines()]
+file.close()
+
+target = "Sofia"
+low = 0
+high = len(names) - 1
+
+while low <= high:
+    mid = (low + high) // 2
+    # TODO: if names[mid] == target, print the index and break
+    # TODO: elif target < names[mid], narrow to the left half (high = mid - 1)
+    # TODO: else, narrow to the right half (low = mid + 1)
+    break
+`,
+      check:(code) => {
+        const hasWhile = /\bwhile\s+/.test(code)
+        const hasMid   = /mid\s*=\s*\(.*\+.*\)\s*\/\/\s*2/.test(code)
+        const hasNarrow = /(low|high)\s*=\s*mid/.test(code)
+        return hasWhile && hasMid && hasNarrow
+      },
+    },
+    {
+      id:'m6s4', name:'Link Two Classes', xp:55,
+      files: {
+        'roster.csv': 'id,name\n1,Amara\n2,Liam\n3,Sofia\n',
+        'results.csv': 'id,grade\n1,85\n2,72\n3,91\n',
+      },
+      text:`<strong>Challenge 4 — Linking Two Datasets</strong> — <code>roster.csv</code> has student IDs and names; <code>results.csv</code> has the same IDs with grades. Link them by the shared <code>id</code> column and print each student's name next to their grade — the same idea a relational database uses to join two tables.`,
+      hints:[
+        'Build a dictionary from results.csv first: grades_by_id = {}, then grades_by_id[id] = grade for each row.',
+        'Then loop through roster.csv: for each row, look up grades_by_id[id] to get that student\'s grade.',
+        'A dictionary lookup by a shared key (here, "id") is exactly how a relational database links two tables together.',
+      ],
+      starter:`# Grade 8 — Linking Two Datasets by a Shared Key
+results_file = open("results.csv")
+result_lines = results_file.readlines()
+results_file.close()
+
+grades_by_id = {}
+for line in result_lines[1:]:
+    student_id, grade = line.strip().split(",")
+    grades_by_id[student_id] = grade
+
+roster_file = open("roster.csv")
+roster_lines = roster_file.readlines()
+roster_file.close()
+
+for line in roster_lines[1:]:
+    student_id, name = line.strip().split(",")
+    # TODO: look up this student's grade in grades_by_id using student_id
+    # then print something like: "Amara: 85"
+`,
+      check:(code) => {
+        const hasDict   = /\{\}/.test(code) || /grades_by_id\s*=\s*\{/.test(code)
+        const hasLookup = /grades_by_id\s*\[/.test(code)
+        const hasTwoOpens = (code.match(/open\s*\(/g) || []).length >= 2
+        return hasDict && hasLookup && hasTwoOpens
+      },
+    },
+  ]},
   { id:'m7',  name:'⚙️ M7 — Inside the Machine',      sub:'Binary numbers, storage units, how images/sound are numbers',           count:3, live:false },
   { id:'m8',  name:'🌐 M8 — The Connected World',     sub:'How the internet works, staying safe, a one-page HTML profile',        count:2, live:false },
   { id:'m9w', name:'🖥 M9 — Interactive Apps',        sub:'A canvas app with real state: menu -> running -> results',              count:4, live:false },
