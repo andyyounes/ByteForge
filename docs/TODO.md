@@ -16,8 +16,13 @@
       toolbox), then G5-G10 content + boss builds.
 - [x] Grade 8 wiring started: Builder City map live for Modules 1-4 (From Blocks
       to Text, Choices & Loops - both new; Functions, Lists - rehomed pre-existing
-      Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked. Next:
-      M5 Strings & Validation (the Caesar cipher in real code).
+      Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked.
+- [x] Grade 8 M5 — Strings & Validation built (3 stages: string methods/slicing
+      via a messy-username cleanup, a real password validator, and the Caesar
+      cipher coded for real — the payoff of Grade 6's cipher-wheel spiral).
+      Verified live through Pyodide. Modules 6-10 still stubbed locked — next
+      up is M6 Files & Data, which also needs the spreadsheet-functions/
+      binary-search/relational-linking content added in the 0860 realignment.
 - [ ] Expand A Level Code Lab sets (5 → 10 per category) + more full past papers.
 - [ ] Past-paper PDF importer (teacher uploads a real Paper 4 → lab category, verbatim).
 
