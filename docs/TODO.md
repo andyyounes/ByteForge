@@ -4,10 +4,21 @@
 - [x] Grade 6 harder challenges: W1 got Triple Star (par 26) + The Labyrinth (par 24);
       W2 got The Spiral (10 chips) + Star Snake (8 chips). Still open: ★★★-only secret world.
 - [x] Grade 6 World 3 — Color & Shape Lab (RGB mixer, 5 stages + Rainbow Gauntlet boss).
-- [ ] Grade 6: build remaining worlds — Loop Land, Turtle Island, Pixel Caves,
-      Cipher City, Music Studio (Web Audio), Dance Party, Game Corner, AI World,
-      Final Quest. (World-boss unlock + per-stage engines are in place; each new
-      world = a stage list + a mini-game engine like the color mixer.)
+- [x] Grade 6 World 4 — Loop Land built (6 stages: 5 + boss w/ 2 mazes), reusing
+      World 2's exact maze+repeat-chip engine at bigger scale, themed as bracelets/
+      tiles/countdown/rhythm. Closes both 0860-audit additions for this world:
+      flowchart notation (predict-the-route framing in the goal text) and a
+      nested-loop peek (boss goal text, explicitly deferred to Grade 7 since the
+      engine only supports flat repeats). Every maze verified programmatically
+      (par values now covered by scripts/test-g6-maze.mjs's own test suite, not
+      just a scratch check) and live via Playwright — W4S1 solves in a perfect
+      3-star run, the full boss (incl. its star pickup) completes to "BOSS
+      DEFEATED!". Zero regressions on the 18 pre-existing W1/W2 maze checks.
+- [ ] Grade 6: build remaining worlds — Turtle Island, Pixel Caves, Cipher City,
+      Music Studio (Web Audio), Dance Party, Game Corner, AI World, Final Quest.
+      (World-boss unlock + per-stage engines are in place; each new world = a
+      stage list + a mini-game engine like the color mixer, or the same maze
+      engine again like Loop Land, whichever fits the world's actual content.)
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
       Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
