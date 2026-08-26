@@ -229,7 +229,14 @@
       their declared percentages — wired into `npm run verify`.
 - [ ] Weekly class leaderboard (reset Mondays).
 - [ ] OBS-01 cosmetics unlocked by level.
-- [ ] Badge gallery with locked silhouettes (user_achievements table exists).
+- [x] Badge gallery with locked silhouettes. AS Level: 5 Pseudocode Lab badges
+      (First Script, Ch11 Clear, Data Structures Done, Recursion Expert,
+      AS Level Champion 500 XP). A Level: 6 Code Lab badges (Lab Coat On,
+      Recursion Cleared, Sort Master, ADT Expert, String Wizard, Code Lab
+      Legend 800 XP). 🏅 button in XP strip opens earned/locked overlay.
+      Persistence via LessonQuest.saveBadge / earnedBadges (localStorage +
+      server sync). Separate from the DB-backed user_achievements system
+      (which is for Grade 6–9/IGCSE concepts going through /api/progress).
 - [x] Rusty nodes (spaced repetition): stars >14 days old go amber on the Journey
       path; re-fighting the boss refreshes them. AS/A only.
 - [ ] Legendary bosses: re-fight a beaten practice boss at a stricter threshold

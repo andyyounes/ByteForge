@@ -475,6 +475,45 @@ class Env {
 // ── Block structure parser ────────────────────────────────────────────────────
 // Returns a tree of statement nodes
 
+// Splits a physical line on `;` outside of string literals, so several
+// statements chained on one line each become their own line-text.
+function splitOnSemicolons(text){
+  const parts=[];let cur='',inStr=false
+  for(let i=0;i<text.length;i++){
+    const ch=text[i]
+    if(ch==='"')inStr=!inStr
+    if(ch===';'&&!inStr){parts.push(cur);cur='';continue}
+    cur+=ch
+  }
+  parts.push(cur)
+  return parts
+}
+
+// Turns one physical line packing an inline IF/THEN/ELSE/ENDIF (e.g.
+// "IF x > 5 THEN y ← 1 ELSE y ← 2 ENDIF", or a lone "ELSE y ← 2") into
+// several separate line-texts, so the line-oriented parseIf()/parseBlock()
+// see each part on its own line exactly like the multi-line form they
+// already handle. Quote-aware: a keyword inside a string is not a split point.
+function expandInlineIf(text){
+  let masked='',inStr=false
+  for(let i=0;i<text.length;i++){
+    const ch=text[i]
+    if(ch==='"')inStr=!inStr
+    masked+=(inStr&&ch!=='"')?'x':ch
+  }
+  const re=/\b(IF\s+.+?\s+THEN|ELSEIF\s+.+?\s+THEN|ELSE|ENDIF)\b/gi
+  if(!re.test(masked))return[text]
+  re.lastIndex=0
+  const parts=[];let last=0,m
+  while((m=re.exec(masked))){
+    if(m.index>last)parts.push(text.slice(last,m.index))
+    parts.push(text.slice(m.index,re.lastIndex))
+    last=re.lastIndex
+  }
+  if(last<text.length)parts.push(text.slice(last))
+  return parts.map(p=>p.trim()).filter(Boolean)
+}
+
 function parseBlock(rawLines, pos, stopAt) {
   const block = []; const stops = stopAt || []
   while (pos < rawLines.length) {
@@ -568,8 +607,17 @@ class Interpreter {
     this.reset()
     this.inputQ = [...inputValues]
 
+    // Two preprocessing passes, both ported from igcse-y2.html after
+    // scripts/test-g9-challenges.mjs proved Grade 9 had the same two defects:
+    //   splitOnSemicolons — `a ← 1; b ← 2` previously ran ONLY the first
+    //     statement, silently. Challenge 10's starter fills its array as
+    //     `arr[1]←2; arr[2]←5; …`, so 9 of its 10 elements stayed 0.
+    //   expandInlineIf   — `IF x > 5 THEN OUTPUT "big"` on one physical line
+    //     had its trailing statement silently dropped by the line-oriented
+    //     parseBlock()/parseIf().
     const rawLines = code.split('\n')
-      .map((text,i)=>({text: text.replace(/\/\/.*$/,'').trim(), n:i+1}))
+      .flatMap((text,i)=>splitOnSemicolons(text.replace(/\/\/.*$/,''))
+        .flatMap(t=>expandInlineIf(t.trim()).map(seg=>({text:seg, n:i+1}))))
       .filter(l=>l.text)
 
     const [block] = parseBlock(rawLines, 0)
@@ -773,7 +821,14 @@ class Interpreter {
     // DECLARE varName : TYPE  or  DECLARE arr : ARRAY[lo:hi] OF TYPE
     const m1 = text.match(/^DECLARE\s+(\w+)\s*:\s*ARRAY\s*\[(\d+)\s*:\s*(\d+)\]\s*OF\s+(\w+)/i)
     if (m1) {
-      const [,name,,lo,hi] = m1
+      // m1 = [fullMatch, name, lowerBound, upperBound, type] — this destructure
+      // previously had one extra skipped slot ([,name,,lo,hi]), silently shifting
+      // every field over by one: lo got the upperBound, hi got the TYPE string
+      // ("INTEGER"), and parseInt("INTEGER") is NaN, so Array(NaN) threw
+      // "Invalid array length" on EVERY 1D array DECLARE — Array & FOR, Bubble
+      // Sort and Binary Search were all impossible to complete. Same defect as
+      // the one fixed in igcse-y2.html; found by scripts/test-g9-challenges.mjs.
+      const [,name,lo,hi] = m1
       const base = parseInt(lo); const size = parseInt(hi)-base+1
       const fill = typeDefault(m1[4])
       env.setLocal(name, {_data: Array(size).fill(fill), _base: base, _hi: parseInt(hi)})
@@ -1016,7 +1071,10 @@ IF (year MOD 4 = 0 AND year MOD 100 <> 0) OR year MOD 400 = 0 THEN
 ELSE
    // TODO: OUTPUT "Not a leap year"
 ENDIF`,
-    check:(code,res) => res.output.some(o => o.trim().toLowerCase().includes('leap year')),
+    // Exact match, not .includes() — "Not a leap year" CONTAINS "leap year",
+    // so the old substring test passed students whose logic was inverted and
+    // who printed the wrong answer for the given INPUT of 2000.
+    check:(code,res) => res.output.some(o => o.trim().toLowerCase() === 'leap year'),
   },
 
   // ── Week 7 · Data Types & Declarations ───────────────────────────────────
@@ -1127,7 +1185,7 @@ DECLARE count : INTEGER
 n     ← 1
 count ← 0
 
-WHILE n <= 10 DO          // BUG: this stops too early
+WHILE n <= 5 DO           // BUG: this stops too early
    IF n MOD 2 = 0 THEN
       OUTPUT n
       count ← count + 1
@@ -1225,8 +1283,10 @@ FUNCTION BinarySearch(target : INTEGER) RETURNS INTEGER
          RETURN mid
       ELSEIF target > arr[mid] THEN
          // TODO: search right half (low ← mid + 1)
+         RETURN -1   // placeholder — delete this once you add the line above
       ELSE
          // TODO: search left half (high ← mid - 1)
+         RETURN -1   // placeholder — delete this once you add the line above
       ENDIF
    ENDWHILE
    RETURN -1
