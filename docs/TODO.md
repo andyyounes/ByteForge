@@ -22,9 +22,20 @@
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
       Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
-      "read the code" arc) and quest-map.js. Worlds 4-10 stubbed locked on the
-      map. Next: G4 My Blocks (needs custom-block/function support in the
-      toolbox), then G5-G10 content + boss builds.
+      "read the code" arc) and quest-map.js.
+- [x] Grade 7 G4 — My Blocks built: added a "Functions" toolbox category via
+      Blockly's built-in PROCEDURE custom-category (no hand-rolled blocks
+      needed) plus hasFunction/needsFunction detection wired into the
+      existing check dispatcher. 3 stages: spawnEnemy(x,y), shoot(x,y,isBig)
+      with if/else inside the function, and a boss combining jump() with an
+      animated gravity loop — opens with the 0860-audit's pseudocode prompt.
+      While verifying live, found and fixed a real pre-existing bug: the
+      animated-mode draw-call counter was built AFTER capturing update()'s
+      closure, so it was dead code — every animated boss (G1/G2/G3, not just
+      this new one) was silently never getting shapes counted for
+      validation. Fixed and regression-tested all three pre-existing bosses.
+      Worlds 5-10 still stubbed locked — next up is G5 Player Control (needs
+      the PAN/LAN/WAN networking aside from the 0860 realignment).
 - [x] Grade 8 wiring started: Builder City map live for Modules 1-4 (From Blocks
       to Text, Choices & Loops - both new; Functions, Lists - rehomed pre-existing
       Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked.
