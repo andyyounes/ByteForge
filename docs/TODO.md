@@ -186,7 +186,33 @@
       with a Big Data discussion per the 0860 audit. Verified live including
       confirming Pyodide's virtual FS supports real writes with zero extra
       engineering. **Grade 8 is now fully built end to end.**
-- [ ] Expand A Level Code Lab sets (5 → 10 per category) + more full past papers.
+- [x] Expand A Level Code Lab sets (5 → 10 per category): rec/srt/adt/str all
+      now have 10 exercises each (20 new: GCD, sum-of-digits, insertion/merge
+      sort, binary-search iteration count, balanced brackets, two-stack
+      queue, BST in-order traversal, postfix evaluation, anagram check,
+      title case, longest word, and more). Each verified against the real
+      interpreter via a reference solution in test-al-lab.mjs's SOLUTIONS
+      map; the past-paper sets (pp41mj21/pp42on22) left at 5 each.
+- [x] Expand AS Level's PSEUDO_SETS: Ch13 (Data Structures) 4 → 8 exercises,
+      Ch15 (Recursion) 3 → 7. Built scripts/test-as-pseudo.mjs from scratch —
+      PSEUDO_SETS had ZERO test coverage before this (unlike A Level's
+      Code Lab/Paper 4 sets), now covers all 22 output_equals exercises
+      (1 remaining is free-form 'ai'-checked, untestable) with hand-authored
+      reference solutions, wired into `npm run verify`.
+      **Found and fixed a real, pre-existing bug this way**: the Ch15
+      Fibonacci exercise's own hint text (`IF n <= 1 THEN RETURN n ENDIF`
+      on one line) silently produced ZERO output with no error — the
+      exact same single-line-IF parser limitation flagged (but only
+      routed around, not fixed) in IGCSE Y2's session above. This time
+      fixed it for real in the shared interpreter powering AS Level, A
+      Level, and IGCSE Y2 alike: ported the same `expandInlineIf()`
+      quote-aware line-splitting preprocessor to a-level.html and
+      as-level.html (previously only in igcse-y2.html). Also strengthened
+      test-al-lab.mjs to catch the Grade-8-style "starter already passes"
+      bug (found + fixed 2 instances while authoring the 20 new A Level
+      exercises: a BOOLEAN stub returning a hardcoded TRUE, and a starter
+      whose trailing IF/OUTPUT ran unconditionally regardless of the
+      incomplete loop above it).
 - [ ] Past-paper PDF importer (teacher uploads a real Paper 4 → lab category, verbatim).
 
 ## Gamification

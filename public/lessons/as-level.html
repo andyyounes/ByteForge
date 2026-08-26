@@ -4326,7 +4326,7 @@ class Interpreter {
     const rawLines=code.split('\n').flatMap((line,i)=>{
       const text=line.replace(/\/\/.*$/,'').trim()
       if(!text)return[]
-      return splitStmts(text).map(t=>({text:t,n:i+1}))
+      return splitStmts(text).flatMap(t=>expandInlineIf(t).map(seg=>({text:seg,n:i+1})))
     })
     const[block]=parseBlock(rawLines,0);this.execBlock(block,this.globals)
     return{output:this.output,trace:this.trace}
@@ -4437,6 +4437,36 @@ function splitStmts(text){
   }
   if(cur.trim())parts.push(cur.trim())
   return parts.length?parts:[text]
+}
+// Turns one physical line that packs an inline IF/THEN/ELSE/ENDIF (e.g.
+// "IF n <= 1 THEN RETURN n ENDIF") into several separate line-texts — one
+// per control keyword and one per statement between them — so the
+// line-oriented parseIf()/parseBlock() (which only ever look at whole
+// lines) see each part on its own line, exactly like the multi-line form
+// they already handle correctly. Fixes a real bug found via
+// scripts/test-as-pseudo.mjs: this exact pattern (from the Ch15 Fibonacci
+// exercise's own hint text) silently swallowed everything after it —
+// including ENDFUNCTION and the final OUTPUT — into an unterminated IF
+// body, producing zero output with no error at all. Quote-aware: a
+// keyword inside a "string literal" is never treated as a delimiter.
+function expandInlineIf(text){
+  let masked='',inStr=false
+  for(let i=0;i<text.length;i++){
+    const ch=text[i]
+    if(ch==='"')inStr=!inStr
+    masked+=(inStr&&ch!=='"')?'x':ch
+  }
+  const re=/\b(IF\s+.+?\s+THEN|ELSEIF\s+.+?\s+THEN|ELSE|ENDIF)\b/gi
+  if(!re.test(masked))return[text]
+  re.lastIndex=0
+  const parts=[];let last=0,m
+  while((m=re.exec(masked))){
+    if(m.index>last)parts.push(text.slice(last,m.index))
+    parts.push(text.slice(m.index,re.lastIndex))
+    last=re.lastIndex
+  }
+  if(last<text.length)parts.push(text.slice(last))
+  return parts.map(p=>p.trim()).filter(Boolean)
 }
 function parseParams(src){if(!src.trim())return[];return splitArgs(src).map(p=>{const byref=/\bBYREF\b/i.test(p);const clean=p.replace(/\bBYVAL\b/i,'').replace(/\bBYREF\b/i,'').trim();const m=clean.match(/^(\w+)\s*(?::\s*(\w+))?/);return{name:m?.[1]||clean,type:m?.[2]||'ANY',byref}})}
 function splitArgs(src){const result=[];let depth=0,cur='';for(const c of src){if(c==='('||c==='[')depth++;else if(c===')'||c===']')depth--;if(c===','&&depth===0){result.push(cur.trim());cur=''}else cur+=c}if(cur.trim())result.push(cur.trim());return result}
@@ -6011,6 +6041,26 @@ const PSEUDO_SETS = {
         hint:'For each element from index 2 onwards, compare it with elements to its left and shift them right until you find its position.',
         starter:'DECLARE arr : ARRAY[1:6] OF INTEGER\narr[1] ← 5\narr[2] ← 3\narr[3] ← 8\narr[4] ← 1\narr[5] ← 9\narr[6] ← 2\n',
         check:{ type:'output_equals', lines:['1','2','3','5','8','9'] } },
+      { id:'p13-5', title:'Queue Simulation', difficulty:'Intermediate', xp:60,
+        desc:'Simulate a FIFO queue with front/rear pointers into an array. Enqueue A, B, C, D. Dequeue (output) twice, then output "Front: <value>".',
+        hint:'DECLARE q : ARRAY[1:6] OF STRING\nDECLARE front, rear : INTEGER\nfront ← 1\nrear ← 0\nrear ← rear + 1\nq[rear] ← "A"\n... (enqueue B, C, D the same way)\nOUTPUT q[front]\nfront ← front + 1\nOUTPUT q[front]\nfront ← front + 1\nOUTPUT "Front: " & q[front]',
+        starter:'DECLARE q : ARRAY[1:6] OF STRING\nDECLARE front, rear : INTEGER\nfront ← 1\nrear ← 0\n// TODO: enqueue "A","B","C","D" (rear ← rear + 1; q[rear] ← item)\n// TODO: dequeue twice — OUTPUT each served item (front ← front + 1)\n// TODO: OUTPUT "Front: " & q[front]',
+        check:{ type:'output_equals', lines:['A','B','Front: C'] } },
+      { id:'p13-6', title:'Selection Sort', difficulty:'Advanced', xp:80,
+        desc:'Sort [29, 10, 14, 37, 13] using selection sort (find the minimum of the unsorted part, swap it to the front). Output the sorted values on one line, space-separated.',
+        hint:'FOR i ← 1 TO 4 — find minIdx in a[i..5] by scanning, then swap a[i] with a[minIdx].',
+        starter:'DECLARE a : ARRAY[1:5] OF INTEGER\nDECLARE i, j, minIdx, temp : INTEGER\nDECLARE out : STRING\na[1] ← 29; a[2] ← 10; a[3] ← 14; a[4] ← 37; a[5] ← 13\n\n// TODO: FOR i ← 1 TO 4 — find minIdx of a[i..5], swap a[i] and a[minIdx]\n\nout ← NUM_TO_STR(a[1])\nFOR i ← 2 TO 5\n   out ← out & " " & NUM_TO_STR(a[i])\nNEXT i\nOUTPUT out',
+        check:{ type:'output_equals', lines:['10 13 14 29 37'] } },
+      { id:'p13-7', title:'Binary Search', difficulty:'Advanced', xp:75,
+        desc:'Binary search the 11-element sorted array [2,5,8,12,16,23,38,45,56,72,91] for 23. Output "Found at <index>" (1-based).',
+        hint:'low ← 1, high ← 11. WHILE low <= high — mid ← (low+high) DIV 2, compare a[mid] to 23, narrow low/high.',
+        starter:'DECLARE a : ARRAY[1:11] OF INTEGER\nDECLARE low, high, mid : INTEGER\nDECLARE found : BOOLEAN\na[1]←2;a[2]←5;a[3]←8;a[4]←12;a[5]←16;a[6]←23;a[7]←38;a[8]←45;a[9]←56;a[10]←72;a[11]←91\nlow ← 1\nhigh ← 11\nfound ← FALSE\n\n// TODO: WHILE found = FALSE AND low <= high — narrow the search\n\nIF found THEN\n   OUTPUT "Found at " & NUM_TO_STR(mid)\nELSE\n   OUTPUT "-1"\nENDIF',
+        check:{ type:'output_equals', lines:['Found at 6'] } },
+      { id:'p13-8', title:'Frequency Count', difficulty:'Intermediate', xp:55,
+        desc:'Count how many times the value 5 appears in [3,1,4,1,5,9,2,6,5,3,5]. Output "5 appears <n> times".',
+        hint:'Loop through the array with a counter, incrementing whenever a[i] = 5.',
+        starter:'DECLARE a : ARRAY[1:11] OF INTEGER\nDECLARE i, count : INTEGER\na[1]←3;a[2]←1;a[3]←4;a[4]←1;a[5]←5;a[6]←9;a[7]←2;a[8]←6;a[9]←5;a[10]←3;a[11]←5\ncount ← 0\n\n// TODO: FOR i ← 1 TO 11 — IF a[i] = 5 THEN count ← count + 1\n\nOUTPUT "5 appears " & NUM_TO_STR(count) & " times"',
+        check:{ type:'output_equals', lines:['5 appears 3 times'] } },
     ]
   },
   ch15: {
@@ -6031,6 +6081,26 @@ const PSEUDO_SETS = {
         hint:'PROCEDURE DoubleByVal(BYVAL n : INTEGER)\n   n ← n * 2\nENDPROCEDURE\nPROCEDURE DoubleByRef(BYREF n : INTEGER)\n   n ← n * 2\nENDPROCEDURE\nDECLARE x : INTEGER\nx ← 10\nCALL DoubleByVal(x)\nOUTPUT x\nCALL DoubleByRef(x)\nOUTPUT x',
         starter:'PROCEDURE DoubleByVal(BYVAL n : INTEGER)\n   n ← n * 2\nENDPROCEDURE\n\nPROCEDURE DoubleByRef(BYREF n : INTEGER)\n   n ← n * 2\nENDPROCEDURE\n\nDECLARE x : INTEGER\nx ← 10\n',
         check:{ type:'output_equals', lines:['10','20'] } },
+      { id:'p15-4', title:'Recursion — GCD', difficulty:'Advanced', xp:70,
+        desc:'Write a recursive <code>FUNCTION GCD(a, b : INTEGER) RETURNS INTEGER</code> using Euclid’s algorithm (GCD(a,b) = GCD(b, a MOD b), base case b = 0). Output GCD(84, 30).',
+        hint:'FUNCTION GCD(a : INTEGER, b : INTEGER) RETURNS INTEGER\n   IF b = 0 THEN\n      RETURN a\n   ELSE\n      RETURN GCD(b, a MOD b)\n   ENDIF\nENDFUNCTION\nOUTPUT GCD(84, 30)',
+        starter:'FUNCTION GCD(a : INTEGER, b : INTEGER) RETURNS INTEGER\n   \nENDFUNCTION\nOUTPUT GCD(84, 30)',
+        check:{ type:'output_equals', lines:['6'] } },
+      { id:'p15-5', title:'Recursive Array Sum', difficulty:'Advanced', xp:75,
+        desc:'Given array [3,6,9,12], write a recursive <code>FUNCTION SumArray(idx, n : INTEGER) RETURNS INTEGER</code> that sums a[idx..n] with no loop at all. Output SumArray(1, 4).',
+        hint:'FUNCTION SumArray(idx : INTEGER, n : INTEGER) RETURNS INTEGER\n   IF idx > n THEN\n      RETURN 0\n   ELSE\n      RETURN a[idx] + SumArray(idx + 1, n)\n   ENDIF\nENDFUNCTION',
+        starter:'DECLARE a : ARRAY[1:4] OF INTEGER\na[1] ← 3; a[2] ← 6; a[3] ← 9; a[4] ← 12\n\nFUNCTION SumArray(idx : INTEGER, n : INTEGER) RETURNS INTEGER\n   \nENDFUNCTION\n\nOUTPUT SumArray(1, 4)',
+        check:{ type:'output_equals', lines:['30'] } },
+      { id:'p15-6', title:'Recursion — Power', difficulty:'Advanced', xp:75,
+        desc:'Write a recursive <code>FUNCTION Power(base, exp : INTEGER) RETURNS INTEGER</code> — no ^ operator allowed. Output Power(3, 4).',
+        hint:'FUNCTION Power(base : INTEGER, exp : INTEGER) RETURNS INTEGER\n   IF exp = 0 THEN\n      RETURN 1\n   ELSE\n      RETURN base * Power(base, exp - 1)\n   ENDIF\nENDFUNCTION\nOUTPUT Power(3, 4)',
+        starter:'FUNCTION Power(base : INTEGER, exp : INTEGER) RETURNS INTEGER\n   \nENDFUNCTION\nOUTPUT Power(3, 4)',
+        check:{ type:'output_equals', lines:['81'] } },
+      { id:'p15-7', title:'BYREF Array Parameter', difficulty:'Advanced', xp:70,
+        desc:'Write <code>PROCEDURE DoubleAll(BYREF arr : ARRAY[1:3] OF INTEGER)</code> that doubles every element of the array in place. Call it on [1,2,3] and output the result space-separated.',
+        hint:'Arrays are passed BYREF here so the caller sees the changes. FOR i ← 1 TO 3 — arr[i] ← arr[i] * 2.',
+        starter:'PROCEDURE DoubleAll(BYREF arr : ARRAY[1:3] OF INTEGER)\n   DECLARE i : INTEGER\n   // TODO: FOR i ← 1 TO 3 — arr[i] ← arr[i] * 2\nENDPROCEDURE\n\nDECLARE nums : ARRAY[1:3] OF INTEGER\nDECLARE i : INTEGER\nDECLARE out : STRING\nnums[1] ← 1; nums[2] ← 2; nums[3] ← 3\nCALL DoubleAll(nums)\nout ← NUM_TO_STR(nums[1])\nFOR i ← 2 TO 3\n   out ← out & " " & NUM_TO_STR(nums[i])\nNEXT i\nOUTPUT out',
+        check:{ type:'output_equals', lines:['2 4 6'] } },
     ]
   }
 }

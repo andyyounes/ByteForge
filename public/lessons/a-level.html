@@ -3964,7 +3964,7 @@ class Interpreter {
     const rawLines=code.split('\n').flatMap((line,i)=>{
       const text=line.replace(/\/\/.*$/,'').trim()
       if(!text)return[]
-      return splitStmts(text).map(t=>({text:t,n:i+1}))
+      return splitStmts(text).flatMap(t=>expandInlineIf(t).map(seg=>({text:seg,n:i+1})))
     })
     const[block]=parseBlock(rawLines,0);this.execBlock(block,this.globals)
     return{output:this.output,trace:this.trace}
@@ -4075,6 +4075,36 @@ function splitStmts(text){
   }
   if(cur.trim())parts.push(cur.trim())
   return parts.length?parts:[text]
+}
+// Turns one physical line that packs an inline IF/THEN/ELSE/ENDIF (e.g.
+// "IF n <= 1 THEN RETURN n ENDIF") into several separate line-texts — one
+// per control keyword and one per statement between them — so the
+// line-oriented parseIf()/parseBlock() (which only ever look at whole
+// lines) see each part on its own line, exactly like the multi-line form
+// they already handle correctly. Fixes a real bug found via
+// scripts/test-as-pseudo.mjs: this exact pattern (from the Ch15 Fibonacci
+// exercise's own hint text) silently swallowed everything after it —
+// including ENDFUNCTION and the final OUTPUT — into an unterminated IF
+// body, producing zero output with no error at all. Quote-aware: a
+// keyword inside a "string literal" is never treated as a delimiter.
+function expandInlineIf(text){
+  let masked='',inStr=false
+  for(let i=0;i<text.length;i++){
+    const ch=text[i]
+    if(ch==='"')inStr=!inStr
+    masked+=(inStr&&ch!=='"')?'x':ch
+  }
+  const re=/\b(IF\s+.+?\s+THEN|ELSEIF\s+.+?\s+THEN|ELSE|ENDIF)\b/gi
+  if(!re.test(masked))return[text]
+  re.lastIndex=0
+  const parts=[];let last=0,m
+  while((m=re.exec(masked))){
+    if(m.index>last)parts.push(text.slice(last,m.index))
+    parts.push(text.slice(m.index,re.lastIndex))
+    last=re.lastIndex
+  }
+  if(last<text.length)parts.push(text.slice(last))
+  return parts.map(p=>p.trim()).filter(Boolean)
 }
 function parseParams(src){if(!src.trim())return[];return splitArgs(src).map(p=>{const byref=/\bBYREF\b/i.test(p);const clean=p.replace(/\bBYVAL\b/i,'').replace(/\bBYREF\b/i,'').trim();const m=clean.match(/^(\w+)\s*(?::\s*(\w+))?/);return{name:m?.[1]||clean,type:m?.[2]||'ANY',byref}})}
 function splitArgs(src){const result=[];let depth=0,cur='';for(const c of src){if(c==='('||c==='[')depth++;else if(c===')'||c===']')depth--;if(c===','&&depth===0){result.push(cur.trim());cur=''}else cur+=c}if(cur.trim())result.push(cur.trim());return result}
