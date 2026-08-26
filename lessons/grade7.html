@@ -1144,7 +1144,28 @@ const WORLDS = [
       check:(log) => log.hasIf && log.texts >= 4,
     },
   ]},
-  { id:'g10', name:'🏆 G10 — Design & Capstone',   sub:'Plan → build → test → ship YOUR game',                   count:2, live:false },
+  { id:'g10', name:'🏆 G10 — Design & Capstone', sub:'Plan → build → test → ship YOUR game', live:true, stages:[
+    { id:'g10s1', name:'Design Your Game', xp:60,
+      text:`<strong>Challenge 1 — Plan It First</strong> — Before building, decide: what's your game called? What does the player control? What's the win condition? Sketch it with a function that draws your title screen, and a variable for your win condition (a score target, a timer, or a boss health value).`,
+      hints:[
+        'Pick ONE clear win condition — "reach 20 points" is easier to build (and to test) than something vague.',
+        'Define a function like drawTitle() that draws your game\'s name — reuse it from My Blocks.',
+        'Create the core variable your whole game will revolve around: score, health, or a timer.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:false, needsFunction:true,
+      check:(log) => log.hasFunction && log.texts >= 1,
+    },
+    { id:'g10boss', name:'Ship Your Own Game', xp:100, boss:true,
+      text:`<strong>🏆 FINAL BOSS — Ship Your Own Game</strong> — Bring the whole year together: a state machine (menu → playing → gameover, from Game States), player input (keyboard or mouse, from Player Control), collision or a win condition (from Collision & Physics), and at least one function you define (from My Blocks). This is YOUR game, in the class arcade.`,
+      hints:[
+        'Start from your Challenge 1 plan — same title, same win condition, now made fully playable.',
+        'Use "on every frame" for the game loop: check input, update your core variable, check the win condition, draw the current state.',
+        'Playtest it yourself first: does it feel fair? Is it too easy or too hard to win? Iterate once before you call it done.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:true, needsFunction:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasFunction && (log.rects >= 1 || log.circles >= 1),
+    },
+  ]},
 ]
 
 const CHALLENGES = WORLDS.filter(w => w.live).flatMap(w => w.stages.map(s => ({ ...s, mod: w.id.toUpperCase() })))
