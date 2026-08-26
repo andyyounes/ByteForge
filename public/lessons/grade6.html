@@ -224,6 +224,29 @@
       </div>
       <div class="feedback" id="mix-feedback"></div>
     </div>
+    <!-- 🐢 Turtle Island (World 5) -->
+    <div class="turtlewrap" id="turtlewrap" style="display:none;">
+      <canvas id="turtle-canvas" width="420" height="300" style="background:#0c0f1a;border-radius:10px;border:1px solid rgba(255,255,255,.08);"></canvas>
+      <div class="turtle-controls" style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
+        <div class="mix-row"><span class="mix-ch" style="min-width:70px;">Sides (n)</span>
+          <input type="range" id="t-sides" min="3" max="12" value="4" style="accent-color:#4ade80" oninput="turtleUpdate()">
+          <b id="t-sides-v">4</b></div>
+        <div class="mix-row"><span class="mix-ch" style="min-width:70px;">Turn angle°</span>
+          <input type="range" id="t-angle" min="1" max="170" value="90" style="accent-color:#818cf8" oninput="turtleUpdate()">
+          <b id="t-angle-v">90</b></div>
+        <div class="mix-row"><span class="mix-ch" style="min-width:70px;">Growth</span>
+          <input type="range" id="t-growth" min="0" max="8" value="0" style="accent-color:#fbbf24" oninput="turtleUpdate()">
+          <b id="t-growth-v">0</b></div>
+        <div class="mix-row"><span class="mix-ch" style="min-width:70px;">Layers</span>
+          <input type="range" id="t-layers" min="1" max="6" value="1" style="accent-color:#f472b6" oninput="turtleUpdate()">
+          <b id="t-layers-v">1</b></div>
+      </div>
+      <div class="run-row" style="margin-top:14px;">
+        <button class="run-btn" onclick="turtleCheck()">🐢 DRAW!</button>
+        <button id="t-auto-btn" class="run-btn" style="display:none;background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.4);color:#4ade80;" onclick="toggleAngleLock()">🔒 Auto-angle: ON</button>
+      </div>
+      <div class="feedback" id="t-feedback"></div>
+    </div>
     <div class="deck">
       <div>
         <div class="deck-title">🎮 COMMANDS — tap to add</div>
@@ -580,7 +603,32 @@ const W4_STAGES = [
     ] },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 5 — Turtle Island: loops + angles = art. Choosing the right angle for
+// n sides (360÷n) is the whole point — sliders stand in for a repeat-loop.
+// ══════════════════════════════════════════════════════════════════════════════
+const W5_STAGES = [
+  { id: 'w5s1', title: 'Perfect Square', emoji: '🟩', type: 'turtle', xp: 25,
+    goal: 'A square needs exactly 4 sides. The turn angle is locked to 360÷sides for you — watch it change as you move the Sides slider. Set Sides to 4.',
+    turtle: { exactSides: 4, lockAngle: true, defaultSides: 3 } },
+  { id: 'w5s2', title: 'Any Polygon', emoji: '🔷', type: 'turtle', xp: 30,
+    goal: 'Loops + math = any shape you want. Pick 5 or more sides — a pentagon, hexagon, even a 12-gon. Watch how the angle (360÷n) gets smaller as n grows.',
+    turtle: { minSides: 5, lockAngle: true, defaultSides: 4 } },
+  { id: 'w5s3', title: 'Five-Pointed Star', emoji: '⭐', type: 'turtle', xp: 40,
+    goal: 'A star breaks the simple rule! With 5 sides, the ordinary angle is 360÷5 = 72° — but that just draws a pentagon. Unlock the angle and try skipping every other point instead: 360×2÷5 = 144°.',
+    turtle: { minSides: 5, needsStarAngle: true, lockAngle: false, allowUnlock: true, defaultSides: 5, defaultAngle: 72 } },
+  { id: 'w5s4', title: 'Spiral Bloom', emoji: '🌀', type: 'turtle', xp: 40,
+    goal: 'Turn up Growth: each side gets a little longer than the last, so the shape spirals outward instead of closing. Keep Sides around 4-6 for a clean spiral arm.',
+    turtle: { needsGrowth: true, lockAngle: true, defaultSides: 4, defaultGrowth: 3 } },
+  { id: 'w5s5', title: 'Layered Bloom', emoji: '🌸', type: 'turtle', xp: 45,
+    goal: 'Turn up Layers: the same shape gets redrawn several times, each one rotated a bit further round — like petals on a flower.',
+    turtle: { minLayers: 3, minSides: 4, lockAngle: true, defaultSides: 6, defaultLayers: 1 } },
+  { id: 'w5boss', title: 'BOSS — Mandala Masterpiece', emoji: '🕸️', boss: true, type: 'turtle', xp: 75,
+    goal: 'Bring it all together: at least 6 sides, at least 4 layers, and some growth for extra flair — your own mandala, in your own palette.',
+    turtle: { minSides: 6, minLayers: 4, needsGrowth: true, lockAngle: true, defaultSides: 6, defaultLayers: 1, defaultGrowth: 0 } },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // The quest map — 12 worlds (Worlds 1–4 playable in this release)
@@ -590,7 +638,7 @@ const WORLDS = [
   { id: 'w2',  name: '🧩 Block Basics',       sub: 'Repeat chips — your first taste of loops',  stages: W2_STAGES, live: true },
   { id: 'w3',  name: '🎨 Color & Shape Lab',  sub: 'Mix light — colors are secretly numbers!',  stages: W3_STAGES, live: true },
   { id: 'w4',  name: '🔁 Loop Land',          sub: 'Why write it 10 times? Repeat!',            stages: W4_STAGES, live: true },
-  { id: 'w5',  name: '🐢 Turtle Island',      sub: 'Loops + angles = amazing art',              count: 6,  live: false },
+  { id: 'w5',  name: '🐢 Turtle Island',      sub: 'Loops + angles = amazing art',              stages: W5_STAGES, live: true },
   { id: 'w6',  name: '🖼 Pixel Caves',        sub: 'Pictures are secretly numbers',             count: 5,  live: false },
   { id: 'w7',  name: '🕵️ Cipher City',        sub: 'Secret codes — make them and crack them',   count: 5,  live: false },
   { id: 'w8',  name: '🎵 Music Studio',       sub: 'Beats are loops you can hear',              count: 6,  live: false },
@@ -674,11 +722,14 @@ function openStage(id) {
 
 // Route to the right mini-game engine for this stage
 function loadStage() {
-  const isColor = activeStage.type === 'color'
-  document.querySelector('.board-wrap').style.display = isColor ? 'none' : ''
-  document.querySelector('.deck').style.display = isColor ? 'none' : ''
+  const isColor  = activeStage.type === 'color'
+  const isTurtle = activeStage.type === 'turtle'
+  document.querySelector('.board-wrap').style.display = (isColor || isTurtle) ? 'none' : ''
+  document.querySelector('.deck').style.display = (isColor || isTurtle) ? 'none' : ''
   document.getElementById('mixer').style.display = isColor ? '' : 'none'
+  document.getElementById('turtlewrap').style.display = isTurtle ? '' : 'none'
   if (isColor) loadColor()
+  else if (isTurtle) loadTurtle()
   else loadMaze()
 }
 
@@ -753,6 +804,113 @@ async function mixCheck() {
   const worst = activeStage.boss ? mixWorst : diff
   const stars = worst <= 16 ? 3 : worst <= 40 ? 2 : 1
   completeStage(stars)
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 🐢 Turtle Island engine — parametrized loops+angle art (sides, angle, growth,
+// layers). Rather than free-form block programming, students choose the
+// NUMBERS that drive a repeat-loop turtle — same "angle = 360÷n" idea the
+// spec calls for, without needing a second full Blockly workspace bolted on.
+// ══════════════════════════════════════════════════════════════════════════════
+const TURTLE_PALETTE = ['#4ade80', '#818cf8', '#fbbf24', '#f472b6', '#22d3ee', '#f87171']
+let turtleAngleLocked = true
+
+function turtleDrawOne(ctx, cx, cy, sides, angleDeg, growth, rotOffset, color) {
+  let x = cx, y = cy
+  let heading = rotOffset
+  let length = 34
+  ctx.strokeStyle = color
+  ctx.lineWidth = 2.5
+  ctx.beginPath()
+  ctx.moveTo(x, y)
+  const steps = Math.max(sides, 3)
+  for (let i = 0; i < steps; i++) {
+    const rad = heading * Math.PI / 180
+    const nx = x + length * Math.cos(rad)
+    const ny = y + length * Math.sin(rad)
+    ctx.lineTo(nx, ny)
+    x = nx; y = ny
+    heading += angleDeg
+    length += growth
+  }
+  ctx.stroke()
+}
+
+function turtleParams() {
+  return {
+    sides:  +document.getElementById('t-sides').value,
+    angle:  +document.getElementById('t-angle').value,
+    growth: +document.getElementById('t-growth').value,
+    layers: +document.getElementById('t-layers').value,
+  }
+}
+
+function drawTurtleShape() {
+  const canvas = document.getElementById('turtle-canvas')
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  const cx = canvas.width / 2, cy = canvas.height / 2
+  const { sides, angle, growth, layers } = turtleParams()
+  for (let L = 0; L < layers; L++) {
+    const rotOffset = (360 / layers) * L
+    turtleDrawOne(ctx, cx, cy, sides, angle, growth, rotOffset, TURTLE_PALETTE[L % TURTLE_PALETTE.length])
+  }
+}
+
+function turtleUpdate() {
+  document.getElementById('t-sides-v').textContent  = document.getElementById('t-sides').value
+  document.getElementById('t-growth-v').textContent = document.getElementById('t-growth').value
+  document.getElementById('t-layers-v').textContent = document.getElementById('t-layers').value
+  if (turtleAngleLocked) {
+    const sides = +document.getElementById('t-sides').value
+    document.getElementById('t-angle').value = Math.round(360 / sides)
+  }
+  document.getElementById('t-angle-v').textContent = document.getElementById('t-angle').value
+  drawTurtleShape()
+}
+
+function toggleAngleLock() {
+  turtleAngleLocked = !turtleAngleLocked
+  document.getElementById('t-angle').disabled = turtleAngleLocked
+  document.getElementById('t-auto-btn').textContent = turtleAngleLocked ? '🔒 Auto-angle: ON' : '🔓 Auto-angle: OFF'
+  turtleUpdate()
+}
+
+function loadTurtle() {
+  const cfg = activeStage.turtle || {}
+  document.getElementById('t-feedback').textContent = ''
+  turtleAngleLocked = cfg.lockAngle !== false
+  const autoBtn = document.getElementById('t-auto-btn')
+  autoBtn.style.display = cfg.allowUnlock ? '' : 'none'
+  autoBtn.textContent = turtleAngleLocked ? '🔒 Auto-angle: ON' : '🔓 Auto-angle: OFF'
+  document.getElementById('t-sides').value  = cfg.defaultSides  ?? 4
+  document.getElementById('t-angle').value  = cfg.defaultAngle ?? Math.round(360 / (cfg.defaultSides ?? 4))
+  document.getElementById('t-angle').disabled = turtleAngleLocked
+  document.getElementById('t-growth').value = cfg.defaultGrowth ?? 0
+  document.getElementById('t-layers').value = cfg.defaultLayers ?? 1
+  turtleUpdate()
+}
+
+function turtleCheck() {
+  const { sides, angle, growth, layers } = turtleParams()
+  const t  = activeStage.turtle || {}
+  const fb = document.getElementById('t-feedback')
+  const msgs = []
+
+  if (t.exactSides != null && sides !== t.exactSides) msgs.push(`Set sides to exactly ${t.exactSides}.`)
+  if (t.minSides != null && sides < t.minSides) msgs.push(`Use at least ${t.minSides} sides.`)
+  if (t.needsStarAngle && Math.abs(angle - Math.round(360 / sides)) < 8) msgs.push('A star needs an angle DIFFERENT from the simple polygon formula (360÷n) — try skipping points, e.g. 360×2÷n.')
+  if (t.needsGrowth && growth < 1) msgs.push('Turn up Growth so each side gets a little longer — that\'s what makes it spiral.')
+  if (t.minLayers != null && layers < t.minLayers) msgs.push(`Use at least ${t.minLayers} layers to build up the pattern.`)
+
+  if (msgs.length === 0) {
+    fb.style.color = '#4ade80'
+    fb.textContent = '✅ Beautiful!'
+    completeStage(3)
+  } else {
+    fb.style.color = '#fbbf24'
+    fb.textContent = '🌡️ ' + msgs.join(' ')
+  }
 }
 
 function currentMaze() {
@@ -915,8 +1073,10 @@ function completeStage(stars) {
   document.getElementById('win-stars').innerHTML =
     '⭐'.repeat(stars) + '<span class="dim">' + '⭐'.repeat(3 - stars) + '</span>'
   document.getElementById('win-title').textContent = activeStage.boss ? '👾 BOSS DEFEATED!' : 'Stage complete!'
-  const isColor = activeStage.type === 'color'
+  const isColor  = activeStage.type === 'color'
+  const isTurtle = activeStage.type === 'turtle'
   document.getElementById('win-sub').textContent = newBest && !firstTime ? 'New best!' :
+    isTurtle ? 'Beautiful pattern — try a new shape next!' :
     stars === 3 ? (isColor ? 'Perfect mix — a true color scientist!' : 'Perfect run — couldn\'t be shorter!') :
     stars === 2 ? (isColor ? 'Close! Match it even tighter for 3 stars.' : 'Great! Can you find a shorter way for 3 stars?') :
     (isColor ? 'Matched! Try again for a super-close mix.' : 'Done! Try again with fewer commands for more stars.')
