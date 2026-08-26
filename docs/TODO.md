@@ -42,9 +42,14 @@
       stage, ever — extended it with the same regex approach as hasFunction),
       and a genuine CSS layout bug where a long-enough challenge description
       could collapse the CodeMirror editor to 0px height (fixed with
-      max-height + scroll on .ch-header). Worlds 6-10 still stubbed locked —
-      next up is G6 Collision & Physics (needs the linear-search addition
-      from the 0860 realignment).
+      max-height + scroll on .ch-header).
+- [x] Grade 7 G6 — Collision & Physics built: hitbox detection via the
+      distance formula, gravity/bounce physics, and a Breakout clone boss
+      with a real linear search (a list of bricks checked one at a time,
+      contrasted with why that gets slow at scale — hooks toward Grade 8's
+      binary search). Worlds 7-10 still stubbed locked — next up is G7 Game
+      States (needs the firewalls/antivirus/echo-check addition from the
+      0860 realignment).
 - [x] Grade 8 wiring started: Builder City map live for Modules 1-4 (From Blocks
       to Text, Choices & Loops - both new; Functions, Lists - rehomed pre-existing
       Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked.
