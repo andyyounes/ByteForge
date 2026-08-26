@@ -287,6 +287,49 @@
 - [ ] Interpreter: short-circuit AND/OR (removes the flag-pattern workaround).
 - [ ] Resend: verify a domain so teacher emails deliver beyond the owner inbox.
 - [ ] Kill or automate the `lessons/` mirror (manual copies will drift).
-- [ ] `npm run verify` bundling all test scripts (lesson JS parse, lab, challenges, mazes).
+- [x] `npm run verify` bundling all test scripts (lesson JS parse, lab,
+      challenges, mazes) — done as part of building real pass/fail
+      regression coverage for every grade's exercises (see below).
+      Bundles: check-lesson-js, test-g6-maze, test-g7-challenges,
+      test-g8-challenges, test-g9-missions, test-igcse-y1-challenges,
+      test-igcse-y2-challenges, test-al-lab, test-p4-challenges,
+      test-p4-starters — all pure Node, no dev server needed.
+      `npm run verify:g6-worlds` is separate (needs `npm run dev` up
+      first — it drives a real Playwright browser against Grade 6's
+      DOM-coupled engines).
+- [x] Built permanent pass/fail regression tests for every grade's
+      exercises (previously only Grade 6's maze worlds W1/W2/W4 and
+      Grade 9's missions had any): scripts/test-g6-worlds.mjs (Grade 6
+      W3/W5-W12, Playwright-driven, 90/90), test-g7-challenges.mjs
+      (99/99, pure logic), test-g8-challenges.mjs (62/62), 
+      test-igcse-y1-challenges.mjs (40/40), test-igcse-y2-challenges.mjs
+      (24/24, runs the real interpreter). Each derives its "correct
+      answer" structurally from the stage's own data wherever possible
+      (never a separately hand-maintained copy that could drift) and
+      always tests a wrong-answer/starter-stub rejection path too, not
+      just the happy path — that's specifically what caught real bugs:
+      - Grade 6: a wrong-answer-generator bug in the test itself (color
+        perturbation was a no-op near 255) — fixed in the test.
+      - Grade 8: 7 challenges whose starter's own "# TODO: use a while
+        loop"-style comment satisfied a check() looking for that literal
+        text (check() is regex over raw source, comments included) —
+        fixed by stripping comments before matching. Plus 2 genuine
+        content bugs (a lookup-vs-assignment regex confusion in M6, a
+        try/except check that never verified the student caused the
+        error in M7) — both fixed.
+      - IGCSE Y2: 5 real interpreter/content bugs — an array-DECLARE
+        destructuring bug crashing 4 challenges outright (`Array(NaN)`
+        from a shifted-by-one field), a silently-broken semicolon
+        statement separator (only the first of "a ← 1; b ← 2" ever
+        ran, with zero error), an infinite-looping starter (both
+        while-branches left low/high unchanged), a starter that
+        already gave away its own answer, and one known-but-not-fixed
+        parser limitation (single-line `ELSE <stmt>` silently drops the
+        inline content — routed around at the content level, not fixed
+        in the parser itself; a real fix would need parseIf() rework).
+      Not yet covered: AS/A-Level's own THEORY_EXERCISES (only its Code
+      Lab has test-al-lab.mjs/test-p4-*.mjs), and Grade 9's
+      grade9-missions.html already has full coverage via
+      test-g9-missions.mjs.
 - [ ] Push repo to GitHub; deploy to Vercel.
 - [ ] Preload Pyodide in the background when the Code Lab opens.
