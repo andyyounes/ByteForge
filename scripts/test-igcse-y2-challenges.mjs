@@ -64,7 +64,57 @@ for (const { label, code, expect } of inlineIfCases) {
   }
 }
 
+// ── 2D arrays and file handling ──────────────────────────────────────────────
+// Both were outright broken, and both are taught by challenges in this file:
+//   * 2D DECLARE was never implemented (the regex is 1D-only), so the variable
+//     became null and Challenge 1's OWN HINTS crashed with
+//     "Cannot read properties of null (reading '_data')". The expression parser
+//     already had a 2D read path keyed on _base2, but nothing ever set _base2.
+//   * OPENFILE unconditionally reset `lines` to [], so the
+//     write -> CLOSEFILE -> re-open FOR READ pattern that Challenge 6's text,
+//     all three hints and its own supplied starter line instruct discarded
+//     everything just written, making it unsolvable as taught.
+//   * Array WRITES were unchecked while reads threw, so a[0] silently vanished
+//     and a[99] silently grew the array — an off-by-one in a stack or sort
+//     challenge passed instead of erroring.
+const engineCases = [
+  { label: '2D: declare, write and read back',
+    code: 'DECLARE grid : ARRAY[1:3, 1:3] OF INTEGER\ngrid[2,3] ← 6\nOUTPUT grid[2,3]', expect: ['6'] },
+  { label: '2D: no space after the comma in the bounds',
+    code: 'DECLARE g : ARRAY[1:3,1:3] OF INTEGER\ng[1,1] ← 7\nOUTPUT g[1,1]', expect: ['7'] },
+  { label: '2D: nested FOR fill',
+    code: 'DECLARE g : ARRAY[1:2, 1:2] OF INTEGER\nDECLARE r : INTEGER\nDECLARE c : INTEGER\nFOR r ← 1 TO 2\n  FOR c ← 1 TO 2\n    g[r,c] ← r * c\n  NEXT c\nNEXT r\nOUTPUT g[2,2]', expect: ['4'] },
+  { label: 'files: re-opening FOR READ preserves what was written',
+    code: 'DECLARE l : STRING\nOPENFILE "d.txt" FOR WRITE\nWRITEFILE "d.txt","Alpha"\nWRITEFILE "d.txt","Beta"\nCLOSEFILE "d.txt"\nOPENFILE "d.txt" FOR READ\nREADFILE "d.txt", l\nOUTPUT l\nREADFILE "d.txt", l\nOUTPUT l', expect: ['Alpha', 'Beta'] },
+  { label: 'files: opening FOR WRITE still truncates',
+    code: 'DECLARE l : STRING\nOPENFILE "d.txt" FOR WRITE\nWRITEFILE "d.txt","Old"\nCLOSEFILE "d.txt"\nOPENFILE "d.txt" FOR WRITE\nWRITEFILE "d.txt","New"\nCLOSEFILE "d.txt"\nOPENFILE "d.txt" FOR READ\nREADFILE "d.txt", l\nOUTPUT l', expect: ['New'] },
+  { label: '1D arrays still work after the 2D change',
+    code: 'DECLARE a : ARRAY[1:3] OF INTEGER\na[2] ← 5\nOUTPUT a[2]', expect: ['5'] },
+]
+for (const { label, code, expect } of engineCases) {
+  try {
+    const { output } = new Interpreter().run(code.replace(/<-/g, '←'), [])
+    const ok = JSON.stringify(output) === JSON.stringify(expect)
+    if (ok) { pass++; console.log(`✓ ${label}`) }
+    else { fail++; console.log(`✗ ${label} — expected ${JSON.stringify(expect)}, got ${JSON.stringify(output)}`) }
+  } catch (e) {
+    fail++
+    console.log(`✗ ${label} — interpreter threw: ${e?.message ?? JSON.stringify(e)}`)
+  }
+}
+// Out-of-bounds WRITES must now throw rather than silently corrupting state.
+for (const { label, code } of [
+  { label: 'array write past the upper bound is rejected', code: 'DECLARE a : ARRAY[1:3] OF INTEGER\na[99] ← 9' },
+  { label: 'array write below the lower bound is rejected', code: 'DECLARE a : ARRAY[1:3] OF INTEGER\na[0] ← 9' },
+]) {
+  try {
+    new Interpreter().run(code, [])
+    fail++; console.log(`✗ ${label} — no error raised`)
+  } catch { pass++; console.log(`✓ ${label}`) }
+}
+
 console.log(`\n${pass} passed, ${fail} failed.`)
 if (fail > 0) process.exit(1)
 console.log('all IGCSE Y2 challenge starters run cleanly and are genuinely incomplete')
+console.log('2D arrays, file re-reads and array write bounds all behave correctly')
 console.log('inline IF/THEN/ELSE/ENDIF on a single physical line is correctly handled')

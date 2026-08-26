@@ -549,7 +549,17 @@ class Interpreter {
     // OPENFILE
     if(u.startsWith('OPENFILE ')){
       const m=text.match(/OPENFILE\s+"?([^"]+)"?\s+FOR\s+(READ|WRITE)/i)
-      if(m){const fn=m[1].trim();this.files[fn]={lines:[],ptr:0,mode:m[2].toUpperCase()};this.record(stmt,env)}
+      // Opening FOR READ must NOT wipe the file. This used to reset `lines` to
+      // [] on every OPENFILE, so the write→CLOSEFILE→re-open-FOR-READ pattern —
+      // which Challenge 6's text, all three of its hints AND its own supplied
+      // starter line all instruct — discarded everything just written, making
+      // the challenge unsolvable as taught. FOR WRITE still truncates, which is
+      // what "open for writing" means.
+      if(m){const fn=m[1].trim();const mode=m[2].toUpperCase()
+        const prev=this.files[fn]
+        if(mode==='READ'&&prev)this.files[fn]={lines:prev.lines,ptr:0,mode}
+        else this.files[fn]={lines:[],ptr:0,mode}
+        this.record(stmt,env)}
       return
     }
     // CLOSEFILE
@@ -612,9 +622,25 @@ class Interpreter {
       const arrM=lhs.match(/^(\w+)\[(.+)\]$/)
       if(arrM){
         const arr=env.get(arrM[1])
-        if(!Array.isArray(arr._data))throw new Error(`'${arrM[1]}' is not an array`)
-        const idx=Math.round(this.evalE(arrM[2].trim(),env))-arr._base
-        arr._data[idx]=val
+        if(!arr||!Array.isArray(arr._data))throw new Error(`'${arrM[1]}' is not an array`)
+        // 2D write: a[r,c]. The expression parser already had a 2D READ path
+        // (via _base2) but there was no 2D write and no 2D DECLARE, so 2D
+        // arrays were entirely unusable — Challenge 1's own hints crashed.
+        const parts=splitArgs(arrM[2])
+        if(parts.length===2&&arr._base2!=null){
+          const r=Math.round(this.evalE(parts[0].trim(),env))-arr._base
+          const c=Math.round(this.evalE(parts[1].trim(),env))-arr._base2
+          if(!arr._data[r])throw new Error(`Array row ${r+arr._base} out of bounds for '${arrM[1]}'`)
+          if(c<0||c>=arr._data[r].length)throw new Error(`Array column ${c+arr._base2} out of bounds for '${arrM[1]}'`)
+          arr._data[r][c]=val
+        } else {
+          const idx=Math.round(this.evalE(arrM[2].trim(),env))-arr._base
+          // Writes used to be unchecked while reads threw, so a[0] silently
+          // vanished and a[99] silently grew the array — an off-by-one in a
+          // stack/sort challenge passed instead of erroring.
+          if(idx<0||idx>=arr._data.length)throw new Error(`Array index ${idx+arr._base} out of bounds for '${arrM[1]}'`)
+          arr._data[idx]=val
+        }
       } else {env.set(lhs,val)}
       this.record(stmt,env);return
     }
@@ -634,6 +660,23 @@ class Interpreter {
     console.warn('Unrecognised statement:',text);this.record(stmt,env)
   }
   execDeclare(text,env){
+    // 2D: DECLARE grid : ARRAY[1:3, 1:3] OF INTEGER
+    // This was never implemented — the regex below is 1D-only, so a 2D DECLARE
+    // fell through to the scalar branch and the variable became null. The
+    // expression parser DID have a 2D read path keyed on _base2, but nothing
+    // ever set _base2, so Challenge 1's own hints crashed with
+    // "Cannot read properties of null (reading '_data')".
+    const m2d=text.match(/^DECLARE\s+(\w+)\s*:\s*ARRAY\s*\[(\d+)\s*:\s*(\d+)\s*,\s*(\d+)\s*:\s*(\d+)\]\s*OF\s+(\w+)/i)
+    if(m2d){
+      const[,name,lo1,hi1,lo2,hi2,ty]=m2d
+      const base=parseInt(lo1),base2=parseInt(lo2)
+      const rows=parseInt(hi1)-base+1,cols=parseInt(hi2)-base2+1
+      const fill=typeDefault(ty)
+      env.setLocal(name,{
+        _data:Array.from({length:rows},()=>Array(cols).fill(fill)),
+        _base:base,_hi:parseInt(hi1),_base2:base2,_hi2:parseInt(hi2)})
+      return
+    }
     const m1=text.match(/^DECLARE\s+(\w+)\s*:\s*ARRAY\s*\[(\d+)\s*:\s*(\d+)\]\s*OF\s+(\w+)/i)
     if(m1){
       // m1 = [fullMatch, name, lowerBound, upperBound, type] — this destructure
