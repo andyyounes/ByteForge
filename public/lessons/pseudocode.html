@@ -604,8 +604,26 @@ NEXT i`;
         }
 
         // arithmetic â€” safe eval via JS (avoid eval, use expression parser)
-        const jsExpr = expr
-          .replace(/MOD/gi, '%').replace(/DIV/gi, 'Math.floor(({0})/({1}))'.slice(0,14))
+        // Integer division. This used to be
+        //   .replace(/DIV/gi, 'Math.floor(({0})/({1}))'.slice(0,14))
+        // where .slice(0,14) yields the 14-character FRAGMENT "Math.floor(({0",
+        // so `7 DIV 2` became `7 Math.floor(({0 2`, threw a SyntaxError, and the
+        // catch below silently returned the raw text — `OUTPUT 7 DIV 2` printed
+        // the literal string "7 DIV 2" with no error. DIV is core Cambridge
+        // syntax and 18 concepts route to this page.
+        // Both operators were also unanchored, so /DIV/gi and /MOD/gi corrupted
+        // any identifier containing them (divisor -> "Math.floor(({0isor",
+        // modulus -> "%ulus"). Now word-bounded.
+        const OPERAND = '(\\([^()]*\\)|-?[\\w.]+(?:\\[[^\\]]*\\])?)'
+        let divExpr = expr
+        for (let guard = 0; guard < 20 && /\bDIV\b/i.test(divExpr); guard++) {
+          const before = divExpr
+          divExpr = divExpr.replace(new RegExp(OPERAND + '\\s*\\bDIV\\b\\s*' + OPERAND, 'i'),
+                                    'Math.floor(($1)/($2))')
+          if (divExpr === before) break   // unparseable operand — don't spin
+        }
+        const jsExpr = divExpr
+          .replace(/\bMOD\b/gi, '%')
           .replace(/\^/g,'**')
           .replace(/([A-Za-z_]\w*)(\[[^\]]+\])?/g, (match,name,idx) => {
             if (idx) { const arr=this.vars[name]; if(Array.isArray(arr)){ const i=Number(this._eval(idx.slice(1,-1)))-(arr._lo||1); return arr[i]??0; } }

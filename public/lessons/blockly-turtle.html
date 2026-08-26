@@ -626,7 +626,11 @@ const CHALLENGES = [
     ],
     check: () => {
       const jsCode = Blockly.JavaScript.workspaceToCode(workspace)
-      const hasLoop = jsCode.includes('for(')
+      // Blockly's JS generator emits "for (var i = 0; ..." WITH a space, so
+      // includes('for(') never matched and these two loop challenges could not
+      // be completed however correct the blocks. Match either spacing, and also
+      // accept while-loops.
+      const hasLoop = /\b(for|while)\s*\(/.test(jsCode)
       return hasLoop && execLog.forwards >= 5 && execLog.drawCalls >= 5
     },
   },
@@ -640,7 +644,11 @@ const CHALLENGES = [
     ],
     check: () => {
       const jsCode = Blockly.JavaScript.workspaceToCode(workspace)
-      const hasLoop = jsCode.includes('for(')
+      // Blockly's JS generator emits "for (var i = 0; ..." WITH a space, so
+      // includes('for(') never matched and these two loop challenges could not
+      // be completed however correct the blocks. Match either spacing, and also
+      // accept while-loops.
+      const hasLoop = /\b(for|while)\s*\(/.test(jsCode)
       return hasLoop && execLog.forwards >= 5
     },
   },

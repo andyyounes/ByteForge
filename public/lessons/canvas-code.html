@@ -246,12 +246,16 @@ const CHALLENGES = [
     grade: 7,
     xp: 25,
     hint: 'Create three variables for r, g, b (0–255) and use rect() to fill the canvas.',
-    starter: `// Colour mixer — change the variables to mix a new colour!
+    // Every starter on this page used to be a COMPLETE working demo, and every
+    // check was a substring match the demo already satisfied — so all five
+    // challenges completed the moment you pressed Run, with zero edits. Each
+    // starter is now a genuine stub whose key line the student must write.
+    starter: `// Colour mixer — set r, g and b, then fill the canvas with that colour!
 let r = 0
 let g = 200
 let b = 255
 
-background(\`rgb(\${r},\${g},\${b})\`)
+// TODO: fill the canvas — background(\`rgb(\${r},\${g},\${b})\`)
 text("R:" + r + "  G:" + g + "  B:" + b, 20, 30, 14, "#fff")`,
     check: (src) => src.includes('rgb') && src.includes('background'),
   },
@@ -268,10 +272,12 @@ clear()
 // Draw the housing
 rect(230, 80, 100, 280, "#1a1a1a")
 
-// Draw the lights — change colors based on state
-let redColor    = state === 0 ? "#ef4444" : "#3f0f0f"
-let greenColor  = state === 1 ? "#22c55e" : "#0f3f0f"
-let yellowColor = state === 2 ? "#eab308" : "#3f3300"
+// Draw the lights — pick each colour from the state variable
+// TODO: light the correct lamp, e.g.
+//   let redColor = state equals 0 ? bright red : dark red
+let redColor    = "#3f0f0f"
+let greenColor  = "#0f3f0f"
+let yellowColor = "#3f3300"
 
 circle(280, 140, 35, redColor)
 circle(280, 220, 35, yellowColor)
@@ -293,14 +299,16 @@ function update() {
   clear()
   if (isKeyDown("ArrowLeft"))  x -= speed
   if (isKeyDown("ArrowRight")) x += speed
-  if (isKeyDown("ArrowUp"))    y -= speed
-  if (isKeyDown("ArrowDown"))  y += speed
+  // TODO: move the box with the arrow keys, e.g.
+  //   when the ArrowUp key is down, subtract speed from y
   rect(x - 25, y - 25, 50, 50, "#b8ef4a")
   text("Use arrow keys", 10, HEIGHT - 15, 12, "#6b7280")
 }
 
 return update`,
-    check: (src) => src.includes('isKeyDown') && src.includes('update'),
+    // Left/Right ship as the worked example, so requiring only "isKeyDown"
+    // passed the untouched starter. Require the two directions that ARE the TODO.
+    check: (src) => src.includes('update') && /ArrowUp/.test(src) && /ArrowDown/.test(src),
   },
   // Grade 8: Functions
   {
@@ -320,11 +328,12 @@ function drawHouse(x, y, color) {
 }
 
 clear()
-drawHouse(60,  200, "#3b82f6")
-drawHouse(180, 200, "#f97316")
-drawHouse(300, 200, "#22c55e")
-drawHouse(420, 200, "#a855f7")`,
-    check: (src) => src.includes('function') && src.match(/drawHouse.*,.*,/),
+// TODO: build the village — call the house function four times,
+// each with a different x position and colour.`,
+    // The old /drawHouse.*,.*,/ matched the function DEFINITION that ships in
+    // the starter. The task is to CALL it four times, so count the calls
+    // (1 definition + 4 calls = 5 occurrences).
+    check: (src) => src.includes('function') && (src.match(/drawHouse\s*\(/g) || []).length >= 5,
   },
   // Grade 8: Lists
   {
@@ -336,7 +345,8 @@ drawHouse(420, 200, "#a855f7")`,
 let scores = [82, 47, 91, 63, 55, 78, 34, 99, 71, 50]
 
 // Sort descending
-scores.sort((a, b) => b - a)
+// TODO: put the highest score first before drawing the bars
+// (use the array's sort method with a compare function)
 
 clear()
 text("Top Scores", 20, 35, 18, "#e8eaf0")
@@ -380,9 +390,15 @@ function selectChallenge(i) {
   renderChallenges()
 }
 
+// Checks are substring matches over raw source, so a starter's own
+// instructional "// TODO: call background(...)" comment would satisfy a check
+// looking for "background" before the student writes anything. Strip line
+// comments first (same fix as grade8.html's stripPyComments).
+function stripJsComments(code) { return code.replace(/\/\/.*$/gm, '') }
+
 function checkChallenge() {
   const ch  = CHALLENGES[activeIdx]
-  const src = document.getElementById('editor').value
+  const src = stripJsComments(document.getElementById('editor').value)
   if (ch && ch.check(src)) {
     if (!completed.has(activeIdx)) {
       completed.add(activeIdx)

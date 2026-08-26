@@ -181,7 +181,7 @@
       javascript: [
         { id:'js1', title:'Hello World',       difficulty:1, xp:20,  desc:'<p>Log <code>Hello, World!</code> to the console.</p>', starter:'console.log();\n', tests:[{input:'',expected:'Hello, World!'}] },
         { id:'js2', title:'Even or Odd',       difficulty:1, xp:30,  desc:'<p>Print whether numbers 1â€“10 are Even or Odd.</p>', starter:'for (let i = 1; i <= 10; i++) {\n  // TODO\n}\n', tests:[] },
-        { id:'js3', title:'Reverse a string',  difficulty:2, xp:50,  desc:'<p>Reverse the string <code>"ByteForge"</code> and print it.</p>', starter:'const s = "ByteForge";\n// TODO: reverse and print\n', tests:[{input:'',expected:'egreFÃ©tyB'.replace('Ã©','o')}] },
+        { id:'js3', title:'Reverse a string',  difficulty:2, xp:50,  desc:'<p>Reverse the string <code>"ByteForge"</code> and print it.</p>', starter:'const s = "ByteForge";\n// TODO: reverse and print\n', tests:[{input:'',expected:'egroFetyB'}] },
       ],
       java: [
         { id:'ja1', title:'Hello World',       difficulty:1, xp:20,  desc:'<p>Print <code>Hello, World!</code> using Java.</p>', starter:'public class Main {\n    public static void main(String[] args) {\n        // TODO\n    }\n}\n', tests:[{input:'',expected:'Hello, World!'}] },
@@ -249,11 +249,15 @@
         </div>`).join('') || '<div style="padding:16px;font-size:13px;color:var(--fg-faint)">No exercises for this language yet</div>';
     }
 
-    function loadExercise(lang, id) {
+    // keepCode: re-render the description/test panel WITHOUT touching the
+    // editor. checkTests() calls this after every run to show the pass/fail
+    // badges, and it used to reset the editor to the starter every time — so
+    // pressing Run wiped the student's work, pass or fail.
+    function loadExercise(lang, id, keepCode) {
       const ex = (EXERCISES[lang]||[]).find(e=>e.id===id);
       if (!ex) return;
       currentEx = ex;
-      if (ex.starter) editor.setValue(ex.starter);
+      if (ex.starter && !keepCode) editor.setValue(ex.starter);
       document.getElementById('desc-title').textContent = ex.title;
       let html = ex.desc || '';
       if (ex.tests?.length) {
@@ -329,12 +333,20 @@
         t.result = pass ? 'Passed' : `Got: ${actualOutput.slice(0,60)}`;
         if (!pass) allPassed = false;
       });
-      if (currentEx) loadExercise(currentLang, currentEx.id);
+      // Capture the student's code BEFORE re-rendering, and keep the editor
+      // intact — this used to reset it to the starter, which also meant the
+      // code persisted to the attempt record below was always the starter.
+      const submittedCode = editor.getValue();
+      if (currentEx) loadExercise(currentLang, currentEx.id, true);
       if (allPassed) {
         addOutput(`âœ… All tests passed!`, 'ok');
         if (me && currentEx) {
-          const gained = BF.recordAttempt(me.id, currentEx.id, { passed:true, score:100, code:editor.getValue() });
-          if (gained.passed && !BF.progress(me.id).completedExercises.includes(currentEx.id)) {
+          // Check completion BEFORE recording: recordAttempt() itself adds the
+          // id to completedExercises on a pass, so testing afterwards was
+          // always false and the XP popup could never fire.
+          const firstTime = !BF.progress(me.id).completedExercises.includes(currentEx.id);
+          const gained = BF.recordAttempt(me.id, currentEx.id, { passed:true, score:100, code:submittedCode });
+          if (gained.passed && firstTime) {
             showXP(currentEx.xp||50);
           }
         }
