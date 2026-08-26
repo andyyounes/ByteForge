@@ -291,6 +291,18 @@
       </div>
       <div class="feedback" id="music-feedback"></div>
     </div>
+    <!-- 💃 Dance Party (World 9) -->
+    <div class="dancewrap" id="dancewrap" style="display:none;">
+      <div id="dance-char" style="font-size:64px;text-align:center;background:#0c0f1a;border-radius:10px;border:1px solid rgba(255,255,255,.08);padding:20px;">🕺</div>
+      <div id="dance-grid" style="display:flex;gap:4px;margin-top:14px;flex-wrap:wrap;"></div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:8px;">Tap a step to cycle its move: ❌ rest → 🙌 wave → ⭐ jump → 🔄 spin → 👐 clap</div>
+      <div class="run-row" style="margin-top:14px;">
+        <button class="run-btn" id="d-play-btn" onclick="danceTogglePlay()">▶ PLAY</button>
+        <button class="run-btn" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:#9ca3af;" onclick="danceClear()">✕ Clear</button>
+        <button class="run-btn" onclick="danceCheck()">💃 CHECK ROUTINE</button>
+      </div>
+      <div class="feedback" id="dance-feedback"></div>
+    </div>
     <div class="deck">
       <div>
         <div class="deck-title">🎮 COMMANDS — tap to add</div>
@@ -754,7 +766,29 @@ const W8_STAGES = [
                [3,2],[3,10]] } },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 9 — Dance Party: a move sequence is a program — a fixed list of
+// steps, played back in the same order, on a loop, every time.
+// ══════════════════════════════════════════════════════════════════════════════
+const W9_STAGES = [
+  { id: 'w9s1', title: 'First Moves', emoji: '🙌', type: 'dance', xp: 30,
+    goal: 'Your character follows exactly what you tap, in order, on a loop. Build a simple 4-step routine: wave, jump, wave, jump.',
+    dance: { steps: 4, target: [1,2,1,2] } },
+  { id: 'w9s2', title: 'Add a Beat', emoji: '🔄', type: 'dance', xp: 35,
+    goal: 'Longer routine, more moves. Build: wave, jump, wave, spin, wave, jump, wave, spin.',
+    dance: { steps: 8, target: [1,2,1,3,1,2,1,3] } },
+  { id: 'w9s3', title: 'Sync to the Music', emoji: '🎵', type: 'dance', xp: 40,
+    goal: 'A routine can rest too — not every step needs a move. Build: jump, rest, jump, rest, clap, rest, jump, rest.',
+    dance: { steps: 8, target: [2,0,2,0,4,0,2,0] } },
+  { id: 'w9s4', title: 'Freestyle Loop', emoji: '🕺', type: 'dance', xp: 45,
+    goal: 'A full 16-step freestyle using every move you know. Match this exact sequence: wave,jump,spin,clap,wave,jump,spin,clap,jump,wave,clap,spin,jump,wave,clap,spin.',
+    dance: { steps: 16, target: [1,2,3,4,1,2,3,4,2,1,4,3,2,1,4,3] } },
+  { id: 'w9boss', title: 'BOSS — Dance Battle', emoji: '💃', boss: true, type: 'dance', xp: 80,
+    goal: 'The final battle routine — 16 steps, every move, no repeats of the same pattern twice. Match it exactly: jump,jump,wave,spin,clap,jump,wave,spin,jump,jump,wave,spin,clap,jump,spin,wave.',
+    dance: { steps: 16, target: [2,2,1,3,4,2,1,3,2,2,1,3,4,2,3,1] } },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // The quest map — 12 worlds (Worlds 1–4 playable in this release)
@@ -768,7 +802,7 @@ const WORLDS = [
   { id: 'w6',  name: '🖼 Pixel Caves',        sub: 'Pictures are secretly numbers',             stages: W6_STAGES, live: true },
   { id: 'w7',  name: '🕵️ Cipher City',        sub: 'Secret codes — make them and crack them',   stages: W7_STAGES, live: true },
   { id: 'w8',  name: '🎵 Music Studio',       sub: 'Beats are loops you can hear',              stages: W8_STAGES, live: true },
-  { id: 'w9',  name: '💃 Dance Party',        sub: 'Code a character to dance to YOUR track',   count: 5,  live: false },
+  { id: 'w9',  name: '💃 Dance Party',        sub: 'Code a character to dance to YOUR track',   stages: W9_STAGES, live: true },
   { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  count: 7,  live: false },
   { id: 'w11', name: '🧠 AI World',           sub: 'Teach a machine. Then trick it.',           count: 6,  live: false },
   { id: 'w12', name: '🚀 The Final Quest',    sub: 'Your masterpiece. Any world. Go big.',      count: 1,  live: false },
@@ -853,7 +887,8 @@ function loadStage() {
   const isPixel  = activeStage.type === 'pixel'
   const isCipher = activeStage.type === 'cipher'
   const isMusic  = activeStage.type === 'music'
-  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic
+  const isDance  = activeStage.type === 'dance'
+  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic || isDance
   document.querySelector('.board-wrap').style.display = isCustom ? 'none' : ''
   document.querySelector('.deck').style.display = isCustom ? 'none' : ''
   document.getElementById('mixer').style.display = isColor ? '' : 'none'
@@ -861,11 +896,13 @@ function loadStage() {
   document.getElementById('pixelwrap').style.display = isPixel ? '' : 'none'
   document.getElementById('cipherwrap').style.display = isCipher ? '' : 'none'
   document.getElementById('musicwrap').style.display = isMusic ? '' : 'none'
+  document.getElementById('dancewrap').style.display = isDance ? '' : 'none'
   if (isColor) loadColor()
   else if (isTurtle) loadTurtle()
   else if (isPixel) loadPixel()
   else if (isCipher) loadCipher()
   else if (isMusic) loadMusic()
+  else if (isDance) loadDance()
   else loadMaze()
 }
 
@@ -1362,6 +1399,96 @@ function musicCheck() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// World 9 — Dance Party: same idea as the beat grid, but each step picks a
+// move instead of an on/off hit — a sequence of instructions your character
+// plays back in order, on a loop, exactly like a program.
+// ══════════════════════════════════════════════════════════════════════════════
+const DANCE_MOVES = ['❌', '🙌', '⭐', '🔄', '👐']  // 0=rest, 1=wave, 2=jump, 3=spin, 4=clap
+let danceSeq = []
+let dancePlaying = false
+let danceTimer = null
+let danceStep = 0
+
+function loadDance() {
+  danceStopPlaying()
+  const cfg = activeStage.dance || {}
+  const steps = cfg.steps || 8
+  danceSeq = new Array(steps).fill(0)
+  const grid = document.getElementById('dance-grid')
+  grid.innerHTML = ''
+  for (let i = 0; i < steps; i++) {
+    const cell = document.createElement('div')
+    cell.id = `dn-${i}`
+    cell.textContent = DANCE_MOVES[0]
+    cell.style.cssText = 'width:36px;height:36px;border-radius:6px;background:#1a1e2e;border:1px solid rgba(255,255,255,.08);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.1s;'
+    cell.onclick = () => danceCycle(i)
+    grid.appendChild(cell)
+  }
+  document.getElementById('dance-char').textContent = '🕺'
+  document.getElementById('d-play-btn').textContent = '▶ PLAY'
+  document.getElementById('dance-feedback').textContent = ''
+}
+
+function danceCycle(i) {
+  danceSeq[i] = (danceSeq[i] + 1) % DANCE_MOVES.length
+  document.getElementById(`dn-${i}`).textContent = DANCE_MOVES[danceSeq[i]]
+}
+
+function danceClear() {
+  danceSeq = danceSeq.map(() => 0)
+  danceSeq.forEach((_, i) => { document.getElementById(`dn-${i}`).textContent = DANCE_MOVES[0] })
+}
+
+function danceTogglePlay() {
+  if (dancePlaying) danceStopPlaying()
+  else danceStartPlaying()
+}
+
+function danceStartPlaying() {
+  const stepMs = 400
+  danceStep = 0
+  dancePlaying = true
+  document.getElementById('d-play-btn').textContent = '⏸ STOP'
+  const tick = () => {
+    const move = danceSeq[danceStep]
+    document.getElementById('dance-char').textContent = move === 0 ? '🕺' : DANCE_MOVES[move]
+    danceSeq.forEach((_, i) => {
+      const cell = document.getElementById(`dn-${i}`)
+      if (cell) cell.style.outline = i === danceStep ? '2px solid #fff' : 'none'
+    })
+    danceStep = (danceStep + 1) % danceSeq.length
+  }
+  tick()
+  danceTimer = setInterval(tick, stepMs)
+}
+
+function danceStopPlaying() {
+  dancePlaying = false
+  if (danceTimer) clearInterval(danceTimer)
+  danceTimer = null
+  document.querySelectorAll('#dance-grid > div').forEach(cell => { cell.style.outline = 'none' })
+  const btn = document.getElementById('d-play-btn')
+  if (btn) btn.textContent = '▶ PLAY'
+  const ch = document.getElementById('dance-char')
+  if (ch) ch.textContent = '🕺'
+}
+
+function danceCheck() {
+  const cfg = activeStage.dance || {}
+  const fb  = document.getElementById('dance-feedback')
+  const target = cfg.target || []
+  const wrongSpots = danceSeq.filter((v, i) => v !== target[i]).length
+  if (wrongSpots === 0 && danceSeq.length === target.length) {
+    fb.style.color = '#4ade80'
+    fb.textContent = '✅ What a routine!'
+    completeStage(3)
+  } else {
+    fb.style.color = '#fbbf24'
+    fb.textContent = `🌡️ ${wrongSpots} step(s) don't match yet — keep tapping!`
+  }
+}
+
 function currentMaze() {
   return activeStage.boss ? activeStage.mazes[activeMazeIdx] : activeStage
 }
@@ -1527,11 +1654,13 @@ function completeStage(stars) {
   const isPixel  = activeStage.type === 'pixel'
   const isCipher = activeStage.type === 'cipher'
   const isMusic  = activeStage.type === 'music'
+  const isDance  = activeStage.type === 'dance'
   document.getElementById('win-sub').textContent = newBest && !firstTime ? 'New best!' :
     isTurtle ? 'Beautiful pattern — try a new shape next!' :
     isPixel ? 'Every pixel exactly where it should be!' :
     isCipher ? 'Cracked it — the code is broken!' :
     isMusic ? 'That groove is locked in!' :
+    isDance ? 'What a routine!' :
     stars === 3 ? (isColor ? 'Perfect mix — a true color scientist!' : 'Perfect run — couldn\'t be shorter!') :
     stars === 2 ? (isColor ? 'Close! Match it even tighter for 3 stars.' : 'Great! Can you find a shorter way for 3 stars?') :
     (isColor ? 'Matched! Try again for a super-close mix.' : 'Done! Try again with fewer commands for more stars.')
