@@ -40,11 +40,21 @@
       reached the file. Verified live via Playwright: all 4 stages solve with
       their reference answers, preview text updates correctly, screenshot
       confirms clean rendering, zero app-logic console errors.
-- [ ] Grade 6: build remaining worlds — Music Studio (Web Audio), Dance Party,
-      Game Corner, AI World, Final Quest. (World-boss unlock is in place;
-      each new world = a stage list + whichever engine fits - maze/chip,
-      color mixer, turtle sliders, pixel-grid, or cipher-wheel - or a new one
-      if the content genuinely needs it.)
+- [x] Grade 6 World 8 — Music Studio built with a new Web Audio beat-grid
+      engine (rows = instruments, columns = loop steps, sounds synthesized
+      live - kick/snare/hihat/clap via oscillators + filtered noise, no
+      audio files). 6 stages (5 + boss): Four on the Floor, Add the Snare,
+      Hi-Hat Groove, Change the Tempo (BPM slider tied to a target),
+      Compose a Groove (16-step syncopated), and a BOSS Full Beat combining
+      4 instruments + tempo. Verified live via Playwright: all 6 solve
+      correctly, tempo-mismatch rejection path fires, play/stop toggles
+      cleanly, screenshot confirms clean grid rendering, zero app-logic
+      console errors.
+- [ ] Grade 6: build remaining worlds — Dance Party, Game Corner, AI World,
+      Final Quest. (World-boss unlock is in place; each new world = a stage
+      list + whichever engine fits - maze/chip, color mixer, turtle sliders,
+      pixel-grid, cipher-wheel, or beat-grid - or a new one if the content
+      genuinely needs it.)
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
       Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
