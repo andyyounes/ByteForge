@@ -764,7 +764,12 @@ for score in top_5:
       const hasList   = /\[/.test(code)
       const hasSort   = /sorted\s*\(/.test(code)
       const hasSlice  = /\[-\d+:\]/.test(code)
-      return hasList && hasSort && (log.rects >= 4 || log.texts >= 4)
+      // The starter already ships the list, the sorted() call, the [-5:] slice
+      // AND a loop that draws 5 bars — so `rects >= 4` was satisfied on load and
+      // the stage completed by pressing Run without any edit. hasSlice was
+      // computed and then thrown away. The stage's only TODO is the text label,
+      // so that is what must actually be required.
+      return hasList && hasSort && hasSlice && log.texts >= 4
     },
   },
   ]},
@@ -1191,11 +1196,18 @@ print(check_win(120))
 print(is_even(4))
 print(average([]))
 `,
-      check:(code) => {
+      check:(code, log, rawCode) => {
         const fixedSyntax = /if\s+score\s*>=\s*100\s*:/.test(code)
         const fixedLogic  = /n\s*%\s*2\s*==\s*0/.test(code)
         const fixedRuntime = /len\s*\(\s*scores\s*\)\s*==\s*0/.test(code) || /if\s+not\s+scores/.test(code)
-        const namesTypes = /syntax/i.test(code) && /logic/i.test(code) && /runtime/i.test(code)
+        // This task explicitly says to label each fix with a COMMENT naming the
+        // error type — but checks receive comment-stripped source, so the three
+        // words could never be found and the challenge was impossible to
+        // complete as instructed. Match them against the raw source instead.
+        // (The three fixed* clauses above still guard the starter, whose own
+        // TODO comments mention the words but whose code is unfixed.)
+        const src = rawCode ?? code
+        const namesTypes = /syntax/i.test(src) && /logic/i.test(src) && /runtime/i.test(src)
         return fixedSyntax && fixedLogic && fixedRuntime && namesTypes
       },
     },
@@ -1509,7 +1521,11 @@ function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
 function validateChallenge(code) {
   const ch = CHALLENGES[activeIdx]
   if (!ch || completed.has(activeIdx)) return
-  if (ch.check(stripPyComments(code), drawLog)) {
+  // Third arg is the RAW source: a few challenges legitimately instruct the
+  // student to write comments (e.g. M9 "Name That Error" asks them to label
+  // each fix with the error type), and those words are gone from the stripped
+  // copy. Checks that don't need it simply ignore the extra argument.
+  if (ch.check(stripPyComments(code), drawLog, code)) {
     completed.add(activeIdx)
     renderPills()
     document.getElementById('pass-badge').style.display = 'block'

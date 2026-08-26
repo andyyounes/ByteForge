@@ -536,10 +536,14 @@ const W2_STAGES = [
            '##########'] },
   { id: 'w2s3', title: 'The Big Square', emoji: '🔲', par: 3, xp: 25, repeats: true,
     goal: 'All the way around the block — 11 steps in only 3 chips. Feel the power!',
+    // The left column used to be open ('#.###.#'), so D×3 walked straight from
+    // S to G — the "go around the block" stage was beatable in ONE chip and
+    // still awarded 3★. Walling it restores the intended route:
+    // R×4 (4) + D×3 (3) + L×4 (4) = 11 steps in exactly 3 chips, as the goal says.
     grid: ['#######',
            '#S....#',
-           '#.###.#',
-           '#.###.#',
+           '#####.#',
+           '#####.#',
            '#G....#',
            '#######'] },
   { id: 'w2s4', title: 'Star Runner', emoji: '🌠', par: 6, xp: 30, repeats: true,
@@ -707,7 +711,10 @@ const W5_STAGES = [
     turtle: { minSides: 5, needsStarAngle: true, lockAngle: false, allowUnlock: true, defaultSides: 5, defaultAngle: 72 } },
   { id: 'w5s4', title: 'Spiral Bloom', emoji: '🌀', type: 'turtle', xp: 40,
     goal: 'Turn up Growth: each side gets a little longer than the last, so the shape spirals outward instead of closing. Keep Sides around 4-6 for a clean spiral arm.',
-    turtle: { needsGrowth: true, lockAngle: true, defaultSides: 4, defaultGrowth: 3 } },
+    // defaultGrowth was 3, but the check only needs growth >= 1 — so the stage
+    // was already solved on load and completed by clicking Check without
+    // touching a slider. Start at 0 so "Turn up Growth" is a real instruction.
+    turtle: { needsGrowth: true, lockAngle: true, defaultSides: 4, defaultGrowth: 0 } },
   { id: 'w5s5', title: 'Layered Bloom', emoji: '🌸', type: 'turtle', xp: 45,
     goal: 'Turn up Layers: the same shape gets redrawn several times, each one rotated a bit further round — like petals on a flower.',
     turtle: { minLayers: 3, minSides: 4, lockAngle: true, defaultSides: 6, defaultLayers: 1 } },
@@ -1064,6 +1071,19 @@ function loadStage() {
   document.getElementById('gamewrap').style.display = isGame ? '' : 'none'
   document.getElementById('aiwrap').style.display = isAI ? '' : 'none'
   document.getElementById('finalwrap').style.display = isFinal ? '' : 'none'
+  // Write the stage header for EVERY stage type. Only loadColor() and
+  // loadMaze() used to do this, so all 31 stages in Worlds 5–12 (turtle,
+  // pixel, cipher, music, dance, gamerules, aiworld, finalquest) rendered a
+  // blank title/goal/par on a fresh load — or, worse, kept the PREVIOUS
+  // stage's header when navigating in from another world. For those worlds
+  // `goal` IS the whole task description (w9s4's exact move sequence, w6s3's
+  // row/col ranges), so the student was shown nothing to do. The specialised
+  // loaders below still overwrite p-par (and loadColor/loadMaze the title)
+  // where they have a more specific target to state.
+  document.getElementById('p-title').textContent = activeStage.title || ''
+  document.getElementById('p-goal').textContent  = activeStage.goal  || ''
+  document.getElementById('p-par').textContent   = ''
+
   if (isColor) loadColor()
   else if (isTurtle) loadTurtle()
   else if (isPixel) loadPixel()
@@ -1242,7 +1262,20 @@ function turtleCheck() {
 
   if (t.exactSides != null && sides !== t.exactSides) msgs.push(`Set sides to exactly ${t.exactSides}.`)
   if (t.minSides != null && sides < t.minSides) msgs.push(`Use at least ${t.minSides} sides.`)
-  if (t.needsStarAngle && Math.abs(angle - Math.round(360 / sides)) < 8) msgs.push('A star needs an angle DIFFERENT from the simple polygon formula (360÷n) — try skipping points, e.g. 360×2÷n.')
+  // A star angle is 360×k÷n for a "skip" k of 2 or more that shares no factor
+  // with n (k=1 is the plain polygon). This used to be a purely NEGATIVE test —
+  // it only rejected angles near 360÷n, so ANY other angle passed, including 1°
+  // or 170°, which draw scribbles rather than stars. Now checked positively.
+  if (t.needsStarAngle) {
+    const gcd = (a, b) => b ? gcd(b, a % b) : a
+    const starAngles = []
+    for (let k = 2; k < sides; k++) if (gcd(k, sides) === 1) starAngles.push(360 * k / sides)
+    if (!starAngles.length) {
+      msgs.push(`You can't make a star with ${sides} sides — every skip shares a factor with ${sides}. Try 5, 7 or 8 sides.`)
+    } else if (!starAngles.some(sa => Math.abs(angle - sa) < 8)) {
+      msgs.push(`That angle draws a shape, not a star. With ${sides} sides, skip points instead: try ${Math.round(starAngles[0])}° (360×2÷${sides}).`)
+    }
+  }
   if (t.needsGrowth && growth < 1) msgs.push('Turn up Growth so each side gets a little longer — that\'s what makes it spiral.')
   if (t.minLayers != null && layers < t.minLayers) msgs.push(`Use at least ${t.minLayers} layers to build up the pattern.`)
 
