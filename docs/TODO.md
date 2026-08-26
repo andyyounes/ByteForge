@@ -50,11 +50,20 @@
       correctly, tempo-mismatch rejection path fires, play/stop toggles
       cleanly, screenshot confirms clean grid rendering, zero app-logic
       console errors.
-- [ ] Grade 6: build remaining worlds — Dance Party, Game Corner, AI World,
-      Final Quest. (World-boss unlock is in place; each new world = a stage
-      list + whichever engine fits - maze/chip, color mixer, turtle sliders,
-      pixel-grid, cipher-wheel, or beat-grid - or a new one if the content
-      genuinely needs it.)
+- [x] Grade 6 World 9 — Dance Party built with a move-sequence engine (same
+      "grid of steps" shape as the Music Studio beat-grid, but each step
+      cycles through a move palette — rest/wave/jump/spin/clap — instead of
+      toggling on/off; PLAY animates a big character emoji through the
+      sequence on a loop). 5 stages (4 + boss): First Moves, Add a Beat,
+      Sync to the Music (introduces rest steps), Freestyle Loop (16 steps,
+      all 4 moves), BOSS Dance Battle. Verified live via Playwright: all 5
+      solve correctly, play/stop animates and resets cleanly, zero
+      app-logic console errors.
+- [ ] Grade 6: build remaining worlds — Game Corner, AI World, Final Quest.
+      (World-boss unlock is in place; each new world = a stage list +
+      whichever engine fits - maze/chip, color mixer, turtle sliders,
+      pixel-grid, cipher-wheel, beat-grid, or move-sequence - or a new one
+      if the content genuinely needs it.)
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
       Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
