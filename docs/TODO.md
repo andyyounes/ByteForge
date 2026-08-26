@@ -195,6 +195,23 @@
 - [ ] Streak shields (miss one day without losing the flame) + weekly quests.
 
 ## Platform
+- [x] Codebase cleanup: removed the dead pre-Next.js legacy static site (root
+      index/login/join/dashboard-student/dashboard-teacher/class-view/pathway/
+      achievements.html + their public/ mirrors + js/{adaptive,concepts,mastery}.js) -
+      confirmed zero references anywhere in app/lib/components and a working
+      Next.js replacement route for every one before deleting. Also removed
+      4 orphaned lesson widgets with zero references anywhere: grade6-patterns.html,
+      chapter-view.html, quiz.html, trace-table.html. Verified /, /login, and
+      /lessons/grade6.html all still 200 after deletion. Separately repointed
+      lib/concepts.ts's 10 Grade 6 pathway concepts (g6-pixels...g6-capstone)
+      from the old standalone widget pages (pixel-grid.html/blockly-turtle.html)
+      to the live grade6.html Adventure Map, matching how Grade 7's concepts
+      were already migrated - tsc --noEmit clean, /student/pathway still
+      responds. Left in place pending a product decision: pixel-grid.html/
+      blockly-turtle.html/canvas-code.html (now unreferenced by concepts.ts
+      but not deleted), and grade9-missions.html (a real teacher-panel + API
+      integration exists for it, but no student-facing link was ever wired up -
+      needs a decision, not a deletion).
 - [x] Quest progress → server (lesson_saves row `<pk>-quest`): steps, stars,
       checkpoints, streak, daily, wrong-answer bank. Pull-merge on lesson open,
       debounced push + 60s heartbeat. (Code Lab exercise saves still local-only.)
