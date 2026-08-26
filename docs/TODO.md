@@ -14,11 +14,19 @@
       just a scratch check) and live via Playwright — W4S1 solves in a perfect
       3-star run, the full boss (incl. its star pickup) completes to "BOSS
       DEFEATED!". Zero regressions on the 18 pre-existing W1/W2 maze checks.
-- [ ] Grade 6: build remaining worlds — Turtle Island, Pixel Caves, Cipher City,
-      Music Studio (Web Audio), Dance Party, Game Corner, AI World, Final Quest.
-      (World-boss unlock + per-stage engines are in place; each new world = a
-      stage list + a mini-game engine like the color mixer, or the same maze
-      engine again like Loop Land, whichever fits the world's actual content.)
+- [x] Grade 6 World 5 — Turtle Island built with a new lightweight turtle-art
+      engine (sliders for sides/angle/growth/layers driving a live canvas
+      turtle, auto-angle lock unlockable for stars) rather than importing the
+      much heavier standalone blockly-turtle.html. 6 stages matching the spec
+      exactly: square, any polygon, five-pointed star (unlock angle to
+      360×2/5), spiral (growth), layered bloom, and a mandala boss. Verified
+      live and visually confirmed the canvas draws a genuine star and a real
+      rotated multi-color mandala.
+- [ ] Grade 6: build remaining worlds — Pixel Caves, Cipher City, Music Studio
+      (Web Audio), Dance Party, Game Corner, AI World, Final Quest. (World-boss
+      unlock is in place; each new world = a stage list + whichever engine
+      fits — maze/chip, color mixer, or turtle-style sliders — or a new one
+      if the content genuinely needs it, same judgment call as Turtle Island.)
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
       Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
