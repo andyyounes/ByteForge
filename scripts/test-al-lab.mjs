@@ -461,6 +461,433 @@ FOR i ← 2 TO LENGTH(s)
 NEXT i
 result ← result & cur & NUM_TO_STR(runLen)
 OUTPUT result`,
+
+  r6: `FUNCTION GCD(a : INTEGER, b : INTEGER) RETURNS INTEGER
+   IF b = 0 THEN
+      RETURN a
+   ELSE
+      RETURN GCD(b, a MOD b)
+   ENDIF
+ENDFUNCTION
+OUTPUT GCD(48, 18)`,
+
+  r7: `FUNCTION SumDigits(n : INTEGER) RETURNS INTEGER
+   IF n < 10 THEN
+      RETURN n
+   ELSE
+      RETURN (n MOD 10) + SumDigits(n DIV 10)
+   ENDIF
+ENDFUNCTION
+OUTPUT SumDigits(9875)`,
+
+  r8: `DECLARE a : ARRAY[1:5] OF INTEGER
+a[1] ← 4; a[2] ← 8; a[3] ← 15; a[4] ← 16; a[5] ← 23
+FUNCTION SumArray(idx : INTEGER, n : INTEGER) RETURNS INTEGER
+   IF idx > n THEN
+      RETURN 0
+   ELSE
+      RETURN a[idx] + SumArray(idx + 1, n)
+   ENDIF
+ENDFUNCTION
+OUTPUT SumArray(1, 5)`,
+
+  r9: `FUNCTION IsPalindrome(s : STRING) RETURNS BOOLEAN
+   IF LENGTH(s) <= 1 THEN
+      RETURN TRUE
+   ELSE
+      IF LEFT(s, 1) <> RIGHT(s, 1) THEN
+         RETURN FALSE
+      ELSE
+         RETURN IsPalindrome(RIGHT(LEFT(s, LENGTH(s) - 1), LENGTH(s) - 2))
+      ENDIF
+   ENDIF
+ENDFUNCTION
+IF IsPalindrome("LEVEL") THEN
+   OUTPUT "Yes"
+ELSE
+   OUTPUT "No"
+ENDIF`,
+
+  r10: `DECLARE a : ARRAY[1:7] OF INTEGER
+a[1] ← 4; a[2] ← 8; a[3] ← 15; a[4] ← 16; a[5] ← 23; a[6] ← 42; a[7] ← 8
+FUNCTION MaxFrom(idx : INTEGER, n : INTEGER) RETURNS INTEGER
+   IF idx = n THEN
+      RETURN a[idx]
+   ELSE
+      DECLARE restMax : INTEGER
+      restMax ← MaxFrom(idx + 1, n)
+      IF a[idx] > restMax THEN
+         RETURN a[idx]
+      ELSE
+         RETURN restMax
+      ENDIF
+   ENDIF
+ENDFUNCTION
+OUTPUT MaxFrom(1, 7)`,
+
+  s6: `DECLARE a : ARRAY[1:5] OF INTEGER
+DECLARE i, j, key : INTEGER
+DECLARE shifting : BOOLEAN
+DECLARE out : STRING
+a[1] ← 12; a[2] ← 5; a[3] ← 9; a[4] ← 2; a[5] ← 17
+FOR i ← 2 TO 5
+   key ← a[i]
+   j ← i - 1
+   shifting ← j >= 1
+   WHILE shifting DO
+      IF a[j] > key THEN
+         a[j + 1] ← a[j]
+         j ← j - 1
+         shifting ← j >= 1
+      ELSE
+         shifting ← FALSE
+      ENDIF
+   ENDWHILE
+   a[j + 1] ← key
+NEXT i
+out ← NUM_TO_STR(a[1])
+FOR i ← 2 TO 5
+   out ← out & " " & NUM_TO_STR(a[i])
+NEXT i
+OUTPUT out`,
+
+  s7: `DECLARE x : ARRAY[1:3] OF INTEGER
+DECLARE y : ARRAY[1:3] OF INTEGER
+DECLARE merged : ARRAY[1:6] OF INTEGER
+DECLARE i, j, k : INTEGER
+DECLARE out : STRING
+x[1] ← 1; x[2] ← 4; x[3] ← 7
+y[1] ← 2; y[2] ← 3; y[3] ← 9
+i ← 1; j ← 1; k ← 1
+WHILE i <= 3 AND j <= 3 DO
+   IF x[i] <= y[j] THEN
+      merged[k] ← x[i]
+      i ← i + 1
+   ELSE
+      merged[k] ← y[j]
+      j ← j + 1
+   ENDIF
+   k ← k + 1
+ENDWHILE
+WHILE i <= 3 DO
+   merged[k] ← x[i]
+   i ← i + 1
+   k ← k + 1
+ENDWHILE
+WHILE j <= 3 DO
+   merged[k] ← y[j]
+   j ← j + 1
+   k ← k + 1
+ENDWHILE
+out ← NUM_TO_STR(merged[1])
+FOR i ← 2 TO 6
+   out ← out & " " & NUM_TO_STR(merged[i])
+NEXT i
+OUTPUT out`,
+
+  s8: `DECLARE a : ARRAY[1:10] OF INTEGER
+DECLARE low, high, mid, iterations : INTEGER
+DECLARE found : BOOLEAN
+a[1]←3;a[2]←8;a[3]←12;a[4]←17;a[5]←23;a[6]←31;a[7]←40;a[8]←55;a[9]←61;a[10]←70
+low ← 1
+high ← 10
+iterations ← 0
+found ← FALSE
+WHILE found = FALSE AND low <= high DO
+   iterations ← iterations + 1
+   mid ← (low + high) DIV 2
+   IF a[mid] = 40 THEN
+      found ← TRUE
+   ELSE
+      IF a[mid] < 40 THEN
+         low ← mid + 1
+      ELSE
+         high ← mid - 1
+      ENDIF
+   ENDIF
+ENDWHILE
+OUTPUT "Iterations: " & NUM_TO_STR(iterations)`,
+
+  s9: `DECLARE a : ARRAY[1:5] OF INTEGER
+DECLARE i, largest, second : INTEGER
+a[1] ← 14; a[2] ← 7; a[3] ← 22; a[4] ← 3; a[5] ← 19
+IF a[1] > a[2] THEN
+   largest ← a[1]
+   second ← a[2]
+ELSE
+   largest ← a[2]
+   second ← a[1]
+ENDIF
+FOR i ← 3 TO 5
+   IF a[i] > largest THEN
+      second ← largest
+      largest ← a[i]
+   ELSE
+      IF a[i] > second THEN
+         second ← a[i]
+      ENDIF
+   ENDIF
+NEXT i
+OUTPUT "Second largest: " & NUM_TO_STR(second)`,
+
+  s10: `DECLARE names : ARRAY[1:4] OF STRING
+DECLARE i, j : INTEGER
+DECLARE temp, out : STRING
+names[1] ← "Zoe"; names[2] ← "Amy"; names[3] ← "Mike"; names[4] ← "Bob"
+FOR i ← 1 TO 3
+   FOR j ← 1 TO 4 - i
+      IF names[j] > names[j + 1] THEN
+         temp ← names[j]
+         names[j] ← names[j + 1]
+         names[j + 1] ← temp
+      ENDIF
+   NEXT j
+NEXT i
+out ← names[1]
+FOR i ← 2 TO 4
+   out ← out & " " & names[i]
+NEXT i
+OUTPUT out`,
+
+  a6: `DECLARE s : STRING
+DECLARE stack : ARRAY[1:10] OF STRING
+DECLARE sp, i : INTEGER
+DECLARE ch : STRING
+DECLARE balanced : BOOLEAN
+s ← "({[]})"
+sp ← 0
+balanced ← TRUE
+FOR i ← 1 TO LENGTH(s)
+   ch ← RIGHT(LEFT(s, i), 1)
+   IF ch = "(" OR ch = "{" OR ch = "[" THEN
+      sp ← sp + 1
+      stack[sp] ← ch
+   ELSE
+      IF ch = ")" OR ch = "}" OR ch = "]" THEN
+         IF sp = 0 THEN
+            balanced ← FALSE
+         ELSE
+            IF (ch = ")" AND stack[sp] <> "(") OR (ch = "}" AND stack[sp] <> "{") OR (ch = "]" AND stack[sp] <> "[") THEN
+               balanced ← FALSE
+            ENDIF
+            sp ← sp - 1
+         ENDIF
+      ENDIF
+   ENDIF
+NEXT i
+IF balanced AND sp = 0 THEN
+   OUTPUT "Balanced"
+ELSE
+   OUTPUT "Unbalanced"
+ENDIF`,
+
+  a7: `DECLARE inS : ARRAY[1:5] OF INTEGER
+DECLARE outS : ARRAY[1:5] OF INTEGER
+DECLARE inSp, outSp : INTEGER
+inSp ← 0
+outSp ← 0
+inSp ← inSp + 1
+inS[inSp] ← 1
+inSp ← inSp + 1
+inS[inSp] ← 2
+inSp ← inSp + 1
+inS[inSp] ← 3
+WHILE inSp > 0 DO
+   outSp ← outSp + 1
+   outS[outSp] ← inS[inSp]
+   inSp ← inSp - 1
+ENDWHILE
+WHILE outSp > 0 DO
+   OUTPUT outS[outSp]
+   outSp ← outSp - 1
+ENDWHILE`,
+
+  a8: `DECLARE val   : ARRAY[1:5] OF INTEGER
+DECLARE left  : ARRAY[1:5] OF INTEGER
+DECLARE right : ARRAY[1:5] OF INTEGER
+val[1] ← 50 : left[1] ← 2 : right[1] ← 3
+val[2] ← 30 : left[2] ← 4 : right[2] ← 5
+val[3] ← 70 : left[3] ← 0 : right[3] ← 0
+val[4] ← 20 : left[4] ← 0 : right[4] ← 0
+val[5] ← 40 : left[5] ← 0 : right[5] ← 0
+PROCEDURE InOrder(node : INTEGER)
+   IF node <> 0 THEN
+      CALL InOrder(left[node])
+      OUTPUT val[node]
+      CALL InOrder(right[node])
+   ENDIF
+ENDPROCEDURE
+CALL InOrder(1)`,
+
+  a9: `DECLARE data : ARRAY[1:4] OF INTEGER
+DECLARE nxt  : ARRAY[1:4] OF INTEGER
+DECLARE prv  : ARRAY[1:4] OF INTEGER
+DECLARE startPtr, p : INTEGER
+data[1] ← 10 : nxt[1] ← 2 : prv[1] ← 0
+data[2] ← 20 : nxt[2] ← 3 : prv[2] ← 1
+data[3] ← 30 : nxt[3] ← 4 : prv[3] ← 2
+data[4] ← 40 : nxt[4] ← 0 : prv[4] ← 3
+startPtr ← 1
+p ← startPtr
+WHILE nxt[p] <> 0 DO
+   p ← nxt[p]
+ENDWHILE
+WHILE p <> 0 DO
+   OUTPUT data[p]
+   p ← prv[p]
+ENDWHILE`,
+
+  a10: `DECLARE tokens : ARRAY[1:5] OF STRING
+DECLARE stack : ARRAY[1:5] OF INTEGER
+DECLARE sp, i : INTEGER
+DECLARE tok : STRING
+DECLARE x, y : INTEGER
+tokens[1] ← "4"; tokens[2] ← "2"; tokens[3] ← "+"; tokens[4] ← "3"; tokens[5] ← "*"
+sp ← 0
+FOR i ← 1 TO 5
+   tok ← tokens[i]
+   IF tok = "+" OR tok = "-" OR tok = "*" THEN
+      y ← stack[sp]
+      sp ← sp - 1
+      x ← stack[sp]
+      sp ← sp - 1
+      IF tok = "+" THEN
+         sp ← sp + 1
+         stack[sp] ← x + y
+      ELSE
+         IF tok = "-" THEN
+            sp ← sp + 1
+            stack[sp] ← x - y
+         ELSE
+            sp ← sp + 1
+            stack[sp] ← x * y
+         ENDIF
+      ENDIF
+   ELSE
+      sp ← sp + 1
+      stack[sp] ← STR_TO_NUM(tok)
+   ENDIF
+NEXT i
+OUTPUT stack[sp]`,
+
+  t6: `FUNCTION IsPal(s : STRING) RETURNS BOOLEAN
+   IF LENGTH(s) <= 1 THEN
+      RETURN TRUE
+   ELSE
+      IF LEFT(s,1) <> RIGHT(s,1) THEN
+         RETURN FALSE
+      ELSE
+         RETURN IsPal(RIGHT(LEFT(s, LENGTH(s) - 1), LENGTH(s) - 2))
+      ENDIF
+   ENDIF
+ENDFUNCTION
+IF IsPal("RACECAR") THEN
+   OUTPUT "Yes"
+ELSE
+   OUTPUT "No"
+ENDIF`,
+
+  t7: `DECLARE s, sub, part : STRING
+DECLARE i, foundAt : INTEGER
+s ← "COMPUTER SCIENCE"
+sub ← "SCI"
+foundAt ← -1
+FOR i ← 1 TO LENGTH(s) - LENGTH(sub) + 1
+   part ← RIGHT(LEFT(s, i + LENGTH(sub) - 1), LENGTH(sub))
+   IF part = sub THEN
+      foundAt ← i
+   ENDIF
+NEXT i
+IF foundAt = -1 THEN
+   OUTPUT "Not found"
+ELSE
+   OUTPUT "Found at " & NUM_TO_STR(foundAt)
+ENDIF`,
+
+  t8: `DECLARE s1, s2, ch : STRING
+DECLARE counts1 : ARRAY[1:26] OF INTEGER
+DECLARE counts2 : ARRAY[1:26] OF INTEGER
+DECLARE alpha : STRING
+DECLARE i, j, pos, same : INTEGER
+s1 ← "LISTEN"
+s2 ← "SILENT"
+alpha ← "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+FOR i ← 1 TO 26
+   counts1[i] ← 0
+   counts2[i] ← 0
+NEXT i
+FOR i ← 1 TO LENGTH(s1)
+   ch ← RIGHT(LEFT(s1, i), 1)
+   FOR j ← 1 TO 26
+      IF RIGHT(LEFT(alpha, j), 1) = ch THEN
+         pos ← j
+      ENDIF
+   NEXT j
+   counts1[pos] ← counts1[pos] + 1
+NEXT i
+FOR i ← 1 TO LENGTH(s2)
+   ch ← RIGHT(LEFT(s2, i), 1)
+   FOR j ← 1 TO 26
+      IF RIGHT(LEFT(alpha, j), 1) = ch THEN
+         pos ← j
+      ENDIF
+   NEXT j
+   counts2[pos] ← counts2[pos] + 1
+NEXT i
+same ← 1
+FOR i ← 1 TO 26
+   IF counts1[i] <> counts2[i] THEN
+      same ← 0
+   ENDIF
+NEXT i
+IF same = 1 THEN
+   OUTPUT "Anagram"
+ELSE
+   OUTPUT "Not an anagram"
+ENDIF`,
+
+  t9: `DECLARE s, ch, result : STRING
+DECLARE i : INTEGER
+DECLARE startOfWord : BOOLEAN
+s ← "hello world of computing"
+result ← ""
+startOfWord ← TRUE
+FOR i ← 1 TO LENGTH(s)
+   ch ← RIGHT(LEFT(s, i), 1)
+   IF ch = " " THEN
+      result ← result & ch
+      startOfWord ← TRUE
+   ELSE
+      IF startOfWord THEN
+         result ← result & UCASE(ch)
+         startOfWord ← FALSE
+      ELSE
+         result ← result & LCASE(ch)
+      ENDIF
+   ENDIF
+NEXT i
+OUTPUT result`,
+
+  t10: `DECLARE s, ch, curWord, longest : STRING
+DECLARE i : INTEGER
+s ← "DATA STRUCTURES AND COMMUNICATION PROTOCOLS"
+curWord ← ""
+longest ← ""
+FOR i ← 1 TO LENGTH(s)
+   ch ← RIGHT(LEFT(s, i), 1)
+   IF ch = " " THEN
+      IF LENGTH(curWord) > LENGTH(longest) THEN
+         longest ← curWord
+      ENDIF
+      curWord ← ""
+   ELSE
+      curWord ← curWord & ch
+   ENDIF
+NEXT i
+IF LENGTH(curWord) > LENGTH(longest) THEN
+   longest ← curWord
+ENDIF
+OUTPUT longest`,
 }
 
 let pass = 0, fail = 0, skipped = 0
@@ -482,9 +909,18 @@ for (const [setId, set] of Object.entries(SETS)) {
       fail++
       console.log(`✗ ${setId}/${ex.id} ${ex.title} — threw: ${e?.message ?? JSON.stringify(e)}`)
     }
-    // Starters must not crash either (pseudocode only)
+    // Starters must not crash (pseudocode only) AND must not already satisfy
+    // ex.expect — an unmodified starter passing is exactly the "# TODO" bug
+    // found in Grade 8 (see docs/TODO.md) and in two of these new exercises
+    // during authoring (a boolean-function stub whose placeholder body
+    // happened to always return the value the one test case needed).
     if (ex.ps) {
-      try { new Interpreter().run(ex.ps.replace(/<-/g, '←'), []) }
+      try {
+        const res = new Interpreter().run(ex.ps.replace(/<-/g, '←'), [])
+        const got = res.output.map(o => String(o).trim())
+        const alreadyPasses = got.length === ex.expect.length && ex.expect.every((e, i) => got[i] === e)
+        if (alreadyPasses) { fail++; console.log(`✗ ${setId}/${ex.id} — starter already satisfies expect before any student edits`) }
+      }
       catch (e) { console.log(`  ⚠ starter for ${ex.id} crashes: ${e?.message ?? JSON.stringify(e)}`) }
     }
   }
