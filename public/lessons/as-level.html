@@ -3616,12 +3616,21 @@ function checkAnswers(btn) {
     const msText  = (card.querySelector('.ms-body')?.textContent || '').toLowerCase()
 
     // Pull key 4+ char content words from the mark scheme
+    // Exclude words that already appear in the QUESTION, or the answer can be
+    // "written" by pasting the question text straight back into the box — which
+    // scored 100% on 17 of the 88 practice questions.
+    const stemText = (card.querySelector('.q-stem')?.textContent || '').toLowerCase()
+    const stemWords = new Set(stemText.match(/\b[a-z]{4,}\b/g) || [])
     const keywords = [...new Set(
-      (msText.match(/\b[a-z]{4,}\b/g) || []).filter(w => !STOPWORDS.has(w))
+      (msText.match(/\b[a-z]{4,}\b/g) || []).filter(w => !STOPWORDS.has(w) && !stemWords.has(w))
     )].slice(0, 8)
 
     const hits  = keywords.filter(w => answer.includes(w)).length
-    const score = keywords.length ? hits / keywords.length : 0.6
+    // A purely numeric mark scheme yields NO keywords. That used to fall back to
+    // 0.6, which clears the 0.55 "✅ Good answer!" bar — so six questions gave a
+    // green tick to literally any text and unlocked Mark Complete. Score null
+    // instead and report it honestly below.
+    const score = keywords.length ? hits / keywords.length : null
 
     // Remove any existing feedback badge
     card.querySelector('.answer-feedback')?.remove()
@@ -3630,7 +3639,10 @@ function checkAnswers(btn) {
 
     const fb = document.createElement('div')
     fb.className = 'answer-feedback'
-    if (score >= 0.55) {
+    if (score === null) {
+      fb.classList.add('fb-partial')
+      fb.innerHTML = '📝 <strong>Self-mark this one.</strong> This answer is numeric/worked — compare it against the mark scheme below.'
+    } else if (score >= 0.55) {
       fb.classList.add('fb-good')
       fb.innerHTML = '✅ <strong>Good answer!</strong> Key points covered — check the mark scheme below to confirm.'
     } else if (score >= 0.25) {
@@ -5866,7 +5878,11 @@ Then <code>SELECT * FROM Ward;</code> to verify all 5 rows.`,
       { id:'h3', title:'Filter Patients by Age', difficulty:'Beginner', xp:50, tags:['select'],
         desc:`Select all patients <strong>between 20 and 50 years old</strong> (inclusive). Order results by age from youngest to oldest.`,
         hint:'SELECT * FROM Patients\nWHERE age BETWEEN 20 AND 50\nORDER BY age ASC;',
-        check:{ type:'row_count', count:5 } },
+        // Was count:5, but only FOUR seeded patients are aged 20-50
+        // (34, 45, 28, 41; the rest are 67, 12, 72, 19, 55, 8), so the
+        // exercise's own hint query was marked wrong. Verified against
+        // HOSPITAL_SQL.
+        check:{ type:'row_count', count:4 } },
       { id:'h4', title:'Update Ward Capacity', difficulty:'Intermediate', xp:75, tags:['update'],
         desc:`The Paediatrics ward (ward_id = 3) has been extended. <strong>Update its capacity to 35</strong> and its floor to 2. Then <code>SELECT * FROM Ward WHERE ward_id = 3;</code> to verify.`,
         hint:'UPDATE Ward SET capacity = 35, floor = 2 WHERE ward_id = 3;\nSELECT * FROM Ward WHERE ward_id = 3;',
@@ -5882,7 +5898,10 @@ Then <code>SELECT * FROM Ward;</code> to verify all 5 rows.`,
       { id:'h7', title:'Busiest Doctors', difficulty:'Intermediate', xp:75, tags:['group','join'],
         desc:`Find doctors who have <strong>more than 2 appointments</strong>. Show doctor name, specialisation, and appointment count. Order by count descending.`,
         hint:'SELECT d.name, d.specialisation, COUNT(*) AS appointments\nFROM Appointments a\nJOIN Doctors d ON a.doctor_id = d.doctor_id\nGROUP BY d.doctor_id\nHAVING COUNT(*) > 2\nORDER BY appointments DESC;',
-        check:{ type:'row_count', count:2 } },
+        // Was count:2, but THREE doctors have more than 2 appointments
+        // (doctors 1, 2 and 3, with 5, 3 and 3), so the exercise's own hint
+        // query was marked wrong. Verified against HOSPITAL_SQL.
+        check:{ type:'row_count', count:3 } },
       { id:'h8', title:'Doctor Summary Report', difficulty:'Advanced', xp:100, tags:['join','group'],
         desc:`Create a complete report: doctor name, specialisation, years of experience, total appointments, and average patient age (rounded to 1 decimal). Order by total appointments descending.<br><br>Use LEFT JOIN so doctors with zero appointments still appear.`,
         hint:'SELECT d.name, d.specialisation, d.years_experience,\n       COUNT(a.appointment_id) AS total_appointments,\n       ROUND(AVG(p.age), 1) AS avg_patient_age\nFROM Doctors d\nLEFT JOIN Appointments a ON d.doctor_id = a.doctor_id\nLEFT JOIN Patients p     ON a.patient_id = p.patient_id\nGROUP BY d.doctor_id\nORDER BY total_appointments DESC;',
@@ -8325,7 +8344,27 @@ function checkTheoryShort(evt, id) {
   if (!ans.trim()) { if (fb) { fb.className='tprac-feedback partial'; fb.style.display='block'; fb.textContent='Write your answer first.' } return }
   const kws    = ex.keywords || []
   const found  = kws.filter(kw => ans.includes(kw.toLowerCase()))
-  const pct    = kws.length ? Math.round((found.length / kws.length) * 100) : 100
+  // Keyword lists mix genuinely-REQUIRED concepts with ALTERNATIVE acceptable
+  // phrasings (e.g. ['LIFO','FIFO','last in first out','first in first out',
+  // 'top','front','rear','order']), but the score used to be a conjunction over
+  // ALL of them — found/total >= 80%. No real answer can hit 8/8 synonyms, so
+  // 39 of the 64 short-answer questions REJECTED THEIR OWN MODEL ANSWER, and 8
+  // of those gave a perfect answer the red "❌ Review needed" verdict.
+  // Calibrate instead against the model answer: the target is however many
+  // keywords the model answer itself hits, and the student earns credit for ANY
+  // listed synonym. The model answer therefore scores 100% by construction,
+  // while a student who covers as much ground as the mark scheme also passes.
+  const msText = String(ex.ms || '').replace(/<[^>]+>/g, ' ').toLowerCase()
+  const target = Math.max(1, kws.filter(kw => msText.includes(kw.toLowerCase())).length)
+  const pct    = kws.length ? Math.min(100, Math.round((found.length / target) * 100)) : null
+  if (fb && pct === null) {
+    // No keyword list — there is nothing to score against, so don't award a
+    // green tick for arbitrary text (which is what returning 100 used to do).
+    fb.style.display = 'block'
+    fb.className = 'tprac-feedback partial'
+    fb.innerHTML = `📝 Compare your answer with the mark scheme. <span style="display:block;margin-top:5px;font-size:11px;">Model: ${ex.ms}</span>`
+    return
+  }
   if (fb) {
     fb.style.display = 'block'
     if (pct >= 80) {

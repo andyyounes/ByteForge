@@ -7960,7 +7960,27 @@ function checkTheoryShort(evt, id) {
   if (!ans.trim()) { if (fb) { fb.className='tprac-feedback partial'; fb.style.display='block'; fb.textContent='Write your answer first.' } return }
   const kws   = ex.keywords || []
   const found = kws.filter(kw => ans.includes(kw.toLowerCase()))
-  const pct   = kws.length ? Math.round((found.length / kws.length) * 100) : 100
+  // Keyword lists mix genuinely-REQUIRED concepts with ALTERNATIVE acceptable
+  // phrasings, but the score used to be a conjunction over ALL of them
+  // (found/total >= 80%). 20 of the 35 questions REJECTED THEIR OWN MODEL
+  // ANSWER — t25_3 "Pure Functions" scored its own mark scheme 38%, i.e. the
+  // red "❌ Review needed" verdict. The bar also demanded more distinct terms
+  // than the question's own mark allocation: t19_2 is a [2]-mark question with
+  // 9 keywords, so a correct exam-length answer could never pass.
+  // Calibrate against the model answer instead: the target is however many
+  // keywords the mark scheme itself hits, and the student earns credit for ANY
+  // listed synonym. The model answer scores 100% by construction.
+  const msText = String(ex.ms || '').replace(/<[^>]+>/g, ' ').toLowerCase()
+  const target = Math.max(1, kws.filter(kw => msText.includes(kw.toLowerCase())).length)
+  const pct    = kws.length ? Math.min(100, Math.round((found.length / target) * 100)) : null
+  if (fb && pct === null) {
+    // No keyword list — nothing to score against, so don't hand out a green
+    // tick for arbitrary text (which is what returning 100 used to do).
+    fb.style.display = 'block'
+    fb.className = 'tprac-feedback partial'
+    fb.innerHTML = `📝 Compare your answer with the mark scheme. <span style="display:block;margin-top:5px;font-size:11px;">Model: ${ex.ms}</span>`
+    return
+  }
   if (fb) {
     fb.style.display = 'block'
     if (pct >= 80) {
