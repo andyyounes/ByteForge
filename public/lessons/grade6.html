@@ -257,6 +257,25 @@
       </div>
       <div class="feedback" id="pixel-feedback"></div>
     </div>
+    <!-- 🕵️ Cipher City (World 7) -->
+    <div class="cipherwrap" id="cipherwrap" style="display:none;">
+      <div style="font-size:11px;color:#9ca3af;margin-bottom:6px;" id="cipher-label"></div>
+      <div style="font-family:var(--mono,monospace);font-size:16px;letter-spacing:.06em;color:#e879f9;background:#0c0f1a;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;word-break:break-word;" id="cipher-message"></div>
+      <div id="cipher-shift-row" style="margin-top:14px;">
+        <div class="mix-row"><span class="mix-ch" style="min-width:70px;">Shift</span>
+          <input type="range" id="c-shift" min="1" max="25" value="3" style="accent-color:#e879f9" oninput="cipherUpdate()">
+          <b id="c-shift-v">3</b></div>
+        <div style="font-family:var(--mono,monospace);font-size:13px;color:#4ade80;margin-top:8px;word-break:break-word;" id="cipher-preview"></div>
+      </div>
+      <div style="margin-top:14px;">
+        <label style="font-size:11px;color:#9ca3af;">Your answer</label>
+        <textarea id="cipher-answer" rows="2" style="width:100%;margin-top:4px;padding:8px 10px;background:#0c0f1a;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#e5e7eb;font-family:var(--mono,monospace);font-size:13px;resize:none;"></textarea>
+      </div>
+      <div class="run-row" style="margin-top:14px;">
+        <button class="run-btn" onclick="cipherCheck()">🕵️ CHECK</button>
+      </div>
+      <div class="feedback" id="cipher-feedback"></div>
+    </div>
     <div class="deck">
       <div>
         <div class="deck-title">🎮 COMMANDS — tap to add</div>
@@ -666,7 +685,28 @@ const W6_STAGES = [
                [4,1],[4,2],[4,3],[4,4],[4,5],[5,2],[5,3],[5,4],[6,3]] } },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 7 — Cipher City: a Caesar shift is just "add a number to each letter,
+// wrap around at z". Same wheel, three jobs: encode, decode, and (with the
+// shift hidden) crack.
+// ══════════════════════════════════════════════════════════════════════════════
+const W7_STAGES = [
+  { id: 'w7s1', title: 'Encode with the Wheel', emoji: '🔐', type: 'cipher', xp: 30,
+    goal: 'A Caesar cipher shifts every letter forward by the same number. Turn the wheel to shift 3, then type out the secret message.',
+    cipher: { mode: 'encode', message: 'meet me at noon', shift: 3, answer: 'phhw ph dw qrrq' } },
+  { id: 'w7s2', title: 'Decode a Message', emoji: '🔓', type: 'cipher', xp: 35,
+    goal: 'Every website you visit hides secret codes too — that padlock icon means your messages are encrypted, scrambled so only the right computer can read them (networks even hide the real numeric addresses of computers, called IP addresses, behind easy names using something called DNS). Turn the wheel back to shift 5 and read the real message.',
+    cipher: { mode: 'decode', message: 'pjju ymnx rjxxflj xfkj', shift: 5, answer: 'keep this message safe' } },
+  { id: 'w7s3', title: 'Crack the Code', emoji: '🕵️', type: 'cipher', xp: 40,
+    goal: 'This time the shift is a secret! Try every shift on the wheel until the message spells a real word.',
+    cipher: { mode: 'crack', message: 'lxmn', shift: 9, answer: 'code', hint: 'Turn the wheel one click at a time and read the preview — stop when it spells something real.' } },
+  { id: 'w7boss', title: 'BOSS — Crack the Code', emoji: '🚪', boss: true, type: 'cipher', xp: 75,
+    goal: 'Escape room time! A locked door has left you this note, shift unknown. Hunt for the right shift and read the full message to escape.',
+    cipher: { mode: 'crack', message: 'xppe xp le esp zwo zlv ecpp le xtoytrse', shift: 11, answer: 'meet me at the old oak tree at midnight',
+      hint: 'The letter E is the most common letter in English — look for a shift where short words like "at" and "me" appear.' } },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // The quest map — 12 worlds (Worlds 1–4 playable in this release)
@@ -678,7 +718,7 @@ const WORLDS = [
   { id: 'w4',  name: '🔁 Loop Land',          sub: 'Why write it 10 times? Repeat!',            stages: W4_STAGES, live: true },
   { id: 'w5',  name: '🐢 Turtle Island',      sub: 'Loops + angles = amazing art',              stages: W5_STAGES, live: true },
   { id: 'w6',  name: '🖼 Pixel Caves',        sub: 'Pictures are secretly numbers',             stages: W6_STAGES, live: true },
-  { id: 'w7',  name: '🕵️ Cipher City',        sub: 'Secret codes — make them and crack them',   count: 5,  live: false },
+  { id: 'w7',  name: '🕵️ Cipher City',        sub: 'Secret codes — make them and crack them',   stages: W7_STAGES, live: true },
   { id: 'w8',  name: '🎵 Music Studio',       sub: 'Beats are loops you can hear',              count: 6,  live: false },
   { id: 'w9',  name: '💃 Dance Party',        sub: 'Code a character to dance to YOUR track',   count: 5,  live: false },
   { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  count: 7,  live: false },
@@ -763,15 +803,18 @@ function loadStage() {
   const isColor  = activeStage.type === 'color'
   const isTurtle = activeStage.type === 'turtle'
   const isPixel  = activeStage.type === 'pixel'
-  const isCustom = isColor || isTurtle || isPixel
+  const isCipher = activeStage.type === 'cipher'
+  const isCustom = isColor || isTurtle || isPixel || isCipher
   document.querySelector('.board-wrap').style.display = isCustom ? 'none' : ''
   document.querySelector('.deck').style.display = isCustom ? 'none' : ''
   document.getElementById('mixer').style.display = isColor ? '' : 'none'
   document.getElementById('turtlewrap').style.display = isTurtle ? '' : 'none'
   document.getElementById('pixelwrap').style.display = isPixel ? '' : 'none'
+  document.getElementById('cipherwrap').style.display = isCipher ? '' : 'none'
   if (isColor) loadColor()
   else if (isTurtle) loadTurtle()
   else if (isPixel) loadPixel()
+  else if (isCipher) loadCipher()
   else loadMaze()
 }
 
@@ -1050,6 +1093,56 @@ function pixelCheck() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// World 7 — Cipher City: Caesar shift ciphers. Encode, decode, and crack.
+// ══════════════════════════════════════════════════════════════════════════════
+function caesarShift(str, shift) {
+  const s = ((shift % 26) + 26) % 26
+  return str.replace(/[a-zA-Z]/g, ch => {
+    const base = ch <= 'Z' ? 65 : 97
+    return String.fromCharCode((ch.charCodeAt(0) - base + s) % 26 + base)
+  })
+}
+
+function loadCipher() {
+  const cfg = activeStage.cipher || {}
+  document.getElementById('cipher-label').textContent =
+    cfg.mode === 'encode' ? '🔓 Plain message — encode it:' :
+    cfg.mode === 'decode' ? '🔒 Secret message (shift ' + cfg.shift + '):' :
+    '🔒 Secret message (shift unknown — crack it!):'
+  document.getElementById('cipher-message').textContent = cfg.message
+  document.getElementById('c-shift').value = cfg.mode === 'crack' ? 1 : cfg.shift
+  document.getElementById('c-shift-v').textContent = document.getElementById('c-shift').value
+  document.getElementById('cipher-answer').value = ''
+  document.getElementById('cipher-feedback').textContent = cfg.hint ? '💡 ' + cfg.hint : ''
+  cipherUpdate()
+}
+
+function cipherUpdate() {
+  const cfg = activeStage.cipher || {}
+  const shift = +document.getElementById('c-shift').value
+  document.getElementById('c-shift-v').textContent = shift
+  // Preview: encode mode shifts forward (wheel turns the plaintext into code);
+  // decode/crack shift backward (turning the secret message back to plain).
+  const preview = cfg.mode === 'encode' ? caesarShift(cfg.message, shift) : caesarShift(cfg.message, -shift)
+  document.getElementById('cipher-preview').textContent = '→ ' + preview
+}
+
+function cipherCheck() {
+  const cfg = activeStage.cipher || {}
+  const fb  = document.getElementById('cipher-feedback')
+  const typed = document.getElementById('cipher-answer').value.trim().toLowerCase()
+  const target = (cfg.answer || '').trim().toLowerCase()
+  if (typed && typed === target) {
+    fb.style.color = '#4ade80'
+    fb.textContent = '✅ Cracked it!'
+    completeStage(3)
+  } else {
+    fb.style.color = '#fbbf24'
+    fb.textContent = '🌡️ Not quite — turn the wheel and check your spelling, then try again.'
+  }
+}
+
 function currentMaze() {
   return activeStage.boss ? activeStage.mazes[activeMazeIdx] : activeStage
 }
@@ -1213,9 +1306,11 @@ function completeStage(stars) {
   const isColor  = activeStage.type === 'color'
   const isTurtle = activeStage.type === 'turtle'
   const isPixel  = activeStage.type === 'pixel'
+  const isCipher = activeStage.type === 'cipher'
   document.getElementById('win-sub').textContent = newBest && !firstTime ? 'New best!' :
     isTurtle ? 'Beautiful pattern — try a new shape next!' :
     isPixel ? 'Every pixel exactly where it should be!' :
+    isCipher ? 'Cracked it — the code is broken!' :
     stars === 3 ? (isColor ? 'Perfect mix — a true color scientist!' : 'Perfect run — couldn\'t be shorter!') :
     stars === 2 ? (isColor ? 'Close! Match it even tighter for 3 stars.' : 'Great! Can you find a shorter way for 3 stars?') :
     (isColor ? 'Matched! Try again for a super-close mix.' : 'Done! Try again with fewer commands for more stars.')
