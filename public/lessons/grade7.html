@@ -365,6 +365,7 @@
     <block type="text_join"></block>
     <block type="text_length"></block>
   </category>
+  <category name="Functions" colour="#e879f9" custom="PROCEDURE"></category>
 </xml>
 
 <script>
@@ -759,10 +760,22 @@ function runCode() {
   const scopeVals = Object.values(drawingAPI)
 
   if (isAnimated) {
+    // Build the monitored API FIRST — update() must be captured using these
+    // wrapped functions, since its closure binds whichever rect/circle it
+    // saw at definition time. (Previously this wrapper existed but was built
+    // AFTER the capture step and never actually got wired in, so draw-call
+    // counts silently never incremented for any animated stage — fixed here.)
+    let execLog = { frames:0, rects:0, circles:0, hasFunction: /\bfunction\s+(?!update\b)\w+\s*\(/.test(code) }
+    const monitoredAPI = { ...drawingAPI }
+    const origRect   = drawingAPI.rect.bind(drawingAPI)
+    const origCircle = drawingAPI.circle.bind(drawingAPI)
+    monitoredAPI.rect   = (...a) => { execLog.rects++;   origRect(...a)   }
+    monitoredAPI.circle = (...a) => { execLog.circles++; origCircle(...a) }
+
     // Inject a capture hook so we can grab the update function reference
     const captureCode = code + '\n; if(typeof update==="function")__captureUpdate__(update);'
     let updateFn = null
-    const extAPI = { ...drawingAPI, __captureUpdate__: fn => { updateFn = fn } }
+    const extAPI = { ...monitoredAPI, __captureUpdate__: fn => { updateFn = fn } }
     try {
       new Function(...Object.keys(extAPI), captureCode)(...Object.values(extAPI))
     } catch(e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
@@ -774,15 +787,7 @@ function runCode() {
     document.getElementById('run-btn').style.display  = 'none'
     log('Animation running — press ■ Stop to halt.', 'ok')
 
-    let execLog = { frames:0, rects:0, circles:0 }
     const autoClear = true  // could expose as checkbox later
-
-    // Wrap drawing API to count draw calls for validation
-    const monitoredAPI = { ...drawingAPI }
-    const origRect   = drawingAPI.rect.bind(drawingAPI)
-    const origCircle = drawingAPI.circle.bind(drawingAPI)
-    monitoredAPI.rect   = (...a) => { execLog.rects++;   origRect(...a)   }
-    monitoredAPI.circle = (...a) => { execLog.circles++; origCircle(...a) }
 
     function loop() {
       if (!loopActive) return
@@ -805,6 +810,7 @@ function runCode() {
     // Detect if/else in source
     drawLog.hasIf = /\bif\s*\(/.test(code)
     drawLog.hasVar = /\b(var|let|const)\b/.test(code)
+    drawLog.hasFunction = /\bfunction\s+(?!update\b)\w+\s*\(/.test(code)
     try {
       new Function(...Object.keys(trackedAPI), code)(...Object.values(trackedAPI))
     } catch(e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
@@ -928,7 +934,38 @@ const WORLDS = [
     },
   ]},
 
-  { id:'g4',  name:'🧰 G4 — My Blocks',           sub:'jump(), shoot(), spawnEnemy() — powers you define',        count:4, live:false },
+  { id:'g4', name:'🧰 G4 — My Blocks', sub:'jump(), shoot(), spawnEnemy() — powers you define', live:true, stages:[
+    { id:'g4s1', name:'spawnEnemy()', xp:40,
+      text:`<strong>Challenge 1</strong> — Define a function called <em>spawnEnemy</em> with two number parameters, <em>x</em> and <em>y</em>. Inside it, draw a circle at (x, y). Call your function THREE times with different x/y values to spawn three enemies.`,
+      hints:[
+        'Functions → "define do nothing" block. Click the gear ⚙ to add two inputs named x and y.',
+        'Inside the function, use a Draw → circle block, but plug in the x and y parameters (Variables) instead of typed numbers.',
+        'Drag out "call spawnEnemy" three times, filling in different x/y numbers each time.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:false, needsFunction:true,
+      check:(log) => log.hasFunction && log.circles >= 3,
+    },
+    { id:'g4s2', name:'shoot()', xp:45,
+      text:`<strong>Challenge 2</strong> — Define a function <em>shoot</em> with parameters x, y, and <em>isBig</em> (a true/false). Inside, use if/else: if isBig, draw a circle with radius 30; otherwise radius 10. Call it 4 times, mixing big and small shots.`,
+      hints:[
+        'Add a third parameter to your function called isBig — Blockly lets a parameter be anything, including a true/false value.',
+        'Inside the function: if isBig (Logic → boolean, or just the parameter itself) then draw big, else draw small.',
+        'Call shoot() with a mix of true and false so you see both sizes appear.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:false, needsFunction:true,
+      check:(log) => log.hasFunction && log.hasIf && log.circles >= 4,
+    },
+    { id:'g4boss', name:'Platformer Vertical Slice', xp:70, boss:true,
+      text:`<strong>🧰 BOSS — Platformer Vertical Slice</strong> — Before touching a single block, write two lines of pseudocode for your jump power, e.g. <em>"IF up-arrow pressed AND on ground THEN y = y − 40"</em>. Then build it: a player rectangle that falls with gravity and jumps when you press ↑. Define a function <em>jump()</em> that changes the player's y position, and call it from inside "On every frame" when the key is pressed.`,
+      hints:[
+        'Create variables x, y and velocity. In "on every frame": velocity = velocity + 1 (gravity), then y = y + velocity.',
+        'Define jump() with no parameters: inside it, set velocity to a negative number like -15 so the player shoots upward.',
+        'Inside "on every frame", check: if ArrowUp is pressed, call jump(). Clear and redraw the player rectangle at (x, y) every frame.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:true, needsFunction:true,
+      check:(log) => log.frames >= 5 && log.hasFunction && (log.rects >= 1 || log.circles >= 1),
+    },
+  ]},
   { id:'g5',  name:'⌨️ G5 — Player Control',       sub:'Keyboard + mouse input schemes, aiming',                  count:4, live:false },
   { id:'g6',  name:'💥 G6 — Collision & Physics',  sub:'Hitboxes, bouncing, gravity, knockback',                  count:4, live:false },
   { id:'g7w', name:'🎬 G7 — Game States',          sub:'Menu → playing → paused → game-over → win',              count:4, live:false },
@@ -1029,6 +1066,7 @@ function checkChallenge(log) {
     if (ch.needsFrames && (!log.frames || log.frames < 5)) missing.push('"On every frame" event block')
     if (ch.needsVar && !log.hasVar) missing.push('a variable (Variables → set … to …)')
     if (ch.needsIf && !log.hasIf) missing.push('an if/else block (Control → if)')
+    if (ch.needsFunction && !log.hasFunction) missing.push('a function you define (Functions → define, with a name)')
     if ((log.circles || 0) < 1 && (log.rects || 0) < 1) missing.push('a drawn shape (Draw → rectangle or circle)')
     if (missing.length) {
       logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
