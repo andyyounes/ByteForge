@@ -331,5 +331,27 @@
       Lab has test-al-lab.mjs/test-p4-*.mjs), and Grade 9's
       grade9-missions.html already has full coverage via
       test-g9-missions.mjs.
+- [x] Closed both follow-ups flagged by the test-coverage push above:
+      - IGCSE Y1: authored a real hand-written correct answer for all 20
+        challenges (transcribed from each challenge's own hints — the
+        same source a student uses) and added a positive-path check to
+        test-igcse-y1-challenges.mjs alongside the existing blank/garbage
+        rejection tests. 60/60 (20 challenges × 3: blank-reject,
+        garbage-reject, correct-accept).
+      - IGCSE Y2: fixed the parseIf() single-line ELSE/THEN limitation
+        for real, instead of routing around it at the content level.
+        Added `expandInlineIf()` in public/lessons/igcse-y2.html — a
+        quote-aware preprocessing pass that splits one physical line
+        packing inline `IF...THEN...ELSE...ENDIF` (or a lone `ELSE
+        <stmt>`) into separate line-texts before parseBlock/parseIf ever
+        see them, so the existing line-oriented parser handles each part
+        exactly like the multi-line form it already supported correctly.
+        Verified against 6 cases (inline THEN alone, inline ELSE after a
+        multi-line IF, a fully-inline one-liner IF/THEN/ELSE/ENDIF, a
+        true-branch case with trailing code after ENDIF, an inline IF
+        nested in a FOR loop, and confirming a literal "ELSE" inside a
+        string isn't mis-split) — all added as permanent regression
+        cases in test-igcse-y2-challenges.mjs. Full `npm run verify`
+        still green (0 regressions across every grade).
 - [ ] Push repo to GitHub; deploy to Vercel.
 - [ ] Preload Pyodide in the background when the Code Lab opens.

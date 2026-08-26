@@ -41,6 +41,30 @@ for (const ch of CHALLENGES) {
   else { fail++; console.log(`✗ ${label} — starter code already satisfies check() before the student does anything`) }
 }
 
+// Regression coverage for the parseIf() single-line ELSE/THEN limitation
+// found during the initial test-coverage push (docs/TODO.md) and since
+// fixed via expandInlineIf(): inline trailing content after THEN/ELSE on
+// the same physical line must actually run, not be silently dropped.
+const inlineIfCases = [
+  { label: 'inline THEN, no ELSE',           code: 'x ← 10\nIF x > 5 THEN OUTPUT "big"\nOUTPUT "done"',            expect: ['big', 'done'] },
+  { label: 'inline ELSE after multi-line IF', code: 'x ← 2\nIF x > 5 THEN\n   OUTPUT "big"\nELSE OUTPUT "small"\nENDIF', expect: ['small'] },
+  { label: 'fully inline IF/THEN/ELSE/ENDIF', code: 'x ← 2\nIF x > 5 THEN OUTPUT "big" ELSE OUTPUT "small" ENDIF',  expect: ['small'] },
+  { label: 'fully inline, true branch + trailing code', code: 'x ← 10\nIF x > 5 THEN OUTPUT "big" ELSE OUTPUT "small" ENDIF\nOUTPUT "after"', expect: ['big', 'after'] },
+  { label: 'inline IF nested inside a FOR loop', code: 'FOR i ← 1 TO 3\n  IF i = 2 THEN OUTPUT "two" ELSE OUTPUT i ENDIF\nNEXT i', expect: ['1', 'two', '3'] },
+  { label: 'ELSE as a literal word inside a string is not mis-split', code: 'OUTPUT "please ELSE choose wisely"', expect: ['please ELSE choose wisely'] },
+]
+for (const { label, code, expect } of inlineIfCases) {
+  try {
+    const { output } = new Interpreter().run(code, [])
+    if (JSON.stringify(output) === JSON.stringify(expect)) { pass++; console.log(`✓ inline-IF: ${label}`) }
+    else { fail++; console.log(`✗ inline-IF: ${label} — expected ${JSON.stringify(expect)}, got ${JSON.stringify(output)}`) }
+  } catch (e) {
+    fail++
+    console.log(`✗ inline-IF: ${label} — interpreter threw: ${e?.message ?? JSON.stringify(e)}`)
+  }
+}
+
 console.log(`\n${pass} passed, ${fail} failed.`)
 if (fail > 0) process.exit(1)
 console.log('all IGCSE Y2 challenge starters run cleanly and are genuinely incomplete')
+console.log('inline IF/THEN/ELSE/ENDIF on a single physical line is correctly handled')

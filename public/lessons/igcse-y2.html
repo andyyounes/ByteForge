@@ -460,7 +460,8 @@ class Interpreter {
     // splits on ";" outside double-quoted strings so OUTPUT "a; b" isn't
     // affected.
     const rawLines=code.split('\n')
-      .flatMap((text,i)=>splitOnSemicolons(text.replace(/\/\/.*$/,'')).map(t=>({text:t.trim(),n:i+1})))
+      .flatMap((text,i)=>splitOnSemicolons(text.replace(/\/\/.*$/,''))
+        .flatMap(t=>expandInlineIf(t.trim()).map(seg=>({text:seg,n:i+1}))))
       .filter(l=>l.text)
     const[block]=parseBlock(rawLines,0)
     this.execBlock(block,this.globals)
@@ -664,6 +665,37 @@ function splitOnSemicolons(text){
   }
   parts.push(cur)
   return parts
+}
+
+// Turns one physical line that packs an inline IF/THEN/ELSE/ENDIF (e.g.
+// "IF x > 5 THEN y ← 1 ELSE y ← 2 ENDIF", or a lone "ELSE y ← 2") into
+// several separate line-texts — one per control keyword and one per
+// statement between them — so the line-oriented parseIf()/parseBlock()
+// (which only ever look at whole lines) see each part on its own line,
+// exactly like the multi-line form they already handled correctly. Fixes
+// a known bug where inline trailing content after THEN/ELSE was silently
+// dropped (previously routed around at the content level; see docs/TODO.md
+// and scripts/test-igcse-y2-challenges.mjs). Quote-aware: a keyword that
+// happens to appear inside a "string literal" is never treated as a
+// delimiter.
+function expandInlineIf(text){
+  let masked='',inStr=false
+  for(let i=0;i<text.length;i++){
+    const ch=text[i]
+    if(ch==='"')inStr=!inStr
+    masked+=(inStr&&ch!=='"')?'x':ch
+  }
+  const re=/\b(IF\s+.+?\s+THEN|ELSEIF\s+.+?\s+THEN|ELSE|ENDIF)\b/gi
+  if(!re.test(masked))return[text]
+  re.lastIndex=0
+  const parts=[];let last=0,m
+  while((m=re.exec(masked))){
+    if(m.index>last)parts.push(text.slice(last,m.index))
+    parts.push(text.slice(m.index,re.lastIndex))
+    last=re.lastIndex
+  }
+  if(last<text.length)parts.push(text.slice(last))
+  return parts.map(p=>p.trim()).filter(Boolean)
 }
 
 function parseParams(src){
