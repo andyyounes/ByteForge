@@ -321,6 +321,20 @@
       </div>
       <div class="feedback" id="ai-feedback"></div>
     </div>
+    <!-- 🚀 The Final Quest (World 12) -->
+    <div class="finalwrap" id="finalwrap" style="display:none;">
+      <div id="final-checklist" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div style="margin-top:16px;font-size:13px;color:#e5e7eb;">
+        Which world was your masterpiece?
+        <select id="final-favorite" style="background:#0c0f1a;color:#fbbf24;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:4px 8px;font-size:13px;font-weight:700;margin-left:6px;">
+          <option value="">— choose —</option>
+        </select>
+      </div>
+      <div class="run-row" style="margin-top:14px;">
+        <button class="run-btn" onclick="finalQuestCheck()">🚀 CLAIM VICTORY</button>
+      </div>
+      <div class="feedback" id="final-feedback"></div>
+    </div>
     <div class="deck">
       <div>
         <div class="deck-title">🎮 COMMANDS — tap to add</div>
@@ -925,7 +939,17 @@ const W11_STAGES = [
       ] } },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES, ...W11_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 12 — The Final Quest: one capstone stage, no new skill to teach —
+// just proof every world's boss was really beaten.
+// ══════════════════════════════════════════════════════════════════════════════
+const W12_STAGES = [
+  { id: 'w12final', title: 'The Final Quest', emoji: '🚀', boss: true, type: 'finalquest', xp: 150,
+    goal: 'The whole year, one last check. Every world\'s boss has to be beaten before you can claim your masterpiece.',
+    finalquest: { bossIds: ['w1boss','w2boss','w3boss','w4boss','w5boss','w6boss','w7boss','w8boss','w9boss','w10boss','w11boss'] } },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES, ...W11_STAGES, ...W12_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // The quest map — 12 worlds (Worlds 1–4 playable in this release)
@@ -942,7 +966,7 @@ const WORLDS = [
   { id: 'w9',  name: '💃 Dance Party',        sub: 'Code a character to dance to YOUR track',   stages: W9_STAGES, live: true },
   { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  stages: W10_STAGES, live: true },
   { id: 'w11', name: '🧠 AI World',           sub: 'Teach a machine. Then trick it.',           stages: W11_STAGES, live: true },
-  { id: 'w12', name: '🚀 The Final Quest',    sub: 'Your masterpiece. Any world. Go big.',      count: 1,  live: false },
+  { id: 'w12', name: '🚀 The Final Quest',    sub: 'Your masterpiece. Any world. Go big.',      stages: W12_STAGES, live: true },
 ]
 
 // ── Progress (localStorage + server best-effort) ─────────────────────────────
@@ -1027,7 +1051,8 @@ function loadStage() {
   const isDance  = activeStage.type === 'dance'
   const isGame   = activeStage.type === 'gamerules'
   const isAI     = activeStage.type === 'aiworld'
-  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic || isDance || isGame || isAI
+  const isFinal  = activeStage.type === 'finalquest'
+  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic || isDance || isGame || isAI || isFinal
   document.querySelector('.board-wrap').style.display = isCustom ? 'none' : ''
   document.querySelector('.deck').style.display = isCustom ? 'none' : ''
   document.getElementById('mixer').style.display = isColor ? '' : 'none'
@@ -1038,6 +1063,7 @@ function loadStage() {
   document.getElementById('dancewrap').style.display = isDance ? '' : 'none'
   document.getElementById('gamewrap').style.display = isGame ? '' : 'none'
   document.getElementById('aiwrap').style.display = isAI ? '' : 'none'
+  document.getElementById('finalwrap').style.display = isFinal ? '' : 'none'
   if (isColor) loadColor()
   else if (isTurtle) loadTurtle()
   else if (isPixel) loadPixel()
@@ -1046,6 +1072,7 @@ function loadStage() {
   else if (isDance) loadDance()
   else if (isGame) loadGameRules()
   else if (isAI) loadAIWorld()
+  else if (isFinal) loadFinalQuest()
   else loadMaze()
 }
 
@@ -1853,6 +1880,51 @@ function aiCheck() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// World 12 — The Final Quest: the year's real capstone check. No new
+// mechanic to learn — just proof every prior world's boss was actually
+// beaten, reusing the same localStorage progress every other world already
+// writes to. A cosmetic "pick your masterpiece" reflection closes it out.
+// ══════════════════════════════════════════════════════════════════════════════
+function loadFinalQuest() {
+  const cfg = activeStage.finalquest || {}
+  const prog = getProg()
+  const list = document.getElementById('final-checklist')
+  list.innerHTML = ''
+  const favorite = document.getElementById('final-favorite')
+  favorite.innerHTML = '<option value="">— choose —</option>'
+  ;(cfg.bossIds || []).forEach(bid => {
+    const stage = ALL_STAGES.find(s => s.id === bid)
+    const world = WORLDS.find(w => (w.stages || []).some(s => s.id === bid))
+    const done = !!(prog[bid] && prog[bid].stars > 0)
+    const row = document.createElement('div')
+    row.style.cssText = `display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:${done ? 'rgba(74,222,128,.08)' : 'rgba(255,255,255,.03)'};border:1px solid ${done ? 'rgba(74,222,128,.3)' : 'rgba(255,255,255,.08)'};`
+    row.innerHTML = `<span style="font-size:16px;">${done ? '✅' : '⬜'}</span><span style="font-size:13px;color:${done ? '#4ade80' : '#9ca3af'};">${world ? world.name : bid}${stage ? ' — ' + stage.title : ''}</span>`
+    list.appendChild(row)
+    if (world) {
+      const opt = document.createElement('option')
+      opt.value = world.id; opt.textContent = world.name
+      favorite.appendChild(opt)
+    }
+  })
+  document.getElementById('final-feedback').textContent = ''
+}
+
+function finalQuestCheck() {
+  const cfg = activeStage.finalquest || {}
+  const fb  = document.getElementById('final-feedback')
+  const prog = getProg()
+  const missing = (cfg.bossIds || []).filter(bid => !(prog[bid] && prog[bid].stars > 0))
+  if (missing.length === 0) {
+    fb.style.color = '#4ade80'
+    fb.textContent = '✅ Every world beaten — you are a true Creator!'
+    completeStage(3)
+  } else {
+    fb.style.color = '#fbbf24'
+    fb.textContent = `🌡️ ${missing.length} world boss(es) still unbeaten — go finish them first!`
+  }
+}
+
 function currentMaze() {
   return activeStage.boss ? activeStage.mazes[activeMazeIdx] : activeStage
 }
@@ -2021,6 +2093,7 @@ function completeStage(stars) {
   const isDance  = activeStage.type === 'dance'
   const isGame   = activeStage.type === 'gamerules'
   const isAI     = activeStage.type === 'aiworld'
+  const isFinal  = activeStage.type === 'finalquest'
   document.getElementById('win-sub').textContent = newBest && !firstTime ? 'New best!' :
     isTurtle ? 'Beautiful pattern — try a new shape next!' :
     isPixel ? 'Every pixel exactly where it should be!' :
@@ -2029,6 +2102,7 @@ function completeStage(stars) {
     isDance ? 'What a routine!' :
     isGame ? 'Solid game design!' :
     isAI ? 'The machine learned it!' :
+    isFinal ? 'You are a true Creator!' :
     stars === 3 ? (isColor ? 'Perfect mix — a true color scientist!' : 'Perfect run — couldn\'t be shorter!') :
     stars === 2 ? (isColor ? 'Close! Match it even tighter for 3 stars.' : 'Great! Can you find a shorter way for 3 stars?') :
     (isColor ? 'Matched! Try again for a super-close mix.' : 'Done! Try again with fewer commands for more stars.')
