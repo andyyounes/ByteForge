@@ -29,11 +29,22 @@
       puzzles over two described overlapping shapes, and a boss revealing a
       hidden gem pattern. Verified live and visually confirmed the heart and
       gem render as genuine correct pixel art.
-- [ ] Grade 6: build remaining worlds — Cipher City, Music Studio (Web Audio),
-      Dance Party, Game Corner, AI World, Final Quest. (World-boss unlock is
-      in place; each new world = a stage list + whichever engine fits -
-      maze/chip, color mixer, turtle sliders, or pixel-grid - or a new one if
-      the content genuinely needs it.)
+- [x] Grade 6 World 7 — Cipher City built with a new lightweight Caesar-cipher
+      engine (caesarShift() via charCode wraparound, one wheel-slider driving
+      a live shift preview shared by encode/decode/crack modes). 4 stages:
+      Encode with the Wheel, Decode a Message (carries the 0860-audit's
+      IP/DNS/encryption analogy), Crack the Code (shift hidden, short word,
+      frequency-hint framing), and a BOSS Crack the Code escape-room stage
+      (full sentence, shift hidden). Caught and fixed one real cipher-math
+      transcription bug during independent Node verification before it ever
+      reached the file. Verified live via Playwright: all 4 stages solve with
+      their reference answers, preview text updates correctly, screenshot
+      confirms clean rendering, zero app-logic console errors.
+- [ ] Grade 6: build remaining worlds — Music Studio (Web Audio), Dance Party,
+      Game Corner, AI World, Final Quest. (World-boss unlock is in place;
+      each new world = a stage list + whichever engine fits - maze/chip,
+      color mixer, turtle sliders, pixel-grid, or cipher-wheel - or a new one
+      if the content genuinely needs it.)
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
       Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
