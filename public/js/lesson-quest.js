@@ -119,7 +119,7 @@ const LessonQuest = (() => {
   let _syncStarted = false, _pushT = null, _dirty = false
   function syncKeys(pk) {
     const out = []
-    const pre = ['bf-lq-' + pk + '-', 'bf-lqcp-' + pk + '-', 'bf-lqd-' + pk + '-']
+    const pre = ['bf-lq-' + pk + '-', 'bf-lqcp-' + pk + '-', 'bf-lqd-' + pk + '-', 'bf-badge-' + pk + '-']
     const exact = ['bf-lqs-' + pk, 'bf-lqw-' + pk, 'bf-lqrb-' + pk]
     try {
       for (let i = 0; i < localStorage.length; i++) {
@@ -801,6 +801,30 @@ const LessonQuest = (() => {
 
     bank(pageKey, pair) { bankMiss(pageKey, pair) },
     bankSize(pageKey) { return (jget(bankKey(pageKey)) || []).length },
+
+    // ── 🏅 Badge persistence (AS/A Level specific achievements) ───────────────
+    // Check logic lives in the lesson page; lesson-quest.js handles persist + sync.
+    badgeSaved(pageKey, badgeId) {
+      return !!(jget('bf-badge-' + pageKey + '-' + badgeId))
+    },
+    saveBadge(pageKey, badgeId, xp) {
+      if (this.badgeSaved(pageKey, badgeId)) return false
+      jset('bf-badge-' + pageKey + '-' + badgeId, { at: Date.now(), xp: xp })
+      return true
+    },
+    earnedBadges(pageKey) {
+      const out = [], pre = 'bf-badge-' + pageKey + '-'
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i)
+          if (k && k.indexOf(pre) === 0) {
+            const d = jget(k) || {}
+            out.push({ id: k.slice(pre.length), at: d.at, xp: d.xp || 0 })
+          }
+        }
+      } catch (e) {}
+      return out
+    },
 
     // 🩹 Revision Boss — a quiz built from this student's own past mistakes.
     // Terms answered correctly in a passed run leave the bank for good.
