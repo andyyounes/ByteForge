@@ -22,11 +22,18 @@
       360×2/5), spiral (growth), layered bloom, and a mandala boss. Verified
       live and visually confirmed the canvas draws a genuine star and a real
       rotated multi-color mandala.
-- [ ] Grade 6: build remaining worlds — Pixel Caves, Cipher City, Music Studio
-      (Web Audio), Dance Party, Game Corner, AI World, Final Quest. (World-boss
-      unlock is in place; each new world = a stage list + whichever engine
-      fits — maze/chip, color mixer, or turtle-style sliders — or a new one
-      if the content genuinely needs it, same judgment call as Turtle Island.)
+- [x] Grade 6 World 6 — Pixel Caves built with a reusable pixel-grid engine
+      (toggle cells, pattern-match mode + binary place-value mode covering
+      the whole world's spec in one mechanic). 5 stages: pixel-art heart,
+      binary-as-pixels (light 8/4/2/1 columns to total 11), AND/OR logic
+      puzzles over two described overlapping shapes, and a boss revealing a
+      hidden gem pattern. Verified live and visually confirmed the heart and
+      gem render as genuine correct pixel art.
+- [ ] Grade 6: build remaining worlds — Cipher City, Music Studio (Web Audio),
+      Dance Party, Game Corner, AI World, Final Quest. (World-boss unlock is
+      in place; each new world = a stage list + whichever engine fits -
+      maze/chip, color mixer, turtle sliders, or pixel-grid - or a new one if
+      the content genuinely needs it.)
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
       Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
