@@ -451,8 +451,16 @@ class Interpreter {
   }
   run(code,inputValues=[]){
     this.reset();this.inputQ=[...inputValues]
+    // A single line can hold several ";"-separated statements (e.g. the
+    // Stack examples' own "top ← top + 1; arr[top] ← val") — but nothing
+    // here ever actually SPLIT on ";", so only the first statement before
+    // it ever ran and everything after was silently dropped, no error at
+    // all (found via scripts/test-igcse-y2-challenges.mjs's minimal-repro
+    // debugging: "a ← 1; b ← 2" left b at its default value). splitOnSemicolons
+    // splits on ";" outside double-quoted strings so OUTPUT "a; b" isn't
+    // affected.
     const rawLines=code.split('\n')
-      .map((text,i)=>({text:text.replace(/\/\/.*$/,'').trim(),n:i+1}))
+      .flatMap((text,i)=>splitOnSemicolons(text.replace(/\/\/.*$/,'')).map(t=>({text:t.trim(),n:i+1})))
       .filter(l=>l.text)
     const[block]=parseBlock(rawLines,0)
     this.execBlock(block,this.globals)
@@ -627,13 +635,35 @@ class Interpreter {
   execDeclare(text,env){
     const m1=text.match(/^DECLARE\s+(\w+)\s*:\s*ARRAY\s*\[(\d+)\s*:\s*(\d+)\]\s*OF\s+(\w+)/i)
     if(m1){
-      const[,name,,lo,hi]=m1;const base=parseInt(lo);const size=parseInt(hi)-base+1
+      // m1 = [fullMatch, name, lowerBound, upperBound, type] — this destructure
+      // previously had one extra skipped slot ([,name,,lo,hi]), which silently
+      // shifted every field over by one: lo actually got the upperBound string,
+      // hi got the TYPE string ("INTEGER"), and parseInt("INTEGER") is NaN,
+      // so every 1D `DECLARE arr : ARRAY[lo:hi] OF type` crashed with "Invalid
+      // array length" the moment it ran (found via
+      // scripts/test-igcse-y2-challenges.mjs running every challenge starter
+      // through the real interpreter — 4 of them crashed outright).
+      const[,name,lo,hi]=m1;const base=parseInt(lo);const size=parseInt(hi)-base+1
       const fill=typeDefault(m1[4])
       env.setLocal(name,{_data:Array(size).fill(fill),_base:base,_hi:parseInt(hi)});return
     }
     const m2=text.match(/^DECLARE\s+(\w+)\s*:\s*(\w+)/i)
     if(m2)env.setLocal(m2[1],typeDefault(m2[2]))
   }
+}
+
+// Splits a line on ";" into separate statements, ignoring any ";" that
+// appears inside a double-quoted string literal (so OUTPUT "a; b" stays intact).
+function splitOnSemicolons(text){
+  const parts=[];let cur='',inStr=false
+  for(let i=0;i<text.length;i++){
+    const ch=text[i]
+    if(ch==='"')inStr=!inStr
+    if(ch===';'&&!inStr){parts.push(cur);cur='';continue}
+    cur+=ch
+  }
+  parts.push(cur)
+  return parts
 }
 
 function parseParams(src){
@@ -772,8 +802,9 @@ DECLARE c : INTEGER
 DECLARE result : INTEGER
 
 // Simple workaround — compute on the fly:
-r ← 2
-c ← 3
+// TODO: set r and c to the row/column you want to look up (the challenge asks for grid[2,3])
+r ← 1
+c ← 1
 result ← r * c
 OUTPUT result`,
     check:(code,res)=>res.output.some(o=>o.trim()==='6'),
@@ -899,8 +930,11 @@ DECLARE top : INTEGER
 top ← 0
 
 PROCEDURE Push(BYVAL val : INTEGER)
-   IF top >= 5 THEN OUTPUT "Stack overflow!"
-   ELSE top ← top + 1; arr[top] ← val
+   IF top >= 5 THEN
+      OUTPUT "Stack overflow!"
+   ELSE
+      top ← top + 1
+      arr[top] ← val
    ENDIF
 ENDPROCEDURE
 
@@ -973,9 +1007,11 @@ FUNCTION BinSearch(target : INTEGER) RETURNS INTEGER
       IF arr[mid] = target THEN
          RETURN mid
       ELSEIF arr[mid] < target THEN
-         // TODO: search right half
+         // TODO: search right half — set low ← mid + 1
+         high ← low - 1   // placeholder so the loop exits safely until you fix this — remove once you add the real line above
       ELSE
-         // TODO: search left half
+         // TODO: search left half — set high ← mid - 1
+         high ← low - 1   // placeholder so the loop exits safely until you fix this — remove once you add the real line above
       ENDIF
    ENDWHILE
    RETURN -1
