@@ -767,7 +767,7 @@ function runCode() {
     // AFTER the capture step and never actually got wired in, so draw-call
     // counts silently never incremented for any animated stage — fixed here.)
     let execLog = {
-      frames:0, rects:0, circles:0,
+      frames:0, rects:0, circles:0, lines:0, texts:0,
       hasFunction: /\bfunction\s+(?!update\b)\w+\s*\(/.test(code),
       hasIf:       /\bif\s*\(/.test(code),
       hasVar:      /\b(var|let|const)\b/.test(code),
@@ -775,8 +775,12 @@ function runCode() {
     const monitoredAPI = { ...drawingAPI }
     const origRect   = drawingAPI.rect.bind(drawingAPI)
     const origCircle = drawingAPI.circle.bind(drawingAPI)
+    const origLine   = drawingAPI.line.bind(drawingAPI)
+    const origText   = drawingAPI.text.bind(drawingAPI)
     monitoredAPI.rect   = (...a) => { execLog.rects++;   origRect(...a)   }
     monitoredAPI.circle = (...a) => { execLog.circles++; origCircle(...a) }
+    monitoredAPI.line   = (...a) => { execLog.lines++;   origLine(...a)   }
+    monitoredAPI.text   = (...a) => { execLog.texts++;   origText(...a)   }
 
     // Inject a capture hook so we can grab the update function reference
     const captureCode = code + '\n; if(typeof update==="function")__captureUpdate__(update);'
@@ -839,9 +843,10 @@ function friendlyErr(msg) {
 // Decisions); Worlds 4-10 built up incrementally since. Each stage keeps the
 // exact check(log) contract runCode() produces: static runs → {rects,circles,
 // lines,texts,hasIf,hasVar,hasFunction}; animated (on-every-frame code) runs →
-// {frames,rects,circles,hasFunction,hasIf,hasVar} — full parity with static
-// as of the G4/G5 pass (previously animated mode had no hasIf/hasVar at all,
-// so needsIf/needsVar could never be satisfied there — fixed alongside the
+// {frames,rects,circles,lines,texts,hasFunction,hasIf,hasVar} — full parity
+// with static as of the G4/G5/G7 pass (previously animated mode had no
+// hasIf/hasVar/lines/texts at all, so any check needing them could never be
+// satisfied there — fixed alongside the
 // monitoredAPI closure-timing bug, see the G4 note in grade7-curriculum.md).
 const WORLDS = [
   { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
@@ -1041,7 +1046,39 @@ const WORLDS = [
       check:(log) => log.frames >= 5 && log.hasIf && (log.rects >= 1) && (log.circles >= 1),
     },
   ]},
-  { id:'g7w', name:'🎬 G7 — Game States',          sub:'Menu → playing → paused → game-over → win',              count:4, live:false },
+  { id:'g7w', name:'🎬 G7 — Game States', sub:'Menu → playing → paused → game-over → win', live:true, stages:[
+    { id:'g7s1', name:'The State Variable', xp:40,
+      text:`<strong>Challenge 1</strong> — Create a variable called <em>state</em> set to the text "menu". Use if/else: if state is "menu", draw a title with text(). If state is "playing", draw a circle instead. Change the value of state and re-run to see the other screen.`,
+      hints:[
+        'A state is just a variable holding text: state = "menu". Change it to "playing" and run again.',
+        'if (state === "menu") { text block } else if (state === "playing") { circle block }',
+        'One variable, completely different screens — that\'s the entire idea behind a state machine.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:false, needsFunction:false,
+      check:(log) => log.hasIf && (log.texts >= 1 || log.circles >= 1),
+    },
+    { id:'g7s2', name:'Switching States', xp:45,
+      text:`<strong>Challenge 2</strong> — Add a score variable. In "on every frame", check: if score reaches 10 or more, change state from "playing" to "win". Draw differently depending on the current state, every frame.`,
+      hints:[
+        'Variables: state = "playing", score = 0. Each frame, increase score a little (e.g. score = score + 1).',
+        'if (score >= 10) { state = "win" } — this changes the state variable itself once the condition is met.',
+        'Then check state to decide what to draw: "playing" → one shape, "win" → a different shape or text.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.hasIf && (log.rects >= 1 || log.circles >= 1 || log.texts >= 1),
+    },
+    { id:'g7boss', name:'Full Game Loop w/ Screens', xp:80, boss:true,
+      text:`<strong>🎬 BOSS — Full Game Loop</strong> — Build a real state machine with at least THREE states: "menu", "playing", and "gameover" (bonus: add "paused" too). Draw something different for each, and switch between them based on a condition (like a timer or score).<br><br>
+      <span style="opacity:.8;font-size:12px;">💡 What if this were an online multiplayer game? A <strong>firewall</strong> decides who's even allowed to connect to your game server in the first place — like a bouncer checking IDs. Once connected, an <strong>echo check</strong> answers "did that move I sent actually arrive?" — the receiver sends a tiny reply back to confirm, and if it doesn't, the sender knows to try again. Your local state machine works the same way whether it's just you playing, or a thousand players online — states don't change just because a network's involved.</span>`,
+      hints:[
+        'Use a timer variable (frameCount = frameCount + 1 each frame) to auto-switch from "menu" to "playing" after ~60 frames.',
+        'Inside "playing", track something (score, health, or a countdown) — when it crosses a threshold, set state = "gameover".',
+        'Draw completely different screens for each state: a title for menu, gameplay shapes for playing, a message for gameover.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.hasIf && (log.rects >= 1 || log.circles >= 1) && log.texts >= 1,
+    },
+  ]},
   { id:'g8',  name:'🤖 G8 — Smart NPCs',           sub:'Enemies that chase, flee, patrol; a rule-based chatbot', count:4, live:false },
   { id:'g9w', name:'💬 G9 — Strings & Dialogue',   sub:'Player names, dialogue trees, high-score tables',        count:4, live:false },
   { id:'g10', name:'🏆 G10 — Design & Capstone',   sub:'Plan → build → test → ship YOUR game',                   count:2, live:false },
