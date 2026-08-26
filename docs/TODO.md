@@ -59,10 +59,19 @@
       all 4 moves), BOSS Dance Battle. Verified live via Playwright: all 5
       solve correctly, play/stop animates and resets cleanly, zero
       app-logic console errors.
-- [ ] Grade 6: build remaining worlds — Game Corner, AI World, Final Quest.
-      (World-boss unlock is in place; each new world = a stage list +
-      whichever engine fits - maze/chip, color mixer, turtle sliders,
-      pixel-grid, cipher-wheel, beat-grid, or move-sequence - or a new one
+- [x] Grade 6 World 10 — Game Corner built with a game-design-vocabulary
+      engine (fill-in-the-blank dropdowns over design-document sentences,
+      deliberately structural rather than a second code-execution engine —
+      real game building is Grade 7's whole year). 6 stages (5 + boss),
+      closing the 0860 sub-routine-vocabulary gap with its own dedicated
+      stage (w10s4), plus a rule-based-vs-real-ML aside continuing Grade 7's
+      Smart NPCs framing. Verified live via Playwright: all 6 solve
+      correctly, the wrong-answer rejection path fires and renders
+      correctly, zero app-logic console errors.
+- [ ] Grade 6: build remaining worlds — AI World, Final Quest. (World-boss
+      unlock is in place; each new world = a stage list + whichever engine
+      fits - maze/chip, color mixer, turtle sliders, pixel-grid,
+      cipher-wheel, beat-grid, move-sequence, or game-rules - or a new one
       if the content genuinely needs it.)
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
