@@ -34,8 +34,17 @@
       closure, so it was dead code — every animated boss (G1/G2/G3, not just
       this new one) was silently never getting shapes counted for
       validation. Fixed and regression-tested all three pre-existing bosses.
-      Worlds 5-10 still stubbed locked — next up is G5 Player Control (needs
-      the PAN/LAN/WAN networking aside from the 0860 realignment).
+- [x] Grade 7 G5 — Player Control built: arrow-key movement, a mouse-following
+      reticle, and a boss combining both (opens with the PAN/LAN/WAN
+      networking aside from the 0860 realignment). Found and fixed two more
+      real bugs while verifying live: animated-mode never tracked hasIf/
+      hasVar at all (needsIf/needsVar could never pass for any animated
+      stage, ever — extended it with the same regex approach as hasFunction),
+      and a genuine CSS layout bug where a long-enough challenge description
+      could collapse the CodeMirror editor to 0px height (fixed with
+      max-height + scroll on .ch-header). Worlds 6-10 still stubbed locked —
+      next up is G6 Collision & Physics (needs the linear-search addition
+      from the 0860 realignment).
 - [x] Grade 8 wiring started: Builder City map live for Modules 1-4 (From Blocks
       to Text, Choices & Loops - both new; Functions, Lists - rehomed pre-existing
       Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked.
