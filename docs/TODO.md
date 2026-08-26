@@ -60,9 +60,16 @@
       a patrol pattern flipping direction at boundaries, and a boss combining
       patrol/chase/flee via distance thresholds (reuses the distance formula
       from Collision & Physics). Closes with the explicit rule-based-AI-vs-
-      machine-learning contrast from the 0860 realignment. Worlds 9-10 still
-      stubbed locked — next up is G9 Strings & Dialogue (needs the ASCII
-      addition).
+      machine-learning contrast from the 0860 realignment.
+- [x] Grade 7 G9 — Strings & Dialogue built: greeting-by-name with the ASCII
+      addition (charCodeAt), a dialogue tree on string comparison, and a boss
+      RPG scene combining name/ASCII/dialogue/a high-score table.
+- [x] Grade 7 G10 — Design & Capstone built, completing "The Game Maker"
+      (10/10 worlds live). A planning stage (title function + win-condition
+      variable) and a final boss synthesizing the whole year: state machine,
+      input, collision/win-condition, and a student-defined function. Ran a
+      full regression sweep of all 10 boss stages (G1-G10) - all pass, zero
+      errors. **Grade 7 is now fully built end to end.**
 - [x] Grade 8 wiring started: Builder City map live for Modules 1-4 (From Blocks
       to Text, Choices & Loops - both new; Functions, Lists - rehomed pre-existing
       Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked.
