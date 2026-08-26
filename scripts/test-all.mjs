@@ -34,6 +34,7 @@ const SUITES = [
   { id: 'p4-starters',grade: 'A Level',   name: 'Paper 4 starters',                   script: 'test-p4-starters.mjs' },
   { id: 'theory',     grade: 'AS+A Level', name: 'Written-answer scoring (THEORY_EXERCISES)', script: 'test-theory-scoring.mjs' },
   { id: 'tools',      grade: 'Tools',     name: 'Standalone tool lessons',              script: 'test-tool-lessons.mjs' },
+  { id: 'interp',     grade: 'AS+A Level', name: 'Pseudocode interpreters',                  script: 'test-interpreters.mjs' },
   { id: 'chests',     grade: 'Platform',  name: 'Daily quest chest rewards',          script: 'test-chest-rewards.mjs' },
 ]
 
