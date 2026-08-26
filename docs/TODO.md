@@ -47,9 +47,16 @@
       distance formula, gravity/bounce physics, and a Breakout clone boss
       with a real linear search (a list of bricks checked one at a time,
       contrasted with why that gets slow at scale — hooks toward Grade 8's
-      binary search). Worlds 7-10 still stubbed locked — next up is G7 Game
-      States (needs the firewalls/antivirus/echo-check addition from the
-      0860 realignment).
+      binary search).
+- [x] Grade 7 G7 — Game States built: a state variable driving different
+      screens, state-switching on a score condition, and a boss 3-state
+      machine (menu/playing/gameover) with a timer-driven transition. Opens
+      with the firewalls/echo-check networking aside from the 0860
+      realignment. Extended the animated log to track lines/texts too
+      (matching the earlier hasIf/hasVar fix) - full field parity between
+      static and animated modes now. Regression-tested all 6 existing boss
+      stages after the extension, all pass. Worlds 8-10 still stubbed locked
+      — next up is G8 Smart NPCs (needs the explicit ML-vs-rules addition).
 - [x] Grade 8 wiring started: Builder City map live for Modules 1-4 (From Blocks
       to Text, Choices & Loops - both new; Functions, Lists - rehomed pre-existing
       Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked.
