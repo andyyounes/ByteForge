@@ -986,7 +986,15 @@ for line in roster_lines[1:]:
 `,
       check:(code) => {
         const hasDict   = /\{\}/.test(code) || /grades_by_id\s*=\s*\{/.test(code)
-        const hasLookup = /grades_by_id\s*\[/.test(code)
+        // The starter already assigns grades_by_id[student_id] = grade while
+        // BUILDING the dict (given scaffolding) — that alone matches a loose
+        // "grades_by_id[" search, so the unmodified starter would pass without
+        // the student ever adding the actual lookup. Require a SECOND
+        // occurrence: one for the given build line, one for the new lookup
+        // the TODO asks for (found via scripts/test-g8-challenges.mjs
+        // asserting the starter must not pass on its own).
+        const lookupCount = (code.match(/grades_by_id\s*\[/g) || []).length
+        const hasLookup = lookupCount >= 2
         const hasTwoOpens = (code.match(/open\s*\(/g) || []).length >= 2
         return hasDict && hasLookup && hasTwoOpens
       },
@@ -1078,7 +1086,15 @@ print("That's interpretation: one line at a time, not all-or-nothing like a comp
       check:(code) => {
         const hasTry    = /\btry\s*:/.test(code)
         const hasExcept = /\bexcept\b/.test(code)
-        return hasTry && hasExcept
+        // The starter already GIVES both try: and except ZeroDivisionError: as
+        // scaffolding — only the "pass" placeholder inside the try block is
+        // the actual TODO. Checking try+except alone means the untouched
+        // starter passes without the student causing any error at all (found
+        // via scripts/test-g8-challenges.mjs asserting the starter must not
+        // pass on its own). Require real division code between try: and
+        // except — the thing that actually raises ZeroDivisionError.
+        const causesError = /try\s*:[\s\S]*?\/[\s\S]*?except/.test(code)
+        return hasTry && hasExcept && causesError
       },
     },
   ]},
@@ -1483,10 +1499,17 @@ function clearEditor() {
   document.getElementById('pass-badge').style.display = 'none'
 }
 
+// Every check() is a regex match over raw source text — strip Python
+// comments first, or a starter's own instructional "# TODO: use a while
+// loop" comment can satisfy a check looking for the literal word "while"
+// before the student has written a single real line (found via
+// scripts/test-g8-challenges.mjs asserting every starter must NOT pass).
+function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
+
 function validateChallenge(code) {
   const ch = CHALLENGES[activeIdx]
   if (!ch || completed.has(activeIdx)) return
-  if (ch.check(code, drawLog)) {
+  if (ch.check(stripPyComments(code), drawLog)) {
     completed.add(activeIdx)
     renderPills()
     document.getElementById('pass-badge').style.display = 'block'
