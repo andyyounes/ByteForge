@@ -303,6 +303,14 @@
       </div>
       <div class="feedback" id="dance-feedback"></div>
     </div>
+    <!-- 🕹 Game Corner (World 10) -->
+    <div class="gamewrap" id="gamewrap" style="display:none;">
+      <div id="game-rules" style="display:flex;flex-direction:column;gap:12px;"></div>
+      <div class="run-row" style="margin-top:14px;">
+        <button class="run-btn" onclick="gameRulesCheck()">🕹 CHECK DESIGN</button>
+      </div>
+      <div class="feedback" id="game-feedback"></div>
+    </div>
     <div class="deck">
       <div>
         <div class="deck-title">🎮 COMMANDS — tap to add</div>
@@ -788,7 +796,58 @@ const W9_STAGES = [
     dance: { steps: 16, target: [2,2,1,3,4,2,1,3,2,2,1,3,4,2,3,1] } },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 10 — Game Corner: build your own game, one design rule at a time.
+// [0860: sub-routine vocabulary] gets its own dedicated stage (w10s4).
+// ══════════════════════════════════════════════════════════════════════════════
+const W10_STAGES = [
+  { id: 'w10s1', title: 'Sprites & Roles', emoji: '🧍', type: 'gamerules', xp: 30,
+    goal: 'Every game has parts with names. Fill in the blanks to describe the basics of your game.',
+    gamerules: { rules: [
+      { template: 'The character you control is called the ___.', choices: ['hero', 'enemy', 'background'], answer: 'hero' },
+      { template: 'Something the hero collects to score points is called a ___.', choices: ['power-up', 'obstacle', 'wall'], answer: 'power-up' },
+    ] } },
+  { id: 'w10s2', title: 'Win & Lose Conditions', emoji: '🏁', type: 'gamerules', xp: 35,
+    goal: 'Every game needs a way to win and a way to lose. Fill in the rules that decide the outcome.',
+    gamerules: { rules: [
+      { template: 'When the hero touches the enemy, the game should ___.', choices: ['end (lose)', 'gain a point', 'do nothing'], answer: 'end (lose)' },
+      { template: 'When the hero collects every star, the game should ___.', choices: ['win', 'lose', 'do nothing'], answer: 'win' },
+    ] } },
+  { id: 'w10s3', title: 'Obstacles & Enemies', emoji: '🚧', type: 'gamerules', xp: 40,
+    goal: 'Not every sprite behaves the same way. Fill in the words that describe how obstacles and enemies work.',
+    gamerules: { rules: [
+      { template: 'A wall the hero cannot walk through is called an ___.', choices: ['obstacle', 'power-up', 'goal'], answer: 'obstacle' },
+      { template: 'An enemy that moves the exact same way every time follows a repeating ___.', choices: ['pattern', 'score', 'random click'], answer: 'pattern' },
+      { template: "If an enemy's behavior never changes no matter what, that's called ___ behavior (unlike real machine learning, which learns from data).", choices: ['rule-based', 'learned', 'random'], answer: 'rule-based' },
+    ] } },
+  { id: 'w10s4', title: 'Sub-Routines & Variables', emoji: '🧩', type: 'gamerules', xp: 40,
+    goal: 'Big games reuse small named pieces instead of retyping the same steps everywhere. Fill in the vocabulary for reusable code and stored numbers.',
+    gamerules: { rules: [
+      { template: 'A named block of steps you can reuse any time you need it is called a ___.', choices: ['sub-routine', 'variable', 'sprite'], answer: 'sub-routine' },
+      { template: 'spawnEnemy() is an example of a ___ — call it whenever you need a new enemy instead of retyping the same steps.', choices: ['sub-routine', 'score', 'obstacle'], answer: 'sub-routine' },
+      { template: 'The number that goes up when the hero collects something is stored in a ___.', choices: ['variable', 'wall', 'pattern'], answer: 'variable' },
+    ] } },
+  { id: 'w10s5', title: 'Level Design', emoji: '🗺️', type: 'gamerules', xp: 45,
+    goal: 'Put it all together — a whole level design uses every piece of vocabulary you\'ve learned so far.',
+    gamerules: { rules: [
+      { template: 'The player-controlled sprite is the ___.', choices: ['hero', 'enemy', 'obstacle'], answer: 'hero' },
+      { template: 'A wall blocking the hero\'s path is an ___.', choices: ['obstacle', 'power-up', 'variable'], answer: 'obstacle' },
+      { template: 'A reusable named block of steps is a ___.', choices: ['sub-routine', 'score', 'goal'], answer: 'sub-routine' },
+      { template: 'The stored number tracking progress is a ___.', choices: ['variable', 'sprite', 'pattern'], answer: 'variable' },
+    ] } },
+  { id: 'w10boss', title: 'BOSS — Design Your Game', emoji: '🎮', boss: true, type: 'gamerules', xp: 80,
+    goal: 'The full design document for your game — every rule, all at once. Get every blank right to ship it.',
+    gamerules: { rules: [
+      { template: 'The character you control is the ___.', choices: ['hero', 'enemy', 'wall'], answer: 'hero' },
+      { template: 'Something collected for points is a ___.', choices: ['power-up', 'obstacle', 'variable'], answer: 'power-up' },
+      { template: 'Touching the enemy should make the game ___.', choices: ['end (lose)', 'win', 'pause'], answer: 'end (lose)' },
+      { template: 'Collecting every star should make the game ___.', choices: ['win', 'end (lose)', 'restart'], answer: 'win' },
+      { template: 'A reusable named block of steps is a ___.', choices: ['sub-routine', 'sprite', 'goal'], answer: 'sub-routine' },
+      { template: 'The stored number tracking the score is a ___.', choices: ['variable', 'pattern', 'obstacle'], answer: 'variable' },
+    ] } },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // The quest map — 12 worlds (Worlds 1–4 playable in this release)
@@ -803,7 +862,7 @@ const WORLDS = [
   { id: 'w7',  name: '🕵️ Cipher City',        sub: 'Secret codes — make them and crack them',   stages: W7_STAGES, live: true },
   { id: 'w8',  name: '🎵 Music Studio',       sub: 'Beats are loops you can hear',              stages: W8_STAGES, live: true },
   { id: 'w9',  name: '💃 Dance Party',        sub: 'Code a character to dance to YOUR track',   stages: W9_STAGES, live: true },
-  { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  count: 7,  live: false },
+  { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  stages: W10_STAGES, live: true },
   { id: 'w11', name: '🧠 AI World',           sub: 'Teach a machine. Then trick it.',           count: 6,  live: false },
   { id: 'w12', name: '🚀 The Final Quest',    sub: 'Your masterpiece. Any world. Go big.',      count: 1,  live: false },
 ]
@@ -888,7 +947,8 @@ function loadStage() {
   const isCipher = activeStage.type === 'cipher'
   const isMusic  = activeStage.type === 'music'
   const isDance  = activeStage.type === 'dance'
-  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic || isDance
+  const isGame   = activeStage.type === 'gamerules'
+  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic || isDance || isGame
   document.querySelector('.board-wrap').style.display = isCustom ? 'none' : ''
   document.querySelector('.deck').style.display = isCustom ? 'none' : ''
   document.getElementById('mixer').style.display = isColor ? '' : 'none'
@@ -897,12 +957,14 @@ function loadStage() {
   document.getElementById('cipherwrap').style.display = isCipher ? '' : 'none'
   document.getElementById('musicwrap').style.display = isMusic ? '' : 'none'
   document.getElementById('dancewrap').style.display = isDance ? '' : 'none'
+  document.getElementById('gamewrap').style.display = isGame ? '' : 'none'
   if (isColor) loadColor()
   else if (isTurtle) loadTurtle()
   else if (isPixel) loadPixel()
   else if (isCipher) loadCipher()
   else if (isMusic) loadMusic()
   else if (isDance) loadDance()
+  else if (isGame) loadGameRules()
   else loadMaze()
 }
 
@@ -1489,6 +1551,58 @@ function danceCheck() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// World 10 — Game Corner: designing a game means naming its parts correctly.
+// Each rule is a sentence with a blank — fill it with the right game-design
+// word from a dropdown. Builds real vocabulary (sprite, obstacle, sub-routine,
+// variable) before students ever touch full code in Grade 7.
+// ══════════════════════════════════════════════════════════════════════════════
+function loadGameRules() {
+  const cfg = activeStage.gamerules || {}
+  const wrap = document.getElementById('game-rules')
+  wrap.innerHTML = ''
+  ;(cfg.rules || []).forEach((rule, i) => {
+    const [before, after] = rule.template.split('___')
+    const row = document.createElement('div')
+    row.style.cssText = 'font-size:13px;color:#e5e7eb;line-height:1.6;'
+    const select = document.createElement('select')
+    select.id = `gr-${i}`
+    select.style.cssText = 'background:#0c0f1a;color:#4ade80;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:4px 8px;font-size:13px;font-weight:700;margin:0 4px;'
+    const blank = document.createElement('option')
+    blank.value = ''; blank.textContent = '— choose —'
+    select.appendChild(blank)
+    rule.choices.forEach(c => {
+      const opt = document.createElement('option')
+      opt.value = c; opt.textContent = c
+      select.appendChild(opt)
+    })
+    row.append(document.createTextNode(before))
+    row.appendChild(select)
+    row.append(document.createTextNode(after))
+    wrap.appendChild(row)
+  })
+  document.getElementById('game-feedback').textContent = ''
+}
+
+function gameRulesCheck() {
+  const cfg = activeStage.gamerules || {}
+  const fb  = document.getElementById('game-feedback')
+  const rules = cfg.rules || []
+  let wrong = 0
+  rules.forEach((rule, i) => {
+    const val = document.getElementById(`gr-${i}`).value
+    if (val !== rule.answer) wrong++
+  })
+  if (wrong === 0) {
+    fb.style.color = '#4ade80'
+    fb.textContent = '✅ Solid game design!'
+    completeStage(3)
+  } else {
+    fb.style.color = '#fbbf24'
+    fb.textContent = `🌡️ ${wrong} rule(s) still need fixing.`
+  }
+}
+
 function currentMaze() {
   return activeStage.boss ? activeStage.mazes[activeMazeIdx] : activeStage
 }
@@ -1655,12 +1769,14 @@ function completeStage(stars) {
   const isCipher = activeStage.type === 'cipher'
   const isMusic  = activeStage.type === 'music'
   const isDance  = activeStage.type === 'dance'
+  const isGame   = activeStage.type === 'gamerules'
   document.getElementById('win-sub').textContent = newBest && !firstTime ? 'New best!' :
     isTurtle ? 'Beautiful pattern — try a new shape next!' :
     isPixel ? 'Every pixel exactly where it should be!' :
     isCipher ? 'Cracked it — the code is broken!' :
     isMusic ? 'That groove is locked in!' :
     isDance ? 'What a routine!' :
+    isGame ? 'Solid game design!' :
     stars === 3 ? (isColor ? 'Perfect mix — a true color scientist!' : 'Perfect run — couldn\'t be shorter!') :
     stars === 2 ? (isColor ? 'Close! Match it even tighter for 3 stars.' : 'Great! Can you find a shorter way for 3 stars?') :
     (isColor ? 'Matched! Try again for a super-close mix.' : 'Done! Try again with fewer commands for more stars.')
