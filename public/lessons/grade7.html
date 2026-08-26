@@ -910,8 +910,13 @@ const WORLDS = [
         'Add an if block: if key "Space" is down → change score by 1.',
         'Draw a circle with radius = 20 + score (use the + math block). Hold Space to watch it grow!',
       ],
-      needsVar:false, needsIf:false, needsFrames:true,
-      check:(log) => log.frames >= 5 && (log.circles >= 1 || log.rects >= 1),
+      // This boss asks for a score VARIABLE and an IF on the Space key, but its
+      // check was byte-identical to g1boss's (a mouse-follow stage) and both
+      // flags were false — so the minimal g1boss solution, with no variable and
+      // no if at all, cleared it. hasVar/hasIf are already populated by the
+      // animated branch, so enforcing them is free.
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasVar && log.hasIf && (log.circles >= 1 || log.rects >= 1),
     },
   ]},
 
@@ -943,8 +948,11 @@ const WORLDS = [
         'Add if blocks: if ArrowLeft is pressed → change x by -4. If ArrowRight → x by +4.',
         'Add ArrowUp → y by -4, ArrowDown → y by +4. Click the canvas first to focus it!',
       ],
-      needsVar:false, needsIf:false, needsFrames:true,
-      check:(log) => log.frames >= 5 && (log.rects >= 1 || log.circles >= 1),
+      // Same as g2boss: this asks for x/y VARIABLES and IFs on the arrow keys,
+      // but shipped g1boss's check with both flags false, so a solution with
+      // neither passed.
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasVar && log.hasIf && (log.rects >= 1 || log.circles >= 1),
     },
   ]},
 
@@ -1097,8 +1105,13 @@ const WORLDS = [
         'if (enemyX > 300) { direction = -1 } — flips to moving left once it goes far enough right.',
         'if (enemyX < 50) { direction = 1 } — flips back once it goes far enough left. Two ifs, one patrol loop.',
       ],
-      needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
-      check:(log) => log.frames >= 5 && log.hasIf && log.rects >= 1,
+      // Used to demand `rects >= 1`, which nothing in the task text or the three
+      // hints ever mentions — and the PREVIOUS stage frames the same NPC as
+      // "an enemy circle". A correct patrol drawn as a circle failed, and
+      // (before the feedback fix) said nothing about why. Either shape is fine.
+      // needsVar is now true because all three hints require a direction variable.
+      needsVar:true, needsIf:true, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.rects >= 1 || log.circles >= 1),
     },
     { id:'g8boss', name:'Enemy with 3 Behaviours', xp:80, boss:true,
       text:`<strong>🤖 BOSS — Enemy with 3 Behaviours</strong> — One enemy, three rules: PATROL back and forth normally. If the player (mouse) gets within 100 pixels, switch to CHASE. If the player gets within 30 pixels, switch to FLEE (run away instead). Measure distance the same way you did back in Collision & Physics.<br><br>
@@ -1262,8 +1275,21 @@ function checkChallenge(log) {
     if (ch.needsIf && !log.hasIf) missing.push('an if/else block (Control → if)')
     if (ch.needsFunction && !log.hasFunction) missing.push('a function you define (Functions → define, with a name)')
     if ((log.circles || 0) < 1 && (log.rects || 0) < 1) missing.push('a drawn shape (Draw → rectangle or circle)')
+    // Count-based shortfalls. Without these, a stage needing (say) 4 corners or
+    // 3 text lines could only ever report the generic "at least one shape"
+    // message — and if the student already had one shape, `missing` came out
+    // EMPTY and the branch below logged nothing at all. Nine stages could
+    // dead-end a student on "Done." with zero on-screen explanation.
+    const shapes = (log.circles || 0) + (log.rects || 0)
+    if (ch.needsShapes && shapes < ch.needsShapes) missing.push(`at least ${ch.needsShapes} drawn shapes (you drew ${shapes})`)
+    if (ch.needsTexts  && (log.texts || 0) < ch.needsTexts) missing.push(`at least ${ch.needsTexts} text label${ch.needsTexts > 1 ? 's' : ''} (Draw → text) — you drew ${log.texts || 0}`)
     if (missing.length) {
       logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
+    } else {
+      // Never fail silently: the check said no, so say so even when we can't
+      // name the specific shortfall.
+      logLine('❌ Not quite — your code ran, but it doesn\'t meet this challenge\'s goal yet. '
+            + 'Re-read the task above and try the 💡 Hint button.', 'err')
     }
   }
 }

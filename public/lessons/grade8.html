@@ -546,7 +546,21 @@ number = 7
 
 # TODO: use % 2 and an if/else to print "even" or "odd"
 `,
-      check:(code) => /if\s+/.test(code) && /%\s*2/.test(code) && /print\s*\(/.test(code),
+      // Structural-only checks accepted fully inverted logic with no else at
+      // all: `if number % 2 == 1: print("even")` passed. Require an else, and
+      // require the branch label to match the condition it is under.
+      check:(code) => {
+        if (!/if\s+/.test(code) || !/%\s*2/.test(code) || !/print\s*\(/.test(code)) return false
+        if (!/\belse\b/.test(code)) return false
+        const m = code.match(/if[^:\n]*%\s*2\s*(==|!=)\s*([01])[^:\n]*:([\s\S]*?)(?:\belse\b([\s\S]*))?$/)
+        if (!m) return false
+        const [, op, val, ifBody, elseBody = ''] = m
+        // Work out whether the if-branch is the EVEN case, then check its label.
+        const ifIsEven = (op === '==' && val === '0') || (op === '!=' && val === '1')
+        const ifSaysEven   = /["']even["']/i.test(ifBody)
+        const elseSaysEven = /["']even["']/i.test(elseBody)
+        return ifIsEven ? (ifSaysEven && !elseSaysEven) : (!ifSaysEven && elseSaysEven)
+      },
     },
     { id:'m2s2', name:'FizzBuzz Lite', xp:45,
       text:`<strong>Challenge 2 — For Loops + Chained Decisions</strong> — Loop from 1 to 10. If the number divides by 3, print "Fizz". If it divides by 5, print "Buzz". Otherwise print the number.`,
@@ -617,8 +631,14 @@ draw_smiley(120, 130, 70, 255, 220, 50)    # big yellow smiley
 `,
     check: (code, log) => {
       const hasDef  = /def\s+\w+/.test(code)
-      const hasCalls= (code.match(/\w+\s*\(/g) || []).length >= 4
-      return hasDef && log.circles >= 3
+      // hasCalls was computed and then thrown away, and circles >= 3 was met by
+      // three EYELESS, MOUTHLESS heads (the starter's eye circles ship commented
+      // out and the mouth is a bare TODO) — so the stage passed without doing
+      // either thing it asks for. A finished smiley is head + 2 eyes = 3 circles,
+      // and the task wants at least two of them.
+      const calls   = (code.match(/draw_smiley\s*\(/g) || []).length
+      const hasMouth = (log.lines || 0) >= 1 || (log.rects || 0) >= 1 || (log.circles || 0) >= 8
+      return hasDef && calls >= 2 && log.circles >= 6 && hasMouth
     },
   },
   {
@@ -1098,7 +1118,13 @@ print("That's interpretation: one line at a time, not all-or-nothing like a comp
         // via scripts/test-g8-challenges.mjs asserting the starter must not
         // pass on its own). Require real division code between try: and
         // except — the thing that actually raises ZeroDivisionError.
-        const causesError = /try\s*:[\s\S]*?\/[\s\S]*?except/.test(code)
+        // Requiring merely a "/" between try: and except is too weak — a safe
+        // `result = 1 / 2` satisfies it, nothing is ever raised, the except
+        // branch never runs, and the whole point of the exercise is skipped.
+        // Require division by ZERO or by a NAME (which is what can actually be
+        // zero at runtime), not by a non-zero numeric literal.
+        const tryBlock = (code.match(/try\s*:([\s\S]*?)except/) || [, ''])[1]
+        const causesError = /\/\s*(0(?!\s*\.\s*[1-9])|[A-Za-z_]\w*)/.test(tryBlock)
         return hasTry && hasExcept && causesError
       },
     },
@@ -1358,7 +1384,11 @@ print(f"Score: {score}/{len(answers)} ({percentage}%)")
         const hasCompare = /student_answers\s*\[\s*i\s*\]\s*==\s*answers\s*\[\s*i\s*\]/.test(code)
         const hasGuard   = /len\s*\(\s*answers\s*\)\s*(==|>)\s*0/.test(code)
         const hasPercent = /score\s*\/\s*len\s*\(\s*answers\s*\)/.test(code)
-        return hasCompare && hasGuard && hasPercent
+        // Purely structural before, so a scorer that DECREMENTS on a match
+        // (`score = score - 1`) passed and printed a negative percentage.
+        // Require an actual increment.
+        const increments = /score\s*\+=\s*1\b/.test(code) || /score\s*=\s*score\s*\+\s*1\b/.test(code)
+        return hasCompare && hasGuard && hasPercent && increments
       },
     },
     {
