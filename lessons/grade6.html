@@ -311,6 +311,16 @@
       </div>
       <div class="feedback" id="game-feedback"></div>
     </div>
+    <!-- 🧠 AI World (World 11) -->
+    <div class="aiwrap" id="aiwrap" style="display:none;">
+      <div id="ai-cards" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;"></div>
+      <div id="ai-bins" style="display:flex;gap:10px;margin-top:14px;justify-content:center;"></div>
+      <div id="ai-table-wrap" style="margin-top:10px;overflow-x:auto;display:none;"></div>
+      <div class="run-row" style="margin-top:14px;">
+        <button class="run-btn" onclick="aiCheck()">🧠 CHECK</button>
+      </div>
+      <div class="feedback" id="ai-feedback"></div>
+    </div>
     <div class="deck">
       <div>
         <div class="deck-title">🎮 COMMANDS — tap to add</div>
@@ -847,7 +857,75 @@ const W10_STAGES = [
     ] } },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 11 — AI World: teach a machine with labeled examples, use its rule
+// to predict, then find what fools it. [0860: data-organizing-by-key /
+// primary-key concept] gets its own dedicated stage (w11s2).
+// ══════════════════════════════════════════════════════════════════════════════
+const W11_STAGES = [
+  { id: 'w11s1', title: 'Show It Examples', emoji: '🍎', type: 'aiworld', xp: 30,
+    goal: 'A machine learns from labeled examples — that\'s called training data. Sort each fruit into the correct bin by tapping it (tap again to change the bin).',
+    aiworld: { mode: 'train', bins: ['🍎 Apple', '🍋 Lemon'],
+      cards: [
+        { emoji: '🍎', label: 'red, big',    answer: 0 },
+        { emoji: '🍋', label: 'yellow, small', answer: 1 },
+        { emoji: '🍎', label: 'red, small',  answer: 0 },
+        { emoji: '🍋', label: 'yellow, big', answer: 1 },
+        { emoji: '🍎', label: 'red, big',    answer: 0 },
+        { emoji: '🍋', label: 'yellow, small', answer: 1 },
+      ] } },
+  { id: 'w11s2', title: 'Organize the Data', emoji: '🗝️', type: 'aiworld', xp: 35,
+    goal: 'Machines organize training data in tables too — and every table needs a column that\'s different for every single row, so nothing ever gets mixed up.',
+    aiworld: { columns: ['Name', 'Grade', 'Student ID'],
+      rows: [['Ana', '6', 'S1042'], ['Leo', '6', 'S1043'], ['Ana', '7', 'S1044'], ['Sam', '6', 'S1045']],
+      mode: 'primarykey', answer: 'Student ID',
+      hint: 'Two rows share the name "Ana" and two rows share Grade "6" — but no two rows share the same value in one particular column.' } },
+  { id: 'w11s3', title: 'Machine Says', emoji: '🤖', type: 'aiworld', xp: 40,
+    goal: 'You trained the machine — it learned a simple rule: red means Apple, yellow means Lemon. Now predict what it says about two new fruits it\'s never seen.',
+    aiworld: { mode: 'train', bins: ['🍎 Apple', '🍋 Lemon'],
+      cards: [
+        { emoji: '🍋', label: 'yellow, big — new!',   answer: 1 },
+        { emoji: '🍎', label: 'red, small — new!',    answer: 0 },
+      ],
+      hint: 'The machine only ever learned to look at color.' } },
+  { id: 'w11s4', title: 'Trick the Machine', emoji: '🎭', type: 'aiworld', xp: 45,
+    goal: 'This machine only learned one simple rule: color decides everything. Tap the ONE card that would trick it — something its rule was never taught to handle.',
+    aiworld: { mode: 'trick', bins: ['🍎 Apple', '🍋 Lemon'], answer: 2,
+      cards: [
+        { emoji: '🍎', label: 'red apple' },
+        { emoji: '🍋', label: 'yellow lemon' },
+        { emoji: '🟢', label: 'green apple' },
+        { emoji: '🍋', label: 'small yellow lemon' },
+      ],
+      hint: 'The machine has only ever seen red and yellow.' } },
+  { id: 'w11s5', title: 'Bigger Dataset', emoji: '🍊', type: 'aiworld', xp: 45,
+    goal: 'Real training sets have more categories and more examples. Sort every fruit into its correct bin.',
+    aiworld: { mode: 'train', bins: ['🍎 Apple', '🍋 Lemon', '🍊 Orange'],
+      cards: [
+        { emoji: '🍎', label: 'red, round',    answer: 0 },
+        { emoji: '🍋', label: 'yellow, oval',  answer: 1 },
+        { emoji: '🍊', label: 'orange, round', answer: 2 },
+        { emoji: '🍎', label: 'red, small',    answer: 0 },
+        { emoji: '🍋', label: 'yellow, small', answer: 1 },
+        { emoji: '🍊', label: 'orange, big',   answer: 2 },
+      ] } },
+  { id: 'w11boss', title: 'BOSS — Build Your Own Classifier', emoji: '🧠', boss: true, type: 'aiworld', xp: 80,
+    goal: 'The final training set — three categories, nine examples. Sort every single one correctly to finish training your classifier.',
+    aiworld: { mode: 'train', bins: ['🍎 Apple', '🍋 Lemon', '🍊 Orange'],
+      cards: [
+        { emoji: '🍎', label: 'red, round',    answer: 0 },
+        { emoji: '🍋', label: 'yellow, oval',  answer: 1 },
+        { emoji: '🍊', label: 'orange, round', answer: 2 },
+        { emoji: '🍎', label: 'red, small',    answer: 0 },
+        { emoji: '🍋', label: 'yellow, small', answer: 1 },
+        { emoji: '🍊', label: 'orange, big',   answer: 2 },
+        { emoji: '🍎', label: 'red, big',      answer: 0 },
+        { emoji: '🍋', label: 'yellow, big',   answer: 1 },
+        { emoji: '🍊', label: 'orange, small', answer: 2 },
+      ] } },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES, ...W11_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // The quest map — 12 worlds (Worlds 1–4 playable in this release)
@@ -863,7 +941,7 @@ const WORLDS = [
   { id: 'w8',  name: '🎵 Music Studio',       sub: 'Beats are loops you can hear',              stages: W8_STAGES, live: true },
   { id: 'w9',  name: '💃 Dance Party',        sub: 'Code a character to dance to YOUR track',   stages: W9_STAGES, live: true },
   { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  stages: W10_STAGES, live: true },
-  { id: 'w11', name: '🧠 AI World',           sub: 'Teach a machine. Then trick it.',           count: 6,  live: false },
+  { id: 'w11', name: '🧠 AI World',           sub: 'Teach a machine. Then trick it.',           stages: W11_STAGES, live: true },
   { id: 'w12', name: '🚀 The Final Quest',    sub: 'Your masterpiece. Any world. Go big.',      count: 1,  live: false },
 ]
 
@@ -948,7 +1026,8 @@ function loadStage() {
   const isMusic  = activeStage.type === 'music'
   const isDance  = activeStage.type === 'dance'
   const isGame   = activeStage.type === 'gamerules'
-  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic || isDance || isGame
+  const isAI     = activeStage.type === 'aiworld'
+  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic || isDance || isGame || isAI
   document.querySelector('.board-wrap').style.display = isCustom ? 'none' : ''
   document.querySelector('.deck').style.display = isCustom ? 'none' : ''
   document.getElementById('mixer').style.display = isColor ? '' : 'none'
@@ -958,6 +1037,7 @@ function loadStage() {
   document.getElementById('musicwrap').style.display = isMusic ? '' : 'none'
   document.getElementById('dancewrap').style.display = isDance ? '' : 'none'
   document.getElementById('gamewrap').style.display = isGame ? '' : 'none'
+  document.getElementById('aiwrap').style.display = isAI ? '' : 'none'
   if (isColor) loadColor()
   else if (isTurtle) loadTurtle()
   else if (isPixel) loadPixel()
@@ -965,6 +1045,7 @@ function loadStage() {
   else if (isMusic) loadMusic()
   else if (isDance) loadDance()
   else if (isGame) loadGameRules()
+  else if (isAI) loadAIWorld()
   else loadMaze()
 }
 
@@ -1603,6 +1684,175 @@ function gameRulesCheck() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// World 11 — AI World: "teach a machine" by sorting labeled examples into
+// bins (training data), then use the rule it learned to predict new items,
+// then find the example that would fool a machine that only knows one
+// simple rule. A separate 'primarykey' mode covers the 0860-audit's
+// data-organizing-by-key addition with a small table + one question.
+// ══════════════════════════════════════════════════════════════════════════════
+let aiAssign = {}   // card index -> bin index (or -1 = unassigned), for train/predict modes
+let aiSelected = -1 // single selected card index, for trick mode
+
+function loadAIWorld() {
+  const cfg = activeStage.aiworld || {}
+  const cardsEl = document.getElementById('ai-cards')
+  const binsEl  = document.getElementById('ai-bins')
+  const tableWrap = document.getElementById('ai-table-wrap')
+  cardsEl.innerHTML = ''; binsEl.innerHTML = ''; tableWrap.innerHTML = ''
+  tableWrap.style.display = 'none'
+  cardsEl.style.display = 'flex'; binsEl.style.display = 'flex'
+  aiAssign = {}; aiSelected = -1
+
+  if (cfg.mode === 'primarykey') {
+    cardsEl.style.display = 'none'; binsEl.style.display = 'none'
+    tableWrap.style.display = ''
+    const table = document.createElement('table')
+    table.style.cssText = 'border-collapse:collapse;width:100%;font-size:13px;'
+    const thead = document.createElement('tr')
+    cfg.columns.forEach(col => {
+      const th = document.createElement('th')
+      th.textContent = col
+      th.style.cssText = 'border:1px solid rgba(255,255,255,.15);padding:6px 10px;color:#4ade80;background:#0c0f1a;'
+      thead.appendChild(th)
+    })
+    table.appendChild(thead)
+    cfg.rows.forEach(row => {
+      const tr = document.createElement('tr')
+      row.forEach(cell => {
+        const td = document.createElement('td')
+        td.textContent = cell
+        td.style.cssText = 'border:1px solid rgba(255,255,255,.1);padding:6px 10px;color:#e5e7eb;'
+        tr.appendChild(td)
+      })
+      table.appendChild(tr)
+    })
+    tableWrap.appendChild(table)
+    const qRow = document.createElement('div')
+    qRow.style.cssText = 'margin-top:12px;font-size:13px;color:#e5e7eb;'
+    const select = document.createElement('select')
+    select.id = 'ai-pk-select'
+    select.style.cssText = 'background:#0c0f1a;color:#4ade80;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:4px 8px;font-size:13px;font-weight:700;margin:0 4px;'
+    const blank = document.createElement('option'); blank.value = ''; blank.textContent = '— choose —'
+    select.appendChild(blank)
+    cfg.columns.forEach(col => {
+      const opt = document.createElement('option'); opt.value = col; opt.textContent = col
+      select.appendChild(opt)
+    })
+    qRow.append('Which column is guaranteed unique for every row — the ')
+    const b = document.createElement('b'); b.textContent = 'primary key'; b.style.color = '#a855f7'
+    qRow.appendChild(b)
+    qRow.append('? ')
+    qRow.appendChild(select)
+    tableWrap.appendChild(qRow)
+    document.getElementById('ai-feedback').textContent = cfg.hint ? '💡 ' + cfg.hint : ''
+    return
+  }
+
+  // train / predict / trick modes all use the card+bin renderer
+  ;(cfg.bins || []).forEach((bin, bIdx) => {
+    const binEl = document.createElement('div')
+    binEl.id = `ai-bin-${bIdx}`
+    binEl.style.cssText = 'flex:1;min-height:70px;border:2px dashed rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center;font-size:13px;color:#9ca3af;'
+    binEl.innerHTML = `<div style="font-weight:800;margin-bottom:6px;">${bin}</div><div id="ai-bin-items-${bIdx}" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;"></div>`
+    binsEl.appendChild(binEl)
+  })
+
+  cfg.cards.forEach((card, i) => {
+    const cardEl = document.createElement('div')
+    cardEl.id = `ai-card-${i}`
+    cardEl.textContent = card.emoji + ' ' + card.label
+    cardEl.style.cssText = 'padding:8px 12px;border-radius:8px;background:#1a1e2e;border:1px solid rgba(255,255,255,.1);cursor:pointer;font-size:13px;color:#e5e7eb;transition:.1s;'
+    cardEl.onclick = () => cfg.mode === 'trick' ? aiSelectCard(i) : aiCycleBin(i, cfg.bins.length)
+    cardsEl.appendChild(cardEl)
+    aiAssign[i] = -1
+  })
+  document.getElementById('ai-feedback').textContent = cfg.hint ? '💡 ' + cfg.hint : ''
+}
+
+function aiCycleBin(i, numBins) {
+  // cycles -1 (unassigned) -> 0 -> 1 -> ... -> numBins-1 -> back to -1
+  aiAssign[i] = ((aiAssign[i] + 2) % (numBins + 1)) - 1
+  aiRenderCards()
+}
+
+function aiSelectCard(i) {
+  aiSelected = aiSelected === i ? -1 : i
+  aiRenderCards()
+}
+
+function aiRenderCards() {
+  const cfg = activeStage.aiworld || {}
+  cfg.cards.forEach((card, i) => {
+    const el = document.getElementById(`ai-card-${i}`)
+    if (!el) return
+    if (cfg.mode === 'trick') {
+      el.style.background = aiSelected === i ? '#a855f7' : '#1a1e2e'
+      el.style.color = aiSelected === i ? '#fff' : '#e5e7eb'
+    } else {
+      el.style.background = aiAssign[i] >= 0 ? '#22252f' : '#1a1e2e'
+      el.style.opacity = aiAssign[i] >= 0 ? '.4' : '1'
+    }
+  })
+  if (cfg.mode !== 'trick') {
+    ;(cfg.bins || []).forEach((_, bIdx) => {
+      const binItems = document.getElementById(`ai-bin-items-${bIdx}`)
+      if (!binItems) return
+      binItems.innerHTML = ''
+      cfg.cards.forEach((card, i) => {
+        if (aiAssign[i] === bIdx) {
+          const chip = document.createElement('span')
+          chip.textContent = card.emoji
+          chip.style.cssText = 'font-size:18px;'
+          binItems.appendChild(chip)
+        }
+      })
+    })
+  }
+}
+
+function aiCheck() {
+  const cfg = activeStage.aiworld || {}
+  const fb  = document.getElementById('ai-feedback')
+
+  if (cfg.mode === 'primarykey') {
+    const val = document.getElementById('ai-pk-select').value
+    if (val === cfg.answer) {
+      fb.style.color = '#4ade80'
+      fb.textContent = '✅ The machine learned it!'
+      completeStage(3)
+    } else {
+      fb.style.color = '#fbbf24'
+      fb.textContent = '🌡️ Not quite — look for the column where no two rows share a value.'
+    }
+    return
+  }
+
+  if (cfg.mode === 'trick') {
+    if (aiSelected === cfg.answer) {
+      fb.style.color = '#4ade80'
+      fb.textContent = '✅ The machine learned it!'
+      completeStage(3)
+    } else {
+      fb.style.color = '#fbbf24'
+      fb.textContent = '🌡️ Not the one — think about what the machine\'s simple rule can\'t tell apart.'
+    }
+    return
+  }
+
+  // train / predict
+  let wrong = 0
+  cfg.cards.forEach((card, i) => { if (aiAssign[i] !== card.answer) wrong++ })
+  if (wrong === 0) {
+    fb.style.color = '#4ade80'
+    fb.textContent = '✅ The machine learned it!'
+    completeStage(3)
+  } else {
+    fb.style.color = '#fbbf24'
+    fb.textContent = `🌡️ ${wrong} card(s) in the wrong bin.`
+  }
+}
+
 function currentMaze() {
   return activeStage.boss ? activeStage.mazes[activeMazeIdx] : activeStage
 }
@@ -1770,6 +2020,7 @@ function completeStage(stars) {
   const isMusic  = activeStage.type === 'music'
   const isDance  = activeStage.type === 'dance'
   const isGame   = activeStage.type === 'gamerules'
+  const isAI     = activeStage.type === 'aiworld'
   document.getElementById('win-sub').textContent = newBest && !firstTime ? 'New best!' :
     isTurtle ? 'Beautiful pattern — try a new shape next!' :
     isPixel ? 'Every pixel exactly where it should be!' :
@@ -1777,6 +2028,7 @@ function completeStage(stars) {
     isMusic ? 'That groove is locked in!' :
     isDance ? 'What a routine!' :
     isGame ? 'Solid game design!' :
+    isAI ? 'The machine learned it!' :
     stars === 3 ? (isColor ? 'Perfect mix — a true color scientist!' : 'Perfect run — couldn\'t be shorter!') :
     stars === 2 ? (isColor ? 'Close! Match it even tighter for 3 stars.' : 'Great! Can you find a shorter way for 3 stars?') :
     (isColor ? 'Matched! Try again for a super-close mix.' : 'Done! Try again with fewer commands for more stars.')
