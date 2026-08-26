@@ -154,6 +154,33 @@ let hintIdx   = 0
 // type: 'convert' → exact numeric/text match
 //       'theory'  → keyword presence check
 //       'trace'   → comma-separated values match
+// ── Answer-matching helpers ───────────────────────────────────────────────────
+// These checks used to be bare `answer.includes('...')` calls, which matched
+// SUBSTRINGS of ordinary English and so accepted nonsense and — worse —
+// accepted fully inverted answers, i.e. exactly the misconception each question
+// exists to catch. Real examples that used to pass:
+//   'lan'        ⊂ "p<lan>"          → "I want a plan for a large area"  ACCEPTED
+//   'wan'        ⊂ "<wan>t"
+//   'alu'        ⊂ "v<alu>e"         → "Aluminium is accurate in the register." ACCEPTED
+//   'cu'         ⊂ "ac<cu>rate"
+//   'symmetric'  ⊂ "a<symmetric>"    → one word satisfied both clauses
+//   'virus'      ⊂ "anti<virus>"
+// word() does a word-boundary match, killing the substring class outright.
+// about() additionally checks the CLAUSE a term appears in, so a claim can be
+// tied to the right subject and an inverted definition is rejected.
+function word(a, w) { return new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(a) }
+function anyWord(a, ...ws) { return ws.some(w => word(a, w)) }
+// Split into clauses so "RAM is volatile" and "ROM is not" can be judged apart.
+function clauses(a) { return a.split(/[.;,\n]|\band\b|\bwhereas\b|\bwhile\b|\bbut\b/i).filter(c => c.trim()) }
+// True if some clause mentioning `subject` also asserts one of `traits`
+// (and, if `not` is given, does NOT assert any of those).
+function about(a, subject, traits, not) {
+  return clauses(a).some(c =>
+    word(c, subject) &&
+    traits.some(t => word(c, t)) &&
+    (!not || !not.some(t => word(c, t))))
+}
+
 const CHALLENGES = [
   // ── Module 1: Data Representation ─────────────────────────────────────────
   {
@@ -193,9 +220,11 @@ const CHALLENGES = [
     hints:['ALU = Arithmetic Logic Unit — performs calculations and logical comparisons.', 'CU = Control Unit — fetches, decodes, and coordinates execution of instructions.', 'Registers are tiny, ultra-fast storage locations inside the CPU (e.g. PC, MAR, MDR, ACC).'],
     check: ans => {
       const a = ans.toLowerCase()
-      return (a.includes('alu') || a.includes('arithmetic')) &&
-             (a.includes('cu') || a.includes('control unit')) &&
-             (a.includes('register') || a.includes('cache'))
+      // Word-boundary: 'alu' used to match "v(alu)e" and 'cu' "ac(cu)rate",
+      // so "Aluminium is accurate in the register." passed.
+      return anyWord(a, 'alu', 'arithmetic') &&
+             (anyWord(a, 'cu') || /control\s+unit/i.test(a)) &&
+             anyWord(a, 'register', 'registers', 'cache')
     },
   },
   {
@@ -204,8 +233,25 @@ const CHALLENGES = [
     hints:['RAM is volatile — it loses data when power is removed. ROM is non-volatile.', 'RAM can be read and written. ROM can only be read (Read-Only Memory).', 'RAM stores running programs; ROM stores firmware/BIOS.'],
     check: ans => {
       const a = ans.toLowerCase()
-      return (a.includes('volatile') || a.includes('loses') || a.includes('power')) &&
-             (a.includes('read') || a.includes('write') || a.includes('written'))
+      // Previously never even required the word ROM, and accepted
+      // "I read a book about power." plus the fully inverted answer
+      // "ROM is volatile … RAM is non-volatile and read-only."
+      // Now both terms are required, and each must carry its OWN correct
+      // property: RAM volatile (and not described as non-volatile), ROM the
+      // opposite.
+      if (!word(a, 'ram') || !word(a, 'rom')) return false
+      const ramVolatile = about(a, 'ram', ['volatile', 'loses', 'lost', 'temporary'], ['non-volatile', 'nonvolatile', 'permanent'])
+                          || /ram[^.;]*\blos(e|es|t)\b[^.;]*power/i.test(a)
+      // Careful: '-' is not a word character, so \bvolatile\b matches INSIDE
+      // "non-volatile". Strip that phrase before testing for a bare "volatile",
+      // or a correct ROM answer trips its own negative guard.
+      const romPermanent = clauses(a).some(c => {
+        if (!word(c, 'rom')) return false
+        const saysPermanent = /\bnon-?volatile\b/i.test(c) || anyWord(c, 'permanent', 'keeps', 'retains', 'read-only')
+        const saysVolatile  = word(c.replace(/\bnon-?volatile\b/ig, ''), 'volatile')
+        return saysPermanent && !saysVolatile
+      })
+      return ramVolatile && romPermanent
     },
   },
   {
@@ -238,9 +284,16 @@ const CHALLENGES = [
     hints:['LAN = Local Area Network — covers a small area (e.g. one building). WAN = Wide Area Network — covers large geographic areas.', 'A LAN is usually owned by one organisation. A WAN spans multiple organisations or countries.', 'LANs typically have higher speeds and lower costs than WANs.'],
     check: ans => {
       const a = ans.toLowerCase()
-      return a.includes('lan') && a.includes('wan') &&
-             (a.includes('area') || a.includes('geographic') || a.includes('small') || a.includes('large') ||
-              a.includes('own') || a.includes('speed') || a.includes('cost'))
+      // 'lan' used to match "p(lan)" and 'wan' "(wan)t", so
+      // "I want a plan for a large area" passed — as did the reversed
+      // definition "A WAN is small … a LAN is huge and global."
+      // Each term must now carry its own correct scale.
+      if (!word(a, 'lan') || !word(a, 'wan')) return false
+      const BIG   = ['large', 'larger', 'wide', 'wider', 'big', 'bigger', 'global', 'country', 'countries', 'city', 'cities', 'worldwide', 'internet']
+      const SMALL = ['small', 'smaller', 'local', 'site', 'building', 'office', 'campus', 'room', 'single']
+      const lanSmall = about(a, 'lan', SMALL, BIG)
+      const wanLarge = about(a, 'wan', [...BIG, 'geographical', 'geographic'], SMALL)
+      return lanSmall && wanLarge
     },
   },
   {
@@ -281,8 +334,16 @@ const CHALLENGES = [
     hints:['Encryption converts plaintext into ciphertext using an algorithm and a key.', 'Symmetric: the same key is used for encryption and decryption. Fast but key distribution is a problem.', 'Asymmetric: uses a public key to encrypt and a private key to decrypt. Slower but more secure for key exchange.'],
     check: ans => {
       const a = ans.toLowerCase()
-      return (a.includes('encrypt') || a.includes('cipher') || a.includes('key')) &&
-             a.includes('symmetric') && a.includes('asymmetric')
+      // 'symmetric' is a SUBSTRING of 'asymmetric', so the single word
+      // "asymmetric" used to satisfy both clauses — and the answer
+      // "Asymmetric encryption uses one key for both …" (the definition of
+      // SYMMETRIC) passed. \b fixes this: \bsymmetric\b does not match inside
+      // "asymmetric". Each term must also carry its correct key count.
+      if (!anyWord(a, 'encrypt', 'encryption', 'cipher', 'key', 'keys')) return false
+      if (!word(a, 'symmetric') || !word(a, 'asymmetric')) return false
+      const symOneKey  = about(a, 'symmetric',  ['one', 'same', 'single', 'shared', '1'])
+      const asymTwoKey = about(a, 'asymmetric', ['two', 'public', 'private', 'pair', '2'])
+      return symOneKey && asymTwoKey
     },
   },
   {
@@ -321,9 +382,14 @@ const CHALLENGES = [
     text:`<strong>Challenge 17 — Bubble Sort</strong><br>Starting array: <code>[5, 3, 8, 1, 6]</code><br>Show the array after each <strong>complete pass</strong> of bubble sort (pass 1, 2, 3, 4).<br>Enter each pass on a new line as comma-separated values, e.g.:<br><code>3, 5, 1, 6, 8</code>`,
     hints:['Pass 1: compare adjacent pairs. 5,3→swap; 3,5,8,1,6 → 3,5,1,8,6 → 3,5,1,6,8', 'Pass 2: 3,1,5,6,8', 'Pass 3: 1,3,5,6,8 — Pass 4: 1,3,5,6,8 (already sorted)'],
     check: ans => {
-      const lines = ans.trim().split('\n').map(l=>l.replace(/\s/g,''))
+      // Used to check ONLY line 1 (`expected.some(e => lines[0] === e)`),
+      // and accepted ANY of the four passes there — so the final sorted array
+      // counted as pass 1, and lines 2-4 were never looked at at all:
+      // "1,3,5,6,8\nqqqq" passed this 50-XP challenge. Now every pass must be
+      // correct and in order.
+      const lines = ans.trim().split('\n').map(l=>l.replace(/\s/g,'')).filter(Boolean)
       const expected = ['3,5,1,6,8','3,1,5,6,8','1,3,5,6,8','1,3,5,6,8']
-      return expected.some(e=>lines[0]===e) && lines.length >= 2
+      return lines.length === expected.length && expected.every((e,i)=>lines[i]===e)
     },
   },
   {
@@ -332,9 +398,15 @@ const CHALLENGES = [
     hints:['Linear search: O(n) — must check every element in the worst case.', 'Binary search: O(log n) — halves the search space each time.', 'Binary search requires the data to be sorted first.'],
     check: ans => {
       const a = ans.toLowerCase()
-      return (a.includes('o(n)') || a.includes('linear')) &&
-             (a.includes('o(log') || a.includes('log n')) &&
-             (a.includes('sort') || a.includes('halv') || a.includes('half'))
+      // The clauses used to be independent, so the SWAPPED answer
+      // "Linear search is O(log n) and binary search is O(n)" passed:
+      // 'linear' satisfied clause 1 and 'log n' satisfied clause 2 regardless
+      // of which algorithm they were attached to. Now each complexity must sit
+      // in the same clause as its own algorithm.
+      const linearIsN   = clauses(a).some(c => word(c, 'linear') && /o\s*\(\s*n\s*\)/i.test(c) && !/log/i.test(c))
+      const binaryIsLog = clauses(a).some(c => word(c, 'binary') && /log/i.test(c))
+      const condition   = anyWord(a, 'sort', 'sorted', 'order', 'ordered') || /halv|half/i.test(a)
+      return linearIsN && binaryIsLog && condition
     },
   },
   {
@@ -343,9 +415,16 @@ const CHALLENGES = [
     hints:['LIFO = Last In, First Out — the last item added is the first to be removed.', 'PUSH adds an item to the top of the stack. POP removes the top item.', 'Real-world uses: undo/redo in editors, function call stack (return addresses), browser back button.'],
     check: ans => {
       const a = ans.toLowerCase()
-      return a.includes('lifo') &&
-             (a.includes('push') || a.includes('pop')) &&
-             (a.includes('undo') || a.includes('call') || a.includes('back') || a.includes('browser') || a.includes('function') || a.includes('return'))
+      // Used to accept the inverted definition:
+      // "LIFO means first in first out. PUSH removes the top item."
+      // Reject an explicit FIFO expansion, and require PUSH/POP to be
+      // described the right way round.
+      if (!word(a, 'lifo')) return false
+      if (/first\s+in\s*,?\s*first\s+out/i.test(a)) return false
+      const pushAdds    = about(a, 'push', ['add', 'adds', 'put', 'puts', 'place', 'places', 'insert', 'inserts', 'onto', 'on'], ['remove', 'removes', 'take', 'takes', 'delete'])
+      const popRemoves  = about(a, 'pop',  ['remove', 'removes', 'take', 'takes', 'off', 'delete', 'deletes', 'retrieve'], ['add', 'adds', 'insert'])
+      const hasUse      = anyWord(a, 'undo', 'call', 'back', 'browser', 'function', 'return', 'recursion', 'backtrack')
+      return (pushAdds || popRemoves) && hasUse
     },
   },
   {
@@ -353,8 +432,9 @@ const CHALLENGES = [
     text:`<strong>Challenge 20 — Trace Table</strong><br>Trace this pseudocode and complete the table.<br><pre style="font-size:11px;color:#7dd3fc;margin:8px 0;line-height:1.6">x ← 1\nWHILE x &lt; 5 DO\n   x ← x + 2\n   OUTPUT x\nENDWHILE</pre>Enter the values OUTPUT prints, one per line.`,
     hints:['x starts at 1. After first iteration: x ← 1+2 = 3. Output: 3.', 'After second iteration: x ← 3+2 = 5. Output: 5. Now x=5 is NOT < 5, so loop ends.', 'Two outputs: 3 and 5.'],
     check: ans => {
-      const lines = ans.trim().split('\n').map(l=>l.trim())
-      return lines.includes('3') && lines.includes('5') && lines.length === 2
+      // .includes() is order-blind, so "5\n3" (the outputs reversed) passed.
+      const lines = ans.trim().split('\n').map(l=>l.trim()).filter(Boolean)
+      return lines.length === 2 && lines[0] === '3' && lines[1] === '5'
     },
   },
 ]

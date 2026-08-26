@@ -16,7 +16,10 @@
 import { readFileSync } from 'fs'
 
 const html = readFileSync('c:/Users/user/Downloads/ICT website/public/lessons/igcse-y1.html', 'utf8')
-const s = html.indexOf('const CHALLENGES = [')
+// Start from the answer-matching helpers (word/anyWord/clauses/about), not from
+// `const CHALLENGES` — the checks call them, so slicing from the array alone
+// makes every check throw "word is not defined".
+const s = html.indexOf('// ── Answer-matching helpers')
 const m = html.slice(s).match(/\r?\n\]\r?\n/) // the array closes on its own bare "]" line, no semicolon
 const ctx = html.slice(s, s + m.index + m[0].indexOf(']') + 1)
 const { CHALLENGES } = new Function(ctx + '\nreturn { CHALLENGES }')()
@@ -82,6 +85,41 @@ for (const ch of CHALLENGES) {
   }
 }
 
+// ── Plausible-but-WRONG answers that must be rejected ────────────────────────
+// Blank/garbage rejection is a low bar. These are the answers a real student
+// with a real misconception would type — mostly INVERTED definitions, i.e.
+// exactly what each question exists to catch. Every one of these was ACCEPTED
+// before the checks were tightened, because they used bare .includes()
+// substring matching ('lan' ⊂ "plan", 'alu' ⊂ "value", 'symmetric' ⊂
+// "asymmetric", 'virus' ⊂ "antivirus") and tested clauses independently, so a
+// term and a property could be matched even when attached to the wrong subject.
+const WRONG = [
+  ['M3/LAN vs WAN',        'I want a plan for a large area'],
+  ['M3/LAN vs WAN',        'A WAN is small and owned by one person, a LAN is huge and global.'],
+  ['M2/RAM vs ROM',        'I read a book about power.'],
+  ['M2/RAM vs ROM',        'ROM is volatile and can be written to; RAM is non-volatile and read-only.'],
+  ['M2/CPU Components',    'Aluminium is accurate in the register.'],
+  ['M2/CPU Components',    'The value of an accurate register'],
+  ['M4/Encryption',        'asymmetric key'],
+  ['M4/Encryption',        'Asymmetric encryption uses one key for both encryption and decryption.'],
+  ['M5/Bubble Sort Trace', '1,3,5,6,8\nqqqq'],
+  ['M5/Bubble Sort Trace', '3,1,5,6,8\nnonsense here'],
+  ['M5/Stacks (LIFO)',     'LIFO means first in first out. PUSH removes the top item. Undo.'],
+  ['M5/Search Complexity', 'Linear search is O(log n) and binary search is O(n); you must sort the data.'],
+  ['M5/Trace Table',       '5\n3'],
+]
+for (const [id, answer] of WRONG) {
+  const ch = CHALLENGES.find(c => `${c.mod}/${c.name}` === id)
+  if (!ch) { fail++; console.log(`✗ ${id} — challenge not found for wrong-answer case`); continue }
+  try {
+    if (ch.check(answer)) { fail++; console.log(`✗ ${id} — ACCEPTS a wrong answer: ${JSON.stringify(answer)}`) }
+    else { pass++; console.log(`✓ ${id} — correctly rejects a plausible wrong answer`) }
+  } catch (err) {
+    fail++
+    console.log(`✗ ${id} — check() THROWS on a wrong answer: ${err.message}`)
+  }
+}
+
 console.log(`\n${pass} passed, ${fail} failed.`)
 if (fail > 0) process.exit(1)
-console.log('\nall IGCSE Y1 challenge checks correctly reject blank/garbage answers AND accept a real correct answer')
+console.log('\nall IGCSE Y1 challenge checks reject blank/garbage AND plausible-wrong answers, and accept a real correct answer')
