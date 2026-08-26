@@ -56,7 +56,13 @@
       (matching the earlier hasIf/hasVar fix) - full field parity between
       static and animated modes now. Regression-tested all 6 existing boss
       stages after the extension, all pass. Worlds 8-10 still stubbed locked
-      — next up is G8 Smart NPCs (needs the explicit ML-vs-rules addition).
+- [x] Grade 7 G8 — Smart NPCs built: chase-the-mouse (simple x/y comparison),
+      a patrol pattern flipping direction at boundaries, and a boss combining
+      patrol/chase/flee via distance thresholds (reuses the distance formula
+      from Collision & Physics). Closes with the explicit rule-based-AI-vs-
+      machine-learning contrast from the 0860 realignment. Worlds 9-10 still
+      stubbed locked — next up is G9 Strings & Dialogue (needs the ASCII
+      addition).
 - [x] Grade 8 wiring started: Builder City map live for Modules 1-4 (From Blocks
       to Text, Choices & Loops - both new; Functions, Lists - rehomed pre-existing
       Pyodide challenges) in grade8.html. Modules 5-10 stubbed locked.
