@@ -33,8 +33,22 @@ const LessonQuest = (() => {
   }
   const BOSSES = ['👾','🐉','🦑','🤖','👹','🦖','🐙','💀','🛸','🧟','🦂','🕷️','😈','🧌']
 
-  const DAILY_GOAL = 5      // steps per day to open the daily chest (+30 XP)
+  const DAILY_GOAL = 5      // steps per day to open the daily chest
   const RUST_DAYS = 14      // stars older than this show as "rusty" on the path
+
+  // ── 🎁 Daily quest chest rewards — weighted random, not a flat +30 ─────────
+  // Common chests still land near the old flat amount most of the time; rare
+  // ones are a real "ooh" moment. Cumulative weights out of 100.
+  const CHEST_REWARDS = [
+    { max: 60,  xp: 30,  label: '🎯 Daily Quest complete — chest opened!' },
+    { max: 85,  xp: 50,  label: '🎯 Daily Quest complete — shiny chest! ✨' },
+    { max: 96,  xp: 75,  label: '🎯 Daily Quest complete — golden chest! 🌟' },
+    { max: 100, xp: 120, label: '🎯 Daily Quest complete — ★ LEGENDARY CHEST! ★' },
+  ]
+  function rollChestReward() {
+    const roll = Math.random() * 100
+    return CHEST_REWARDS.find(r => roll < r.max) || CHEST_REWARDS[0]
+  }
 
   function key(pk, id) { return 'bf-lq-' + pk + '-' + id }
   function load(pk, id) {
@@ -76,10 +90,12 @@ const LessonQuest = (() => {
     const d = jget(dk) || { n: 0 }
     d.n++
     if (d.n >= DAILY_GOAL && !d.chest) {
+      const reward = rollChestReward()
       d.chest = 1
+      d.chestXP = reward.xp
       jset(dk, d)
-      confetti(document.getElementById('lq-bar'), ['🎁','🔥','⭐','🎉'])
-      if (cfg.onXP) setTimeout(() => cfg.onXP(30, '🎯 Daily Quest complete — chest opened!'), 900)
+      confetti(document.getElementById('lq-bar'), reward.xp >= 100 ? ['🎁','🌟','⭐','🎉','✨'] : ['🎁','🔥','⭐','🎉'])
+      if (cfg.onXP) setTimeout(() => cfg.onXP(reward.xp, reward.label), 900)
     } else {
       jset(dk, d)
     }
@@ -765,7 +781,7 @@ const LessonQuest = (() => {
             xp += Object.keys((st && st.steps) || {}).filter(s => s !== 'boss').length * 5
           } else if (k.indexOf('bf-lqd-' + pageKey + '-') === 0) {
             const d = JSON.parse(localStorage.getItem(k))
-            if (d && d.chest) xp += 30                       // daily quest chests
+            if (d && d.chest) xp += (d.chestXP || 30)         // daily quest chests (variable reward; 30 for legacy chests opened before that existed)
           }
         }
         xp += parseInt(localStorage.getItem('bf-lqrb-' + pageKey)) || 0   // revision bosses

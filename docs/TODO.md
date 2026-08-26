@@ -217,7 +217,16 @@
 
 ## Gamification
 - [x] Streak flame (in quest bar) + daily quest chest (5 steps/day = +30 XP). AS/A only.
-- [ ] XP chests with variable rewards.
+- [x] XP chests with variable rewards. The daily quest chest (LessonQuest,
+      currently AS/A Level only) no longer pays a flat +30 XP — it now
+      rolls a weighted reward: 60% common (30 XP), 25% shiny (50 XP), 11%
+      golden (75 XP), 4% ★LEGENDARY★ (120 XP), with bigger confetti on the
+      rare ones. The rolled amount is persisted per-chest (`d.chestXP`) so
+      `LessonQuest.totalXP()` recomputes the true historical total instead
+      of assuming 30 (falls back to 30 for chests opened before this
+      change). New scripts/test-chest-rewards.mjs verifies the weight
+      bands are well-formed and, over 200k rolls, statistically match
+      their declared percentages — wired into `npm run verify`.
 - [ ] Weekly class leaderboard (reset Mondays).
 - [ ] OBS-01 cosmetics unlocked by level.
 - [ ] Badge gallery with locked silhouettes (user_achievements table exists).
