@@ -16,20 +16,22 @@ import type { Concept, Pathway, Achievement, MasteryMap } from '@/types'
 export const CONCEPTS: Concept[] = [
 
   // ══════════════════════════════════════════════════════════════════════════
-  //  GRADE 6 — "The Artist's Toolkit"
-  //  Sequential modules: each unlocks the next. All link to the blockly-turtle
-  //  or pixel-grid editor. gradeMin:6 — only Grade 6 students see these.
+  //  GRADE 6 — "The Creator Quest"
+  //  Sequential modules power the pathway skill-tree view; all now link to
+  //  the live grade6.html Adventure Map (12-world build), matching how
+  //  Grade 7's concepts already point at grade7.html. gradeMin:6 — only
+  //  Grade 6 students see these.
   // ══════════════════════════════════════════════════════════════════════════
-  { id:'g6-pixels',     name:'M1 · Pixels & Color',           icon:'◼', color:'#f97316', tier:0, xGroup:4,  prerequisites:[],               difficulty:1, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','pixel-grid'],          tags:['grade6','visual'],    lessonUrl:'/lessons/pixel-grid.html' },
-  { id:'g6-turtle',     name:'M2 · Meet the Turtle',           icon:'▷', color:'#22c55e', tier:1, xGroup:9,  prerequisites:['g6-pixels'],    difficulty:1, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','blockly-turtle'],      tags:['grade6','drawing'],   lessonUrl:'/lessons/blockly-turtle.html' },
-  { id:'g6-loops',      name:'M3 · Loops & Repetition',        icon:'↺', color:'#22c55e', tier:2, xGroup:7,  prerequisites:['g6-turtle'],    difficulty:1, gradeMin:6, estimatedMinutes:75, learningModes:['grade6','blockly-turtle'],      tags:['grade6','loops'],     lessonUrl:'/lessons/blockly-turtle.html' },
-  { id:'g6-animation',  name:'M4 · Animation & Movement',      icon:'▶', color:'#06b6d4', tier:3, xGroup:7,  prerequisites:['g6-loops'],     difficulty:2, gradeMin:6, estimatedMinutes:75, learningModes:['grade6','canvas-code'],         tags:['grade6','animation'], lessonUrl:'/lessons/blockly-turtle.html' },
-  { id:'g6-patterns',   name:'M5 · Patterns & Nested Loops',   icon:'⊞', color:'#f97316', tier:4, xGroup:4,  prerequisites:['g6-animation'], difficulty:2, gradeMin:6, estimatedMinutes:75, learningModes:['grade6','blockly-turtle'],      tags:['grade6','patterns'],  lessonUrl:'/lessons/blockly-turtle.html' },
-  { id:'g6-color-vars', name:'M6 · Color & Variables',         icon:'◉', color:'#f97316', tier:5, xGroup:6,  prerequisites:['g6-patterns'],  difficulty:2, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','pixel-grid'],          tags:['grade6','variables'], lessonUrl:'/lessons/pixel-grid.html' },
-  { id:'g6-random',     name:'M7 · Randomness',                 icon:'⁈', color:'#eab308', tier:6, xGroup:5,  prerequisites:['g6-color-vars'],difficulty:2, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','canvas-code'],         tags:['grade6','random'],    lessonUrl:'/lessons/blockly-turtle.html' },
-  { id:'g6-debug',      name:'M8 · Debugging & Fixing',         icon:'⊘', color:'#a855f7', tier:7, xGroup:1,  prerequisites:['g6-random'],    difficulty:2, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','blockly-turtle'],      tags:['grade6','debug'],     lessonUrl:'/lessons/blockly-turtle.html' },
-  { id:'g6-story',      name:'M9 · Storytelling with Code',     icon:'⬡', color:'#06b6d4', tier:8, xGroup:1,  prerequisites:['g6-debug'],     difficulty:3, gradeMin:6, estimatedMinutes:90, learningModes:['grade6','canvas-code'],         tags:['grade6','creative'],  lessonUrl:'/lessons/blockly-turtle.html' },
-  { id:'g6-capstone',   name:'M10 · Year Capstone',             icon:'★', color:'#eab308', tier:9, xGroup:0,  prerequisites:['g6-story'],     difficulty:3, gradeMin:6, estimatedMinutes:90, learningModes:['grade6','canvas-code'],         tags:['grade6','capstone'],  lessonUrl:'/lessons/blockly-turtle.html' },
+  { id:'g6-pixels',     name:'M1 · Pixels & Color',           icon:'◼', color:'#f97316', tier:0, xGroup:4,  prerequisites:[],               difficulty:1, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','pixel-grid'],          tags:['grade6','visual'],    lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-turtle',     name:'M2 · Meet the Turtle',           icon:'▷', color:'#22c55e', tier:1, xGroup:9,  prerequisites:['g6-pixels'],    difficulty:1, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','blockly-turtle'],      tags:['grade6','drawing'],   lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-loops',      name:'M3 · Loops & Repetition',        icon:'↺', color:'#22c55e', tier:2, xGroup:7,  prerequisites:['g6-turtle'],    difficulty:1, gradeMin:6, estimatedMinutes:75, learningModes:['grade6','blockly-turtle'],      tags:['grade6','loops'],     lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-animation',  name:'M4 · Animation & Movement',      icon:'▶', color:'#06b6d4', tier:3, xGroup:7,  prerequisites:['g6-loops'],     difficulty:2, gradeMin:6, estimatedMinutes:75, learningModes:['grade6','canvas-code'],         tags:['grade6','animation'], lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-patterns',   name:'M5 · Patterns & Nested Loops',   icon:'⊞', color:'#f97316', tier:4, xGroup:4,  prerequisites:['g6-animation'], difficulty:2, gradeMin:6, estimatedMinutes:75, learningModes:['grade6','blockly-turtle'],      tags:['grade6','patterns'],  lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-color-vars', name:'M6 · Color & Variables',         icon:'◉', color:'#f97316', tier:5, xGroup:6,  prerequisites:['g6-patterns'],  difficulty:2, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','pixel-grid'],          tags:['grade6','variables'], lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-random',     name:'M7 · Randomness',                 icon:'⁈', color:'#eab308', tier:6, xGroup:5,  prerequisites:['g6-color-vars'],difficulty:2, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','canvas-code'],         tags:['grade6','random'],    lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-debug',      name:'M8 · Debugging & Fixing',         icon:'⊘', color:'#a855f7', tier:7, xGroup:1,  prerequisites:['g6-random'],    difficulty:2, gradeMin:6, estimatedMinutes:60, learningModes:['grade6','blockly-turtle'],      tags:['grade6','debug'],     lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-story',      name:'M9 · Storytelling with Code',     icon:'⬡', color:'#06b6d4', tier:8, xGroup:1,  prerequisites:['g6-debug'],     difficulty:3, gradeMin:6, estimatedMinutes:90, learningModes:['grade6','canvas-code'],         tags:['grade6','creative'],  lessonUrl:'/lessons/grade6.html' },
+  { id:'g6-capstone',   name:'M10 · Year Capstone',             icon:'★', color:'#eab308', tier:9, xGroup:0,  prerequisites:['g6-story'],     difficulty:3, gradeMin:6, estimatedMinutes:90, learningModes:['grade6','canvas-code'],         tags:['grade6','capstone'],  lessonUrl:'/lessons/grade6.html' },
 
   // ══════════════════════════════════════════════════════════════════════════
   //  GRADE 7 — "The Game Maker"
