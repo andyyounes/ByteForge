@@ -276,6 +276,21 @@
       </div>
       <div class="feedback" id="cipher-feedback"></div>
     </div>
+    <!-- 🎵 Music Studio (World 8) -->
+    <div class="musicwrap" id="musicwrap" style="display:none;">
+      <div id="music-grid" style="display:flex;flex-direction:column;gap:4px;"></div>
+      <div id="music-tempo-row" style="margin-top:14px;display:none;">
+        <div class="mix-row"><span class="mix-ch" style="min-width:70px;">Tempo</span>
+          <input type="range" id="m-bpm" min="60" max="200" value="120" style="accent-color:#fbbf24" oninput="musicTempoUpdate()">
+          <b id="m-bpm-v">120</b><span style="font-size:11px;color:#9ca3af;margin-left:6px;">BPM</span></div>
+      </div>
+      <div class="run-row" style="margin-top:14px;">
+        <button class="run-btn" id="m-play-btn" onclick="musicTogglePlay()">▶ PLAY</button>
+        <button class="run-btn" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:#9ca3af;" onclick="musicClear()">✕ Clear</button>
+        <button class="run-btn" onclick="musicCheck()">🎵 CHECK GROOVE</button>
+      </div>
+      <div class="feedback" id="music-feedback"></div>
+    </div>
     <div class="deck">
       <div>
         <div class="deck-title">🎮 COMMANDS — tap to add</div>
@@ -706,7 +721,40 @@ const W7_STAGES = [
       hint: 'The letter E is the most common letter in English — look for a shift where short words like "at" and "me" appear.' } },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 8 — Music Studio: a beat is a loop you can hear. Toggle cells on a
+// grid — rows are instruments, columns are steps — and the loop plays them
+// back forever, same as a repeat-chip loop plays commands back.
+// ══════════════════════════════════════════════════════════════════════════════
+const W8_STAGES = [
+  { id: 'w8s1', title: 'Four on the Floor', emoji: '🥁', type: 'music', xp: 30,
+    goal: 'A loop is just something that repeats. Build a kick drum loop that hits on every single beat — press PLAY to hear it repeat.',
+    music: { rows: ['Kick'], steps: 8, target: [[0,0],[0,2],[0,4],[0,6]] } },
+  { id: 'w8s2', title: 'Add the Snare', emoji: '🎶', type: 'music', xp: 35,
+    goal: 'Real beats layer more than one instrument in the same loop. Add a kick on beats 1 and 3, and a snare on the "and" beats (the backbeat).',
+    music: { rows: ['Kick', 'Snare'], steps: 8, target: [[0,0],[0,4],[1,2],[1,6]] } },
+  { id: 'w8s3', title: 'Hi-Hat Groove', emoji: '🎧', type: 'music', xp: 40,
+    goal: 'Add a hi-hat that ticks on every single step — a fast inner loop layered on top of the slower kick/snare loop.',
+    music: { rows: ['Kick', 'Snare', 'HiHat'], steps: 8,
+      target: [[0,0],[0,4],[1,2],[1,6],[2,0],[2,1],[2,2],[2,3],[2,4],[2,5],[2,6],[2,7]] } },
+  { id: 'w8s4', title: 'Change the Tempo', emoji: '⏱', type: 'music', xp: 40,
+    goal: 'Same groove as before — but a loop can play at different speeds too. Tempo (BPM = beats per minute) controls how many times the loop repeats each minute. Rebuild the groove, then set the tempo to 150 BPM.',
+    music: { rows: ['Kick', 'Snare', 'HiHat'], steps: 8, needsTempo: true, defaultBpm: 120, targetBpm: 150,
+      target: [[0,0],[0,4],[1,2],[1,6],[2,0],[2,1],[2,2],[2,3],[2,4],[2,5],[2,6],[2,7]] } },
+  { id: 'w8s5', title: 'Compose a Groove', emoji: '🎼', type: 'music', xp: 45,
+    goal: 'A longer 16-step loop with a syncopated feel — some hits land off the obvious beat. Match the pattern exactly.',
+    music: { rows: ['Kick', 'Snare', 'HiHat'], steps: 16,
+      target: [[0,0],[0,3],[0,8],[0,11],[1,4],[1,12],
+               [2,0],[2,2],[2,4],[2,6],[2,8],[2,10],[2,12],[2,14]] } },
+  { id: 'w8boss', title: 'BOSS — Full Beat', emoji: '🎚', boss: true, type: 'music', xp: 80,
+    goal: 'The full studio session: four instruments, a 16-step loop, and a target tempo. Build the complete groove at 128 BPM.',
+    music: { rows: ['Kick', 'Snare', 'HiHat', 'Clap'], steps: 16, needsTempo: true, defaultBpm: 120, targetBpm: 128,
+      target: [[0,0],[0,4],[0,8],[0,12],[1,4],[1,12],
+               [2,0],[2,2],[2,4],[2,6],[2,8],[2,10],[2,12],[2,14],
+               [3,2],[3,10]] } },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // The quest map — 12 worlds (Worlds 1–4 playable in this release)
@@ -719,7 +767,7 @@ const WORLDS = [
   { id: 'w5',  name: '🐢 Turtle Island',      sub: 'Loops + angles = amazing art',              stages: W5_STAGES, live: true },
   { id: 'w6',  name: '🖼 Pixel Caves',        sub: 'Pictures are secretly numbers',             stages: W6_STAGES, live: true },
   { id: 'w7',  name: '🕵️ Cipher City',        sub: 'Secret codes — make them and crack them',   stages: W7_STAGES, live: true },
-  { id: 'w8',  name: '🎵 Music Studio',       sub: 'Beats are loops you can hear',              count: 6,  live: false },
+  { id: 'w8',  name: '🎵 Music Studio',       sub: 'Beats are loops you can hear',              stages: W8_STAGES, live: true },
   { id: 'w9',  name: '💃 Dance Party',        sub: 'Code a character to dance to YOUR track',   count: 5,  live: false },
   { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  count: 7,  live: false },
   { id: 'w11', name: '🧠 AI World',           sub: 'Teach a machine. Then trick it.',           count: 6,  live: false },
@@ -804,17 +852,20 @@ function loadStage() {
   const isTurtle = activeStage.type === 'turtle'
   const isPixel  = activeStage.type === 'pixel'
   const isCipher = activeStage.type === 'cipher'
-  const isCustom = isColor || isTurtle || isPixel || isCipher
+  const isMusic  = activeStage.type === 'music'
+  const isCustom = isColor || isTurtle || isPixel || isCipher || isMusic
   document.querySelector('.board-wrap').style.display = isCustom ? 'none' : ''
   document.querySelector('.deck').style.display = isCustom ? 'none' : ''
   document.getElementById('mixer').style.display = isColor ? '' : 'none'
   document.getElementById('turtlewrap').style.display = isTurtle ? '' : 'none'
   document.getElementById('pixelwrap').style.display = isPixel ? '' : 'none'
   document.getElementById('cipherwrap').style.display = isCipher ? '' : 'none'
+  document.getElementById('musicwrap').style.display = isMusic ? '' : 'none'
   if (isColor) loadColor()
   else if (isTurtle) loadTurtle()
   else if (isPixel) loadPixel()
   else if (isCipher) loadCipher()
+  else if (isMusic) loadMusic()
   else loadMaze()
 }
 
@@ -1143,6 +1194,174 @@ function cipherCheck() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// World 8 — Music Studio: a beat grid is a loop you can hear. Rows are
+// instruments, columns are steps in the loop; toggle a cell, it plays on
+// that beat, every time the loop comes back around.
+// ══════════════════════════════════════════════════════════════════════════════
+let musicState = new Set()   // 'row,col' keys, toggled = "on"
+let musicPlaying = false
+let musicTimer = null
+let musicStep = 0
+let musicCtx = null
+
+const MUSIC_COLORS = ['#f472b6', '#60a5fa', '#fbbf24', '#a855f7']
+
+function musicAudioCtx() {
+  if (!musicCtx) musicCtx = new (window.AudioContext || window.webkitAudioContext)()
+  return musicCtx
+}
+
+// Simple synthesized hits — no audio files needed.
+function musicPlayHit(row) {
+  const ctx = musicAudioCtx()
+  const t = ctx.currentTime
+  const gain = ctx.createGain()
+  gain.connect(ctx.destination)
+  if (row === 0) { // kick — low sine, fast pitch drop
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(150, t)
+    osc.frequency.exponentialRampToValueAtTime(40, t + 0.15)
+    gain.gain.setValueAtTime(0.9, t)
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2)
+    osc.connect(gain); osc.start(t); osc.stop(t + 0.2)
+  } else { // snare/hihat/clap — filtered noise burst, tone by row
+    const bufSize = ctx.sampleRate * 0.15
+    const buffer = ctx.createBuffer(1, bufSize, ctx.sampleRate)
+    const data = buffer.getChannelData(0)
+    for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1
+    const noise = ctx.createBufferSource()
+    noise.buffer = buffer
+    const filter = ctx.createBiquadFilter()
+    filter.type = row === 1 ? 'bandpass' : row === 2 ? 'highpass' : 'bandpass'
+    filter.frequency.value = row === 1 ? 1800 : row === 2 ? 6000 : 1200
+    const dur = row === 2 ? 0.05 : 0.12
+    gain.gain.setValueAtTime(0.7, t)
+    gain.gain.exponentialRampToValueAtTime(0.01, t + dur)
+    noise.connect(filter); filter.connect(gain); noise.start(t); noise.stop(t + dur)
+  }
+}
+
+function loadMusic() {
+  musicStopPlaying()
+  const cfg = activeStage.music || {}
+  musicState = new Set()
+  const rowLabels = cfg.rows || ['Kick']
+  const steps = cfg.steps || 8
+  const grid = document.getElementById('music-grid')
+  grid.innerHTML = ''
+  rowLabels.forEach((label, r) => {
+    const rowEl = document.createElement('div')
+    rowEl.style.cssText = 'display:flex;align-items:center;gap:4px;'
+    const tag = document.createElement('span')
+    tag.textContent = label
+    tag.style.cssText = 'min-width:56px;font-size:11px;color:#9ca3af;font-weight:700;'
+    rowEl.appendChild(tag)
+    for (let c = 0; c < steps; c++) {
+      const cell = document.createElement('div')
+      cell.id = `mu-${r}-${c}`
+      cell.style.cssText = 'width:28px;height:28px;border-radius:5px;background:#1a1e2e;border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:.1s;' +
+        (c % 4 === 0 ? 'border-left:2px solid rgba(255,255,255,.2);' : '')
+      cell.onclick = () => musicToggle(r, c)
+      rowEl.appendChild(cell)
+    }
+    grid.appendChild(rowEl)
+  })
+  document.getElementById('music-tempo-row').style.display = cfg.needsTempo ? '' : 'none'
+  document.getElementById('m-bpm').value = cfg.defaultBpm || 120
+  document.getElementById('m-bpm-v').textContent = document.getElementById('m-bpm').value
+  document.getElementById('m-play-btn').textContent = '▶ PLAY'
+  document.getElementById('music-feedback').textContent = ''
+}
+
+function musicToggle(r, c) {
+  const key = r + ',' + c
+  const cell = document.getElementById(`mu-${r}-${c}`)
+  if (musicState.has(key)) {
+    musicState.delete(key)
+    cell.style.background = '#1a1e2e'
+  } else {
+    musicState.add(key)
+    cell.style.background = MUSIC_COLORS[r % MUSIC_COLORS.length]
+  }
+}
+
+function musicClear() {
+  musicState.forEach(key => {
+    const [r, c] = key.split(',')
+    const cell = document.getElementById(`mu-${r}-${c}`)
+    if (cell) cell.style.background = '#1a1e2e'
+  })
+  musicState = new Set()
+}
+
+function musicTempoUpdate() {
+  document.getElementById('m-bpm-v').textContent = document.getElementById('m-bpm').value
+}
+
+function musicTogglePlay() {
+  if (musicPlaying) musicStopPlaying()
+  else musicStartPlaying()
+}
+
+function musicStartPlaying() {
+  const cfg = activeStage.music || {}
+  const steps = cfg.steps || 8
+  const rows = (cfg.rows || ['Kick']).length
+  const bpm = +document.getElementById('m-bpm').value || cfg.defaultBpm || 120
+  const stepMs = (60000 / bpm) / 2  // two steps per beat (8th notes)
+  musicStep = 0
+  musicPlaying = true
+  document.getElementById('m-play-btn').textContent = '⏸ STOP'
+  const tick = () => {
+    for (let r = 0; r < rows; r++) {
+      if (musicState.has(r + ',' + musicStep)) musicPlayHit(r)
+    }
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < steps; c++) {
+        const cell = document.getElementById(`mu-${r}-${c}`)
+        if (!cell) continue
+        cell.style.outline = c === musicStep ? '2px solid #fff' : 'none'
+      }
+    }
+    musicStep = (musicStep + 1) % steps
+  }
+  tick()
+  musicTimer = setInterval(tick, stepMs)
+}
+
+function musicStopPlaying() {
+  musicPlaying = false
+  if (musicTimer) clearInterval(musicTimer)
+  musicTimer = null
+  document.querySelectorAll('#music-grid > div > div').forEach(cell => { cell.style.outline = 'none' })
+  const btn = document.getElementById('m-play-btn')
+  if (btn) btn.textContent = '▶ PLAY'
+}
+
+function musicCheck() {
+  const cfg = activeStage.music || {}
+  const fb  = document.getElementById('music-feedback')
+  const target = new Set((cfg.target || []).map(([r, c]) => r + ',' + c))
+  const correct = [...musicState].filter(k => target.has(k)).length
+  const wrong   = [...musicState].filter(k => !target.has(k)).length
+  const missing = target.size - correct
+  const bpm = +document.getElementById('m-bpm').value
+  const bpmOk = !cfg.needsTempo || Math.abs(bpm - cfg.targetBpm) <= 3
+  if (wrong === 0 && missing === 0 && bpmOk) {
+    fb.style.color = '#4ade80'
+    fb.textContent = '✅ That groove is locked in!'
+    completeStage(3)
+  } else if (!bpmOk) {
+    fb.style.color = '#fbbf24'
+    fb.textContent = `🌡️ Pattern's right, but the tempo isn't — target is ${cfg.targetBpm} BPM.`
+  } else {
+    fb.style.color = '#fbbf24'
+    fb.textContent = `🌡️ ${missing} beat(s) still missing, ${wrong} beat(s) shouldn't be on.`
+  }
+}
+
 function currentMaze() {
   return activeStage.boss ? activeStage.mazes[activeMazeIdx] : activeStage
 }
@@ -1307,10 +1526,12 @@ function completeStage(stars) {
   const isTurtle = activeStage.type === 'turtle'
   const isPixel  = activeStage.type === 'pixel'
   const isCipher = activeStage.type === 'cipher'
+  const isMusic  = activeStage.type === 'music'
   document.getElementById('win-sub').textContent = newBest && !firstTime ? 'New best!' :
     isTurtle ? 'Beautiful pattern — try a new shape next!' :
     isPixel ? 'Every pixel exactly where it should be!' :
     isCipher ? 'Cracked it — the code is broken!' :
+    isMusic ? 'That groove is locked in!' :
     stars === 3 ? (isColor ? 'Perfect mix — a true color scientist!' : 'Perfect run — couldn\'t be shorter!') :
     stars === 2 ? (isColor ? 'Close! Match it even tighter for 3 stars.' : 'Great! Can you find a shorter way for 3 stars?') :
     (isColor ? 'Matched! Try again for a super-close mix.' : 'Done! Try again with fewer commands for more stars.')
