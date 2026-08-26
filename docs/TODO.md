@@ -68,11 +68,26 @@
       Smart NPCs framing. Verified live via Playwright: all 6 solve
       correctly, the wrong-answer rejection path fires and renders
       correctly, zero app-logic console errors.
-- [ ] Grade 6: build remaining worlds — AI World, Final Quest. (World-boss
-      unlock is in place; each new world = a stage list + whichever engine
-      fits - maze/chip, color mixer, turtle sliders, pixel-grid,
-      cipher-wheel, beat-grid, move-sequence, or game-rules - or a new one
-      if the content genuinely needs it.)
+- [x] Grade 6 World 11 — AI World built with a teach-a-machine classifier
+      engine (tap a card to cycle it through bins = training data) plus a
+      primary-key data-table mode closing the 0860-audit gap. 6 stages
+      (5 + boss): Show It Examples, Organize the Data (primary key),
+      Machine Says (predict with a learned rule), Trick the Machine (find
+      what a color-only rule can't handle), Bigger Dataset, BOSS Build
+      Your Own Classifier. Verified live via Playwright: all 6 solve
+      correctly, wrong-bin rejection renders correctly, zero app-logic
+      console errors.
+- [x] Grade 6 World 12 — The Final Quest built as a genuine capstone check
+      (type:'finalquest'): no new skill, just a checklist reading every
+      other world's already-existing localStorage progress to confirm all
+      11 prior bosses were really beaten, plus a cosmetic "pick your
+      masterpiece" reflection. Verified live: fails correctly with bosses
+      outstanding, passes and fires the full boss-defeated celebration
+      once all 11 are marked beaten (confirmed via screenshot). Ran a full
+      regression sweep opening all 12 worlds' boss/final stages after this
+      build — zero console errors.
+- [x] **Grade 6 "The Creator Quest" is now fully built — all 12 worlds live
+      in grade6.html (12/12).**
 - [x] Grade 7 wiring started: Game Maker Galaxy map live for Worlds 1-3 (Sprite
       Start, Variables & State, Decisions) in grade7.html, reusing the existing
       Blockly + x-ray CodeMirror bridge (already implements the spec's Term 1
