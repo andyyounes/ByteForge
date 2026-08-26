@@ -53,7 +53,8 @@
     .right-panel { display:flex; flex-direction:column; overflow:hidden; }
 
     /* Challenge header */
-    .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px; }
+    .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px;
+                  max-height:38vh; overflow-y:auto; }
     .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
@@ -765,7 +766,12 @@ function runCode() {
     // saw at definition time. (Previously this wrapper existed but was built
     // AFTER the capture step and never actually got wired in, so draw-call
     // counts silently never incremented for any animated stage — fixed here.)
-    let execLog = { frames:0, rects:0, circles:0, hasFunction: /\bfunction\s+(?!update\b)\w+\s*\(/.test(code) }
+    let execLog = {
+      frames:0, rects:0, circles:0,
+      hasFunction: /\bfunction\s+(?!update\b)\w+\s*\(/.test(code),
+      hasIf:       /\bif\s*\(/.test(code),
+      hasVar:      /\b(var|let|const)\b/.test(code),
+    }
     const monitoredAPI = { ...drawingAPI }
     const origRect   = drawingAPI.rect.bind(drawingAPI)
     const origCircle = drawingAPI.circle.bind(drawingAPI)
@@ -829,11 +835,14 @@ function friendlyErr(msg) {
 }
 
 // ── Game Maker Galaxy — 10 worlds, each ending in a playable boss build ────────
-// Worlds 1-3 are live this session (Sprite Start, Variables & State, Decisions);
-// Worlds 4-10 are stubbed (map shows them locked/"coming soon") for a later pass.
-// Each stage keeps the exact check(log) contract runCode() already produces:
-// static runs → {rects,circles,lines,texts,hasIf,hasVar}; animated (on-every-
-// frame code) runs → {frames,rects,circles} only — no hasVar/hasIf there yet.
+// Worlds 1-3 were live before this pass (Sprite Start, Variables & State,
+// Decisions); Worlds 4-10 built up incrementally since. Each stage keeps the
+// exact check(log) contract runCode() produces: static runs → {rects,circles,
+// lines,texts,hasIf,hasVar,hasFunction}; animated (on-every-frame code) runs →
+// {frames,rects,circles,hasFunction,hasIf,hasVar} — full parity with static
+// as of the G4/G5 pass (previously animated mode had no hasIf/hasVar at all,
+// so needsIf/needsVar could never be satisfied there — fixed alongside the
+// monitoredAPI closure-timing bug, see the G4 note in grade7-curriculum.md).
 const WORLDS = [
   { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
     { id:'g1s1', name:'First Sprite', xp:20,
@@ -966,7 +975,39 @@ const WORLDS = [
       check:(log) => log.frames >= 5 && log.hasFunction && (log.rects >= 1 || log.circles >= 1),
     },
   ]},
-  { id:'g5',  name:'⌨️ G5 — Player Control',       sub:'Keyboard + mouse input schemes, aiming',                  count:4, live:false },
+  { id:'g5', name:'⌨️ G5 — Player Control', sub:'Keyboard + mouse input schemes, aiming', live:true, stages:[
+    { id:'g5s1', name:'Move with Arrow Keys', xp:40,
+      text:`<strong>Challenge 1</strong> — Create x and y variables. In "on every frame", check all four arrow keys: ← subtracts from x, → adds to x, ↑ subtracts from y, ↓ adds to y. Draw a rectangle at (x, y) every frame.`,
+      hints:[
+        'Create variables x = 200, y = 100 before the frame loop starts.',
+        'Four separate if blocks, one per arrow key — each just changes x or y by a fixed amount like 4.',
+        'Clear the canvas each frame (or it draws over itself), then draw the rectangle at the current x, y.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.hasIf && (log.rects >= 1 || log.circles >= 1),
+    },
+    { id:'g5s2', name:'Aim with the Mouse', xp:40,
+      text:`<strong>Challenge 2</strong> — Draw a small circle (a "reticle") that follows the mouse: use mouseX() and mouseY() as the circle's position, every frame, so it tracks wherever the player points.`,
+      hints:[
+        'Mouse → mouseX() and mouseY() give the current pointer position as numbers, live.',
+        'In "on every frame": clear, then circle(mouseX(), mouseY(), 10).',
+        'Move your mouse over the canvas after pressing Run — the reticle should follow it exactly.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.circles >= 1,
+    },
+    { id:'g5boss', name:'Top-Down Shooter Controls', xp:65, boss:true,
+      text:`<strong>⌨️ BOSS — Top-Down Shooter Controls</strong> — Combine both input schemes: arrow keys move a player rectangle, while a reticle circle follows the mouse independently. Two input devices, one game.<br><br>
+      <span style="opacity:.8;font-size:12px;">💡 How does your controller actually talk to the game? A wired USB keyboard and a wireless Bluetooth mouse are both examples of a <strong>PAN</strong> (Personal Area Network — devices close to one computer). Your school's wifi connecting many computers together is a <strong>LAN</strong> (Local Area Network). The internet connecting LANs across the world is a <strong>WAN</strong> (Wide Area Network) — three different scales of the same idea: "get data from one device to another."</span>`,
+      hints:[
+        'Keep your Challenge 1 movement code AND your Challenge 2 mouse-follow code — both run inside the same "on every frame".',
+        'Draw the player rectangle at x, y (arrow-key controlled), then draw the reticle circle at mouseX(), mouseY() — same frame, both shapes.',
+        'Test it: arrows move the square, mouse moves the circle, completely independently.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.hasIf && log.rects >= 1 && log.circles >= 1,
+    },
+  ]},
   { id:'g6',  name:'💥 G6 — Collision & Physics',  sub:'Hitboxes, bouncing, gravity, knockback',                  count:4, live:false },
   { id:'g7w', name:'🎬 G7 — Game States',          sub:'Menu → playing → paused → game-over → win',              count:4, live:false },
   { id:'g8',  name:'🤖 G8 — Smart NPCs',           sub:'Enemies that chase, flee, patrol; a rule-based chatbot', count:4, live:false },
