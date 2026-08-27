@@ -36,10 +36,15 @@ const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, t
   positions: [[20,20],[440,20],[20,220],[440,220], [220,130], [60,130],[240,130],[420,130]],
   // Story Studio's "page" stages (st1*) — a DOM preview, not the canvas —
   // check headings/paragraphs/links/buttons instead of shapes/frames.
-  headings: 999, paragraphs: 999, links: 999, buttons: 999 })
+  headings: 999, paragraphs: 999, links: 999, buttons: 999,
+  // st2* (CSS styling) — bgColor/headingColor are non-empty strings when
+  // set, align matches whichever value a stage's needsAlign names ('center'
+  // for every st2 stage today), fontSize is a generous px value.
+  bgColor: '#ffffff', headingColor: '#111111', align: 'center', fontSize: 999 })
 const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   texts: 0,   hasIf: false, hasVar: false, hasFunction: false,
   positions: [],
-  headings: 0, paragraphs: 0, links: 0, buttons: 0 })
+  headings: 0, paragraphs: 0, links: 0, buttons: 0,
+  bgColor: '', headingColor: '', align: '', fontSize: 0 })
 
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.id}`
@@ -50,15 +55,25 @@ for (const ch of CHALLENGES) {
   if (!ch.check(emptyLog())) { pass++; console.log(`✓ ${label} — not vacuous (empty log correctly fails)`) }
   else { fail++; console.log(`✗ ${label} — VACUOUS: an empty/no-op submission passes check()`) }
 
-  const flags = ['needsVar', 'needsIf', 'needsFrames', 'needsFunction', 'needsHeadings', 'needsParagraphs', 'needsLinks', 'needsButtons']
+  const flags = ['needsVar', 'needsIf', 'needsFrames', 'needsFunction', 'needsHeadings', 'needsParagraphs', 'needsLinks', 'needsButtons',
+    'needsBgColor', 'needsHeadingColor', 'needsAlign', 'needsFontSize']
   const fieldFor = { needsVar: 'hasVar', needsIf: 'hasIf', needsFrames: 'frames', needsFunction: 'hasFunction',
-    needsHeadings: 'headings', needsParagraphs: 'paragraphs', needsLinks: 'links', needsButtons: 'buttons' }
-  const numericFields = new Set(['frames', 'headings', 'paragraphs', 'links', 'buttons'])
+    needsHeadings: 'headings', needsParagraphs: 'paragraphs', needsLinks: 'links', needsButtons: 'buttons',
+    needsBgColor: 'bgColor', needsHeadingColor: 'headingColor', needsAlign: 'align', needsFontSize: 'fontSize' }
+  const numericFields = new Set(['frames', 'headings', 'paragraphs', 'links', 'buttons', 'fontSize'])
+  const stringFields  = new Set(['bgColor', 'headingColor', 'align'])
   for (const flag of flags) {
     if (!ch[flag]) continue
     const log = maximalLog()
     const field = fieldFor[flag]
-    log[field] = numericFields.has(field) ? 0 : false
+    // needsAlign carries the REQUIRED value (e.g. 'center'), not a boolean —
+    // "off" here means a DIFFERENT value, not empty (an empty string would
+    // also correctly fail, but testing a wrong-but-set value is the sharper
+    // check that the requirement is actually compared, not just truthiness).
+    if (flag === 'needsAlign') log[field] = ch[flag] === 'left' ? 'right' : 'left'
+    else if (numericFields.has(field)) log[field] = 0
+    else if (stringFields.has(field))  log[field] = ''
+    else log[field] = false
     if (!ch.check(log)) { pass++; console.log(`✓ ${label} — ${flag} is genuinely enforced by check()`) }
     else { fail++; console.log(`✗ ${label} — ${flag}:true but check() still passes with ${field} off (hint promises a requirement it doesn't enforce)`) }
   }

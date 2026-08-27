@@ -354,6 +354,14 @@
       <value name="STR"><shadow type="text"><field name="TEXT">Go</field></shadow></value>
     </block>
   </category>
+  <category name="Style" colour="#0d9488">
+    <block type="page_set_background"></block>
+    <block type="page_set_heading_color"></block>
+    <block type="page_set_align"></block>
+    <block type="page_set_font_size">
+      <value name="SIZE"><shadow type="math_number"><field name="NUM">18</field></shadow></value>
+    </block>
+  </category>
   <category name="Mouse" colour="#06b6d4">
     <block type="canvas_mouse_x"></block>
     <block type="canvas_mouse_y"></block>
@@ -640,6 +648,40 @@ Blockly.defineBlocksWithJsonArray([
     colour:'#16a34a',
     tooltip:'Adds a <button> to the page.',
   },
+  // Style — Story Studio 2 (CSS styling: background/heading colour/align/font size)
+  {
+    type:'page_set_background',
+    message0:'set page background colour %1',
+    args0:[{type:'field_colour', name:'COLOR', colour:'#ffffff'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#0d9488',
+    tooltip:'CSS: sets the background-color of the whole page.',
+  },
+  {
+    type:'page_set_heading_color',
+    message0:'set heading colour %1',
+    args0:[{type:'field_colour', name:'COLOR', colour:'#111111'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#0d9488',
+    tooltip:'CSS: sets the text colour of every heading on the page.',
+  },
+  {
+    type:'page_set_align',
+    message0:'align page text %1',
+    args0:[{type:'field_dropdown', name:'ALIGN', options:[['left','left'],['center','center'],['right','right']]}],
+    previousStatement:null, nextStatement:null,
+    colour:'#0d9488',
+    tooltip:'CSS: text-align for the whole page — left, center, or right.',
+  },
+  {
+    type:'page_set_font_size',
+    message0:'set paragraph text size %1 px',
+    args0:[{type:'input_value', name:'SIZE', check:'Number'}],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#0d9488',
+    tooltip:'CSS: font-size for every paragraph on the page.',
+  },
 ])
 
 // ── JavaScript Code Generators ────────────────────────────────────────────────
@@ -665,6 +707,10 @@ jsGen.forBlock['page_add_heading']   = (b,g) => `addHeading(${g.valueToCode(b,'S
 jsGen.forBlock['page_add_paragraph'] = (b,g) => `addParagraph(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Text'"});\n`
 jsGen.forBlock['page_add_link']      = (b,g) => `addLink(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Link'"},${g.valueToCode(b,'URL',g.ORDER_NONE)||"'#'"});\n`
 jsGen.forBlock['page_add_button']    = (b,g) => `addButton(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Button'"});\n`
+jsGen.forBlock['page_set_background']   = (b)   => `setBackground('${b.getFieldValue('COLOR')}');\n`
+jsGen.forBlock['page_set_heading_color']= (b)   => `setHeadingColor('${b.getFieldValue('COLOR')}');\n`
+jsGen.forBlock['page_set_align']        = (b)   => `setAlign('${b.getFieldValue('ALIGN')}');\n`
+jsGen.forBlock['page_set_font_size']    = (b,g) => `setFontSize(${g.valueToCode(b,'SIZE',g.ORDER_NONE)||18});\n`
 
 function v(b,g,name,def) { return g.valueToCode(b,name,g.ORDER_NONE)||def }
 
@@ -823,12 +869,24 @@ const drawingAPI = {
 // browser page, so students practice "what does each tag actually do" before
 // Grade 8 introduces the real HTML/CSS/JS text editor.
 const pageEl = document.getElementById('output-page')
+// CSS state — Story Studio 2 (Week 2) teaches these as page-wide style rules,
+// so they apply regardless of whether style blocks run before or after the
+// content blocks they affect (exactly like a real <style> block, which
+// applies no matter where in the HTML file it's written).
+let _pageStyle = { headingColor: null, fontSize: null }
 const pageAPI = {
-  clearPage()   { pageEl.innerHTML = '' },
-  addHeading(str)   { const h = document.createElement('h1'); h.textContent = String(str); pageEl.appendChild(h) },
-  addParagraph(str) { const p = document.createElement('p');  p.textContent = String(str); pageEl.appendChild(p) },
+  clearPage()   { pageEl.innerHTML = ''; pageEl.style.backgroundColor = ''; pageEl.style.textAlign = ''; _pageStyle = { headingColor: null, fontSize: null } },
+  addHeading(str)   { const h = document.createElement('h1'); h.textContent = String(str); if (_pageStyle.headingColor) h.style.color = _pageStyle.headingColor; pageEl.appendChild(h) },
+  addParagraph(str) { const p = document.createElement('p');  p.textContent = String(str); if (_pageStyle.fontSize) p.style.fontSize = _pageStyle.fontSize + 'px'; pageEl.appendChild(p) },
   addLink(str,url)  { const a = document.createElement('a');  a.textContent = String(str); a.href = String(url); a.target='_blank'; pageEl.appendChild(a); pageEl.appendChild(document.createElement('br')) },
   addButton(str)    { const btn = document.createElement('button'); btn.textContent = String(str); pageEl.appendChild(btn) },
+  // Week 2 — CSS styling. Background/align apply to the whole page container
+  // (like styling <body>); heading colour/font size apply to every h1/p
+  // already on the page AND any added afterwards (like a real CSS rule).
+  setBackground(c)   { pageEl.style.backgroundColor = c },
+  setHeadingColor(c) { _pageStyle.headingColor = c; pageEl.querySelectorAll('h1').forEach(h => h.style.color = c) },
+  setAlign(a)        { pageEl.style.textAlign = a },
+  setFontSize(px)    { _pageStyle.fontSize = px; pageEl.querySelectorAll('p').forEach(p => p.style.fontSize = px + 'px') },
 }
 
 function resetDrawState() {
@@ -893,6 +951,12 @@ function runPageCode() {
     buttons:    pageEl.querySelectorAll('button').length,
     headingText:   [...pageEl.querySelectorAll('h1')].map(e => e.textContent),
     paragraphText: [...pageEl.querySelectorAll('p')].map(e => e.textContent),
+    // Week 2 — CSS styling state, read straight off the DOM/style object so
+    // the check reflects what's actually applied, not what was merely called.
+    bgColor:     pageEl.style.backgroundColor || '',
+    headingColor: _pageStyle.headingColor || '',
+    align:       pageEl.style.textAlign || '',
+    fontSize:    _pageStyle.fontSize || null,
   }
   checkChallenge(pageLog)
 }
@@ -1071,6 +1135,57 @@ const WORLDS = [
       ],
       needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1,
       check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1,
+    },
+  ]},
+  // ── Story Studio — Semester 1, Week 2: CSS styling basics ──────────────────
+  // Same page-block engine — a new "Style" category standing in for CSS
+  // rules (background-color, heading colour, text-align, font-size).
+  { id:'st2', name:'🎨 Story Studio 2 — Style It', sub:'Background, heading colour, alignment, font size — CSS for your page', live:true, stages:[
+    { id:'st2s1', name:'Paint the Page', xp:20, type:'page',
+      text:`<strong>Challenge 1</strong> — CSS styles the WHOLE page, not just one word. Add a heading, then set the page's background colour to anything you like.`,
+      hints:[
+        'Open the Style category and drag out "set page background colour".',
+        'Pick any colour from the swatch — it applies to the entire page at once.',
+      ],
+      needsHeadings:1, needsBgColor:true,
+      check:(log) => log.headings >= 1 && !!log.bgColor,
+    },
+    { id:'st2s2', name:'Title Colour', xp:25, type:'page',
+      text:`<strong>Challenge 2</strong> — Style one TYPE of element specifically. Add a heading, then set the heading colour (separate from the page background).`,
+      hints:[
+        'Drag out "set heading colour" from Style.',
+        'This rule targets ONLY headings — paragraphs and buttons are untouched, exactly like a real CSS rule that only targets <code>h1</code>.',
+      ],
+      needsHeadings:1, needsHeadingColor:true,
+      check:(log) => log.headings >= 1 && !!log.headingColor,
+    },
+    { id:'st2s3', name:'Center Stage', xp:25, type:'page',
+      text:`<strong>Challenge 3</strong> — Add a heading and a paragraph, then align the page's text to the CENTER.`,
+      hints:[
+        'Drag out "align page text" and choose "center" from its dropdown.',
+        'Unlike colour, alignment doesn\'t need a colour picker — just a choice from a small fixed list.',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsAlign:'center',
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.align === 'center',
+    },
+    { id:'st2s4', name:'Readable Text', xp:30, type:'page',
+      text:`<strong>Challenge 4</strong> — Add a heading and a paragraph, then set the paragraph text size to at least 16px so it's genuinely easy to read.`,
+      hints:[
+        'Drag out "set paragraph text size" and type a number ≥ 16 into its slot.',
+        'Real accessibility guidelines recommend body text be at least 16px — small text is a genuine, common design mistake.',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsFontSize:16,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.fontSize >= 16,
+    },
+    { id:'st2boss', name:'BOSS — Style the Front Page', xp:70, type:'page', boss:true,
+      text:`<strong>BOSS</strong> — Take last week's front page (heading, 2+ paragraphs, a link, a button) and style ALL of it: a background colour, a heading colour, centered text, and paragraph text at least 16px. Every tag AND every style rule, together.`,
+      hints:[
+        'This is st1boss\'s content plus every Style block from this week — nothing new to learn, just combine both weeks.',
+        'Order genuinely doesn\'t matter here — CSS rules apply no matter when they\'re set, unlike the tags themselves which appear in the order you add them.',
+      ],
+      needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1
+                  && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16,
     },
   ]},
   { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
@@ -1575,6 +1690,32 @@ const CHALLENGE_LESSON = {
       <p>Heading → paragraphs → link → button is not a random combination — it's close to the actual shape of a huge number of real websites: a title, some body text, a way to go elsewhere, and a call to action.</p></div>
     <div class="cl-block"><h4>Nothing new — just assembly</h4>
       <p>Every piece of this boss came from st1s1–st1s5. Real programming often looks exactly like this: combining small, already-understood pieces into one finished thing, rather than learning something brand new at the very end.</p></div>` },
+  // ── Story Studio 2 — Style It: CSS basics ───────────────────────────────────
+  st2s1: { title: 'CSS styles the whole page at once', html: `
+    <div class="cl-block"><h4>HTML vs. CSS</h4>
+      <p>Last week's blocks (heading, paragraph, link, button) are HTML — the CONTENT of the page. This week's Style blocks are CSS — how that content LOOKS. Same page, two completely different jobs.</p></div>
+    <div class="cl-block"><h4>Background applies to the container, not one element</h4>
+      <p>"Set page background colour" doesn't touch any single heading or paragraph — it colours the whole page behind everything, exactly like a real CSS rule targeting <code>body</code>.</p></div>` },
+  st2s2: { title: 'CSS rules can target ONE kind of element', html: `
+    <div class="cl-block"><h4>Specific, not global</h4>
+      <p>"Set heading colour" only changes headings — any paragraphs stay whatever colour they already were. Real CSS works exactly this way: a rule like <code>h1 { color: ... }</code> only touches <code>&lt;h1&gt;</code> elements, nothing else.</p></div>
+    <div class="cl-block"><h4>Why this matters</h4>
+      <p>Being able to style just ONE type of element — not the whole page at once — is what makes CSS actually useful for real design: different colours/sizes for titles vs. body text vs. buttons.</p></div>` },
+  st2s3: { title: 'Alignment is a choice, not a colour', html: `
+    <div class="cl-block"><h4>A small fixed list of options</h4>
+      <p>Unlike colour (millions of possible values), text alignment only has a few real choices — left, center, right. That's why this block uses a dropdown instead of a colour picker: the right input for a CSS property depends on what kind of value it actually takes.</p></div>
+    <div class="cl-block"><h4>Center is a genuine design decision</h4>
+      <p>Centered text reads differently to left-aligned text — it's used for titles/hero sections, but rarely for long paragraphs (centered paragraphs are actually harder to read line-by-line, a real, common CSS mistake).</p></div>` },
+  st2s4: { title: 'Font size affects real readability', html: `
+    <div class="cl-block"><h4>Not just aesthetics</h4>
+      <p>Text that's too small is a genuine accessibility problem, not just a style preference — real design guidelines set a MINIMUM readable size (commonly 16px) for body text, which is exactly the number this challenge checks for.</p></div>
+    <div class="cl-block"><h4>Applies to paragraphs specifically</h4>
+      <p>Like heading colour, this rule targets one element type (paragraphs) — your heading stays its own separate size, controlled by a different rule entirely.</p></div>` },
+  st2boss: { title: 'BOSS — HTML gives structure, CSS gives style', html: `
+    <div class="cl-block"><h4>Two weeks, two real jobs</h4>
+      <p>Week 1 (HTML) decided WHAT is on the page — a heading, some paragraphs, a link, a button. Week 2 (CSS) decides how it LOOKS — colours, alignment, size. Every real website is built from exactly this split.</p></div>
+    <div class="cl-block"><h4>Order-independent, on purpose</h4>
+      <p>Unlike HTML tags (which appear in the order you add them), these CSS rules apply no matter when you set them — style the page first or last, the result is identical. That's a genuine, real difference between structure and style.</p></div>` },
   // ── G1 — Sprite Start: coordinates & sequence ──────────────────────────────
   g1s1: { title: 'Coordinates — every sprite has an (x, y)', html: `
     <div class="cl-block"><h4>x and y are just numbers</h4>
@@ -1981,6 +2122,10 @@ function checkChallenge(log) {
       if (ch.needsParagraphs && (log.paragraphs || 0) < ch.needsParagraphs) missing.push(`at least ${ch.needsParagraphs} paragraph${ch.needsParagraphs>1?'s':''} (Page → add paragraph)`)
       if (ch.needsLinks      && (log.links      || 0) < ch.needsLinks)      missing.push(`a link (Page → add link)`)
       if (ch.needsButtons    && (log.buttons    || 0) < ch.needsButtons)    missing.push(`a button (Page → add button)`)
+      if (ch.needsBgColor    && !log.bgColor)     missing.push(`a page background colour (Style → set page background colour)`)
+      if (ch.needsHeadingColor && !log.headingColor) missing.push(`a heading colour (Style → set heading colour)`)
+      if (ch.needsAlign      && log.align !== ch.needsAlign) missing.push(`page text aligned "${ch.needsAlign}" (Style → align page text)`)
+      if (ch.needsFontSize   && !(log.fontSize && log.fontSize >= ch.needsFontSize)) missing.push(`paragraph text at least ${ch.needsFontSize}px (Style → set paragraph text size)`)
       if (missing.length) logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
       else logLine('❌ Not quite — your page built, but it doesn\'t meet this challenge\'s goal yet. Re-read the task above and try the 💡 Hint button.', 'err')
       return
