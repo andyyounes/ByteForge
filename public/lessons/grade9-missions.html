@@ -103,19 +103,26 @@
   .cm-error-line { background:rgba(248,113,113,.14) !important; }
 
   /* ── Mission list overlay ── */
-  /* ── Learn bubble — video/Match-Up/theory, a real map node type ── */
-  .learn-wrap { position:fixed; inset:0; z-index:60; background:rgba(6,8,16,.92); overflow-y:auto;
-                display:flex; align-items:flex-start; justify-content:center; padding:40px 16px; }
-  .learn-card { width:min(720px,100%); background:#111320; border:1px solid rgba(255,255,255,.1); border-radius:14px; overflow:hidden; }
-  .learn-hdr { padding:16px 20px; font-size:16px; font-weight:800; display:flex; align-items:center;
-               justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.08); }
-  .learn-body { padding:20px; }
+  /* ── Learn bubble — video/Match-Up/theory, a real map node type.
+       Renders INLINE as part of the normal page (same #main grid every
+       other mission type uses), not a popup/modal overlay — a genuine
+       lesson page, not a dialog interrupting one. ── */
+  .learn-wrap { display:none; grid-column:1 / -1; overflow-y:auto; background:#0b0d16; }
+  .learn-wrap.open { display:block; }
+  .learn-card { max-width:760px; margin:0 auto; padding:24px 16px 60px; }
+  .learn-hdr { padding:8px 0 16px; font-size:20px; font-weight:800; display:flex; align-items:center;
+               justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:20px; }
+  .learn-body { }
   .learn-section { margin-bottom:22px; }
   .learn-section-title { font-size:12px; font-weight:900; letter-spacing:.06em; text-transform:uppercase;
                           color:#67e8f9; margin-bottom:10px; }
   .learn-video { background:#0a0c18; border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:14px 16px;
                  font-size:13px; color:#c7d2e0; }
   .learn-video a { color:#67e8f9; font-weight:700; }
+  /* Real embedded player, shown instead of the "search YouTube" fallback
+     whenever a mission provides a specific, curated videoId. */
+  .learn-video-embed { position:relative; width:100%; padding-top:56.25%; border-radius:8px; overflow:hidden; }
+  .learn-video-embed iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
   .learn-matchup { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .lm-term, .lm-def { padding:9px 12px; border-radius:8px; font-size:12.5px; cursor:pointer;
                        background:#161927; border:1px solid rgba(255,255,255,.1); color:#e2e8f0; user-select:none; }
@@ -282,7 +289,7 @@
      the student to use it, added directly in response to real feedback that
      Phase 0 jumped straight into binary conversion without ever teaching
      what binary (or a variable, or an integer) even IS. -->
-<div class="learn-wrap" id="learn-wrap" style="display:none;">
+<div class="learn-wrap" id="learn-wrap">
   <div class="learn-card">
     <div class="learn-hdr">
       <span id="learn-title"></span>
@@ -292,6 +299,7 @@
       <div class="learn-section">
         <div class="learn-section-title">🎬 Watch &amp; Learn</div>
         <div class="learn-video" id="learn-video"></div>
+        <div class="learn-video-embed" id="learn-video-embed"></div>
       </div>
       <div class="learn-section">
         <div class="learn-section-title">🔑 Key Terms — Match-Up <span id="learn-matchup-score"></span></div>
@@ -311,7 +319,7 @@
      a target number. No code at all — this comes BEFORE variables/coding
      are ever introduced, teaching binary as a real physical/hands-on idea
      first. -->
-<div class="learn-wrap" id="cards-wrap" style="display:none;">
+<div class="learn-wrap" id="cards-wrap">
   <div class="learn-card">
     <div class="learn-hdr">
       <span id="cards-title"></span>
@@ -486,6 +494,7 @@ const MISSIONS = [
     brief: 'Before anything else — what actually IS a computer, and what are its real parts?',
     api: [],
     learn: {
+      videoId: 'hm3YQPY0kOw', videoTitle: 'What is a Computer? — Crash Course Computer Science #1',
       videoQuery: 'what is a computer CPU RAM storage explained simply',
       terms: [
         { term: 'CPU',     def: 'The Central Processing Unit — carries out instructions. The "brain" of the computer.' },
@@ -2866,8 +2875,8 @@ function openMission(id) {
   missionStartedAt = Date.now()
   if (activeMission.type === 'learn') { renderLearnBubble(); return }
   if (activeMission.type === 'cards') { renderCardsBubble(); return }
-  document.getElementById('learn-wrap').style.display = 'none'
-  document.getElementById('cards-wrap').style.display = 'none'
+  document.getElementById('learn-wrap').classList.remove('open')
+  document.getElementById('cards-wrap').classList.remove('open')
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
   document.getElementById('m-phase').textContent = activeMission.phase
   document.getElementById('m-par').textContent = parLabel(activeMission)
@@ -2910,13 +2919,24 @@ let _lmSelected = null   // currently-selected term index, or null
 let _lmMatched  = new Set()
 function renderLearnBubble() {
   const m = activeMission
-  document.getElementById('cards-wrap').style.display = 'none'
-  document.getElementById('learn-wrap').style.display = 'flex'
+  document.getElementById('cards-wrap').classList.remove('open')
+  document.getElementById('learn-wrap').classList.add('open')
   document.getElementById('learn-title').textContent = m.emoji + ' ' + m.title
-  document.getElementById('learn-video').innerHTML =
-    '<p>🔎 Search YouTube for: <a href="https://www.youtube.com/results?search_query='
-    + encodeURIComponent(m.learn.videoQuery) + '" target="_blank" rel="noopener">'
-    + m.learn.videoQuery + '</a></p>'
+  const embedEl = document.getElementById('learn-video-embed')
+  const linkEl  = document.getElementById('learn-video')
+  if (m.learn.videoId) {
+    // A specific, curated video — a real embedded player, not a search link.
+    embedEl.innerHTML = '<iframe src="https://www.youtube.com/embed/' + m.learn.videoId
+      + '" title="' + (m.learn.videoTitle || 'Lesson video') + '" allowfullscreen loading="lazy"></iframe>'
+    linkEl.style.display = 'none'
+  } else {
+    embedEl.innerHTML = ''
+    linkEl.style.display = ''
+    linkEl.innerHTML =
+      '<p>🔎 Search YouTube for: <a href="https://www.youtube.com/results?search_query='
+      + encodeURIComponent(m.learn.videoQuery) + '" target="_blank" rel="noopener">'
+      + m.learn.videoQuery + '</a></p>'
+  }
   document.getElementById('learn-theory').innerHTML = m.learn.theory
   _lmSelected = null
   _lmMatched = new Set()
@@ -2982,8 +3002,8 @@ function completeLearnBubble() {
 let _cardsFlipped = new Set()
 function renderCardsBubble() {
   const m = activeMission
-  document.getElementById('learn-wrap').style.display = 'none'
-  document.getElementById('cards-wrap').style.display = 'flex'
+  document.getElementById('learn-wrap').classList.remove('open')
+  document.getElementById('cards-wrap').classList.add('open')
   document.getElementById('cards-title').textContent = m.emoji + ' ' + m.title
   document.getElementById('cards-intro').textContent = m.cards.intro
   _cardsFlipped = new Set()
