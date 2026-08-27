@@ -525,6 +525,10 @@ async function runWebCode() {
     hasLSGet:         /localStorage\s*\.\s*getItem\s*\(/.test(js),
     hasJSONStringify: /JSON\s*\.\s*stringify\s*\(/.test(js),
     hasJSONParse:     /JSON\s*\.\s*parse\s*\(/.test(js),
+    // Week 4 — loops generating repeated UI. listItems (li count) already
+    // existed from Week 1's element counts; hasLoop covers for/while/forEach
+    // equally, since all three are genuine ways to repeat UI-building code.
+    hasLoop: /\bfor\s*\(|\bwhile\s*\(|\.forEach\s*\(/.test(js),
   }
   clog('Ran — checking your page…', 'info')
   checkWebChallenge(webLog)
@@ -849,6 +853,66 @@ const MODULES = [
       },
       needsLSSet:true, needsLSGet:true, needsJSON:true, needsIf:true,
       check:(log) => log.hasLSSet && log.hasLSGet && log.hasJSONStringify && log.hasJSONParse && log.hasIf,
+    },
+  ]},
+  // ── Web Story 4 — Semester 1, Week 4: loops generating repeated UI ─────────
+  { id:'ws4', name:'🔁 Web Story 4 — One Loop, Many Choices', sub:'A loop that builds page elements — one per item, automatically', live:true, stages:[
+    { id:'ws4s1', name:'A List of Choices', xp:30, lang:'web',
+      text:`<strong>Challenge 1</strong> — Given an array of choices, use a LOOP to add one &lt;li&gt; per item into a &lt;ul id="choices"&gt; — not three separate lines of code copy-pasted.`,
+      hints:[
+        'let choices = ["Fight", "Flee", "Negotiate"];',
+        'for (let i = 0; i < choices.length; i++) { const li = document.createElement("li"); li.textContent = choices[i]; document.getElementById("choices").appendChild(li); }',
+        'A .forEach(choice => { ... }) loop works exactly as well — either is a genuine loop.',
+      ],
+      webStarter: {
+        html: `<ul id="choices"></ul>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `let choices = ["Fight", "Flee", "Negotiate"];\n// TODO: loop over choices, adding one <li> per item into #choices\n`,
+      },
+      needsLoop:true,
+      check:(log) => log.hasLoop && log.listItems >= 3,
+    },
+    { id:'ws4s2', name:'Numbered Items', xp:30, lang:'web',
+      text:`<strong>Challenge 2</strong> — Same idea, but number each item as you loop: "1. Fight", "2. Flee", "3. Negotiate" — using the loop's own counter, not typed by hand.`,
+      hints:[
+        'for (let i = 0; i < choices.length; i++) { li.textContent = (i + 1) + ". " + choices[i]; }',
+        'i starts at 0, so add 1 to get a human-friendly "1, 2, 3" instead of "0, 1, 2".',
+      ],
+      webStarter: {
+        html: `<ul id="choices"></ul>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `let choices = ["Fight", "Flee", "Negotiate"];\n// TODO: loop over choices, numbering each one (1. , 2. , 3. ) using the loop counter\n`,
+      },
+      needsLoop:true,
+      check:(log) => log.hasLoop && log.listItems >= 3 && /1\.\s*\w/.test(log.bodyText),
+    },
+    { id:'ws4s3', name:'Loop Inside a Function', xp:35, lang:'web',
+      text:`<strong>Challenge 3</strong> — Write a function <code>renderList(items)</code> that contains the loop and builds the &lt;li&gt; elements — so you can call it with ANY array, not just one hardcoded one.`,
+      hints:[
+        'function renderList(items) { items.forEach(item => { ...build and append an <li>... }); }',
+        'Call renderList() twice with two DIFFERENT arrays — the same function handles both, because the loop is generic, not tied to one specific array.',
+      ],
+      webStarter: {
+        html: `<ul id="choices"></ul>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `// TODO: function renderList(items) — loops over items, adding one <li> per item into #choices\n\n// TODO: call renderList with an array of at least 3 items\n`,
+      },
+      needsLoop:true, needsFunction:true,
+      check:(log) => log.hasLoop && log.hasFunction && log.listItems >= 3,
+    },
+    { id:'ws4boss', name:'BOSS — Full Inventory Display', xp:70, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Build an inventory array (push a 3rd item onto it), write a function that LOOPS over it to display each item as an &lt;li&gt;, AND show the total count (e.g. "3 items") separately.`,
+      hints:[
+        'This combines Week 1\'s array+push, Week 2\'s function, and this week\'s loop — building &lt;li&gt;s from a real array, inside a function, with a count shown too.',
+        'inventory.length gives you the count directly — no need to loop just to count.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n<ul id="choices"></ul>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `let inventory = ["sword", "shield"];\n// TODO: push a 3rd item onto inventory\n\n// TODO: function renderInventory(items) — loops, building one <li> per item into #choices\n\n// TODO: call it, and show the item COUNT in #story (e.g. "3 items")\n`,
+      },
+      needsLoop:true, needsFunction:true, needsArray:true, needsPush:true,
+      check:(log) => log.hasLoop && log.hasFunction && log.hasArray && log.hasPush && log.listItems >= 3 && /\d/.test(log.bodyText),
     },
   ]},
   { id:'m1', name:'🔤 M1 — From Blocks to Text', sub:'print, input, variables, types — the G7 skills, now in real Python', live:true, stages:[
@@ -2401,6 +2465,21 @@ const CHALLENGE_LESSON = {
   ws3boss: { title: 'BOSS — real persistent story state', html: `
     <div class="cl-block"><h4>Every idea from this week, working together</h4>
       <p>Saving structured data (arrays/objects via JSON), loading it back, and checking whether it existed first — this is genuinely the same shape as how real websites remember your shopping cart, your game progress, or your preferences between visits.</p></div>` },
+  // ── Web Story 4 — One Loop, Many Choices: loops generating UI ───────────────
+  ws4s1: { title: 'A loop builds elements — it doesn\'t just repeat text', html: `
+    <div class="cl-block"><h4>Real elements, not copy-pasted HTML</h4>
+      <p>Each pass through the loop creates a genuinely NEW &lt;li&gt; element and adds it to the page — the number of choices in the array directly decides how many list items appear, with zero hardcoded &lt;li&gt; tags in the HTML itself.</p></div>
+    <div class="cl-block"><h4>Scales to any size array</h4>
+      <p>This exact same loop works whether choices has 3 items or 30 — copy-pasting HTML by hand could never do that.</p></div>` },
+  ws4s2: { title: 'The loop counter is real, usable data', html: `
+    <div class="cl-block"><h4>i isn\'t just internal bookkeeping</h4>
+      <p>The loop\'s own counter (i) can be used directly in what you build — numbering items, styling every other row differently, anything that depends on POSITION rather than just content.</p></div>` },
+  ws4s3: { title: 'A loop wrapped in a function becomes reusable', html: `
+    <div class="cl-block"><h4>Not tied to one specific array</h4>
+      <p>renderList(items) doesn\'t care what\'s inside items — call it with a shopping list, a list of enemies, a list of chapter titles, and the exact same loop logic handles all of them.</p></div>` },
+  ws4boss: { title: 'BOSS — array, function, and loop, together', html: `
+    <div class="cl-block"><h4>Four weeks, one real pattern</h4>
+      <p>An array holding real data (Week 1), a function organizing the logic (Week 2), and a loop turning that data into visible page elements (this week) is genuinely the core pattern behind almost every real list, menu, or gallery on the web.</p></div>` },
   // ── M1 — From Blocks to Text ────────────────────────────────────────────────
   m1s1: { title: 'print() — your first real line of code', html: `
     <div class="cl-block"><h4>The classic first line, in any language</h4>
