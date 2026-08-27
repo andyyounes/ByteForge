@@ -498,32 +498,46 @@
 
   function buildSimPath() {
     const path = [];
-    const visited = new Set();
-    function walk(id) {
-      if (!id || visited.has(id) || visited.size > 50) return;
-      visited.add(id);
-      path.push(id);
+    // Visit COUNTS, not a visited Set. The old code bailed out the moment a
+    // node repeated, so a loop's back-edge ended the walk immediately: the body
+    // ran exactly once and "End" was never reached — the Loop template could
+    // not be simulated as a loop at all. Counting instead lets the body repeat
+    // a few times and then exit properly.
+    const visits = new Map();
+    const LOOP_ITERS = 3;   // how many times a loop body is demonstrated
+    const MAX_STEPS  = 60;
+    function walk(id, branch) {
+      if (!id || path.length >= MAX_STEPS) return;
+      const seen = visits.get(id) || 0;
+      if (seen >= LOOP_ITERS) return;
+      visits.set(id, seen + 1);
+      path.push({ id, branch });
       const n = nodes.find(x => x.id === id);
       if (!n) return;
       const outs = edges.filter(e => e.from === id);
       if (n.type === 'decision') {
-        // Simulate: always take "Yes" branch for demo
-        const yes = outs.find(e => e.label==='Yes') || outs[0];
-        if (yes) walk(yes.to);
+        const yes = outs.find(e => e.label === 'Yes') || outs[0];
+        const no  = outs.find(e => e.label === 'No')  || outs[1];
+        // Take Yes while the loop still has iterations left, then leave via No.
+        // Previously this ALWAYS took Yes, so the No branch of every template
+        // was unreachable and a loop could never terminate.
+        const takeYes = (seen + 1 < LOOP_ITERS) || !no;
+        const edge = takeYes ? yes : no;
+        if (edge) walk(edge.to, takeYes ? 'Yes' : 'No');
       } else {
-        if (outs[0]) walk(outs[0].to);
+        if (outs[0]) walk(outs[0].to, '');
       }
     }
     const start = nodes.find(n => n.type === 'start');
-    if (start) walk(start.id);
+    if (start) walk(start.id, '');
     return path;
   }
 
   const SIM_MSGS = {
-    start: n => `â–¶ Program starts â€” "${n.label}"`,
+    start: n => /^(end|stop|finish|done)/i.test(n.label||'') ? `Program ends — "${n.label}"` : `â–¶ Program starts â€” "${n.label}"`,
     process: n => `âš™ï¸ Executing: ${n.label}`,
     io: n => n.label.toLowerCase().includes('input') ? `ðŸ“¥ Waiting for input: ${n.label}` : `ðŸ“¤ Output: ${n.label}`,
-    decision: n => `â“ Checking condition: ${n.label} â†’ taking YES branch`,
+    decision: (n, branch) => `â“ Checking condition: ${n.label} â†’ taking ${branch === 'No' ? 'NO' : 'YES'} branch`,
   };
 
   function startSim() {
@@ -547,7 +561,10 @@
       return;
     }
 
-    const id = simQueue[simIndex++];
+    // buildSimPath now yields {id, branch} so the decision message can report
+    // the branch actually taken instead of always claiming YES.
+    const step = simQueue[simIndex++];
+    const id = step.id, branch = step.branch;
     const n  = nodes.find(x => x.id === id);
     if (!n) { simStep(); return; }
 
@@ -558,7 +575,7 @@
       const shape = g.querySelector('ellipse,rect,polygon');
       if (shape) shape.setAttribute('stroke', '#f97316');
     }
-    document.getElementById('sim-msg').textContent = (SIM_MSGS[n.type] || (nn => nn.label))(n);
+    document.getElementById('sim-msg').textContent = (SIM_MSGS[n.type] || (nn => nn.label))(n, branch);
     if (simIndex >= simQueue.length) document.getElementById('sim-msg').textContent += '  âœ… Done!';
   }
 

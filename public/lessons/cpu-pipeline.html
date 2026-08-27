@@ -222,7 +222,7 @@ const STAGES = [
     color: '#38bdf8',
     title: 'Stage 1 — Fetch',
     text: 'The Control Unit reads the next instruction from RAM. It uses the Program Counter (PC) register to know which address to fetch from. After fetching, the PC is automatically incremented to point to the next instruction.',
-    code: 'MAR ← [PC]          // Load address from Program Counter\nMDR ← [MAR]         // Read instruction from that address\nCIR ← [MDR]         // Copy into Current Instruction Register\nPC  ← PC + 1        // Advance Program Counter',
+    code: 'MAR ← [PC]          // Load address from Program Counter\nMDR ← [[MAR]]       // Fetch from the memory address held in MAR\nCIR ← [MDR]         // Copy into Current Instruction Register\nPC  ← [PC] + 1      // Advance Program Counter',
   },
   {
     name: 'Decode',
@@ -252,7 +252,7 @@ const INSTRUCTIONS = [
   { addr:'0x01', op:'LOAD R2, 18',  comment:'// Load value 18 into R2'  },
   { addr:'0x02', op:'ADD  R3, R1, R2', comment:'// R3 = R1 + R2 = 60'  },
   { addr:'0x03', op:'CMP  R3, 50',  comment:'// Compare R3 with 50'    },
-  { addr:'0x04', op:'JGT  0x07',    comment:'// Jump if R3 > 50'       },
+  { addr:'0x04', op:'JGT  0x06',    comment:'// Jump if R3 > 50'       },
   { addr:'0x05', op:'STORE 0xFF, R3',comment:'// Save R3 to memory'    },
   { addr:'0x06', op:'HALT',         comment:'// Stop execution'        },
 ]

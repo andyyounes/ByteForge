@@ -125,6 +125,54 @@ const t = (ok, label) => {
   t(!loopRe.test('forward(100)'),                   'blockly-turtle: loop gate does not match forward()')
 }
 
+// ── flowchart.html: the simulator must actually simulate ─────────────────────
+// buildSimPath used a `visited` Set and bailed the moment a node repeated, so a
+// loop's back-edge ended the walk immediately: the body ran ONCE and "End" was
+// never reached — the While-loop template could not be simulated as a loop at
+// all. Decisions also always took the Yes branch, making every No branch
+// unreachable. Run the real (patched) logic over the shipped templates.
+{
+  const src = readFileSync(`${ROOT}/public/lessons/flowchart.html`, 'latin1')
+  const s = src.indexOf('const path = [];')
+  const e = src.indexOf('return path;', s) + 'return path;'.length
+  const buildSimPath = (nodes, edges) => new Function('nodes', 'edges', src.slice(s, e))(nodes, edges)
+
+  let id = 1
+  const mk = (type, label) => ({ id: id++, type, label })
+
+  // While-loop template
+  const ln = [mk('start','Start'), mk('process','count = 0'), mk('decision','count < 5?'),
+              mk('process','Do something'), mk('process','count = count + 1'), mk('start','End')]
+  const [S, INIT, DEC, BODY, INC, END] = ln
+  const le = [
+    { from:S.id, to:INIT.id, label:'' }, { from:INIT.id, to:DEC.id, label:'' },
+    { from:DEC.id, to:BODY.id, label:'Yes' }, { from:BODY.id, to:INC.id, label:'' },
+    { from:INC.id, to:DEC.id, label:'' },          // back-edge
+    { from:DEC.id, to:END.id, label:'No' },
+  ]
+  const lp = buildSimPath(ln, le)
+  t(lp.some(x => x.id === END.id),            'flowchart: the loop template reaches End')
+  t(lp.filter(x => x.id === BODY.id).length >= 2, 'flowchart: the loop body actually repeats')
+  t(lp.some(x => x.branch === 'No'),          'flowchart: the No branch is reachable (loop can exit)')
+  t(lp.length <= 60,                          'flowchart: the walk is bounded (no runaway loop)')
+
+  // If/Else template — must still terminate at End
+  id = 1
+  const fn = [mk('start','Start'), mk('process','Init'), mk('decision','Condition true?'),
+              mk('process','True branch'), mk('process','False branch'), mk('start','End')]
+  const [S2, P2, D2, T2, F2, E2] = fn
+  const fe = [
+    { from:S2.id, to:P2.id, label:'' }, { from:P2.id, to:D2.id, label:'' },
+    { from:D2.id, to:T2.id, label:'Yes' }, { from:D2.id, to:F2.id, label:'No' },
+    { from:T2.id, to:E2.id, label:'' }, { from:F2.id, to:E2.id, label:'' },
+  ]
+  const fp = buildSimPath(fn, fe)
+  t(fp.some(x => x.id === E2.id), 'flowchart: the if/else template reaches End')
+
+  // The decision message must report the branch actually taken.
+  t(/decision:\s*\(n,\s*branch\)/.test(src), 'flowchart: the decision message reports the real branch, not always YES')
+}
+
 // ── No stray control bytes anywhere in shipped source ────────────────────────
 {
   const BS = String.fromCharCode(8)
