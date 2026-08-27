@@ -6317,6 +6317,227 @@ const P2_LESSON_CONTENT = [
       <code>&nbsp;&nbsp;ENDIF</code><br>
       <code>ENDPROCEDURE</code></p>
     </div>` },
+  { title: 'Euclid’s Algorithm (GCD)', content: `
+    <div class="p2-lesson-block"><h3>Greatest Common Divisor</h3>
+      <p>Euclid's algorithm finds the GCD of two integers using the identity <code>GCD(a, b) = GCD(b, a MOD b)</code>, until the remainder is 0 — the other value is the GCD.</p>
+      <p><code>FUNCTION GCD(a : INTEGER, b : INTEGER) RETURNS INTEGER</code><br>
+      <code>&nbsp;&nbsp;IF b = 0 THEN RETURN a</code><br>
+      <code>&nbsp;&nbsp;ELSE RETURN GCD(b, a MOD b)</code><br>
+      <code>ENDFUNCTION</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Trace Example</h3>
+      <p>GCD(48, 18) → GCD(18, 12) → GCD(12, 6) → GCD(6, 0) → returns 6.</p>
+    </div>` },
+  { title: 'Recursive Binary Search', content: `
+    <div class="p2-lesson-block"><h3>Binary Search, Recursively</h3>
+      <p>Binary search halves the search space each call by comparing the target to the middle element of a <strong>sorted</strong> array.</p>
+      <p><code>FUNCTION BinarySearch(arr : ARRAY, low : INTEGER, high : INTEGER, target : INTEGER) RETURNS INTEGER</code><br>
+      <code>&nbsp;&nbsp;IF low > high THEN RETURN -1</code><br>
+      <code>&nbsp;&nbsp;mid ← (low + high) DIV 2</code><br>
+      <code>&nbsp;&nbsp;IF arr[mid] = target THEN RETURN mid</code><br>
+      <code>&nbsp;&nbsp;ELSE IF arr[mid] < target THEN RETURN BinarySearch(arr, mid+1, high, target)</code><br>
+      <code>&nbsp;&nbsp;ELSE RETURN BinarySearch(arr, low, mid-1, target)</code><br>
+      <code>ENDFUNCTION</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Complexity</h3>
+      <p>O(log n) — each call eliminates half the remaining elements. Requires the array to already be sorted.</p>
+    </div>` },
+  { title: 'Tower of Hanoi', content: `
+    <div class="p2-lesson-block"><h3>The Classic Recursive Puzzle</h3>
+      <p>Move n disks from a source peg to a destination peg, using a spare peg, never placing a larger disk on a smaller one.</p>
+      <p><code>PROCEDURE Hanoi(n : INTEGER, from : STRING, to : STRING, via : STRING)</code><br>
+      <code>&nbsp;&nbsp;IF n = 1 THEN OUTPUT "Move disk 1 from " &amp; from &amp; " to " &amp; to</code><br>
+      <code>&nbsp;&nbsp;ELSE</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;CALL Hanoi(n-1, from, via, to)</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;OUTPUT "Move disk " &amp; n &amp; " from " &amp; from &amp; " to " &amp; to</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;CALL Hanoi(n-1, via, to, from)</code><br>
+      <code>&nbsp;&nbsp;ENDIF</code><br>
+      <code>ENDPROCEDURE</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Complexity</h3>
+      <p>Requires 2ⁿ − 1 moves — a classic example of exponential time complexity from a simple recursive definition.</p>
+    </div>` },
+  { title: 'Memoised Fibonacci', content: `
+    <div class="p2-lesson-block"><h3>Memoisation</h3>
+      <p>Naive recursive Fibonacci recomputes the same sub-problems repeatedly. <strong>Memoisation</strong> caches results the first time they're computed, so later calls just look them up.</p>
+      <p><code>DECLARE memo : ARRAY[0:50] OF INTEGER</code><br>
+      <code>FUNCTION FibMemo(n : INTEGER) RETURNS INTEGER</code><br>
+      <code>&nbsp;&nbsp;IF n <= 1 THEN RETURN n</code><br>
+      <code>&nbsp;&nbsp;IF memo[n] <> 0 THEN RETURN memo[n]</code><br>
+      <code>&nbsp;&nbsp;memo[n] ← FibMemo(n-1) + FibMemo(n-2)</code><br>
+      <code>&nbsp;&nbsp;RETURN memo[n]</code><br>
+      <code>ENDFUNCTION</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Why It Matters</h3>
+      <p>Memoisation turns Fibonacci from O(2ⁿ) into O(n) — a common exam question is to explain why the naive version is slow and how memoisation fixes it.</p>
+    </div>` },
+  { title: 'Insertion Sort', content: `
+    <div class="p2-lesson-block"><h3>How Insertion Sort Works</h3>
+      <p>Builds a sorted section one element at a time: take the next element and shift it left past every larger element already in the sorted section.</p>
+      <p><code>FOR i ← 2 TO n</code><br>
+      <code>&nbsp;&nbsp;key ← arr[i]</code><br>
+      <code>&nbsp;&nbsp;j ← i - 1</code><br>
+      <code>&nbsp;&nbsp;WHILE j > 0 AND arr[j] > key DO</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;arr[j+1] ← arr[j]</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;j ← j - 1</code><br>
+      <code>&nbsp;&nbsp;ENDWHILE</code><br>
+      <code>&nbsp;&nbsp;arr[j+1] ← key</code><br>
+      <code>NEXT i</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Complexity</h3>
+      <p>Worst/average case O(n²); best case (already sorted) O(n). Efficient for small or nearly-sorted arrays.</p>
+    </div>` },
+  { title: 'Optimised Bubble Sort', content: `
+    <div class="p2-lesson-block"><h3>Bubble Sort with Early Exit</h3>
+      <p>Standard bubble sort keeps making full passes even once the array is sorted. The optimisation: track whether any swap happened in a pass — if not, stop early.</p>
+      <p><code>REPEAT</code><br>
+      <code>&nbsp;&nbsp;swapped ← FALSE</code><br>
+      <code>&nbsp;&nbsp;FOR j ← 1 TO n-1</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;IF arr[j] > arr[j+1] THEN</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;swap arr[j], arr[j+1]; swapped ← TRUE</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;ENDIF</code><br>
+      <code>&nbsp;&nbsp;NEXT j</code><br>
+      <code>UNTIL NOT swapped</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Why It's Better</h3>
+      <p>Worst case is still O(n²), but on an already-sorted or near-sorted array it terminates in O(n) — one pass with no swaps.</p>
+    </div>` },
+  { title: 'Merge Sorted Arrays', content: `
+    <div class="p2-lesson-block"><h3>Merging Two Sorted Arrays</h3>
+      <p>Given two already-sorted arrays, merge them into one sorted array by repeatedly comparing the front of each and taking the smaller.</p>
+      <p><code>i ← 1; j ← 1; k ← 1</code><br>
+      <code>WHILE i <= lenA AND j <= lenB DO</code><br>
+      <code>&nbsp;&nbsp;IF a[i] <= b[j] THEN merged[k] ← a[i]; i ← i + 1</code><br>
+      <code>&nbsp;&nbsp;ELSE merged[k] ← b[j]; j ← j + 1</code><br>
+      <code>&nbsp;&nbsp;ENDIF</code><br>
+      <code>&nbsp;&nbsp;k ← k + 1</code><br>
+      <code>ENDWHILE</code><br>
+      <code>// then copy any remaining elements from whichever array wasn't exhausted</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Why It Matters</h3>
+      <p>This merge step is the core of merge sort — merging is O(n), which is why merge sort overall is O(n log n).</p>
+    </div>` },
+  { title: 'Linked List — Insert', content: `
+    <div class="p2-lesson-block"><h3>Singly Linked List</h3>
+      <p>Each node stores a value and a pointer to the next node. Insertion means creating a new node and re-linking pointers — no shifting of other elements, unlike an array.</p>
+      <p><code>PROCEDURE InsertAfter(target : NodePtr, val : INTEGER)</code><br>
+      <code>&nbsp;&nbsp;DECLARE newNode : NodePtr</code><br>
+      <code>&nbsp;&nbsp;newNode ← NEW Node</code><br>
+      <code>&nbsp;&nbsp;newNode.value ← val</code><br>
+      <code>&nbsp;&nbsp;newNode.next ← target.next</code><br>
+      <code>&nbsp;&nbsp;target.next ← newNode</code><br>
+      <code>ENDPROCEDURE</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Why Linked Lists</h3>
+      <p>Insertion is O(1) once you have a pointer to the target node (no shifting), versus O(n) for inserting into the middle of an array.</p>
+    </div>` },
+  { title: 'Linked List — Delete', content: `
+    <div class="p2-lesson-block"><h3>Deleting a Node</h3>
+      <p>To delete a node, re-point the previous node's <code>next</code> pointer past it — the deleted node becomes unreachable (and is garbage-collected/freed).</p>
+      <p><code>PROCEDURE DeleteAfter(target : NodePtr)</code><br>
+      <code>&nbsp;&nbsp;IF target.next <> NULL THEN</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;target.next ← target.next.next</code><br>
+      <code>&nbsp;&nbsp;ENDIF</code><br>
+      <code>ENDPROCEDURE</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Edge Cases</h3>
+      <p>Deleting the head node needs special handling (there's no "previous" node to re-point) — always check for the empty-list and head-deletion cases.</p>
+    </div>` },
+  { title: 'Binary Search Tree — In-Order Traversal', content: `
+    <div class="p2-lesson-block"><h3>Binary Search Trees</h3>
+      <p>In a BST, every left subtree holds smaller values and every right subtree holds larger values than the node itself.</p>
+    </div>
+    <div class="p2-lesson-block"><h3>In-Order Traversal</h3>
+      <p>Visiting Left → Node → Right on a BST outputs every value in <strong>ascending sorted order</strong>.</p>
+      <p><code>PROCEDURE InOrder(node : NodePtr)</code><br>
+      <code>&nbsp;&nbsp;IF node <> NULL THEN</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;CALL InOrder(node.left)</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;OUTPUT node.value</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;CALL InOrder(node.right)</code><br>
+      <code>&nbsp;&nbsp;ENDIF</code><br>
+      <code>ENDPROCEDURE</code></p>
+    </div>` },
+  { title: 'Circular Queue', content: `
+    <div class="p2-lesson-block"><h3>Why "Circular"?</h3>
+      <p>A normal array-based queue wastes space at the front once items are dequeued. A <strong>circular queue</strong> wraps the front/rear pointers back to index 0 using MOD, reusing that freed space.</p>
+      <p><code>PROCEDURE Enqueue(val : INTEGER)</code><br>
+      <code>&nbsp;&nbsp;IF (rear + 1) MOD MAX_SIZE = front THEN OUTPUT "Queue full"</code><br>
+      <code>&nbsp;&nbsp;ELSE</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;rear ← (rear + 1) MOD MAX_SIZE</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;queue[rear] ← val</code><br>
+      <code>&nbsp;&nbsp;ENDIF</code><br>
+      <code>ENDPROCEDURE</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>FIFO</h3>
+      <p>Queues are First-In First-Out — the opposite ordering to a stack's LIFO.</p>
+    </div>` },
+  { title: 'RPN (Reverse Polish Notation) Evaluator', content: `
+    <div class="p2-lesson-block"><h3>What Is RPN?</h3>
+      <p>Reverse Polish Notation writes operators <em>after</em> their operands (e.g. <code>3 4 +</code> instead of <code>3 + 4</code>) — no brackets or precedence rules are ever needed.</p>
+    </div>
+    <div class="p2-lesson-block"><h3>Evaluating with a Stack</h3>
+      <p>Scan tokens left to right. Push numbers. On an operator, POP two values, apply the operator, PUSH the result back.</p>
+      <p><code>FOR EACH token IN expression</code><br>
+      <code>&nbsp;&nbsp;IF token IS a number THEN PUSH(token)</code><br>
+      <code>&nbsp;&nbsp;ELSE</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;b ← POP(); a ← POP()</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;PUSH(Apply(token, a, b))</code><br>
+      <code>&nbsp;&nbsp;ENDIF</code><br>
+      <code>NEXT</code><br>
+      <code>// the final value left on the stack is the result</code></p>
+    </div>` },
+  { title: 'Hashing — Linear Probing', content: `
+    <div class="p2-lesson-block"><h3>Hash Tables</h3>
+      <p>A hash function maps a key to an array index (the "bucket"). <strong>Collisions</strong> happen when two different keys hash to the same index.</p>
+    </div>
+    <div class="p2-lesson-block"><h3>Linear Probing</h3>
+      <p>On a collision, linear probing searches forward one slot at a time (wrapping with MOD) until it finds an empty slot.</p>
+      <p><code>PROCEDURE Insert(key : INTEGER, val : INTEGER)</code><br>
+      <code>&nbsp;&nbsp;index ← key MOD TABLE_SIZE</code><br>
+      <code>&nbsp;&nbsp;WHILE table[index] <> EMPTY DO</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;index ← (index + 1) MOD TABLE_SIZE</code><br>
+      <code>&nbsp;&nbsp;ENDWHILE</code><br>
+      <code>&nbsp;&nbsp;table[index] ← val</code><br>
+      <code>ENDPROCEDURE</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Trade-off</h3>
+      <p>Simple to implement, but clusters of filled slots ("clustering") can degrade lookup from O(1) toward O(n) as the table fills up.</p>
+    </div>` },
+  { title: 'Recursive Palindrome Check', content: `
+    <div class="p2-lesson-block"><h3>Palindromes, Recursively</h3>
+      <p>A string is a palindrome if its first and last characters match <em>and</em> the substring between them is also a palindrome.</p>
+      <p><code>FUNCTION IsPalindrome(s : STRING) RETURNS BOOLEAN</code><br>
+      <code>&nbsp;&nbsp;IF LENGTH(s) <= 1 THEN RETURN TRUE</code><br>
+      <code>&nbsp;&nbsp;IF LEFT(s,1) <> RIGHT(s,1) THEN RETURN FALSE</code><br>
+      <code>&nbsp;&nbsp;RETURN IsPalindrome(MID(s, 2, LENGTH(s)-2))</code><br>
+      <code>ENDFUNCTION</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Base Cases</h3>
+      <p>A string of length 0 or 1 is always a palindrome — that's what stops the recursion.</p>
+    </div>` },
+  { title: 'Caesar Cipher', content: `
+    <div class="p2-lesson-block"><h3>Simple Substitution Encryption</h3>
+      <p>A Caesar cipher shifts every letter by a fixed number of positions in the alphabet, wrapping Z back to A.</p>
+      <p><code>FUNCTION Encrypt(ch : CHAR, shift : INTEGER) RETURNS CHAR</code><br>
+      <code>&nbsp;&nbsp;code ← ASC(ch) - ASC('A')</code><br>
+      <code>&nbsp;&nbsp;shifted ← (code + shift) MOD 26</code><br>
+      <code>&nbsp;&nbsp;RETURN CHR(shifted + ASC('A'))</code><br>
+      <code>ENDFUNCTION</code></p>
+    </div>
+    <div class="p2-lesson-block"><h3>Why MOD 26?</h3>
+      <p>MOD wraps the shifted value back into the 0-25 range so, e.g., shifting 'Z' by 1 wraps around to 'A' rather than going out of range.</p>
+    </div>` },
+  { title: 'BYVAL vs BYREF — Bank Account', content: `
+    <div class="p2-lesson-block"><h3>Passing Parameters</h3>
+      <p><strong>BYVAL</strong> passes a copy — changes inside the procedure do not affect the caller's variable. <strong>BYREF</strong> passes a reference to the original variable — changes inside the procedure <em>do</em> affect the caller's variable.</p>
+    </div>
+    <div class="p2-lesson-block"><h3>Why It Matters Here</h3>
+      <p>A bank account's balance must be updated by a Withdraw/Deposit procedure, so the balance parameter must be passed <strong>BYREF</strong> — passing it BYVAL would silently discard the update once the procedure returns.</p>
+      <p><code>PROCEDURE Withdraw(BYREF balance : REAL, amount : REAL)</code><br>
+      <code>&nbsp;&nbsp;IF amount <= balance THEN balance ← balance - amount</code><br>
+      <code>&nbsp;&nbsp;ELSE OUTPUT "Insufficient funds"</code><br>
+      <code>ENDPROCEDURE</code></p>
+    </div>` },
 ]
 
 function renderP2Lesson(idx) {
