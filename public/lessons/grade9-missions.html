@@ -2035,9 +2035,11 @@ function logAppend(msg, cls) {
 // ══════════════════════════════════════════════════════════════════════════════
 // Mission lifecycle
 // ══════════════════════════════════════════════════════════════════════════════
+let missionStartedAt = Date.now()
 function openMission(id) {
   activeMission = MISSIONS.find(m => m.id === id)
   if (!activeMission) return
+  missionStartedAt = Date.now()
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
   document.getElementById('m-phase').textContent = activeMission.phase
   document.getElementById('m-par').textContent = parLabel(activeMission)
@@ -2307,6 +2309,27 @@ async function runDataMission(isSubmit) {
   btn.disabled = false
 }
 
+// ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
+// grade9-missions.html never reported to /api/progress at all — completion
+// lived only in getProg()/localStorage + a best-effort LessonSaves mirror, so
+// the dashboard's AdaptiveSuggestions/LearningPath panels (which read
+// concept_mastery) showed nothing for Grade 9 students regardless of how many
+// missions they'd actually finished. Phase-level mapping (not mission-by-
+// mission — 31 missions vs. lib/concepts.ts's 30 week-level g9-* concepts
+// don't line up 1:1) onto the closest matching concept for each phase.
+const G9M_PHASE_CONCEPT = { p1: 'pseudocode-intro', p2: 'g9-procedures', p3: 'g9-python-files' }
+async function reportRealProgress(mission, timeSpentMs) {
+  const prefix = (mission.id.match(/^(p\d)/) || [])[1]
+  const conceptId = prefix && G9M_PHASE_CONCEPT[prefix]
+  if (!conceptId) return
+  try {
+    await fetch('/api/progress', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ concept_id: conceptId, correct: true, time_spent_ms: timeSpentMs || 0 }),
+    })
+  } catch (e) {}
+}
+
 function completeMission(stats) {
   const st = starsFor(activeMission, stats)
   const p = getProg()
@@ -2320,9 +2343,14 @@ function completeMission(stats) {
     lang: lang,
   }
   saveProg(p)
-  const idx = MISSIONS.indexOf(activeMission)
-  try { LessonSaves.save('grade9-missions', idx, { passed: true, xpEarned: xp, code: editor.getValue() }) } catch (e) {}
+  // id-keyed (mission's own stable id, not array position) — same fix applied
+  // to every other grade's LessonSaves calls this session; this mirror row
+  // isn't read back anywhere yet (completion state is getProg()/localStorage,
+  // like grade6.html), but keeps it consistent and future-proof as missions
+  // are added toward the ~45-50 target.
+  try { LessonSaves.save('grade9-missions', activeMission.id, { passed: true, xpEarned: xp, code: editor.getValue() }) } catch (e) {}
   try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+  try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
 
   const metric = activeMission.stars.metric || 'cmds'
   document.getElementById('win-stars').innerHTML =

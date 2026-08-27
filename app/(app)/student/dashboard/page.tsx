@@ -21,7 +21,14 @@ const GRADE_LESSONS: Record<number, { url: string; title: string; subtitle: stri
   6:  { url: '/lessons/grade6.html',         title: 'The Creator Quest',          subtitle: 'Walk the adventure map — robots, art, music, games & AI',        badge: 'Grade 6'  },
   7:  { url: '/lessons/grade7.html',         title: 'Block + Code Editor',        subtitle: 'Build animations and games with Blockly and JavaScript',         badge: 'Grade 7'  },
   8:  { url: '/lessons/grade8.html',         title: 'Python Editor',              subtitle: 'Write real Python 3 code with a live drawing canvas',           badge: 'Grade 8'  },
-  9:  { url: '/lessons/grade9.html',         title: 'Pseudocode & Algorithms',    subtitle: 'Master structured programming with pseudocode and trace tables', badge: 'Grade 9'  },
+  // Was '/lessons/grade9.html' — an early 13-challenge prototype (W6-W12
+  // only). The real, fully-built curriculum is grade9-missions.html: 31
+  // missions across 3 phases (Turtle -> Agent Battles -> Data/SQL), tested
+  // via scripts/test-g9-missions.mjs, matching the documented 30-week "Deep
+  // Diver" spec far more closely. It was built and finished in July but the
+  // dashboard link was never updated to point at it — students had no way to
+  // reach it. grade9.html is left in place (unlinked) rather than deleted.
+  9:  { url: '/lessons/grade9-missions.html', title: 'Mission IDE',               subtitle: 'Turtle piloting, agent battles, and real data missions',        badge: 'Grade 9'  },
   10: { url: '/lessons/igcse-y1.html',       title: 'IGCSE Year 1 — Theory',      subtitle: 'Data representation, hardware, networking & security',          badge: 'IGCSE Y1' },
   11: { url: '/lessons/igcse-y2.html',       title: 'IGCSE Year 2 — Programming', subtitle: 'Pseudocode, algorithms, data structures & trace tables',        badge: 'IGCSE Y2' },
   12: { url: '/lessons/as-level.html',       title: 'AS Level',                   subtitle: 'Paper 1 theory + Paper 2 programming — Cambridge 9618',        badge: 'AS Level' },
