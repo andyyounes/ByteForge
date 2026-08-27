@@ -94,6 +94,17 @@
     .canvas-wrap { flex-shrink:0; background:#030510; border-bottom:1px solid var(--border);
                    display:flex; align-items:center; justify-content:center; height:260px; position:relative; }
     #output-canvas { display:block; }
+    /* Page-building preview — used by the "page" stage type (Story Studio
+       world), a DOM preview standing in for a real browser page instead of
+       the canvas the Game Maker world draws to. */
+    #output-page { display:none; width:480px; height:260px; overflow-y:auto; background:#fff; color:#111;
+                   border-radius:6px; padding:14px 16px; font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
+    #output-page h1 { font-size:20px; margin:0 0 8px; color:#111; }
+    #output-page p  { font-size:13px; margin:0 0 8px; color:#333; line-height:1.4; }
+    #output-page a  { color:#6366f1; font-size:13px; }
+    #output-page button { font-size:12px; padding:6px 12px; border-radius:6px; border:1px solid #6366f1;
+                   background:#6366f1; color:#fff; cursor:pointer; margin-bottom:8px; }
+    #output-page:empty::before { content:'Page output — drag Page blocks and press ▶ Run'; color:#94a3b8; font-size:12px; }
     .pass-badge { position:absolute; top:8px; left:50%; transform:translateX(-50%);
                   padding:5px 13px; border-radius:8px; font-size:12px; font-weight:700;
                   background:rgba(34,197,94,.2); border:1px solid rgba(34,197,94,.5); color:#4ade80; display:none; }
@@ -236,6 +247,7 @@
     <!-- Canvas -->
     <div class="canvas-wrap">
       <canvas id="output-canvas" width="480" height="260"></canvas>
+      <div id="output-page"></div>
       <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
     </div>
 
@@ -325,6 +337,22 @@
     </block>
     <block type="canvas_stroke_picker"></block>
     <block type="canvas_font_size"><value name="SIZE"><shadow type="math_number"><field name="NUM">20</field></shadow></value></block>
+  </category>
+  <category name="Page" colour="#16a34a">
+    <block type="page_clear"></block>
+    <block type="page_add_heading">
+      <value name="STR"><shadow type="text"><field name="TEXT">My Page</field></shadow></value>
+    </block>
+    <block type="page_add_paragraph">
+      <value name="STR"><shadow type="text"><field name="TEXT">Some text here.</field></shadow></value>
+    </block>
+    <block type="page_add_link">
+      <value name="STR"><shadow type="text"><field name="TEXT">Click me</field></shadow></value>
+      <value name="URL"><shadow type="text"><field name="TEXT">https://example.com</field></shadow></value>
+    </block>
+    <block type="page_add_button">
+      <value name="STR"><shadow type="text"><field name="TEXT">Go</field></shadow></value>
+    </block>
   </category>
   <category name="Mouse" colour="#06b6d4">
     <block type="canvas_mouse_x"></block>
@@ -565,6 +593,53 @@ Blockly.defineBlocksWithJsonArray([
     colour:'#9333ea',
     tooltip:'Returns true if the chosen key is currently held down.',
   },
+  // Page — Story Studio world (building a real web page out of tags-as-blocks)
+  {
+    type:'page_clear',
+    message0:'clear the page',
+    previousStatement:null, nextStatement:null,
+    colour:'#16a34a',
+    tooltip:'Removes everything currently on the page — start fresh.',
+  },
+  {
+    type:'page_add_heading',
+    message0:'add heading %1',
+    args0:[{type:'input_value', name:'STR'}],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#16a34a',
+    tooltip:'Adds a big <h1> heading to the page — used once per page for the title.',
+  },
+  {
+    type:'page_add_paragraph',
+    message0:'add paragraph %1',
+    args0:[{type:'input_value', name:'STR'}],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#16a34a',
+    tooltip:'Adds a <p> paragraph of body text to the page.',
+  },
+  {
+    type:'page_add_link',
+    message0:'add link %1  to %2',
+    args0:[
+      {type:'input_value', name:'STR'},
+      {type:'input_value', name:'URL'},
+    ],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#16a34a',
+    tooltip:'Adds an <a> link — clickable text that goes to another page.',
+  },
+  {
+    type:'page_add_button',
+    message0:'add button %1',
+    args0:[{type:'input_value', name:'STR'}],
+    inputsInline:true,
+    previousStatement:null, nextStatement:null,
+    colour:'#16a34a',
+    tooltip:'Adds a <button> to the page.',
+  },
 ])
 
 // ── JavaScript Code Generators ────────────────────────────────────────────────
@@ -585,6 +660,11 @@ jsGen.forBlock['canvas_font_size']   = (b,g) => `fontSize(${v(b,g,'SIZE',20)});\
 jsGen.forBlock['canvas_mouse_x']     = ()    => [`mouseX()`, jsGen.ORDER_FUNCTION_CALL]
 jsGen.forBlock['canvas_mouse_y']     = ()    => [`mouseY()`, jsGen.ORDER_FUNCTION_CALL]
 jsGen.forBlock['canvas_is_key']      = (b)   => [`isKeyDown('${b.getFieldValue('KEY')}')`, jsGen.ORDER_FUNCTION_CALL]
+jsGen.forBlock['page_clear']         = ()    => `clearPage();\n`
+jsGen.forBlock['page_add_heading']   = (b,g) => `addHeading(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Heading'"});\n`
+jsGen.forBlock['page_add_paragraph'] = (b,g) => `addParagraph(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Text'"});\n`
+jsGen.forBlock['page_add_link']      = (b,g) => `addLink(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Link'"},${g.valueToCode(b,'URL',g.ORDER_NONE)||"'#'"});\n`
+jsGen.forBlock['page_add_button']    = (b,g) => `addButton(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Button'"});\n`
 
 function v(b,g,name,def) { return g.valueToCode(b,name,g.ORDER_NONE)||def }
 
@@ -738,6 +818,19 @@ const drawingAPI = {
   print(...args){ log(args.join(' ')) },
 }
 
+// ── Page-building API — used by the "page" stage type (Story Studio world) ────
+// Renders into #output-page instead of the canvas: a stand-in for a real
+// browser page, so students practice "what does each tag actually do" before
+// Grade 8 introduces the real HTML/CSS/JS text editor.
+const pageEl = document.getElementById('output-page')
+const pageAPI = {
+  clearPage()   { pageEl.innerHTML = '' },
+  addHeading(str)   { const h = document.createElement('h1'); h.textContent = String(str); pageEl.appendChild(h) },
+  addParagraph(str) { const p = document.createElement('p');  p.textContent = String(str); pageEl.appendChild(p) },
+  addLink(str,url)  { const a = document.createElement('a');  a.textContent = String(str); a.href = String(url); a.target='_blank'; pageEl.appendChild(a); pageEl.appendChild(document.createElement('br')) },
+  addButton(str)    { const btn = document.createElement('button'); btn.textContent = String(str); pageEl.appendChild(btn) },
+}
+
 function resetDrawState() {
   _fill   = '#b8ef4a'
   _stroke = 'none'
@@ -780,7 +873,34 @@ function stopLoop() {
   document.getElementById('run-btn').style.display  = ''
 }
 
+// Runner for "page" stages (Story Studio world) — no animation loop, no
+// canvas; builds real DOM elements into #output-page and checks against
+// that, mirroring runCode()'s static (non-animated) branch above.
+function runPageCode() {
+  document.getElementById('pass-badge').style.display = 'none'
+  pageAPI.clearPage()
+  const code = editor.getValue()
+  if (!code.trim() || code.startsWith('// Start by dragging')) {
+    log('No code yet — drag some Page blocks!', 'info'); return
+  }
+  try {
+    new Function(...Object.keys(pageAPI), code)(...Object.values(pageAPI))
+  } catch (e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
+  const pageLog = {
+    headings:   pageEl.querySelectorAll('h1').length,
+    paragraphs: pageEl.querySelectorAll('p').length,
+    links:      pageEl.querySelectorAll('a').length,
+    buttons:    pageEl.querySelectorAll('button').length,
+    headingText:   [...pageEl.querySelectorAll('h1')].map(e => e.textContent),
+    paragraphText: [...pageEl.querySelectorAll('p')].map(e => e.textContent),
+  }
+  checkChallenge(pageLog)
+}
+
 function runCode() {
+  const activeCh = CHALLENGES[activeIdx]
+  if (activeCh && activeCh.type === 'page') { runPageCode(); return }
+
   stopLoop()
   resetDrawState()
   ctx.clearRect(0,0,W,H)
@@ -891,6 +1011,68 @@ function friendlyErr(msg) {
 // satisfied there — fixed alongside the
 // monitoredAPI closure-timing bug, see the G4 note in grade7-curriculum.md).
 const WORLDS = [
+  // ── Story Studio — Semester 1, Week 1: HTML structure & tags ──────────────
+  // Page-building blocks stand in for real HTML tags (heading→h1, paragraph→p,
+  // link→a, button→button) so students learn what each tag is FOR before
+  // Grade 8 introduces the real text-based HTML/CSS/JS editor.
+  { id:'st1', name:'📰 Story Studio 1 — Page Basics', sub:'Headings, paragraphs, links, buttons — the tags every page starts with', live:true, stages:[
+    { id:'st1s1', name:'Front Page', xp:20, type:'page',
+      text:`<strong>Challenge 1</strong> — Every page starts with ONE big heading — its title. Add a heading that says "My Story".`,
+      hints:[
+        'Open the Page category and drag out "add heading".',
+        'Type "My Story" into the text slot.',
+        'Press ▶ Run — you should see it appear as a big title.',
+      ],
+      needsHeadings:1,
+      check:(log) => log.headings >= 1,
+    },
+    { id:'st1s2', name:'Say More', xp:25, type:'page',
+      text:`<strong>Challenge 2</strong> — A heading alone is just a title. Add a heading AND a paragraph of body text underneath it.`,
+      hints:[
+        'Keep your heading from before, then drag out "add paragraph" below it.',
+        'Blocks run top to bottom — order controls what appears first.',
+        'Type any sentence into the paragraph text.',
+      ],
+      needsHeadings:1, needsParagraphs:1,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1,
+    },
+    { id:'st1s3', name:'Chapter One', xp:30, type:'page',
+      text:`<strong>Challenge 3</strong> — Real pages usually need MORE than one paragraph. Add one heading and THREE separate paragraphs (three separate "add paragraph" blocks, not one long one).`,
+      hints:[
+        'Drag out three separate "add paragraph" blocks, each with different text.',
+        'This is exactly how a real HTML page is built — one &lt;p&gt; tag per paragraph.',
+      ],
+      needsHeadings:1, needsParagraphs:3,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 3,
+    },
+    { id:'st1s4', name:'Read More', xp:35, type:'page',
+      text:`<strong>Challenge 4</strong> — Pages link to OTHER pages. Add a heading, a paragraph, and a link with the text "Read the next chapter".`,
+      hints:[
+        'Drag out "add link" from the Page category.',
+        'The first slot is the text people click; the second is where it goes (any URL works for practice).',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsLinks:1,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.links >= 1,
+    },
+    { id:'st1s5', name:'Call to Action', xp:35, type:'page',
+      text:`<strong>Challenge 5</strong> — Buttons invite the READER to do something. Add a heading, a paragraph, and a button that says "Start Reading".`,
+      hints:[
+        'Drag out "add button" from the Page category.',
+        'A button on its own does nothing yet — Week 3 teaches making it actually respond when clicked.',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsButtons:1,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.buttons >= 1,
+    },
+    { id:'st1boss', name:'BOSS — Ship the Front Page', xp:60, type:'page', boss:true,
+      text:`<strong>BOSS</strong> — Build your story's real front page: ONE heading (your story's title), at least TWO paragraphs (a blurb), a link ("Read the next chapter"), and a button ("Start Reading"). Every tag from this week, together.`,
+      hints:[
+        'This is everything from st1s1–st1s5 combined into one page — nothing new to learn, just assemble it.',
+        'Order matters for how it reads: heading first, then paragraphs, then link/button.',
+      ],
+      needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1,
+    },
+  ]},
   { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
     { id:'g1s1', name:'First Sprite', xp:20,
       text:`<strong>Challenge 1</strong> — Draw a single circle anywhere on the canvas. That's your first "sprite"!`,
@@ -1362,6 +1544,37 @@ const CHALLENGES = WORLDS.filter(w => w.live).flatMap(w => w.stages.map(s => ({ 
 // per-world summary this replaced). Rendered by renderChallengeLesson().
 // ══════════════════════════════════════════════════════════════════════════════
 const CHALLENGE_LESSON = {
+  // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
+  st1s1: { title: 'A heading is a page\'s title', html: `
+    <div class="cl-block"><h4>Every real page starts here</h4>
+      <p>In real HTML this block is a <code>&lt;h1&gt;</code> tag — the biggest, most important text on the page, shown once near the top. "Add heading" is standing in for that exact tag: one big title, nothing more.</p></div>
+    <div class="cl-block"><h4>Why only one heading (usually)</h4>
+      <p>A page can technically have many headings, but a single <code>&lt;h1&gt;</code> per page is the normal rule — it's the one thing that tells a reader (and a search engine) what this whole page is actually about.</p></div>` },
+  st1s2: { title: 'A paragraph is the body of the page', html: `
+    <div class="cl-block"><h4>Heading vs. paragraph</h4>
+      <p>If the heading is the title, the paragraph (<code>&lt;p&gt;</code> in real HTML) is everything you actually want to SAY. Almost every page is really just: one heading, then one or more paragraphs.</p></div>
+    <div class="cl-block"><h4>Order is the page's reading order</h4>
+      <p>Blocks run top to bottom, and so does the page — whatever you add first appears first. This is exactly how a real HTML file works too: the browser reads it top to bottom and lays it out in that order.</p></div>` },
+  st1s3: { title: 'One paragraph per idea', html: `
+    <div class="cl-block"><h4>Why not one giant paragraph?</h4>
+      <p>Real writers (and real HTML) break text into SEPARATE paragraphs — one per idea — rather than one giant block. Each "add paragraph" block is its own <code>&lt;p&gt;</code> tag, and using three of them, not one long one, is what makes a page skimmable.</p></div>
+    <div class="cl-block"><h4>Structure you can SEE</h4>
+      <p>Notice the gap that appears between each paragraph automatically — that spacing is built into what a paragraph tag means, not something you had to draw yourself.</p></div>` },
+  st1s4: { title: 'A link connects one page to another', html: `
+    <div class="cl-block"><h4>Two pieces every link needs</h4>
+      <p>A link (<code>&lt;a&gt;</code> in real HTML) always needs TWO things: the text someone clicks, and the address it goes to (its <code>href</code>). "Add link" takes exactly those two inputs for the same reason.</p></div>
+    <div class="cl-block"><h4>This is what makes the WEB a web</h4>
+      <p>Without links, every page would be an island. A link is the one tag that turns separate pages into a connected site — exactly what your interactive story needs between "chapters".</p></div>` },
+  st1s5: { title: 'A button invites an action', html: `
+    <div class="cl-block"><h4>Different from a link</h4>
+      <p>A link takes you somewhere else; a button (<code>&lt;button&gt;</code>) triggers something HERE, on the same page — like submitting a form, or (as Week 3 covers) changing the text on screen when clicked.</p></div>
+    <div class="cl-block"><h4>It does nothing yet — on purpose</h4>
+      <p>Right now your button is just a shape with a label — clicking it does nothing. That's deliberate: this week is about what a button IS; Week 3 is about making it actually respond.</p></div>` },
+  st1boss: { title: 'BOSS — every tag, one real page', html: `
+    <div class="cl-block"><h4>The shape of almost every web page</h4>
+      <p>Heading → paragraphs → link → button is not a random combination — it's close to the actual shape of a huge number of real websites: a title, some body text, a way to go elsewhere, and a call to action.</p></div>
+    <div class="cl-block"><h4>Nothing new — just assembly</h4>
+      <p>Every piece of this boss came from st1s1–st1s5. Real programming often looks exactly like this: combining small, already-understood pieces into one finished thing, rather than learning something brand new at the very end.</p></div>` },
   // ── G1 — Sprite Start: coordinates & sequence ──────────────────────────────
   g1s1: { title: 'Coordinates — every sprite has an (x, y)', html: `
     <div class="cl-block"><h4>x and y are just numbers</h4>
@@ -1707,6 +1920,12 @@ function selectChallenge(i) {
   document.getElementById('pass-badge').style.display = 'none'
   stopLoop()
   ctx.clearRect(0,0,W,H)
+  // Story Studio's "page" stages render into a DOM preview, not the canvas —
+  // swap which output element is visible to match this challenge's type.
+  const isPageStage = ch.type === 'page'
+  document.getElementById('output-canvas').style.display = isPageStage ? 'none' : 'block'
+  document.getElementById('output-page').style.display   = isPageStage ? 'block' : 'none'
+  if (isPageStage) pageAPI.clearPage()
   renderPills()
   renderChallengeLesson(ch)
   log('Challenge: ' + ch.name, 'info')
@@ -1757,6 +1976,15 @@ function checkChallenge(log) {
     // Specific feedback on what's missing — driven by each stage's own
     // needsVar/needsIf/needsFrames flags, so new worlds don't need a new branch here.
     const missing = []
+    if (ch.type === 'page') {
+      if (ch.needsHeadings   && (log.headings   || 0) < ch.needsHeadings)   missing.push(`at least ${ch.needsHeadings} heading${ch.needsHeadings>1?'s':''} (Page → add heading)`)
+      if (ch.needsParagraphs && (log.paragraphs || 0) < ch.needsParagraphs) missing.push(`at least ${ch.needsParagraphs} paragraph${ch.needsParagraphs>1?'s':''} (Page → add paragraph)`)
+      if (ch.needsLinks      && (log.links      || 0) < ch.needsLinks)      missing.push(`a link (Page → add link)`)
+      if (ch.needsButtons    && (log.buttons    || 0) < ch.needsButtons)    missing.push(`a button (Page → add button)`)
+      if (missing.length) logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
+      else logLine('❌ Not quite — your page built, but it doesn\'t meet this challenge\'s goal yet. Re-read the task above and try the 💡 Hint button.', 'err')
+      return
+    }
     if (ch.needsFrames && (!log.frames || log.frames < 5)) missing.push('"On every frame" event block')
     if (ch.needsVar && !log.hasVar) missing.push('a variable (Variables → set … to …)')
     if (ch.needsIf && !log.hasIf) missing.push('an if/else block (Control → if)')

@@ -33,9 +33,13 @@ let pass = 0, fail = 0
 // them names, or this generic satisfiability test would wrongly flag a
 // perfectly good position-aware check as unsatisfiable.
 const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, texts: 999, hasIf: true, hasVar: true, hasFunction: true,
-  positions: [[20,20],[440,20],[20,220],[440,220], [220,130], [60,130],[240,130],[420,130]] })
+  positions: [[20,20],[440,20],[20,220],[440,220], [220,130], [60,130],[240,130],[420,130]],
+  // Story Studio's "page" stages (st1*) — a DOM preview, not the canvas —
+  // check headings/paragraphs/links/buttons instead of shapes/frames.
+  headings: 999, paragraphs: 999, links: 999, buttons: 999 })
 const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   texts: 0,   hasIf: false, hasVar: false, hasFunction: false,
-  positions: [] })
+  positions: [],
+  headings: 0, paragraphs: 0, links: 0, buttons: 0 })
 
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.id}`
@@ -46,13 +50,15 @@ for (const ch of CHALLENGES) {
   if (!ch.check(emptyLog())) { pass++; console.log(`✓ ${label} — not vacuous (empty log correctly fails)`) }
   else { fail++; console.log(`✗ ${label} — VACUOUS: an empty/no-op submission passes check()`) }
 
-  const flags = ['needsVar', 'needsIf', 'needsFrames', 'needsFunction']
-  const fieldFor = { needsVar: 'hasVar', needsIf: 'hasIf', needsFrames: 'frames', needsFunction: 'hasFunction' }
+  const flags = ['needsVar', 'needsIf', 'needsFrames', 'needsFunction', 'needsHeadings', 'needsParagraphs', 'needsLinks', 'needsButtons']
+  const fieldFor = { needsVar: 'hasVar', needsIf: 'hasIf', needsFrames: 'frames', needsFunction: 'hasFunction',
+    needsHeadings: 'headings', needsParagraphs: 'paragraphs', needsLinks: 'links', needsButtons: 'buttons' }
+  const numericFields = new Set(['frames', 'headings', 'paragraphs', 'links', 'buttons'])
   for (const flag of flags) {
     if (!ch[flag]) continue
     const log = maximalLog()
     const field = fieldFor[flag]
-    log[field] = field === 'frames' ? 0 : false
+    log[field] = numericFields.has(field) ? 0 : false
     if (!ch.check(log)) { pass++; console.log(`✓ ${label} — ${flag} is genuinely enforced by check()`) }
     else { fail++; console.log(`✗ ${label} — ${flag}:true but check() still passes with ${field} off (hint promises a requirement it doesn't enforce)`) }
   }

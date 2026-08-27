@@ -1,0 +1,459 @@
+# ByteForge — Full Challenge/Exercise List (for writing lessons)
+
+Every practice item across every class, by id and title.
+
+## Grade 6 — The Creator Quest (grade6.html)
+
+- w1s1 — Sequences — one command at a time
+- w1s2 — Turning — direction matters
+- w1s3 — Planning around obstacles
+- w1s4 — Longer sequences
+- w1s5 — Collecting data along the route
+- w1s6 — Hard mode — three-point planning
+- w1s7 — Dead ends — backtracking
+- w1boss — BOSS — Everything so far, together
+- w2s1 — Repeats — your first loop
+- w2s2 — Loops on straight runs
+- w2s3 — Loops around a shape
+- w2s4 — Loops + collecting stars
+- w2s5 — Hard mode — nested shapes
+- w2s6 — A star can hide on your path
+- w2boss — BOSS — Two mazes, fewest chips wins
+- w3s1 — Colors ARE numbers
+- w3s2 — Mixing two colors together
+- w3s3 — Halfway values
+- w3s4 — Following hints to narrow down numbers
+- w3s5 — Subtle, realistic mixes
+- w3boss — BOSS — Three colors, no mistakes
+- w4s1 — Flowcharts — planning before building
+- w4s2 — Repeating flowchart shapes
+- w4s3 — Counting down the legs
+- w4s4 — Loops with stars along two legs
+- w4s5 — Four-leg planning
+- w4boss — BOSS — Loop Master, and a peek ahead
+- w5s1 — Loops draw shapes — angle = 360 ÷ sides
+- w5s2 — The formula scales to any shape
+- w5s3 — Breaking the rule on purpose
+- w5s4 — Growth — a loop that changes each time
+- w5s5 — Layers — repeating the whole pattern
+- w5boss — BOSS — Combine every turtle idea
+- w6s1 — Every picture is a grid of numbers
+- w6s2 — Binary place values, as pixels
+- w6s3 — AND logic — true only where BOTH overlap
+- w6s4 — OR logic — true if EITHER (or both)
+- w6boss — BOSS — Reveal a hidden picture
+- w7s1 — Encrypting — shifting every letter
+- w7s2 — Decrypting — shifting back
+- w7s3 — Cracking — the shift is a secret
+- w7boss — BOSS — Escape room decryption
+- w8s1 — A beat is a loop you can hear
+- w8s2 — Layering two loops together
+- w8s3 — A fast loop layered on slow ones
+- w8s4 — Tempo — how fast the loop repeats
+- w8s5 — Syncopation — hits off the obvious beat
+- w8boss — BOSS — Full studio session
+- w9s1 — A dance routine is a sequence
+- w9s2 — Longer sequences, more moves
+- w9s3 — Rests — a step that does nothing
+- w9s4 — Freestyle — using every move you know
+- w9boss — BOSS — Dance Battle finale
+- w10s1 — Every game part has a name
+- w10s2 — Win and lose conditions
+- w10s3 — Rule-based behaviour vs. real AI
+- w10s4 — Sub-routines and variables
+- w10s5 — Combining every game-design term
+- w10boss — BOSS — Ship the full design document
+- w11s1 — Training data — teaching by example
+- w11s2 — Primary keys — a column that's never repeated
+- w11s3 — Predicting with a learned rule
+- w11s4 — Fooling a machine that only knows one rule
+- w11s5 — More categories, more examples
+- w11boss — BOSS — Build your own classifier
+- w12final — The Final Quest — proof, not a new lesson
+
+## Grade 7 — The Game Maker (grade7.html)
+
+- g1s1 — Coordinates — every sprite has an (x, y)
+- g1s2 — Reading coordinates precisely
+- g1s3 — Rectangles need FOUR numbers, not two
+- g1s4 — Sequence — same Y, different X
+- g1boss — BOSS — Coordinates that update every frame
+- g2s1 — Variables — a named box that can change
+- g2s2 — One variable, many uses
+- g2s3 — A variable driving TWO different things
+- g2boss — BOSS — A variable that changes over time
+- g3s1 — IF/ELSE — choosing between paths
+- g3s2 — Comparisons — greater than, not just equal
+- g3s3 — Combining a variable, IF, and drawing
+- g3boss — BOSS — Multiple IFs, one per key
+- g4s1 — Functions — reusable named blocks
+- g4s2 — A parameter that changes behaviour, not just position
+- g4s3 — A text parameter, not just numbers
+- g4boss — BOSS — A function called from inside a loop
+- g5s1 — Keyboard input — four separate checks
+- g5s2 — Mouse position — always available, live
+- g5s3 — Two independent things, same frame loop
+- g5boss — BOSS — Two input schemes, one game
+- g6s1 — The distance formula — real Pythagoras
+- g6s2 — Gravity and bouncing — physics as a loop
+- g6s3 — Combining collision detection with movement
+- g6boss — BOSS — Linear search through an array
+- g7s1 — A state is just a variable holding text
+- g7s2 — A condition that changes the state itself
+- g7s3 — A flag that gates everything else
+- g7boss — BOSS — A real, multi-state machine
+- g8s1 — "AI" made entirely of comparisons
+- g8s2 — A direction variable that flips
+- g8s3 — Matching text — the simplest kind of "AI"
+- g8boss — BOSS — Three behaviours, one distance check
+- g9s1 — Strings — text is just data too
+- g9s2 — Comparing text to branch a conversation
+- g9s3 — String methods — transforming text
+- g9boss — BOSS — Text, arrays, and a loop, together
+- g10s1 — Planning BEFORE building
+- g10s2 — Live, updating feedback for the player
+- g10boss — FINAL BOSS — Everything from the whole year
+
+## Grade 8 — The App Builder (grade8.html)
+
+- m1s1 — print() — your first real line of code
+- m1s2 — Variables and f-strings
+- m1s3 — Every value has a TYPE
+- m1s4 — input() always returns TEXT
+- m1s5 — A real formula, not just a print statement
+- m2s1 — if/else — real syntax for a decision
+- m2s2 — for loops with range(), and elif chains
+- m2s3 — while loops — repeat until a condition is false
+- m2s4 — Chained if/elif — order decides correctness
+- m2s5 — Accumulating a running total
+- m3s1 — Functions with parameters — real def syntax
+- m3s2 — A loop that calls a function repeatedly
+- m3s3 — return — a function that hands back a value
+- m3s4 — A function with a loop INSIDE it
+- m3s5 — Returning MORE than one value
+- m4s1 — A list is an ordered collection of values
+- m4s2 — Tuples — a fixed little group of values
+- m4s3 — sorted() and slicing — built-in tools, not loops
+- m4s4 — Filtering — building a new, smaller list
+- m4s5 — The "in" keyword — checking membership
+- m5s1 — String methods and slicing
+- m5s2 — Never trust input blindly — validation
+- m5s3 — The Caesar cipher, in real code
+- m5s4 — Reversing a string with [::-1]
+- m5s5 — .split() with no arguments — splitting on whitespace
+- m6s1 — Opening and reading a real file
+- m6s2 — Built-in stats functions on real data
+- m6s3 — Binary search — a real, faster search
+- m6s4 — Linking two datasets by a shared key
+- m6s5 — Append mode ("a") vs. write mode ("w")
+- m6s6 — Read, filter, and write — the whole data pipeline
+- m7s1 — Storage units and binary, for real
+- m7s2 — Images ARE numbers — grayscale conversion
+- m7s3 — Interpreter vs. compiler
+- m7s4 — Encoding and decoding a message
+- m7s5 — Run-length encoding — real compression
+- m8s1 — Packets — messages arrive out of order
+- m8s2 — Generating real HTML with Python
+- m8s3 — Password strength — combining checks in a function
+- m8s4 — https:// vs. http:// — a real security check
+- m8s5 — Linking pages — a real multi-page website
+- m9s1 — Three kinds of bugs, three different fixes
+- m9s2 — Trace tables — debugging by watching, not guessing
+- m9s3 — app_state — a real state machine
+- m9s4 — Combining state, guards, and drawing
+- m9s5 — A list that grows as the app runs
+- m9s6 — try/except — a different error, same pattern
+- m10s1 — Every real app starts with loading data
+- m10s2 — Marking answers — comparing two lists
+- m10s3 — Writing a file, then reading it back to prove it
+- m10s4 — The whole app, in one program
+- m10s5 — A real leaderboard from accumulated data
+- m10s6 — What separates "working" from "finished"
+
+## Grade 9 — The Deep Diver / Mission IDE (grade9-missions.html)
+
+- p1m1 — Sequence — commands run one after another
+- p1m2 — Planning around an obstacle
+- p1m3 — Working within a real constraint
+- p1m4 — Loops — repeating a pattern by NAME, not by hand
+- p1m5 — A loop with a repeating multi-step pattern
+- p1m6 — The loop variable itself carries useful data
+- p1m7 — No starter — proving you own the pattern
+- p1m8 — IF — a real decision, not a shape
+- p1m9 — Three-way decisions — if/elif/else
+- p1m10 — MOD/% — using a number's position, not just its value
+- p1m11 — Capstone — everything from Phase 1, combined
+- p2m1 — A turn-based loop: read state, decide, act
+- p2m2 — Hesitation has a real cost
+- p2m3 — Functions — required from here on
+- p2m4 — Scanning data to find an extreme value
+- p2m5 — A new action, and reading the turn counter
+- p2m6 — Same pattern, no scaffolding
+- p2m7 — Prioritizing by threat, not by convenience
+- p2m8 — Ranking, not just finding one extreme
+- p2m9 — An enemy that reacts to YOUR pattern
+- p2m10 — The opposite lesson — don't hesitate
+- p2m11 — BOSS — every Phase 2 idea, at once
+- p3m1 — A new mission type — no battle, just data
+- p3m2 — Finding the maximum — and why it must be a loop
+- p3m3 — Finding the minimum this time
+- p3m4 — Counting records that meet a condition
+- p3m5 — Running total that goes down, not up
+- p3m6 — Combining data-reading with a live battle
+- p3m7 — A lookup function feeding a ranking function
+- p3m8 — Two mechanics stacked, no scaffolding
+- p3m9 — CAPSTONE — every Phase 3 (and Phase 2) idea, at once
+
+## IGCSE Year 1 — Theory Peaks (igcse-y1.html)
+
+- M1/Binary→Decimal — Binary place values, right to left
+- M1/Decimal→Hex — Hexadecimal — base 16, using A-F for 10-15
+- M1/File Size — File size = pixels × colour depth
+- M1/Binary Addition — Binary addition — carrying, just like decimal
+- M1/Sound Digitisation — Sound is analogue — sampling makes it digital
+- M2/CPU Components — ALU, CU, and registers — the CPU's core parts
+- M2/RAM vs ROM — Volatile vs. non-volatile memory
+- M2/FDE Cycle — Fetch — Decode — Execute, the CPU's heartbeat
+- M2/Device Types — Input, output, and storage — three different jobs
+- M3/LAN vs WAN — Scale — local vs. wide area networks
+- M3/Client-Server vs P2P — A central authority vs. everyone equal
+- M3/TCP/IP Layers — Four layers, each with its own job
+- M3/Protocols — Different jobs need different protocols
+- M4/Encryption — Symmetric — one key; Asymmetric — two keys
+- M4/Malware Types — Different malware, different behaviour
+- M4/Network Protection — Multiple layers of defence
+- M4/Ethics Dilemma — Security vs. privacy — a genuine trade-off
+- M5/Bubble Sort Trace — Bubble sort — swap adjacent pairs, pass after pass
+- M5/Search Complexity — O(n) vs. O(log n) — why binary search wins
+- M5/Stacks (LIFO) — LIFO — Last In, First Out
+- M5/Trace Table — Tracing a WHILE loop, step by step
+
+## IGCSE Year 2 — Code Expedition (igcse-y2.html)
+
+- M1/2D Array — 2D arrays — a grid, not just a line
+- M1/Record DECLARE — Records — grouping related data together
+- M2/BYVAL — BYVAL — the procedure gets a COPY
+- M2/BYREF — BYREF — the procedure gets the REAL variable
+- M3/Write File — OPENFILE / WRITEFILE / CLOSEFILE
+- M3/EOF Loop — Writing, then reading the SAME file back
+- M4/Stack PUSH — An array-based stack — PUSH
+- M4/Stack POP — POP — removing from the top, LIFO order
+- M5/Bubble Sort — Bubble sort — nested loops, adjacent swaps
+- M5/Binary Search — Binary search, in real pseudocode
+- M6/Class Declaration — Simulating a class with named procedures
+- M6/Inheritance — Inheritance — building on top of an existing "class"
+
+## AS Level — Paper 1/2 Theory Topics
+
+- ch2-1 — 2.1 Network Fundamentals (Chapter 2 — Communication & Networking)
+- ch2-2 — 2.2 The Internet & Protocols (Chapter 2 — Communication & Networking)
+- ch3-1 — 3.1 Input, Output & Storage (Chapter 3 — Hardware)
+- ch3-2 — 3.2 Memory (Chapter 3 — Hardware)
+- ch3-3 — 3.3 Input/Output Interfaces (Chapter 3 — Hardware)
+- ch4-1 — 4.1 Logic Gates (Chapter 4 — Logic Gates & Circuits)
+- ch4-2 — 4.2 Boolean Algebra (Chapter 4 — Logic Gates & Circuits)
+- ch4-3 — 4.3 Logic Circuits (Chapter 4 — Logic Gates & Circuits)
+- ch5-1 — 5.1 CPU Architecture (Chapter 5 — Processor Fundamentals)
+- ch5-2 — 5.2 Fetch–Decode–Execute Cycle (Chapter 5 — Processor Fundamentals)
+- ch5-3 — 5.3 Processor Performance (Chapter 5 — Processor Fundamentals)
+- ch6-1 — 6.1 Assembly Language (Chapter 6 — Assembly Language)
+- ch6-2 — 6.2 Instruction Sets (Chapter 6 — Assembly Language)
+- ch7-1 — 7.1 Sensors & Actuators (Chapter 7 — Monitoring & Control)
+- ch7-2 — 7.2 Control Systems (Chapter 7 — Monitoring & Control)
+- ch7-3 — 7.3 Interrupts & ADC (Chapter 7 — Monitoring & Control)
+- ch8-1 — 8.1 Operating Systems (Chapter 8 — System Software)
+- ch8-2 — 8.2 Language Translators (Chapter 8 — System Software)
+- ch8-3 — 8.3 Virtual Machines (Chapter 8 — System Software)
+- ch9-1 — 9.1 Security Threats (Chapter 9 — Security & Privacy)
+- ch9-2 — 9.2 Encryption & Hashing (Chapter 9 — Security & Privacy)
+- ch9-3 — 9.3 Data Integrity (Chapter 9 — Security & Privacy)
+- ch10-1 — 10.1 Computing Ethics (Chapter 10 — Ethics & Ownership)
+- ch10-2 — 10.2 Intellectual Property (Chapter 10 — Ethics & Ownership)
+- ch10-3 — 10.3 Privacy & Law (Chapter 10 — Ethics & Ownership)
+
+## AS Level — Practice Bank
+
+- p01 — Hello World [Output, Easy]
+- p02 — Sum of Two Numbers [Variables, Easy]
+- p03 — Positive or Negative [Selection, Easy]
+- p04 — Count to Ten [Iteration, Easy]
+- p05 — Multiplication Table [Iteration, Easy]
+- p06 — Simple Procedure [Procedures, Easy]
+- p07 — Square Function [Functions, Easy]
+- p08 — Array Sum [Arrays, Easy]
+- p09 — String Length Checker [Strings, Easy]
+- p10 — Even or Odd [Selection, Easy]
+- p11 — WHILE Countdown [Iteration, Easy]
+- p12 — Max of Three [Selection, Easy]
+- p12b — Denary to Binary [Binary, Easy]
+- p13b — Binary Addition [Binary, Medium]
+- p13d — Binary Overflow Checker [Binary, Medium]
+- p13 — Factorial (Iterative) [Iteration, Medium]
+- p14 — Factorial (Recursive) [Recursion, Medium]
+- p15 — Fibonacci Sequence [Iteration, Medium]
+- p16 — Prime Number Check [Functions, Medium]
+- p17 — Linear Search [Arrays, Medium]
+- p18 — Bubble Sort [Arrays, Medium]
+- p19 — Count Vowels [Strings, Medium]
+- p20 — Reverse a String [Strings, Medium]
+- p21 — BYVAL vs BYREF [Procedures, Medium]
+- p22 — 2D Array — Grid Sum [Arrays, Medium]
+- p23 — Stack Push & Pop [Data Structures, Medium]
+- p24 — Grade Calculator [Selection, Medium]
+- p25 — Input Validation Loop [Iteration, Medium]
+- p26 — Binary Search [Arrays, Medium]
+- p27 — Recursive Power [Recursion, Medium]
+- p28 — Insertion Sort [Arrays, Hard]
+- p29 — Queue (Circular) [Data Structures, Hard]
+- p30 — Linked List Traversal [Data Structures, Hard]
+- p31 — Recursive String Reverse [Recursion, Hard]
+- p32 — OOP — BankAccount Class [OOP, Hard]
+- p33 — OOP — Inheritance [OOP, Hard]
+- p34 — Tower of Hanoi [Recursion, Hard]
+- p35 — Palindrome Check [Strings, Hard]
+- p36 — Matrix Multiplication [Arrays, Hard]
+- p37 — File Write & Read [File Handling, Hard]
+- p38 — Recursive Sum of Array [Recursion, Hard]
+- p39 — Queue Using Two Stacks [Data Structures, Hard]
+- p40 — FizzBuzz Pro [Iteration, Medium]
+
+## AS Level — Pseudocode Lab (Ch 11/13/15)
+
+- p11-1 — Hello Output
+- p11-2 — Arithmetic
+- p11-3 — IF Statement
+- p11-4 — FOR Loop — Sum 1–10
+- p11-5 — WHILE — Countdown
+- p11-6 — Function — Square
+- p11-7 — Procedure — Greet
+- p11-8 — Array — Sum Elements
+- p13-1 — Stack — Push & Pop
+- p13-2 — Bubble Sort
+- p13-3 — Linear Search
+- p13-4 — Insertion Sort
+- p13-5 — Queue Simulation
+- p13-6 — Selection Sort
+- p13-7 — Binary Search
+- p13-8 — Frequency Count
+- p15-1 — Recursion — Factorial
+- p15-2 — Recursion — Fibonacci
+- p15-3 — BYVAL vs BYREF
+- p15-4 — Recursion — GCD
+- p15-5 — Recursive Array Sum
+- p15-6 — Recursion — Power
+- p15-7 — BYREF Array Parameter
+
+## AS Level — SQL Lab (db-1/db-2/db-3, 23 exercises total)
+
+### db-1
+- Q1 — Explore the database. Select all records from the Patients table to see what data we have.
+- Q2 — Select only the name, age and blood_type columns from Patients — practice choosing specific columns.
+- Q3 — Find all patients older than 50. Use a WHERE clause.
+- Q4 — Create a new table called Ward with these columns:• ward_id INTEGER PRIMARY KEY• ward_name TEXT NOT NULL• capa…
+- Q5 — Insert 3 wards into your new Ward table:• (1, 'Cardiology', 20)• (2, 'Paediatrics', 15)• (3, 'Emergency', 30)T…
+- Q6 — The Cardiology ward has been expanded to 25 beds. Update its capacity where ward_id = 1. Then SELECT that row …
+- Q7 — The Emergency ward is being closed. Delete it from the Ward table (ward_id = 3). Then SELECT all wards to conf…
+- Q8 — Now explore foreign keys. View the Appointments table — notice patient_id and doctor_id link to other tables. …
+### db-2
+- Q1 — Design your own table. Create a Ward table with columns: ward_id INTEGER PRIMARY KEY, ward_name TEXT, floor IN…
+- Q2 — Populate the Ward table with 4 rows in a single INSERT statement (multi-row INSERT):(1,'Cardiology',2,1), (2,'…
+- Q3 — List all patients ordered alphabetically by name (A → Z).
+- Q4 — JOIN Patients + Appointments + Doctors in one query to show: patient name, doctor name, and diagnosis. Use tab…
+- Q5 — Count appointments per doctor specialisation. JOIN Appointments with Doctors, GROUP BY specialisation, ORDER B…
+- Q6 — Update two records at once: all patients with blood type 'A+' should be updated to 'A' (simplified coding). Th…
+- Q7 — Delete all medications linked to appointment_id = 1 (the first appointment). Then SELECT remaining medications…
+- Q8 — Final challenge: For each doctor, show their name, specialisation, number of appointments, and average patient…
+### db-3
+- Q1 — Unnormalised form (UNF). Create a flat AppointmentFlat table that violates normalisation by storing everything…
+- Q2 — Insert 3 rows into AppointmentFlat to see the redundancy problem. Notice how patient_name and doctor_name repe…
+- Q3 — 1NF violation: med1 and med2 are repeating groups. Count how many rows have a non-NULL med2. In 1NF, each colu…
+- Q4 — 2NF: All non-key attributes must depend on the whole primary key. In our normalised Appointments table, verify…
+- Q5 — 3NF: No transitive dependencies. A doctor's specialisation depends on the doctor, not on the appointment. Show…
+- Q6 — Deletion anomaly demo: In the unnormalised table, deleting a patient's only appointment would lose their docto…
+- Q7 — Show the power of normalisation: In our properly normalised DB, pull a full report — patient name, doctor name…
+
+## A Level — Paper 1/2 Theory Topics
+
+
+## A Level — Paper 4 Challenges + Code Lab (recursion/search-sort/ADT/strings/past papers) + Practice Bank
+
+- a01 — Big-O of a Loop
+- a02 — Hash Index Calculation
+- a03 — Max-Heap Check
+- a04 — SQL SELECT
+- a05 — Functional Dependency
+- a06 — Deadlock Conditions
+- a07 — Forward Chaining
+- a08 — Binary Heap Insert
+- a09 — Graph Adjacency
+- a10 — Page Fault Count
+- a11 — Dijkstra
+- a12 — Hash Table with Chaining
+- a13 — Merge Sort
+- a14 — BFS Traversal
+- a15 — SQL JOIN Query
+- a16 — Normalise to 3NF
+- a17 — OOP — Abstract Class
+- a18 — ACID — Transaction
+- a19 — Process Scheduling Trace
+- a20 — DFS Recursion
+- a21 — Quicksort
+- a22 — Hash Table Open Addressing
+- a23 — Dijkstra Full Trace
+- a24 — Design Patterns — Singleton
+- a25 — Backward Chaining Trace
+- a26 — LRU Page Replacement
+- a27 — SQL Advanced Query
+- a28 — OOP — Strategy Pattern
+- a29 — Deadlock Detection
+- a30 — Neural Network Concepts
+- r1 — Countdown
+- r2 — Sum 1 to N
+- r3 — Power
+- r4 — Count Digits
+- r5 — Reverse a String
+- r6 — GCD (Euclid)
+- r7 — Sum of Digits
+- r8 — Recursive Array Sum
+- r9 — Palindrome Check
+- r10 — Recursive Max in Array
+- s1 — Linear Search
+- s2 — Minimum + Index
+- s3 — Binary Search Trail
+- s4 — Selection Sort
+- s5 — Count the Swaps
+- s6 — Insertion Sort
+- s7 — Merge Two Sorted Arrays
+- s8 — Binary Search Iteration Count
+- s9 — Second Largest
+- s10 — Sort Strings Alphabetically
+- a1 — Stack Reverse
+- a2 — Ticket Queue
+- a3 — List Length
+- a4 — Running Minimum
+- a5 — BST Insert Path
+- a6 — Balanced Brackets
+- a7 — Two-Stack Queue
+- a8 — BST In-order Traversal
+- a9 — Doubly Linked List — Traverse Backwards
+- a10 — Postfix (RPN) Evaluation
+- t1 — Vowel Count
+- t2 — Initials
+- t3 — Word Count
+- t4 — Caesar Decode
+- t5 — Run-Length Encoding
+- t6 — Palindrome Check (String)
+- t7 — Substring Search
+- t8 — Anagram Check
+- t9 — Title Case Conversion
+- t10 — Longest Word
+- ppa1 — Q1 — Array Processing
+- ppa2 — Q2 — Recursion
+- ppa3 — Q3 — Stack Implementation
+- ppa4 — Q4 — OOP: Ticket Classes
+- ppa5 — Q5 — Text File Processing
+- ppb1 — Q1 — Queue Simulation
+- ppb2 — Q2 — Linked List Insert
+- ppb3 — Q3 — Recursive Character Count
+- ppb4 — Q4 — OOP: Bank Accounts
+- ppb5 — Q5 — Random-Access File
