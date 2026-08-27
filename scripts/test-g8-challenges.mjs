@@ -40,11 +40,13 @@ function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
 const webMaximalLog = () => ({ bodyText: 'true false you see 1. item 3 items ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
   hasFunction: true, functionCount: 999, hasReturn: true, hasIf: true,
   hasLSSet: true, hasLSGet: true, hasJSONStringify: true, hasJSONParse: true,
-  hasLoop: true, listItems: 999 })
+  hasLoop: true, listItems: 999,
+  hasClick: true, listItemsGrewOnClick: true, bodyChangedOnClick: true })
 const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false,
   hasFunction: false, functionCount: 0, hasReturn: false, hasIf: false,
   hasLSSet: false, hasLSGet: false, hasJSONStringify: false, hasJSONParse: false,
-  hasLoop: false, listItems: 0 })
+  hasLoop: false, listItems: 0,
+  hasClick: false, listItemsGrewOnClick: false, bodyChangedOnClick: false })
 
 let pass = 0, fail = 0
 for (const ch of CHALLENGES) {

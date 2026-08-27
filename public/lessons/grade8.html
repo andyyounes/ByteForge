@@ -529,7 +529,18 @@ async function runWebCode() {
     // existed from Week 1's element counts; hasLoop covers for/while/forEach
     // equally, since all three are genuine ways to repeat UI-building code.
     hasLoop: /\bfor\s*\(|\bwhile\s*\(|\.forEach\s*\(/.test(js),
+    // Week 5 — combining state, functions, and loops into a real, clickable
+    // mini story engine. A click handler only proves anything once it
+    // genuinely runs — same principle as Grade 7's synthetic click — so fire
+    // a REAL click on the page's button and compare the list before/after.
+    hasClick: /\.addEventListener\s*\(\s*['"]click['"]|\.onclick\s*=/.test(js),
   }
+  const liBefore = doc.querySelectorAll('li').length
+  const bodyBefore = webLog.bodyText
+  const btn = doc.querySelector('button')
+  if (btn) btn.click()
+  webLog.listItemsGrewOnClick = btn != null && doc.querySelectorAll('li').length > liBefore
+  webLog.bodyChangedOnClick   = btn != null && doc.body.textContent !== bodyBefore
   clog('Ran — checking your page…', 'info')
   checkWebChallenge(webLog)
 }
@@ -913,6 +924,69 @@ const MODULES = [
       },
       needsLoop:true, needsFunction:true, needsArray:true, needsPush:true,
       check:(log) => log.hasLoop && log.hasFunction && log.hasArray && log.hasPush && log.listItems >= 3 && /\d/.test(log.bodyText),
+    },
+  ]},
+  // ── Web Story 5 — Semester 1, Week 5: combining state, functions, loops ────
+  // The semester finale — a genuinely clickable mini story engine, tying
+  // together all four prior weeks (state, functions, loops, localStorage).
+  { id:'ws5', name:'🏆 Web Story 5 — Your Story Engine', sub:'Everything from Semester 1, working together in one real interactive page', live:true, stages:[
+    { id:'ws5s1', name:'Add and Re-Render', xp:35, lang:'web',
+      text:`<strong>Challenge 1</strong> — Write a function <code>renderInventory(items)</code> that clears and rebuilds the &lt;li&gt; list (a loop). Add a button that, when CLICKED, pushes a new item onto inventory and calls renderInventory() again.`,
+      hints:[
+        'function renderInventory(items) { document.getElementById("choices").innerHTML = ""; items.forEach(item => { ... }); }',
+        'document.getElementById("addBtn").addEventListener("click", function() { inventory.push("gem"); renderInventory(inventory); });',
+        'Call renderInventory(inventory) once at the start too, so the list shows something before the first click.',
+      ],
+      webStarter: {
+        html: `<ul id="choices"></ul>\n<button id="addBtn">Find an item</button>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `let inventory = ["sword", "shield"];\n\nfunction renderInventory(items) {\n  // TODO: clear #choices, then loop over items adding one <li> per item\n}\n\n// TODO: call renderInventory(inventory) once here\n\n// TODO: addBtn click handler — push a new item onto inventory, then call renderInventory(inventory) again\n`,
+      },
+      needsLoop:true, needsFunction:true, needsArray:true, needsPush:true, needsClick:true,
+      check:(log) => log.hasLoop && log.hasFunction && log.hasArray && log.hasPush && log.hasClick && log.listItemsGrewOnClick,
+    },
+    { id:'ws5s2', name:'Track a Flag, Too', xp:35, lang:'web',
+      text:`<strong>Challenge 2</strong> — Add a flags object (e.g. <code>{ hasVisited: false }</code>). When the button is clicked, ALSO flip a flag to true and display its value alongside the inventory.`,
+      hints:[
+        'let flags = { hasVisited: false };',
+        'Inside the same click handler: flags.hasVisited = true; then update a display of flags.hasVisited too.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n<ul id="choices"></ul>\n<button id="addBtn">Find an item</button>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `let inventory = ["sword", "shield"];\nlet flags = { hasVisited: false };\n\nfunction renderInventory(items) {\n  // TODO: clear #choices, loop over items adding one <li> per item\n}\nrenderInventory(inventory);\n\n// TODO: addBtn click — push an item, flip flags.hasVisited to true, re-render inventory AND show flags.hasVisited in #story\n`,
+      },
+      needsLoop:true, needsFunction:true, needsArray:true, needsObject:true, needsClick:true,
+      check:(log) => log.hasLoop && log.hasFunction && log.hasArray && log.hasObject && log.hasClick && log.listItemsGrewOnClick && log.bodyChangedOnClick,
+    },
+    { id:'ws5s3', name:'Save As You Go', xp:40, lang:'web',
+      text:`<strong>Challenge 3</strong> — Every time the button is clicked and inventory changes, SAVE it to localStorage too (JSON.stringify), so progress genuinely survives a real refresh.`,
+      hints:[
+        'Inside the click handler, after pushing: localStorage.setItem("inventory", JSON.stringify(inventory));',
+        'This is Week 3\'s saving pattern, just triggered by a click instead of running once at the top of the page.',
+      ],
+      webStarter: {
+        html: `<ul id="choices"></ul>\n<button id="addBtn">Find an item</button>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `let inventory = ["sword", "shield"];\n\nfunction renderInventory(items) {\n  // TODO: clear #choices, loop over items adding one <li> per item\n}\nrenderInventory(inventory);\n\n// TODO: addBtn click — push an item, SAVE inventory to localStorage (JSON.stringify), then re-render\n`,
+      },
+      needsLoop:true, needsFunction:true, needsClick:true, needsLSSet:true, needsJSON:true,
+      check:(log) => log.hasLoop && log.hasFunction && log.hasClick && log.hasLSSet && log.hasJSONStringify && log.listItemsGrewOnClick,
+    },
+    { id:'ws5boss', name:'BOSS — Your Story Engine', xp:120, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — The full Semester 1 finale. Build a page with an inventory array AND a flags object, a function that loops to render the list, a button whose click pushes a new item, flips a flag, re-renders, AND saves everything to localStorage.`,
+      hints:[
+        'This is every idea from Weeks 1-5 in one page: state (array+object), a function, a loop, a real click handler, and localStorage — nothing new, purely the full combination.',
+        'Build it one piece at a time, testing with ▶ Run after each addition, rather than writing everything before running once.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n<ul id="choices"></ul>\n<button id="addBtn">Find an item</button>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `// TODO: inventory array + flags object\n\n// TODO: function renderInventory(items) — loop, rebuild #choices\n\n// TODO: addBtn click — push item, flip a flag, save to localStorage (JSON), re-render, show flag in #story\n`,
+      },
+      needsLoop:true, needsFunction:true, needsArray:true, needsObject:true, needsPush:true, needsClick:true, needsLSSet:true, needsJSON:true,
+      check:(log) => log.hasLoop && log.hasFunction && log.hasArray && log.hasObject && log.hasPush && log.hasClick
+                  && log.hasLSSet && log.hasJSONStringify && log.listItemsGrewOnClick && log.bodyChangedOnClick,
     },
   ]},
   { id:'m1', name:'🔤 M1 — From Blocks to Text', sub:'print, input, variables, types — the G7 skills, now in real Python', live:true, stages:[
@@ -2480,6 +2554,23 @@ const CHALLENGE_LESSON = {
   ws4boss: { title: 'BOSS — array, function, and loop, together', html: `
     <div class="cl-block"><h4>Four weeks, one real pattern</h4>
       <p>An array holding real data (Week 1), a function organizing the logic (Week 2), and a loop turning that data into visible page elements (this week) is genuinely the core pattern behind almost every real list, menu, or gallery on the web.</p></div>` },
+  // ── Web Story 5 — Your Story Engine: combining everything ───────────────────
+  ws5s1: { title: 'A click that triggers a re-render', html: `
+    <div class="cl-block"><h4>Real DOM events, not blocks</h4>
+      <p>addEventListener("click", ...) is genuine JavaScript event handling — the same underlying mechanism Grade 7's block-based onclick generates, just written directly. The function inside it runs every time, not once.</p></div>
+    <div class="cl-block"><h4>Re-render, don\'t just append once</h4>
+      <p>Clearing #choices before looping again means the list always reflects the CURRENT inventory — click twice and you get 4 items shown, not a growing mess of stale old lists layered on top of each other.</p></div>` },
+  ws5s2: { title: 'One click, multiple kinds of state updated', html: `
+    <div class="cl-block"><h4>Array AND object, same handler</h4>
+      <p>A single click genuinely updates two DIFFERENT shapes of state at once — an ordered list (inventory) and a named fact (flags.hasVisited) — exactly like a real game update loop touching multiple systems per action.</p></div>` },
+  ws5s3: { title: 'Saving on every meaningful change', html: `
+    <div class="cl-block"><h4>Not just once at the start</h4>
+      <p>Week 3 saved once, when the page loaded. Real progress-saving usually happens repeatedly, every time something changes — exactly like this: every click that changes inventory also saves it, so nothing is ever lost.</p></div>` },
+  ws5boss: { title: 'BOSS — a real, small, working story engine', html: `
+    <div class="cl-block"><h4>Five weeks, one finished thing</h4>
+      <p>State (arrays/objects), functions organizing logic, loops building UI, real click events, and localStorage persistence — this is genuinely the same shape as a real, if small, interactive web application, built entirely from ideas introduced one at a time.</p></div>
+    <div class="cl-block"><h4>This is what the actual project will build on</h4>
+      <p>Every mechanic here — inventory, flags, a click-driven update, saved progress — is a real building block for the actual Semester 1 interactive story project this course leads into.</p></div>` },
   // ── M1 — From Blocks to Text ────────────────────────────────────────────────
   m1s1: { title: 'print() — your first real line of code', html: `
     <div class="cl-block"><h4>The classic first line, in any language</h4>
