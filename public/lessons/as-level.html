@@ -6306,19 +6306,29 @@ const SQL_EXERCISES = {
 }
 
 // ── SQL engine (sql.js via CDN) ────────────────────────────────────────────────
-let _sqlJs = null, _sqlDb = null
+// One database PER TOPIC. There used to be a single shared _sqlDb that was
+// ALWAYS seeded with HOSPITAL_SQL regardless of which topic was open, so the
+// School and E-commerce exercises ran against the HOSPITAL schema and their
+// tables simply did not exist. The single shared instance also meant earlier
+// exercises permanently broke later ones inside a topic: db-1/4 creates the
+// Ward table, so db-2/1's CREATE TABLE Ward failed with "already exists", and
+// a DELETE in db-2/7 changed the row count db-3/7 expects.
+let _sqlJs = null
+const _sqlDbs = Object.create(null)
 
 async function resetSqlDb(topicId) {
-  _sqlDb = null
-  await getSqlDb()
+  if (_sqlDbs[topicId]) { try { _sqlDbs[topicId].close() } catch (e) {} }
+  delete _sqlDbs[topicId]
+  await getSqlDb(topicId)
   showToast('↺ Database reset to original state')
   // Clear all result & feedback divs for this topic
   document.querySelectorAll(`[id^="sqlex-result-${topicId}"], [id^="sqlex-feedback-${topicId}"]`)
     .forEach(el => { el.innerHTML = ''; el.className = el.className.replace(/\s*(pass|fail)/g,'') })
 }
 
-async function getSqlDb() {
-  if (_sqlDb) return _sqlDb
+async function getSqlDb(topicId) {
+  const key = topicId || 'hospital'
+  if (_sqlDbs[key]) return _sqlDbs[key]
   if (!_sqlJs) {
     _sqlJs = await new Promise((res, rej) => {
       const s = document.createElement('script')
@@ -6328,9 +6338,26 @@ async function getSqlDb() {
       document.head.appendChild(s)
     })
   }
-  _sqlDb = new _sqlJs.Database()
-  _sqlDb.run(HOSPITAL_SQL)
-  return _sqlDb
+  const db = new _sqlJs.Database()
+  // Seed from the topic's OWN setup, not unconditionally from HOSPITAL_SQL.
+  db.run((IDE_SETS[key] && IDE_SETS[key].setup) || HOSPITAL_SQL)
+  _sqlDbs[key] = db
+  return db
+}
+
+// Splits on ';' OUTSIDE string literals. The old naive split(';') broke any
+// query containing a semicolon inside a quoted value.
+function splitSqlStatements(sql) {
+  const out = []; let cur = '', q = null
+  for (let i = 0; i < sql.length; i++) {
+    const c = sql[i]
+    if (q) { cur += c; if (c === q) q = null; continue }
+    if (c === "'" || c === '"') { q = c; cur += c; continue }
+    if (c === ';') { out.push(cur); cur = ''; continue }
+    cur += c
+  }
+  out.push(cur)
+  return out.map(x => x.trim()).filter(Boolean)
 }
 
 function sqlResultToRows(res) {
@@ -6351,11 +6378,11 @@ function renderSqlTable(rows) {
   </div>`
 }
 
-async function runSqlInEl(sql, resultEl, loadingMsg) {
+async function runSqlInEl(sql, resultEl, loadingMsg, topicId) {
   resultEl.innerHTML = `<div class="sql-result-count">${loadingMsg || 'Running…'}</div>`
   try {
-    const db = await getSqlDb()
-    const stmts = sql.trim().split(';').map(s => s.trim()).filter(Boolean)
+    const db = await getSqlDb(topicId)
+    const stmts = splitSqlStatements(sql)
     let lastRows = []
     for (const stmt of stmts) {
       const res = db.exec(stmt)
@@ -6463,7 +6490,7 @@ async function runSqlExercise(topicId, n) {
   const resEl = document.getElementById(`sqlex-result-${topicId}-${n}`)
   const fbEl  = document.getElementById(`sqlex-feedback-${topicId}-${n}`)
   if (!edEl || !resEl) return
-  const rows = await runSqlInEl(edEl.value, resEl, 'Running query…')
+  const rows = await runSqlInEl(edEl.value, resEl, 'Running query…', topicId)
   if (rows !== null && fbEl) {
     const pass = ex.check(rows)
     fbEl.className = 'sql-ex-feedback ' + (pass ? 'pass' : 'fail')
@@ -6475,7 +6502,7 @@ async function runFreeSql(topicId) {
   const edEl  = document.getElementById('sqlfree-' + topicId)
   const resEl = document.getElementById('sqlfree-result-' + topicId)
   if (!edEl || !resEl) return
-  await runSqlInEl(edEl.value, resEl, 'Loading database…')
+  await runSqlInEl(edEl.value, resEl, 'Loading database…', topicId)
 }
 
 // ── IDE Lab ───────────────────────────────────────────────────────────────────

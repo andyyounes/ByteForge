@@ -29,6 +29,7 @@ const SUITES = [
   { id: 'igcse-y1',   grade: 'IGCSE Y1',  name: 'Theory challenges',                  script: 'test-igcse-y1-challenges.mjs' },
   { id: 'igcse-y2',   grade: 'IGCSE Y2',  name: 'Pseudocode challenges',              script: 'test-igcse-y2-challenges.mjs' },
   { id: 'as-pseudo',  grade: 'AS Level',  name: 'Pseudocode Lab (PSEUDO_SETS)',       script: 'test-as-pseudo.mjs' },
+  { id: 'as-sql',     grade: 'AS Level',  name: 'SQL exercises',                        script: 'test-as-sql.mjs' },
   { id: 'al-lab',     grade: 'A Level',   name: 'Code Lab (AL_LAB_SETS)',             script: 'test-al-lab.mjs' },
   { id: 'p4',         grade: 'A Level',   name: 'Paper 4 challenges',                 script: 'test-p4-challenges.mjs' },
   { id: 'p4-starters',grade: 'A Level',   name: 'Paper 4 starters',                   script: 'test-p4-starters.mjs' },
