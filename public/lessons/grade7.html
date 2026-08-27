@@ -362,6 +362,18 @@
       <value name="SIZE"><shadow type="math_number"><field name="NUM">18</field></shadow></value>
     </block>
   </category>
+  <category name="Interact" colour="#ca8a04">
+    <block type="page_on_click"></block>
+    <block type="page_set_heading_text">
+      <value name="STR"><shadow type="text"><field name="TEXT">New heading!</field></shadow></value>
+    </block>
+    <block type="page_set_paragraph_text">
+      <value name="STR"><shadow type="text"><field name="TEXT">New paragraph text!</field></shadow></value>
+    </block>
+    <block type="page_set_button_text">
+      <value name="STR"><shadow type="text"><field name="TEXT">Thanks!</field></shadow></value>
+    </block>
+  </category>
   <category name="Mouse" colour="#06b6d4">
     <block type="canvas_mouse_x"></block>
     <block type="canvas_mouse_y"></block>
@@ -682,6 +694,39 @@ Blockly.defineBlocksWithJsonArray([
     colour:'#0d9488',
     tooltip:'CSS: font-size for every paragraph on the page.',
   },
+  // Interact — Story Studio 3 (buttons & onclick)
+  {
+    type:'page_on_click',
+    message0:'when button is clicked %1 do %2',
+    args0:[{type:'input_dummy'}, {type:'input_statement', name:'DO'}],
+    previousStatement:null, nextStatement:null,
+    colour:'#ca8a04',
+    tooltip:'Runs these blocks every time the page\'s button is clicked. This is JavaScript\'s onclick.',
+  },
+  {
+    type:'page_set_heading_text',
+    message0:'change heading text to %1',
+    args0:[{type:'input_value', name:'STR'}],
+    inputsInline:true, previousStatement:null, nextStatement:null,
+    colour:'#ca8a04',
+    tooltip:'Replaces the page\'s heading text with something new.',
+  },
+  {
+    type:'page_set_paragraph_text',
+    message0:'change paragraph text to %1',
+    args0:[{type:'input_value', name:'STR'}],
+    inputsInline:true, previousStatement:null, nextStatement:null,
+    colour:'#ca8a04',
+    tooltip:'Replaces the page\'s (first) paragraph text with something new.',
+  },
+  {
+    type:'page_set_button_text',
+    message0:'change button text to %1',
+    args0:[{type:'input_value', name:'STR'}],
+    inputsInline:true, previousStatement:null, nextStatement:null,
+    colour:'#ca8a04',
+    tooltip:'Replaces the button\'s own label text.',
+  },
 ])
 
 // ── JavaScript Code Generators ────────────────────────────────────────────────
@@ -711,6 +756,10 @@ jsGen.forBlock['page_set_background']   = (b)   => `setBackground('${b.getFieldV
 jsGen.forBlock['page_set_heading_color']= (b)   => `setHeadingColor('${b.getFieldValue('COLOR')}');\n`
 jsGen.forBlock['page_set_align']        = (b)   => `setAlign('${b.getFieldValue('ALIGN')}');\n`
 jsGen.forBlock['page_set_font_size']    = (b,g) => `setFontSize(${g.valueToCode(b,'SIZE',g.ORDER_NONE)||18});\n`
+jsGen.forBlock['page_on_click']          = (b,g) => `onButtonClick(function() {\n${g.statementToCode(b,'DO')}});\n`
+jsGen.forBlock['page_set_heading_text']   = (b,g) => `setHeadingText(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Text'"});\n`
+jsGen.forBlock['page_set_paragraph_text'] = (b,g) => `setParagraphText(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Text'"});\n`
+jsGen.forBlock['page_set_button_text']    = (b,g) => `setButtonText(${g.valueToCode(b,'STR',g.ORDER_NONE)||"'Text'"});\n`
 
 function v(b,g,name,def) { return g.valueToCode(b,name,g.ORDER_NONE)||def }
 
@@ -887,6 +936,13 @@ const pageAPI = {
   setHeadingColor(c) { _pageStyle.headingColor = c; pageEl.querySelectorAll('h1').forEach(h => h.style.color = c) },
   setAlign(a)        { pageEl.style.textAlign = a },
   setFontSize(px)    { _pageStyle.fontSize = px; pageEl.querySelectorAll('p').forEach(p => p.style.fontSize = px + 'px') },
+  // Week 3 — buttons & onclick. Targets the LAST button/heading/paragraph
+  // added so far — simple by design, matching "one button, one job" at this
+  // stage (multiple independently-clickable buttons come later, in Grade 8).
+  onButtonClick(fn)  { const btns = pageEl.querySelectorAll('button'); const btn = btns[btns.length - 1]; if (btn) btn.addEventListener('click', fn) },
+  setHeadingText(str)   { const h = pageEl.querySelector('h1'); if (h) h.textContent = String(str) },
+  setParagraphText(str) { const p = pageEl.querySelector('p');  if (p) p.textContent = String(str) },
+  setButtonText(str)    { const btns = pageEl.querySelectorAll('button'); const btn = btns[btns.length - 1]; if (btn) btn.textContent = String(str) },
 }
 
 function resetDrawState() {
@@ -944,6 +1000,20 @@ function runPageCode() {
   try {
     new Function(...Object.keys(pageAPI), code)(...Object.values(pageAPI))
   } catch (e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
+
+  // Week 3 — buttons & onclick. A click HANDLER only proves anything once it
+  // actually runs, so — rather than just checking the blocks exist — fire a
+  // real synthetic click on the button and compare before/after, the same
+  // way a human tester would confirm "does this button actually do anything".
+  const headingBefore   = pageEl.querySelector('h1')?.textContent ?? null
+  const paragraphBefore = pageEl.querySelector('p')?.textContent  ?? null
+  const buttonTextBefore = [...pageEl.querySelectorAll('button')].pop()?.textContent ?? null
+  const lastButton = [...pageEl.querySelectorAll('button')].pop()
+  if (lastButton) lastButton.click()
+  const headingAfter   = pageEl.querySelector('h1')?.textContent ?? null
+  const paragraphAfter = pageEl.querySelector('p')?.textContent  ?? null
+  const buttonTextAfter = [...pageEl.querySelectorAll('button')].pop()?.textContent ?? null
+
   const pageLog = {
     headings:   pageEl.querySelectorAll('h1').length,
     paragraphs: pageEl.querySelectorAll('p').length,
@@ -957,6 +1027,12 @@ function runPageCode() {
     headingColor: _pageStyle.headingColor || '',
     align:       pageEl.style.textAlign || '',
     fontSize:    _pageStyle.fontSize || null,
+    // Week 3 — did clicking the button genuinely change anything? Requires a
+    // real onButtonClick handler that ran and changed the text — a button
+    // that merely EXISTS, with no handler, leaves before === after.
+    headingChangedByClick:   lastButton != null && headingBefore   !== headingAfter,
+    paragraphChangedByClick: lastButton != null && paragraphBefore !== paragraphAfter,
+    buttonTextChangedByClick: lastButton != null && buttonTextBefore !== buttonTextAfter,
   }
   checkChallenge(pageLog)
 }
@@ -1186,6 +1262,61 @@ const WORLDS = [
       needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
       check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1
                   && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16,
+    },
+  ]},
+  // ── Story Studio — Semester 1, Week 3: buttons & onclick ───────────────────
+  // A button that does nothing (Weeks 1-2) becomes a button that DOES
+  // something — the runner actually fires a synthetic click and compares
+  // before/after, so these checks prove the handler genuinely works.
+  { id:'st3', name:'👆 Story Studio 3 — Make It Click', sub:'onclick — a button that actually does something when pressed', live:true, stages:[
+    { id:'st3s1', name:'Click to Reveal', xp:25, type:'page',
+      text:`<strong>Challenge 1</strong> — Add a heading that says "???" and a button. When the button is clicked, change the heading text to reveal something else.`,
+      hints:[
+        'Open the Interact category and drag out "when button is clicked".',
+        'Inside it, drag "change heading text to" and type your reveal.',
+        'Press ▶ Run — the button click is tested automatically, so you\'ll see it pass without having to click it yourself.',
+      ],
+      needsHeadings:1, needsButtons:1, needsHeadingChange:true,
+      check:(log) => log.headings >= 1 && log.buttons >= 1 && log.headingChangedByClick === true,
+    },
+    { id:'st3s2', name:'Click for More', xp:30, type:'page',
+      text:`<strong>Challenge 2</strong> — Add a heading, a paragraph with placeholder text like "Click below…", and a button. When clicked, change the PARAGRAPH text instead of the heading.`,
+      hints:[
+        'Same "when button is clicked" block — this time put "change paragraph text to" inside it.',
+        'The heading stays exactly as you first wrote it; only the paragraph should change.',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsButtons:1, needsParagraphChange:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.buttons >= 1 && log.paragraphChangedByClick === true,
+    },
+    { id:'st3s3', name:'Both at Once', xp:35, type:'page',
+      text:`<strong>Challenge 3</strong> — One click, two changes. Add a heading, a paragraph, and a button. When clicked, change BOTH the heading AND the paragraph text.`,
+      hints:[
+        'Put two blocks inside the same "when button is clicked" — "change heading text to" AND "change paragraph text to".',
+        'A single click event can trigger as many actions as you put inside its DO section — that\'s exactly what onclick means in real JavaScript.',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsButtons:1, needsHeadingChange:true, needsParagraphChange:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.buttons >= 1 && log.headingChangedByClick === true && log.paragraphChangedByClick === true,
+    },
+    { id:'st3s4', name:'Button Talks Back', xp:35, type:'page',
+      text:`<strong>Challenge 4</strong> — Add a heading, a paragraph, and a button labelled "Click me!". When clicked, change the heading text AND change the BUTTON's own label (e.g. to "Thanks!").`,
+      hints:[
+        'Add "change button text to" inside the same click handler.',
+        'A button changing its own label after being pressed is a genuine, common real-website pattern — think "Submit" becoming "Submitted ✓".',
+      ],
+      needsHeadings:1, needsButtons:1, needsHeadingChange:true, needsButtonTextChange:true,
+      check:(log) => log.headings >= 1 && log.buttons >= 1 && log.headingChangedByClick === true && log.buttonTextChangedByClick === true,
+    },
+    { id:'st3boss', name:'BOSS — The Big Reveal', xp:80, type:'page', boss:true,
+      text:`<strong>BOSS</strong> — Build the full styled front page (heading, 2+ paragraphs, link, button, background colour, heading colour, centered, readable text) from Weeks 1-2 — but now, clicking the button reveals a "twist": it changes the heading text, the paragraph text, AND the button's own label, all at once.`,
+      hints:[
+        'This is st2boss\'s entire page PLUS one "when button is clicked" block containing three change blocks inside it.',
+        'Nothing here is new — it\'s every block from all three weeks, combined into one finished, interactive page.',
+      ],
+      needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
+      needsHeadingChange:true, needsParagraphChange:true, needsButtonTextChange:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1
+                  && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16
+                  && log.headingChangedByClick === true && log.paragraphChangedByClick === true && log.buttonTextChangedByClick === true,
     },
   ]},
   { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
@@ -1716,6 +1847,28 @@ const CHALLENGE_LESSON = {
       <p>Week 1 (HTML) decided WHAT is on the page — a heading, some paragraphs, a link, a button. Week 2 (CSS) decides how it LOOKS — colours, alignment, size. Every real website is built from exactly this split.</p></div>
     <div class="cl-block"><h4>Order-independent, on purpose</h4>
       <p>Unlike HTML tags (which appear in the order you add them), these CSS rules apply no matter when you set them — style the page first or last, the result is identical. That's a genuine, real difference between structure and style.</p></div>` },
+  // ── Story Studio 3 — Make It Click: onclick ─────────────────────────────────
+  st3s1: { title: 'onclick — code that waits for a click', html: `
+    <div class="cl-block"><h4>A whole new kind of block</h4>
+      <p>Every block before this ran the INSTANT you pressed ▶ Run. "When button is clicked" is different — the code inside it waits, doing nothing, until a real click happens. That's exactly what JavaScript's <code>onclick</code> is.</p></div>
+    <div class="cl-block"><h4>How this gets tested without a real click</h4>
+      <p>Since you can't physically click inside this checker, Run automatically fires one simulated click and compares your heading text before and after — if your handler genuinely changed it, the challenge passes.</p></div>` },
+  st3s2: { title: 'The same event, a different action', html: `
+    <div class="cl-block"><h4>onclick isn\'t tied to one specific action</h4>
+      <p>Last challenge's click changed a HEADING; this one changes a PARAGRAPH. The event ("when clicked") stays the same — what happens inside it is entirely up to you, the same way a real webpage's button might submit a form, open a menu, or update a score.</p></div>` },
+  st3s3: { title: 'One event, multiple actions', html: `
+    <div class="cl-block"><h4>Stacking blocks inside the handler</h4>
+      <p>Anything placed inside "when button is clicked" all runs together, in order, from a single click — there's no limit to how many change-blocks you can stack inside one handler.</p></div>
+    <div class="cl-block"><h4>This is genuinely how real onclick works</h4>
+      <p>A real <code>button.onclick = function() { ... }</code> in JavaScript can contain as many statements as you want — exactly the same idea as stacking blocks inside this one event.</p></div>` },
+  st3s4: { title: 'A button can change itself', html: `
+    <div class="cl-block"><h4>The clicked thing isn\'t off-limits</h4>
+      <p>It's easy to assume a button can only affect OTHER things on the page — but it can just as easily change its own label. "Submit" becoming "Submitted ✓" after a click is a genuine, extremely common real pattern.</p></div>` },
+  st3boss: { title: 'BOSS — three weeks, one real interactive page', html: `
+    <div class="cl-block"><h4>Structure, style, and behaviour</h4>
+      <p>Week 1 gave the page structure (HTML). Week 2 gave it style (CSS). Week 3 gives it BEHAVIOUR (JavaScript) — together, that's genuinely the same three-part split every real website is built from.</p></div>
+    <div class="cl-block"><h4>Nothing new — full assembly</h4>
+      <p>Every piece here — the tags, the styling, the click handler — already exists from st1/st2/st3s1-s4. This boss is purely about combining all three weeks into one finished, interactive front page.</p></div>` },
   // ── G1 — Sprite Start: coordinates & sequence ──────────────────────────────
   g1s1: { title: 'Coordinates — every sprite has an (x, y)', html: `
     <div class="cl-block"><h4>x and y are just numbers</h4>
@@ -2126,6 +2279,9 @@ function checkChallenge(log) {
       if (ch.needsHeadingColor && !log.headingColor) missing.push(`a heading colour (Style → set heading colour)`)
       if (ch.needsAlign      && log.align !== ch.needsAlign) missing.push(`page text aligned "${ch.needsAlign}" (Style → align page text)`)
       if (ch.needsFontSize   && !(log.fontSize && log.fontSize >= ch.needsFontSize)) missing.push(`paragraph text at least ${ch.needsFontSize}px (Style → set paragraph text size)`)
+      if (ch.needsHeadingChange   && !log.headingChangedByClick)   missing.push(`a button click that actually changes the heading (Interact → when button is clicked → change heading text to)`)
+      if (ch.needsParagraphChange && !log.paragraphChangedByClick) missing.push(`a button click that actually changes the paragraph (Interact → when button is clicked → change paragraph text to)`)
+      if (ch.needsButtonTextChange && !log.buttonTextChangedByClick) missing.push(`a button click that changes its OWN text (Interact → when button is clicked → change button text to)`)
       if (missing.length) logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
       else logLine('❌ Not quite — your page built, but it doesn\'t meet this challenge\'s goal yet. Re-read the task above and try the 💡 Hint button.', 'err')
       return

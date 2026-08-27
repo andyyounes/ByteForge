@@ -40,11 +40,14 @@ const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, t
   // st2* (CSS styling) — bgColor/headingColor are non-empty strings when
   // set, align matches whichever value a stage's needsAlign names ('center'
   // for every st2 stage today), fontSize is a generous px value.
-  bgColor: '#ffffff', headingColor: '#111111', align: 'center', fontSize: 999 })
+  bgColor: '#ffffff', headingColor: '#111111', align: 'center', fontSize: 999,
+  // st3* (onclick) — a genuine click-driven change to heading/paragraph/button text.
+  headingChangedByClick: true, paragraphChangedByClick: true, buttonTextChangedByClick: true })
 const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   texts: 0,   hasIf: false, hasVar: false, hasFunction: false,
   positions: [],
   headings: 0, paragraphs: 0, links: 0, buttons: 0,
-  bgColor: '', headingColor: '', align: '', fontSize: 0 })
+  bgColor: '', headingColor: '', align: '', fontSize: 0,
+  headingChangedByClick: false, paragraphChangedByClick: false, buttonTextChangedByClick: false })
 
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.id}`
@@ -56,10 +59,12 @@ for (const ch of CHALLENGES) {
   else { fail++; console.log(`✗ ${label} — VACUOUS: an empty/no-op submission passes check()`) }
 
   const flags = ['needsVar', 'needsIf', 'needsFrames', 'needsFunction', 'needsHeadings', 'needsParagraphs', 'needsLinks', 'needsButtons',
-    'needsBgColor', 'needsHeadingColor', 'needsAlign', 'needsFontSize']
+    'needsBgColor', 'needsHeadingColor', 'needsAlign', 'needsFontSize',
+    'needsHeadingChange', 'needsParagraphChange', 'needsButtonTextChange']
   const fieldFor = { needsVar: 'hasVar', needsIf: 'hasIf', needsFrames: 'frames', needsFunction: 'hasFunction',
     needsHeadings: 'headings', needsParagraphs: 'paragraphs', needsLinks: 'links', needsButtons: 'buttons',
-    needsBgColor: 'bgColor', needsHeadingColor: 'headingColor', needsAlign: 'align', needsFontSize: 'fontSize' }
+    needsBgColor: 'bgColor', needsHeadingColor: 'headingColor', needsAlign: 'align', needsFontSize: 'fontSize',
+    needsHeadingChange: 'headingChangedByClick', needsParagraphChange: 'paragraphChangedByClick', needsButtonTextChange: 'buttonTextChangedByClick' }
   const numericFields = new Set(['frames', 'headings', 'paragraphs', 'links', 'buttons', 'fontSize'])
   const stringFields  = new Set(['bgColor', 'headingColor', 'align'])
   for (const flag of flags) {
