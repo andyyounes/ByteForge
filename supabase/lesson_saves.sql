@@ -1,16 +1,26 @@
 -- ── lesson_saves ──────────────────────────────────────────────────────────────
--- Stores per-student progress for static lesson pages (grade6-patterns, grade7,
--- grade8, grade9, blockly-turtle). Each row represents either:
---   challenge_idx >= 0  →  a completed challenge
+-- Stores per-student progress for static lesson pages (grade6-grade9, IGCSE
+-- Y1/Y2, AS/A Level theory + Paper 2/4). Each row is either:
+--   challenge_id  set   →  a completed challenge, identified by its own
+--                          stable id (survives new challenges being added
+--                          anywhere in a lesson's list — see the comment on
+--                          challenge_idx below for why id-based, not index)
 --   challenge_idx = -1  →  a workspace/code autosave (restored on next visit)
+--
+-- challenge_idx is kept only for that -1 autosave sentinel and legacy
+-- compatibility; it's nullable because id-keyed rows don't use it (a flat
+-- position in a challenge list shifts every time a challenge is inserted
+-- anywhere but the very end, silently reassigning a student's earned
+-- progress to the wrong challenge — challenge_id doesn't have that problem).
 --
 -- Run once in the Supabase SQL editor (dashboard → SQL editor → New query).
 
 CREATE TABLE IF NOT EXISTS lesson_saves (
   id            UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
   student_id    UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  lesson_key    TEXT        NOT NULL,        -- e.g. 'grade7', 'grade9', 'grade6-patterns'
-  challenge_idx INTEGER     NOT NULL DEFAULT -1,
+  lesson_key    TEXT        NOT NULL,        -- e.g. 'grade7', 'as-paper1-theory'
+  challenge_idx INTEGER,                     -- -1 = workspace autosave; NULL for id-keyed rows
+  challenge_id  TEXT,                        -- e.g. 'g1s1', 'ch1-2', 'REC1'
   passed        BOOLEAN     NOT NULL DEFAULT false,
   code          TEXT,                        -- student code or pseudocode text
   save_data     JSONB,                       -- blockly XML, pixel art grid, etc.
@@ -18,6 +28,10 @@ CREATE TABLE IF NOT EXISTS lesson_saves (
   saved_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (student_id, lesson_key, challenge_idx)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS lesson_saves_student_lesson_challenge_id
+  ON lesson_saves (student_id, lesson_key, challenge_id)
+  WHERE challenge_id IS NOT NULL;
 
 ALTER TABLE lesson_saves ENABLE ROW LEVEL SECURITY;
 
