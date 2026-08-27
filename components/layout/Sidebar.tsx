@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
-import { HomeIcon, PathwayIcon, TrophyIcon, SettingsIcon } from '@/components/ui/Icons'
+import { HomeIcon, TrophyIcon, SettingsIcon } from '@/components/ui/Icons'
 import { STAGE_MAP } from '@/lib/stage-config'
 import type { Profile, StageId } from '@/types'
 
@@ -13,9 +13,11 @@ interface NavItem {
   label: string
 }
 
+// Skill Tree link removed per product decision: it cluttered the nav for
+// Grade 6-9 students (the only grades with pathway data), see
+// PathwayProgressPanel removal in the dashboard for the same reasoning.
 const STUDENT_NAV: NavItem[] = [
   { href: '/student/dashboard',    icon: <HomeIcon    size={16} />, label: 'Dashboard'    },
-  { href: '/student/pathway',      icon: <PathwayIcon size={16} />, label: 'Skill Tree'   },
   { href: '/student/achievements', icon: <TrophyIcon  size={16} />, label: 'Achievements' },
 ]
 

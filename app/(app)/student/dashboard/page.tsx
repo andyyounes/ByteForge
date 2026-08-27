@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { suggestNext, pathwayProgress } from '@/lib/adaptive'
+import { suggestNext } from '@/lib/adaptive'
 import { masteryStatusCounts, initialMasteryMap, recalculateAvailability } from '@/lib/mastery'
 import { stageToGrade, CONCEPTS } from '@/lib/concepts'
 import { XPBar } from '@/components/ui/XPBar'
@@ -9,7 +9,6 @@ import { StatsRow } from '@/components/student/StatsRow'
 import { DailyChallengeCard } from '@/components/student/DailyChallengeCard'
 import { AdaptiveSuggestions } from '@/components/student/AdaptiveSuggestions'
 import { LearningPath } from '@/components/student/LearningPath'
-import { PathwayProgressPanel } from '@/components/student/PathwayProgressPanel'
 import { AchievementsTeaser } from '@/components/student/AchievementsTeaser'
 import { JoinClassInput } from '@/components/student/JoinClassInput'
 import { Card } from '@/components/ui/Card'
@@ -178,7 +177,6 @@ export default async function StudentDashboardPage() {
   const studentGrade  = stageToGrade(profile.stage)
   const statusCounts  = masteryStatusCounts(masteryMap)
   const suggestions   = suggestNext(masteryMap, 4, studentGrade)
-  const pathways      = pathwayProgress(masteryMap, studentGrade)
   const masteredCount = statusCounts.mastered ?? 0
 
   // All grades 6–13 get a direct link to their interactive lesson.
@@ -346,36 +344,39 @@ export default async function StudentDashboardPage() {
           {/* Show join input only when not yet in any class */}
           {!hasClass && <JoinClassInput />}
 
-          {/* ── Exams + Past Papers quick-links (only when in a class) ─── */}
-          {hasClass && membership?.class_id && (
-            <div className={`grid grid-cols-1 gap-3 ${isCambridgeLevel ? 'sm:grid-cols-2' : ''}`}>
-              {isCambridgeLevel && (
-                <Card className="border-b2">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-accent/10 text-accent shrink-0 text-lg">📝</div>
-                      <div>
-                        <p className="text-xs font-bold text-accent uppercase tracking-wider">Unit Exams</p>
-                        <p className="text-sm font-semibold text-fg">Chapter Exams</p>
-                        <p className="text-xs text-fg-faint mt-0.5">Self-mark with mark scheme</p>
-                      </div>
+          {/* ── Exams + Past Papers quick-links ───────────────────────────
+              Cambridge levels (IGCSE/AS/A Level) only — these map to real
+              Cambridge past papers and chapter exams uploaded via Book
+              Lessons. Grade 6-9 have no such papers and no exam content, so
+              this card was clutter there (removed per product decision — the
+              same one that dropped the Skill Tree link for those grades). */}
+          {hasClass && membership?.class_id && isCambridgeLevel && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Card className="border-b2">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-accent/10 text-accent shrink-0 text-lg">📝</div>
+                    <div>
+                      <p className="text-xs font-bold text-accent uppercase tracking-wider">Unit Exams</p>
+                      <p className="text-sm font-semibold text-fg">Chapter Exams</p>
+                      <p className="text-xs text-fg-faint mt-0.5">Self-mark with mark scheme</p>
                     </div>
-                    <Link
-                      href="/student/exams"
-                      className="py-2 px-3 text-sm font-semibold rounded-lg bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors shrink-0 flex items-center gap-1.5"
-                    >
-                      Open <ChevronRightIcon size={14} />
-                    </Link>
                   </div>
-                </Card>
-              )}
+                  <Link
+                    href="/student/exams"
+                    className="py-2 px-3 text-sm font-semibold rounded-lg bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors shrink-0 flex items-center gap-1.5"
+                  >
+                    Open <ChevronRightIcon size={14} />
+                  </Link>
+                </div>
+              </Card>
               <Card className="border-b2">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-violet-400/10 text-violet-400 shrink-0 text-lg">📋</div>
                     <div>
                       <p className="text-xs font-bold text-violet-400 uppercase tracking-wider">Past Papers</p>
-                      <p className="text-sm font-semibold text-fg">{isCambridgeLevel ? 'Cambridge Papers' : 'Practice Papers'}</p>
+                      <p className="text-sm font-semibold text-fg">Cambridge Papers</p>
                       <p className="text-xs text-fg-faint mt-0.5">AI-marked instantly</p>
                     </div>
                   </div>
@@ -401,9 +402,11 @@ export default async function StudentDashboardPage() {
           )}
         </div>
 
-        {/* Right col: pathways + achievements ───────────────────────── */}
+        {/* Right col: achievements ────────────────────────────────────
+            PathwayProgressPanel ("Game Maker" etc. % complete tile) removed
+            per product decision — redundant with LearningPath/AdaptiveSuggestions
+            already shown in the left column, and cluttered the dashboard. */}
         <div className="space-y-4">
-          {studentGrade <= 9 && <PathwayProgressPanel pathways={pathways} />}
           <AchievementsTeaser unlocked={achievements} />
         </div>
       </div>

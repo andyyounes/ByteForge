@@ -4,8 +4,8 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { recordAttempt, recalculateAvailability, checkNewAchievements } from '@/lib/mastery'
 import { calculateStreak } from '@/lib/adaptive'
-import { exerciseXp } from '@/lib/xp'
-import { conceptById } from '@/lib/concepts'
+import { exerciseXp, conceptCompletionXp } from '@/lib/xp'
+import { conceptById, stageToGrade } from '@/lib/concepts'
 import type { ConceptMastery, MasteryMap, Profile, UserAchievement } from '@/types'
 
 // â”€â”€ Request schema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -86,6 +86,11 @@ export async function POST(request: NextRequest) {
   }
 
   // â”€â”€ Compute updated mastery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // First-ever attempt at this concept — used below to award concept-completion
+  // XP exactly once per concept (grade-differentiated), guarding against a
+  // student re-triggering the same challenge's progress report repeatedly.
+  const isFirstAttemptAtConcept = existingRow.attempts === 0
+
   const { updatedMastery, newlyMastered, scoreChange } = recordAttempt(
     existingRow,
     correct,
@@ -141,6 +146,14 @@ export async function POST(request: NextRequest) {
         (count ?? 0) + 1
       )
     }
+  }
+
+  // Concept-only report (Grade 6-9, IGCSE, AS/A Level lesson pages — no
+  // exercises table row to look up xp_reward from). Award a grade-differentiated
+  // amount once per concept, otherwise these calls granted ~0 XP despite
+  // correctly updating mastery/status.
+  if (!exercise_id && correct && isFirstAttemptAtConcept) {
+    xpGained += conceptCompletionXp(stageToGrade(profile.stage))
   }
 
   // Mastery achievement bonus

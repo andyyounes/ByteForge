@@ -81,3 +81,23 @@ export function exerciseXp(
   const attempt = attemptNumber <= 1 ? 1 : 0.5
   return Math.round(baseReward * mult * attempt)
 }
+
+// ── Per-grade concept-completion XP ───────────────────────────────────────────
+// Grade 6-9 and IGCSE/AS/A-Level lesson pages report progress by concept_id only
+// (no exercise_id/exercises row), so exerciseXp() above never fires for them —
+// this was the actual reason those grades' "gamification bridge" moved mastery
+// status but granted ~0 real XP per challenge. This is the differentiated
+// curve requested: younger grades get smaller, more frequent awards (many easy
+// challenges per concept feels rewarding fast); older grades get larger awards
+// per concept (fewer, harder challenges, so mastering one concept should be
+// worth more). Tune the numbers here — one place for the whole curve.
+const GRADE_CONCEPT_XP: Record<number, number> = {
+  6: 15, 7: 20, 8: 25, 9: 30,   // Grade 6-9
+  10: 30, 11: 35,                // IGCSE Y1 / Y2
+  12: 40, 13: 45,                 // AS Level / A Level
+}
+
+/** XP for a concept-only progress report (no exercise_id), differentiated by grade. */
+export function conceptCompletionXp(grade: number): number {
+  return GRADE_CONCEPT_XP[grade] ?? 20
+}

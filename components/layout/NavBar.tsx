@@ -12,7 +12,6 @@ import {
   FlameIcon,
   HomeIcon,
   TrophyIcon,
-  PathwayIcon,
   SettingsIcon,
   SignOutIcon,
 } from '@/components/ui/Icons'
@@ -125,10 +124,7 @@ export function NavBar({ profile, onMenuToggle }: NavBarProps) {
                 Dashboard
               </DropdownLink>
               {profile.role === 'student' && (
-                <>
-                  <DropdownLink href="/student/pathway"      icon={<PathwayIcon size={14} />}>Skill Tree</DropdownLink>
-                  <DropdownLink href="/student/achievements" icon={<TrophyIcon  size={14} />}>Achievements</DropdownLink>
-                </>
+                <DropdownLink href="/student/achievements" icon={<TrophyIcon  size={14} />}>Achievements</DropdownLink>
               )}
             </nav>
 
