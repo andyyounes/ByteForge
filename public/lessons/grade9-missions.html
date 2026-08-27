@@ -477,6 +477,32 @@ function parLabel(m) {
 //   stars:   par = command count for 3★ (efficiency), par+2 = 2★, pass = 1★
 // ══════════════════════════════════════════════════════════════════════════════
 const MISSIONS = [
+  // ── Phase -2 · What Is a Computer? — the actual true starting point.
+  // Before binary (how a computer stores things) or variables (how you tell
+  // it what to do), a student should know a computer even HAS these parts
+  // in the first place: CPU, memory, storage, input/output.
+  {
+    id: 'learn-computer', type: 'learn', phase: 'PHASE -2 · WHAT IS A COMPUTER?', emoji: '🖥️', title: 'What Is a Computer?', xp: 15,
+    brief: 'Before anything else — what actually IS a computer, and what are its real parts?',
+    api: [],
+    learn: {
+      videoQuery: 'what is a computer CPU RAM storage explained simply',
+      terms: [
+        { term: 'CPU',     def: 'The Central Processing Unit — carries out instructions. The "brain" of the computer.' },
+        { term: 'RAM',     def: 'Temporary, fast memory — holds data only while the computer is ON. Cleared when power is off.' },
+        { term: 'Storage', def: 'Permanent memory (a hard drive or SSD) — keeps data even after the power is switched off.' },
+        { term: 'Input',   def: 'Getting data INTO the computer — e.g. a keyboard, mouse, or sensor.' },
+        { term: 'Output',  def: 'Getting data OUT of the computer — e.g. a screen, speaker, or printer.' },
+      ],
+      theory: `
+        <h4>Every computer does the same four things</h4>
+        <p>Whatever it looks like — a laptop, a phone, a games console — every computer follows the same basic pattern: <b>Input</b> (data comes in), <b>Process</b> (the CPU does something with it), <b>Output</b> (a result comes out), and <b>Storage</b> (data is kept for later). This is called the IPOS cycle.</p>
+        <h4>RAM vs. Storage — temporary vs. permanent</h4>
+        <p>These are easy to confuse, but genuinely different jobs: RAM is fast but forgets everything the instant power is lost — it's where a program runs WHILE it's open. Storage is slower but permanent — it's where your files, photos, and installed programs live even when the computer is off.</p>
+        <h4>The CPU — where the "thinking" happens</h4>
+        <p>The CPU doesn't store your files or run out of battery on its own — its ONE job is to carry out instructions, one after another, extremely fast. Every program you'll ever write is ultimately a list of instructions for the CPU to carry out.</p>`,
+    },
+  },
   // ── Phase -1 · Your First Code — absolute zero. Nothing here assumes ANY
   // prior programming knowledge: not what a variable is, not int vs string,
   // not even that = means "store", not "equals like in maths". Every later
@@ -3315,6 +3341,10 @@ const TIERS = [
   // added directly in response to real feedback that practice missions
   // (converting to binary, using a variable) were asking students to DO
   // something before ever teaching them WHAT it was.
+  // The true starting point of Grade 9 — before binary, before variables,
+  // before any coding: what a computer actually IS and what its real parts
+  // are (CPU/RAM/storage/input/output).
+  { name: '🖥️ PHASE -2 · WHAT IS A COMPUTER?', ids: ['learn-computer'] },
   // Binary comes FIRST of all, taught unplugged (no code at all) — a real
   // concept lesson plus the classic "binary cards" hands-on activity —
   // BEFORE variables or any coding is introduced. Directly requested:
