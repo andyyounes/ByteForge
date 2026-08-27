@@ -176,9 +176,9 @@
           <strong>Binary Addition:</strong> Enter two decimal numbers. Watch how they combine in binary. Carry the 1 when you get 1+1=10!
         </div>
         <div class="addition-row">
-          <input type="number" id="add-a" class="num-input" value="6" min="0" max="127" oninput="renderAddition()"/>
+          <input type="number" id="add-a" class="num-input" value="6" min="0" max="255" oninput="renderAddition()"/>
           <div class="plus-sign">+</div>
-          <input type="number" id="add-b" class="num-input" value="5" min="0" max="127" oninput="renderAddition()"/>
+          <input type="number" id="add-b" class="num-input" value="5" min="0" max="255" oninput="renderAddition()"/>
           <div class="plus-sign">=</div>
           <div style="text-align:center">
             <div style="font-size:28px;font-weight:800;color:var(--orange);font-family:var(--mono)" id="add-sum">11</div>
@@ -415,14 +415,21 @@
         carry = col >= 2 ? 1 : 0;
       }
 
+      // Alignment: sumBin is 9 digits, and the A row is a 28px spacer + 8 cells
+      // = 9. The carry row used to have only 8 cells and NO leading spacer, so
+      // every carry rendered one column to the LEFT of the digit it belongs to;
+      // and the B row began with a bare "+" character rather than a 28px cell,
+      // so it did not line up either. The carry row now leads with the final
+      // carry-out (the overflow bit, which lines up with sumBin's 9th digit)
+      // and the B row uses a proper cell for the "+".
       const col = n => `<span style="display:inline-block;width:28px;text-align:center">${n}</span>`;
       const vis = document.getElementById('addition-visual');
       vis.innerHTML = `
         <div style="color:var(--fg-faint);font-size:13px;margin-bottom:4px">
-          ${carries.map(c=>`<span style="display:inline-block;width:28px;text-align:center;color:${c?'var(--yellow)':'var(--bg)'}">${c}</span>`).join('')}
+          ${[carry, ...carries].map(c=>`<span style="display:inline-block;width:28px;text-align:center;color:${c?'var(--yellow)':'var(--bg)'}">${c}</span>`).join('')}
         </div>
         <div>${col('')}${aBin.split('').map(col).join('')}</div>
-        <div>+${bBin.split('').map(col).join('')}</div>
+        <div>${col('+')}${bBin.split('').map(col).join('')}</div>
         <div style="border-top:2px solid var(--border);padding-top:8px;color:var(--orange)">
           ${sumBin.split('').map(col).join('')}
         </div>

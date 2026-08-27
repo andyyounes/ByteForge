@@ -250,7 +250,11 @@ function updateRLE(val) {
 
   // Stats — each original char = 1 byte; each RLE group = 2 bytes (count + char)
   const origBytes = val.length
-  const compBytes = groups.reduce((s,g) => s + (g.count > 9 ? 3 : 2), 0)
+  // Was `g.count > 9 ? 3 : 2`, which contradicts the comment directly above:
+  // a one-byte count covers 0-255, so a run of 10+ still costs 2 bytes, not 3.
+  // On the default input AAAAAABBBCCDDDDDDDDDD that reported 9 bytes / 57%
+  // saving instead of the correct 8 bytes / 62%.
+  const compBytes = groups.length * 2
   const saving    = origBytes > 0 ? Math.max(0, Math.round((1 - compBytes/origBytes) * 100)) : 0
 
   document.getElementById('orig-size').textContent    = origBytes
@@ -300,9 +304,13 @@ function updateImgRLE() {
     `<span style="color:${g.char==='1'?'#e8eaf0':'#6b7280'}">${g.count}×${g.char==='1'?'white':'black'}</span>`
   ).join(' <span style="color:var(--border-hi)">·</span> ')
 
-  document.getElementById('img-orig-bits').textContent = totalBits + ' bits'
-  document.getElementById('img-comp-bits').textContent =
-    groups.reduce((s,g) => s + String(g.count).length + 1, 0) + ' chars'
+  // The surrounding HTML already prints the unit ("... bits"), so write bare
+  // numbers. This used to append ' bits' to one and ' chars' to the other,
+  // rendering "Total: 64 bits -> RLE: 3 chars bits" - a duplicated unit AND a
+  // bits-versus-CHARACTERS comparison that overstated the saving by roughly 8x.
+  // rleBits (the correct bit count) was computed above and then thrown away.
+  document.getElementById('img-orig-bits').textContent = totalBits
+  document.getElementById('img-comp-bits').textContent = rleBits
 }
 
 // ── Questions ─────────────────────────────────────────────────────────────────
