@@ -37,8 +37,10 @@ function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
 // state read), not a Python code string — same shape as Grade 7's page-type
 // stages. Mirrors that file's maximal/empty log pattern instead of the
 // code-regex convention every Python stage below uses.
-const webMaximalLog = () => ({ bodyText: 'true false ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true })
-const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false })
+const webMaximalLog = () => ({ bodyText: 'true false you see ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
+  hasFunction: true, functionCount: 999, hasReturn: true })
+const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false,
+  hasFunction: false, functionCount: 0, hasReturn: false })
 
 let pass = 0, fail = 0
 for (const ch of CHALLENGES) {

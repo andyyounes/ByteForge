@@ -509,6 +509,12 @@ async function runWebCode() {
     hasArray:  /\b(?:let|const|var)\s+\w+\s*=\s*\[/.test(js),
     hasObject: /\b(?:let|const|var)\s+\w+\s*=\s*\{/.test(js),
     hasPush:   /\.push\s*\(/.test(js),
+    // Week 2 — functions organizing story logic. functionCount requires TWO
+    // distinct functions for stages that need "functions working together",
+    // not just one — a genuinely different bar than "any function at all".
+    hasFunction:  /\bfunction\s+\w+\s*\(/.test(js),
+    functionCount: (js.match(/\bfunction\s+\w+\s*\(/g) || []).length,
+    hasReturn:    /\breturn\b/.test(js),
   }
   clog('Ran — checking your page…', 'info')
   checkWebChallenge(webLog)
@@ -711,6 +717,67 @@ const MODULES = [
       },
       needsArray:true, needsPush:true, needsObject:true,
       check:(log) => log.hasArray && log.hasPush && log.hasObject && /true|false/i.test(log.bodyText),
+    },
+  ]},
+  // ── Web Story 2 — Semester 1, Week 2: functions organizing story logic ────
+  { id:'ws2', name:'📘 Web Story 2 — Organizing the Telling', sub:'Functions — reusable, named pieces of story logic', live:true, stages:[
+    { id:'ws2s1', name:'Your First Story Function', xp:25, lang:'web',
+      text:`<strong>Challenge 1</strong> — Write <code>function describeItem(name)</code> that RETURNS the text "You see a " + name + ".". Call it with an item name and display the RESULT inside <code>#story</code>.`,
+      hints:[
+        'function describeItem(name) { return "You see a " + name + "."; }',
+        'document.getElementById("story").textContent = describeItem("lantern");',
+        'The function itself does NOT touch the page — it just returns text; a separate line displays what it returned.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: write function describeItem(name) that RETURNS "You see a " + name + "."\n\n// TODO: call it and show the result in #story\n`,
+      },
+      needsFunction:true, needsReturn:true,
+      check:(log) => log.hasFunction && log.hasReturn && /you see/i.test(log.bodyText),
+    },
+    { id:'ws2s2', name:'A Function That Changes State', xp:30, lang:'web',
+      text:`<strong>Challenge 2</strong> — Write <code>function addItem(item)</code> that pushes item onto an inventory array declared OUTSIDE the function. Call it a couple of times, then display the whole inventory.`,
+      hints:[
+        'let inventory = []; function addItem(item) { inventory.push(item); }',
+        'A function can read and change a variable declared OUTSIDE it — that\'s exactly what makes it useful for real story state, not just returning a value.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `let inventory = [];\n// TODO: write function addItem(item) that pushes item onto inventory\n\n// TODO: call addItem twice with different items\n\n// TODO: show inventory (joined) in #story\n`,
+      },
+      needsFunction:true, needsArray:true, needsPush:true,
+      check:(log) => log.hasFunction && log.hasArray && log.hasPush,
+    },
+    { id:'ws2s3', name:'Two Functions, One Page', xp:35, lang:'web',
+      text:`<strong>Challenge 3</strong> — Write TWO separate functions: one that returns TRUE/FALSE for whether the reader has enough gold (e.g. <code>canAfford(gold, price)</code>), and another that displays a message based on the result.`,
+      hints:[
+        'function canAfford(gold, price) { return gold >= price; }',
+        'function showResult(can) { document.getElementById("story").textContent = can ? "You can afford it!" : "Not enough gold."; }',
+        'Call canAfford() first, then pass ITS result into showResult().',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: function canAfford(gold, price) — RETURNS true/false\n\n// TODO: function showResult(can) — displays a message in #story based on can\n\n// TODO: call canAfford(...), then pass its result into showResult(...)\n`,
+      },
+      needsFunction2:true,
+      check:(log) => log.functionCount >= 2,
+    },
+    { id:'ws2boss', name:'BOSS — A Story Told By Functions', xp:75, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Organize a whole small page around functions: at least THREE separate functions — one building/returning a description, one managing inventory or a flag, and one that ties the others together and actually writes to <code>#story</code>.`,
+      hints:[
+        'This combines ws2s1\'s returning function, ws2s2\'s state-changing function, and ws2s3\'s "call one function\'s result into another".',
+        'Nothing here is a new IDEA — it\'s three functions from this week, each doing its own job, called together.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: at least 3 functions, each with one clear job\n// TODO: one of them should RETURN a value used by another\n// TODO: call them together to build and display the story in #story\n`,
+      },
+      needsFunction3:true, needsReturn:true,
+      check:(log) => log.functionCount >= 3 && log.hasReturn,
     },
   ]},
   { id:'m1', name:'🔤 M1 — From Blocks to Text', sub:'print, input, variables, types — the G7 skills, now in real Python', live:true, stages:[
@@ -2235,6 +2302,19 @@ const CHALLENGE_LESSON = {
   ws1boss: { title: 'BOSS — arrays and objects, together', html: `
     <div class="cl-block"><h4>A real story tracks both kinds of state</h4>
       <p>An inventory (an ordered LIST of items) and a set of flags (NAMED yes/no facts) are genuinely different shapes of data, and a real interactive story needs both — this boss is the smallest real example of tracking each correctly.</p></div>` },
+  // ── Web Story 2 — Organizing the Telling: functions ─────────────────────────
+  ws2s1: { title: 'A function RETURNS a value — it doesn\'t display one', html: `
+    <div class="cl-block"><h4>Two separate steps, on purpose</h4>
+      <p>describeItem() hands back a string; a SEPARATE line decides what to do with it (here, show it in #story). Keeping "compute the text" and "display the text" as two different steps is what makes describeItem() reusable for other items, other pages, anywhere you need that same sentence shape.</p></div>` },
+  ws2s2: { title: 'A function can read AND change outside variables', html: `
+    <div class="cl-block"><h4>Not a sealed box</h4>
+      <p>addItem() reaches OUTSIDE itself to push onto inventory — functions aren\'t limited to only using their own parameters. This is exactly what makes a function useful for managing real, ongoing story state instead of just doing one-off calculations.</p></div>` },
+  ws2s3: { title: 'One function\'s result, another function\'s input', html: `
+    <div class="cl-block"><h4>Functions can call each other</h4>
+      <p>canAfford() returns true/false; showResult() takes THAT value and decides what to display. Chaining functions this way — one\'s output becomes another\'s input — is how real programs build complex behaviour out of small, simple, individually-understandable pieces.</p></div>` },
+  ws2boss: { title: 'BOSS — a page organized entirely around functions', html: `
+    <div class="cl-block"><h4>Structure comes from HOW you split the work</h4>
+      <p>A working page could technically be one giant block of code — but splitting it into functions, each with ONE clear job, is what makes a real project readable, testable, and changeable later without breaking everything else.</p></div>` },
   // ── M1 — From Blocks to Text ────────────────────────────────────────────────
   m1s1: { title: 'print() — your first real line of code', html: `
     <div class="cl-block"><h4>The classic first line, in any language</h4>
