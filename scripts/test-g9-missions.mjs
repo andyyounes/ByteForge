@@ -38,7 +38,7 @@ const SOLUTIONS = {
 }
 
 for (const m of MISSIONS) {
-  if (m.type === 'battle' || m.type === 'data' || m.type === 'learn' || m.type === 'cards') continue   // validated separately, below (learn/cards bubbles have no code/solution at all)
+  if (m.type === 'battle' || m.type === 'data' || m.type === 'learn' || m.type === 'cards' || m.type === 'flowchart') continue   // validated separately, below (learn/cards/flowchart bubbles have no code/solution at all)
   const sol = SOLUTIONS[m.id]
   if (!sol) { bad(m.id + ' — no reference solution'); continue }
   const sim = simTurtle(m.scene, sol)

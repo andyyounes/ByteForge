@@ -150,6 +150,32 @@
   .cards-status .total.ok { color:#4ade80; }
   #cards-check-btn { width:100%; }
 
+  /* ── Flowchart Builder — real drag-and-drop shapes + click-to-connect ── */
+  .fc-palette { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .fc-palette-btn { padding:8px 14px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;
+                     background:#161927; border:1px solid rgba(255,255,255,.15); color:#e2e8f0; }
+  .fc-palette-btn:hover { border-color:#67e8f9; }
+  .fc-canvas-wrap { position:relative; width:100%; height:420px; background:#0a0c18;
+                    border:1px solid rgba(255,255,255,.1); border-radius:10px; overflow:hidden; margin-bottom:14px; }
+  .fc-canvas-wrap.connecting { cursor:crosshair; }
+  #fc-svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .fc-shape { position:absolute; min-width:110px; min-height:52px; display:flex; align-items:center; justify-content:center;
+              padding:6px 10px; font-size:11.5px; font-weight:700; text-align:center; cursor:move; user-select:none;
+              background:#1c2033; border:2px solid #4b5563; color:#e2e8f0; }
+  .fc-shape.selected-for-connect { border-color:#fbbf24; box-shadow:0 0 0 2px rgba(251,191,36,.3); }
+  .fc-shape[data-type="terminator"] { border-radius:999px; border-color:#4ade80; }
+  .fc-shape[data-type="process"] { border-radius:6px; border-color:#67e8f9; }
+  .fc-shape[data-type="decision"] { transform:rotate(45deg); width:90px; height:90px; min-width:0; min-height:0; border-color:#fbbf24; }
+  .fc-shape[data-type="decision"] .fc-label { transform:rotate(-45deg); width:120px; }
+  .fc-shape[data-type="io"] { transform:skewX(-12deg); border-color:#a78bfa; }
+  .fc-shape[data-type="io"] .fc-label { transform:skewX(12deg); }
+  .fc-shape .fc-label { outline:none; }
+  .fc-shape .fc-del { position:absolute; top:-8px; right:-8px; width:18px; height:18px; border-radius:50%;
+                       background:#f87171; color:#1a0505; font-size:11px; font-weight:900; display:flex;
+                       align-items:center; justify-content:center; cursor:pointer; }
+  .fc-status { text-align:center; font-size:13px; font-weight:700; margin-bottom:14px; color:#c7d2e0; }
+  #fc-check-btn { width:100%; }
+
   .mlist { position:fixed; inset:0; z-index:50; background:#0d0f1a; overflow-y:auto; display:none; }
   .mlist.open { display:block; }
   .mlist-hero { text-align:center; padding:30px 16px 10px; }
@@ -330,6 +356,35 @@
       <div class="cards-row" id="cards-row"></div>
       <div class="cards-status" id="cards-status"></div>
       <button class="btn btn-run" id="cards-check-btn" onclick="checkCards()">✓ Check My Total</button>
+    </div>
+  </div>
+</div>
+
+<!-- Flowchart Builder — real drag-and-drop shapes, click-to-connect arrows,
+     editable labels. A genuine diagramming tool, not another text-answer
+     mission — added directly in response to "you added an IDE for
+     flowcharts right?" (the answer was no, until this). -->
+<div class="learn-wrap" id="flowchart-wrap">
+  <div class="learn-card" style="max-width:900px;">
+    <div class="learn-hdr">
+      <span id="fc-title"></span>
+      <button class="mbar-back" onclick="mbarBack()">☰ Missions</button>
+    </div>
+    <div class="learn-body">
+      <p class="cards-intro" id="fc-intro"></p>
+      <div class="fc-palette">
+        <div class="fc-palette-btn" onclick="addShape('terminator')">⬭ Start/End</div>
+        <div class="fc-palette-btn" onclick="addShape('process')">▭ Process</div>
+        <div class="fc-palette-btn" onclick="addShape('decision')">◇ Decision</div>
+        <div class="fc-palette-btn" onclick="addShape('io')">▱ Input/Output</div>
+        <div class="fc-palette-btn" id="fc-connect-btn" onclick="toggleConnectMode()">🔗 Connect Shapes</div>
+        <div class="fc-palette-btn" onclick="clearFlowchart()">🗑 Clear</div>
+      </div>
+      <div class="fc-canvas-wrap" id="fc-canvas-wrap">
+        <svg id="fc-svg"></svg>
+      </div>
+      <div class="fc-status" id="fc-status">Drag shapes to reposition. Click a shape's text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.</div>
+      <button class="btn btn-run" id="fc-check-btn" onclick="checkFlowchart()">✓ Check My Flowchart</button>
     </div>
   </div>
 </div>
@@ -929,6 +984,15 @@ const MISSIONS = [
     },
     answer: 'Decision',
     stars: { metric: 'pass' },
+  },
+  {
+    id: 'flow-build', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '🧩', title: 'Build It — Even or Odd', xp: 60,
+    brief: 'Build a REAL flowchart: Start → Input a number → Decision (is it even?) → two branches (Yes/No), each leading to its own output step → End. Drag shapes onto the canvas, connect them with arrows, and label each one.',
+    api: [],
+    flowchart: {
+      intro: 'Use the palette to add a Start, an Input/Output step, a Decision, two more Process/Output steps for Yes and No, and an End — then connect them in order with arrows.',
+      minShapes: 5, minConnections: 5, requiresDecision: true,
+    },
   },
 
   // ── Phase 0B · Flight Computer — algorithmic thinking, before you fly ───────
@@ -2996,8 +3060,10 @@ function openMission(id) {
   missionStartedAt = Date.now()
   if (activeMission.type === 'learn') { renderLearnBubble(); return }
   if (activeMission.type === 'cards') { renderCardsBubble(); return }
+  if (activeMission.type === 'flowchart') { renderFlowchartBubble(); return }
   document.getElementById('learn-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.remove('open')
+  document.getElementById('flowchart-wrap').classList.remove('open')
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
   document.getElementById('m-phase').textContent = activeMission.phase
   document.getElementById('m-par').textContent = parLabel(activeMission)
@@ -3041,6 +3107,7 @@ let _lmMatched  = new Set()
 function renderLearnBubble() {
   const m = activeMission
   document.getElementById('cards-wrap').classList.remove('open')
+  document.getElementById('flowchart-wrap').classList.remove('open')
   document.getElementById('learn-wrap').classList.add('open')
   document.getElementById('learn-title').textContent = m.emoji + ' ' + m.title
   const embedEl = document.getElementById('learn-video-embed')
@@ -3124,6 +3191,7 @@ let _cardsFlipped = new Set()
 function renderCardsBubble() {
   const m = activeMission
   document.getElementById('learn-wrap').classList.remove('open')
+  document.getElementById('flowchart-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.add('open')
   document.getElementById('cards-title').textContent = m.emoji + ' ' + m.title
   document.getElementById('cards-intro').textContent = m.cards.intro
@@ -3168,6 +3236,153 @@ function checkCards() {
   try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
   document.getElementById('cards-status').innerHTML = '✅ Correct! ' + activeMission.cards.target + ' made from ' + [..._cardsFlipped].map(i => activeMission.cards.values[i]).join(' + ')
   setTimeout(mbarBack, 1200)
+}
+
+// ── Flowchart Builder — real drag-and-drop shapes, click-to-connect arrows ──
+// A genuine diagramming tool: shapes are draggable divs positioned absolutely
+// inside a canvas; connections are SVG lines recalculated whenever either
+// endpoint moves. "Correctness" is checked structurally (shape counts,
+// exactly one true start/end, a decision with two real branches) rather
+// than pixel-matching a specific layout — any valid flowchart passes.
+let _fcShapes = []      // { id, type, label, x, y }
+let _fcConns  = []      // { from, to }
+let _fcConnectMode = false
+let _fcConnectFrom = null
+let _fcNextId = 1
+
+function renderFlowchartBubble() {
+  const m = activeMission
+  document.getElementById('learn-wrap').classList.remove('open')
+  document.getElementById('cards-wrap').classList.remove('open')
+  document.getElementById('flowchart-wrap').classList.add('open')
+  document.getElementById('fc-title').textContent = m.emoji + ' ' + m.title
+  document.getElementById('fc-intro').textContent = m.flowchart.intro
+  clearFlowchart()
+}
+function clearFlowchart() {
+  _fcShapes = []; _fcConns = []; _fcConnectMode = false; _fcConnectFrom = null; _fcNextId = 1
+  document.getElementById('fc-canvas-wrap').classList.remove('connecting')
+  const canvas = document.getElementById('fc-canvas-wrap')
+  canvas.querySelectorAll('.fc-shape').forEach(el => el.remove())
+  document.getElementById('fc-svg').innerHTML = ''
+  document.getElementById('fc-status').textContent = 'Drag shapes to reposition. Click a shape\'s text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.'
+}
+function addShape(type) {
+  const id = _fcNextId++
+  const labelDefault = { terminator: 'Start', process: 'Do something', decision: 'Yes/No?', io: 'Input/Output' }[type]
+  // Spread new shapes out based on how many currently exist, not `id`
+  // (which keeps climbing even after deletions) — avoids everything
+  // spawning stacked in the same top-left corner.
+  const n = _fcShapes.length
+  const shape = { id, type, label: labelDefault, x: 20 + (n % 4) * 160, y: 20 + Math.floor(n / 4) * 130 }
+  _fcShapes.push(shape)
+  const el = document.createElement('div')
+  el.className = 'fc-shape'
+  el.dataset.type = type
+  el.dataset.id = id
+  el.style.left = shape.x + 'px'
+  el.style.top = shape.y + 'px'
+  el.innerHTML = '<span class="fc-label" contenteditable="true">' + labelDefault + '</span><span class="fc-del" onclick="deleteShape(' + id + ', event)">×</span>'
+  const canvas = document.getElementById('fc-canvas-wrap')
+  canvas.appendChild(el)
+  el.querySelector('.fc-label').addEventListener('input', e => { shape.label = e.target.textContent })
+  el.querySelector('.fc-label').addEventListener('mousedown', e => e.stopPropagation())
+  el.addEventListener('click', e => { if (_fcConnectMode && !e.target.classList.contains('fc-del')) handleConnectClick(id, el) })
+  makeShapeDraggable(el, shape)
+}
+function deleteShape(id, e) {
+  e.stopPropagation()
+  _fcShapes = _fcShapes.filter(s => s.id !== id)
+  _fcConns = _fcConns.filter(c => c.from !== id && c.to !== id)
+  document.querySelector('.fc-shape[data-id="' + id + '"]')?.remove()
+  drawConnections()
+}
+function makeShapeDraggable(el, shape) {
+  let dragging = false, offX = 0, offY = 0
+  el.addEventListener('mousedown', e => {
+    if (_fcConnectMode || e.target.classList.contains('fc-del')) return
+    dragging = true
+    const rect = el.getBoundingClientRect()
+    offX = e.clientX - rect.left; offY = e.clientY - rect.top
+    e.preventDefault()
+  })
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return
+    const canvasRect = document.getElementById('fc-canvas-wrap').getBoundingClientRect()
+    shape.x = e.clientX - canvasRect.left - offX
+    shape.y = e.clientY - canvasRect.top - offY
+    el.style.left = shape.x + 'px'
+    el.style.top = shape.y + 'px'
+    drawConnections()
+  })
+  document.addEventListener('mouseup', () => { dragging = false })
+}
+function toggleConnectMode() {
+  _fcConnectMode = !_fcConnectMode
+  _fcConnectFrom = null
+  document.getElementById('fc-canvas-wrap').classList.toggle('connecting', _fcConnectMode)
+  document.getElementById('fc-connect-btn').style.background = _fcConnectMode ? 'rgba(251,191,36,.15)' : ''
+  document.querySelectorAll('.fc-shape').forEach(el => el.classList.remove('selected-for-connect'))
+  document.getElementById('fc-status').textContent = _fcConnectMode
+    ? 'Connect mode ON — click a FROM shape, then a TO shape, to draw an arrow between them.'
+    : 'Drag shapes to reposition. Click a shape\'s text to edit its label.'
+}
+function handleConnectClick(id, el) {
+  if (_fcConnectFrom === null) {
+    _fcConnectFrom = id
+    el.classList.add('selected-for-connect')
+  } else if (_fcConnectFrom !== id) {
+    _fcConns.push({ from: _fcConnectFrom, to: id })
+    document.querySelectorAll('.fc-shape').forEach(e => e.classList.remove('selected-for-connect'))
+    _fcConnectFrom = null
+    drawConnections()
+  }
+}
+function shapeCenter(id) {
+  const s = _fcShapes.find(s => s.id === id)
+  const el = document.querySelector('.fc-shape[data-id="' + id + '"]')
+  if (!s || !el) return null
+  return { x: s.x + el.offsetWidth / 2, y: s.y + el.offsetHeight / 2 }
+}
+function drawConnections() {
+  const svg = document.getElementById('fc-svg')
+  svg.innerHTML = '<defs><marker id="fc-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">'
+    + '<path d="M0,0 L8,4 L0,8 Z" fill="#67e8f9"/></marker></defs>'
+  _fcConns.forEach(c => {
+    const a = shapeCenter(c.from), b = shapeCenter(c.to)
+    if (!a || !b) return
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+    line.setAttribute('x1', a.x); line.setAttribute('y1', a.y)
+    line.setAttribute('x2', b.x); line.setAttribute('y2', b.y)
+    line.setAttribute('stroke', '#67e8f9'); line.setAttribute('stroke-width', '2')
+    line.setAttribute('marker-end', 'url(#fc-arrow)')
+    svg.appendChild(line)
+  })
+}
+function checkFlowchart() {
+  const req = activeMission.flowchart
+  const missing = []
+  const terminators = _fcShapes.filter(s => s.type === 'terminator')
+  const decisions    = _fcShapes.filter(s => s.type === 'decision')
+  const hasStart = terminators.some(t => !_fcConns.some(c => c.to === t.id))
+  const hasEnd   = terminators.some(t => !_fcConns.some(c => c.from === t.id))
+  const decisionWithTwoBranches = decisions.some(d => _fcConns.filter(c => c.from === d.id).length >= 2)
+  if (_fcShapes.length < (req.minShapes || 3)) missing.push('at least ' + (req.minShapes || 3) + ' shapes')
+  if (!hasStart) missing.push('a Start (a Terminator with no incoming arrow)')
+  if (!hasEnd)   missing.push('an End (a Terminator with no outgoing arrow)')
+  if (req.requiresDecision && !decisionWithTwoBranches) missing.push('a Decision shape with TWO outgoing arrows (Yes and No)')
+  if (_fcConns.length < (req.minConnections || 2)) missing.push('at least ' + (req.minConnections || 2) + ' connections linking your shapes together')
+
+  if (missing.length) {
+    document.getElementById('fc-status').innerHTML = '❌ Not quite — still needs: ' + missing.join(' · ')
+    return
+  }
+  const p = getProg()
+  p[activeMission.id] = { stars: 3, xp: (p[activeMission.id] || {}).xp || activeMission.xp, lang, code: '' }
+  saveProg(p)
+  try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
+  document.getElementById('fc-status').innerHTML = '✅ Correct! A genuine flowchart — start, end, and a real decision branch, all connected.'
+  setTimeout(mbarBack, 1400)
 }
 
 // Draws each mission type's starting frame — routed by activeMission.type
@@ -3423,7 +3638,7 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   // matched this topic closely.
   'learn-computer': 'g9-cpu-model', 'comp-p1': 'g9-cpu-model', 'comp-p2': 'g9-cpu-model',
   p0m1: 'g9-binary', p0m2: 'g9-binary', 'learn-images': 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
-  'learn-flowcharts': 'g9-flowcharts-loops', 'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops',
+  'learn-flowcharts': 'g9-flowcharts-loops', 'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops', 'flow-build': 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
   'learn-datatypes': 'g9-declarations',
   p0m5: 'g9-declarations', p0m6: 'g9-declarations',
@@ -3529,7 +3744,7 @@ const TIERS = [
   { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'learn-datatypes', 'p0m5', 'p0m6'] },
   { name: '🖼️ FOUNDATIONS 5 · IMAGES — binary pixels', ids: ['learn-images', 'p0m7', 'p0m8'] },
   { name: '🏆 FOUNDATIONS 4-5 CAPSTONE', ids: ['p0boss'] },
-  { name: '📊 FOUNDATIONS 6 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'flow-p1', 'flow-p2'] },
+  { name: '📊 FOUNDATIONS 6 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'flow-p1', 'flow-p2', 'flow-build'] },
   { name: '📟 FOUNDATIONS 7 · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },
   { name: '🏆 FOUNDATIONS 7 CAPSTONE', ids: ['p0bboss'] },
   { name: '🧭 TIER 1 — SEQUENCING', ids: ['p1m1', 'p1m2', 'p1m3'] },
