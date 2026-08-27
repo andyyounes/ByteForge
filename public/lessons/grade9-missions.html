@@ -473,6 +473,37 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
+    id: 'p0m7', type: 'data', phase: 'PHASE 0 · IMAGES', emoji: '🖼️', title: 'Count the Lit Pixels', xp: 40,
+    brief: 'A tiny black-and-white image is stored as binary — each row a string of 0s (dark) and 1s (lit). Loop through every row and answer() the TOTAL number of lit pixels in the whole image.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Bitmap (4x4)', dataFields: ['row'],
+    data: [{ row: '0110' }, { row: '1001' }, { row: '1001' }, { row: '0110' }],
+    starter: {
+      py: "total = 0\nfor row in data:\n    # TODO: add up how many '1' characters are in row['row']\n    pass\n\nanswer(total)\n",
+      ps: '// dataRow[i] — 1-based, dataCount rows total\ntotal ← 0\nFOR i ← 1 TO dataCount\n'
+        + '    // TODO: count the 1s in dataRow[i] and add to total\nNEXT i\n\nanswer(total)\n',
+    },
+    answer: 8,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p0m8', type: 'data', phase: 'PHASE 0 · IMAGES', emoji: '📡', title: 'Which Row Has the Most Light', xp: 45,
+    brief: 'Sensor diagnostics need the BRIGHTEST row — the one with the most lit (1) pixels. answer() its row number (1-based).',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Bitmap (4x4)', dataFields: ['row'],
+    data: [{ row: '1000' }, { row: '1110' }, { row: '0100' }, { row: '1111' }],
+    starter: {
+      py: "brightest = 1\nbrightestCount = -1\nfor i in range(len(data)):\n"
+        + "    # TODO: count 1s in data[i]['row'] — if it beats brightestCount, update brightest (i+1) and brightestCount\n    pass\n\nanswer(brightest)\n",
+      ps: 'brightest ← 1\nbrightestCount ← -1\nFOR i ← 1 TO dataCount\n'
+        + '    // TODO: count the 1s in dataRow[i] — if higher than brightestCount, update brightest ← i, brightestCount\nNEXT i\n\nanswer(brightest)\n',
+    },
+    answer: 4,
+    stars: { metric: 'pass' },
+  },
+  {
     id: 'p0boss', type: 'data', phase: 'PHASE 0 · CAPSTONE', emoji: '🏆', title: 'BOSS — Systems Check Complete', xp: 60,
     brief: '<b>Everything from Systems Check:</b> convert the binary signal to denary, then answer() "EVEN" or "ODD" depending on whether it\'s even — a genuine IF decision, not a hardcoded guess.',
     api: ['answer(value)'],
@@ -1143,6 +1174,16 @@ const MISSION_LESSON = {
   p0m6: { title: 'Coercion — converting a value from one type to another, on purpose', html: `
     <div class="ml-block"><h4>int("42") is a genuine type conversion</h4>
       <p>"42" starts as text; int() converts it into a real number BEFORE the + 8 can happen — arithmetic on text alone (like "42" + 8) would simply crash, not silently do the "obvious" thing.</p></div>` },
+  p0m7: { title: 'A picture is just binary, arranged in a grid', html: `
+    <div class="ml-block"><h4>One row, one string of 0s and 1s</h4>
+      <p>A real black-and-white bitmap stores each pixel as a single bit: 0 for dark, 1 for lit. A row like "0110" is really just four pixels side by side — dark, lit, lit, dark.</p></div>
+    <div class="ml-block"><h4>Counting characters, not numbers</h4>
+      <p>Each row is a STRING here, not a number — counting how many characters equal '1' is a genuinely different operation from binary-to-denary conversion (p0m1/p0m2), even though it's the same '0s and 1s' data.</p></div>` },
+  p0m8: { title: 'Comparing rows means tracking the best one seen so far', html: `
+    <div class="ml-block"><h4>The same "keep the best so far" pattern</h4>
+      <p>Finding the row with the most 1s uses the identical loop shape as finding a maximum value anywhere else — track the best candidate seen so far, update it only when something beats it.</p></div>
+    <div class="ml-block"><h4>Real image compression starts here</h4>
+      <p>Knowing which rows carry the most information (the most "on" pixels) is a genuine first step toward real image compression techniques — rows with very little variation compress far better than busy ones.</p></div>` },
   p0boss: { title: 'BOSS — binary, logic, and types, together', html: `
     <div class="ml-block"><h4>Three ideas, one real diagnostic</h4>
       <p>Converting binary to denary (p0m1/p0m2) feeds directly into a genuine IF decision (even/odd) — exactly how real systems combine data representation with logic to make an actual decision, not just display a number.</p></div>` },
