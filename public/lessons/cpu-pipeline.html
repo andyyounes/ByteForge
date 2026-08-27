@@ -116,7 +116,7 @@
 <div class="container">
   <div class="page-header">
     <h1 class="page-title">CPU Pipeline</h1>
-    <p class="page-sub">Watch an instruction travel through the four stages of the Fetch–Decode–Execute cycle.</p>
+    <p class="page-sub">Watch several instructions move through the pipeline at once — while one is fetched, another is decoded, another executes, and another writes back.</p>
   </div>
 
   <!-- Pipeline visualizer -->
@@ -162,7 +162,7 @@
 
       <!-- Instruction token -->
       <div class="pipeline-token-row" id="token-row">
-        <div class="token-slot"><div class="token hidden" id="instr-token">ADD<br/>R1,R2</div></div>
+        <div class="token-slot"></div>
         <div class="token-slot"></div>
         <div class="token-slot"></div>
         <div class="token-slot"></div>
@@ -257,17 +257,27 @@ const INSTRUCTIONS = [
   { addr:'0x06', op:'HALT',         comment:'// Stop execution'        },
 ]
 
-let currentStage  = -1   // -1 = not started
-let currentInstr  = 0
-let autoId        = null
+// ── Pipeline state ────────────────────────────────────────────────────────────
+// This used to move a SINGLE token through all four stages, one instruction
+// fully completing (Fetch -> Decode -> Execute -> WriteBack) before the next
+// one entered Fetch — i.e. it demonstrated a NON-pipelined CPU. Question 3
+// ("Why is pipelining beneficial?") asks students to answer using what they
+// saw in the animation above, expecting "it processes multiple instructions
+// simultaneously at different stages" — the exact opposite of what the old
+// animation showed. inFlight now tracks every instruction currently moving
+// through the pipeline, each at its own stage, so a new instruction enters
+// Fetch on every tick while up to three earlier ones are still in later
+// stages — real overlap, visible as multiple tokens lit up at once.
+let inFlight       = []   // [{ instrIdx, stage }], stage 0=Fetch..3=WriteBack
+let nextToFetch    = 0
+let autoId         = null
 let instrCompleted = 0
 
-// ── Pipeline state ────────────────────────────────────────────────────────────
 function resetPipeline() {
   clearInterval(autoId); autoId = null
   document.getElementById('auto-btn').textContent = '▶ Auto-play'
-  currentStage = -1
-  currentInstr = 0
+  inFlight = []
+  nextToFetch = 0
   instrCompleted = 0
   document.getElementById('instr-count').textContent = '0'
 
@@ -275,9 +285,7 @@ function resetPipeline() {
     const box = document.getElementById('stage-' + i)
     box.classList.remove('active','done')
   }
-
-  const token = document.getElementById('instr-token')
-  token.classList.add('hidden')
+  document.querySelectorAll('#token-row .token-slot').forEach(s => { s.innerHTML = '' })
 
   updateInstrList()
   document.getElementById('detail-title').textContent = 'Click a stage to learn what it does'
@@ -287,56 +295,49 @@ function resetPipeline() {
 }
 
 function stepPipeline() {
-  if (currentInstr >= INSTRUCTIONS.length) { resetPipeline(); return }
+  if (nextToFetch >= INSTRUCTIONS.length && inFlight.length === 0) { resetPipeline(); return }
 
-  currentStage++
-  if (currentStage === 0) {
-    // New instruction entering pipeline
-    const instr = INSTRUCTIONS[currentInstr]
-    const token = document.getElementById('instr-token')
-    const shortOp = instr.op.split(' ')[0] + '\n' + (instr.op.split(' ')[1] ?? '')
-    token.textContent = shortOp
-    token.classList.remove('hidden')
+  // Advance every in-flight instruction one stage. One that steps PAST
+  // WriteBack (stage 3) retires this tick instead of moving again.
+  const advanced = []
+  for (const f of inFlight) {
+    const ns = f.stage + 1
+    if (ns > 3) { instrCompleted++ } else { advanced.push({ instrIdx: f.instrIdx, stage: ns }) }
+  }
+  inFlight = advanced
+
+  // A new instruction enters Fetch on THIS tick too — while earlier ones are
+  // simultaneously in Decode/Execute/WriteBack. This is the actual overlap a
+  // pipelined CPU relies on.
+  if (nextToFetch < INSTRUCTIONS.length) {
+    inFlight.push({ instrIdx: nextToFetch, stage: 0 })
+    nextToFetch++
   }
 
-  // Move token to current stage slot
-  moveToken(currentStage)
-
-  // Update stage highlights
-  for (let i = 0; i < 4; i++) {
-    const box = document.getElementById('stage-' + i)
-    box.classList.remove('active')
-    if (i < currentStage) box.classList.add('done')
-  }
-  document.getElementById('stage-' + currentStage).classList.remove('done')
-  document.getElementById('stage-' + currentStage).classList.add('active')
-  focusStage(currentStage)
-
+  renderPipeline()
+  document.getElementById('instr-count').textContent = instrCompleted
   updateInstrList()
 
-  if (currentStage === 3) {
-    instrCompleted++
-    document.getElementById('instr-count').textContent = instrCompleted
-    currentStage = -1
-    currentInstr++
-    // Hide token briefly
-    setTimeout(() => {
-      const token = document.getElementById('instr-token')
-      token.classList.add('hidden')
-      for (let i = 0; i < 4; i++) document.getElementById('stage-' + i).classList.remove('active','done')
-    }, 400)
-  }
+  const newest = inFlight[inFlight.length - 1]
+  if (newest) focusStage(newest.stage)
 }
 
-function moveToken(stageIdx) {
-  const tokenRow  = document.getElementById('token-row')
-  const slots     = tokenRow.querySelectorAll('.token-slot')
-  const token     = document.getElementById('instr-token')
-  // Remove from current slot, add to new
-  document.querySelectorAll('.token-slot').forEach(s => {
-    if (s.contains(token)) s.removeChild(token)
+// Redraws every stage box and token from the current inFlight[] state — no
+// per-stage-box history ("done") is meaningful any more, since several
+// instructions can occupy several stages on the very same tick.
+function renderPipeline() {
+  const slots = document.querySelectorAll('#token-row .token-slot')
+  slots.forEach(s => { s.innerHTML = '' })
+  for (let i = 0; i < 4; i++) document.getElementById('stage-' + i).classList.remove('active','done')
+
+  inFlight.forEach(f => {
+    const instr = INSTRUCTIONS[f.instrIdx]
+    const token = document.createElement('div')
+    token.className = 'token'
+    token.textContent = instr.op.split(' ')[0] + '\n' + (instr.op.split(' ')[1] ?? '')
+    slots[f.stage].appendChild(token)
+    document.getElementById('stage-' + f.stage).classList.add('active')
   })
-  slots[stageIdx].appendChild(token)
 }
 
 function autoPipeline() {
@@ -349,7 +350,7 @@ function autoPipeline() {
   const speed = +document.getElementById('speed').value
   const ms = [0, 1200, 800, 500, 300, 150][speed]
   autoId = setInterval(() => {
-    if (currentInstr >= INSTRUCTIONS.length) {
+    if (nextToFetch >= INSTRUCTIONS.length && inFlight.length === 0) {
       clearInterval(autoId); autoId = null
       document.getElementById('auto-btn').textContent = '↺ Done'
       return
@@ -378,11 +379,15 @@ function focusStage(i) {
 function updateInstrList() {
   const list = document.getElementById('instr-list')
   list.innerHTML = ''
+  // Instructions retire strictly in program order (no reordering in this
+  // model), so "done" is simply the first instrCompleted of them; "current"
+  // is any instruction actually in inFlight[] right now — with real overlap,
+  // that can be MORE than one row at a time.
   INSTRUCTIONS.forEach((instr, i) => {
     const row = document.createElement('div')
     row.className = 'instr-row'
-    if (i === currentInstr) row.classList.add('current')
-    if (i < currentInstr)  row.classList.add('done')
+    if (inFlight.some(f => f.instrIdx === i)) row.classList.add('current')
+    if (i < instrCompleted) row.classList.add('done')
     row.innerHTML = `<span class="instr-addr">${instr.addr}</span>
                      <span class="instr-op">${instr.op}</span>
                      <span class="instr-comment">${instr.comment}</span>`

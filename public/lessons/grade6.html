@@ -1967,7 +1967,11 @@ function loadMaze() {
   document.getElementById('p-title').textContent = activeStage.title
     + (activeStage.boss ? ' — maze ' + (activeMazeIdx + 1) + ' of ' + activeStage.mazes.length : '')
   document.getElementById('p-goal').textContent = activeStage.goal
-  document.getElementById('p-par').textContent = '3★ target: ' + m.par + ' commands'
+  // renderProgram() already picks 'chip' vs 'command' for the noun based on
+  // activeStage.repeats — this label was hardcoded to 'commands' regardless,
+  // so a chip world like w2s5 read "3★ target: 10 commands" for a route that
+  // is really 30 moves / 10 CHIPS.
+  document.getElementById('p-par').textContent = '3★ target: ' + m.par + ' ' + (activeStage.repeats ? 'chip' : 'command') + (m.par === 1 ? '' : 's')
   program = []
   running = false
   document.getElementById('rep-row').style.display = activeStage.repeats ? '' : 'none'
