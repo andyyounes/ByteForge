@@ -4862,7 +4862,27 @@ const PRACTICE_EXERCISES = [
     starter:'DECLARE a, b, c : INTEGER\nINPUT a\nINPUT b\nINPUT c\n// Nested IF or compound condition',
     expected:'The largest value' },
 
+  { id:'p12b', title:'Denary to Binary', topic:'Binary', difficulty:'Easy',
+    desc:'Read a denary INTEGER n (0–255). Convert it to an 8-bit binary STRING by repeatedly dividing by 2 and recording remainders (bottom-to-top), then output the 8-bit result.',
+    starter:'DECLARE n : INTEGER\nINPUT n\nDECLARE bits : STRING\nbits ← ""\n// Repeatedly: bits ← (n MOD 2) & bits ; n ← n DIV 2\n// Pad with leading zeros to 8 digits',
+    expected:'e.g. n=45 → "00101101"' },
+
   // ── Medium ────────────────────────────────────────────────────────────────
+  { id:'p13b', title:'Binary Addition', topic:'Binary', difficulty:'Medium',
+    desc:'Two 8-bit binary numbers are given as STRINGs (e.g. "01101010" and "00111100"). Add them bit-by-bit from the rightmost digit, tracking the carry, and output the 8-bit binary result. If a carry is left over after the leftmost bit, output "Overflow" as well.',
+    starter:'DECLARE a, b : STRING\na ← "01101010"\nb ← "00111100"\nDECLARE carry : INTEGER\ncarry ← 0\nDECLARE result : STRING\nresult ← ""\n// Loop i from 8 DOWNTO 1, add bit i of a and b plus carry\n// bitSum ← a[i] + b[i] + carry ; new bit ← bitSum MOD 2 ; carry ← bitSum DIV 2',
+    expected:'01101010 + 00111100 = 10101010 (no overflow, MSB used as sign here so check against Ch1.2 rules)' },
+
+  { id:'p13c', title:"Binary Subtraction (Two's Complement)", topic:'Binary', difficulty:'Medium',
+    desc:"Read two 8-bit binary STRINGs a and b. Compute a − b by finding the two's complement of b (invert all bits, then add 1) and adding that to a. Output the 8-bit binary result.",
+    starter:'DECLARE a, b : STRING\na ← "01101010"\nb ← "00111100"\n// Step 1: invert every bit of b\n// Step 2: add 1 to the inverted value (binary addition)\n// Step 3: add the result to a (binary addition), discard any overflow carry',
+    expected:"a − b as an 8-bit two's complement binary string" },
+
+  { id:'p13d', title:'Binary Overflow Checker', topic:'Binary', difficulty:'Medium',
+    desc:"Write a FUNCTION HasOverflow(a : STRING, b : STRING) RETURNS BOOLEAN that adds two 8-bit two's complement binary strings and returns TRUE if the result overflows the 8-bit range (i.e. adding two positives gives a negative result, or two negatives give a positive result), FALSE otherwise.",
+    starter:'FUNCTION HasOverflow(a : STRING, b : STRING) RETURNS BOOLEAN\n  // Compare sign bits (leftmost bit) of a, b and the summed result\n  // Overflow only possible when a and b have the SAME sign bit\nENDFUNCTION',
+    expected:'TRUE only when both operands share a sign and the result flips sign' },
+
   { id:'p13', title:'Factorial (Iterative)', topic:'Iteration', difficulty:'Medium',
     desc:'Read a non-negative integer n from the user. Calculate n! (factorial) using a loop and output the result.',
     starter:'DECLARE n, result, i : INTEGER\nINPUT n\nresult ← 1\n// FOR loop from 1 to n, multiply result',
