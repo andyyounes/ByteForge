@@ -33,6 +33,7 @@ const SUITES = [
   { id: 'al-lab',     grade: 'A Level',   name: 'Code Lab (AL_LAB_SETS)',             script: 'test-al-lab.mjs' },
   { id: 'p4',         grade: 'A Level',   name: 'Paper 4 challenges',                 script: 'test-p4-challenges.mjs' },
   { id: 'p4-starters',grade: 'A Level',   name: 'Paper 4 starters',                   script: 'test-p4-starters.mjs' },
+  { id: 'al-prac',    grade: 'A Level',   name: 'Practice exercises',                   script: 'test-al-practice.mjs' },
   { id: 'theory',     grade: 'AS+A Level', name: 'Written-answer scoring (THEORY_EXERCISES)', script: 'test-theory-scoring.mjs' },
   { id: 'tools',      grade: 'Tools',     name: 'Standalone tool lessons',              script: 'test-tool-lessons.mjs' },
   { id: 'interp',     grade: 'AS+A Level', name: 'Pseudocode interpreters',                  script: 'test-interpreters.mjs' },

@@ -4207,9 +4207,32 @@ function ins(text){p2Editor.focus();p2Editor.replaceSelection(text)}
 let p2TraceVisible=true
 const p2Interp=new Interpreter()
 
+// Some practice exercises are SQL, OOP/CLASS or transaction tasks rather than
+// 9618 pseudocode, and the Run button fed them straight to the pseudocode
+// interpreter — which can only ever fail. Students saw parse errors pointing at
+// a SQL comment ("Unsupported statement: -- Write your SQL here"). Detect those
+// and say what to do instead of pretending to run them.
+function p2NonPseudoKind(code){
+  const src=code.replace(/^\s*\/\/.*$/gm,'').trim()
+  if(/^\s*--/m.test(src)||/\bSELECT\b[\s\S]*\bFROM\b/i.test(src))return{kind:'SQL',
+    hint:'Write your SQL query, then use <strong>🤖 AI Check</strong> to have it marked. The pseudocode runner cannot execute SQL.'}
+  if(/^\s*CLASS\b/mi.test(src))return{kind:'OOP',
+    hint:'This is a class-design exercise. Write your CLASS definition, then use <strong>🤖 AI Check</strong> — the pseudocode runner does not implement CLASS.'}
+  if(/^\s*BEGIN TRANSACTION\b/mi.test(src))return{kind:'transaction',
+    hint:'This is a database-transaction exercise. Describe or write the transaction, then use <strong>🤖 AI Check</strong>.'}
+  return null
+}
+
 function runCode(){
   const code=p2Editor.getValue().replace(/<-/g,'←')
   if(!code.trim()){p2AppendOut('// Nothing to run.','out');return}
+  const nonPseudo=p2NonPseudoKind(code)
+  if(nonPseudo){
+    document.getElementById('p2-output').innerHTML=''
+    p2AppendOut(`ℹ This is a ${nonPseudo.kind} exercise, not pseudocode.`,'out-ok')
+    p2AppendOut(nonPseudo.hint,'out')
+    return
+  }
   LessonSaves.save('al-paper4',-1,{code:p2Editor.getValue()})
   const rawInputs=document.getElementById('p2-input-vals').value||''
   const inputVals=rawInputs.split('\n').map(s=>s.trim()).filter(s=>s!=='')
@@ -4854,12 +4877,12 @@ const PRACTICE_EXERCISES = [
   // ── Easy ──────────────────────────────────────────────────────────────────
   { id:'a01', title:'Big-O of a Loop', topic:'Algorithm Analysis', difficulty:'Easy',
     desc:'Write pseudocode for a loop from 1 to n that outputs each value. State its Big-O time complexity in a comment.',
-    starter:'// Write your loop and state the Big-O\nDECLARE i : INTEGER\nFOR i ← 1 TO n\n  OUTPUT i\nNEXT i\n// Time complexity: O(?)',
+    starter:'// Write your loop and state the Big-O\nDECLARE i : INTEGER\nDECLARE n : INTEGER\nn ← 5\nFOR i ← 1 TO n\n  OUTPUT i\nNEXT i\n// Time complexity: O(?)',
     expected:'O(n) — linear' },
 
   { id:'a02', title:'Hash Index Calculation', topic:'Hash Tables', difficulty:'Easy',
     desc:'Calculate hash indices for keys 25, 36, 47 using hash(k) = k MOD 7. Output each key and its index.',
-    starter:'DECLARE key : INTEGER\nFOR key IN [25, 36, 47]\n  OUTPUT key & " → " & (key MOD 7)\nNEXT',
+    starter:'DECLARE keys : ARRAY[1:3] OF INTEGER\nDECLARE i : INTEGER\nkeys[1] ← 25\nkeys[2] ← 36\nkeys[3] ← 47\nFOR i ← 1 TO 3\n  OUTPUT keys[i] & " → " & (keys[i] MOD 7)\nNEXT i',
     expected:'25→4, 36→1, 47→5' },
 
   { id:'a03', title:'Max-Heap Check', topic:'Heaps', difficulty:'Easy',
