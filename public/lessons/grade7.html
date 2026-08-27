@@ -1043,6 +1043,11 @@ function runPageCode() {
     // A genuine reassignment exists if there are MORE '=' assignments than
     // declarations — i.e. some variable was set once, then set again later.
     hasVarUpdate: (code.match(/[^=!<>+\-*/%]=(?!=)/g) || []).length > (code.match(/\b(?:let|const)\s+\w+\s*=/g) || []).length,
+    // Week 5 — if/else branching. Same coarse source-text check as the
+    // canvas worlds' hasIf; hasElseIf additionally requires a genuine
+    // three-way (or more) branch, not just a single if/else.
+    hasIf:     /\bif\s*\(/.test(code),
+    hasElseIf: /\belse\s+if\s*\(/.test(code),
   }
   checkChallenge(pageLog)
 }
@@ -1375,6 +1380,53 @@ const WORLDS = [
                   && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16
                   && log.headingChangedByClick === true && log.paragraphChangedByClick === true && log.buttonTextChangedByClick === true
                   && log.hasVar,
+    },
+  ]},
+  // ── Story Studio — Semester 1, Week 5: if/else branching ───────────────────
+  // The payoff of Week 4's variables: something to actually BRANCH on. No new
+  // blocks needed — Control/Logic's existing if/else-if blocks already work
+  // with Page blocks, same as Variables did last week.
+  { id:'st5', name:'🔀 Story Studio 5 — Choose a Path', sub:'if/else — a story that branches on the reader\'s choice', live:true, stages:[
+    { id:'st5s1', name:'Two Endings', xp:30, type:'page',
+      text:`<strong>Challenge 1</strong> — Create a variable (e.g. <code>choice</code> set to "brave" or "cautious"). Use IF/ELSE to show a DIFFERENT heading depending on which one it is.`,
+      hints:[
+        'Variables → set choice to "brave" (or "cautious").',
+        'Control → if/else, with Logic → "= " comparing choice to "brave" as the condition.',
+        'Put a different "add heading" (or "change heading text to") in each branch.',
+      ],
+      needsVar:true, needsIf:true, needsHeadings:1,
+      check:(log) => log.hasVar && log.hasIf && log.headings >= 1,
+    },
+    { id:'st5s2', name:'Three Paths', xp:35, type:'page',
+      text:`<strong>Challenge 2</strong> — Create a numeric variable (e.g. <code>score</code>). Use if / else if / else to show THREE different paragraphs depending on whether it's low, medium, or high.`,
+      hints:[
+        'Control → if/else, then click the blue gear ⚙ icon on the block to add an "else if" section — that\'s a genuine THIRD path, not just two.',
+        'Three ranges need two comparisons: e.g. score < 30, then score < 70, then else for everything above.',
+      ],
+      needsVar:true, needsIf:true, needsElseIf:true, needsParagraphs:1,
+      check:(log) => log.hasVar && log.hasIf && log.hasElseIf && log.paragraphs >= 1,
+    },
+    { id:'st5s3', name:'Branch on the Click', xp:40, type:'page',
+      text:`<strong>Challenge 3</strong> — Set health to 100. Add a button that, when clicked, reduces health by 30 AND uses IF/ELSE to show "Game Over" if health has reached 0 or below, or the new health otherwise.`,
+      hints:[
+        'Inside "when button is clicked": update health first, THEN check it with if/else.',
+        'This is Weeks 3, 4, and 5 in one handler — click triggers the change, the change updates a variable, the variable is what the if/else branches on.',
+      ],
+      needsVar:true, needsVarUpdate:true, needsIf:true, needsHeadingChange:true,
+      check:(log) => log.hasVar && log.hasVarUpdate && log.hasIf && log.headingChangedByClick === true,
+    },
+    { id:'st5boss', name:'BOSS — Your Story, Your Ending', xp:110, type:'page', boss:true,
+      text:`<strong>BOSS</strong> — The full Semester 1 finale. Build the complete styled interactive front page (heading, 2+ paragraphs, link, button, background/heading colour, centered, readable text) — and make the button's click handler update a variable AND use if/else to decide what the reveal actually says. Structure, style, behaviour, memory, and decision-making, all in one page.`,
+      hints:[
+        'This is st4boss\'s entire page, with the click handler\'s reveal now DECIDED by an if/else on your variable\'s new value, instead of always showing the same fixed text.',
+        'Every single piece — every tag, every style rule, the click handler, the variable, the if/else — already exists from Weeks 1-5. This is purely the full assembly.',
+      ],
+      needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
+      needsHeadingChange:true, needsParagraphChange:true, needsButtonTextChange:true, needsVar:true, needsIf:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1
+                  && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16
+                  && log.headingChangedByClick === true && log.paragraphChangedByClick === true && log.buttonTextChangedByClick === true
+                  && log.hasVar && log.hasIf,
     },
   ]},
   { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
@@ -1946,6 +1998,27 @@ const CHALLENGE_LESSON = {
       <p>HTML gave structure, CSS gave style, onclick gave behaviour — variables give the page MEMORY: something that persists and can change as the reader interacts, rather than a fixed, unchanging page.</p></div>
     <div class="cl-block"><h4>This is a real interactive story engine, in miniature</h4>
       <p>A variable that updates when a button is clicked, then gets displayed back to the reader, is genuinely the core mechanism behind every choice-tracking interactive story — this boss is a small, real version of exactly that.</p></div>` },
+  // ── Story Studio 5 — Choose a Path: if/else branching ───────────────────────
+  st5s1: { title: 'A variable is only useful if something CHECKS it', html: `
+    <div class="cl-block"><h4>Why Week 4 came before Week 5</h4>
+      <p>A variable stores a choice; IF/ELSE is what actually MAKES that choice matter. Without a branch, "brave" and "cautious" would produce the exact same page — the whole point of tracking a choice is doing something different depending on what it was.</p></div>
+    <div class="cl-block"><h4>The same Control/Logic blocks from Game Maker</h4>
+      <p>Nothing new to learn technically — this is the identical if/else + comparison blocks from Grade 7's Game Maker world, applied to page content instead of a game.</p></div>` },
+  st5s2: { title: 'else if — a genuine third path', html: `
+    <div class="cl-block"><h4>Two branches vs. three (or more)</h4>
+      <p>Plain if/else can only ever pick between TWO outcomes. "else if" inserts a genuine third path — and a fourth, a fifth, as many as you need — each with its OWN condition, checked in order from top to bottom.</p></div>
+    <div class="cl-block"><h4>Order matters</h4>
+      <p>Conditions are checked top to bottom, and the FIRST one that's true wins — so ranges need to be ordered carefully (checking "< 30" before "< 70" is what makes a genuine low/medium/high split work correctly).</p></div>` },
+  st5s3: { title: 'Branching on a value THAT JUST CHANGED', html: `
+    <div class="cl-block"><h4>Update, then check — in that order</h4>
+      <p>The if/else here reads health AFTER it\'s already been reduced by the click — not the original 100. Get the order backwards (checking before updating) and the branch would always be one click behind reality.</p></div>
+    <div class="cl-block"><h4>Three weeks, one handler</h4>
+      <p>A single click (Week 3) triggers a variable update (Week 4) which is immediately branched on (Week 5) — this is genuinely how real interactive stories track health, decide "Game Over", and react to a reader's choices.</p></div>` },
+  st5boss: { title: 'BOSS — the whole semester, one real page', html: `
+    <div class="cl-block"><h4>Five weeks, one finished thing</h4>
+      <p>HTML gave structure. CSS gave style. onclick gave behaviour. Variables gave memory. if/else gives DECISIONS. A real interactive story needs genuinely all five — this boss is a small, real example of every one working together.</p></div>
+    <div class="cl-block"><h4>Nothing new, ever again this semester</h4>
+      <p>Every block in this boss already existed by the end of some earlier week. Semester 1's entire arc has been: introduce one real idea per week, then let the final boss prove they all combine into something genuinely worth building.</p></div>` },
   // ── G1 — Sprite Start: coordinates & sequence ──────────────────────────────
   g1s1: { title: 'Coordinates — every sprite has an (x, y)', html: `
     <div class="cl-block"><h4>x and y are just numbers</h4>
@@ -2362,6 +2435,8 @@ function checkChallenge(log) {
       if (ch.needsVar && !log.hasVar) missing.push(`a variable (Variables → set … to …)`)
       if (ch.needsVar2 && (log.varCount || 0) < 2) missing.push(`at least 2 variables (you used ${log.varCount || 0})`)
       if (ch.needsVarUpdate && !log.hasVarUpdate) missing.push(`a variable that's set, then given a NEW value later (a genuine update, not just one set-and-forget)`)
+      if (ch.needsIf && !log.hasIf) missing.push(`an if/else block (Control → if)`)
+      if (ch.needsElseIf && !log.hasElseIf) missing.push(`a THIRD path — an "else if" branch, not just if/else (Control → if/else if)`)
       if (missing.length) logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
       else logLine('❌ Not quite — your page built, but it doesn\'t meet this challenge\'s goal yet. Re-read the task above and try the 💡 Hint button.', 'err')
       return

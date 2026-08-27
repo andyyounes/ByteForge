@@ -45,13 +45,13 @@ const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, t
   headingChangedByClick: true, paragraphChangedByClick: true, buttonTextChangedByClick: true,
   // st4* (variables & simple state) — hasVar is shared with the canvas
   // worlds' flag; varCount/hasVarUpdate are page-specific.
-  varCount: 999, hasVarUpdate: true })
+  varCount: 999, hasVarUpdate: true, hasElseIf: true })
 const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   texts: 0,   hasIf: false, hasVar: false, hasFunction: false,
   positions: [],
   headings: 0, paragraphs: 0, links: 0, buttons: 0,
   bgColor: '', headingColor: '', align: '', fontSize: 0,
   headingChangedByClick: false, paragraphChangedByClick: false, buttonTextChangedByClick: false,
-  varCount: 0, hasVarUpdate: false })
+  varCount: 0, hasVarUpdate: false, hasElseIf: false })
 
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.id}`
@@ -65,12 +65,12 @@ for (const ch of CHALLENGES) {
   const flags = ['needsVar', 'needsIf', 'needsFrames', 'needsFunction', 'needsHeadings', 'needsParagraphs', 'needsLinks', 'needsButtons',
     'needsBgColor', 'needsHeadingColor', 'needsAlign', 'needsFontSize',
     'needsHeadingChange', 'needsParagraphChange', 'needsButtonTextChange',
-    'needsVar2', 'needsVarUpdate']
+    'needsVar2', 'needsVarUpdate', 'needsElseIf']
   const fieldFor = { needsVar: 'hasVar', needsIf: 'hasIf', needsFrames: 'frames', needsFunction: 'hasFunction',
     needsHeadings: 'headings', needsParagraphs: 'paragraphs', needsLinks: 'links', needsButtons: 'buttons',
     needsBgColor: 'bgColor', needsHeadingColor: 'headingColor', needsAlign: 'align', needsFontSize: 'fontSize',
     needsHeadingChange: 'headingChangedByClick', needsParagraphChange: 'paragraphChangedByClick', needsButtonTextChange: 'buttonTextChangedByClick',
-    needsVar2: 'varCount', needsVarUpdate: 'hasVarUpdate' }
+    needsVar2: 'varCount', needsVarUpdate: 'hasVarUpdate', needsElseIf: 'hasElseIf' }
   const numericFields = new Set(['frames', 'headings', 'paragraphs', 'links', 'buttons', 'fontSize', 'varCount'])
   const stringFields  = new Set(['bgColor', 'headingColor', 'align'])
   for (const flag of flags) {
