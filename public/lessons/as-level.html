@@ -1141,7 +1141,7 @@
     </svg>
     <span class="logo-text">ByteForge</span>
   </div>
-  <div class="nav-links"><a href="#" onclick="showJourney();return false" style="color:#e879f9;font-weight:800;">🗺 Journey</a> &nbsp; <a href="/student/dashboard">← Dashboard</a></div>
+  <div class="nav-links"><a href="#" onclick="showJourney();return false" style="color:#e879f9;font-weight:800;">🗺 Lesson Journey</a> &nbsp; <a href="#" onclick="showPracticeJourney();return false" style="color:#38bdf8;font-weight:800;">📝 Practice Map</a> &nbsp; <a href="/student/dashboard">← Dashboard</a></div>
 </nav>
 
 <!-- Tab bar -->
@@ -7731,6 +7731,44 @@ function showJourney() {
       }
       switchTab(getChapterNum(id) >= 11 ? 'p2' : 'p1')
       loadTopic(id)
+    },
+  })
+}
+
+// ── Practice Map — separate journey view over PRACTICE_EXERCISES ────────────
+// Distinct from showJourney() (lesson topics/exams): this tracks practice-bank
+// progress on its own path, grouped by topic, so practice progress isn't
+// buried inside the lesson map or the cramped in-tab card list.
+function showPracticeJourney() {
+  try { _bfwLeave() } catch (e) {}
+  const EMO = ['📝','🧮','🔁','🧩','🧠','🔢','📦','🔤','⚙️']
+  const byTopic = {}
+  const order = []
+  PRACTICE_EXERCISES.forEach(ex => {
+    if (!byTopic[ex.topic]) { byTopic[ex.topic] = []; order.push(ex.topic) }
+    byTopic[ex.topic].push(ex)
+  })
+  const worlds = order.map((topic, wi) => ({
+    name: topic,
+    sub: '',
+    live: true,
+    stages: byTopic[topic].map((ex, i) => ({
+      id: ex.id,
+      emoji: EMO[(wi + i) % EMO.length],
+      label: ex.title + ' (' + ex.difficulty + ')',
+      done: _pracDone.has(ex.id),
+    })),
+  }))
+  QuestMap.show({
+    title: '📝 Your Practice Map',
+    subtitle: 'Every Paper 2 practice exercise, grouped by topic — separate from the lesson journey.',
+    accent: '#38bdf8',
+    freeRoam: true, layout: 'path', softLock: true,
+    avatarSvg: (typeof _BFW_AV !== 'undefined') ? _BFW_AV : '',
+    worlds: worlds,
+    onOpen: function(id) {
+      switchTab('p2')
+      loadPractice(id)
     },
   })
 }
