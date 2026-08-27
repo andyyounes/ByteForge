@@ -51,6 +51,29 @@
   .ml-toggle:hover { color:#a5f3fc; }
   #ml-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
   .ml-body { padding:0 16px 14px; font-size:12px; color:#c7d2e0; line-height:1.7; }
+
+  /* ── Project Toolkit modal (Semester 3 process-skill reference content) ── */
+  .toolkit-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200;
+                     display:flex; align-items:center; justify-content:center; padding:24px; }
+  .toolkit-modal { background:#111320; border:1px solid rgba(255,255,255,.12); border-radius:14px;
+                   width:min(720px,100%); max-height:85vh; display:flex; flex-direction:column; overflow:hidden; }
+  .toolkit-hdr { padding:14px 20px; font-size:15px; font-weight:800; display:flex; align-items:center;
+                 justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.08); }
+  .toolkit-close { cursor:pointer; color:#9ca3af; font-size:16px; }
+  .toolkit-close:hover { color:#fff; }
+  .toolkit-tabs { display:flex; border-bottom:1px solid rgba(255,255,255,.08); flex-shrink:0; }
+  .toolkit-tab { padding:10px 16px; font-size:12px; font-weight:800; cursor:pointer; color:#9ca3af;
+                 border-bottom:2px solid transparent; }
+  .toolkit-tab.active { color:#67e8f9; border-bottom-color:#67e8f9; }
+  .toolkit-body { padding:18px 22px; overflow-y:auto; font-size:13px; line-height:1.7; color:#c7d2e0; }
+  .toolkit-body h4 { color:#e2e8f0; font-size:13.5px; margin:16px 0 6px; }
+  .toolkit-body h4:first-child { margin-top:0; }
+  .toolkit-body ul, .toolkit-body ol { margin:6px 0 6px 20px; }
+  .toolkit-body code { background:#0a0c18; border:1px solid rgba(255,255,255,.1); border-radius:4px;
+                        padding:1px 6px; font-size:12px; color:#b8ef4a; }
+  .toolkit-body table { width:100%; border-collapse:collapse; margin:8px 0; font-size:12px; }
+  .toolkit-body th, .toolkit-body td { border:1px solid rgba(255,255,255,.12); padding:6px 8px; text-align:left; }
+  .toolkit-body th { background:#0a0c18; color:#67e8f9; }
   .ml-body.collapsed { display:none; }
   .ml-block { background:#161927; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
   .ml-block:last-child { margin-bottom:0; }
@@ -180,8 +203,31 @@
 
 <nav class="nav">
   <div class="nav-logo"><span class="bolt">⚡</span><span>ByteForge · 🌊 Deep Diver</span></div>
-  <a href="/student/dashboard">← Dashboard</a>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="#" onclick="openToolkit(); return false;">🧰 Project Toolkit</a>
+    <a href="/student/dashboard">← Dashboard</a>
+  </div>
 </nav>
+
+<!-- Project Toolkit — Semester 3's capstone project process skills (planning,
+     building, testing, evaluation) are NOT codeable missions like every other
+     week — they're reference/checklist content, kept lightweight rather than
+     forced into the mission/answer() format. -->
+<div class="toolkit-overlay" id="toolkit-overlay" style="display:none;">
+  <div class="toolkit-modal">
+    <div class="toolkit-hdr">
+      <span>🧰 Project Toolkit</span>
+      <span class="toolkit-close" onclick="closeToolkit()">✕</span>
+    </div>
+    <div class="toolkit-tabs">
+      <div class="toolkit-tab active" id="tk-tab-plan"  onclick="switchToolkitTab('plan')">1. Planning</div>
+      <div class="toolkit-tab"        id="tk-tab-build" onclick="switchToolkitTab('build')">2. Building</div>
+      <div class="toolkit-tab"        id="tk-tab-test"  onclick="switchToolkitTab('test')">3. Testing</div>
+      <div class="toolkit-tab"        id="tk-tab-eval"  onclick="switchToolkitTab('eval')">4. Evaluating</div>
+    </div>
+    <div class="toolkit-body" id="toolkit-body"></div>
+  </div>
+</div>
 
 <div class="mbar">
   <button class="mbar-back" id="mbar-back-btn" onclick="mbarBack()">☰ Missions</button>
@@ -2732,6 +2778,79 @@ const TIERS = [
 // AS-A page uses — each TIER becomes a chapter banner on the path (exactly
 // like AS/A Level's CHAPTER_TOPICS). Soft lock: dimmed but still clickable,
 // same trade-off AS/A Level makes for revision-friendly navigation.
+// ── Project Toolkit — Semester 3 capstone process skills ──────────────────
+// Not missions: no code, no answer() check. Planning/building/testing/
+// evaluating are genuine project-process skills, kept as lightweight
+// reference/checklist content rather than forced into a graded format.
+const TOOLKIT_CONTENT = {
+  plan: `
+    <h4>Break the big idea into small pieces (decomposition)</h4>
+    <p>Don't start coding your whole project at once. Write down the big goal, then split it into the smallest pieces you can actually build and test ONE at a time.</p>
+    <ul>
+      <li>What's the ONE core thing the program must do? (e.g. "track a player's score")</li>
+      <li>What are 3-5 smaller sub-problems that add up to that? (e.g. store data → update it → display it → save it)</li>
+      <li>Which sub-problem is genuinely the simplest to build FIRST — one you could test today?</li>
+    </ul>
+    <h4>A simple planning checklist</h4>
+    <ol>
+      <li>Write a one-sentence description of what the finished project does.</li>
+      <li>List the sub-problems, in the order you'll build them.</li>
+      <li>For each sub-problem, name ONE thing you'll test to prove it works.</li>
+    </ol>
+    <p>This maps to <b>Criterion A</b> — showing you understand the concepts (abstraction, decomposition) BEFORE writing code, not figuring it out as you go.</p>`,
+  build: `
+    <h4>Build one sub-problem at a time</h4>
+    <p>Using your plan's list, build and test EACH sub-problem before moving to the next — not the whole thing at once, hoping it all works together at the end.</p>
+    <ul>
+      <li>Get sub-problem 1 working and tested. Only then start sub-problem 2.</li>
+      <li>If something breaks, you'll know it's almost certainly in the piece you JUST added — not somewhere in 200 lines you wrote yesterday.</li>
+    </ul>
+    <h4>Keep a build log</h4>
+    <table><tr><th>Date</th><th>What I built</th><th>Did it work?</th><th>Notes</th></tr>
+      <tr><td>e.g. Mon</td><td>Score variable + display</td><td>✓ Yes</td><td>—</td></tr>
+      <tr><td>e.g. Tue</td><td>Save to file</td><td>✗ Not yet</td><td>File path was wrong</td></tr>
+    </table>
+    <p>This maps to <b>Criterion C</b> — a real record of designing and building your solution, not just the finished code with no evidence of the process.</p>`,
+  test: `
+    <h4>A trace table proves your logic BEFORE you trust the output</h4>
+    <p>Pick real, specific test values and work through your code BY HAND, line by line, writing down what each variable holds at each step — then compare to what your program actually outputs.</p>
+    <table><tr><th>Line</th><th>total</th><th>i</th><th>Note</th></tr>
+      <tr><td>total ← 0</td><td>0</td><td>—</td><td>starting value</td></tr>
+      <tr><td>FOR i ← 1 TO 3</td><td>0</td><td>1</td><td>first pass</td></tr>
+      <tr><td>total ← total + i</td><td>1</td><td>1</td><td>0 + 1</td></tr>
+      <tr><td>total ← total + i</td><td>3</td><td>2</td><td>1 + 2</td></tr>
+      <tr><td>total ← total + i</td><td>6</td><td>3</td><td>3 + 3</td></tr>
+    </table>
+    <h4>Test data categories — don't only test the "normal" case</h4>
+    <ul>
+      <li><b>Normal</b> data — a typical, expected input.</li>
+      <li><b>Boundary</b> data — the smallest/largest value your program should still accept.</li>
+      <li><b>Erroneous</b> data — a genuinely invalid input, to prove your program handles it gracefully instead of crashing.</li>
+    </ul>
+    <p>This maps to <b>Criterion C</b> — real testing evidence, covering more than just "I ran it once and it looked fine".</p>`,
+  eval: `
+    <h4>Evaluate against what you actually planned</h4>
+    <p>Go back to your Week 1 plan. For each sub-problem you listed, honestly answer: did the finished project actually do this?</p>
+    <h4>A genuine self-evaluation, not just "it works"</h4>
+    <ul>
+      <li><b>Criterion A</b> — Which concepts did you genuinely use (loops, functions, files, state)? Could you explain WHY each one was the right choice?</li>
+      <li><b>Criterion B</b> — What real problem did you analyse, and how did you turn it into a computational solution (not just "I copied a pattern")?</li>
+      <li><b>Criterion C</b> — Does it work on ALL your test data (normal, boundary, erroneous)? What would you improve with more time?</li>
+    </ul>
+    <p>A strong evaluation names a REAL limitation or improvement — "it always works perfectly" is rarely true and reads as not having tested thoroughly.</p>`,
+}
+let toolkitTab = 'plan'
+function openToolkit() {
+  document.getElementById('toolkit-overlay').style.display = 'flex'
+  switchToolkitTab(toolkitTab)
+}
+function closeToolkit() { document.getElementById('toolkit-overlay').style.display = 'none' }
+function switchToolkitTab(tab) {
+  toolkitTab = tab
+  ;['plan','build','test','eval'].forEach(t => document.getElementById('tk-tab-' + t).classList.toggle('active', t === tab))
+  document.getElementById('toolkit-body').innerHTML = TOOLKIT_CONTENT[tab]
+}
+
 function showJourney() {
   const p = getProg()
   const worlds = TIERS.map(tier => ({
