@@ -53,11 +53,22 @@ export const CONCEPTS: Concept[] = [
   { id:'g7-capstone',     name:'M10 · Year Capstone',             icon:'★', color:'#eab308', tier:9, xGroup:1,  prerequisites:['g7-strings'],       difficulty:4, gradeMin:7, estimatedMinutes:90, learningModes:['grade7','game','canvas-code'],  tags:['grade7','capstone'], lessonUrl:'/lessons/grade7.html' },
 
   // ══════════════════════════════════════════════════════════════════════════
-  //  GRADE 8 — Systems Builder interactive track
-  //  prerequisites:[] so Grade 8 students see these immediately.
+  //  GRADE 8 — "The App Builder" — 10 modules (M1-M10), mirroring grade8.html's
+  //  own MODULES array. Only 2 of these 10 concepts existed before — the other
+  //  8 modules had real, gradeable content but nothing to report mastery
+  //  against, so completing them could never move a student's real dashboard.
+  //  prerequisites chain linearly, matching the module order students see.
   // ══════════════════════════════════════════════════════════════════════════
-  { id:'functions-params', name:'Functions & Parameters', icon:'ƒ', color:'#3b82f6', tier:5, xGroup:4, prerequisites:[],                   difficulty:3, gradeMin:8, estimatedMinutes:35, learningModes:['grade8','canvas-code'],  tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
-  { id:'lists-data',       name:'Lists & Arrays',         icon:'≡', color:'#3b82f6', tier:5, xGroup:5, prerequisites:['functions-params'], difficulty:3, gradeMin:8, estimatedMinutes:35, learningModes:['grade8','canvas-code'],  tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-text',          name:'M1 · From Blocks to Text',   icon:'🔤', color:'#3b82f6', tier:5, xGroup:0, prerequisites:[],                   difficulty:2, gradeMin:8, estimatedMinutes:35, learningModes:['grade8'],                tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-loops',         name:'M2 · Choices & Loops',        icon:'🚦', color:'#3b82f6', tier:5, xGroup:1, prerequisites:['g8-text'],           difficulty:2, gradeMin:8, estimatedMinutes:35, learningModes:['grade8'],                tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
+  { id:'functions-params', name:'M3 · Functions & Parameters', icon:'ƒ',  color:'#3b82f6', tier:5, xGroup:4, prerequisites:['g8-loops'],          difficulty:3, gradeMin:8, estimatedMinutes:35, learningModes:['grade8','canvas-code'],  tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
+  { id:'lists-data',       name:'M4 · Lists & Arrays',         icon:'≡',  color:'#3b82f6', tier:5, xGroup:5, prerequisites:['functions-params'], difficulty:3, gradeMin:8, estimatedMinutes:35, learningModes:['grade8','canvas-code'],  tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-strings',       name:'M5 · Strings & Validation',   icon:'✂️', color:'#3b82f6', tier:5, xGroup:6, prerequisites:['lists-data'],        difficulty:3, gradeMin:8, estimatedMinutes:35, learningModes:['grade8'],                tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-files',         name:'M6 · Files & Data',           icon:'🗂', color:'#3b82f6', tier:5, xGroup:7, prerequisites:['g8-strings'],        difficulty:3, gradeMin:8, estimatedMinutes:45, learningModes:['grade8'],                tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-hardware',      name:'M7 · Inside the Machine',     icon:'⚙️', color:'#06b6d4', tier:5, xGroup:8, prerequisites:['g8-files'],          difficulty:2, gradeMin:8, estimatedMinutes:35, learningModes:['grade8'],                tags:['grade8','hardware'],    lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-web',           name:'M8 · The Connected World',    icon:'🌐', color:'#06b6d4', tier:5, xGroup:9, prerequisites:['g8-hardware'],       difficulty:2, gradeMin:8, estimatedMinutes:30, learningModes:['grade8'],                tags:['grade8','networking'],  lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-apps',          name:'M9 · Interactive Apps',       icon:'🖥',  color:'#3b82f6', tier:6, xGroup:0, prerequisites:['g8-web'],            difficulty:3, gradeMin:8, estimatedMinutes:45, learningModes:['grade8'],                tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-capstone',      name:'M10 · Capstone: Data App',    icon:'🏆', color:'#eab308', tier:6, xGroup:1, prerequisites:['g8-apps'],           difficulty:3, gradeMin:8, estimatedMinutes:60, learningModes:['grade8'],                tags:['grade8','capstone'],    lessonUrl:'/lessons/grade8.html' },
 
   // ══════════════════════════════════════════════════════════════════════════
   //  GRADE 9 — "The Deep Diver"
@@ -204,7 +215,7 @@ export const PATHWAYS: Pathway[] = [
     name: 'Systems Builder',
     icon: '⊞',
     color: '#3b82f6',
-    conceptIds: ['functions-params','lists-data','compression','cpu-pipeline'],
+    conceptIds: ['g8-text','g8-loops','functions-params','lists-data','g8-strings','g8-files','g8-hardware','g8-web','g8-apps','g8-capstone'],
     tier: 'Grade 8',
   },
   // ── General pathways (Grade 9+) ───────────────────────────────────────────

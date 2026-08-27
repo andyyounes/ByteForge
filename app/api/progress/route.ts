@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { recordAttempt, recalculateAvailability, checkNewAchievements } from '@/lib/mastery'
 import { calculateStreak } from '@/lib/adaptive'
 import { exerciseXp } from '@/lib/xp'
+import { conceptById } from '@/lib/concepts'
 import type { ConceptMastery, MasteryMap, Profile, UserAchievement } from '@/types'
 
 // â”€â”€ Request schema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -42,15 +43,46 @@ export async function POST(request: NextRequest) {
   const { concept_id, correct, time_spent_ms, weaknesses, exercise_id, lesson_id, code, output, score } = parsed.data
 
   // â”€â”€ Fetch existing mastery record â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const { data: existingRow } = await supabase
+  let { data: existingRow } = await supabase
     .from('concept_mastery')
     .select('*')
     .eq('student_id', user.id)
     .eq('concept_id', concept_id)
     .single<ConceptMastery>()
 
+  // Self-healing instead of a hard 404: a student onboarded before a concept
+  // existed (or before it was added to a lesson page's own progress-reporting
+  // code) has no row for it yet. lib/concepts.ts is the single source of
+  // truth for every concept that should exist, so if concept_id is real,
+  // create the row now rather than silently dropping the student's progress —
+  // that is exactly the failure mode that made Grade 7/8 report nothing to
+  // the real dashboard for months.
   if (!existingRow) {
-    return NextResponse.json({ error: 'Concept mastery record not found' }, { status: 404 })
+    const concept = conceptById(concept_id)
+    if (!concept) {
+      return NextResponse.json({ error: 'Unknown concept_id' }, { status: 404 })
+    }
+    const { data: inserted, error: insertError } = await supabase
+      .from('concept_mastery')
+      .insert({
+        student_id:       user.id,
+        concept_id,
+        mastery_score:    0,
+        status:           concept.prerequisites.length === 0 ? 'available' : 'locked',
+        attempts:         0,
+        correct_attempts: 0,
+        accuracy_history: [],
+        weaknesses:       [],
+        time_spent_ms:    0,
+        last_practiced:   null,
+      })
+      .select('*')
+      .single<ConceptMastery>()
+    if (insertError || !inserted) {
+      console.error('[POST /api/progress] backfill insert failed:', insertError)
+      return NextResponse.json({ error: 'Concept mastery record not found' }, { status: 404 })
+    }
+    existingRow = inserted
   }
 
   // â”€â”€ Compute updated mastery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

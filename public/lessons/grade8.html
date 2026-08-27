@@ -1513,9 +1513,12 @@ function renderPills() {
   })
 }
 
+let challengeStartedAt = Date.now()
+
 function selectChallenge(i) {
   activeIdx = i
   hintIdx   = 0
+  challengeStartedAt = Date.now()
   const ch  = CHALLENGES[i]
   document.getElementById('ch-text').innerHTML = ch.text
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
@@ -1525,6 +1528,28 @@ function selectChallenge(i) {
   ctx.clearRect(0,0,W,H)
   renderPills()
   clog('Challenge: ' + ch.name, 'info')
+}
+
+// ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
+// Same root-cause fix as grade7.html: public/js/db.js's BF.addXP/recordAttempt
+// only ever wrote to a localStorage-only mock database, disconnected from the
+// real Supabase profile/concept_mastery rows /student/dashboard reads. Map
+// each of Grade 8's 10 modules onto the matching concept in lib/concepts.ts
+// (8 of these 10 concepts did not exist before this fix — only
+// functions-params/lists-data did, for modules M3/M4).
+const G8_MODULE_CONCEPT = {
+  m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
+  m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
+}
+async function reportRealProgress(ch, timeSpentMs) {
+  const concept_id = G8_MODULE_CONCEPT[ch.mod]
+  if (!concept_id) return
+  try {
+    await fetch('/api/progress', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ concept_id, correct: true, time_spent_ms: Math.max(0, Math.min(3600000, timeSpentMs)) }),
+    })
+  } catch (e) { console.warn('[grade8] progress report failed (offline?):', e.message) }
 }
 
 function resetToStarter() {
@@ -1563,6 +1588,7 @@ function validateChallenge(code) {
     clog('Challenge complete! +' + ch.xp + ' XP', 'ok')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g8-c' + activeIdx, { passed: true, score: 100 }); }
     LessonSaves.save('grade8', activeIdx, { passed: true, xpEarned: ch.xp, code })
+    reportRealProgress(ch, Date.now() - challengeStartedAt)
   }
 }
 
