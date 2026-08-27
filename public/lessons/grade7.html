@@ -1256,9 +1256,12 @@ function renderPills() {
   })
 }
 
+let challengeStartedAt = Date.now()
+
 function selectChallenge(i) {
   activeIdx = i
   hintIdx   = 0
+  challengeStartedAt = Date.now()
   const ch  = CHALLENGES[i]
   document.getElementById('ch-text').innerHTML = ch.text
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
@@ -1267,6 +1270,33 @@ function selectChallenge(i) {
   ctx.clearRect(0,0,W,H)
   renderPills()
   log('Challenge: ' + ch.name, 'info')
+}
+
+// ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
+// BF.addXP/recordAttempt below only ever wrote to a LOCAL browser mock
+// database (public/js/db.js is a pure localStorage layer) — a student could
+// clear every challenge here and their real account, and /student/dashboard,
+// would still show 0 XP, no streak, and 0 mastered concepts, because nothing
+// in this page ever called the real progress API. Map each module to the
+// matching concept already defined in lib/concepts.ts and report there too.
+const G7_MODULE_CONCEPT = {
+  G1: 'g7-variables', G2: 'g7-variables', G3: 'g7-conditionals', G4: 'g7-functions',
+  G6: 'g7-collision', G7W: 'g7-gamestate', G8: 'g7-design', G9W: 'g7-strings', G10: 'g7-capstone',
+}
+// G5 (Player Control) splits across two concepts depending on the challenge.
+const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }
+function g7ConceptsFor(ch) {
+  return G7_ID_CONCEPT_OVERRIDE[ch.id] || (G7_MODULE_CONCEPT[ch.mod] ? [G7_MODULE_CONCEPT[ch.mod]] : [])
+}
+async function reportRealProgress(ch, timeSpentMs) {
+  for (const concept_id of g7ConceptsFor(ch)) {
+    try {
+      await fetch('/api/progress', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ concept_id, correct: true, time_spent_ms: Math.max(0, Math.min(3600000, timeSpentMs)) }),
+      })
+    } catch (e) { console.warn('[grade7] progress report failed (offline?):', e.message) }
+  }
 }
 
 function checkChallenge(log) {
@@ -1280,6 +1310,7 @@ function checkChallenge(log) {
     logLine('✅ Challenge complete! +' + ch.xp + ' XP', 'ok')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g7-c' + activeIdx, { passed: true, score: 100 }); }
     LessonSaves.save('grade7', activeIdx, { passed: true, xpEarned: ch.xp, code: editor.getValue() })
+    reportRealProgress(ch, Date.now() - challengeStartedAt)
     // Auto-unlock next
     renderPills()
   } else {
