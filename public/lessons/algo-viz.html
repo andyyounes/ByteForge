@@ -158,22 +158,34 @@
       name: 'Bubble Sort',
       complexity: { time:'O(n²)', best:'O(n)', space:'O(1)', quality:{time:'bad',best:'ok',space:'good'} },
       pseudo: [
-        'FOR i ← 0 TO n-2',
+        'REPEAT',
+        '  swapped ← FALSE',
         '  FOR j ← 0 TO n-2-i',
         '    IF arr[j] > arr[j+1] THEN',
         '      SWAP arr[j] AND arr[j+1]',
+        '      swapped ← TRUE',
         '    ENDIF',
         '  NEXT j',
-        'NEXT i',
+        'UNTIL swapped = FALSE',
       ],
       generate(arr) {
         const a = [...arr]; const steps = [];
-        for (let i=0;i<a.length-1;i++) {
+        // Optimised bubble sort WITH the early exit, matching the pseudocode
+        // shown beside it. Without this the best case is O(n^2), contradicting
+        // the complexity panel's best: O(n).
+        // pseudoLine indices point at the line actually being executed: 3 is
+        // 'IF arr[j] > arr[j+1] THEN' and 4 is the SWAP. The comparison step
+        // used to point at index 1 (a FOR header), so the visualiser
+        // highlighted the loop line while narrating a comparison.
+        let swapped = true;
+        for (let i=0; i<a.length-1 && swapped; i++) {
+          swapped = false;
           for (let j=0;j<a.length-1-i;j++) {
-            steps.push({ arr:[...a], compare:[j,j+1], swapped:false, sorted:Array.from({length:i},(_,k)=>a.length-1-k), pseudoLine:1, msg:`Comparing <strong>${a[j]}</strong> and <strong>${a[j+1]}</strong>` });
+            steps.push({ arr:[...a], compare:[j,j+1], swapped:false, sorted:Array.from({length:i},(_,k)=>a.length-1-k), pseudoLine:3, msg:`Comparing <strong>${a[j]}</strong> and <strong>${a[j+1]}</strong>` });
             if (a[j]>a[j+1]) {
               [a[j],a[j+1]]=[a[j+1],a[j]];
-              steps.push({ arr:[...a], compare:[j,j+1], swapped:true, sorted:Array.from({length:i},(_,k)=>a.length-1-k), pseudoLine:3, msg:`Swapped <strong>${a[j+1]}</strong> and <strong>${a[j]}</strong>` });
+              swapped = true;
+              steps.push({ arr:[...a], compare:[j,j+1], swapped:true, sorted:Array.from({length:i},(_,k)=>a.length-1-k), pseudoLine:4, msg:`Swapped <strong>${a[j+1]}</strong> and <strong>${a[j]}</strong>` });
             }
           }
         }
@@ -208,6 +220,48 @@
           steps.push({ arr:[...a], compare:[j+1], key:j+1, sorted:Array.from({length:i+1},(_,k)=>k), pseudoLine:7, msg:`Placed <strong>${key}</strong> at position ${j+1}` });
         }
         steps.push({ arr:[...a], compare:[], sorted:Array.from({length:a.length},(_,k)=>k), pseudoLine:-1, msg:'✅ Array is sorted!' });
+        return steps;
+      }
+    },
+    // The 'sort-merge' concept in lib/concepts.ts lists 'algo-viz' in its
+    // learningModes and points students here, but ALGOS had no merge sort at
+    // all — the concept promised a visualisation that did not exist.
+    merge: {
+      name: 'Merge Sort',
+      complexity: { time:'O(n log n)', best:'O(n log n)', space:'O(n)', quality:{time:'good',best:'good',space:'ok'} },
+      pseudo: [
+        'PROCEDURE MergeSort(arr, left, right)',
+        '  IF left < right THEN',
+        '    mid ← (left + right) DIV 2',
+        '    CALL MergeSort(arr, left, mid)',
+        '    CALL MergeSort(arr, mid+1, right)',
+        '    CALL Merge(arr, left, mid, right)',
+        '  ENDIF',
+        'ENDPROCEDURE',
+      ],
+      generate(arr) {
+        const a = [...arr]; const steps = [];
+        const merge = (lo, mid, hi) => {
+          const left = a.slice(lo, mid+1), right = a.slice(mid+1, hi+1);
+          steps.push({ arr:[...a], compare:[lo,hi], swapped:false, sorted:[], pseudoLine:5,
+            msg:`Merging <strong>[${left.join(', ')}]</strong> with <strong>[${right.join(', ')}]</strong>` });
+          let i=0, j=0, k=lo;
+          while (i<left.length && j<right.length) a[k++] = (left[i] <= right[j]) ? left[i++] : right[j++];
+          while (i<left.length)  a[k++] = left[i++];
+          while (j<right.length) a[k++] = right[j++];
+          steps.push({ arr:[...a], compare:[lo,hi], swapped:true, sorted:[], pseudoLine:5,
+            msg:`Merged to <strong>[${a.slice(lo,hi+1).join(', ')}]</strong>` });
+        };
+        const sort = (lo, hi) => {
+          if (lo >= hi) return;
+          const mid = Math.floor((lo+hi)/2);
+          steps.push({ arr:[...a], compare:[lo,hi], swapped:false, sorted:[], pseudoLine:2,
+            msg:`Split <strong>[${a.slice(lo,hi+1).join(', ')}]</strong> into two halves` });
+          sort(lo, mid); sort(mid+1, hi); merge(lo, mid, hi);
+        };
+        sort(0, a.length-1);
+        steps.push({ arr:[...a], compare:[], swapped:false,
+          sorted:Array.from({length:a.length},(_,k)=>k), pseudoLine:-1, msg:'✅ Array is sorted!' });
         return steps;
       }
     },
