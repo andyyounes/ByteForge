@@ -1429,6 +1429,122 @@ const WORLDS = [
                   && log.hasVar && log.hasIf,
     },
   ]},
+  // ── Block Arcade — Semester 2: Scratch-style on-ramp before Game Maker ─────
+  // Same canvas + Blockly drag-block engine as Game Maker (g1-g10) below —
+  // no new blocks needed, since this engine is ALREADY block-based, much
+  // like Scratch. Block Arcade covers the same core ideas (coordinates,
+  // motion+loops, events, variables, if/else) at an easier pace, as the
+  // semester BEFORE Game Maker revisits them with more rigor — a real
+  // Scratch-style on-ramp rather than a parallel track students choose between.
+  { id:'sc1', name:'🕹 Block Arcade 1 — Sprites & the Stage', sub:'Every sprite lives at an (x, y) — same idea as Game Maker, eased in', live:true, stages:[
+    { id:'sc1s1', name:'Meet Your Sprite', xp:20,
+      text:`<strong>Challenge 1</strong> — Draw one shape anywhere on the stage. That's your first sprite!`,
+      hints:['Open Draw and drag out "draw circle".', 'Give it any X and Y — try the middle of the stage.', 'Press ▶ Run.'],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => log.circles >= 1 || log.rects >= 1,
+    },
+    { id:'sc1s2', name:'Two Sprites, Two Corners', xp:25,
+      text:`<strong>Challenge 2</strong> — Draw TWO sprites: one near the top-left corner (around 20,20) and one near the bottom-right corner (around 440,220).`,
+      hints:['Corners are roughly (20,20) and (440,220) on this 480x260 stage.', 'Drag out two "draw circle" (or rectangle) blocks with different X/Y.'],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => {
+        const corners = [[20,20],[440,220]]
+        return corners.every(([cx,cy]) => log.positions.some(([x,y]) => Math.abs(x-cx) < 60 && Math.abs(y-cy) < 60))
+      },
+    },
+    { id:'sc1boss', name:'BOSS — Place Your Cast', xp:45, boss:true,
+      text:`<strong>BOSS</strong> — Draw THREE sprites at three different corners of the stage: top-left, top-right, and bottom-left.`,
+      hints:['Corners: (20,20), (440,20), (20,220).', 'Three separate draw blocks, three different positions.'],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => {
+        const corners = [[20,20],[440,20],[20,220]]
+        return corners.every(([cx,cy]) => log.positions.some(([x,y]) => Math.abs(x-cx) < 60 && Math.abs(y-cy) < 60))
+      },
+    },
+  ]},
+  { id:'sc2', name:'🕹 Block Arcade 2 — Motion & Repeat', sub:'"Repeat" blocks — do something several times without copy-pasting', live:true, stages:[
+    { id:'sc2s1', name:'Repeat 3 Times', xp:25,
+      text:`<strong>Challenge 1</strong> — Use a "repeat" block to draw 3 sprites, instead of dragging out 3 separate draw blocks by hand.`,
+      hints:['Control → "repeat 4 times" — change 4 to 3.', 'Put one "draw circle" INSIDE the repeat block.', 'Give it a different X each pass if you can — Math → "change x by" is one way.'],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => (log.circles + log.rects) >= 3,
+    },
+    { id:'sc2s2', name:'Marching Line', xp:30,
+      text:`<strong>Challenge 2</strong> — Use a variable AND a repeat block together: draw 5 sprites in an evenly-spaced horizontal row (e.g. x = 40, 120, 200, 280, 360).`,
+      hints:['Variables → create "x", set it to 40 before the loop.', 'Inside the repeat: draw a circle at (x, 130), then change x by 80.'],
+      needsVar:true, needsIf:false, needsFrames:false,
+      check:(log) => {
+        const targets = [40,120,200,280,360]
+        return log.hasVar && targets.every(tx => log.positions.some(([x]) => Math.abs(x-tx) < 25))
+      },
+    },
+    { id:'sc2boss', name:'BOSS — Bouncing Sprite', xp:55, boss:true,
+      text:`<strong>BOSS</strong> — Make a sprite move sideways every frame, using "On every frame" + a variable for its X position that changes each frame.`,
+      hints:['Events → "On every frame".', 'Variables → create x, then each frame: "change x by 2", then draw the sprite at (x, 130).'],
+      needsVar:true, needsIf:false, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasVar && (log.circles >= 1 || log.rects >= 1),
+    },
+  ]},
+  { id:'sc3', name:'🕹 Block Arcade 3 — Events', sub:'Keys are events — the stage reacts to what the player presses', live:true, stages:[
+    { id:'sc3s1', name:'Press to Move', xp:30,
+      text:`<strong>Challenge 1</strong> — Make a sprite move LEFT/RIGHT using the ← and → arrow keys, checked every frame.`,
+      hints:['Events → "On every frame".', 'Keyboard → "key ← is pressed?" inside an if — change x by -3. Same for → and +3.'],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.circles >= 1 || log.rects >= 1),
+    },
+    { id:'sc3s2', name:'Jump on Space', xp:30,
+      text:`<strong>Challenge 2</strong> — Make a sprite move UP whenever the Space key is held down, every frame.`,
+      hints:['Keyboard → "key Space is pressed?" — inside an if, change y by -3 (up is negative in canvas coordinates).'],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.circles >= 1 || log.rects >= 1),
+    },
+    { id:'sc3boss', name:'BOSS — Full Control', xp:60, boss:true,
+      text:`<strong>BOSS</strong> — A sprite that moves in all FOUR directions: ←, →, ↑, ↓, each checked every frame.`,
+      hints:['Four separate "key ... is pressed?" ifs, one per arrow key, each changing x or y.'],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.circles >= 1 || log.rects >= 1),
+    },
+  ]},
+  { id:'sc4', name:'🕹 Block Arcade 4 — Variables', sub:'Score and lives — numbers the game tracks and shows the player', live:true, stages:[
+    { id:'sc4s1', name:'Score Counter', xp:30,
+      text:`<strong>Challenge 1</strong> — Create a variable called score, set it to 0, and display it on screen every frame using "draw text" (e.g. joined with "Score: ").`,
+      hints:['Variables → create score, set to 0 — BEFORE "On every frame".', 'Inside the frame loop: draw text showing score.'],
+      needsVar:true, needsIf:false, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasVar && log.texts >= 1,
+    },
+    { id:'sc4s2', name:'Score Goes Up', xp:35,
+      text:`<strong>Challenge 2</strong> — Make score increase by 1 every frame (or every time a key is pressed), and keep showing the CURRENT value on screen.`,
+      hints:['"change score by 1" each frame — Math → change [var] by [n].', 'Keep the "draw text" showing score inside the same frame loop, so it always shows the latest value.'],
+      needsVar:true, needsIf:false, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasVar && log.texts >= 1,
+    },
+    { id:'sc4boss', name:'BOSS — Score & Lives HUD', xp:55, boss:true,
+      text:`<strong>BOSS</strong> — Track TWO variables at once — score and lives — and show BOTH on screen every frame (two separate text labels).`,
+      hints:['Two variables, two "draw text" blocks inside the same frame loop — one per variable.'],
+      needsVar:true, needsIf:false, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasVar && log.texts >= 2,
+    },
+  ]},
+  { id:'sc5', name:'🕹 Block Arcade 5 — If/Else', sub:'Rules that check a condition — a wall, an edge, a win', live:true, stages:[
+    { id:'sc5s1', name:'Touching the Edge', xp:30,
+      text:`<strong>Challenge 1</strong> — A sprite moves sideways every frame. When its X goes past 400, use IF to change its fill colour — a simple "touching the edge" rule.`,
+      hints:['Events → "On every frame", moving a variable x each frame.', 'Control → if x > 400 — Color → set fill colour inside it.'],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.circles >= 1 || log.rects >= 1),
+    },
+    { id:'sc5s2', name:'Win Message', xp:35,
+      text:`<strong>Challenge 2</strong> — Track a score variable that increases each frame. When it reaches 5 or more, show "You Win!" instead of the score.`,
+      hints:['Control → if score >= 5 — draw text "You Win!"; else — draw text showing the score.'],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && log.texts >= 1,
+    },
+    { id:'sc5boss', name:'BOSS — Game Rules', xp:70, boss:true,
+      text:`<strong>BOSS</strong> — Combine everything from Block Arcade: a sprite that moves with arrow keys, a score variable that goes up over time, and an IF that shows "You Win!" once score reaches a target.`,
+      hints:['This is sc3boss\'s movement + sc4boss\'s score tracking + sc5s2\'s win-condition if, all in the same "On every frame".', 'Nothing new — just combining every Block Arcade idea into one sprite.'],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.circles >= 1 || log.rects >= 1) && log.texts >= 1,
+    },
+  ]},
   { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
     { id:'g1s1', name:'First Sprite', xp:20,
       text:`<strong>Challenge 1</strong> — Draw a single circle anywhere on the canvas. That's your first "sprite"!`,
@@ -2019,6 +2135,56 @@ const CHALLENGE_LESSON = {
       <p>HTML gave structure. CSS gave style. onclick gave behaviour. Variables gave memory. if/else gives DECISIONS. A real interactive story needs genuinely all five — this boss is a small, real example of every one working together.</p></div>
     <div class="cl-block"><h4>Nothing new, ever again this semester</h4>
       <p>Every block in this boss already existed by the end of some earlier week. Semester 1's entire arc has been: introduce one real idea per week, then let the final boss prove they all combine into something genuinely worth building.</p></div>` },
+  // ── Block Arcade 1 — Sprites & the Stage: coordinates ───────────────────────
+  sc1s1: { title: 'A sprite is just a shape at a position', html: `
+    <div class="cl-block"><h4>Same idea, Scratch-flavoured</h4>
+      <p>In Scratch, a "sprite" is any character or object on the stage — here, a drawn shape stands in for one. Under the hood it's exactly the same idea Game Maker uses later: a position (x, y) plus something drawn there.</p></div>` },
+  sc1s2: { title: 'Naming positions makes them easier to reason about', html: `
+    <div class="cl-block"><h4>Corners as landmarks</h4>
+      <p>"Top-left" and "bottom-right" are easier to picture than raw numbers — but they're really just shorthand for specific (x,y) values. Learning to translate a description into coordinates is a skill you'll use constantly.</p></div>` },
+  sc1boss: { title: 'BOSS — three sprites, three positions', html: `
+    <div class="cl-block"><h4>Nothing new, more of it</h4>
+      <p>Three corners instead of two — the same skill, just repeated. Real Scratch projects often start with exactly this: placing a handful of sprites before anything moves or reacts.</p></div>` },
+  // ── Block Arcade 2 — Motion & Repeat: loops ──────────────────────────────────
+  sc2s1: { title: 'Repeat — do it several times without repeating yourself', html: `
+    <div class="cl-block"><h4>Why not just drag 3 draw blocks?</h4>
+      <p>You could — but "repeat 3" scales; drawing 30 sprites by hand would mean 30 blocks, while a repeat block handles any number just by changing one setting.</p></div>` },
+  sc2s2: { title: 'A variable changing INSIDE a loop', html: `
+    <div class="cl-block"><h4>The loop variable does the real work</h4>
+      <p>Changing x by 80 each pass through the loop is what actually spaces the sprites out — the repeat block alone would draw 5 sprites in the exact same spot without a variable tracking where the next one goes.</p></div>` },
+  sc2boss: { title: 'BOSS — movement is just a variable changing every frame', html: `
+    <div class="cl-block"><h4>From "loop 5 times" to "loop forever"</h4>
+      <p>"On every frame" is a repeat block that never stops — 60 times a second while your game runs. Changing x by a little each frame is genuinely what ALL motion in ALL games (Scratch, this platform, anything) actually is.</p></div>` },
+  // ── Block Arcade 3 — Events: key presses ─────────────────────────────────────
+  sc3s1: { title: 'Checking a key is a question, asked every frame', html: `
+    <div class="cl-block"><h4>Events vs. one-time checks</h4>
+      <p>"Key ← is pressed?" isn't checked once — placed inside "on every frame", it's asked 60 times a second, which is what makes a held-down key feel like continuous, smooth movement rather than one single nudge.</p></div>` },
+  sc3s2: { title: 'Any key can trigger any action', html: `
+    <div class="cl-block"><h4>Space isn't special — it's just another key</h4>
+      <p>The exact same "key ... is pressed?" block works for Space, W, or any other key. What makes an action feel like a "jump" is purely what you put inside the if — here, decreasing y.</p></div>` },
+  sc3boss: { title: 'BOSS — four keys, four directions', html: `
+    <div class="cl-block"><h4>Independent checks, not one big rule</h4>
+      <p>Each arrow key gets its OWN separate if — they don't interfere with each other, so pressing two at once (e.g. → and ↑) genuinely moves the sprite diagonally, for free.</p></div>` },
+  // ── Block Arcade 4 — Variables: score & lives ────────────────────────────────
+  sc4s1: { title: 'A variable the PLAYER can see', html: `
+    <div class="cl-block"><h4>Score only matters if it's visible</h4>
+      <p>A score variable that no one can see isn't really a score to the player — "draw text" showing it every frame is what turns an internal number into a real, readable scoreboard.</p></div>` },
+  sc4s2: { title: 'Redrawing every frame keeps the display current', html: `
+    <div class="cl-block"><h4>You never "update" the label manually</h4>
+      <p>Because "draw text" re-reads score fresh every single frame, the display always shows whatever score currently IS — there's no separate step where you tell the display "the score changed, please update".</p></div>` },
+  sc4boss: { title: 'BOSS — a real two-stat HUD', html: `
+    <div class="cl-block"><h4>Most real games track more than one number</h4>
+      <p>Score AND lives, shown together, is genuinely what almost every simple arcade game's on-screen display actually is — two independent variables, each displayed the same way.</p></div>` },
+  // ── Block Arcade 5 — If/Else: rules ───────────────────────────────────────────
+  sc5s1: { title: 'A rule that only fires past a threshold', html: `
+    <div class="cl-block"><h4>"Touching the edge" is just a comparison</h4>
+      <p>There's no special "edge" concept in code — "x > 400" IS the edge, for a 480-wide stage. Any boundary, wall, or "off-screen" check in a real game is built from exactly this kind of comparison.</p></div>` },
+  sc5s2: { title: 'IF can replace what\'s shown, not just add to it', html: `
+    <div class="cl-block"><h4>Either the score, or the win message — never both</h4>
+      <p>Because "You Win!" and the running score are in DIFFERENT branches of the same if/else, only one is ever drawn on a given frame — exactly the "pick exactly one path" behaviour if/else was built for.</p></div>` },
+  sc5boss: { title: 'BOSS — every Block Arcade idea, one sprite', html: `
+    <div class="cl-block"><h4>Five weeks, one small real game</h4>
+      <p>Coordinates, loops/motion, key events, variables, and if/else — every idea from Block Arcade combines here into something genuinely close to a tiny real game, right before Game Maker revisits all five ideas with more depth and real rigor.</p></div>` },
   // ── G1 — Sprite Start: coordinates & sequence ──────────────────────────────
   g1s1: { title: 'Coordinates — every sprite has an (x, y)', html: `
     <div class="cl-block"><h4>x and y are just numbers</h4>
