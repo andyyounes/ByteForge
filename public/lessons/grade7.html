@@ -112,7 +112,11 @@
     #output-page:empty::before { content:'Page output — drag Page blocks and press ▶ Run'; color:#94a3b8; font-size:12px; }
     .pass-badge { position:absolute; top:8px; left:50%; transform:translateX(-50%);
                   padding:5px 13px; border-radius:8px; font-size:12px; font-weight:700;
-                  background:rgba(34,197,94,.2); border:1px solid rgba(34,197,94,.5); color:#4ade80; display:none; }
+                  background:rgba(34,197,94,.2); border:1px solid rgba(34,197,94,.5); color:#4ade80;
+                  display:none; align-items:center; gap:10px; }
+    .pass-next-btn { padding:3px 10px; border-radius:6px; font-size:11.5px; font-weight:800; cursor:pointer;
+                      background:#4ade80; color:#052e12; border:none; }
+    .pass-next-btn:hover { background:#86efac; }
     .canvas-overlay-btns { position:absolute; top:8px; right:10px; display:flex; gap:5px; }
 
     /* Sync indicator bar */
@@ -253,7 +257,10 @@
     <div class="canvas-wrap">
       <canvas id="output-canvas" width="480" height="260"></canvas>
       <div id="output-page"></div>
-      <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
+      <div class="pass-badge" id="pass-badge">
+        <span>✓ Challenge complete!</span>
+        <button class="pass-next-btn" id="pass-next-btn" onclick="stepChallenge(1)">Next →</button>
+      </div>
     </div>
 
     <!-- Sync indicator -->
@@ -2579,7 +2586,9 @@ function checkChallenge(log) {
   if (ch.check(log)) {
     completed.add(activeIdx)
     renderPills()
-    document.getElementById('pass-badge').style.display = 'block'
+    document.getElementById('pass-badge').style.display = 'flex'
+    // No "Next" button past the very last challenge — nothing to jump to.
+    document.getElementById('pass-next-btn').style.display = (activeIdx + 1 < CHALLENGES.length) ? '' : 'none'
     showToast('Challenge complete! +' + ch.xp + ' XP 🎉')
     logLine('✅ Challenge complete! +' + ch.xp + ' XP', 'ok')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g7-c' + activeIdx, { passed: true, score: 100 }); }
