@@ -27,8 +27,14 @@ const { CHALLENGES } = new Function(ctx + '\nreturn { CHALLENGES }')()
 console.log(`Found ${CHALLENGES.length} Grade 7 challenges.\n`)
 
 let pass = 0, fail = 0
-const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, texts: 999, hasIf: true, hasVar: true, hasFunction: true })
-const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   texts: 0,   hasIf: false, hasVar: false, hasFunction: false })
+// positions: g1s2 "Four Corners" checks WHERE shapes were drawn, not just how
+// many — the maximal log needs a shape actually sitting at each of the four
+// corners it names, or this generic satisfiability test would wrongly flag a
+// perfectly good position-aware check as unsatisfiable.
+const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, texts: 999, hasIf: true, hasVar: true, hasFunction: true,
+  positions: [[20,20],[440,20],[20,220],[440,220]] })
+const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   texts: 0,   hasIf: false, hasVar: false, hasFunction: false,
+  positions: [] })
 
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.id}`
@@ -49,6 +55,27 @@ for (const ch of CHALLENGES) {
     if (!ch.check(log)) { pass++; console.log(`✓ ${label} — ${flag} is genuinely enforced by check()`) }
     else { fail++; console.log(`✗ ${label} — ${flag}:true but check() still passes with ${field} off (hint promises a requirement it doesn't enforce)`) }
   }
+}
+
+// ── g1s2 "Four Corners" must actually check corner POSITIONS ─────────────────
+// Was (log.rects + log.circles) >= 4 — a pure draw-call count with no position
+// check at all, so a single shape drawn 4 times in the same spot (a circle()
+// call wrapped in a 4x loop, never varying x/y) passed despite touching no
+// corner. Confirmed live in a real browser before this fix: exactly this
+// exploit marked the stage complete.
+{
+  const g1s2 = CHALLENGES.find(c => c.id === 'g1s2')
+  if (g1s2) {
+    const exploitLog = { rects: 0, circles: 4, lines: 0, texts: 0, hasIf: false, hasVar: false,
+      positions: [[200,130],[200,130],[200,130],[200,130]] }   // 4 draws, same spot, no corner
+    if (!g1s2.check(exploitLog)) { pass++; console.log('✓ g1s2 — rejects 4 shapes stacked in the center (not a corner)') }
+    else { fail++; console.log('✗ g1s2 — STILL ACCEPTS 4 shapes stacked away from any corner') }
+
+    const realLog = { rects: 0, circles: 4, lines: 0, texts: 0, hasIf: false, hasVar: false,
+      positions: [[20,20],[440,20],[20,220],[440,220]] }
+    if (g1s2.check(realLog)) { pass++; console.log('✓ g1s2 — accepts 4 shapes actually at the 4 corners') }
+    else { fail++; console.log('✗ g1s2 — REJECTS a genuine 4-corner solution') }
+  } else { fail++; console.log('✗ g1s2 not found') }
 }
 
 console.log(`\n${pass} passed, ${fail} failed.`)

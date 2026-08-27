@@ -158,7 +158,7 @@
   </div>
   <div class="nav-links">
     <a href="#" onclick="showJourney(); return false;" style="color:#e879f9;font-weight:700;">🌌 Galaxy Map</a>
-    <a href="../dashboard-student.html">← Dashboard</a>
+    <a href="/student/dashboard">← Dashboard</a>
   </div>
 </nav>
 
@@ -811,10 +811,15 @@ function runCode() {
 
   } else {
     // Static / run-once
-    let drawLog = { rects:0, circles:0, lines:0, texts:0, hasIf:false }
+    // positions: every rect/circle call's (x,y), so a check can verify WHERE
+    // shapes landed rather than only how many were drawn. Without this, g1s2
+    // "Four Corners" could only count draw calls — a single circle() wrapped
+    // in a 4x loop with no varying x/y produced drawLog.circles===4 and
+    // passed, despite drawing one shape, in one spot, not in any corner.
+    let drawLog = { rects:0, circles:0, lines:0, texts:0, hasIf:false, positions:[] }
     const trackedAPI = { ...drawingAPI }
-    trackedAPI.rect   = (...a) => { drawLog.rects++;   drawingAPI.rect(...a) }
-    trackedAPI.circle = (...a) => { drawLog.circles++; drawingAPI.circle(...a) }
+    trackedAPI.rect   = (...a) => { drawLog.rects++;   drawLog.positions.push([a[0],a[1]]); drawingAPI.rect(...a) }
+    trackedAPI.circle = (...a) => { drawLog.circles++; drawLog.positions.push([a[0],a[1]]); drawingAPI.circle(...a) }
     trackedAPI.line   = (...a) => { drawLog.lines++;   drawingAPI.line(...a) }
     trackedAPI.text   = (...a) => { drawLog.texts++;   drawingAPI.text(...a) }
     // Detect if/else in source
@@ -868,7 +873,18 @@ const WORLDS = [
         'Run it — you should see four shapes, one near each corner.',
       ],
       needsVar:false, needsIf:false, needsFrames:false,
-      check:(log) => (log.rects + log.circles) >= 4,
+      // Used to be (log.rects + log.circles) >= 4 — a pure draw-call COUNT
+      // with no position check at all, so a single shape drawn 4 times in
+      // the same spot (e.g. one circle() call inside a 4x loop with no
+      // varying x/y) passed, despite never touching a corner. Now requires a
+      // shape actually near each of the four distinct corners named in the
+      // task's own hint (20,20)/(440,20)/(20,220)/(440,220).
+      check:(log) => {
+        const corners = [[20,20],[440,20],[20,220],[440,220]]
+        const NEAR = 60
+        return corners.every(([cx,cy]) =>
+          (log.positions||[]).some(([x,y]) => Math.hypot(x-cx, y-cy) <= NEAR))
+      },
     },
     { id:'g1boss', name:'Sprite Follows You', xp:45, boss:true,
       text:`<strong>🚀 BOSS — Sprite Follows You</strong> — Use <em>On every frame</em>. Inside it: clear the canvas, then draw a circle at <em>mouseX</em> / <em>mouseY</em>. Move your mouse over the canvas — your sprite follows it!`,
