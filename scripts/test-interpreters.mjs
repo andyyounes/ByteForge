@@ -83,6 +83,26 @@ DECLARE x : INTEGER
 x ← 10
 Dbl(x)
 OUTPUT x`, ['20']],
+  // Cambridge gives NOT LOWER precedence than the relational operators, so
+  // `NOT a = b` means `NOT (a = b)`. NOT used to be handled in parseUnary —
+  // the tightest-binding level — so it parsed as `(NOT a) = b` and
+  // `IF NOT 1 = 2` took the ELSE branch. Exam-correct code needed parentheses,
+  // with no diagnostic explaining why.
+  ['NOT binds looser than =  (NOT 1 = 2 is TRUE)',
+   'IF NOT 1 = 2 THEN\n  OUTPUT "t"\nELSE\n  OUTPUT "f"\nENDIF', ['t']],
+  ['NOT binds looser than =  (NOT 2 = 2 is FALSE)',
+   'IF NOT 2 = 2 THEN\n  OUTPUT "t"\nELSE\n  OUTPUT "f"\nENDIF', ['f']],
+  ['NOT binds looser than >',
+   'IF NOT 3 > 5 THEN\n  OUTPUT "t"\nELSE\n  OUTPUT "f"\nENDIF', ['t']],
+  ['explicit parentheses still work',
+   'IF NOT (1 = 2) THEN\n  OUTPUT "t"\nELSE\n  OUTPUT "f"\nENDIF', ['t']],
+  ['NOT still binds tighter than AND',
+   'IF NOT FALSE AND TRUE THEN\n  OUTPUT "t"\nELSE\n  OUTPUT "f"\nENDIF', ['t']],
+  ['NOT on a plain boolean',
+   'IF NOT TRUE THEN\n  OUTPUT "t"\nELSE\n  OUTPUT "f"\nENDIF', ['f']],
+  ['unary minus survives the NOT change', 'OUTPUT -5 + 2', ['-3']],
+  ['exponent survives the NOT change',    'OUTPUT 2 ^ 3',   ['8']],
+
   ['BYVAL still does NOT write back (bare call)',
    `PROCEDURE Dbl(BYVAL n : INTEGER)
    n ← n * 2

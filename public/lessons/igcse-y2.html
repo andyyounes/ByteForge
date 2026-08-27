@@ -260,13 +260,17 @@ class ExprParser {
   eat(t,v)  { if(this.check(t,v)) return this.advance(); return null }
   parse()   { return this.parseBool() }
   parseBool() {
-    let v=this.parseCmp()
+    let v=this.parseNot()
     while(this.check('KW','AND')||this.check('KW','OR')){
-      const op=this.advance().v; const r=this.parseCmp()
+      const op=this.advance().v; const r=this.parseNot()
       v=op==='AND'?v&&r:v||r
     }
     return v
   }
+  // NOT sits BETWEEN AND/OR and the comparisons, per Cambridge precedence:
+  // `NOT a = b` is `NOT (a = b)`. It used to live in parseUnary (tightest
+  // binding), so it parsed as `(NOT a) = b` and `IF NOT 1 = 2` was FALSE.
+  parseNot(){if(this.check('KW','NOT')){this.advance();return!this.parseNot()}return this.parseCmp()}
   parseCmp() {
     let v=this.parseConcat()
     const ops=['=','<>','<','>','<=','>=']
@@ -302,7 +306,6 @@ class ExprParser {
     return v
   }
   parseUnary() {
-    if(this.check('KW','NOT')){this.advance();return!this.parsePow()}
     if(this.check('OP','-'))  {this.advance();return-this.parsePow()}
     if(this.check('OP','+'))  {this.advance();return this.parsePow()}
     return this.parsePow()
