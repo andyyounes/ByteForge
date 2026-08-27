@@ -78,6 +78,17 @@
                      background:none; border:1px solid var(--border); color:var(--fg-faint); }
     .ch-nav-toggle:hover { color:var(--fg); border-color:var(--border-hi); }
     .ch-nav-toggle.open { color:#60a5fa; border-color:#60a5fa; }
+    .ch-lesson { flex-shrink:0; background:#12141f; border:1px solid rgba(129,140,248,.18); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .cl-toggle { padding:8px 12px; font-size:12px; font-weight:800; color:#a5b4fc; cursor:pointer;
+                 display:flex; align-items:center; gap:6px; user-select:none; }
+    .cl-toggle:hover { color:#c7d2fe; }
+    #cl-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
+    .cl-body { padding:0 12px 12px; font-size:12px; color:#c7d2e0; line-height:1.7; }
+    .cl-body.collapsed { display:none; }
+    .cl-block { background:#0d0f1a; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
+    .cl-block:last-child { margin-bottom:0; }
+    .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
+    .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -184,6 +195,12 @@
         <button class="ch-nav-toggle" id="ch-nav-toggle" onclick="toggleChallengeList()">☰ All challenges</button>
       </div>
       <div class="ch-pills" id="ch-pills" style="display:none"></div>
+      <!-- Full per-challenge lesson — one real explainer per practice,
+           populated from CHALLENGE_LESSON. Same pattern as Grade 6/7/9. -->
+      <div class="ch-lesson" id="ch-lesson" style="display:none;">
+        <div class="cl-toggle" id="cl-toggle" onclick="toggleChallengeLesson()">📘 <span id="cl-title"></span> <span id="cl-arrow">▾</span></div>
+        <div class="cl-body" id="cl-body"></div>
+      </div>
       <div class="ch-row">
         <div class="ch-text" id="ch-text">Select a challenge to begin.</div>
         <div class="ch-meta">
@@ -1996,6 +2013,297 @@ except FileNotFoundError:
 ]
 
 const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({ ...s, mod: m.id.toUpperCase() })))
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 📘 CHALLENGE_LESSON — one real, full explainer per practice (all 53
+// challenges). Rendered by renderChallengeLesson().
+// ══════════════════════════════════════════════════════════════════════════════
+const CHALLENGE_LESSON = {
+  // ── M1 — From Blocks to Text ────────────────────────────────────────────────
+  m1s1: { title: 'print() — your first real line of code', html: `
+    <div class="cl-block"><h4>The classic first line, in any language</h4>
+      <p><code>print()</code> displays whatever you put inside its brackets — text goes in quotes, e.g. <code>print("Hello, World!")</code>. This exact line is traditionally the very first thing anyone writes in a new programming language.</p></div>
+    <div class="cl-block"><h4>Real syntax now, not blocks</h4>
+      <p>Every idea from Grade 7's Blockly (sequence, variables, functions) carries over directly — the difference now is you're typing exact punctuation (quotes, brackets, colons) that has to be perfectly correct, unlike snapping together pre-shaped blocks.</p></div>` },
+  m1s2: { title: 'Variables and f-strings', html: `
+    <div class="cl-block"><h4>name = "Alex" — a variable, in real syntax</h4>
+      <p>A variable is still a named box holding a value, exactly like Grade 7's Variables blocks — just written as <code>name = "Alex"</code> instead of snapped together. Quotes mean text; no quotes means a number.</p></div>
+    <div class="cl-block"><h4>f-strings — variables inside text</h4>
+      <p><code>f"My name is {name}"</code> lets you drop a variable directly INSIDE a string — the <code>f</code> before the quotes is what makes the <code>{}</code> curly braces get replaced with the variable's actual value.</p></div>` },
+  m1s3: { title: 'Every value has a TYPE', html: `
+    <div class="cl-block"><h4>int, float, str, bool — four basic types</h4>
+      <p><strong>int</strong> = whole numbers (7). <strong>float</strong> = decimals (7.5). <strong>str</strong> = text ("hi"). <strong>bool</strong> = True/False. Python tracks the type of every single value automatically.</p></div>
+    <div class="cl-block"><h4>type() reveals it</h4>
+      <p><code>type(x)</code> tells you exactly what kind of value <code>x</code> currently holds — genuinely useful when debugging code that's mysteriously treating a number like text (or vice versa).</p></div>` },
+  m1s4: { title: 'input() always returns TEXT', html: `
+    <div class="cl-block"><h4>Even if they type a number, you get a string</h4>
+      <p><code>input()</code> ALWAYS hands back text, no matter what the user typed — typing "25" gives you the STRING "25", not the number 25. Trying to do maths on it directly (like adding 10) would either crash or glue "10" onto the end as more text.</p></div>
+    <div class="cl-block"><h4>int() converts it into a real number</h4>
+      <p><code>int(age_text)</code> converts that text into an actual number you can calculate with — this exact "get text, convert it" pattern is needed literally any time a program asks a user for a number.</p></div>` },
+  m1s5: { title: 'A real formula, not just a print statement', html: `
+    <div class="cl-block"><h4>Order of operations works like maths class</h4>
+      <p><code>celsius * 9 / 5 + 32</code> — Python does × and ÷ before +, exactly like normal maths rules. This is a genuine, widely-used real-world formula, not a made-up exercise.</p></div>
+    <div class="cl-block"><h4>Reusing one formula for many inputs</h4>
+      <p>Converting three different Celsius values with the SAME formula (just different starting numbers) is exactly why formulas — not one-off calculations — are worth writing as reusable code.</p></div>` },
+
+  // ── M2 — Choices & Loops ─────────────────────────────────────────────────────
+  m2s1: { title: 'if/else — real syntax for a decision', html: `
+    <div class="cl-block"><h4>% is the remainder operator</h4>
+      <p><code>number % 2</code> gives what's LEFT OVER after dividing by 2 — 0 for even numbers, 1 for odd ones. This is the exact same MOD idea from Grade 7's conditions, just written as <code>%</code> instead of a "remainder" block.</p></div>
+    <div class="cl-block"><h4>Getting the label right, not just the branch</h4>
+      <p>It's easy to write working code that prints the WRONG label (e.g. calling odd numbers "even") — matching your if-branch's outcome to what it actually represents is a real, common source of bugs worth double-checking.</p></div>` },
+  m2s2: { title: 'for loops with range(), and elif chains', html: `
+    <div class="cl-block"><h4>range(1, 11) counts 1 through 10</h4>
+      <p><code>for i in range(1, 11):</code> loops <code>i</code> through 1, 2, 3… 10 — the second number is EXCLUSIVE (not included), which is why you need 11 to reach 10. This trips up almost everyone the first time.</p></div>
+    <div class="cl-block"><h4>elif — checking several conditions in order</h4>
+      <p><code>if / elif / else</code> checks conditions top-to-bottom, running only the FIRST one that matches — exactly like Grade 7's chained IF/ELSE IF, just real Python syntax.</p></div>` },
+  m2s3: { title: 'while loops — repeat until a condition is false', html: `
+    <div class="cl-block"><h4>for vs. while — known count vs. unknown count</h4>
+      <p><code>for</code> loops are perfect when you know exactly how many times to repeat. <code>while size > 0:</code> instead keeps going for as long as a CONDITION stays true — you don't need to know the exact count in advance, just when to stop.</p></div>
+    <div class="cl-block"><h4>The loop MUST change the condition eventually</h4>
+      <p>Shrinking <code>size</code> by 20 each pass is what eventually makes <code>size > 0</code> false — forget that line and the loop runs forever (an "infinite loop"), a genuine, common real bug.</p></div>` },
+  m2s4: { title: 'Chained if/elif — order decides correctness', html: `
+    <div class="cl-block"><h4>Check from the strictest condition down</h4>
+      <p>Checking <code>&gt;= 70</code> BEFORE <code>&gt;= 90</code> would wrongly grade a 95 as a "B", since 95 also satisfies &gt;=70 and elif stops at the first match. Order in a chain of conditions genuinely changes the result.</p></div>
+    <div class="cl-block"><h4>else catches everything left over</h4>
+      <p>The final <code>else</code> handles anything that didn't match ANY of the numbered conditions above it — a safety net so every possible score gets SOME grade, not just the ones you explicitly checked for.</p></div>` },
+  m2s5: { title: 'Accumulating a running total', html: `
+    <div class="cl-block"><h4>Two variables working together</h4>
+      <p><code>total</code> tracks the running sum; <code>n</code> tracks which number you're currently adding — both change every single pass through the loop, and both matter to getting the right final answer.</p></div>
+    <div class="cl-block"><h4>This "accumulator" pattern is everywhere</h4>
+      <p>Start at a base value, then keep updating it inside a loop — this exact shape (accumulator + loop) is behind totals, counts, and averages throughout real programming, not just this one exercise.</p></div>` },
+
+  // ── M3 — Functions ───────────────────────────────────────────────────────────
+  m3s1: { title: 'Functions with parameters — real def syntax', html: `
+    <div class="cl-block"><h4>def name(params): — the real syntax for "My Blocks"</h4>
+      <p><code>def draw_smiley(x, y, r, ...):</code> defines a reusable function, exactly like Grade 7's custom blocks — just typed instead of dragged. Parameters (x, y, r, colors) let each CALL customise the result.</p></div>
+    <div class="cl-block"><h4>Indentation IS the function's body</h4>
+      <p>Unlike Blockly (where blocks visibly nest inside each other), Python uses INDENTATION to show what's inside the function — every indented line belongs to <code>draw_smiley</code>; the first non-indented line is outside it again.</p></div>` },
+  m3s2: { title: 'A loop that calls a function repeatedly', html: `
+    <div class="cl-block"><h4>Combining a function with a loop</h4>
+      <p>Calling <code>colored_tile(...)</code> inside a <code>for</code> loop, with different x/y each time, builds a whole grid from ONE function definition — functions and loops combine constantly in real code.</p></div>
+    <div class="cl-block"><h4>Parameters make the loop's repeats different</h4>
+      <p>Without parameters, every call to the function would look identical — passing different x, y, and color values each time is what makes 6 calls produce 6 DIFFERENT tiles instead of the same one six times.</p></div>` },
+  m3s3: { title: 'return — a function that hands back a value', html: `
+    <div class="cl-block"><h4>Drawing vs. returning are different jobs</h4>
+      <p>Earlier functions drew shapes directly — a side effect. <code>average(a, b, c)</code> instead computes a VALUE and hands it back with <code>return</code>, to be used however the caller wants (here, as a circle's radius).</p></div>
+    <div class="cl-block"><h4>Store what's returned, then use it</h4>
+      <p><code>r = average(20, 60, 100)</code> captures the returned value in a variable — <code>r</code> now holds a real number, completely independent of how it was calculated.</p></div>` },
+  m3s4: { title: 'A function with a loop INSIDE it', html: `
+    <div class="cl-block"><h4>Functions can contain anything a normal program can</h4>
+      <p><code>is_prime(n)</code> has a real <code>for</code> loop inside its own definition — functions aren't limited to one-line calculations; they can contain loops, ifs, even calls to other functions.</p></div>
+    <div class="cl-block"><h4>return exits IMMEDIATELY, even mid-loop</h4>
+      <p>The moment a factor is found, <code>return False</code> exits the function right away — the loop doesn't keep checking remaining numbers once the answer is already known. This "stop as soon as you know" pattern makes code faster and clearer.</p></div>` },
+  m3s5: { title: 'Returning MORE than one value', html: `
+    <div class="cl-block"><h4>return a, b — two values, one return statement</h4>
+      <p>Python lets a function return several values at once, separated by commas — <code>return smallest, largest</code> packages both numbers together automatically (technically into something called a tuple).</p></div>
+    <div class="cl-block"><h4>Unpacking two variables from one call</h4>
+      <p><code>low, high = min_and_max(scores)</code> unpacks both returned values into two separate variables in one line — genuinely convenient compared to calling two separate functions to get each value one at a time.</p></div>` },
+
+  // ── M4 — Lists ───────────────────────────────────────────────────────────────
+  m4s1: { title: 'A list is an ordered collection of values', html: `
+    <div class="cl-block"><h4>[22, 35, 28, ...] — a list literal</h4>
+      <p>A list holds many values under one name, in order — <code>temperatures</code> is one variable containing 7 numbers. <code>for temp in temperatures:</code> visits each one in turn, exactly like Grade 7's array ideas.</p></div>
+    <div class="cl-block"><h4>Scaling a value to a pixel size</h4>
+      <p><code>bar_height = temp * 5</code> converts a real-world number (degrees) into a visual size (pixels) — a genuine, common task any time you're charting real data.</p></div>` },
+  m4s2: { title: 'Tuples — a fixed little group of values', html: `
+    <div class="cl-block"><h4>(r, g, b) — three numbers, one item</h4>
+      <p>A tuple groups a FIXED number of related values together — here, one color is really three numbers (red, green, blue) bundled as a single list item. A list of tuples is a list where every item is itself a small group.</p></div>
+    <div class="cl-block"><h4>Unpacking — splitting a tuple back into named parts</h4>
+      <p><code>r, g, b = color</code> splits one tuple into three separate variables in a single line — much cleaner than writing <code>color[0]</code>, <code>color[1]</code>, <code>color[2]</code> every time you need each part.</p></div>` },
+  m4s3: { title: 'sorted() and slicing — built-in tools, not loops', html: `
+    <div class="cl-block"><h4>Python already has sorting built in</h4>
+      <p><code>sorted(player_scores)</code> returns a NEW list in order, lowest to highest — no loop required, Python does the sorting for you. This is real, efficient, professional-grade sorting, not a simplified version.</p></div>
+    <div class="cl-block"><h4>[-5:] — slicing from the end</h4>
+      <p>A negative index counts from the END of a list — <code>[-5:]</code> means "the last 5 items". Combined with <code>sorted()</code>, that's an easy way to get the top 5 highest scores.</p></div>` },
+  m4s4: { title: 'Filtering — building a new, smaller list', html: `
+    <div class="cl-block"><h4>Only keep what matches a condition</h4>
+      <p><strong>Filtering</strong> means looping through a list and building a NEW list containing only the items that pass a test (here, being even) — the original list stays untouched.</p></div>
+    <div class="cl-block"><h4>One of the most common real tasks</h4>
+      <p>"Give me only the results that match X" is an everywhere-task in real software — search results, shopping filters, spam folders — and it's always this same "loop + condition + build a new list" pattern.</p></div>` },
+  m4s5: { title: 'The "in" keyword — checking membership', html: `
+    <div class="cl-block"><h4>x in some_list — True or False</h4>
+      <p><code>if ticket in seen:</code> checks whether <code>ticket</code> already exists ANYWHERE inside the <code>seen</code> list — a clean, direct way to ask "have I already encountered this?"</p></div>
+    <div class="cl-block"><h4>Building a "seen so far" list to detect repeats</h4>
+      <p>Growing a second list as you go, and checking each new item against it, is exactly how real software finds duplicates — in a guest list, in ticket numbers, in usernames during sign-up.</p></div>` },
+
+  // ── M5 — Strings & Validation ────────────────────────────────────────────────
+  m5s1: { title: 'String methods and slicing', html: `
+    <div class="cl-block"><h4>.strip() and .lower() — cleaning text</h4>
+      <p>Real user input is messy — extra spaces, inconsistent capitalization. <code>.strip()</code> removes leading/trailing spaces; <code>.lower()</code> makes everything lowercase; chaining them (<code>.strip().lower()</code>) does both in one line.</p></div>
+    <div class="cl-block"><h4>Slicing works on strings, just like lists</h4>
+      <p><code>name[0:3]</code> grabs the first 3 characters — text slicing uses the exact same <code>[start:end]</code> syntax as list slicing, since a string is really just a sequence of characters.</p></div>` },
+  m5s2: { title: 'Never trust input blindly — validation', html: `
+    <div class="cl-block"><h4>Checking a length AND a content requirement</h4>
+      <p>A strong password needs to pass MULTIPLE tests at once — length (<code>len(password) >= 8</code>) AND content (contains a digit). Combining both with <code>and</code> means BOTH have to be true for acceptance.</p></div>
+    <div class="cl-block"><h4>.isdigit() checks one character at a time</h4>
+      <p>Looping through every character and checking <code>ch.isdigit()</code> is how you search a whole string for ANY digit — there's no single built-in "does this string contain a digit" check, so you build it from a loop.</p></div>` },
+  m5s3: { title: 'The Caesar cipher, in real code', html: `
+    <div class="cl-block"><h4>ord() and chr() — letters as numbers, in code</h4>
+      <p><code>ord(ch)</code> converts a letter to its ASCII number; <code>chr(n)</code> converts a number back to a letter — the exact "text is secretly numbers" idea from Grade 7's ASCII challenge, now doing real work.</p></div>
+    <div class="cl-block"><h4>% 26 — wrapping the alphabet around</h4>
+      <p>Shifting "z" forward should wrap back to "a", not go past the alphabet — <code>% 26</code> (26 letters in the alphabet) does exactly that wraparound, the same MOD trick from every wrapping problem you've met.</p></div>` },
+  m5s4: { title: 'Reversing a string with [::-1]', html: `
+    <div class="cl-block"><h4>A step of -1 walks backward through the whole string</h4>
+      <p><code>text[::-1]</code> is a slice with no start, no end, and a step of -1 — meaning "walk the whole string, but backward". This one small piece of syntax reverses an entire string in a single expression.</p></div>
+    <div class="cl-block"><h4>A palindrome is its own reverse</h4>
+      <p>Comparing <code>cleaned == cleaned[::-1]</code> is the entire palindrome test — if a string equals its own reverse, it reads the same both ways.</p></div>` },
+  m5s5: { title: '.split() with no arguments — splitting on whitespace', html: `
+    <div class="cl-block"><h4>Different from Class Register's .split(",")</h4>
+      <p><code>sentence.split()</code> with NO argument splits on any whitespace (spaces) automatically — different from M6's CSV splitting on a comma. Same method, different separator, different use.</p></div>
+    <div class="cl-block"><h4>Scanning for the longest — the same pattern as Crew Roster</h4>
+      <p>Tracking the longest word by comparing <code>len(word)</code> against the best-so-far is the exact same "assume first, check the rest" scanning pattern you'll meet again and again this year.</p></div>` },
+
+  // ── M6 — Files & Data ────────────────────────────────────────────────────────
+  m6s1: { title: 'Opening and reading a real file', html: `
+    <div class="cl-block"><h4>open(), .readlines(), .close()</h4>
+      <p><code>open("students.csv")</code> opens a real file; <code>.readlines()</code> gives you every line as a list of strings, INCLUDING the trailing newline character; always <code>.close()</code> when you're done.</p></div>
+    <div class="cl-block"><h4>Skipping the header row</h4>
+      <p><code>lines[1:]</code> skips index 0 (the header "name,grade") and starts from the real data — CSV files almost always have a header row you need to skip before processing the actual records.</p></div>` },
+  m6s2: { title: 'Built-in stats functions on real data', html: `
+    <div class="cl-block"><h4>max(), min(), sum(), len() — no loop needed</h4>
+      <p>Once your grades are in a real list, Python's built-in functions do the heavy lifting — exactly what a spreadsheet's AVERAGE/MAX/MIN/COUNT do, just written as code instead of clicked in a UI.</p></div>
+    <div class="cl-block"><h4>int() converts text to a number BEFORE you can calculate</h4>
+      <p>Every value read from a file starts as TEXT — <code>int(grade_text)</code> converts it to a real number first, or <code>max()</code>/<code>sum()</code> would compare/add text instead of numbers, giving wrong or broken results.</p></div>` },
+  m6s3: { title: 'Binary search — a real, faster search', html: `
+    <div class="cl-block"><h4>Jump to the middle, throw away half</h4>
+      <p>Instead of checking names one by one (linear search), binary search jumps to the MIDDLE of the sorted list — if the target isn't there, an entire HALF of the remaining list can be safely thrown away, every single step.</p></div>
+    <div class="cl-block"><h4>Only works because the data is SORTED</h4>
+      <p>Binary search's whole trick — "everything before the middle is smaller, everything after is bigger" — completely depends on the list already being in order. Unsorted data breaks the algorithm entirely.</p></div>` },
+  m6s4: { title: 'Linking two datasets by a shared key', html: `
+    <div class="cl-block"><h4>A dictionary as a fast lookup table</h4>
+      <p><code>grades_by_id[student_id] = grade</code> builds a dictionary — a REAL lookup table, mapping one value (id) to another (grade) so you can find it instantly later, without searching through a list.</p></div>
+    <div class="cl-block"><h4>This is exactly how a relational database joins tables</h4>
+      <p>Two separate files, linked by one shared column (id) — that's the entire idea behind a database "join". Grade 8's roster.csv/results.csv is a tiny, real version of exactly what a school's actual student database does.</p></div>` },
+  m6s5: { title: 'Append mode ("a") vs. write mode ("w")', html: `
+    <div class="cl-block"><h4>"w" erases; "a" adds to the end</h4>
+      <p>Opening a file in write mode ("w") WIPES it clean every single time — dangerous if you wanted to keep old entries. Append mode ("a") instead adds new content to the END, leaving everything already there untouched.</p></div>
+    <div class="cl-block"><h4>A real log file works exactly this way</h4>
+      <p>Every time your computer logs an event (an error, a login, a game score), it appends a new line — it would be useless if opening the log to add one entry deleted every previous entry first.</p></div>` },
+  m6s6: { title: 'Read, filter, and write — the whole data pipeline', html: `
+    <div class="cl-block"><h4>Combining every M6 skill in one pipeline</h4>
+      <p>Read a file (Read the Class Register), filter by a condition (the same idea as Filter the Evens), then WRITE the result to a new file — reading, filtering, and writing together is a genuine, complete real-world data task.</p></div>
+    <div class="cl-block"><h4>Why filter BEFORE writing, not after</h4>
+      <p>Checking the condition (grade >= 75) as you loop, and only writing qualifying names, means the output file contains EXACTLY the right data from the start — no need for a separate cleanup pass afterward.</p></div>` },
+
+  // ── M7 — Inside the Machine ──────────────────────────────────────────────────
+  m7s1: { title: 'Storage units and binary, for real', html: `
+    <div class="cl-block"><h4>1024, not 1000 — powers of two</h4>
+      <p>1 KB = 1024 bytes, not 1000 — because computers count in binary (base 2), and 1024 is a power of 2 (2¹⁰). Everything in computing tends to use powers of 2 rather than round decimal numbers.</p></div>
+    <div class="cl-block"><h4>bin() shows a number the way the computer really stores it</h4>
+      <p><code>bin(42)</code> reveals the actual binary digits underneath — the SAME idea as Grade 6's binary cards, just displayed by real code instead of physically flipped.</p></div>` },
+  m7s2: { title: 'Images ARE numbers — grayscale conversion', html: `
+    <div class="cl-block"><h4>Every pixel is really three numbers</h4>
+      <p>A colour pixel is a tuple <code>(r, g, b)</code> — exactly the RGB idea from Grade 6's Color Lab and Grade 8's Rainbow Row, now processed with real code instead of sliders or circles.</p></div>
+    <div class="cl-block"><h4>Averaging three channels into one brightness value</h4>
+      <p><code>(r + g + b) // 3</code> — averaging red, green, and blue gives a single "how bright is this pixel" number, which is exactly how a real photo-editing app converts a colour photo to grayscale.</p></div>` },
+  m7s3: { title: 'Interpreter vs. compiler', html: `
+    <div class="cl-block"><h4>Python runs your code one line at a time</h4>
+      <p>Python is an <strong>interpreter</strong> — it translates and runs each line as it goes, so everything BEFORE a crash has already genuinely happened. A <strong>compiler</strong> instead translates the WHOLE program first and refuses to produce anything if there's an error anywhere in it.</p></div>
+    <div class="cl-block"><h4>try/except — surviving an error on purpose</h4>
+      <p>Wrapping risky code in <code>try:</code>/<code>except ErrorType:</code> lets your program keep running even after something breaks — proving, first-hand, that interpreted code really does execute line by line.</p></div>` },
+  m7s4: { title: 'Encoding and decoding a message', html: `
+    <div class="cl-block"><h4>A full round-trip: text → numbers → text</h4>
+      <p><code>ord()</code> turns each character into its ASCII number; <code>chr()</code> turns a number back into a character — doing BOTH directions proves the conversion is reversible, not a one-way trick.</p></div>
+    <div class="cl-block"><h4>Real encoding always works both ways</h4>
+      <p>Any real encoding scheme (ASCII, Unicode, even encryption) has to be reversible — otherwise the original message could never be recovered. Building both directions yourself makes that concrete.</p></div>` },
+  m7s5: { title: 'Run-length encoding — real compression', html: `
+    <div class="cl-block"><h4>Counting repeats instead of storing them all</h4>
+      <p>"aaaabbbccd" stored as "4a3b2c1d" is genuinely shorter — instead of every repeated character, you store a COUNT plus the character once. This is a real compression technique, used in actual image and file formats.</p></div>
+    <div class="cl-block"><h4>Detecting where one run ends and the next begins</h4>
+      <p>Comparing each character to the PREVIOUS one (<code>text[i] == text[i-1]</code>) is how you detect "still the same run" vs. "a new character has started" — the moment they differ, the current run is finished.</p></div>` },
+
+  // ── M8 — The Connected World ─────────────────────────────────────────────────
+  m8s1: { title: 'Packets — messages arrive out of order', html: `
+    <div class="cl-block"><h4>Real internet messages are chopped into numbered pieces</h4>
+      <p>A message is split into <strong>packets</strong>, sent separately, and can arrive in ANY order — sorting them back into place by their index is exactly what the real internet's TCP protocol does, constantly, for every message you've ever sent.</p></div>
+    <div class="cl-block"><h4>sorted() on tuples sorts by the first item</h4>
+      <p><code>sorted(arrived)</code> automatically sorts a list of (index, chunk) tuples BY the index — Python compares tuples by their first element first, which is exactly what reassembling packets needs.</p></div>` },
+  m8s2: { title: 'Generating real HTML with Python', html: `
+    <div class="cl-block"><h4>A web page is just a text file</h4>
+      <p>Every website is really a plain text file written in HTML — servers routinely BUILD that text on the fly using a real programming language, exactly what you're doing with an f-string here.</p></div>
+    <div class="cl-block"><h4>Staying safe: what NOT to put in a public profile</h4>
+      <p>Never include your real full name, address, or school in anything public-facing — keep it to a first name or nickname, even in practice exercises like this one.</p></div>` },
+  m8s3: { title: 'Password strength — combining checks in a function', html: `
+    <div class="cl-block"><h4>Two conditions, combined with "and"</h4>
+      <p><code>is_strong(password)</code> returns True only when BOTH the length check AND the digit check pass — <code>and</code> requires every condition to be true, unlike <code>or</code> which only needs one.</p></div>
+    <div class="cl-block"><h4>any() — checking if ANY character matches</h4>
+      <p><code>any(ch.isdigit() for ch in password)</code> is a compact way to ask "does at least one character satisfy this test?" — true the moment even a single digit is found anywhere in the string.</p></div>` },
+  m8s4: { title: 'https:// vs. http:// — a real security check', html: `
+    <div class="cl-block"><h4>.startswith() checks the beginning of a string</h4>
+      <p><code>url.startswith("https://")</code> checks whether a string begins with EXACTLY that text — the "s" in https means the connection is encrypted; without it, anything you type (including passwords) travels unprotected.</p></div>
+    <div class="cl-block"><h4>A genuinely useful real-world habit</h4>
+      <p>Checking for that padlock/https before entering sensitive information is real, practical online-safety advice — this challenge writes the exact check your browser performs automatically.</p></div>` },
+  m8s5: { title: 'Linking pages — a real multi-page website', html: `
+    <div class="cl-block"><h4>&lt;a href="..."&gt; — the HTML link tag</h4>
+      <p><code>&lt;a href="about.html"&gt;About Me&lt;/a&gt;</code> creates a clickable link — <code>href</code> names the destination file, the text between the tags is what's actually clickable on the page.</p></div>
+    <div class="cl-block"><h4>Real websites are many pages, connected</h4>
+      <p>A single HTML page is rarely the whole story — real sites are collections of pages, all linked together, exactly like this two-page profile connecting a home page to an about page.</p></div>` },
+
+  // ── M9 — Interactive Apps ────────────────────────────────────────────────────
+  m9s1: { title: 'Three kinds of bugs, three different fixes', html: `
+    <div class="cl-block"><h4>Syntax, logic, and runtime errors are NOT the same thing</h4>
+      <p>A <strong>syntax error</strong> means Python can't even parse your code's structure (a missing colon). A <strong>logic error</strong> means it runs but gives the wrong answer (backwards condition). A <strong>runtime error</strong> crashes only on certain inputs (dividing by zero on an empty list).</p></div>
+    <div class="cl-block"><h4>Real debugging starts with naming which kind you have</h4>
+      <p>Recognising WHICH of the three you're dealing with points you toward the right fix immediately — a syntax error needs a punctuation fix, a logic error needs re-reading your condition, a runtime error needs a guard clause.</p></div>` },
+  m9s2: { title: 'Trace tables — debugging by watching, not guessing', html: `
+    <div class="cl-block"><h4>A print() inside the loop IS a trace table</h4>
+      <p>Printing every variable's value on every pass through the loop is exactly what a paper trace table records — just automated, showing you every intermediate value instead of only the final result.</p></div>
+    <div class="cl-block"><h4>Reading rows top to bottom to find where it goes wrong</h4>
+      <p>When code gives a wrong final answer, tracing shows you EXACTLY which line first produced a wrong value — far faster than guessing where the bug might be.</p></div>` },
+  m9s3: { title: 'app_state — a real state machine', html: `
+    <div class="cl-block"><h4>One variable controlling which screen draws</h4>
+      <p><code>app_state</code> is text ("menu", "running", "results") checked with if/elif — exactly Grade 7's state-machine idea (G7 — Game States), now controlling a real interactive app instead of a game.</p></div>
+    <div class="cl-block"><h4>else — a safety net for unexpected states</h4>
+      <p>A final <code>else</code> catches ANY value that isn't one of the states you explicitly planned for — real apps need this, since real user data is rarely as clean as what you tested with.</p></div>` },
+  m9s4: { title: 'Combining state, guards, and drawing', html: `
+    <div class="cl-block"><h4>Guarding against a real runtime error first</h4>
+      <p>Dividing by <code>total_questions</code> would crash if it were ever 0 — checking that BEFORE dividing (the same runtime-error idea from M7/M9s1) prevents a real crash on a genuinely possible input.</p></div>
+    <div class="cl-block"><h4>Percentage → app_state → drawing, all connected</h4>
+      <p>A computed percentage feeding into which app_state is shown, feeding into what actually gets drawn — three ideas from this module chained together into one small real app.</p></div>` },
+  m9s5: { title: 'A list that grows as the app runs', html: `
+    <div class="cl-block"><h4>State that accumulates over time</h4>
+      <p><code>rounds.append(score)</code> after each round means the list genuinely GROWS as the app progresses — real app state (game history, chat messages, a shopping cart) usually grows exactly like this.</p></div>
+    <div class="cl-block"><h4>sum() and max() work on the growing list</h4>
+      <p>Once every round's score is safely in the list, <code>sum(rounds)</code> and <code>max(rounds)</code> instantly give the total and best round — no need to track separate running totals as you go.</p></div>` },
+  m9s6: { title: 'try/except — a different error, same pattern', html: `
+    <div class="cl-block"><h4>ValueError — when a conversion itself fails</h4>
+      <p><code>int("abc")</code> raises a <strong>ValueError</strong> — a different error TYPE from M7's ZeroDivisionError, but caught with the exact same try/except pattern.</p></div>
+    <div class="cl-block"><h4>A real app can't just crash on unexpected input</h4>
+      <p>Any real app that reads user input needs to handle the moment someone types something unexpected — try/except turns a crash into a friendly message, keeping the app usable instead of broken.</p></div>` },
+
+  // ── M10 — Capstone: Data App ─────────────────────────────────────────────────
+  m10s1: { title: 'Every real app starts with loading data', html: `
+    <div class="cl-block"><h4>Two parallel lists, built together</h4>
+      <p>Loading <code>questions</code> and <code>answers</code> as two SEPARATE lists, but always appending to both at the same time, keeps them lined up — <code>questions[i]</code> and <code>answers[i]</code> always belong to the same row.</p></div>
+    <div class="cl-block"><h4>This is the real foundation of the whole capstone</h4>
+      <p>Every later step (scoring, saving results) depends on this data being loaded correctly first — planning and loading data is always the genuine first step of building any real data-driven app.</p></div>` },
+  m10s2: { title: 'Marking answers — comparing two lists', html: `
+    <div class="cl-block"><h4>Comparing matching positions across two lists</h4>
+      <p><code>student_answers[i] == answers[i]</code> compares the SAME position in two different lists — this only works because both lists were built in the same order back in Challenge 1.</p></div>
+    <div class="cl-block"><h4>Guarding zero questions, again</h4>
+      <p>The exact same "what if this is 0" guard from M9 protects the percentage calculation here too — a real quiz app with zero loaded questions would otherwise crash immediately.</p></div>` },
+  m10s3: { title: 'Writing a file, then reading it back to prove it', html: `
+    <div class="cl-block"><h4>Write mode, then read mode — two separate opens</h4>
+      <p><code>open("highscores.txt", "w")</code> writes; a SEPARATE <code>open("highscores.txt")</code> afterward reads it back — proving the save genuinely persisted, not just that the write command ran without error.</p></div>
+    <div class="cl-block"><h4>This is how every real app remembers things between sessions</h4>
+      <p>Writing to a file is exactly how a real quiz app would remember your best score even after you close and reopen it — nothing kept only in a variable survives the app restarting.</p></div>` },
+  m10s4: { title: 'The whole app, in one program', html: `
+    <div class="cl-block"><h4>Every M10 skill, combined in order</h4>
+      <p>Load (Challenge 1) → score (Challenge 2) → save (Challenge 3) — three separate skills chained into ONE real, complete pipeline, exactly what "shipping an app" really means.</p></div>
+    <div class="cl-block"><h4>Big Data — same ideas, enormous scale</h4>
+      <p>Your quiz.csv has 3 rows; a real company's database might have 3 billion — that jump to <strong>Big Data</strong> needs different TOOLS, but the underlying ideas (rows, columns, reading, filtering) never change.</p></div>` },
+  m10s5: { title: 'A real leaderboard from accumulated data', html: `
+    <div class="cl-block"><h4>Reading many appended entries back at once</h4>
+      <p><code>highscores.txt</code> now has several scores, added over many separate games (via append mode from M6) — reading them ALL back in and sorting is exactly how a real leaderboard works.</p></div>
+    <div class="cl-block"><h4>enumerate() for a ranked display</h4>
+      <p><code>for i, score in enumerate(top_3):</code> gives you both the position (for "#1", "#2"...) and the value together — the same enumerate() idea, now producing a genuinely ranked leaderboard.</p></div>` },
+  m10s6: { title: 'What separates "working" from "finished"', html: `
+    <div class="cl-block"><h4>A title screen — basic but essential presentation</h4>
+      <p>Code that works perfectly but shows the player nothing isn't really finished — a clear title, drawn with <code>text()</code>, is a small thing that makes an app feel genuinely complete.</p></div>
+    <div class="cl-block"><h4>Handling a missing file gracefully</h4>
+      <p><code>except FileNotFoundError:</code> means your app survives even if <code>quiz.csv</code> is ever missing or renamed — real shipped software has to handle the world NOT being exactly as expected.</p></div>` },
+}
 const STAGE_INDEX = {}
 CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.id] = i })
 
@@ -2081,7 +2389,30 @@ function selectChallenge(i) {
   editor.focus()
   ctx.clearRect(0,0,W,H)
   renderPills()
+  renderChallengeLesson(ch)
   clog('Challenge: ' + ch.name, 'info')
+}
+
+// 📘 Full per-challenge lesson content — CHALLENGE_LESSON is defined further
+// down (right after CHALLENGES), keyed by challenge id.
+let _clExpanded = true
+function renderChallengeLesson(ch) {
+  const wrap  = document.getElementById('ch-lesson')
+  const body  = document.getElementById('cl-body')
+  const title = document.getElementById('cl-title')
+  if (!wrap) return
+  const lesson = typeof CHALLENGE_LESSON !== 'undefined' ? CHALLENGE_LESSON[ch.id] : null
+  if (!lesson) { wrap.style.display = 'none'; return }
+  wrap.style.display = ''
+  title.textContent = lesson.title
+  body.innerHTML = lesson.html
+  body.classList.toggle('collapsed', !_clExpanded)
+  document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
+}
+function toggleChallengeLesson() {
+  _clExpanded = !_clExpanded
+  document.getElementById('cl-body').classList.toggle('collapsed', !_clExpanded)
+  document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
 }
 
 // ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
