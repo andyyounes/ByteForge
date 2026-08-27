@@ -153,7 +153,7 @@
 <div class="layout">
 
   <!-- Left: Python editor -->
-  <div class="editor-panel" style="position:relative;">
+  <div class="editor-panel" style="position:relative;" id="py-editor-panel">
     <div class="ed-header">
       <div class="ed-title">
         <span style="font-size:13px;font-weight:700;">Python Editor</span>
@@ -173,6 +173,35 @@
     <div class="py-loading" id="py-loading">
       <div class="spinner"></div>
       <div class="py-loading-text">Loading Python 3 (Pyodide)…</div>
+    </div>
+  </div>
+
+  <!-- Left (alternate): real HTML/CSS/JS editor — used by Web Story stages
+       (lang:'web'). A genuinely new editor, since no live HTML/CSS preview
+       existed anywhere on the platform before this — Grade 8's story
+       project uses real text code (not blocks), matching its own
+       already-real-Python App Builder track. -->
+  <div class="editor-panel" style="position:relative;display:none;" id="web-editor-panel">
+    <div class="ed-header">
+      <div class="ed-title">
+        <span style="font-size:13px;font-weight:700;">Web Editor</span>
+        <span class="grade-badge">Grade 8</span>
+        <span class="lang-badge">HTML/CSS/JS</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="resetWebToStarter()">↺ Starter code</button>
+        <button class="btn btn-brand"  id="web-run-btn" onclick="runWebCode()">▶ Run</button>
+      </div>
+    </div>
+    <div style="flex-shrink:0;display:flex;border-bottom:1px solid var(--border);background:var(--bg-card);">
+      <div class="web-tab active" id="web-tab-html" onclick="switchWebTab('html')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:#fbbf24;border-bottom:2px solid #fbbf24;">HTML</div>
+      <div class="web-tab" id="web-tab-css" onclick="switchWebTab('css')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">CSS</div>
+      <div class="web-tab" id="web-tab-js" onclick="switchWebTab('js')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">JS</div>
+    </div>
+    <div class="cm-outer" style="position:relative;">
+      <textarea id="web-editor-html"></textarea>
+      <textarea id="web-editor-css"  style="display:none;"></textarea>
+      <textarea id="web-editor-js"   style="display:none;"></textarea>
     </div>
   </div>
 
@@ -213,6 +242,10 @@
     <!-- Canvas -->
     <div class="canvas-wrap">
       <canvas id="out-canvas" width="480" height="260"></canvas>
+      <!-- allow-same-origin is needed so the checker can read the iframe's
+           resulting DOM/state after Run — safe here since the only code ever
+           running inside it is the student's own, on their own machine. -->
+      <iframe id="out-web" style="display:none;width:480px;height:260px;border:none;background:#fff;border-radius:6px;" sandbox="allow-scripts allow-same-origin"></iframe>
       <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
     </div>
 
@@ -398,6 +431,105 @@ const editor = CodeMirror.fromTextArea(document.getElementById('py-editor'), {
   },
 })
 
+// ── Web editor (HTML/CSS/JS) — Web Story stages (lang:'web') ──────────────────
+const webEditors = {
+  html: CodeMirror.fromTextArea(document.getElementById('web-editor-html'), { mode:'htmlmixed', theme:'dracula', lineNumbers:true, indentUnit:2, tabSize:2, lineWrapping:false }),
+  css:  CodeMirror.fromTextArea(document.getElementById('web-editor-css'),  { mode:'css',       theme:'dracula', lineNumbers:true, indentUnit:2, tabSize:2, lineWrapping:false }),
+  js:   CodeMirror.fromTextArea(document.getElementById('web-editor-js'),   { mode:'javascript', theme:'dracula', lineNumbers:true, indentUnit:2, tabSize:2, lineWrapping:false }),
+}
+let webTab = 'html'
+function switchWebTab(tab) {
+  webTab = tab
+  ;['html','css','js'].forEach(t => {
+    document.getElementById('web-editor-' + t).nextSibling // no-op, CodeMirror wraps the textarea
+  })
+  document.getElementById('web-tab-html').style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
+  document.getElementById('web-tab-css').style.cssText  = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
+  document.getElementById('web-tab-js').style.cssText   = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
+  document.getElementById('web-tab-' + tab).style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid #fbbf24;color:#fbbf24;'
+  Object.entries(webEditors).forEach(([t, ed]) => { ed.getWrapperElement().style.display = (t === tab) ? '' : 'none' })
+  webEditors[tab].refresh()
+}
+function resetWebToStarter() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch || !ch.webStarter) return
+  webEditors.html.setValue(ch.webStarter.html || '')
+  webEditors.css.setValue(ch.webStarter.css || '')
+  webEditors.js.setValue(ch.webStarter.js || '')
+}
+
+async function runWebCode() {
+  const html = webEditors.html.getValue()
+  const css  = webEditors.css.getValue()
+  const js   = webEditors.js.getValue()
+  const iframe = document.getElementById('out-web')
+  document.getElementById('pass-badge').style.display = 'none'
+
+  // Built with '<' + 'script>' pieces rather than a literal opening tag —
+  // this whole function lives inside the page's OWN script block, and the
+  // literal closing-tag sequence in a JS string (or even a comment) here
+  // would close THAT tag early, the instant the browser's HTML parser (not
+  // just the JS engine) sees the raw character sequence.
+  const openTag  = '<' + 'script>'
+  const closeTag = '<' + '/script>'
+  const srcdoc = `<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}`
+    + `${openTag}window.onerror = function(msg){ parent.postMessage({__bfWebError: String(msg)}, '*'); };\n`
+    + `try {\n${js}\n} catch(e) { parent.postMessage({__bfWebError: String(e.message)}, '*'); }\n${closeTag}</body></html>`
+
+  await new Promise(resolve => {
+    const onLoad = () => { iframe.removeEventListener('load', onLoad); resolve() }
+    iframe.addEventListener('load', onLoad)
+    iframe.srcdoc = srcdoc
+  })
+  // Give any script (esp. one relying on DOMContentLoaded timing) a beat to settle.
+  await new Promise(r => setTimeout(r, 50))
+
+  let webError = null
+  const errHandler = (e) => { if (e.data && e.data.__bfWebError) webError = e.data.__bfWebError }
+  window.addEventListener('message', errHandler)
+  await new Promise(r => setTimeout(r, 30))
+  window.removeEventListener('message', errHandler)
+
+  if (webError) { clog('Error: ' + webError, 'err'); return }
+
+  let doc, win
+  try { doc = iframe.contentDocument; win = iframe.contentWindow } catch (e) { clog('Could not read the page: ' + e.message, 'err'); return }
+
+  const webLog = {
+    html, css, js,
+    bodyText: doc.body ? doc.body.textContent : '',
+    h1s: doc.querySelectorAll('h1,h2,h3').length,
+    paragraphs: doc.querySelectorAll('p').length,
+    buttons: doc.querySelectorAll('button').length,
+    listItems: doc.querySelectorAll('li').length,
+    // JS state — Week 1 (objects/arrays for story state). Read straight off
+    // the iframe's global scope, since `let`/`const` at top level of a
+    // classic (non-module) <script> attach to that window's globals.
+    globals: win,
+    hasArray:  /\b(?:let|const|var)\s+\w+\s*=\s*\[/.test(js),
+    hasObject: /\b(?:let|const|var)\s+\w+\s*=\s*\{/.test(js),
+    hasPush:   /\.push\s*\(/.test(js),
+  }
+  clog('Ran — checking your page…', 'info')
+  checkWebChallenge(webLog)
+}
+
+function checkWebChallenge(log) {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch || completed.has(activeIdx)) return
+  if (ch.check(log)) {
+    completed.add(activeIdx)
+    renderPills()
+    document.getElementById('pass-badge').style.display = 'block'
+    showToast('Challenge complete! +' + ch.xp + ' XP 🎉')
+    clog('✅ Challenge complete! +' + ch.xp + ' XP', 'ok')
+    if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g8-c' + activeIdx, { passed:true, score:100 }) }
+    LessonSaves.save('grade8', ch.id, { passed:true, xpEarned: ch.xp, code: log.js })
+  } else {
+    clog('❌ Not quite — check the task above and try the 💡 Hint button.', 'err')
+  }
+}
+
 // ── Execution ─────────────────────────────────────────────────────────────────
 // Lines injected before user code (for line-number adjustment in errors)
 const PREAMBLE_LINES = 6
@@ -516,6 +648,71 @@ function highlightError(line) {
 // is deliberately structural (right constructs used + it ran clean), same
 // leniency as the pre-existing M9/M10 content below.
 const MODULES = [
+  // ── Web Story 1 — Semester 1, Week 1: objects/arrays for story state ──────
+  // Real HTML/CSS/JS text code (lang:'web') — Grade 8's story project is
+  // "advanced" and matches Grade 8's own real-Python positioning, unlike
+  // Grade 7's block-based Story Studio. check(log) reads a log object (from
+  // runWebCode/checkWebChallenge), not a code string — unlike this file's
+  // Python stages below, which check(code) the raw Python source directly.
+  { id:'ws1', name:'📗 Web Story 1 — Remembering the Reader', sub:'Arrays and objects — a story that tracks the reader\'s inventory and flags', live:true, stages:[
+    { id:'ws1s1', name:'Your First Array', xp:25, lang:'web',
+      text:`<strong>Challenge 1</strong> — In JS, create an array <code>inventory</code> with at least 2 items (e.g. "sword", "shield"). Display them, joined by commas, inside the <code>#story</code> div in the HTML.`,
+      hints:[
+        'JS: let inventory = ["sword", "shield"];',
+        'JS: document.getElementById("story").textContent = inventory.join(", ");',
+        'The HTML tab already has a &lt;div id="story"&gt;&lt;/div&gt; for you to fill in from JS.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: create an array called inventory with at least 2 items\n\n// TODO: show it in #story, joined by commas — try .join(", ")\n`,
+      },
+      needsArray:true,
+      check:(log) => log.hasArray && /\w+(?:,\s*\w+)+/.test(log.bodyText.replace(/["']/g, '')),
+    },
+    { id:'ws1s2', name:'Add to the Array', xp:30, lang:'web',
+      text:`<strong>Challenge 2</strong> — Start with inventory holding 2 items, then use <code>.push()</code> to add a THIRD item before displaying it.`,
+      hints:[
+        'inventory.push("potion"); — adds a new item to the END of the array.',
+        'Push BEFORE you join() and display, so the display includes all 3 items.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `let inventory = ["sword", "shield"];\n// TODO: push a third item onto inventory\n\n// TODO: show all 3 items in #story, joined by commas\n`,
+      },
+      needsArray:true, needsPush:true,
+      check:(log) => log.hasArray && log.hasPush,
+    },
+    { id:'ws1s3', name:'A Flag Object', xp:30, lang:'web',
+      text:`<strong>Challenge 3</strong> — Create an object <code>flags</code> with at least one true/false property (e.g. <code>hasKey: false</code>). Display its value inside <code>#story</code> (e.g. "Has key: false").`,
+      hints:[
+        'JS: let flags = { hasKey: false };',
+        'Read it with flags.hasKey, and show it — e.g. "Has key: " + flags.hasKey.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: create an object called flags with at least one true/false property\n\n// TODO: show its value in #story, e.g. "Has key: false"\n`,
+      },
+      needsObject:true,
+      check:(log) => log.hasObject && /true|false/i.test(log.bodyText),
+    },
+    { id:'ws1boss', name:'BOSS — Inventory & Flags Together', xp:60, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Track BOTH a 3+ item inventory array AND a flags object with at least one property, using push() to add to the array. Display both inside <code>#story</code>.`,
+      hints:[
+        'This is ws1s2\'s array + ws1s3\'s object, both shown on the same page.',
+        'Nothing new — just combining both ideas from this week into one page.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: an inventory array (start with 2 items, push a 3rd)\n\n// TODO: a flags object with at least one true/false property\n\n// TODO: show both in #story\n`,
+      },
+      needsArray:true, needsPush:true, needsObject:true,
+      check:(log) => log.hasArray && log.hasPush && log.hasObject && /true|false/i.test(log.bodyText),
+    },
+  ]},
   { id:'m1', name:'🔤 M1 — From Blocks to Text', sub:'print, input, variables, types — the G7 skills, now in real Python', live:true, stages:[
     { id:'m1s1', name:'Say Hello', xp:20,
       text:`<strong>Challenge 1 — Your First Line</strong> — Use <code>print()</code> to say hello. Then print it again with your own message.`,
@@ -2019,6 +2216,25 @@ const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({
 // challenges). Rendered by renderChallengeLesson().
 // ══════════════════════════════════════════════════════════════════════════════
 const CHALLENGE_LESSON = {
+  // ── Web Story 1 — Remembering the Reader: arrays & objects ──────────────────
+  ws1s1: { title: 'An array is an ordered list of values', html: `
+    <div class="cl-block"><h4>Real JavaScript, real syntax</h4>
+      <p><code>["sword", "shield"]</code> is a genuine JavaScript array — an ordered collection, indexed from 0. <code>.join(", ")</code> turns it back into one readable string, which is exactly how a real inventory display works.</p></div>
+    <div class="cl-block"><h4>Why this is Grade 8's "advanced" story track</h4>
+      <p>This whole world uses real HTML/CSS/JS text code — no blocks — matching the same real-code positioning as this course's Python track, one semester earlier than Grade 7's block-based Story Studio revisits similar ideas.</p></div>` },
+  ws1s2: { title: '.push() adds to the END of an array', html: `
+    <div class="cl-block"><h4>Arrays can grow after creation</h4>
+      <p>An array isn't fixed once written — <code>.push("potion")</code> genuinely adds a new element after the array already exists, exactly like a player finding a new item mid-story.</p></div>
+    <div class="cl-block"><h4>Order matters</h4>
+      <p>Push BEFORE displaying — the display always reflects whatever the array holds at the moment you read it, so a push after the display line wouldn't show up.</p></div>` },
+  ws1s3: { title: 'An object groups related NAMED values', html: `
+    <div class="cl-block"><h4>Different from an array</h4>
+      <p>An array is a list, ordered by position; an object is a set of NAMED properties (<code>flags.hasKey</code>), not ordered by position at all. Both are "collections", but they answer different questions — "what's item #2?" vs. "does this thing have a key?".</p></div>
+    <div class="cl-block"><h4>Booleans track yes/no story state</h4>
+      <p>true/false properties are exactly how a real interactive story tracks whether something has happened yet — has the door been unlocked, has a character been met — without needing a whole separate variable for each one.</p></div>` },
+  ws1boss: { title: 'BOSS — arrays and objects, together', html: `
+    <div class="cl-block"><h4>A real story tracks both kinds of state</h4>
+      <p>An inventory (an ordered LIST of items) and a set of flags (NAMED yes/no facts) are genuinely different shapes of data, and a real interactive story needs both — this boss is the smallest real example of tracking each correctly.</p></div>` },
   // ── M1 — From Blocks to Text ────────────────────────────────────────────────
   m1s1: { title: 'print() — your first real line of code', html: `
     <div class="cl-block"><h4>The classic first line, in any language</h4>
@@ -2385,9 +2601,24 @@ function selectChallenge(i) {
   document.getElementById('ch-text').innerHTML = ch.text
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
   document.getElementById('pass-badge').style.display = 'none'
-  editor.setValue(ch.starter || '# Write your Python here\n')
-  editor.focus()
-  ctx.clearRect(0,0,W,H)
+  // Web Story stages (lang:'web') swap in the real HTML/CSS/JS editor and
+  // iframe preview in place of the Python editor + canvas.
+  const isWeb = ch.lang === 'web'
+  document.getElementById('py-editor-panel').style.display  = isWeb ? 'none' : ''
+  document.getElementById('web-editor-panel').style.display = isWeb ? '' : 'none'
+  document.getElementById('out-canvas').style.display = isWeb ? 'none' : 'block'
+  document.getElementById('out-web').style.display    = isWeb ? 'block' : 'none'
+  if (isWeb) {
+    webEditors.html.setValue((ch.webStarter && ch.webStarter.html) || '')
+    webEditors.css.setValue((ch.webStarter && ch.webStarter.css) || '')
+    webEditors.js.setValue((ch.webStarter && ch.webStarter.js) || '')
+    switchWebTab('html')
+    document.getElementById('out-web').srcdoc = '<body style="font-family:sans-serif;color:#94a3b8;font-size:12px;padding:14px;">Page output — write HTML/CSS/JS, then press ▶ Run</body>'
+  } else {
+    editor.setValue(ch.starter || '# Write your Python here\n')
+    editor.focus()
+    ctx.clearRect(0,0,W,H)
+  }
   renderPills()
   renderChallengeLesson(ch)
   clog('Challenge: ' + ch.name, 'info')

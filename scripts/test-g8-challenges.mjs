@@ -33,9 +33,24 @@ const permissiveLog = { frames: 999, rects: 999, circles: 999, lines: 999, texts
 // for the literal word "while" before the student writes anything real.
 function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
 
+// Web Story stages (lang:'web') check a log OBJECT (from runWebCode's DOM/
+// state read), not a Python code string — same shape as Grade 7's page-type
+// stages. Mirrors that file's maximal/empty log pattern instead of the
+// code-regex convention every Python stage below uses.
+const webMaximalLog = () => ({ bodyText: 'true false ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true })
+const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false })
+
 let pass = 0, fail = 0
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.id}`
+
+  if (ch.lang === 'web') {
+    if (ch.check(webMaximalLog())) { pass++; console.log(`✓ ${label} — satisfiable (maximal log passes)`) }
+    else { fail++; console.log(`✗ ${label} — UNSATISFIABLE: even a maximal log fails check()`) }
+    if (!ch.check(webEmptyLog())) { pass++; console.log(`✓ ${label} — not vacuous (empty log correctly fails)`) }
+    else { fail++; console.log(`✗ ${label} — VACUOUS: an empty log passes check()`) }
+    continue
+  }
 
   if (!ch.check(stripPyComments(''), permissiveLog)) { pass++; console.log(`✓ ${label} — not vacuous (empty submission correctly fails)`) }
   else { fail++; console.log(`✗ ${label} — VACUOUS: an empty submission passes check()`) }
