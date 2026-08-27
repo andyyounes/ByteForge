@@ -4468,7 +4468,21 @@ class Interpreter {
       else env.set(lhs,val);this.record(stmt,env);return
     }
     const scm=text.match(/^(\w+)\s*\(/)
-    if(scm){const name=scm[1].toUpperCase();if(this.procs[name]){const argStr=text.slice(scm[0].length-1).replace(/^\s*\(|\)\s*$/g,'');const args=argStr.trim()?splitArgs(argStr).map(a=>this.evalE(a.trim(),env)):[];const def=this.procs[name];const local=new Env(this.globals);def.params.forEach((p,i)=>local.setLocal(p.name,args[i]??null));this.execBlock(def.body,local);this.record(stmt,env);return}}
+    if(scm){const name=scm[1].toUpperCase();if(this.procs[name]){
+      const argStr=text.slice(scm[0].length-1).replace(/^\s*\(|\)\s*$/g,'')
+      // Keep the argument SOURCE text, not just its value: without it there is
+      // nothing to write a BYREF result back into. This path used to evaluate
+      // args to values and skip the write-back that the `CALL ` path performs,
+      // so `DoubleByRef(x)` left x unchanged while `CALL DoubleByRef(x)`
+      // doubled it — a student writing the bare form learned that BYREF does
+      // nothing, which is the exact opposite of what the lesson teaches.
+      const argSrcs=argStr.trim()?splitArgs(argStr):[]
+      const args=argSrcs.map(a=>this.evalE(a.trim(),env))
+      const def=this.procs[name];const local=new Env(this.globals)
+      def.params.forEach((p,i)=>local.setLocal(p.name,args[i]??null))
+      this.execBlock(def.body,local)
+      def.params.forEach((p,i)=>{if(p.byref&&argSrcs[i])try{env.set(argSrcs[i].trim(),local.get(p.name))}catch(_){}})
+      this.record(stmt,env);return}}
     const MARKERS=['ELSE','ENDIF','ENDWHILE','ENDPROCEDURE','ENDFUNCTION','ENDCASE']
     if(MARKERS.some(m=>u===m||u.startsWith(m+' ')))return
     // Previously a silent console.warn + skip, so a student copying this
@@ -4738,8 +4752,8 @@ PROCEDURE Push(BYVAL val : INTEGER)
    IF sp >= 7 THEN
       OUTPUT "Overflow"
    ELSE
-      sp ← sp + 1
-      stack[sp] ← val
+      // TODO: increment sp, then store val at stack[sp]
+      OUTPUT "Push not written yet"
    ENDIF
 ENDPROCEDURE
 
@@ -4749,9 +4763,8 @@ FUNCTION Pop() RETURNS INTEGER
       OUTPUT "Underflow"
       RETURN -1
    ENDIF
-   v  ← stack[sp]
-   sp ← sp - 1
-   RETURN v
+   // TODO: copy stack[sp] into v, decrement sp, then RETURN v
+   RETURN -1   // placeholder — delete once you return the popped value
 ENDFUNCTION
 
 CALL Push(10)

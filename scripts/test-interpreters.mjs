@@ -61,6 +61,36 @@ const OUTPUT_CASES = [
   ['1D non-1 lower bound',      'DECLARE a : ARRAY[3:5] OF INTEGER\na[3] ← 1\na[5] ← 9\nOUTPUT a[3]\nOUTPUT a[5]', ['1', '9']],
   ['DIV still truncates',       'OUTPUT 7 DIV 2', ['3']],
   ['MOD still works',           'OUTPUT 7 MOD 2', ['1']],
+
+  // BYREF write-back must happen on BOTH call forms. The bare-call path used
+  // to evaluate arguments to values only and skip the write-back that the
+  // `CALL ` path performs, so `DoubleByRef(x)` left x unchanged while
+  // `CALL DoubleByRef(x)` doubled it — the bare form silently taught that
+  // BYREF does nothing, the exact opposite of the lesson beside it.
+  ['BYREF writes back via CALL',
+   `PROCEDURE Dbl(BYREF n : INTEGER)
+   n ← n * 2
+ENDPROCEDURE
+DECLARE x : INTEGER
+x ← 10
+CALL Dbl(x)
+OUTPUT x`, ['20']],
+  ['BYREF writes back via a bare call too',
+   `PROCEDURE Dbl(BYREF n : INTEGER)
+   n ← n * 2
+ENDPROCEDURE
+DECLARE x : INTEGER
+x ← 10
+Dbl(x)
+OUTPUT x`, ['20']],
+  ['BYVAL still does NOT write back (bare call)',
+   `PROCEDURE Dbl(BYVAL n : INTEGER)
+   n ← n * 2
+ENDPROCEDURE
+DECLARE x : INTEGER
+x ← 10
+Dbl(x)
+OUTPUT x`, ['10']],
 ]
 
 // Cases that must RAISE — silence here means corrupt state or a lost error.
