@@ -53,8 +53,13 @@
     .right-panel { display:flex; flex-direction:column; overflow:hidden; }
 
     /* Challenge header */
+    /* Was max-height:38vh — squeezed the whole lesson panel into a tiny
+       scrollable box while the canvas/page-preview below kept a rigid
+       260px regardless of whether it had anything in it yet (often empty,
+       pre-Run). 52vh gives real lesson text room to breathe without
+       needing its own internal scrollbar on most challenges. */
     .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px;
-                  max-height:38vh; overflow-y:auto; }
+                  max-height:52vh; overflow-y:auto; }
     .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; max-height:220px; overflow-y:auto; }
     .ch-nav-strip { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
     .ch-nav-btn { padding:4px 12px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
@@ -2018,46 +2023,46 @@ const CHALLENGES = WORLDS.filter(w => w.live).flatMap(w => w.stages.map(s => ({ 
 const CHALLENGE_LESSON = {
   // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
   st1s1: { title: 'A heading is a page\'s title', html: `
-    <div class="cl-block"><h4>Every real page starts here</h4>
-      <p>In real HTML this block is a <code>&lt;h1&gt;</code> tag — the biggest, most important text on the page, shown once near the top. "Add heading" is standing in for that exact tag: one big title, nothing more.</p></div>
+    <div class="cl-block"><h4>One big title, nothing more</h4>
+      <p>"Add heading" puts the biggest, most important text on the page, shown once near the top — it's the ONE thing that tells a reader what this whole page is about. (This is what a real webpage's <code>&lt;h1&gt;</code> does — same idea, you're just building it with a block instead of typing that tag.)</p></div>
     <div class="cl-block"><h4>Why only one heading (usually)</h4>
-      <p>A page can technically have many headings, but a single <code>&lt;h1&gt;</code> per page is the normal rule — it's the one thing that tells a reader (and a search engine) what this whole page is actually about.</p></div>` },
+      <p>A page CAN have more than one heading block, but sticking to one is the normal rule — extra headings compete for attention and make it unclear what the page is really about.</p></div>` },
   st1s2: { title: 'A paragraph is the body of the page', html: `
     <div class="cl-block"><h4>Heading vs. paragraph</h4>
-      <p>If the heading is the title, the paragraph (<code>&lt;p&gt;</code> in real HTML) is everything you actually want to SAY. Almost every page is really just: one heading, then one or more paragraphs.</p></div>
+      <p>If the heading is the title, the paragraph is everything you actually want to SAY. Almost every page is really just: one heading, then one or more paragraphs.</p></div>
     <div class="cl-block"><h4>Order is the page's reading order</h4>
-      <p>Blocks run top to bottom, and so does the page — whatever you add first appears first. This is exactly how a real HTML file works too: the browser reads it top to bottom and lays it out in that order.</p></div>` },
+      <p>Blocks run top to bottom, and so does the page — whatever you add first appears first, exactly like reading a page from the top down.</p></div>` },
   st1s3: { title: 'One paragraph per idea', html: `
     <div class="cl-block"><h4>Why not one giant paragraph?</h4>
-      <p>Real writers (and real HTML) break text into SEPARATE paragraphs — one per idea — rather than one giant block. Each "add paragraph" block is its own <code>&lt;p&gt;</code> tag, and using three of them, not one long one, is what makes a page skimmable.</p></div>
+      <p>Good writing breaks text into SEPARATE paragraphs — one per idea — rather than one giant block. Three separate "add paragraph" blocks, not one long one, is what makes a page skimmable.</p></div>
     <div class="cl-block"><h4>Structure you can SEE</h4>
-      <p>Notice the gap that appears between each paragraph automatically — that spacing is built into what a paragraph tag means, not something you had to draw yourself.</p></div>` },
+      <p>Notice the gap that appears between each paragraph automatically — that spacing comes built into the paragraph block itself, not something you had to draw yourself.</p></div>` },
   st1s4: { title: 'A link connects one page to another', html: `
     <div class="cl-block"><h4>Two pieces every link needs</h4>
-      <p>A link (<code>&lt;a&gt;</code> in real HTML) always needs TWO things: the text someone clicks, and the address it goes to (its <code>href</code>). "Add link" takes exactly those two inputs for the same reason.</p></div>
+      <p>"Add link" always needs TWO things: the text someone clicks, and the address it goes to. Leave either one out and the link genuinely can't do its job — there'd be nothing to click, or nowhere to send them.</p></div>
     <div class="cl-block"><h4>This is what makes the WEB a web</h4>
-      <p>Without links, every page would be an island. A link is the one tag that turns separate pages into a connected site — exactly what your interactive story needs between "chapters".</p></div>` },
+      <p>Without links, every page would be an island. A link is what turns separate pages into a connected site — exactly what your interactive story needs between "chapters".</p></div>` },
   st1s5: { title: 'A button invites an action', html: `
     <div class="cl-block"><h4>Different from a link</h4>
-      <p>A link takes you somewhere else; a button (<code>&lt;button&gt;</code>) triggers something HERE, on the same page — like submitting a form, or (as Week 3 covers) changing the text on screen when clicked.</p></div>
+      <p>A link takes you somewhere else; a button triggers something HERE, on the same page — like submitting a form, or (as Week 3 covers) changing the text on screen when clicked.</p></div>
     <div class="cl-block"><h4>It does nothing yet — on purpose</h4>
       <p>Right now your button is just a shape with a label — clicking it does nothing. That's deliberate: this week is about what a button IS; Week 3 is about making it actually respond.</p></div>` },
-  st1boss: { title: 'BOSS — every tag, one real page', html: `
+  st1boss: { title: 'BOSS — every block, one real page', html: `
     <div class="cl-block"><h4>The shape of almost every web page</h4>
       <p>Heading → paragraphs → link → button is not a random combination — it's close to the actual shape of a huge number of real websites: a title, some body text, a way to go elsewhere, and a call to action.</p></div>
     <div class="cl-block"><h4>Nothing new — just assembly</h4>
       <p>Every piece of this boss came from st1s1–st1s5. Real programming often looks exactly like this: combining small, already-understood pieces into one finished thing, rather than learning something brand new at the very end.</p></div>` },
   // ── Story Studio 2 — Style It: CSS basics ───────────────────────────────────
-  st2s1: { title: 'CSS styles the whole page at once', html: `
-    <div class="cl-block"><h4>HTML vs. CSS</h4>
-      <p>Last week's blocks (heading, paragraph, link, button) are HTML — the CONTENT of the page. This week's Style blocks are CSS — how that content LOOKS. Same page, two completely different jobs.</p></div>
-    <div class="cl-block"><h4>Background applies to the container, not one element</h4>
-      <p>"Set page background colour" doesn't touch any single heading or paragraph — it colours the whole page behind everything, exactly like a real CSS rule targeting <code>body</code>.</p></div>` },
-  st2s2: { title: 'CSS rules can target ONE kind of element', html: `
+  st2s1: { title: 'Style blocks change how the page LOOKS, not what\'s on it', html: `
+    <div class="cl-block"><h4>Content vs. style — two completely different jobs</h4>
+      <p>Last week's blocks (heading, paragraph, link, button) decided WHAT is on the page. This week's Style blocks decide how it LOOKS — colours, alignment, size. Same page, two completely different jobs.</p></div>
+    <div class="cl-block"><h4>Background applies to the whole page, not one element</h4>
+      <p>"Set page background colour" doesn't touch any single heading or paragraph — it colours the whole page behind everything at once.</p></div>` },
+  st2s2: { title: 'A style rule can target ONE kind of block', html: `
     <div class="cl-block"><h4>Specific, not global</h4>
-      <p>"Set heading colour" only changes headings — any paragraphs stay whatever colour they already were. Real CSS works exactly this way: a rule like <code>h1 { color: ... }</code> only touches <code>&lt;h1&gt;</code> elements, nothing else.</p></div>
+      <p>"Set heading colour" only changes headings — any paragraphs stay whatever colour they already were. It's a targeted rule, not a blanket one.</p></div>
     <div class="cl-block"><h4>Why this matters</h4>
-      <p>Being able to style just ONE type of element — not the whole page at once — is what makes CSS actually useful for real design: different colours/sizes for titles vs. body text vs. buttons.</p></div>` },
+      <p>Being able to style just ONE type of block — not the whole page at once — is what makes real design possible: different colours/sizes for titles vs. body text vs. buttons, rather than everything looking identical.</p></div>` },
   st2s3: { title: 'Alignment is a choice, not a colour', html: `
     <div class="cl-block"><h4>A small fixed list of options</h4>
       <p>Unlike colour (millions of possible values), text alignment only has a few real choices — left, center, right. That's why this block uses a dropdown instead of a colour picker: the right input for a CSS property depends on what kind of value it actually takes.</p></div>
