@@ -338,12 +338,36 @@
 
     // â”€â”€ Challenges â”€â”€
     const CHALLENGES = [
-      { id:'sq', name:'Draw a square', xp:30, check:()=>sim.trail.length>=4 },
-      { id:'tri', name:'Draw a triangle', xp:40, check:()=>sim.trail.length>=3 },
+      // These checks used to be pure SEGMENT COUNTS: 'sq' was trail.length>=4
+      // and 'tri' was trail.length>=3. checkChallenge() evaluates every
+      // challenge after each run, so drawing one square completed "Draw a
+      // square", "Draw a triangle" AND "Travel 100+ pixels" at once - 95 XP
+      // from a single program - and any 4 segments, including a zigzag,
+      // counted as a square. Now the shape is actually verified.
+      { id:'sq', name:'Draw a square', xp:30, check:()=>isRegularPolygon(sim.trail, 4) },
+      { id:'tri', name:'Draw a triangle', xp:40, check:()=>isRegularPolygon(sim.trail, 3) },
       { id:'color', name:'Move in a custom color', xp:20, check:()=>sim.color!=='#f97316' && sim.trail.length>0 },
       { id:'trail100', name:'Travel 100+ pixels', xp:25, check:()=>{ const d=sim.trail.reduce((s,t)=>s+Math.hypot(t.x2-t.x1,t.y2-t.y1),0);return d>=100; } },
-      { id:'say', name:'Make the character say something', xp:15, check:()=>!!sim.speech || document.getElementById('output-panel').textContent.length > 30 },
+      // The second clause here meant the output panel's own "Running... / Done"
+      // text (already ~16 chars before the check runs) completed this challenge
+      // without a Say block ever being used.
+      { id:'say', name:'Make the character say something', xp:15, check:()=>!!sim.speech },
     ];
+
+    // True if the trail forms a closed polygon with exactly `sides` roughly
+    // equal edges, drawn end-to-end. Used so a square cannot pass as a triangle
+    // and a zigzag cannot pass as either.
+    function isRegularPolygon(trail, sides) {
+      if (!trail || trail.length !== sides) return false;
+      for (let i = 1; i < trail.length; i++) {
+        if (Math.hypot(trail[i].x1 - trail[i-1].x2, trail[i].y1 - trail[i-1].y2) > 2) return false;
+      }
+      const first = trail[0], last = trail[trail.length - 1];
+      if (Math.hypot(last.x2 - first.x1, last.y2 - first.y1) > 5) return false;   // must close
+      const lens = trail.map(t => Math.hypot(t.x2 - t.x1, t.y2 - t.y1));
+      const mn = Math.min(...lens), mx = Math.max(...lens);
+      return mn > 5 && mx / mn < 1.25;                                            // roughly equal sides
+    }
     let completedChallenges = [];
 
     function renderChallenges() {

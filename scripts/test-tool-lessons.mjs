@@ -208,6 +208,50 @@ const t = (ok, label) => {
   t(!!hex.check(hcmds), 'turtle/Colourful Hexagon: is completable at all')
 }
 
+// ── pixel-grid.html: setGrid must not depend on the global window.event ──────
+// setGrid used `event.target.classList.add('active')`, relying on the
+// deprecated global window.event. It is ALSO called programmatically by
+// loadChallenge during init, where window.event is undefined — so it threw a
+// TypeError that halted top-level execution: the LessonSaves.load() that
+// follows never ran (saved artwork and completion state were never restored)
+// and draw() was skipped, so the grid did not even render.
+{
+  const h = readFileSync(`${ROOT}/public/lessons/pixel-grid.html`, 'utf8')
+  const live = h.replace(/^\s*\/\/.*$/gm, '')
+  t(/function setGrid\(n, ev\)/.test(live), 'pixel-grid: setGrid takes the event explicitly')
+  t(!/[^.\w]event\.target/.test(live),      'pixel-grid: no reliance on the global window.event in live code')
+  t((live.match(/setGrid\(\d+, event\)/g) || []).length === 4,
+    'pixel-grid: all four size buttons pass their event through')
+}
+
+// ── blockly.html: shape challenges must check the actual shape ───────────────
+// 'sq' was trail.length>=4 and 'tri' was trail.length>=3, and checkChallenge()
+// evaluates EVERY challenge after each run — so one square completed "square",
+// "triangle" and "travel 100+ pixels" at once (95 XP from one program), and any
+// four segments (a zigzag) counted as a square.
+{
+  const h = readFileSync(`${ROOT}/public/lessons/blockly.html`, 'utf8')
+  const s = h.indexOf('function isRegularPolygon')
+  const e = h.indexOf('\n    }', s) + 6
+  const { isRegularPolygon } = new Function(h.slice(s, e) + '\nreturn { isRegularPolygon }')()
+
+  // Build trails: closed square, closed triangle, open zigzag.
+  const seg = (x1, y1, x2, y2) => ({ x1, y1, x2, y2 })
+  const square = [seg(0,0,100,0), seg(100,0,100,100), seg(100,100,0,100), seg(0,100,0,0)]
+  const tri    = [seg(0,0,100,0), seg(100,0,50,86),   seg(50,86,0,0)]
+  const zigzag = [seg(0,0,50,0),  seg(50,0,50,50),    seg(50,50,120,50), seg(120,50,120,10)]
+  const openSquare = square.slice(0, 3)   // three sides, never closes
+
+  t(isRegularPolygon(square, 4) === true,  'blockly: a real square counts as a square')
+  t(isRegularPolygon(square, 3) === false, 'blockly: a square does NOT also count as a triangle')
+  t(isRegularPolygon(tri, 3) === true,     'blockly: a real triangle counts as a triangle')
+  t(isRegularPolygon(tri, 4) === false,    'blockly: a triangle does NOT also count as a square')
+  t(isRegularPolygon(zigzag, 4) === false, 'blockly: a 4-segment zigzag is NOT a square')
+  t(isRegularPolygon(openSquare, 3) === false, 'blockly: an unclosed path is not a polygon')
+  t(!/output-panel'\)\.textContent\.length > 30/.test(h.replace(/^\s*\/\/.*$/gm, '')),
+    'blockly: "say" no longer passes on the output panel\'s own text')
+}
+
 // ── No stray control bytes anywhere in shipped source ────────────────────────
 {
   const BS = String.fromCharCode(8)

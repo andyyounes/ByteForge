@@ -172,10 +172,10 @@
     <div class="tools-section">
       <div class="tools-label">Grid Size</div>
       <div class="size-grid">
-        <div class="size-btn"        onclick="setGrid(8)">8×8</div>
-        <div class="size-btn active" onclick="setGrid(16)">16×16</div>
-        <div class="size-btn"        onclick="setGrid(32)">32×32</div>
-        <div class="size-btn"        onclick="setGrid(64)">64×64</div>
+        <div class="size-btn"        onclick="setGrid(8, event)">8×8</div>
+        <div class="size-btn active" onclick="setGrid(16, event)">16×16</div>
+        <div class="size-btn"        onclick="setGrid(32, event)">32×32</div>
+        <div class="size-btn"        onclick="setGrid(64, event)">64×64</div>
       </div>
     </div>
 
@@ -230,12 +230,22 @@ const ctx = mainCanvas.getContext('2d')
 const targetCanvas = document.getElementById('target-canvas')
 const tctx = targetCanvas.getContext('2d')
 
-function setGrid(n) {
+function setGrid(n, ev) {
   GRID = n
   CELL = 512 / GRID
   pixels = Array(GRID * GRID).fill('transparent')
+  // This was event.target.classList.add('active'), relying on the deprecated
+  // global window.event. setGrid is ALSO called programmatically -- loadChallenge
+  // calls it during init -- and there window.event is undefined, so this threw a
+  // TypeError that halted top-level execution. Everything after it was lost:
+  // the LessonSaves.load() IIFE never ran, so saved artwork and completion state
+  // were never restored, and draw() was skipped so the grid did not even render.
   document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'))
-  event.target.classList.add('active')
+  const btn = (ev && ev.target && ev.target.classList.contains('size-btn'))
+    ? ev.target
+    : Array.from(document.querySelectorAll('.size-btn'))
+        .find(b => (b.getAttribute('onclick') || '').includes('setGrid(' + n))
+  if (btn) btn.classList.add('active')
   draw()
 }
 
