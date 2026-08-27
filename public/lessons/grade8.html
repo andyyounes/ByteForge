@@ -554,6 +554,43 @@ print(type(decimal_number))
 `,
       check:(code) => (code.match(/type\s*\(/g) || []).length >= 4 && (code.match(/print\s*\(/g) || []).length >= 4,
     },
+    { id:'m1s4', name:'Ask the User', xp:35,
+      text:`<strong>Challenge 4 — input()</strong> — <code>input()</code> asks the user to type something and always hands it back as TEXT, even if they typed a number. Ask for the user's age as text, convert it to an int with <code>int()</code>, then print how old they'll be in 10 years.`,
+      hints:[
+        'input("How old are you? ") returns whatever was typed, always as a string.',
+        'int(age_text) converts that string into a real number you can do maths with.',
+        'age_in_10 = age + 10 only works once age is a real int, not text.',
+      ],
+      starter:`# Grade 8 — input() always returns text
+age_text = input("How old are you? ")
+# TODO: convert age_text to an int using int()
+age = 0
+
+# TODO: compute age + 10 and print it with an f-string
+`,
+      check:(code) => /input\s*\(/.test(code) && /int\s*\(/.test(code) && /\+\s*10/.test(code),
+    },
+    { id:'m1s5', name:'Temperature Converter', xp:35,
+      text:`<strong>Challenge 5 — Real Arithmetic</strong> — Build a real Celsius-to-Fahrenheit converter using the actual formula: <code>F = C * 9 / 5 + 32</code>. Try it with three different Celsius values.`,
+      hints:[
+        'fahrenheit = celsius * 9 / 5 + 32 — Python follows normal maths order of operations (× and ÷ before +).',
+        'Make THREE different celsius variables (or reuse one and reprint) and convert all three.',
+        'Print each result with an f-string, e.g. f"{celsius}C is {fahrenheit}F".',
+      ],
+      starter:`# Grade 8 — Temperature Converter
+celsius = 0
+# TODO: fahrenheit = celsius * 9 / 5 + 32
+fahrenheit = 0
+print(f"{celsius}C is {fahrenheit}F")
+
+# TODO: repeat for at least two more celsius values (e.g. 100, 37)
+`,
+      check:(code) => {
+        const hasFormula = /\*\s*9\s*\/\s*5\s*\+\s*32/.test(code)
+        const fCount = (code.match(/print\s*\(/g) || []).length
+        return hasFormula && fCount >= 3
+      },
+    },
   ]},
 
   { id:'m2', name:'🚦 M2 — Choices & Loops', sub:'if/elif/else, while, for-range — predict the drawing before you run it', live:true, stages:[
@@ -616,6 +653,40 @@ size = 100
 # TODO: while size > 0: draw a circle(240, 130, size), then shrink size by 20
 `,
       check:(code, log) => /while\s+/.test(code) && log.circles >= 3,
+    },
+    { id:'m2s4', name:'Grade Classifier', xp:40,
+      text:`<strong>Challenge 4 — Chained If/Elif</strong> — Classify a test score into a grade band: 90+ is "A", 70-89 is "B", 50-69 is "C", below 50 is "F". Use a chain of if/elif/else — only one branch should ever run.`,
+      hints:[
+        'Check from the TOP down: if score >= 90: "A"  elif score >= 70: "B"  elif score >= 50: "C"  else: "F"',
+        'Order matters here — checking >= 70 before >= 90 would wrongly grade a 95 as a "B".',
+        'Try score = 95, then 75, then 55, then 30 — does each print the right letter?',
+      ],
+      starter:`# Grade 8 — Grade Classifier
+score = 82
+
+# TODO: if/elif/elif/else chain: >=90 "A", >=70 "B", >=50 "C", else "F"
+`,
+      check:(code) => {
+        const elifCount = (code.match(/\belif\b/g) || []).length
+        return elifCount >= 2 && /\belse\b/.test(code) && />=\s*90/.test(code)
+      },
+    },
+    { id:'m2s5', name:'Sum to N', xp:40,
+      text:`<strong>Challenge 5 — While Loops, Accumulating</strong> — Use a while loop to add up every whole number from 1 to 20 (1+2+3+...+20), tracking a running total.`,
+      hints:[
+        'Two variables: total = 0 (the running sum) and n = 1 (the current number).',
+        'While n <= 20: total = total + n, then n = n + 1 — don\'t forget to increment n, or the loop never ends!',
+        'Print total once the loop finishes — it should come out to 210.',
+      ],
+      starter:`# Grade 8 — Sum to N (while loop)
+total = 0
+n = 1
+
+# TODO: while n <= 20: add n to total, then increment n
+
+print(f"Sum 1 to 20: {total}")
+`,
+      check:(code) => /while\s+/.test(code) && /total\s*=\s*total\s*\+\s*n\b/.test(code) && /n\s*=\s*n\s*\+\s*1\b/.test(code),
     },
   ]},
 
@@ -719,6 +790,59 @@ circle(160, 130, r)
       const hasDef    = /def\s+\w+/.test(code)
       const hasReturn = /return\s+.+/.test(code)
       return hasDef && hasReturn && log.circles >= 1
+    },
+  },
+  {
+    id:'m3s4', name:'is_prime()', xp:50,
+    text:`<strong>Challenge 4 — A Function With a Loop Inside</strong> — A prime number has exactly two factors: 1 and itself. Write <code>is_prime(n)</code>, using a loop inside the function, that returns True or False. Test it on a few numbers.`,
+    hints:[
+      'A number is NOT prime if any number from 2 up to n-1 divides it evenly (n % i == 0).',
+      'Loop: for i in range(2, n): if n % i == 0: return False — return False the MOMENT you find a factor.',
+      'If the loop finishes with no factor found, return True at the end (outside the loop).',
+    ],
+    starter:`# Grade 8 — is_prime() (a function with a loop inside)
+def is_prime(n):
+    for i in range(2, n):
+        # TODO: if n % i == 0, return False immediately
+        pass
+    return True
+
+print(is_prime(7))
+print(is_prime(8))
+`,
+    check:(code) => {
+      const hasDef  = /def\s+is_prime\s*\(/.test(code)
+      const hasMod  = /%\s*i\b/.test(code) || /n\s*%\s*i/.test(code)
+      const hasFalse = /return\s+False/.test(code)
+      return hasDef && hasMod && hasFalse
+    },
+  },
+  {
+    id:'m3s5', name:'Return TWO Values', xp:50,
+    text:`<strong>Challenge 5 — Multiple Return Values</strong> — Python lets a function return more than one value at once. Write <code>min_and_max(numbers)</code> that returns BOTH the smallest and largest number in a list, then unpack both into two variables at the call site.`,
+    hints:[
+      'return smallest, largest — Python packs two values into what\'s called a tuple automatically.',
+      'Unpack them at the call site: low, high = min_and_max(numbers) — two variables from one function call.',
+      'You can use the built-in min()/max() functions inside your own function, or write the loop yourself.',
+    ],
+    starter:`# Grade 8 — Returning TWO values at once
+def min_and_max(numbers):
+    smallest = numbers[0]
+    largest = numbers[0]
+    for n in numbers:
+        # TODO: update smallest/largest as you scan every number
+        pass
+    return smallest, largest
+
+scores = [45, 82, 19, 67, 90, 33]
+# TODO: low, high = min_and_max(scores)
+print(f"Lowest: {low}, Highest: {high}")
+`,
+    check:(code) => {
+      const hasDef = /def\s+min_and_max\s*\(/.test(code)
+      const hasTupleReturn = /return\s+\w+\s*,\s*\w+/.test(code)
+      const hasUnpack = /\w+\s*,\s*\w+\s*=\s*min_and_max\s*\(/.test(code)
+      return hasDef && hasTupleReturn && hasUnpack
     },
   },
   ]},
@@ -843,6 +967,51 @@ for score in top_5:
       return hasList && hasSort && hasSlice && log.texts >= 4
     },
   },
+  {
+    id:'m4s4', name:'Filter the Evens', xp:40,
+    text:`<strong>Challenge 6 — Filtering a List</strong> — Given a list of numbers, build a NEW list containing only the even ones. This "keep only what matches" pattern is called filtering — one of the most common things you'll ever do with a list.`,
+    hints:[
+      'Start with an empty list: evens = []',
+      'Loop through the numbers: for n in numbers: if n % 2 == 0: evens.append(n)',
+      'Print the new evens list at the end to check your filter worked.',
+    ],
+    starter:`# Grade 8 — Filtering a List
+numbers = [3, 8, 15, 22, 7, 40, 11, 6]
+evens = []
+
+# TODO: loop through numbers, append the EVEN ones to evens
+
+print(evens)
+`,
+    check:(code) => {
+      const hasFor = /for\s+\w+\s+in\s+numbers/.test(code)
+      const hasMod = /%\s*2\s*==\s*0/.test(code)
+      const hasAppend = /evens\.append\s*\(/.test(code)
+      return hasFor && hasMod && hasAppend
+    },
+  },
+  {
+    id:'m4s5', name:'Find the Duplicate', xp:45,
+    text:`<strong>Challenge 7 — Finding Repeats</strong> — A list of ticket numbers should all be unique — but one has been issued twice by mistake. Loop through the list and find which number appears more than once.`,
+    hints:[
+      'Keep a "seen so far" list: seen = []',
+      'For each ticket: if it\'s already in seen (use the "in" keyword), you found the duplicate! Otherwise, append it to seen.',
+      '"x in some_list" checks whether x already exists anywhere in that list — True or False.',
+    ],
+    starter:`# Grade 8 — Find the Duplicate
+tickets = [101, 105, 103, 108, 105, 110]
+seen = []
+
+# TODO: loop through tickets — if a ticket is already "in seen", print it as the duplicate
+# otherwise seen.append(ticket)
+`,
+    check:(code) => {
+      const hasIn = /\bin\s+seen\b/.test(code)
+      const hasAppend = /seen\.append\s*\(/.test(code)
+      const hasFor = /for\s+\w+\s+in\s+tickets/.test(code)
+      return hasIn && hasAppend && hasFor
+    },
+  },
   ]},
 
   { id:'m5', name:'✂️ M5 — Strings & Validation', sub:'Slicing, methods, checking input — the Caesar cipher in real code', live:true, stages:[
@@ -937,6 +1106,45 @@ print(secret)
         const hasMod    = /%\s*26/.test(code)
         return hasDef && hasOrdChr && hasMod
       },
+    },
+    {
+      id:'m5s4', name:'Palindrome Checker', xp:40,
+      text:`<strong>Challenge 4 — Reversing a String</strong> — A palindrome reads the same forwards and backwards (like "level" or "racecar"). Write a check using Python's reverse-slice trick, <code>text[::-1]</code>, to test whether a cleaned word is a palindrome.`,
+      hints:[
+        'text[::-1] reverses a whole string in one go — the same slicing syntax from Clean the Username, with a step of -1.',
+        'Clean first: word.lower().strip() so "Level" and "level " both compare fairly.',
+        'if cleaned == cleaned[::-1]: it\'s a palindrome.',
+      ],
+      starter:`# Grade 8 — Palindrome Checker
+word = "Racecar"
+cleaned = word.lower().strip()
+
+# TODO: if cleaned == cleaned[::-1], print "Palindrome!" else print "Not a palindrome"
+`,
+      check:(code) => /\[\s*::\s*-1\s*\]/.test(code) && /==/.test(code) && /\bif\b/.test(code),
+    },
+    {
+      id:'m5s5', name:'Word Counter', xp:45,
+      text:`<strong>Challenge 5 — Splitting on Spaces</strong> — <code>.split()</code> with no arguments splits text on WHITESPACE, breaking a sentence into a list of words. Count how many words a sentence has, and find the longest one.`,
+      hints:[
+        'words = sentence.split() — no comma this time, it splits on spaces by default.',
+        'len(words) gives the word count.',
+        'Loop through words, tracking the longest one so far by comparing len(word) each time — the same "scan and track the best" pattern from earlier modules.',
+      ],
+      starter:`# Grade 8 — Word Counter
+sentence = "the quick brown fox jumps over the lazy dog"
+words = sentence.split()
+
+print(f"Word count: {len(words)}")
+
+longest = words[0]
+for word in words:
+    # TODO: if len(word) > len(longest), update longest
+    pass
+
+print(f"Longest word: {longest}")
+`,
+      check:(code) => /\.split\s*\(\s*\)/.test(code) && /len\s*\(\s*word\s*\)/.test(code) && /for\s+word\s+in\s+words/.test(code),
     },
   ]},
   { id:'m6', name:'🗂 M6 — Files & Data', sub:'Reading/writing CSV, mean/max/min, a chart from real data', live:true, stages:[
@@ -1075,6 +1283,58 @@ for line in roster_lines[1:]:
         return hasDict && hasLookup && hasTwoOpens
       },
     },
+    {
+      id:'m6s5', name:'Append to a Log File', xp:40,
+      text:`<strong>Challenge 5 — Append Mode</strong> — Writing mode ("w") wipes a file clean every time you open it. Append mode ("a") instead adds new lines to the END, keeping everything already there. Add three new entries to a log file, one at a time.`,
+      hints:[
+        'open("log.txt", "a") opens in APPEND mode — new writes go after the existing content, nothing gets erased.',
+        'Call open()/write()/close() three separate times to prove each one adds a NEW line rather than overwriting.',
+        'Read the file back at the end with open("log.txt").read() to see all three lines together.',
+      ],
+      starter:`# Grade 8 — Append Mode ("a" keeps old content, "w" would erase it)
+# TODO: open "log.txt" in append mode ("a"), write "Entry 1\\n", close it
+# TODO: do the same again for "Entry 2\\n"
+# TODO: and again for "Entry 3\\n"
+
+# TODO: now open "log.txt" (read mode) and print its contents — all 3 entries should be there
+`,
+      check:(code) => {
+        const appendOpens = (code.match(/open\s*\(\s*["']log\.txt["']\s*,\s*["']a["']\s*\)/g) || []).length
+        return appendOpens >= 3 && /\.write\s*\(/.test(code)
+      },
+    },
+    {
+      id:'m6s6', name:'Filter and Save', xp:55,
+      files: { 'students.csv': 'name,grade\nAmara,85\nLiam,72\nSofia,91\nNoah,68\nMaya,77\n' },
+      text:`<strong>Challenge 6 — Filter, Then Save</strong> — Combine reading and writing: read <code>students.csv</code>, keep only students with a grade of 75 or above, and write JUST those names to a new file, <code>honor_roll.txt</code>.`,
+      hints:[
+        'Read and split students.csv exactly like Read the Class Register did.',
+        'Only .append() (or .write()) a name if int(grade_text) >= 75 — that\'s the filter.',
+        'Open "honor_roll.txt" in write mode ("w") and write each qualifying name on its own line.',
+      ],
+      starter:`# Grade 8 — Filter and Save
+file = open("students.csv")
+lines = file.readlines()
+file.close()
+
+out = open("honor_roll.txt", "w")
+for line in lines[1:]:
+    name, grade_text = line.strip().split(",")
+    grade = int(grade_text)
+    # TODO: if grade >= 75, out.write(name + "\\n")
+out.close()
+
+check = open("honor_roll.txt")
+print(check.read())
+check.close()
+`,
+      check:(code) => {
+        const hasFilter = />=\s*75/.test(code)
+        const hasWriteMode = /open\s*\(\s*["']honor_roll\.txt["']\s*,\s*["']w["']\s*\)/.test(code)
+        const hasWrite = /out\.write\s*\(/.test(code)
+        return hasFilter && hasWriteMode && hasWrite
+      },
+    },
   ]},
   { id:'m7', name:'⚙️ M7 — Inside the Machine', sub:'Binary numbers, storage units, how images/sound are numbers', live:true, stages:[
     {
@@ -1179,6 +1439,70 @@ print("That's interpretation: one line at a time, not all-or-nothing like a comp
         return hasTry && hasExcept && causesError
       },
     },
+    {
+      id:'m7s4', name:'Message as ASCII', xp:40,
+      text:`<strong>Challenge 4 — Encoding a Message</strong> — Every character your computer stores is really just a number (ASCII). Convert a whole message into its list of ASCII codes with <code>ord()</code>, then convert that list straight back into the original text with <code>chr()</code>.`,
+      hints:[
+        'codes = [ord(ch) for ch in message] — or a plain for loop with .append() — turns every character into its ASCII number.',
+        'To reverse it: loop through codes, chr(code) turns each number back into a character, join them with += into a new string.',
+        'Print both the codes list AND the rebuilt message — they should prove the round-trip worked.',
+      ],
+      starter:`# Grade 8 — Message as ASCII (encode with ord(), decode with chr())
+message = "hi 8"
+
+codes = []
+for ch in message:
+    # TODO: codes.append(ord(ch))
+    pass
+
+print("Codes:", codes)
+
+rebuilt = ""
+for code in codes:
+    # TODO: rebuilt = rebuilt + chr(code)
+    pass
+
+print("Rebuilt:", rebuilt)
+`,
+      check:(code) => /ord\s*\(/.test(code) && /chr\s*\(/.test(code) && /codes\.append\s*\(/.test(code),
+    },
+    {
+      id:'m7s5', name:'Run-Length Compression', xp:50,
+      text:`<strong>Challenge 5 — A Real Compression Technique</strong> — "aaaabbbccd" can be stored much shorter as "4a3b2c1d" — counting each run of repeated characters instead of storing them all. This is a real, genuine compression technique called <strong>run-length encoding</strong>.`,
+      hints:[
+        'Walk through the string one character at a time, keeping a count of how many times the CURRENT character repeats in a row.',
+        'When the next character is different (or you reach the end), write down count + character, then reset the count for the new character.',
+        'Test it on "aaaabbbccd" — you should get "4a3b2c1d".',
+      ],
+      starter:`# Grade 8 — Run-Length Encoding
+text = "aaaabbbccd"
+result = ""
+count = 1
+
+for i in range(1, len(text)):
+    if text[i] == text[i - 1]:
+        count = count + 1
+    else:
+        # TODO: add str(count) + text[i-1] to result, then reset count = 1
+        pass
+
+# TODO: don't forget the very last run after the loop ends!
+result = result + str(count) + text[-1]
+
+print(result)
+`,
+      check:(code) => {
+        // The starter already ships count=count+1 (in the if-branch) and the
+        // final str(count) line — only the else-branch's "add to result, then
+        // reset count=1" is the actual TODO. Requiring just one occurrence of
+        // each let the untouched starter pass. Require "count = 1" to appear
+        // TWICE (the initial declaration plus the reset the TODO asks for)
+        // and "result +=" (or "result =...+ ") to appear inside the loop body.
+        const resetCount = (code.match(/count\s*=\s*1\b/g) || []).length
+        const hasResultAppend = /result\s*=\s*result\s*\+|result\s*\+=/.test(code)
+        return /count\s*=\s*count\s*\+\s*1/.test(code) && resetCount >= 2 && hasResultAppend
+      },
+    },
   ]},
   { id:'m8', name:'🌐 M8 — The Connected World', sub:'How the internet works, staying safe, a one-page HTML profile', live:true, stages:[
     {
@@ -1272,6 +1596,44 @@ for pw in test_passwords:
         const hasDigitCheck = /isdigit\s*\(\s*\)/.test(code) || /\.isdigit\b/.test(code)
         return hasDef && hasLenCheck && hasDigitCheck
       },
+    },
+    {
+      id:'m8s4', name:'URL Checker', xp:35,
+      text:`<strong>Challenge 4 — Is This Link Safe?</strong> — The "s" in <code>https://</code> means the connection is encrypted; plain <code>http://</code> is not. Write a checker that reports whether a given web address uses the SECURE protocol.`,
+      hints:[
+        '.startswith("https://") checks whether a string begins with exactly that text.',
+        'if url.startswith("https://"): print("Secure") else: print("Not secure — avoid entering passwords here!")',
+        'Test it on at least two URLs: one https://, one plain http://.',
+      ],
+      starter:`# Grade 8 — URL Checker (https:// = encrypted, http:// = not)
+urls = ["https://school.example.com", "http://sketchy-site.example.com"]
+
+for url in urls:
+    # TODO: if url.startswith("https://"), print "Secure", else print "Not secure"
+    pass
+`,
+      check:(code) => /\.startswith\s*\(\s*["']https:\/\/["']\s*\)/.test(code) && /\bif\b/.test(code),
+    },
+    {
+      id:'m8s5', name:'Two-Page Profile', xp:45,
+      text:`<strong>Challenge 5 — Linking Pages</strong> — Real websites are more than one page, connected by links. Extend your Grade 8 profile: generate the HTML for a SECOND page (an "About" page), and add a link from the first page to it using <code>&lt;a href="..."&gt;</code>.`,
+      hints:[
+        'An HTML link looks like: <a href="about.html">About Me</a> — href is the destination, the text between the tags is what\'s clickable.',
+        'Build two separate f-strings: one for the home page (with the link), one for the about page.',
+        'print() both pages one after another so you can see the full two-page site\'s source.',
+      ],
+      starter:`# Grade 8 — Two-Page Profile (linking pages together)
+name = "Alex"
+
+home_page = f"<h1>{name}</h1>\\n<p>Welcome to my page!</p>\\n"
+# TODO: add a link to about.html: home_page += '<a href="about.html">About Me</a>'
+
+about_page = f"<h1>About {name}</h1>\\n<p>I love coding!</p>\\n"
+
+print(home_page)
+print(about_page)
+`,
+      check:(code) => /<a\s+href\s*=\s*["']about\.html["']/.test(code),
     },
   ]},
   { id:'m9w', name:'🖥 M9 — Interactive Apps', sub:'A canvas app with real state: menu -> running -> results', live:true, stages:[
@@ -1408,6 +1770,44 @@ if app_state == "results":
         return hasGuard && hasPercent && hasTextTwice
       },
     },
+    {
+      id:'m9s5', name:'Track Every Round', xp:50,
+      text:`<strong>Challenge 5 — A List That Grows With the App</strong> — Instead of one score number, track every ROUND's score in a list as the app runs. After 3 rounds, print the list, the total, and the best single round.`,
+      hints:[
+        'Start rounds = [] before the game begins, then rounds.append(score) after each round.',
+        'sum(rounds) gives the total across every round; max(rounds) gives the best single round.',
+        'This is real app state — the list grows as the "app" progresses, exactly like a real game history.',
+      ],
+      starter:`# Grade 8 — Track Every Round
+rounds = []
+
+round_scores = [12, 8, 15]   # pretend these arrive one at a time as the game runs
+for score in round_scores:
+    # TODO: rounds.append(score)
+    pass
+
+print("All rounds:", rounds)
+# TODO: print the total (sum) and the best round (max)
+`,
+      check:(code) => /rounds\.append\s*\(/.test(code) && /\bsum\s*\(\s*rounds\s*\)/.test(code) && /\bmax\s*\(\s*rounds\s*\)/.test(code),
+    },
+    {
+      id:'m9s6', name:'Don\'t Crash on Bad Input', xp:50,
+      text:`<strong>Challenge 6 — Handling Bad Input Gracefully</strong> — A real app can't just crash the moment a user types something unexpected. Wrap a number conversion in <code>try/except</code> so typing letters instead of a number gives a friendly message instead of a crash.`,
+      hints:[
+        'int("abc") raises a ValueError — that\'s the specific error type to catch.',
+        'try: age = int(age_text) except ValueError: print("Please enter a real number!")',
+        'This is the SAME try/except idea from How Your Code Actually Runs (M7) — just catching a different error type this time.',
+      ],
+      starter:`# Grade 8 — Don't Crash on Bad Input
+age_text = "twelve"   # deliberately not a real number
+
+# TODO: wrap this in try/except ValueError so a non-numeric input doesn't crash the whole app
+age = int(age_text)
+print(f"Age: {age}")
+`,
+      check:(code) => /\btry\s*:/.test(code) && /except\s+ValueError/.test(code) && /int\s*\(\s*age_text\s*\)/.test(code),
+    },
   ]},
   { id:'m10', name:'🏆 M10 — Capstone: Data App', sub:'Plan -> build -> test -> ship a data-driven app of your own', live:true, stages:[
     {
@@ -1541,6 +1941,56 @@ print(f"Final score: {score}/{len(answers)} ({round(percentage)}%)")
         const hasReload = (code.match(/open\s*\(\s*["']highscores\.txt["']/g) || []).length >= 2
         return hasLoad && hasScore && hasSave && hasReload
       },
+    },
+    {
+      id:'m10s5', name:'Build a Leaderboard', xp:60,
+      text:`<strong>Challenge 5 — Sort and Display</strong> — <code>highscores.txt</code> has one score per line, appended over many games. Read them all in, sort them, and print the top 3 — a real leaderboard.`,
+      hints:[
+        'Read every line, strip it, and int() it into a list of numbers.',
+        'sorted(scores)[-3:] gives the top 3, lowest-to-highest — reverse it (or index from the end) to show best first.',
+        'Print with a rank: for i, score in enumerate(top_3): print(f"#{i+1}: {score}")',
+      ],
+      files: { 'highscores.txt': '72\n85\n91\n68\n77\n95\n' },
+      starter:`# Grade 8 Capstone — Build a Leaderboard
+file = open("highscores.txt")
+scores = []
+for line in file.readlines():
+    # TODO: scores.append(int(line.strip()))
+    pass
+file.close()
+
+# TODO: top_3 = sorted(scores)[-3:]
+top_3 = []
+
+for i, score in enumerate(top_3):
+    print(f"#{i+1}: {score}")
+`,
+      check:(code) => /sorted\s*\(\s*scores\s*\)/.test(code) && /\[-3:\]/.test(code) && /scores\.append\s*\(/.test(code),
+    },
+    {
+      id:'m10s6', name:'Polish & Present', xp:70,
+      text:`<strong>Challenge 6 — Final Polish</strong> — A real shipped app handles bad data gracefully AND presents itself properly. Add a title screen (drawn with <code>text()</code>) AND a try/except guard around loading the quiz file, in case it's ever missing or empty.`,
+      hints:[
+        'Draw a proper title first: text("MY QUIZ APP", 100, 40) before anything else.',
+        'Wrap the file-loading step in try/except FileNotFoundError so a missing quiz.csv shows a friendly message instead of crashing.',
+        'This exact combination — a clear title/intro AND graceful error handling — is what separates a "working" app from a genuinely finished one.',
+      ],
+      files: { 'quiz.csv': 'question,answer\nWhat is 5+3?,8\nCapital of France?,Paris\nColor of the sky?,Blue\n' },
+      starter:`# Grade 8 Capstone — Polish & Present
+background(15, 18, 30)
+fill(255, 255, 255)
+# TODO: draw a title with text(), e.g. text("MY QUIZ APP", 100, 40)
+
+# TODO: wrap the file load in try/except FileNotFoundError
+try:
+    file = open("quiz.csv")
+    lines = file.readlines()
+    file.close()
+    print(f"Loaded {len(lines) - 1} questions.")
+except FileNotFoundError:
+    print("Could not find quiz.csv — showing a sample question instead.")
+`,
+      check:(code, log) => /except\s+FileNotFoundError/.test(code) && log.texts >= 1,
     },
   ]},
 ]
