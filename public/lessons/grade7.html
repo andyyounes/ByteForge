@@ -910,6 +910,37 @@ const WORLDS = [
           (log.positions||[]).some(([x,y]) => Math.hypot(x-cx, y-cy) <= NEAR))
       },
     },
+    { id:'g1s3', name:'Rectangle Room', xp:30,
+      text:`<strong>Challenge 3</strong> — Draw a RECTANGLE roughly in the middle of the canvas (around X=180-260, Y=100-160), then draw a CIRCLE inside it. A rectangle needs a width and height as well as an X/Y position.`,
+      hints:[
+        'Drag out "draw rectangle" — give it an X, Y, width, and height (e.g. X=180, Y=100, width=120, height=60).',
+        'Then drag "draw circle" with an X/Y somewhere inside those same rough bounds (e.g. X=220, Y=130).',
+        'Run it — you should see a circle sitting inside a rectangle, near the middle of the canvas.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => {
+        if (log.rects < 1 || log.circles < 1) return false
+        // Any recorded position reasonably near the middle counts as "inside" —
+        // keeps the check forgiving about exact pixel placement while still
+        // requiring the student to actually aim for the middle, not a corner.
+        return (log.positions||[]).some(([x,y]) => x >= 140 && x <= 340 && y >= 60 && y <= 200)
+      },
+    },
+    { id:'g1s4', name:'Three in a Row', xp:30,
+      text:`<strong>Challenge 4</strong> — Draw THREE shapes in a straight horizontal line: one on the left (around X=60), one in the middle (around X=240), one on the right (around X=420) — all at the same rough height (Y=130). This is "sequence" — one block after another, in order.`,
+      hints:[
+        'Drag out 3 shape blocks (circle or rectangle), one after another.',
+        'Give them the SAME Y value (e.g. Y=130) but different X values: 60, 240, 420.',
+        'Run it — you should see three shapes lined up left-to-right.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => {
+        const targets = [[60,130],[240,130],[420,130]]
+        const NEAR = 55
+        return targets.every(([tx,ty]) =>
+          (log.positions||[]).some(([x,y]) => Math.hypot(x-tx, y-ty) <= NEAR))
+      },
+    },
     { id:'g1boss', name:'Sprite Follows You', xp:45, boss:true,
       text:`<strong>🚀 BOSS — Sprite Follows You</strong> — Use <em>On every frame</em>. Inside it: clear the canvas, then draw a circle at <em>mouseX</em> / <em>mouseY</em>. Move your mouse over the canvas — your sprite follows it!`,
       hints:[

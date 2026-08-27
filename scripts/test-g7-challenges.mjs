@@ -27,12 +27,13 @@ const { CHALLENGES } = new Function(ctx + '\nreturn { CHALLENGES }')()
 console.log(`Found ${CHALLENGES.length} Grade 7 challenges.\n`)
 
 let pass = 0, fail = 0
-// positions: g1s2 "Four Corners" checks WHERE shapes were drawn, not just how
-// many — the maximal log needs a shape actually sitting at each of the four
-// corners it names, or this generic satisfiability test would wrongly flag a
+// positions: several challenges check WHERE shapes were drawn, not just how
+// many (g1s2 "Four Corners", g1s3 "Rectangle Room", g1s4 "Three in a Row") —
+// the maximal log needs a shape actually sitting at every position any of
+// them names, or this generic satisfiability test would wrongly flag a
 // perfectly good position-aware check as unsatisfiable.
 const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, texts: 999, hasIf: true, hasVar: true, hasFunction: true,
-  positions: [[20,20],[440,20],[20,220],[440,220]] })
+  positions: [[20,20],[440,20],[20,220],[440,220], [220,130], [60,130],[240,130],[420,130]] })
 const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   texts: 0,   hasIf: false, hasVar: false, hasFunction: false,
   positions: [] })
 
