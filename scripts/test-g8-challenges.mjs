@@ -38,9 +38,11 @@ function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
 // stages. Mirrors that file's maximal/empty log pattern instead of the
 // code-regex convention every Python stage below uses.
 const webMaximalLog = () => ({ bodyText: 'true false you see ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
-  hasFunction: true, functionCount: 999, hasReturn: true })
+  hasFunction: true, functionCount: 999, hasReturn: true, hasIf: true,
+  hasLSSet: true, hasLSGet: true, hasJSONStringify: true, hasJSONParse: true })
 const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false,
-  hasFunction: false, functionCount: 0, hasReturn: false })
+  hasFunction: false, functionCount: 0, hasReturn: false, hasIf: false,
+  hasLSSet: false, hasLSGet: false, hasJSONStringify: false, hasJSONParse: false })
 
 let pass = 0, fail = 0
 for (const ch of CHALLENGES) {

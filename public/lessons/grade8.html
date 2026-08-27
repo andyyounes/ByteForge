@@ -515,6 +515,16 @@ async function runWebCode() {
     hasFunction:  /\bfunction\s+\w+\s*\(/.test(js),
     functionCount: (js.match(/\bfunction\s+\w+\s*\(/g) || []).length,
     hasReturn:    /\breturn\b/.test(js),
+    hasIf:        /\bif\s*\(/.test(js),
+    // Week 3 — saving progress with localStorage. localStorage.setItem/
+    // getItem/JSON.stringify/parse are all detected the same coarse way as
+    // every other flag here — the iframe genuinely shares the parent page's
+    // origin (allow-same-origin), so localStorage calls really do execute
+    // and really do persist, this is just how "did they use it" is checked.
+    hasLSSet:         /localStorage\s*\.\s*setItem\s*\(/.test(js),
+    hasLSGet:         /localStorage\s*\.\s*getItem\s*\(/.test(js),
+    hasJSONStringify: /JSON\s*\.\s*stringify\s*\(/.test(js),
+    hasJSONParse:     /JSON\s*\.\s*parse\s*\(/.test(js),
   }
   clog('Ran — checking your page…', 'info')
   checkWebChallenge(webLog)
@@ -778,6 +788,67 @@ const MODULES = [
       },
       needsFunction3:true, needsReturn:true,
       check:(log) => log.functionCount >= 3 && log.hasReturn,
+    },
+  ]},
+  // ── Web Story 3 — Semester 1, Week 3: saving progress with localStorage ────
+  { id:'ws3', name:'💾 Web Story 3 — Remembering After You Leave', sub:'localStorage — data that survives a page refresh', live:true, stages:[
+    { id:'ws3s1', name:'Remember After Refresh', xp:30, lang:'web',
+      text:`<strong>Challenge 1</strong> — Save a name to localStorage with <code>localStorage.setItem("name", "Alex")</code>, then read it BACK with <code>localStorage.getItem("name")</code> and display it in <code>#story</code>.`,
+      hints:[
+        'localStorage.setItem("name", "Alex");',
+        'const saved = localStorage.getItem("name"); document.getElementById("story").textContent = saved;',
+        'Unlike a normal variable, localStorage genuinely survives a real page refresh or closing the tab — that\'s the whole point.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: localStorage.setItem("name", "Alex")\n\n// TODO: read it back with localStorage.getItem("name") and show it in #story\n`,
+      },
+      needsLSSet:true, needsLSGet:true,
+      check:(log) => log.hasLSSet && log.hasLSGet && log.bodyText.trim().length > 0,
+    },
+    { id:'ws3s2', name:'Save the Whole Inventory', xp:35, lang:'web',
+      text:`<strong>Challenge 2</strong> — localStorage only stores TEXT — arrays need converting first. Save an inventory array using <code>JSON.stringify()</code>, then read it back with <code>JSON.parse()</code> and display it.`,
+      hints:[
+        'localStorage.setItem("inventory", JSON.stringify(["sword","shield"]));',
+        'const loaded = JSON.parse(localStorage.getItem("inventory"));',
+        'JSON.stringify turns a real array into TEXT (what localStorage can hold); JSON.parse turns that text back into a real array.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `let inventory = ["sword", "shield"];\n// TODO: localStorage.setItem("inventory", JSON.stringify(inventory))\n\n// TODO: read it back — JSON.parse(localStorage.getItem("inventory"))\n\n// TODO: display the loaded array (joined) in #story\n`,
+      },
+      needsJSON:true,
+      check:(log) => log.hasLSSet && log.hasLSGet && log.hasJSONStringify && log.hasJSONParse,
+    },
+    { id:'ws3s3', name:'Was Anything Saved Before?', xp:35, lang:'web',
+      text:`<strong>Challenge 3</strong> — <code>getItem()</code> returns <code>null</code> if nothing was ever saved under that key. Use IF to show "Welcome back!" if a saved name exists, or "New reader — what's your name?" if it doesn't.`,
+      hints:[
+        'const saved = localStorage.getItem("name"); if (saved) { ... } else { ... }',
+        'A value that COULD be null is exactly why real save systems always check before assuming data exists.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: read localStorage.getItem("name") into a variable\n\n// TODO: IF it exists, show "Welcome back!" — ELSE show "New reader — what's your name?"\n`,
+      },
+      needsLSGet:true, needsIf:true,
+      check:(log) => log.hasLSGet && log.hasIf,
+    },
+    { id:'ws3boss', name:'BOSS — A Story That Remembers You', xp:80, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Save BOTH an inventory array (via JSON) and a flags object (via JSON) to localStorage, then load both back and display them — with an IF checking whether anything was saved before.`,
+      hints:[
+        'This is ws3s2\'s array-saving PLUS a flags object saved/loaded the exact same way, plus ws3s3\'s "was anything saved?" check.',
+        'Everything here already exists from this week — just combined onto one page.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: save an inventory array AND a flags object to localStorage (JSON.stringify)\n\n// TODO: load both back (JSON.parse) — check with IF whether they existed first\n\n// TODO: display both in #story\n`,
+      },
+      needsLSSet:true, needsLSGet:true, needsJSON:true, needsIf:true,
+      check:(log) => log.hasLSSet && log.hasLSGet && log.hasJSONStringify && log.hasJSONParse && log.hasIf,
     },
   ]},
   { id:'m1', name:'🔤 M1 — From Blocks to Text', sub:'print, input, variables, types — the G7 skills, now in real Python', live:true, stages:[
@@ -2315,6 +2386,21 @@ const CHALLENGE_LESSON = {
   ws2boss: { title: 'BOSS — a page organized entirely around functions', html: `
     <div class="cl-block"><h4>Structure comes from HOW you split the work</h4>
       <p>A working page could technically be one giant block of code — but splitting it into functions, each with ONE clear job, is what makes a real project readable, testable, and changeable later without breaking everything else.</p></div>` },
+  // ── Web Story 3 — Remembering After You Leave: localStorage ─────────────────
+  ws3s1: { title: 'localStorage genuinely survives a refresh', html: `
+    <div class="cl-block"><h4>Different from every variable so far</h4>
+      <p>Every variable, array, and object this course has used disappears the instant the page reloads. localStorage is different — it\'s saved to the browser itself, tied to this page\'s address, and is still there even after closing the tab entirely.</p></div>` },
+  ws3s2: { title: 'localStorage only holds TEXT', html: `
+    <div class="cl-block"><h4>Why JSON.stringify is required, not optional</h4>
+      <p>Try to save a real array directly and localStorage silently converts it to the useless text "[object Object]" or similar — JSON.stringify() is what correctly turns a real array/object into text that can be perfectly reconstructed later.</p></div>
+    <div class="cl-block"><h4>JSON.parse reverses it exactly</h4>
+      <p>JSON.parse() takes that saved text and rebuilds the EXACT original array — same items, same order — not just some text that looks similar.</p></div>` },
+  ws3s3: { title: 'null means "nothing was ever saved"', html: `
+    <div class="cl-block"><h4>A real, common first-run problem</h4>
+      <p>The very first time anyone visits a page, localStorage.getItem() returns null for everything — there\'s genuinely nothing saved yet. Any real save system has to handle this "first visit" case explicitly, exactly like this challenge does.</p></div>` },
+  ws3boss: { title: 'BOSS — real persistent story state', html: `
+    <div class="cl-block"><h4>Every idea from this week, working together</h4>
+      <p>Saving structured data (arrays/objects via JSON), loading it back, and checking whether it existed first — this is genuinely the same shape as how real websites remember your shopping cart, your game progress, or your preferences between visits.</p></div>` },
   // ── M1 — From Blocks to Text ────────────────────────────────────────────────
   m1s1: { title: 'print() — your first real line of code', html: `
     <div class="cl-block"><h4>The classic first line, in any language</h4>
