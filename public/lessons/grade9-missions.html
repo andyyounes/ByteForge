@@ -103,6 +103,33 @@
   .cm-error-line { background:rgba(248,113,113,.14) !important; }
 
   /* ── Mission list overlay ── */
+  /* ── Learn bubble — video/Match-Up/theory, a real map node type ── */
+  .learn-wrap { position:fixed; inset:0; z-index:60; background:rgba(6,8,16,.92); overflow-y:auto;
+                display:flex; align-items:flex-start; justify-content:center; padding:40px 16px; }
+  .learn-card { width:min(720px,100%); background:#111320; border:1px solid rgba(255,255,255,.1); border-radius:14px; overflow:hidden; }
+  .learn-hdr { padding:16px 20px; font-size:16px; font-weight:800; display:flex; align-items:center;
+               justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.08); }
+  .learn-body { padding:20px; }
+  .learn-section { margin-bottom:22px; }
+  .learn-section-title { font-size:12px; font-weight:900; letter-spacing:.06em; text-transform:uppercase;
+                          color:#67e8f9; margin-bottom:10px; }
+  .learn-video { background:#0a0c18; border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:14px 16px;
+                 font-size:13px; color:#c7d2e0; }
+  .learn-video a { color:#67e8f9; font-weight:700; }
+  .learn-matchup { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .lm-term, .lm-def { padding:9px 12px; border-radius:8px; font-size:12.5px; cursor:pointer;
+                       background:#161927; border:1px solid rgba(255,255,255,.1); color:#e2e8f0; user-select:none; }
+  .lm-term:hover, .lm-def:hover { border-color:#67e8f9; }
+  .lm-term.selected { border-color:#a5b4fc; background:rgba(165,180,252,.12); }
+  .lm-term.matched, .lm-def.matched { border-color:#4ade80; background:rgba(74,222,128,.1); color:#86efac; cursor:default; }
+  .lm-def.wrong-flash { border-color:#f87171 !important; background:rgba(248,113,113,.12) !important; }
+  .learn-theory { font-size:13px; color:#c7d2e0; line-height:1.7; }
+  .learn-theory h4 { color:#fbbf24; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; margin:14px 0 5px; }
+  .learn-theory h4:first-child { margin-top:0; }
+  .learn-theory code { background:#0a0c18; border:1px solid rgba(255,255,255,.1); border-radius:4px; padding:1px 6px; color:#b8ef4a; }
+  #learn-continue-btn { width:100%; }
+  #learn-matchup-score { font-weight:700; color:#4ade80; text-transform:none; letter-spacing:0; }
+
   .mlist { position:fixed; inset:0; z-index:50; background:#0d0f1a; overflow-y:auto; display:none; }
   .mlist.open { display:block; }
   .mlist-hero { text-align:center; padding:30px 16px 10px; }
@@ -234,6 +261,36 @@
   <span class="mbar-phase" id="m-phase">PHASE 1 · TURTLE</span>
   <span class="mbar-title" id="m-title"></span>
   <span class="mbar-par" id="m-par"></span>
+</div>
+
+<!-- Learn bubble — video prompt + key-terms Match-Up + theory panel, matching
+     AS Level/IGCSE Y2's Topics pattern. A real map node (mission type:'learn'),
+     not a code exercise: teaches a concept BEFORE its practice missions ask
+     the student to use it, added directly in response to real feedback that
+     Phase 0 jumped straight into binary conversion without ever teaching
+     what binary (or a variable, or an integer) even IS. -->
+<div class="learn-wrap" id="learn-wrap" style="display:none;">
+  <div class="learn-card">
+    <div class="learn-hdr">
+      <span id="learn-title"></span>
+      <button class="mbar-back" onclick="mbarBack()">☰ Missions</button>
+    </div>
+    <div class="learn-body">
+      <div class="learn-section">
+        <div class="learn-section-title">🎬 Watch &amp; Learn</div>
+        <div class="learn-video" id="learn-video"></div>
+      </div>
+      <div class="learn-section">
+        <div class="learn-section-title">🔑 Key Terms — Match-Up <span id="learn-matchup-score"></span></div>
+        <div class="learn-matchup" id="learn-matchup"></div>
+      </div>
+      <div class="learn-section">
+        <div class="learn-section-title">📖 Theory</div>
+        <div class="learn-theory" id="learn-theory"></div>
+      </div>
+      <button class="btn btn-run" id="learn-continue-btn" onclick="completeLearnBubble()">✓ I've got it — Continue</button>
+    </div>
+  </div>
 </div>
 
 <div class="main">
@@ -387,6 +444,101 @@ function parLabel(m) {
 //   stars:   par = command count for 3★ (efficiency), par+2 = 2★, pass = 1★
 // ══════════════════════════════════════════════════════════════════════════════
 const MISSIONS = [
+  // ── Phase -1 · Your First Code — absolute zero. Nothing here assumes ANY
+  // prior programming knowledge: not what a variable is, not int vs string,
+  // not even that = means "store", not "equals like in maths". Every later
+  // mission (Phase 0's binary/logic/types, Phase 1's piloting) genuinely
+  // depends on this — added directly in response to real feedback that
+  // Phase 0 jumped straight into converting numbers to binary without ever
+  // teaching what a variable or an integer even IS.
+  {
+    id: 'learn-cb', type: 'learn', phase: 'PHASE -1 · YOUR FIRST CODE', emoji: '📘', title: 'What Is a Variable?', xp: 15,
+    brief: 'Before writing any real code, learn what a variable and a data type actually are.',
+    api: [],
+    learn: {
+      videoQuery: 'what is a variable computer science for beginners',
+      terms: [
+        { term: 'Variable',    def: 'A named box in memory that stores a value your code can use later.' },
+        { term: 'Assignment',  def: 'Storing a value into a variable — written with = (or ← in pseudocode).' },
+        { term: 'Integer',     def: 'A whole number, with no decimal point — e.g. 7, -3, 100.' },
+        { term: 'String',      def: 'Text data — always written with quotes around it, e.g. "hello".' },
+        { term: 'Data type',   def: 'What KIND of value something is — integer, string, boolean, etc.' },
+      ],
+      theory: `
+        <h4>A variable is just a labeled box</h4>
+        <p>Every program needs to remember things — a score, a name, a health total. A <code>variable</code> is a named place in memory holding one of those values, so your code can read it, change it, or reuse it later instead of retyping it every time.</p>
+        <h4>= means "store", not "equals"</h4>
+        <p><code>score = 10</code> does NOT mean "score equals 10" the way maths uses =. It means "take the value 10, and STORE it in a box named score." Whatever was in score before is simply overwritten.</p>
+        <h4>Not every value is the same TYPE</h4>
+        <p><code>10</code> is a number (an <b>integer</b>) — no quotes. <code>"10"</code> looks similar but is actually <b>text</b> (a <b>string</b>) — the quotes are what make it text, not a number. Mixing these up is one of the most common real beginner mistakes.</p>`,
+    },
+  },
+  {
+    id: 'cb1', type: 'data', phase: 'PHASE -1 · YOUR FIRST CODE', emoji: '💾', title: 'Store a Number', xp: 20,
+    brief: 'A <b>variable</b> is a labeled box that stores a value so your code can use it later. Create one called <code>score</code>, store the number 10 inside it, then <b>answer()</b> what it holds.',
+    api: ['answer(value)'],
+    dataTitle: 'First Steps', dataFields: [],
+    data: [],
+    starter: {
+      py: '# A variable stores a value so your code can use it later.\n# The = sign here means "store this value", NOT "equals" like in maths.\nscore = 10\n\n# TODO: answer() the value stored in score\n',
+      ps: '// A variable stores a value so your code can use it later.\n// The ← arrow means "store this value" — read it as "becomes".\nscore ← 10\n\n// TODO: answer() the value stored in score\n',
+    },
+    answer: 10,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'cb2', type: 'data', phase: 'PHASE -1 · YOUR FIRST CODE', emoji: '🔤', title: 'What Kind of Value?', xp: 20,
+    brief: 'Not all values are numbers. A number like 10 is an <b>integer</b>. Text — even a single word — is called a <b>string</b>, and always needs QUOTES around it. Store your callsign as text, then answer() it.',
+    api: ['answer(value)'],
+    dataTitle: 'First Steps', dataFields: [],
+    data: [],
+    starter: {
+      py: '# Text values ("strings") need quotes around them — numbers don\'t.\ncallsign = "Nova"\n\n# TODO: answer() the value stored in callsign\n',
+      ps: '// Text values ("strings") need quotes around them — numbers don\'t.\ncallsign ← "Nova"\n\n// TODO: answer() the value stored in callsign\n',
+    },
+    answer: 'Nova',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'cb3', type: 'data', phase: 'PHASE -1 · YOUR FIRST CODE', emoji: '➕', title: 'Do the Math', xp: 25,
+    brief: 'Variables holding numbers (integers) can be used in calculations, exactly like numbers themselves. Store two numbers, then answer() their sum.',
+    api: ['answer(value)'],
+    dataTitle: 'First Steps', dataFields: [],
+    data: [],
+    starter: {
+      py: 'a = 4\nb = 7\n# TODO: answer() a + b (add the two variables together)\n',
+      ps: 'a ← 4\nb ← 7\n// TODO: answer() a + b (add the two variables together)\n',
+    },
+    answer: 11,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'cb4', type: 'data', phase: 'PHASE -1 · YOUR FIRST CODE', emoji: '🔗', title: 'Combine Two Texts', xp: 25,
+    brief: 'Text (strings) can be joined together with <b>+</b>, the same symbol used for adding numbers — but on strings, + means "stick them together", not "add up".',
+    api: ['answer(value)'],
+    dataTitle: 'First Steps', dataFields: [],
+    data: [],
+    starter: {
+      py: 'first  = "Systems "\nsecond = "Online"\n# TODO: answer() first + second (joins the two pieces of text together)\n',
+      ps: 'first  ← "Systems "\nsecond ← "Online"\n// TODO: answer() first + second (joins the two pieces of text together)\n',
+    },
+    answer: 'Systems Online',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'cbboss', type: 'data', phase: 'PHASE -1 · CAPSTONE', emoji: '🏆', title: 'BOSS — Your First Program', xp: 45,
+    brief: 'Combine everything: store a callsign (text) and health (a number, starts at 100, then drops by 25). <code>str(health)</code> converts the NUMBER into text so it can be joined with other text. answer() the combined message.',
+    api: ['answer(value)'],
+    dataTitle: 'First Steps', dataFields: [],
+    data: [],
+    starter: {
+      py: 'callsign = "Nova"\nhealth = 100\nhealth = health - 25\n# TODO: answer() callsign + " has " + str(health) + " HP"\n# str(health) turns the NUMBER into text so + can join it with other text\n',
+      ps: 'callsign ← "Nova"\nhealth ← 100\nhealth ← health - 25\n// TODO: answer() callsign & " has " & STR(health) & " HP"\n// STR(health) turns the NUMBER into text so it can join with other text\n',
+    },
+    answer: 'Nova has 75 HP',
+    stars: { metric: 'pass' },
+  },
+
   // ── Phase 0 · Systems Check — Semester 1, Weeks 1-3: number systems/binary,
   // Boolean logic, data types. Uses the SAME 'data' mission type Phase 3
   // already introduced (a data panel + one answer() call) rather than the
@@ -394,6 +546,28 @@ const MISSIONS = [
   // spatial movement — genuinely new content (no existing Grade 9 coverage),
   // unlike Weeks 4-5 (sequence/selection/iteration), already covered by
   // p1m1-p1m9 below.
+  {
+    id: 'learn-binary', type: 'learn', phase: 'PHASE 0 · BINARY', emoji: '📘', title: 'What Is Binary?', xp: 15,
+    brief: 'Before converting any numbers, learn what binary actually is and why computers use it.',
+    api: [],
+    learn: {
+      videoQuery: 'what is binary explained simply GCSE computer science',
+      terms: [
+        { term: 'Bit',      def: 'A single binary digit — either 0 or 1. Short for "binary digit".' },
+        { term: 'Byte',     def: 'A group of 8 bits, treated as one unit.' },
+        { term: 'Denary',   def: 'The everyday base-10 number system people use — digits 0-9 (also called decimal).' },
+        { term: 'Binary',   def: 'A base-2 number system using only 0 and 1 — the only thing a computer\'s hardware can actually store or switch.' },
+        { term: 'Place value', def: 'How much a digit is worth based on its POSITION — in binary: 1, 2, 4, 8, 16, 32...' },
+      ],
+      theory: `
+        <h4>Computers only ever store ON or OFF</h4>
+        <p>Deep inside a computer, everything is billions of tiny electronic switches — each one is either ON or OFF, with nothing in between. Binary (using only the digits 0 and 1) is the only number system that matches this exactly: 1 = ON, 0 = OFF.</p>
+        <h4>Place values — the same idea as denary, just base 2</h4>
+        <p>In denary, each digit's position is worth a power of 10 (1s, 10s, 100s...). In binary, each position is worth a power of 2 instead: <code>...32 16 8 4 2 1</code>. A binary digit only ADDS its place value if it's a 1 — a 0 in that position contributes nothing.</p>
+        <h4>Worked example: 13 in binary</h4>
+        <p>13 = 8 + 4 + 1 (using the place values 8, 4, 2, 1). So the 8s, 4s, and 1s places get a 1, and the 2s place gets a 0: <code>1101</code>. Checking it: 8+4+0+1 = 13. ✓</p>`,
+    },
+  },
   {
     id: 'p0m1', type: 'data', phase: 'PHASE 0 · BINARY', emoji: '🔢', title: 'Denary to Binary', xp: 30,
     brief: 'Before you can pilot anything, every system runs on <b>binary</b>. Convert the denary number below into binary (no "0b" prefix) and report it with <b>answer(value)</b>.',
@@ -2581,6 +2755,8 @@ function openMission(id) {
   activeMission = MISSIONS.find(m => m.id === id)
   if (!activeMission) return
   missionStartedAt = Date.now()
+  if (activeMission.type === 'learn') { renderLearnBubble(); return }
+  document.getElementById('learn-wrap').style.display = 'none'
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
   document.getElementById('m-phase').textContent = activeMission.phase
   document.getElementById('m-par').textContent = parLabel(activeMission)
@@ -2616,6 +2792,78 @@ function openMission(id) {
     ? '// Mission loaded. Write your tactics and press ▶ Run.'
     : '// Mission loaded. Write your flight plan and press ▶ Run.')
   setTimeout(() => editor.refresh(), 50)
+}
+
+// ── Learn bubble — video/Match-Up/theory, rendered in place of the IDE ──────
+let _lmSelected = null   // currently-selected term index, or null
+let _lmMatched  = new Set()
+function renderLearnBubble() {
+  const m = activeMission
+  document.getElementById('learn-wrap').style.display = 'flex'
+  document.getElementById('learn-title').textContent = m.emoji + ' ' + m.title
+  document.getElementById('learn-video').innerHTML =
+    '<p>🔎 Search YouTube for: <a href="https://www.youtube.com/results?search_query='
+    + encodeURIComponent(m.learn.videoQuery) + '" target="_blank" rel="noopener">'
+    + m.learn.videoQuery + '</a></p>'
+  document.getElementById('learn-theory').innerHTML = m.learn.theory
+  _lmSelected = null
+  _lmMatched = new Set()
+  renderMatchup(m.learn.terms)
+}
+function renderMatchup(terms) {
+  const termsShuffled = terms.map((t, i) => ({ ...t, i }))
+  const defsShuffled  = [...termsShuffled].sort(() => Math.random() - 0.5)
+  const termsCol = document.createElement('div')
+  const defsCol  = document.createElement('div')
+  termsShuffled.forEach(t => {
+    const el = document.createElement('div')
+    el.className = 'lm-term'; el.textContent = t.term; el.dataset.i = t.i
+    el.onclick = () => selectTerm(t.i)
+    termsCol.appendChild(el)
+  })
+  defsShuffled.forEach(t => {
+    const el = document.createElement('div')
+    el.className = 'lm-def'; el.textContent = t.def; el.dataset.i = t.i
+    el.onclick = () => selectDef(t.i, el)
+    defsCol.appendChild(el)
+  })
+  const wrap = document.getElementById('learn-matchup')
+  wrap.innerHTML = ''
+  wrap.appendChild(termsCol)
+  wrap.appendChild(defsCol)
+  updateMatchupScore(terms.length)
+}
+function selectTerm(i) {
+  if (_lmMatched.has(i)) return
+  _lmSelected = i
+  document.querySelectorAll('.lm-term').forEach(el => el.classList.toggle('selected', +el.dataset.i === i))
+}
+function selectDef(i, el) {
+  if (_lmMatched.has(i) || _lmSelected === null) return
+  if (_lmSelected === i) {
+    _lmMatched.add(i)
+    document.querySelector('.lm-term[data-i="' + i + '"]').classList.add('matched')
+    document.querySelector('.lm-term[data-i="' + i + '"]').classList.remove('selected')
+    el.classList.add('matched')
+    _lmSelected = null
+    updateMatchupScore(activeMission.learn.terms.length)
+  } else {
+    el.classList.add('wrong-flash')
+    setTimeout(() => el.classList.remove('wrong-flash'), 400)
+  }
+}
+function updateMatchupScore(total) {
+  document.getElementById('learn-matchup-score').textContent = '(' + _lmMatched.size + '/' + total + ')'
+}
+function completeLearnBubble() {
+  // Learn bubbles always award full stars on completion — there's no
+  // "correct answer" to grade, just genuinely engaging with the material
+  // (the Match-Up itself already proves that much).
+  const p = getProg()
+  p[activeMission.id] = { stars: 3, xp: (p[activeMission.id] || {}).xp || activeMission.xp, lang, code: '' }
+  saveProg(p)
+  try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
+  mbarBack()
 }
 
 // Draws each mission type's starting frame — routed by activeMission.type
@@ -2950,7 +3198,15 @@ const TIERS = [
   // completely invisible on the roadmap, even though openMission(id)
   // worked fine directly — exactly why this went unnoticed by screenshot
   // checks that always opened missions by id rather than through the map.
-  { name: '🔢 PHASE 0 · BINARY & LOGIC — number systems, Boolean logic, data types', ids: ['p0m1', 'p0m2', 'p0m3', 'p0m4', 'p0m5', 'p0m6'] },
+  //
+  // Every tier below that teaches a genuinely new concept for the first
+  // time now starts with a 'learn' bubble (video + Match-Up + theory) —
+  // added directly in response to real feedback that practice missions
+  // (converting to binary, using a variable) were asking students to DO
+  // something before ever teaching them WHAT it was.
+  { name: '📘 PHASE -1 · YOUR FIRST CODE', ids: ['learn-cb', 'cb1', 'cb2', 'cb3', 'cb4'] },
+  { name: '🏆 PHASE -1 CAPSTONE', ids: ['cbboss'] },
+  { name: '🔢 PHASE 0 · BINARY & LOGIC — number systems, Boolean logic, data types', ids: ['learn-binary', 'p0m1', 'p0m2', 'p0m3', 'p0m4', 'p0m5', 'p0m6'] },
   { name: '🖼️ PHASE 0 · IMAGES — binary pixels', ids: ['p0m7', 'p0m8'] },
   { name: '🏆 PHASE 0 CAPSTONE', ids: ['p0boss'] },
   { name: '📟 PHASE 0B · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },

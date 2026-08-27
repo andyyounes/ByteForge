@@ -38,7 +38,7 @@ const SOLUTIONS = {
 }
 
 for (const m of MISSIONS) {
-  if (m.type === 'battle' || m.type === 'data') continue   // validated separately, below
+  if (m.type === 'battle' || m.type === 'data' || m.type === 'learn') continue   // validated separately, below (learn bubbles have no code/solution at all)
   const sol = SOLUTIONS[m.id]
   if (!sol) { bad(m.id + ' — no reference solution'); continue }
   const sim = simTurtle(m.scene, sol)
@@ -70,7 +70,7 @@ const PS_SOURCES = {
   p1m9: "FOR i ← 1 TO LENGTH(signals)\nforward(120)\nIF signals[i] = 'R' THEN\nright(90)\nELSE\nIF signals[i] = 'G' THEN\nleft(90)\nENDIF\nENDIF\nNEXT i\nforward(120)",
   p1m10: 'FOR i ← 1 TO LENGTH(signals)\nd ← signals[i]\nforward(d * 40)\nIF i MOD 2 = 1 THEN\nright(90)\nELSE\nleft(90)\nENDIF\nNEXT i',
 }
-for (const m of MISSIONS.filter(x => x.stars.metric === 'lines')) {
+for (const m of MISSIONS.filter(x => x.stars && x.stars.metric === 'lines')) {
   const py = PY_SOURCES[m.id], ps = PS_SOURCES[m.id]
   if (!py || !ps) { bad(m.id + ' — missing line-metric reference source'); continue }
   let good = true
