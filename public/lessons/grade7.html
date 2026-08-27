@@ -1391,7 +1391,7 @@ const WORLDS = [
       text:`<strong>Challenge 3</strong> — A variable isn't stuck forever. Set a variable (e.g. <code>health</code> to 100), then give it a NEW value further down (e.g. subtract 20), and show the UPDATED value in your heading.`,
       hints:[
         'Variables → "set health to 100", then later "set health to" (health − 20) using a Math subtract block.',
-        'This is the exact same "a variable is a box that can change" idea from Grade 7\'s Game Maker world — applied to a story instead of a game.',
+        'A variable isn\'t locked to its first value — "set health to" again, later, genuinely changes what it holds.',
       ],
       needsVar:true, needsVarUpdate:true, needsHeadings:1,
       check:(log) => log.hasVar && log.hasVarUpdate && log.headings >= 1,
@@ -1464,7 +1464,7 @@ const WORLDS = [
   // motion+loops, events, variables, if/else) at an easier pace, as the
   // semester BEFORE Game Maker revisits them with more rigor — a real
   // Scratch-style on-ramp rather than a parallel track students choose between.
-  { id:'sc1', name:'🕹 Block Arcade 1 — Sprites & the Stage', sub:'Every sprite lives at an (x, y) — same idea as Game Maker, eased in', live:true, stages:[
+  { id:'sc1', name:'🕹 Block Arcade 1 — Sprites & the Stage', sub:'Every sprite lives at an (x, y) — coordinates in blocks', live:true, stages:[
     { id:'sc1s1', name:'Meet Your Sprite', xp:20,
       text:`<strong>Challenge 1</strong> — Draw one shape anywhere on the stage. That's your first sprite!`,
       hints:['Open Draw and drag out "draw circle".', 'Give it any X and Y — try the middle of the stage.', 'Press ▶ Run.'],
@@ -2127,8 +2127,8 @@ const CHALLENGE_LESSON = {
   st4s1: { title: 'A variable is a box with a name', html: `
     <div class="cl-block"><h4>Storing a choice, not just displaying text</h4>
       <p>Every heading/paragraph so far used LITERAL text you typed directly. A variable is different — it's a named box holding a value that your code can reuse, combine, or change later. "You picked: " + item works whether item holds "a sword" or "a shield" — the SAME code, different outcomes.</p></div>
-    <div class="cl-block"><h4>This is the same Variables category from Game Maker</h4>
-      <p>Nothing new to learn here technically — it's the identical Variables block category you'd use in the Game Maker world, just applied to page content instead of a game.</p></div>` },
+    <div class="cl-block"><h4>The same Variables blocks work on ANY kind of content</h4>
+      <p>Nothing about the Variables category is tied specifically to pages — the exact same blocks (create variable, set, get) work identically whether they're feeding text into a heading or tracking a score in a game.</p></div>` },
   st4s2: { title: 'Multiple variables, remembered together', html: `
     <div class="cl-block"><h4>A story often tracks more than one thing</h4>
       <p>A real interactive story remembers MANY details about the reader's path — which item they picked, which room they're in, how much health they have. Two separate variables is the simplest version of that: two named boxes, tracked independently.</p></div>` },
@@ -2146,8 +2146,8 @@ const CHALLENGE_LESSON = {
   st5s1: { title: 'A variable is only useful if something CHECKS it', html: `
     <div class="cl-block"><h4>Why Week 4 came before Week 5</h4>
       <p>A variable stores a choice; IF/ELSE is what actually MAKES that choice matter. Without a branch, "brave" and "cautious" would produce the exact same page — the whole point of tracking a choice is doing something different depending on what it was.</p></div>
-    <div class="cl-block"><h4>The same Control/Logic blocks from Game Maker</h4>
-      <p>Nothing new to learn technically — this is the identical if/else + comparison blocks from Grade 7's Game Maker world, applied to page content instead of a game.</p></div>` },
+    <div class="cl-block"><h4>The same Control/Logic blocks work on ANY kind of content</h4>
+      <p>Nothing about if/else or comparisons is tied to pages specifically — the exact same blocks work identically whether they're branching a story or deciding what happens in a game.</p></div>` },
   st5s2: { title: 'else if — a genuine third path', html: `
     <div class="cl-block"><h4>Two branches vs. three (or more)</h4>
       <p>Plain if/else can only ever pick between TWO outcomes. "else if" inserts a genuine third path — and a fourth, a fifth, as many as you need — each with its OWN condition, checked in order from top to bottom.</p></div>
@@ -2580,6 +2580,16 @@ function selectChallenge(i) {
 const G7_MODULE_CONCEPT = {
   G1: 'g7-variables', G2: 'g7-variables', G3: 'g7-conditionals', G4: 'g7-functions',
   G6: 'g7-collision', G7W: 'g7-gamestate', G8: 'g7-design', G9W: 'g7-strings', G10: 'g7-capstone',
+  // Story Studio (Sem 1) — genuinely new territory, own concepts (added when
+  // st1-st5 were built; previously missing entirely, so completing any of
+  // these silently never touched the real profile/streak — see below).
+  ST1: 'g7-web-structure', ST2: 'g7-web-structure',
+  ST3: 'g7-web-interactive', ST4: 'g7-web-interactive', ST5: 'g7-web-interactive',
+  // Block Arcade (Sem 2) — same core skills as Game Maker, eased in, so
+  // these reinforce the EXISTING matching concepts rather than needing
+  // their own (also added when sc1-sc5 were built; same previously-missing
+  // problem as Story Studio above).
+  SC1: 'g7-variables', SC2: 'g7-variables', SC3: 'g7-keyboard', SC4: 'g7-variables', SC5: 'g7-conditionals',
 }
 // G5 (Player Control) splits across two concepts depending on the challenge.
 const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }

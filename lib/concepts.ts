@@ -52,6 +52,15 @@ export const CONCEPTS: Concept[] = [
   { id:'g7-strings',      name:'M9 · Strings & Text',             icon:'⌘', color:'#f97316', tier:8, xGroup:2,  prerequisites:['g7-design'],        difficulty:3, gradeMin:7, estimatedMinutes:60, learningModes:['grade7','canvas-code'],  tags:['grade7','game'],     lessonUrl:'/lessons/grade7.html' },
   { id:'g7-capstone',     name:'M10 · Year Capstone',             icon:'★', color:'#eab308', tier:9, xGroup:1,  prerequisites:['g7-strings'],       difficulty:4, gradeMin:7, estimatedMinutes:90, learningModes:['grade7','game','canvas-code'],  tags:['grade7','capstone'], lessonUrl:'/lessons/grade7.html' },
 
+  // Semester 1 (Story Studio, st1-st5) and Semester 2 (Block Arcade, sc1-sc5)
+  // — added when those worlds were built. Story Studio is genuinely new
+  // territory (real HTML/CSS/JS-flavoured page-building, not covered by any
+  // of the game-focused concepts above), so it gets its own concepts rather
+  // than a misleading map onto an unrelated one. prerequisites:[] since
+  // Story Studio runs BEFORE Game Maker in the actual semester order.
+  { id:'g7-web-structure',   name:'Story Studio — Structure & Style', icon:'📰', color:'#16a34a', tier:10, xGroup:3, prerequisites:[], difficulty:1, gradeMin:7, estimatedMinutes:60, learningModes:['grade7','canvas-code'], tags:['grade7','web'], lessonUrl:'/lessons/grade7.html' },
+  { id:'g7-web-interactive', name:'Story Studio — Behaviour & Logic', icon:'👆', color:'#ca8a04', tier:11, xGroup:4, prerequisites:['g7-web-structure'], difficulty:2, gradeMin:7, estimatedMinutes:75, learningModes:['grade7','canvas-code'], tags:['grade7','web'], lessonUrl:'/lessons/grade7.html' },
+
   // ══════════════════════════════════════════════════════════════════════════
   //  GRADE 8 — "The App Builder" — 10 modules (M1-M10), mirroring grade8.html's
   //  own MODULES array. Only 2 of these 10 concepts existed before — the other
@@ -69,6 +78,12 @@ export const CONCEPTS: Concept[] = [
   { id:'g8-web',           name:'M8 · The Connected World',    icon:'🌐', color:'#06b6d4', tier:5, xGroup:9, prerequisites:['g8-hardware'],       difficulty:2, gradeMin:8, estimatedMinutes:30, learningModes:['grade8'],                tags:['grade8','networking'],  lessonUrl:'/lessons/grade8.html' },
   { id:'g8-apps',          name:'M9 · Interactive Apps',       icon:'🖥',  color:'#3b82f6', tier:6, xGroup:0, prerequisites:['g8-web'],            difficulty:3, gradeMin:8, estimatedMinutes:45, learningModes:['grade8'],                tags:['grade8','programming'], lessonUrl:'/lessons/grade8.html' },
   { id:'g8-capstone',      name:'M10 · Capstone: Data App',    icon:'🏆', color:'#eab308', tier:6, xGroup:1, prerequisites:['g8-apps'],           difficulty:3, gradeMin:8, estimatedMinutes:60, learningModes:['grade8'],                tags:['grade8','capstone'],    lessonUrl:'/lessons/grade8.html' },
+
+  // Semester 1 (Web Story, ws1-ws5) — real HTML/CSS/JS text-code story
+  // project, genuinely distinct from g8-web (M8, which is internet/
+  // networking THEORY, not DOM/JS programming). prerequisites:[] since
+  // Web Story runs at the start of the year, before the M1-M10 sequence.
+  { id:'g8-web-story', name:'Web Story — Interactive Page Project', icon:'📗', color:'#16a34a', tier:4, xGroup:2, prerequisites:[], difficulty:2, gradeMin:8, estimatedMinutes:75, learningModes:['grade8'], tags:['grade8','web'], lessonUrl:'/lessons/grade8.html' },
 
   // ══════════════════════════════════════════════════════════════════════════
   //  GRADE 9 — "The Deep Diver"

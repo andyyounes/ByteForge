@@ -1190,9 +1190,9 @@ const MISSION_LESSON = {
   // ── Phase 1 · Turtle — sequencing ──────────────────────────────────────────
   p1m1: { title: 'Sequence — commands run one after another', html: `
     <div class="ml-block"><h4>A program is a list, done in order</h4>
-      <p>Just like Grade 6's Robo, your pod does EXACTLY what you write, in EXACTLY the order you write it — that's a <strong>sequence</strong>. <code>forward(d)</code> moves in the direction you're currently facing; <code>left(90)</code>/<code>right(90)</code> rotate on the spot without moving.</p></div>
+      <p>Your pod does EXACTLY what you write, in EXACTLY the order you write it — that's a <strong>sequence</strong>. <code>forward(d)</code> moves in the direction you're currently facing; <code>left(90)</code>/<code>right(90)</code> rotate on the spot without moving.</p></div>
     <div class="ml-block"><h4>Real code now, not blocks</h4>
-      <p>You're writing this as actual Python or pseudocode text — the ideas are identical to Grade 7/8's blocks, but now you're typing real syntax with real punctuation that has to be exactly right.</p></div>` },
+      <p>You're writing this as actual Python or pseudocode text — real syntax with real punctuation that has to be exactly right, not a drag-and-drop block that snaps together for you.</p></div>` },
   p1m2: { title: 'Planning around an obstacle', html: `
     <div class="ml-block"><h4>Read the whole scene before writing a line</h4>
       <p>A wall blocking the direct route means the shortest-looking path is wrong — you have to look at the WHOLE scene, plan a route around the obstacle, THEN start writing forward/turn commands, not react turn-by-turn.</p></div>
@@ -1222,7 +1222,7 @@ const MISSION_LESSON = {
     <div class="ml-block"><h4>Same skill, no scaffolding</h4>
       <p>Every mission so far gave you a starting skeleton to complete. This one doesn't — six sides, 120px each, turning LEFT 60° between them, entirely from scratch. If Comet Chain and Square Patrol both made sense to you, this is the exact same idea with different numbers.</p></div>
     <div class="ml-block"><h4>360÷6 = 60°, again</h4>
-      <p>Same formula from Grade 6's Turtle Island: a hexagon's turn angle is always 360 divided by its number of sides. That idea never goes away — it's just as true in real code as it was with sliders.</p></div>` },
+      <p>A hexagon's turn angle is always 360 divided by its number of sides — the same formula works for any regular shape, in real code just as much as anywhere else.</p></div>` },
   p1m8: { title: 'IF — a real decision, not a shape', html: `
     <div class="ml-block"><h4>get_signals() gives you real data to branch on</h4>
       <p>The beacon colours ('G','R','G') are DATA your code reads and reacts to with a real <code>if</code> statement — G turns left, R turns right. This is your first mission requiring a genuine decision based on data the mission gives you, not a fixed pattern you already know.</p></div>
@@ -1237,7 +1237,7 @@ const MISSION_LESSON = {
     <div class="ml-block"><h4>enumerate() gives you BOTH the position and the value</h4>
       <p>Alternating turn directions needs to know WHICH beacon you're on (1st, 2nd, 3rd…), not just its distance value — <code>enumerate()</code> hands you both the index and the value together, so you can react to position as well as content.</p></div>
     <div class="ml-block"><h4>MOD 2 — the classic even/odd test</h4>
-      <p><code>i % 2</code> (pseudocode: <code>i MOD 2</code>) is exactly how real code tests odd vs. even — remainder 0 means even, remainder 1 means odd. You've now used MOD for real, after meeting it back in Grade 7's collision/physics distance work.</p></div>` },
+      <p><code>i % 2</code> (pseudocode: <code>i MOD 2</code>) is exactly how real code tests odd vs. even — remainder 0 means even, remainder 1 means odd. This is genuinely how every "every other item" pattern you'll ever write actually works.</p></div>` },
   p1m11: { title: 'Capstone — everything from Phase 1, combined', html: `
     <div class="ml-block"><h4>Comets, a wall, a station — no new skill</h4>
       <p>Nothing here is new: waypoints (loops), an obstacle (planning), a precise route (sequence) — this capstone just proves you can combine every Phase 1 idea into one tight, efficient flight, planned on paper before you write a single line.</p></div>
@@ -1346,7 +1346,7 @@ const MISSION_LESSON = {
     <div class="ml-block"><h4>Hidden stats, a shield, a timed charge, two enemies</h4>
       <p>The recon report is the ONLY way to know Core's real attack power — misread it and you'll prioritize wrong and lose. A real targeting function (reading intel, cross-checked against who's alive), alternating for the shield, aware of the 3rd-turn charge: everything from Phases 2 and 3, combined under a tight turn limit.</p></div>
     <div class="ml-block"><h4>You've built every one of these skills separately</h4>
-      <p>Nothing in this fight is new — sequencing, loops, functions, decomposition, prioritization, reading live vs. stale data, timing-based decisions. This capstone just proves you can bring all of it together into one coherent plan, the same way G10's capstone did back in Grade 7.</p></div>` },
+      <p>Nothing in this fight is new — sequencing, loops, functions, decomposition, prioritization, reading live vs. stale data, timing-based decisions. This capstone just proves you can bring all of it together into one coherent plan, exactly what a real capstone project is for.</p></div>` },
 }
 
 function renderMissionLesson(mission) {
@@ -2734,9 +2734,20 @@ async function runDataMission(isSubmit) {
 // mission — 31 missions vs. lib/concepts.ts's 30 week-level g9-* concepts
 // don't line up 1:1) onto the closest matching concept for each phase.
 const G9M_PHASE_CONCEPT = { p1: 'pseudocode-intro', p2: 'g9-procedures', p3: 'g9-python-files' }
+// Phase 0 (Systems Check, added later) needs mission-by-mission mapping, not
+// one phase-wide concept — binary, logic, data types, and pixels are
+// genuinely different topics, all reusing EXISTING g9-* concepts that
+// already matched closely (no need for new ones here, unlike Grade 7/8's
+// brand-new web content).
+const G9M_MISSION_CONCEPT_OVERRIDE = {
+  p0m1: 'g9-binary', p0m2: 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
+  p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
+  p0m5: 'g9-declarations', p0m6: 'g9-declarations',
+  p0boss: 'g9-binary',
+}
 async function reportRealProgress(mission, timeSpentMs) {
   const prefix = (mission.id.match(/^(p\d)/) || [])[1]
-  const conceptId = prefix && G9M_PHASE_CONCEPT[prefix]
+  const conceptId = G9M_MISSION_CONCEPT_OVERRIDE[mission.id] || (prefix && G9M_PHASE_CONCEPT[prefix])
   if (!conceptId) return
   try {
     await fetch('/api/progress', {

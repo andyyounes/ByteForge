@@ -556,6 +556,11 @@ function checkWebChallenge(log) {
     clog('✅ Challenge complete! +' + ch.xp + ' XP', 'ok')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g8-c' + activeIdx, { passed:true, score:100 }) }
     LessonSaves.save('grade8', ch.id, { passed:true, xpEarned: ch.xp, code: log.js })
+    // checkWebChallenge() never called this — Web Story completions never
+    // touched the real profile/streak at all, unlike the Python track's
+    // checkChallenge(), which does call it (just with the wrong-case lookup
+    // fixed elsewhere in this file).
+    reportRealProgress(ch, Date.now() - challengeStartedAt)
   } else {
     clog('❌ Not quite — check the task above and try the 💡 Hint button.', 'err')
   }
@@ -2992,9 +2997,17 @@ function toggleChallengeLesson() {
 const G8_MODULE_CONCEPT = {
   m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
   m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
+  // Web Story (Sem 1, ws1-ws5) — added when this world was built; was
+  // missing entirely before, so completing it silently never touched the
+  // real profile/streak (same bug Grade 7's Story Studio/Block Arcade had).
+  ws1:'g8-web-story', ws2:'g8-web-story', ws3:'g8-web-story', ws4:'g8-web-story', ws5:'g8-web-story',
 }
 async function reportRealProgress(ch, timeSpentMs) {
-  const concept_id = G8_MODULE_CONCEPT[ch.mod]
+  // ch.mod is UPPERCASE ('M1', 'WS1' — see CHALLENGES' m.id.toUpperCase()
+  // above), but every key in G8_MODULE_CONCEPT is lowercase. A plain lookup
+  // here NEVER matched — real progress reporting has been silently broken
+  // for every single Grade 8 challenge, not just the newly-added ones.
+  const concept_id = G8_MODULE_CONCEPT[ch.mod.toLowerCase()]
   if (!concept_id) return
   try {
     await fetch('/api/progress', {
