@@ -976,6 +976,32 @@ const WORLDS = [
   { id: 'w12', name: '🚀 The Final Quest',    sub: 'Your masterpiece. Any world. Go big.',      stages: W12_STAGES, live: true },
 ]
 
+// ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
+// Same root-cause fix as grade7/8/9.html: BF.addXP only ever wrote to a
+// localStorage-only mock database, invisible to /student/dashboard. The 12
+// in-game WORLDS here don't line up 1:1 with the 10 M1-M10 concepts already
+// named in lib/concepts.ts (g6-pixels..g6-capstone follow the ORIGINAL
+// 10-module spec's names, while WORLDS was later expanded/reorganised into 12
+// differently-themed worlds) — this is a best-effort THEMATIC mapping, not an
+// authoritative one, and can be adjusted.
+const G6_WORLD_CONCEPT = {
+  w1:'g6-turtle', w2:'g6-loops', w3:'g6-color-vars', w4:'g6-loops', w5:'g6-animation',
+  w6:'g6-pixels', w7:'g6-patterns', w8:'g6-patterns', w9:'g6-story', w10:'g6-debug',
+  w11:'g6-random', w12:'g6-capstone',
+}
+async function reportRealProgress(stage, firstTime) {
+  if (!firstTime) return   // only report a concept attempt once per stage, like every other grade
+  const worldId = String(stage.id).match(/^(w\d+)/)?.[1]
+  const concept_id = worldId && G6_WORLD_CONCEPT[worldId]
+  if (!concept_id) return
+  try {
+    await fetch('/api/progress', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ concept_id, correct: true, time_spent_ms: 0 }),
+    })
+  } catch (e) { console.warn('[grade6] progress report failed (offline?):', e.message) }
+}
+
 // ── Progress (localStorage + server best-effort) ─────────────────────────────
 function getProg() {
   try { return JSON.parse(localStorage.getItem('bf-g6-quest')) || {} } catch { return {} }
@@ -2118,6 +2144,7 @@ function completeStage(stars) {
   const idx = ALL_STAGES.indexOf(activeStage)
   try { LessonSaves.save('grade6-quest', idx, { passed: true, xpEarned: xp }) } catch (e) {}
   try { if (typeof me !== 'undefined' && me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+  try { reportRealProgress(activeStage, firstTime) } catch (e) {}
 
   document.getElementById('win-stars').innerHTML =
     '⭐'.repeat(stars) + '<span class="dim">' + '⭐'.repeat(3 - stars) + '</span>'
