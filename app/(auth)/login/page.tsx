@@ -70,9 +70,16 @@ function LoginContent() {
     setLoading(true)
     setError(null)
 
+    // Trim (and lowercase) the email before it ever reaches Supabase — a
+    // stray leading/trailing space from autofill or copy-paste makes
+    // "user@x.com " a genuinely different string to Supabase's lookup,
+    // which fails with the same generic "Invalid login credentials" as a
+    // wrong password, even though the account is real and confirmed.
+    const cleanEmail = email.trim().toLowerCase()
+
     try {
       if (mode === 'login') {
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email: cleanEmail, password })
         if (signInError) throw signInError
 
         const { data: { user } } = await supabase.auth.getUser()
@@ -92,7 +99,7 @@ function LoginContent() {
         }
       } else {
         const { error: signUpError } = await supabase.auth.signUp({
-          email,
+          email: cleanEmail,
           password,
           options: {
             data: { name, role },
@@ -103,7 +110,7 @@ function LoginContent() {
 
         if (role === 'student') {
           // Sign in immediately so we can call server-side APIs
-          await supabase.auth.signInWithPassword({ email, password })
+          await supabase.auth.signInWithPassword({ email: cleanEmail, password })
 
           if (joinCode.trim() && classInfo) {
             // Arrived via a join link — the class grade sets their level

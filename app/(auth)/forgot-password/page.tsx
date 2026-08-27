@@ -17,7 +17,10 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    // Trim/lowercase before sending — same fix as the login page, so a
+    // stray space doesn't send the reset email to a technically-different
+    // (and likely nonexistent) address than the account actually uses.
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
       redirectTo: `${window.location.origin}/api/auth/callback?next=/reset-password`,
     })
     setLoading(false)
