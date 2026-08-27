@@ -70,6 +70,18 @@
   .player-goal { font-size:11.5px; color:#9ca3af; }
   .player-par { margin-left:auto; font-size:11px; font-weight:800; color:#fbbf24; white-space:nowrap; }
 
+  .player-lesson { flex-shrink:0; background:#12141f; border-bottom:1px solid rgba(255,255,255,.08); }
+  .pl-toggle { padding:9px 18px; font-size:12.5px; font-weight:800; color:#7dd3fc; cursor:pointer;
+               display:flex; align-items:center; gap:6px; user-select:none; }
+  .pl-toggle:hover { color:#a5e8ff; }
+  #pl-arrow { margin-left:auto; font-size:10px; color:#6b7280; transition:transform .15s; }
+  .pl-body { padding:0 18px 16px; font-size:12.5px; color:#c7d2e0; line-height:1.7; max-width:640px; }
+  .pl-body.collapsed { display:none; }
+  .pl-block { background:#0d0f1a; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:11px 14px; margin-bottom:9px; }
+  .pl-block:last-child { margin-bottom:0; }
+  .pl-block h4 { font-size:11px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
+  .pl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:12px; }
+
   .player-body { flex:1; display:flex; gap:22px; align-items:flex-start; justify-content:center; padding:26px 18px;
                  overflow-y:auto; flex-wrap:wrap; }
 
@@ -189,6 +201,13 @@
       <div class="player-goal" id="p-goal"></div>
     </div>
     <div class="player-par" id="p-par"></div>
+  </div>
+  <!-- 📘 Per-stage lesson — one real explainer per practice, not just the
+       one-line goal. Populated by openStage()/renderStageLesson() for every
+       stage type (maze, color, turtle, pixel, cipher, music, dance, etc). -->
+  <div class="player-lesson" id="p-lesson" style="display:none;">
+    <div class="pl-toggle" id="pl-toggle" onclick="togglePLesson()">📘 <span id="pl-title"></span> <span id="pl-arrow">▾</span></div>
+    <div class="pl-body" id="pl-body"></div>
   </div>
   <div class="player-body">
     <div class="board-wrap">
@@ -959,6 +978,151 @@ const W12_STAGES = [
 const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES, ...W11_STAGES, ...W12_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
+// 📘 STAGE_LESSON — one real explainer per practice, not just the one-line
+// `goal` text. Rendered above every stage by renderStageLesson(). Written
+// world-by-world; a stage with no entry here simply hides the lesson panel.
+// ══════════════════════════════════════════════════════════════════════════════
+const STAGE_LESSON = {
+  // ── World 1 — Robot Road: sequences (commands run in order) ───────────────
+  w1s1: { title: 'Sequences — one command at a time', html: `
+    <div class="pl-block"><h4>What's a sequence?</h4>
+      <p>A computer program is just a list of commands, done <strong>one after another, in order</strong> — that's called a <strong>sequence</strong>. Robo can only do exactly what you tell it: <code>forward</code>, <code>turn left</code>, <code>turn right</code>. Nothing happens unless it's in your list.</p></div>
+    <div class="pl-block"><h4>Try thinking it through first</h4>
+      <p>Before you tap anything, look at the maze and say out loud: "forward, forward, forward" — count how many steps to the flag. That's the sequence you need to build.</p></div>` },
+  w1s2: { title: 'Turning — direction matters', html: `
+    <div class="pl-block"><h4>A turn changes what "forward" means</h4>
+      <p>Robo only ever moves <em>forward</em> — but a <code>turn left</code> or <code>turn right</code> command changes which way "forward" points next. Two commands, forward + turn, are both needed to go around any corner.</p></div>
+    <div class="pl-block"><h4>Why order matters</h4>
+      <p>Turning right THEN going forward is completely different from going forward THEN turning right — you end up in different places! In a sequence, order is everything.</p></div>` },
+  w1s3: { title: 'Planning around obstacles', html: `
+    <div class="pl-block"><h4>The direct path isn't always open</h4>
+      <p>Real programs often can't take the "obvious" route — a wall, a rule, or a missing piece of data blocks the direct path. You have to look at the WHOLE maze first and plan a route around the obstacle, not just react turn by turn.</p></div>
+    <div class="pl-block"><h4>Debugging tip</h4>
+      <p>If Robo bumps into a wall, that's fine — it just means one command in your sequence was wrong. Fix that ONE command rather than starting completely over.</p></div>` },
+  w1s4: { title: 'Longer sequences', html: `
+    <div class="pl-block"><h4>Bigger problems, same idea</h4>
+      <p>This maze just needs a LONGER sequence — the same forward/turn commands as before, just more of them chained together. Real programs are exactly like this: big problems are solved with the same small building blocks, just more of them.</p></div>
+    <div class="pl-block"><h4>Keep count</h4>
+      <p>Count each straight run in the maze separately (e.g. "3 forward, turn, 2 forward, turn...") — it's much easier to build a long sequence out of small counted chunks than to guess the whole thing at once.</p></div>` },
+  w1s5: { title: 'Collecting data along the route', html: `
+    <div class="pl-block"><h4>Visiting places in a specific order</h4>
+      <p>Now your sequence has to visit BOTH stars before the flag — not just find any path, but a path that passes through specific points in an order you choose. This is the core idea behind route-planning in real software, like a delivery app finding the best order to visit stops.</p></div>
+    <div class="pl-block"><h4>Plan before you tap</h4>
+      <p>Trace the route with your finger first: start → star 1 → star 2 → flag. Only build the sequence once you know the full path.</p></div>` },
+  w1s6: { title: 'Hard mode — three-point planning', html: `
+    <div class="pl-block"><h4>More points, more planning</h4>
+      <p>Three stars means more possible orders to visit them in — some orders will need a much longer sequence than others! Real programmers face this exact problem: sometimes there's more than one correct path, but some are much more efficient than others.</p></div>
+    <div class="pl-block"><h4>Why it matters</h4>
+      <p>This "which order is fastest?" question is a real, famous problem in computer science (delivery routes, GPS directions, even how your phone finds wifi) — you're doing a tiny version of it right now.</p></div>` },
+  w1boss: { title: 'BOSS — Everything so far, together', html: `
+    <div class="pl-block"><h4>No new skill — just proof</h4>
+      <p>A boss stage doesn't teach anything new. It just proves you can combine everything from this world — sequencing, turning, planning around walls, visiting points in order — in one bigger maze, without any hints holding your hand.</p></div>
+    <div class="pl-block"><h4>If you get stuck</h4>
+      <p>Break the boss maze into smaller sections mentally, just like Challenge 4 taught you. Solve section 1, then section 2, then join them — don't try to plan the whole thing in one go.</p></div>` },
+
+  // ── World 2 — Block Basics: repeat-chips introduce the idea of a LOOP ──────
+  w2s1: { title: 'Repeats — your first loop', html: `
+    <div class="pl-block"><h4>Why type "forward" nine times?</h4>
+      <p>Tapping ×2, ×3, ×4 or ×5 on a chip tells it to repeat — instead of nine separate "forward" commands, you get ONE chip that repeats forward 9 times. This is exactly what a <strong>loop</strong> is in real programming: doing the same thing over and over WITHOUT writing it out every single time.</p></div>
+    <div class="pl-block"><h4>Fewer chips = better code</h4>
+      <p>Real programmers care about this a lot — a program that repeats itself with a loop is shorter, easier to read, and easier to fix than one that just lists the same command dozens of times.</p></div>` },
+  w2s2: { title: 'Loops on straight runs', html: `
+    <div class="pl-block"><h4>Spot the repeated pattern first</h4>
+      <p>Before building anything, look for STRAIGHT RUNS in the maze — any time you'd move the same direction more than once, that's a loop waiting to happen. This staircase has several short straight runs, each one is its own repeat-chip.</p></div>
+    <div class="pl-block"><h4>One chip per direction change</h4>
+      <p>Every time the direction changes, that's a NEW chip. Count: how many times does the staircase change direction? That's how many chips you'll need.</p></div>` },
+  w2s3: { title: 'Loops around a shape', html: `
+    <div class="pl-block"><h4>Going around a square</h4>
+      <p>Walking all the way around a square block is just THREE straight runs (this maze has no fourth side to walk, since start and flag share a wall) — right, down, left. Three loops, eleven steps total, way fewer taps than typing every single step.</p></div>
+    <div class="pl-block"><h4>The bigger the shape, the bigger the win</h4>
+      <p>Notice how much MORE useful loops become as the shape gets bigger — walking around a huge square would still only need 3 chips, even if each side were 100 steps long!</p></div>` },
+  w2s4: { title: 'Loops + collecting stars', html: `
+    <div class="pl-block"><h4>Combining loops with a goal</h4>
+      <p>Now you're using repeat-chips on long corridors WHILE also making sure you pass through both stars. Plan the star positions first, then figure out which straight runs need a loop.</p></div>
+    <div class="pl-block"><h4>A loop can stop early</h4>
+      <p>If a star is halfway down a long corridor, you might need to split what looks like "one long loop" into two shorter ones — one to reach the star, then another to continue past it.</p></div>` },
+  w2s5: { title: 'Hard mode — nested shapes', html: `
+    <div class="pl-block"><h4>A spiral is loops inside a bigger pattern</h4>
+      <p>30 steps in only 10 chips! A spiral looks complicated, but it's really just a sequence of straight runs that get shorter (or longer) each time you turn — the same "spot the straight run, make it a chip" thinking from earlier stages, just repeated more times.</p></div>
+    <div class="pl-block"><h4>Slow down and trace it</h4>
+      <p>Trace the spiral path with your finger BEFORE building anything. Count each straight section out loud. Rushing on a maze this size usually means starting over.</p></div>` },
+  w2s6: { title: 'A star can hide on your path', html: `
+    <div class="pl-block"><h4>Watch for overlaps</h4>
+      <p>Here's a trick real routes have too: sometimes you collect something just by passing through it — the last star sits directly ON your normal path to the flag, so you don't need an extra detour for it at all.</p></div>
+    <div class="pl-block"><h4>Don't over-plan</h4>
+      <p>Always check: does the direct path already pass a star? If yes, that's one less thing to plan around.</p></div>` },
+  w2boss: { title: 'BOSS — Two mazes, fewest chips wins', html: `
+    <div class="pl-block"><h4>Same skills, back to back</h4>
+      <p>This boss is two separate mazes in a row — solve the first with repeat-chips, then immediately solve the second. Nothing new to learn, just proof you can spot straight runs and turn them into loops reliably, every time.</p></div>
+    <div class="pl-block"><h4>Fewest chips, not fewest steps</h4>
+      <p>Remember: the star rating here counts CHIPS used, not steps taken — a maze with 20 steps built from 3 well-planned loops beats one with 10 steps built from 10 separate commands.</p></div>` },
+
+  // ── World 3 — Color & Shape Lab: RGB numbers ───────────────────────────────
+  w3s1: { title: 'Colors ARE numbers', html: `
+    <div class="pl-block"><h4>Three numbers make every color</h4>
+      <p>Every color a screen can show is really just THREE numbers: how much RED light, how much GREEN light, and how much BLUE light — each from 0 (none) to 255 (full power). This is called <strong>RGB</strong>. Pure red is R=255, G=0, B=0 — full red, no green, no blue at all.</p></div>
+    <div class="pl-block"><h4>Why 255?</h4>
+      <p>255 might look like a strange number to stop at, but it's the biggest number a computer can store in one "byte" of memory (8 bits) — you'll meet bits and bytes properly later this year.</p></div>` },
+  w3s2: { title: 'Mixing two colors together', html: `
+    <div class="pl-block"><h4>No yellow light exists — so how?</h4>
+      <p>Your eye can't tell the difference between "real yellow light" and "a lot of red light + a lot of green light mixed together" — they look identical! This is exactly how every color on a screen is made: mixing just three lights in different amounts.</p></div>
+    <div class="pl-block"><h4>The pattern</h4>
+      <p>High RED + high GREEN + zero BLUE = yellow. Try to predict what high RED + zero GREEN + high BLUE would look like before you check (it's magenta/pink!).</p></div>` },
+  w3s3: { title: 'Halfway values', html: `
+    <div class="pl-block"><h4>Numbers don't have to be 0 or 255</h4>
+      <p>A slider can sit ANYWHERE from 0 to 255 — "about half power" is roughly 128, but real colors are rarely round numbers. Ocean teal needs green and blue both around the middle, with zero red.</p></div>
+    <div class="pl-block"><h4>Estimate, then adjust</h4>
+      <p>Start with a rough guess (halfway on the slider), check the swatch against the target, then nudge up or down. That's exactly how you'll debug real code later: guess, test, adjust.</p></div>` },
+  w3s4: { title: 'Following hints to narrow down numbers', html: `
+    <div class="pl-block"><h4>Using clues to narrow the search</h4>
+      <p>"Some red, zero green, lots of blue" narrows down three unknown numbers into a small range each. This is a real problem-solving skill: instead of guessing blindly, use every clue you're given to eliminate wrong answers fast.</p></div>
+    <div class="pl-block"><h4>The hint arrows</h4>
+      <p>When a slider's arrow points up, your number's too low; pointing down means too high. Follow the arrows like a hot-and-cold game.</p></div>` },
+  w3s5: { title: 'Subtle, realistic mixes', html: `
+    <div class="pl-block"><h4>Real-world colors are messy</h4>
+      <p>A sunset isn't a "pure" color like the earlier stages — it's a subtle mix of all three lights at different, less obvious levels. This is what real photos and real screens look like: almost nothing is a clean 0 or 255.</p></div>
+    <div class="pl-block"><h4>Eagle-eye tip</h4>
+      <p>Compare the two swatches side by side, not one after the other from memory — your eye is much better at spotting small differences when both colors are visible at once.</p></div>` },
+  w3boss: { title: 'BOSS — Three colors, no mistakes', html: `
+    <div class="pl-block"><h4>Consistency, not luck</h4>
+      <p>Matching one color close is easy; matching THREE in a row without your worst one dragging your score down proves you actually understand R+G+B mixing, not just got lucky once.</p></div>
+    <div class="pl-block"><h4>Slow down each time</h4>
+      <p>Treat each of the three colors as its own fresh challenge — resist the urge to rush the second and third ones just because the first one went well.</p></div>` },
+
+  // ── World 4 — Loop Land: bigger loops + flowchart thinking ─────────────────
+  w4s1: { title: 'Flowcharts — planning before building', html: `
+    <div class="pl-block"><h4>A flowchart is a plan you draw BEFORE coding</h4>
+      <p>A <strong>flowchart</strong> uses boxes for actions ("go forward") and diamonds for questions ("wall ahead?") connected by arrows, showing the shape of a program before you ever build it. Real programmers sketch flowcharts to catch mistakes on paper — much cheaper than catching them after building the whole thing.</p></div>
+    <div class="pl-block"><h4>Try it now</h4>
+      <p>Before placing a single chip, picture two boxes joined by an arrow: [go right] → [go down]. That tiny flowchart IS your plan for this maze.</p></div>` },
+  w4s2: { title: 'Repeating flowchart shapes', html: `
+    <div class="pl-block"><h4>Same shape, drawn again</h4>
+      <p>This maze's flowchart would be: [right] → [down] → [right] — notice "right" appears TWICE. Predicting that repetition on paper first is exactly how a programmer decides where a loop belongs before writing any code.</p></div>
+    <div class="pl-block"><h4>Predict, then build</h4>
+      <p>Say the shape out loud before touching a chip: "right, down, right." Only build once you can say the whole plan without looking at the maze.</p></div>` },
+  w4s3: { title: 'Counting down the legs', html: `
+    <div class="pl-block"><h4>Three legs, three chips</h4>
+      <p>Right, down, left — a U-turn shape. Thinking of it as "3, 2, 1" legs (like a countdown) is a memory trick real programmers use too: turning an abstract shape into a simple countdown makes it much easier to hold in your head.</p></div>
+    <div class="pl-block"><h4>Check your turns</h4>
+      <p>A U-turn needs exactly ONE turn-left or turn-right between each straight leg — miscounting turns is the single most common maze mistake.</p></div>` },
+  w4s4: { title: 'Loops with stars along two legs', html: `
+    <div class="pl-block"><h4>Two long legs, one star each</h4>
+      <p>Like a drum beat repeating, this maze has the same shape twice — a long straight run, each hiding a star partway through. Once you spot the repeat, you already know the shape of BOTH loops, not just one.</p></div>
+    <div class="pl-block"><h4>Split around the star</h4>
+      <p>If a star sits partway down a long run, that run becomes TWO shorter loops — one up to the star, one continuing past it — exactly like World 2 taught you.</p></div>` },
+  w4s5: { title: 'Four-leg planning', html: `
+    <div class="pl-block"><h4>Longer, not harder</h4>
+      <p>Four legs instead of two or three — the exact same "spot the straight run, make it a chip" skill from Block Basics, just applied more times in a row. Planning ALL chips before placing the first one matters even more now that there's more to keep track of.</p></div>
+    <div class="pl-block"><h4>Write it down</h4>
+      <p>If four legs is hard to hold in your head, list them in order first: "right, down, right, down" — then build from your list instead of the maze directly.</p></div>` },
+  w4boss: { title: 'BOSS — Loop Master, and a peek ahead', html: `
+    <div class="pl-block"><h4>A sneak peek at NESTED loops</h4>
+      <p>What if you could put a repeat-chip INSIDE another repeat-chip — a "loop of loops"? That's called a <strong>nested loop</strong>, and it would make a maze like this take even fewer chips. You'll actually get to build nested loops for real in Grade 7 — for now, just notice the idea exists.</p></div>
+    <div class="pl-block"><h4>For today: flat chips only</h4>
+      <p>Solve both mazes with the flat repeat-chips you already know. Fewest total chips across both mazes wins the crown.</p></div>` },
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // The quest map — 12 worlds (Worlds 1–4 playable in this release)
 // ══════════════════════════════════════════════════════════════════════════════
 const WORLDS = [
@@ -1072,6 +1236,31 @@ function openStage(id) {
   document.getElementById('player').classList.add('open')
   gauntletCmds = 0
   loadStage()
+  renderStageLesson()
+}
+
+// 📘 Per-stage lesson — real explainer content per practice (not just the
+// one-line `goal`), keyed by stage id in STAGE_LESSON (defined further down,
+// alongside each world's stage data). Falls back to hidden if a stage has no
+// entry yet, so this never breaks a stage mid-rollout.
+let _plExpanded = true
+function renderStageLesson() {
+  const wrap  = document.getElementById('p-lesson')
+  const body  = document.getElementById('pl-body')
+  const title = document.getElementById('pl-title')
+  if (!wrap || !activeStage) return
+  const lesson = typeof STAGE_LESSON !== 'undefined' ? STAGE_LESSON[activeStage.id] : null
+  if (!lesson) { wrap.style.display = 'none'; return }
+  wrap.style.display = ''
+  title.textContent = lesson.title
+  body.innerHTML = lesson.html
+  body.classList.toggle('collapsed', !_plExpanded)
+  document.getElementById('pl-arrow').textContent = _plExpanded ? '▾' : '▸'
+}
+function togglePLesson() {
+  _plExpanded = !_plExpanded
+  document.getElementById('pl-body').classList.toggle('collapsed', !_plExpanded)
+  document.getElementById('pl-arrow').textContent = _plExpanded ? '▾' : '▸'
 }
 
 // Route to the right mini-game engine for this stage
