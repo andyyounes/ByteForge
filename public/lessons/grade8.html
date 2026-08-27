@@ -693,6 +693,34 @@ colored_tile(80,  200, 100, 130, 80, tile_size)   # green
       return hasDef && log.rects >= 4
     },
   },
+  {
+    id:'m3s3', mod:'M9', name:'Function That Returns', xp:45,
+    text:`<strong>Challenge 3 — Return Values</strong> — Both earlier functions just drew shapes — neither gave a value BACK. Define <code>average(a, b, c)</code> that RETURNS the mean of the three numbers. Call it, store the result in a variable, then use that variable as a circle's radius.`,
+    hints:[
+      'A function can hand back a result with the "return" keyword: return (a + b + c) / 3',
+      'Store what it gives back: r = average(20, 60, 100) — r now holds a real number, not a shape.',
+      'Use that variable somewhere real: circle(160, 130, r) — the radius came from your function\'s return value.',
+    ],
+    starter:`# Grade 8 — Functions that RETURN a value
+# draw_smiley and colored_tile only drew shapes. This one hands back a number.
+
+def average(a, b, c):
+    """Return the mean of three numbers."""
+    # TODO: return (a + b + c) / 3
+
+background(15, 18, 32)
+fill(120, 200, 255)
+
+# Call it and USE the value it returns:
+r = average(20, 60, 100)
+circle(160, 130, r)
+`,
+    check: (code, log) => {
+      const hasDef    = /def\s+\w+/.test(code)
+      const hasReturn = /return\s+.+/.test(code)
+      return hasDef && hasReturn && log.circles >= 1
+    },
+  },
   ]},
 
   { id:'m4', name:'📋 M4 — Lists', sub:'Creating, indexing, appending, looping — list + loop = superpower', live:true, stages:[
@@ -1213,6 +1241,36 @@ print(html)
         const hasP  = /<p>/.test(code)
         const hasFString = /f['"]/.test(code)
         return hasH1 && hasP && hasFString
+      },
+    },
+    {
+      id:'m8s3', name:'Password Strength Checker', xp:45,
+      text:`<strong>Challenge 3 — Staying Safe Online</strong> — M8's whole theme is "staying safe online" — this is the piece that was still missing. Write a function <code>is_strong(password)</code> that returns True only if the password is at least 8 characters long AND contains at least one digit. Test it on a few example passwords and print whether each is strong or weak.<br><br>
+      <span style="opacity:.8;font-size:12px;">💡 Real password rules usually also require a mix of uppercase, lowercase, and symbols — length + a digit is a simplified version of the same idea: harder to guess = safer.</span>`,
+      hints:[
+        'Length check: len(password) >= 8',
+        'Digit check: any(ch.isdigit() for ch in password) — True if at least one character is a digit.',
+        'Combine both with "and", return the result, then print("strong" if is_strong(pw) else "weak") for a couple of test passwords.',
+      ],
+      starter:`# Grade 8 — Password Strength Checker
+
+def is_strong(password):
+    """Return True if password is >=8 chars AND has at least one digit."""
+    long_enough = len(password) >= 8
+    # TODO: check for at least one digit — any(ch.isdigit() for ch in password)
+    has_digit = False
+    return long_enough and has_digit
+
+test_passwords = ["cat", "sunshine", "sunshine7", "p4ssw0rd123"]
+for pw in test_passwords:
+    result = "strong" if is_strong(pw) else "weak"
+    print(pw, "->", result)
+`,
+      check:(code) => {
+        const hasDef      = /def\s+\w+/.test(code)
+        const hasLenCheck = /len\s*\(\s*password\s*\)\s*>=?\s*8/.test(code)
+        const hasDigitCheck = /isdigit\s*\(\s*\)/.test(code) || /\.isdigit\b/.test(code)
+        return hasDef && hasLenCheck && hasDigitCheck
       },
     },
   ]},
