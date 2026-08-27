@@ -45,6 +45,17 @@
   .brief-api { margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; }
   .api-chip { font-family:monospace; font-size:11px; background:#161927; border:1px solid rgba(184,239,74,.25);
               color:#b8ef4a; border-radius:6px; padding:3px 9px; }
+  .m-lesson { flex-shrink:0; background:#0e1020; border-top:1px solid rgba(103,232,249,.15); }
+  .ml-toggle { padding:8px 16px; font-size:12px; font-weight:800; color:#67e8f9; cursor:pointer;
+               display:flex; align-items:center; gap:6px; user-select:none; }
+  .ml-toggle:hover { color:#a5f3fc; }
+  #ml-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
+  .ml-body { padding:0 16px 14px; font-size:12px; color:#c7d2e0; line-height:1.7; }
+  .ml-body.collapsed { display:none; }
+  .ml-block { background:#161927; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
+  .ml-block:last-child { margin-bottom:0; }
+  .ml-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
+  .ml-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
   .console { min-height:52px; max-height:110px; overflow-y:auto; padding:9px 16px; font-family:monospace;
              font-size:12px; background:#05060c; border-top:1px solid rgba(255,255,255,.08);
              color:#9ca3af; white-space:pre-wrap; flex-shrink:0; }
@@ -194,6 +205,12 @@
       <div class="brief-goal" id="m-brief"></div>
       <div class="brief-api" id="m-api"></div>
       <div id="m-intel" style="display:none;"></div>
+    </div>
+    <!-- 📘 Full per-mission lesson — one real explainer per mission, populated
+         from MISSION_LESSON. Collapsible, matches Grade 6/7's lesson panel. -->
+    <div class="m-lesson" id="m-lesson" style="display:none;">
+      <div class="ml-toggle" id="ml-toggle" onclick="toggleMissionLesson()">📘 <span id="ml-title"></span> <span id="ml-arrow">▾</span></div>
+      <div class="ml-body" id="ml-body"></div>
     </div>
     <div class="console" id="console">// Mission console — Run your code to see what happens.</div>
   </div>
@@ -953,6 +970,193 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 9 },
   },
 ]
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 📘 MISSION_LESSON — one real, full explainer per mission (all 31), keyed by
+// mission id. Rendered by renderMissionLesson() from inside openMission().
+// ══════════════════════════════════════════════════════════════════════════════
+const MISSION_LESSON = {
+  // ── Phase 1 · Turtle — sequencing ──────────────────────────────────────────
+  p1m1: { title: 'Sequence — commands run one after another', html: `
+    <div class="ml-block"><h4>A program is a list, done in order</h4>
+      <p>Just like Grade 6's Robo, your pod does EXACTLY what you write, in EXACTLY the order you write it — that's a <strong>sequence</strong>. <code>forward(d)</code> moves in the direction you're currently facing; <code>left(90)</code>/<code>right(90)</code> rotate on the spot without moving.</p></div>
+    <div class="ml-block"><h4>Real code now, not blocks</h4>
+      <p>You're writing this as actual Python or pseudocode text — the ideas are identical to Grade 7/8's blocks, but now you're typing real syntax with real punctuation that has to be exactly right.</p></div>` },
+  p1m2: { title: 'Planning around an obstacle', html: `
+    <div class="ml-block"><h4>Read the whole scene before writing a line</h4>
+      <p>A wall blocking the direct route means the shortest-looking path is wrong — you have to look at the WHOLE scene, plan a route around the obstacle, THEN start writing forward/turn commands, not react turn-by-turn.</p></div>
+    <div class="ml-block"><h4>Crashing means a real failure state</h4>
+      <p>Touching the wall doesn't just look wrong — it's a genuine mission failure, the same as a real program crashing on bad input. Plan first; testing by trial-and-error against a wall wastes real attempts.</p></div>` },
+  p1m3: { title: 'Working within a real constraint', html: `
+    <div class="ml-block"><h4>No turning — a genuine limitation</h4>
+      <p>Real engineering constantly works within limitations you didn't choose — here, steering is "damaged" and only <code>forward()</code>/<code>backward()</code> are available. The station is behind you, so the fix is simple: back up instead of turning around.</p></div>
+    <div class="ml-block"><h4>The right tool, not the familiar one</h4>
+      <p>You've used forward() constantly — recognising that <code>backward()</code> is the actually correct tool here, not just the one you're used to, is a real problem-solving skill.</p></div>` },
+  p1m4: { title: 'Loops — repeating a pattern by NAME, not by hand', html: `
+    <div class="ml-block"><h4>for i in range(4): — say it once, it happens 4 times</h4>
+      <p>A perfect square is the SAME two actions (one side + one turn) repeated 4 times — a <strong>loop</strong> lets you write that pattern ONCE inside <code>for i in range(4):</code> instead of typing it out four separate times.</p></div>
+    <div class="ml-block"><h4>Stars now count LINES, not moves</h4>
+      <p>Notice the star metric changed: fewer LINES of code, not fewer commands. A loop can execute many commands from very few lines — that's exactly why real programmers prefer loops over repeated code.</p></div>` },
+  p1m5: { title: 'A loop with a repeating multi-step pattern', html: `
+    <div class="ml-block"><h4>Each "step" is itself several commands</h4>
+      <p>A staircase's step pattern (across, turn, up, turn) is more than one command — but it's the SAME multi-command pattern repeated 5 times, which still fits neatly inside one loop body.</p></div>
+    <div class="ml-block"><h4>Finish the pattern, don't just copy it</h4>
+      <p>The starter gives you the first half of each step — finishing the pattern (rather than being handed the whole thing) is what proves you understand WHY each line is there, not just that you can copy it.</p></div>` },
+  p1m6: { title: 'The loop variable itself carries useful data', html: `
+    <div class="ml-block"><h4>i isn't just a counter — it's a real number you can use</h4>
+      <p><code>for i in range(1, 7):</code> makes <code>i</code> count 1, 2, 3… 6 — and multiplying it directly into <code>forward(40 * i)</code> makes each leg automatically longer than the last. The loop variable isn't just tracking "which repeat am I on" — it's genuinely useful DATA you can compute with.</p></div>
+    <div class="ml-block"><h4>Why this beats writing 6 separate forward() calls</h4>
+      <p>Six hardcoded forward() calls (40, 80, 120…) would work too — but change "expanding spiral" to "12 legs instead of 6" and the loop version needs ONE number changed; the hardcoded version needs rewriting from scratch.</p></div>` },
+  p1m7: { title: 'No starter — proving you own the pattern', html: `
+    <div class="ml-block"><h4>Same skill, no scaffolding</h4>
+      <p>Every mission so far gave you a starting skeleton to complete. This one doesn't — six sides, 120px each, turning LEFT 60° between them, entirely from scratch. If Comet Chain and Square Patrol both made sense to you, this is the exact same idea with different numbers.</p></div>
+    <div class="ml-block"><h4>360÷6 = 60°, again</h4>
+      <p>Same formula from Grade 6's Turtle Island: a hexagon's turn angle is always 360 divided by its number of sides. That idea never goes away — it's just as true in real code as it was with sliders.</p></div>` },
+  p1m8: { title: 'IF — a real decision, not a shape', html: `
+    <div class="ml-block"><h4>get_signals() gives you real data to branch on</h4>
+      <p>The beacon colours ('G','R','G') are DATA your code reads and reacts to with a real <code>if</code> statement — G turns left, R turns right. This is your first mission requiring a genuine decision based on data the mission gives you, not a fixed pattern you already know.</p></div>
+    <div class="ml-block"><h4>The starter leaves a gap on purpose</h4>
+      <p>It handles 'G' but visibly asks "what about red?" — filling that gap with an <code>else</code> (or a second <code>elif</code>) is the actual skill being tested, not just typing out what's already there.</p></div>` },
+  p1m9: { title: 'Three-way decisions — if/elif/else', html: `
+    <div class="ml-block"><h4>if / elif / else — exactly one branch runs</h4>
+      <p>Three possible beacon colours (R/G/B) need a THREE-way decision — Python's <code>elif</code> (pseudocode's chained <code>ELSE IF</code>) lets you check several conditions in order, running only the first one that matches.</p></div>
+    <div class="ml-block"><h4>"Do nothing" is a real branch too</h4>
+      <p>B means "fly straight through, no turn" — that's a genuine third outcome, not an error case. Sometimes the correct branch of a decision really is to do nothing at all.</p></div>` },
+  p1m10: { title: 'MOD/% — using a number\'s position, not just its value', html: `
+    <div class="ml-block"><h4>enumerate() gives you BOTH the position and the value</h4>
+      <p>Alternating turn directions needs to know WHICH beacon you're on (1st, 2nd, 3rd…), not just its distance value — <code>enumerate()</code> hands you both the index and the value together, so you can react to position as well as content.</p></div>
+    <div class="ml-block"><h4>MOD 2 — the classic even/odd test</h4>
+      <p><code>i % 2</code> (pseudocode: <code>i MOD 2</code>) is exactly how real code tests odd vs. even — remainder 0 means even, remainder 1 means odd. You've now used MOD for real, after meeting it back in Grade 7's collision/physics distance work.</p></div>` },
+  p1m11: { title: 'Capstone — everything from Phase 1, combined', html: `
+    <div class="ml-block"><h4>Comets, a wall, a station — no new skill</h4>
+      <p>Nothing here is new: waypoints (loops), an obstacle (planning), a precise route (sequence) — this capstone just proves you can combine every Phase 1 idea into one tight, efficient flight, planned on paper before you write a single line.</p></div>
+    <div class="ml-block"><h4>Back to counting COMMANDS</h4>
+      <p>Stars return to counting moves+turns, not lines — meaning a clever loop that LOOKS efficient in code but flies a longer physical path won't score as well as a shorter, well-planned route. Efficiency in code and efficiency in the real result aren't always the same thing.</p></div>` },
+
+  // ── Phase 2 · Battles — turn-based decisions on live state ──────────────────
+  p2m1: { title: 'A turn-based loop: read state, decide, act', html: `
+    <div class="ml-block"><h4>Your code re-runs fresh, every single turn</h4>
+      <p>Unlike the turtle missions (write once, run once), a battle mission's code runs AGAIN each turn, freely reading the LATEST <code>state</code> — your ship's hp, the enemy fleet, everything. Call <code>attack(id)</code> or <code>wait()</code>; whichever fires first is your move that turn.</p></div>
+    <div class="ml-block"><h4>This is a real, common program shape</h4>
+      <p>"Loop forever: read the current situation, decide, act" is exactly how a huge amount of real interactive software works — a game engine, a robot controller, even a thermostat all follow this same read-decide-act cycle.</p></div>` },
+  p2m2: { title: 'Hesitation has a real cost', html: `
+    <div class="ml-block"><h4>An enemy that fights back changes the calculus</h4>
+      <p>First Contact's drone never attacked — this one hits you back every turn it survives. <code>wait()</code>-ing here isn't neutral anymore; it's actively losing you HP for nothing. The right code depends on the actual situation, not just "the same code that worked last time."</p></div>
+    <div class="ml-block"><h4>Reading state["self"]["hp"]</h4>
+      <p>Your own ship's health is just another field in <code>state</code>, exactly like the enemy's — reading your OWN status, not just the enemy's, becomes important as fights get more dangerous.</p></div>` },
+  p2m3: { title: 'Functions — required from here on', html: `
+    <div class="ml-block"><h4>Why a function, not just inline code</h4>
+      <p>With two enemies, "which one do I attack" is a real decision worth naming and separating out — <code>def pick_target():</code> (pseudocode: <code>FUNCTION PickTarget() RETURNS STRING</code>) isolates that ONE decision, called cleanly from <code>attack(pick_target())</code>.</p></div>
+    <div class="ml-block"><h4>Decomposition — breaking a problem into named pieces</h4>
+      <p>This is a real, important skill called <strong>decomposition</strong>: instead of one long tangled block of logic, you break the problem into a named, callable piece that does ONE job. Every mission from here on requires you to actually use it, not just inline everything.</p></div>` },
+  p2m4: { title: 'Scanning data to find an extreme value', html: `
+    <div class="ml-block"><h4>The "find the minimum" pattern</h4>
+      <p><code>find_weakest()</code> loops through every enemy, tracking whichever has the LOWEST hp seen so far — start by assuming the first one is the answer, then check every other one to see if it's actually lower. This "assume, then check everyone else" pattern finds ANY extreme value (min, max) in ANY list.</p></div>
+    <div class="ml-block"><h4>Why kill the cheapest first</h4>
+      <p>Killing the weakest enemy first reduces the number of things attacking you fastest — a real, sound tactical principle that also happens to be a clean use of this scanning pattern.</p></div>` },
+  p2m5: { title: 'A new action, and reading the turn counter', html: `
+    <div class="ml-block"><h4>defend() trades your attack for reduced damage</h4>
+      <p><code>defend()</code> halves incoming damage this turn but means you don't attack — a genuine trade-off between offense and survival, decided by reading <code>state['turn']</code> (pseudocode: <code>turn</code>) to predict when the big hit is coming.</p></div>
+    <div class="ml-block"><h4>MOD, again, for a real reason</h4>
+      <p><code>state['turn'] % 3 == 0</code> catches every 3rd turn (3, 6, 9…) — the exact same remainder trick from Asteroid Slalom, now deciding a life-or-death timing question instead of a turn direction.</p></div>` },
+  p2m6: { title: 'Same pattern, no scaffolding', html: `
+    <div class="ml-block"><h4>Recognising a pattern in a new situation</h4>
+      <p>Even turns instead of every 3rd — same MOD-based timing idea as Shields Up, just a different divisor and no starter code handed to you. Spotting "this is the same shape of problem as last time" is a real, valuable programming instinct.</p></div>
+    <div class="ml-block"><h4>Write the whole IF yourself</h4>
+      <p>Going from "complete this" to "write it from nothing" is a deliberate step up — proving you understand the PATTERN, not just how to fill in a gap someone left for you.</p></div>` },
+  p2m7: { title: 'Prioritizing by threat, not by convenience', html: `
+    <div class="ml-block"><h4>"Closest" and "most dangerous" are different questions</h4>
+      <p>One enemy is cheap-hp-but-hits-hard, the other is tanky-but-weak — attacking whichever is simply first in the list (or closest) can get you killed. Real prioritization means comparing a MEANINGFUL property (danger = high attack ÷ low hp), not just convenience.</p></div>
+    <div class="ml-block"><h4>state now reveals enemy attack power</h4>
+      <p>You can now see each enemy's attack value directly — use it. A cheap-hp, high-attack enemy that could kill you in one hit is a much bigger threat than a slow tank, even if the tank has more total hp.</p></div>` },
+  p2m8: { title: 'Ranking, not just finding one extreme', html: `
+    <div class="ml-block"><h4>From "find the max" to "work down a whole ranking"</h4>
+      <p>With three enemies, one comparison isn't enough — <code>most_dangerous()</code> needs the SAME "assume first, check the rest" scanning pattern from Weakest First, just comparing attack instead of hp, and you'll call it again next turn once the first target is dead.</p></div>
+    <div class="ml-block"><h4>Get the order wrong, lose the fight</h4>
+      <p>Unlike earlier missions, ranking mistakes here compound — attack the wrong (safer) enemy first and the dangerous ones keep hitting you the whole time you're finishing off the wrong target.</p></div>` },
+  p2m9: { title: 'An enemy that reacts to YOUR pattern', html: `
+    <div class="ml-block"><h4>A shield that punishes repetition</h4>
+      <p>Attacking every single turn now backfires — a shield blocks two attacks in a row, so attacking on EVERY turn wastes half your hits. Alternating <code>attack()</code>/<code>wait()</code> (odd turns attack, even turns wait) beats a mechanic that specifically punishes doing the same thing repeatedly.</p></div>
+    <div class="ml-block"><h4>Adaptive doesn't mean "learning" — it means "state-dependent"</h4>
+      <p>The shield isn't learning from you; it's just a rule tied to a counter, the same as the charge-attack timing from Shields Up. "Adaptive" behaviour in a rule-based system just means a rule that depends on something changing over time.</p></div>` },
+  p2m10: { title: 'The opposite lesson — don\'t hesitate', html: `
+    <div class="ml-block"><h4>Sometimes the safe-looking choice is wrong</h4>
+      <p>An enemy that gets ANGRIER as it's hurt means every turn you stall or defend gives it MORE time to ramp up its attack — the correct strategy here is the direct opposite of Shields Up's caution: rush it down before the rage compounds.</p></div>
+    <div class="ml-block"><h4>Reading a mechanic correctly, not just pattern-matching</h4>
+      <p>If you copied Shields Up's "be cautious" instinct here, you'd actually do WORSE. Real problem-solving means reading each new situation on its own terms, not blindly reapplying whatever worked last time.</p></div>` },
+  p2m11: { title: 'BOSS — every Phase 2 idea, at once', html: `
+    <div class="ml-block"><h4>Prioritization + shield-timing + charge-timing, together</h4>
+      <p>Two enemies (prioritize the cheap-and-dangerous one, from Double Trouble), a back-to-back shield (alternate attacks, from Shield Recharge), AND a 3rd-turn charge attack (from Shields Up) — nothing new, just every Phase 2 skill required simultaneously under real pressure.</p></div>
+    <div class="ml-block"><h4>A function is required, on purpose</h4>
+      <p>With this many moving parts, trying to inline all the logic directly would be a tangled mess — a clean <code>pick_target()</code> function is exactly the kind of decomposition this whole tier has been building toward.</p></div>` },
+
+  // ── Phase 3 · Data — read & report, then combine with battle ────────────────
+  p3m1: { title: 'A new mission type — no battle, just data', html: `
+    <div class="ml-block"><h4>A list of records, and one function: answer()</h4>
+      <p><code>data</code> is a list of dicts (records) — each one has named fields like <code>item</code> and <code>weight</code>. Loop through every record, accumulate a total, then call <code>answer(value)</code> exactly ONCE to report your result.</p></div>
+    <div class="ml-block"><h4>This is a real, extremely common task</h4>
+      <p>"Loop through a table of records and total up one column" is one of the single most common real-world programming tasks — spreadsheets, databases, and data analysis all boil down to exactly this pattern, over and over.</p></div>` },
+  p3m2: { title: 'Finding the maximum — and why it must be a loop', html: `
+    <div class="ml-block"><h4>You cannot hardcode "the third one"</h4>
+      <p>Bex happens to have the highest skill in THIS data — but a real solution has to WORK for any crew list, not just this exact one. That's why this mission explicitly requires a loop: assume the first record is best, then check every other record to see if it's actually better.</p></div>
+    <div class="ml-block"><h4>The same scanning pattern as Weakest First</h4>
+      <p>This is the exact "assume, then compare against everyone else" pattern from Phase 2's Weakest First and Most Dangerous — the same idea works whether you're scanning enemies or crew members.</p></div>` },
+  p3m3: { title: 'Finding the minimum this time', html: `
+    <div class="ml-block"><h4>Minimum uses the same pattern, flipped</h4>
+      <p>"Cheapest route" is a minimum search — identical scanning pattern to Crew Roster's maximum search, just flipping <code>&gt;</code> to <code>&lt;</code>. Once you know the pattern, both directions are the same amount of work.</p></div>
+    <div class="ml-block"><h4>Reporting the NAME, not the number</h4>
+      <p>Notice <code>answer()</code> reports the route's NAME here, not its cost — track both values together as you scan (the cost to compare, the name to report), the same dual-tracking Crew Roster required.</p></div>` },
+  p3m4: { title: 'Counting records that meet a condition', html: `
+    <div class="ml-block"><h4>A running counter, driven by an IF inside a loop</h4>
+      <p>"How many contacts have more than 50 hp" combines a loop with an IF and a counter — start count at 0, and inside the loop, add 1 to it ONLY when the condition is true. This exact combination (loop + IF + counter) is one of the most common patterns in real code.</p></div>
+    <div class="ml-block"><h4>Counting isn't the same as summing</h4>
+      <p>Unlike Cargo Count (which added up every weight), this only counts how many records qualify — the record's actual hp value doesn't get added anywhere, only compared.</p></div>` },
+  p3m5: { title: 'Running total that goes down, not up', html: `
+    <div class="ml-block"><h4>Subtracting instead of adding</h4>
+      <p>Start a budget at 80, then SUBTRACT each leg's cost as you loop through — mechanically identical to Cargo Count's running total, just moving in the opposite direction.</p></div>
+    <div class="ml-block"><h4>Order doesn't matter here — but often does</h4>
+      <p>Subtracting the four costs in any order gives the same final answer (subtraction of several numbers is commutative in total) — worth noticing, since ORDER absolutely does matter in many other programming tasks you've already met (sequences, states).</p></div>` },
+  p3m6: { title: 'Combining data-reading with a live battle', html: `
+    <div class="ml-block"><h4>The data skill now feeds directly into combat</h4>
+      <p>Enemy attack values are hidden in <code>state</code> — the ONLY way to know the real danger is reading a separate <code>state['intel']</code> report first, exactly like Phase 3's data missions, then using that to make the SAME prioritization decision from Double Trouble.</p></div>
+    <div class="ml-block"><h4>Stale data is a real, important trap</h4>
+      <p>Intel doesn't update as enemies die — it's a snapshot from before the fight started. Cross-checking against the LIVE <code>state['enemies']</code> (who's actually still alive) before acting on old intel is a genuine, common bug class in real software: acting on stale data as if it were current.</p></div>` },
+  p3m7: { title: 'A lookup function feeding a ranking function', html: `
+    <div class="ml-block"><h4>Two functions working together</h4>
+      <p><code>true_attack(id)</code> looks up ONE enemy's real attack from the intel report; <code>most_dangerous()</code> calls it repeatedly while scanning every still-alive enemy. Building a small function and then USING it inside a bigger one is real, everyday software design — small pieces combining into bigger capability.</p></div>
+    <div class="ml-block"><h4>The same stale-data trap, at bigger scale</h4>
+      <p>With three enemies instead of two, forgetting to check who's still alive (and accidentally targeting an already-destroyed contact) becomes an easy mistake to make — exactly why Blind Contact called this trap out explicitly first.</p></div>` },
+  p3m8: { title: 'Two mechanics stacked, no scaffolding', html: `
+    <div class="ml-block"><h4>Hidden stats AND a shield, together</h4>
+      <p>No starter this time — you have to independently remember both mechanics: read intel to find the real threat (Blind Contact), then alternate attack/wait to beat the shield (Shield Recharge). Combining two previously-separate skills without being reminded is the actual test here.</p></div>
+    <div class="ml-block"><h4>This is what "capstone-adjacent" practice looks like</h4>
+      <p>Missions like this — no new mechanic, but no hand-holding either — exist specifically to prove you can combine skills under your own steam before the real capstone asks you to do it under full pressure.</p></div>` },
+  p3m9: { title: 'CAPSTONE — every Phase 3 (and Phase 2) idea, at once', html: `
+    <div class="ml-block"><h4>Hidden stats, a shield, a timed charge, two enemies</h4>
+      <p>The recon report is the ONLY way to know Core's real attack power — misread it and you'll prioritize wrong and lose. A real targeting function (reading intel, cross-checked against who's alive), alternating for the shield, aware of the 3rd-turn charge: everything from Phases 2 and 3, combined under a tight turn limit.</p></div>
+    <div class="ml-block"><h4>You've built every one of these skills separately</h4>
+      <p>Nothing in this fight is new — sequencing, loops, functions, decomposition, prioritization, reading live vs. stale data, timing-based decisions. This capstone just proves you can bring all of it together into one coherent plan, the same way G10's capstone did back in Grade 7.</p></div>` },
+}
+
+function renderMissionLesson(mission) {
+  const wrap  = document.getElementById('m-lesson')
+  const body  = document.getElementById('ml-body')
+  const title = document.getElementById('ml-title')
+  if (!wrap) return
+  const lesson = MISSION_LESSON[mission.id]
+  if (!lesson) { wrap.style.display = 'none'; return }
+  wrap.style.display = ''
+  title.textContent = lesson.title
+  body.innerHTML = lesson.html
+  body.classList.toggle('collapsed', !_mlExpanded)
+  document.getElementById('ml-arrow').textContent = _mlExpanded ? '▾' : '▸'
+}
+let _mlExpanded = true
+function toggleMissionLesson() {
+  _mlExpanded = !_mlExpanded
+  document.getElementById('ml-body').classList.toggle('collapsed', !_mlExpanded)
+  document.getElementById('ml-arrow').textContent = _mlExpanded ? '▾' : '▸'
+}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Pure turtle simulation — testable in Node, no DOM.
@@ -2058,6 +2262,7 @@ function openMission(id) {
     intelEl.style.display = 'none'
     intelEl.innerHTML = ''
   }
+  renderMissionLesson(activeMission)
   if (!editor) {
     editor = CodeMirror.fromTextArea(document.getElementById('code'), {
       mode: 'python', theme: 'dracula', lineNumbers: true, indentUnit: 4,
