@@ -24,11 +24,17 @@ export default async function TeacherDashboardPage() {
 
   if (!profile || profile.role !== 'teacher') redirect('/student/dashboard')
 
-  const { data: classes } = await supabase
+  const { data: rawClasses } = await supabase
     .from('classes')
     .select('*')
     .eq('teacher_id', user.id)
     .order('created_at', { ascending: true })
+
+  // Sort by grade progression (6,7,8,9,IGCSE Y1=10,IGCSE Y2=11,AS=12,A=13),
+  // not creation order — `grade` is TEXT, so a plain .order('grade') would
+  // sort alphabetically ("10" before "6"), which is exactly as wrong as the
+  // creation-date order this replaces.
+  const classes = [...(rawClasses ?? [])].sort((a, b) => (parseInt(a.grade, 10) || 0) - (parseInt(b.grade, 10) || 0))
 
   const classIds   = (classes ?? []).map((c: { id: string }) => c.id)
   const firstClass = (classes ?? [])[0] as { id: string; name: string; join_code: string } | undefined
