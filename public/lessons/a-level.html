@@ -3346,7 +3346,13 @@ function renderTopic(id, topic, alreadyDone) {
   const allVideos = []
   if (topic.video)  allVideos.push(topic.video)
   if (topic.videos) allVideos.push(...topic.videos)
-  const videoHTML = allVideos.length === 0 ? '' : `
+  // Unlike AS Level's TOPICS, none of A Level's 45 topics ever had an authored
+  // video (no video/videos field exists in this file's TOPICS at all) — every
+  // chapter of every paper showed a completely empty "Watch & Learn" section
+  // that never even rendered. Rather than fabricate specific YouTube video IDs
+  // we can't verify are real, correct, and still online, fall back to a live
+  // YouTube search for the topic — always accurate, never a dead/wrong link.
+  const videoHTML = allVideos.length > 0 ? `
     <div style="margin-bottom:20px;">
       <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#a78bfa;margin-bottom:10px;">🎬 Watch &amp; Learn</div>
       <div style="display:flex;flex-direction:column;gap:12px;">
@@ -3358,6 +3364,18 @@ function renderTopic(id, topic, alreadyDone) {
                   style="width:100%;aspect-ratio:16/9;border:0;border-radius:8px;display:block;"></iframe>
         </div>`).join('')}
       </div>
+    </div>` : `
+    <div style="margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#a78bfa;margin-bottom:10px;">🎬 Watch &amp; Learn</div>
+      <a href="https://www.youtube.com/results?search_query=${encodeURIComponent((topic.title || '') + ' Cambridge 9618 A Level Computer Science')}"
+         target="_blank" rel="noopener noreferrer"
+         style="display:flex;align-items:center;gap:12px;background:#111320;border:1px solid rgba(167,139,250,.25);border-radius:10px;padding:14px 16px;text-decoration:none;transition:border-color .15s;">
+        <span style="font-size:18px;">🔎</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#e2e8f0;">Search YouTube for "${topic.title || 'this topic'}"</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:2px;">No video is curated for this topic yet — search live instead of a stale/broken link.</div>
+        </div>
+      </a>
     </div>`
 
   // Teacher-added custom content blocks (extra examples, notes, images, links, quotes, text)
