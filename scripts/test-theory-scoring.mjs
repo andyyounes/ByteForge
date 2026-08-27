@@ -27,6 +27,69 @@ import { readFileSync } from 'fs'
 
 const ROOT = 'c:/Users/user/Downloads/ICT website'
 
+// ── Direction-aware scoring re-implementation ────────────────────────────────
+// Mirrors the production helpers (detectVsTerms/buildVsSideMap/splitClauses/
+// mentionsVsTerm/containsWordAware) added to as-level.html and a-level.html to
+// fix presence-only scoring being DIRECTION-BLIND on "X vs Y" questions — an
+// inverted answer (properties swapped between the two terms) used to score
+// identically to the correct one, because it still contained every keyword.
+// Kept in sync manually with the page code; if the two drift, this suite is
+// the thing that will notice via the swap-test below.
+const AL_VS_TRAILING_STOP = ['compression','ordering','chaining','uses','testing','file','access','learning','encryption','sort']
+function detectVsTerms(title) {
+  const m = String(title || '').match(/^(.+?)\s+(?:vs\.?|versus)\s+(.+?)$/i)
+  if (!m) return null
+  const norm = phrase => {
+    const words = phrase.trim().split(/\s+/)
+    while (words.length > 1 && AL_VS_TRAILING_STOP.includes(words[words.length - 1].toLowerCase().replace(/[^a-z]/g, ''))) words.pop()
+    return words.join(' ')
+  }
+  const a = norm(m[1]), b = norm(m[2])
+  return (a && b && a.toLowerCase() !== b.toLowerCase()) ? { a, b } : null
+}
+function splitClauses(text) {
+  return String(text || '').replace(/<[^>]+>/g, ' ')
+    .replace(/\b(e\.g|i\.e)\.(?=\s)/gi, '$1')
+    .split(/\.(?=\s|$)|\n/)
+    .map(c => c.trim().toLowerCase()).filter(Boolean)
+}
+function containsWordAware(text, phrase) {
+  const re = new RegExp('(?<!\\w)' + phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+') + '(?!\\w)', 'i')
+  return re.test(text)
+}
+function mentionsVsTerm(clause, term) { return containsWordAware(clause, term) }
+function buildVsSideMap(ex, vs) {
+  const cls = splitClauses(ex.ms)
+  const sides = {}
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '')
+  for (const kw of ex.keywords || []) {
+    if (norm(kw) === norm(vs.a) || norm(kw) === norm(vs.b)) { sides[kw] = null; continue }
+    let side = null, conflict = false
+    for (const c of cls) {
+      if (!containsWordAware(c, kw)) continue
+      const hasA = mentionsVsTerm(c, vs.a), hasB = mentionsVsTerm(c, vs.b)
+      if (hasA && !hasB) { if (side === null) side = 'A'; else if (side !== 'A') conflict = true }
+      else if (hasB && !hasA) { if (side === null) side = 'B'; else if (side !== 'B') conflict = true }
+    }
+    sides[kw] = conflict ? null : side
+  }
+  return sides
+}
+function scoreDirectional(ex, vs, sideMap, answerLower) {
+  const kws = ex.keywords || []
+  const ansClauses = splitClauses(answerLower)
+  const found = kws.filter(kw => {
+    const side = sideMap[kw]
+    if (!side) return answerLower.includes(kw.toLowerCase())
+    if (!containsWordAware(answerLower, kw)) return false
+    const wantTerm = side === 'A' ? vs.a : vs.b
+    return ansClauses.some(c => containsWordAware(c, kw) && mentionsVsTerm(c, wantTerm))
+  }).length
+  const msText = strip(ex.ms)
+  const target = Math.max(1, kws.filter(kw => msText.includes(kw.toLowerCase())).length)
+  return Math.min(100, Math.round((found / target) * 100))
+}
+
 function loadPool(file) {
   const html = readFileSync(`${ROOT}/public/lessons/${file}`, 'utf8')
   const s = html.indexOf('const THEORY_EXERCISES')
@@ -105,6 +168,33 @@ for (const [label, file] of [['AS Level', 'as-level.html'], ['A Level', 'a-level
   t(noChapter.length === 0,
     `${label}: every question is tagged with a chapter` +
     (noChapter.length ? ` — ${noChapter.length} untagged: ${noChapter.slice(0, 5).map(e => e.id).join(', ')}` : ''))
+
+  // 8. "X vs Y" comparison questions must not be direction-blind. Presence-only
+  //    keyword scoring can't tell a correct answer from one that swaps which
+  //    property belongs to which term — measured examples that used to pass:
+  //      t47 "Stack vs Queue": inverted FIFO/LIFO definition        100%
+  //      t20_3 "Supervised vs Unsupervised": labels swapped          88%
+  //    For every such question, build the side map from its own mark scheme,
+  //    then swap every occurrence of the two term names throughout that mark
+  //    scheme (properties stay put, only the names move) and confirm the
+  //    inverted result scores well below the pass bar.
+  let vsChecked = 0
+  const vsFails = []
+  for (const ex of short) {
+    const vs = detectVsTerms(ex.title)
+    if (!vs) continue
+    vsChecked++
+    const sideMap = buildVsSideMap(ex, vs)
+    const msLower = strip(ex.ms)
+    const swapRe = new RegExp(
+      `(?<!\\w)(${vs.a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+')}|${vs.b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+')})(?!\\w)`, 'gi')
+    const inverted = msLower.replace(swapRe, w => w.toLowerCase() === vs.a.toLowerCase() ? vs.b : vs.a)
+    const invertedScore = scoreDirectional(ex, vs, sideMap, inverted)
+    if (invertedScore >= 70) vsFails.push(`${ex.id} (${vs.a} vs ${vs.b}) — inverted answer still scores ${invertedScore}%`)
+  }
+  t(vsFails.length === 0,
+    `${label}: all ${vsChecked} "X vs Y" comparison questions reject a term-swapped (inverted) answer` +
+    (vsFails.length ? ` — ${vsFails.join('; ')}` : ''))
 }
 
 console.log(`\n${pass} passed, ${fail} failed, ${n} tests total.`)

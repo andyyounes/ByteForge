@@ -7964,7 +7964,11 @@ const THEORY_EXERCISES = [
   { id:'t27', ch:6, title:'Compiler vs Interpreter', type:'short',
     q:'State two advantages of using a compiler rather than an interpreter. [2]',
     keywords:['faster','execution','object code','no source','distribution','optimisation','one-time'],
-    ms:'Compiled code runs faster (machine code produced once; no run-time translation). Object code can be distributed without revealing the source code. Compiler can also optimise the complete program.' },
+    // Was 'Compiled code runs faster... Compiler can also optimise...' — never
+// actually named "Interpreter" anywhere, so no property in this mark scheme
+// could ever be attributed to it; an answer swapping which one does what was
+// indistinguishable from a correct one. Rewritten to name both throughout.
+ms:'The compiler translates the whole program once, so a compiled program runs faster during execution with no run-time translation. The compiler\'s object code can also be distributed without revealing the source code. Because compilation is a one-time step, the compiler can optimise the complete program — an interpreter instead translates and executes the source code line by line every time the program runs.' },
 
   { id:'t28', ch:6, title:'Monitoring vs Control', type:'short',
     q:'Explain the difference between monitoring and control in a computer system. [2]',
@@ -8429,6 +8433,94 @@ function checkTheoryBlank(evt, id) {
   }
 }
 
+// ── Direction-aware scoring for "X vs Y" comparison questions ────────────────
+// Presence-only keyword scoring is DIRECTION-BLIND: an answer that swaps which
+// property belongs to which term still contains every keyword, so it scores
+// exactly as well as the correct answer. Measured examples that used to pass:
+//   t47 "Stack vs Queue": "a stack is FIFO... a queue is LIFO" (inverted)  100%
+//   t51 "REPEAT vs WHILE": swapped pre/post-condition description           83%
+// For questions whose title literally says "A vs B" / "A versus B", figure out
+// (from the model answer itself) which keywords describe ONLY A and which
+// describe ONLY B, then require a keyword to appear in a clause of the
+// STUDENT'S answer that actually names the term it belongs to. A keyword that
+// appears on both sides of the model answer (shared vocabulary) is left
+// unrestricted, exactly as before.
+const AL_VS_TRAILING_STOP = ['compression','ordering','chaining','uses','testing','file','access','learning','encryption','sort']
+function detectVsTerms(title) {
+  const m = String(title || '').match(/^(.+?)\s+(?:vs\.?|versus)\s+(.+?)$/i)
+  if (!m) return null
+  const norm = phrase => {
+    const words = phrase.trim().split(/\s+/)
+    while (words.length > 1 && AL_VS_TRAILING_STOP.includes(words[words.length - 1].toLowerCase().replace(/[^a-z]/g, ''))) words.pop()
+    return words.join(' ')
+  }
+  const a = norm(m[1]), b = norm(m[2])
+  return (a && b && a.toLowerCase() !== b.toLowerCase()) ? { a, b } : null
+}
+// SENTENCE-level segments (period/newline only). Mark schemes attribute
+// properties per SENTENCE ("A does X, Y and Z. B does P and Q."), not per
+// comma/semicolon sub-clause — splitting finer than a sentence lost the
+// attribution the moment a mark scheme continued describing the same term
+// across several semicolon-joined clauses without re-naming it each time
+// (e.g. "Bitmap stores pixels; file size depends on resolution..." — the
+// second clause never repeats "Bitmap", so clause-level splitting saw no
+// term at all and treated "file size" as unsided).
+function splitClauses(text) {
+  // A bare /[.\n]/ split shattered Cambridge's own "REPEAT...UNTIL" /
+  // "WHILE...DO" ellipsis notation at every one of its three dots, severing
+  // the term name from the clause describing it. Only split on a period that
+  // ends a SENTENCE (followed by whitespace or end-of-string) — none of the
+  // three dots in an ellipsis qualify, since each is followed by another dot
+  // or a letter, never whitespace.
+  return String(text || '').replace(/<[^>]+>/g, ' ')
+    // "e.g." / "i.e." also look like sentence endings to that same regex
+    // (the period after "g"/"e" is followed by a space) — strip their periods
+    // first so "— e.g. Dijkstra's algorithm" doesn't get cut in half right
+    // before the very term/example it's introducing.
+    .replace(/\b(e\.g|i\.e)\.(?=\s)/gi, '$1')
+    .split(/\.(?=\s|$)|\n/)
+    .map(c => c.trim().toLowerCase()).filter(Boolean)
+}
+// Word-boundary matcher shared by term detection AND keyword presence. Plain
+// .includes() falsely matched 'labelled' INSIDE 'unlabelled' (it's a literal
+// substring), so the segment describing Unsupervised was seen as also
+// mentioning 'labelled', which manufactured a false side-conflict and made
+// the keyword fall back to unsided (t20_3 stayed vulnerable because of this).
+function containsWordAware(text, phrase) {
+  // Lookaround, not \b: a term ending in a non-word character — "A*" — has no
+  // \b immediately after the '*' when followed by a space or end of string
+  // (neither side of that boundary is a word character), so \bA\*\b silently
+  // never matched at all. (?<!\w)...(?!\w) has no such blind spot.
+  const re = new RegExp('(?<!\\w)' + phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+') + '(?!\\w)', 'i')
+  return re.test(text)
+}
+function mentionsVsTerm(clause, term) { return containsWordAware(clause, term) }
+// Learn, from the MODEL ANSWER, which side each keyword belongs to.
+function buildVsSideMap(ex, vs) {
+  const cls = splitClauses(ex.ms)
+  const sides = {}
+  // A keyword that IS one of the entity names itself (e.g. 'min-heap' as a
+  // keyword on the "Min-Heap vs Max-Heap" question) can't be direction-checked
+  // this way: the swapped label "Min-Heap: [max-heap's facts]" still contains
+  // the literal word "min-heap" right next to itself, so it would trivially
+  // "match its own side" regardless of which facts follow it. Leave such
+  // keywords unsided (simple presence, as before) rather than give them a
+  // false sense of protection.
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '')
+  for (const kw of ex.keywords || []) {
+    if (norm(kw) === norm(vs.a) || norm(kw) === norm(vs.b)) { sides[kw] = null; continue }
+    let side = null, conflict = false
+    for (const c of cls) {
+      if (!containsWordAware(c, kw)) continue
+      const hasA = mentionsVsTerm(c, vs.a), hasB = mentionsVsTerm(c, vs.b)
+      if (hasA && !hasB) { if (side === null) side = 'A'; else if (side !== 'A') conflict = true }
+      else if (hasB && !hasA) { if (side === null) side = 'B'; else if (side !== 'B') conflict = true }
+    }
+    sides[kw] = conflict ? null : side
+  }
+  return sides
+}
+
 function checkTheoryShort(evt, id) {
   evt.stopPropagation()
   const ex  = THEORY_EXERCISES.find(e => e.id === id)
@@ -8438,7 +8530,16 @@ function checkTheoryShort(evt, id) {
   const ans = (inp?.value || '').toLowerCase()
   if (!ans.trim()) { if (fb) { fb.className='tprac-feedback partial'; fb.style.display='block'; fb.textContent='Write your answer first.' } return }
   const kws    = ex.keywords || []
-  const found  = kws.filter(kw => ans.includes(kw.toLowerCase()))
+  const vs = detectVsTerms(ex.title)
+  const sideMap = vs ? buildVsSideMap(ex, vs) : null
+  const ansClauses = vs ? splitClauses(ans) : null
+  const found = kws.filter(kw => {
+    const side = sideMap ? sideMap[kw] : null
+    if (!side) return ans.includes(kw.toLowerCase())   // no side restriction — same as before
+    if (!containsWordAware(ans, kw)) return false
+    const wantTerm = side === 'A' ? vs.a : vs.b
+    return ansClauses.some(c => containsWordAware(c, kw) && mentionsVsTerm(c, wantTerm))
+  })
   // Keyword lists mix genuinely-REQUIRED concepts with ALTERNATIVE acceptable
   // phrasings (e.g. ['LIFO','FIFO','last in first out','first in first out',
   // 'top','front','rear','order']), but the score used to be a conjunction over
