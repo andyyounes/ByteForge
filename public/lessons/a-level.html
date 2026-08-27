@@ -967,17 +967,12 @@
       </div>
       <!-- Theory Practice pane -->
       <div class="p1-pane" id="p1pane-practice">
-        <div class="p1-ch-filters">
-          <button class="p1-ch-filter active" data-ch="all" onclick="filterTheoryPractice('all')">All</button>
-          <button class="p1-ch-filter" data-ch="20" onclick="filterTheoryPractice('20')">Ch 20</button>
-          <button class="p1-ch-filter" data-ch="21" onclick="filterTheoryPractice('21')">Ch 21</button>
-          <button class="p1-ch-filter" data-ch="22" onclick="filterTheoryPractice('22')">Ch 22</button>
-          <button class="p1-ch-filter" data-ch="23" onclick="filterTheoryPractice('23')">Ch 23</button>
-          <button class="p1-ch-filter" data-ch="24" onclick="filterTheoryPractice('24')">Ch 24</button>
-          <button class="p1-ch-filter" data-ch="25" onclick="filterTheoryPractice('25')">Ch 25</button>
-          <button class="p1-ch-filter" data-ch="27" onclick="filterTheoryPractice('27')">Ch 27</button>
-          <button class="p1-ch-filter" data-ch="28" onclick="filterTheoryPractice('28')">Ch 28</button>
-        </div>
+        <!-- Buttons are generated from THEORY_EXERCISES (see renderTheoryFilters).
+             They used to be hardcoded and had drifted out of step with the data:
+             the list jumped 25 -> 27, so Chapter 26's question was reachable only
+             via "All". Generating them means a chapter can never have questions
+             with no button, nor a button with no questions. -->
+        <div class="p1-ch-filters" id="tprac-filters"></div>
         <div class="tprac-q-wrap" id="tprac-list"></div>
       </div>
     </div>
@@ -6414,7 +6409,7 @@ function switchP1Tab(which) {
   tabP.classList.toggle('active', which === 'practice')
   paneT.classList.toggle('active', which === 'topics')
   paneP.classList.toggle('active', which === 'practice')
-  if (which === 'practice') renderTheoryList()
+  if (which === 'practice') { renderTheoryFilters(); renderTheoryList() }
   try { if (which === 'topics' && _bfwCtx) _bfwEnter(); else if (which !== 'topics') _bfwLeave() } catch (e) {}
 }
 
@@ -6965,6 +6960,7 @@ const me = (() => { try { return BF.session() || null } catch (_) { return null 
   p2RenderPills()
   p2SelectChallenge(0)
   loadTopic('ch16-1')
+  renderTheoryFilters()
   renderTheoryList()
   updateXPBar()
   // Land on the Journey road map
@@ -7650,7 +7646,7 @@ const THEORY_EXERCISES = [
   },
   {
     "id": "t22_5",
-    "ch": 24,
+    "ch": 23,
     "title": "Quicksort vs Merge Sort",
     "type": "mcq",
     "q": "Why is quicksort often preferred over merge sort in practice despite its worse worst-case complexity?",
@@ -7790,7 +7786,7 @@ const THEORY_EXERCISES = [
   },
   {
     "id": "t17_5",
-    "ch": 28,
+    "ch": 23,
     "title": "Hash Table Collision Resolution",
     "type": "mcq",
     "q": "Which collision resolution strategy stores all colliding keys in a linked list at the same array index?",
@@ -7828,11 +7824,33 @@ const THEORY_EXERCISES = [
 // ── Theory Practice UI functions ─ _tpracFilter/_tpracOpen declared near the
 // top of the script (see comment there) ───────────────────────────────────────
 
+// Build one button per chapter that ACTUALLY HAS questions, with its count.
+// The hardcoded list had drifted from the data (it skipped 26, which has a
+// question), so that chapter was reachable only through "All".
+const AL_CHAPTER_NAMES = {
+  16:'Data Representation', 17:'Communication', 18:'Hardware & VMs',
+  19:'Logic Circuits', 20:'System Software', 21:'Security',
+  22:'Artificial Intelligence', 23:'Algorithms', 24:'Recursion',
+  25:'Programming Paradigms', 26:'File Processing', 27:'OOP',
+  28:'Low-Level Programming', 29:'Declarative Programming',
+}
+function renderTheoryFilters() {
+  const box = document.getElementById('tprac-filters')
+  if (!box) return
+  const counts = {}
+  THEORY_EXERCISES.forEach(e => { const c = String(e.ch); counts[c] = (counts[c] || 0) + 1 })
+  const chapters = Object.keys(counts).sort((a, b) => Number(a) - Number(b))
+  box.innerHTML =
+    `<button class="p1-ch-filter${_tpracFilter === 'all' ? ' active' : ''}" data-ch="all" onclick="filterTheoryPractice('all')">All (${THEORY_EXERCISES.length})</button>` +
+    chapters.map(c =>
+      `<button class="p1-ch-filter${_tpracFilter === c ? ' active' : ''}" data-ch="${c}" ` +
+      `title="${AL_CHAPTER_NAMES[c] || ''}" onclick="filterTheoryPractice('${c}')">Ch ${c} (${counts[c]})</button>`
+    ).join('')
+}
+
 function filterTheoryPractice(ch) {
   _tpracFilter = ch
-  document.querySelectorAll('.p1-ch-filter').forEach(b => {
-    b.classList.toggle('active', b.dataset.ch === ch)
-  })
+  renderTheoryFilters()
   _tpracOpen = null
   renderTheoryList()
 }

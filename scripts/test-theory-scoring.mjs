@@ -99,6 +99,12 @@ for (const [label, file] of [['AS Level', 'as-level.html'], ['A Level', 'a-level
   const ids = short.map(e => e.id)
   const dupes = [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))]
   t(dupes.length === 0, `${label}: question ids are unique` + (dupes.length ? ` — duplicates: ${dupes.join(', ')}` : ''))
+
+  // 7. Every question must carry a chapter, or it cannot be filtered to.
+  const noChapter = pool.filter(e => e.ch === undefined || e.ch === null)
+  t(noChapter.length === 0,
+    `${label}: every question is tagged with a chapter` +
+    (noChapter.length ? ` — ${noChapter.length} untagged: ${noChapter.slice(0, 5).map(e => e.id).join(', ')}` : ''))
 }
 
 console.log(`\n${pass} passed, ${fail} failed, ${n} tests total.`)
