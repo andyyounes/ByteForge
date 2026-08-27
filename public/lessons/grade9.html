@@ -118,6 +118,7 @@
   <script src="../js/db.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
+  <script src="../js/quest-map.js"></script>
 </head>
 <body>
 
@@ -129,7 +130,7 @@
     </svg>
     <span class="logo-text">ByteForge</span>
   </div>
-  <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
+  <div class="nav-links"><a href="#" onclick="showJourney();return false" style="color:#22d3ee;font-weight:800;">🧭 Mission Map</a> &nbsp; <a href="/student/dashboard">← Dashboard</a></div>
 </nav>
 
 <div class="layout">
@@ -1393,6 +1394,36 @@ CALL Search(nums, 5, 30)`,
     check:(code,res) => res.output.some(o=>o.includes('Found')&&o.includes('3')),
   },
 ]
+
+const STAGE_INDEX = {}
+CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.mod + '/' + s.name] = i })
+
+// Grade 9 had no map at all — every other grade (6/7/8, IGCSE, AS/A Level)
+// already has one. Friendly names for the mixed W-/M-prefixed mod labels
+// (documented elsewhere in this file as inconsistent — see G9_CHALLENGE_CONCEPT).
+const G9_MOD_NAME = {
+  W6: '🌡 Variables & Selection', W7: '🔐 Selection & Strings', W8: '⚙️ Procedures & Functions',
+  W9: '🔍 Trace Tables', W11: '🫧 Sorting', W12: '🎯 Searching',
+  M12: '⚙️ Procedures & Functions (extra)', M13: '🎯 Searching (extra)',
+}
+function showJourney() {
+  const seen = []
+  const byMod = {}
+  CHALLENGES.forEach((ch, i) => {
+    if (!byMod[ch.mod]) { byMod[ch.mod] = []; seen.push(ch.mod) }
+    byMod[ch.mod].push({ id: ch.mod + '/' + ch.name, emoji: ch.boss ? '👑' : '🧩', label: ch.name, done: completed.has(i), boss: !!ch.boss })
+  })
+  const worlds = seen.map(mod => ({ name: G9_MOD_NAME[mod] || mod, sub: '', live: true, stages: byMod[mod] }))
+  QuestMap.show({
+    title: '🧭 Grade 9 Mission Map',
+    subtitle: 'Pseudocode & algorithms — one mission at a time.',
+    accent: '#22d3ee',
+    layout: 'path', softLock: true,
+    avatarSvg: '<span style="font-size:22px;">🧭</span>',
+    worlds,
+    onOpen: (id) => selectChallenge(STAGE_INDEX[id]),
+  })
+}
 
 // -- BF Integration --
 BF.seed();
