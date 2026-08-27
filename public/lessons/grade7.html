@@ -1033,6 +1033,16 @@ function runPageCode() {
     headingChangedByClick:   lastButton != null && headingBefore   !== headingAfter,
     paragraphChangedByClick: lastButton != null && paragraphBefore !== paragraphAfter,
     buttonTextChangedByClick: lastButton != null && buttonTextBefore !== buttonTextAfter,
+    // Week 4 — variables & simple state. Same coarse source-text check the
+    // rest of the platform already uses for "did they use a variable"
+    // (see Game Maker's g2s1 needsVar), read straight off the generated
+    // code rather than the DOM, since a variable's VALUE ends up looking
+    // identical to a literal once it's on the page.
+    hasVar:   /\b(var|let|const)\b/.test(code),
+    varCount: (code.match(/\b(?:let|const)\s+\w+\s*=/g) || []).length,
+    // A genuine reassignment exists if there are MORE '=' assignments than
+    // declarations — i.e. some variable was set once, then set again later.
+    hasVarUpdate: (code.match(/[^=!<>+\-*/%]=(?!=)/g) || []).length > (code.match(/\b(?:let|const)\s+\w+\s*=/g) || []).length,
   }
   checkChallenge(pageLog)
 }
@@ -1317,6 +1327,54 @@ const WORLDS = [
       check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1
                   && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16
                   && log.headingChangedByClick === true && log.paragraphChangedByClick === true && log.buttonTextChangedByClick === true,
+    },
+  ]},
+  // ── Story Studio — Semester 1, Week 4: variables & simple state ────────────
+  // Uses the platform's EXISTING generic Variables category (set/variables_get)
+  // — no new blocks needed, since Page blocks already accept any value block,
+  // not just literal text. "Used a variable" is checked the same coarse way
+  // the rest of the platform already does (see Game Maker's g2s1 needsVar).
+  { id:'st4', name:'🧠 Story Studio 4 — Remember Things', sub:'Variables — a story that remembers the reader\'s choice', live:true, stages:[
+    { id:'st4s1', name:'Remember the Choice', xp:25, type:'page',
+      text:`<strong>Challenge 1</strong> — Create a variable to hold the reader's "choice" (e.g. set <code>item</code> to "a sword"). Add a heading that USES that variable — e.g. "You picked: " joined with item.`,
+      hints:[
+        'Open Variables → "Create variable…", name it item, then drag "set item to" with a text block.',
+        'Use the Text category\'s "join" (or "create text with") block, or Text → "𝑥 & 𝑦" to combine "You picked: " with your variables_get(item) block.',
+        'Plug the joined text into "add heading".',
+      ],
+      needsVar:true, needsHeadings:1,
+      check:(log) => log.hasVar && log.headings >= 1,
+    },
+    { id:'st4s2', name:'Two Details, One Story', xp:30, type:'page',
+      text:`<strong>Challenge 2</strong> — Create TWO variables (e.g. item and place). Show one in the heading and the other in a paragraph — the story now remembers two separate things about the reader's choice.`,
+      hints:[
+        'Create a second variable the same way — Variables → "Create variable…".',
+        'One variable feeds "add heading", the other feeds "add paragraph".',
+      ],
+      needsVar2:true, needsHeadings:1, needsParagraphs:1,
+      check:(log) => (log.varCount || 0) >= 2 && log.headings >= 1 && log.paragraphs >= 1,
+    },
+    { id:'st4s3', name:'The Choice Updates', xp:35, type:'page',
+      text:`<strong>Challenge 3</strong> — A variable isn't stuck forever. Set a variable (e.g. <code>health</code> to 100), then give it a NEW value further down (e.g. subtract 20), and show the UPDATED value in your heading.`,
+      hints:[
+        'Variables → "set health to 100", then later "set health to" (health − 20) using a Math subtract block.',
+        'This is the exact same "a variable is a box that can change" idea from Grade 7\'s Game Maker world — applied to a story instead of a game.',
+      ],
+      needsVar:true, needsVarUpdate:true, needsHeadings:1,
+      check:(log) => log.hasVar && log.hasVarUpdate && log.headings >= 1,
+    },
+    { id:'st4boss', name:'BOSS — The Choice Remembered', xp:90, type:'page', boss:true,
+      text:`<strong>BOSS</strong> — Build the full styled interactive front page (heading, 2+ paragraphs, link, button, background/heading colour, centered, readable text) from Weeks 1-3. This time, use at least one variable somewhere in the page, AND make the button's click handler UPDATE that variable and show its new value.`,
+      hints:[
+        'This is st3boss\'s whole page, plus a variable used anywhere, updated inside the "when button is clicked" handler.',
+        'Every piece already exists from Weeks 1-4 — this is purely combining them.',
+      ],
+      needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
+      needsHeadingChange:true, needsParagraphChange:true, needsButtonTextChange:true, needsVar:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1
+                  && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16
+                  && log.headingChangedByClick === true && log.paragraphChangedByClick === true && log.buttonTextChangedByClick === true
+                  && log.hasVar,
     },
   ]},
   { id:'g1', name:'🚀 G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite', live:true, stages:[
@@ -1869,6 +1927,25 @@ const CHALLENGE_LESSON = {
       <p>Week 1 gave the page structure (HTML). Week 2 gave it style (CSS). Week 3 gives it BEHAVIOUR (JavaScript) — together, that's genuinely the same three-part split every real website is built from.</p></div>
     <div class="cl-block"><h4>Nothing new — full assembly</h4>
       <p>Every piece here — the tags, the styling, the click handler — already exists from st1/st2/st3s1-s4. This boss is purely about combining all three weeks into one finished, interactive front page.</p></div>` },
+  // ── Story Studio 4 — Remember Things: variables & simple state ──────────────
+  st4s1: { title: 'A variable is a box with a name', html: `
+    <div class="cl-block"><h4>Storing a choice, not just displaying text</h4>
+      <p>Every heading/paragraph so far used LITERAL text you typed directly. A variable is different — it's a named box holding a value that your code can reuse, combine, or change later. "You picked: " + item works whether item holds "a sword" or "a shield" — the SAME code, different outcomes.</p></div>
+    <div class="cl-block"><h4>This is the same Variables category from Game Maker</h4>
+      <p>Nothing new to learn here technically — it's the identical Variables block category you'd use in the Game Maker world, just applied to page content instead of a game.</p></div>` },
+  st4s2: { title: 'Multiple variables, remembered together', html: `
+    <div class="cl-block"><h4>A story often tracks more than one thing</h4>
+      <p>A real interactive story remembers MANY details about the reader's path — which item they picked, which room they're in, how much health they have. Two separate variables is the simplest version of that: two named boxes, tracked independently.</p></div>` },
+  st4s3: { title: 'A variable is a box that can CHANGE', html: `
+    <div class="cl-block"><h4>Set once vs. updated</h4>
+      <p>Every variable so far was set ONCE and never touched again. Reassigning it — health ← health − 20 — is what makes a variable genuinely useful for a STORY: health starting at 100 and dropping after a bad choice is state that changes as the reader progresses.</p></div>
+    <div class="cl-block"><h4>Reading its OWN old value</h4>
+      <p>health ← health − 20 reads health's current value, subtracts 20, then stores the result back into the SAME variable — the value on the right is computed BEFORE the assignment happens, using whatever health was a moment ago.</p></div>` },
+  st4boss: { title: 'BOSS — four weeks, a page that remembers', html: `
+    <div class="cl-block"><h4>Structure, style, behaviour, AND memory</h4>
+      <p>HTML gave structure, CSS gave style, onclick gave behaviour — variables give the page MEMORY: something that persists and can change as the reader interacts, rather than a fixed, unchanging page.</p></div>
+    <div class="cl-block"><h4>This is a real interactive story engine, in miniature</h4>
+      <p>A variable that updates when a button is clicked, then gets displayed back to the reader, is genuinely the core mechanism behind every choice-tracking interactive story — this boss is a small, real version of exactly that.</p></div>` },
   // ── G1 — Sprite Start: coordinates & sequence ──────────────────────────────
   g1s1: { title: 'Coordinates — every sprite has an (x, y)', html: `
     <div class="cl-block"><h4>x and y are just numbers</h4>
@@ -2282,6 +2359,9 @@ function checkChallenge(log) {
       if (ch.needsHeadingChange   && !log.headingChangedByClick)   missing.push(`a button click that actually changes the heading (Interact → when button is clicked → change heading text to)`)
       if (ch.needsParagraphChange && !log.paragraphChangedByClick) missing.push(`a button click that actually changes the paragraph (Interact → when button is clicked → change paragraph text to)`)
       if (ch.needsButtonTextChange && !log.buttonTextChangedByClick) missing.push(`a button click that changes its OWN text (Interact → when button is clicked → change button text to)`)
+      if (ch.needsVar && !log.hasVar) missing.push(`a variable (Variables → set … to …)`)
+      if (ch.needsVar2 && (log.varCount || 0) < 2) missing.push(`at least 2 variables (you used ${log.varCount || 0})`)
+      if (ch.needsVarUpdate && !log.hasVarUpdate) missing.push(`a variable that's set, then given a NEW value later (a genuine update, not just one set-and-forget)`)
       if (missing.length) logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
       else logLine('❌ Not quite — your page built, but it doesn\'t meet this challenge\'s goal yet. Re-read the task above and try the 💡 Hint button.', 'err')
       return
