@@ -47,7 +47,11 @@ const MODE_URLS: Record<string, string> = {
   'canvas-code':     '/lessons/canvas-code.html',
   'grade7':          '/lessons/grade7.html',
   'grade8':          '/lessons/grade8.html',
-  'grade9':          '/lessons/grade9.html',
+  // Was '/lessons/grade9.html' — the orphaned 13-challenge prototype, same
+  // stale link fixed across lib/concepts.ts's g9-* entries. The real,
+  // fully-built curriculum (Phase 0-3, Mission IDE) lives at
+  // grade9-missions.html.
+  'grade9':          '/lessons/grade9-missions.html',
   'compression':     '/lessons/compression.html',
   'cpu-pipeline':    '/lessons/cpu-pipeline.html',
 }
