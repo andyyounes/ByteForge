@@ -3165,6 +3165,11 @@ function isTopicDone(id) {
 }
 function markTopicDone(id) {
   try { localStorage.setItem('bf-al-p3-' + id, JSON.stringify({ completed: true, xpEarned: TOPIC_XP })) } catch {}
+  // Previously localStorage-only — invisible to /student/dashboard, lost on
+  // a cleared browser or a different device. 45 Paper 3 topics x 100 XP each
+  // is real coursework that deserves real persistence, same as every other
+  // grade's challenges.
+  try { LessonSaves.save('al-paper3-theory', id, { passed: true, xpEarned: TOPIC_XP }) } catch (e) {}
 }
 
 function getChapterNum(topicId) {
@@ -4875,6 +4880,11 @@ OUTPUT balance   // expected: 350`,
     check:(code,res)=>res.output[0]?.trim()==='350'&&res.output[1]?.trim()==='Insufficient funds'&&res.output[2]?.trim()==='350',
   },
 ]
+
+// mod is unique per challenge — stable identity for saves (survives new
+// challenges being inserted anywhere), unlike a numeric index.
+const P2_STAGE_INDEX = {}
+P2_CHALLENGES.forEach((c, i) => { P2_STAGE_INDEX[c.mod] = i })
 
 const p2Completed = new Set()
 let p2ActiveIdx   = 0
@@ -6651,7 +6661,7 @@ function p2ValidateChallenge(code, result) {
       p2Completed.add(p2ActiveIdx); p2RenderPills()
       showToast('Challenge complete! +' + ch.xp + ' XP')
       if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'asp2-c' + p2ActiveIdx, { passed: true, score: 100 }) }
-      LessonSaves.save('al-paper4', p2ActiveIdx, { passed: true, xpEarned: ch.xp, code })
+      LessonSaves.save('al-paper4', ch.mod, { passed: true, xpEarned: ch.xp, code })
     }
     p2AppendOut('✓ Challenge passed! +' + ch.xp + ' XP', 'out-ok')
   }
@@ -7205,7 +7215,19 @@ const me = (() => { try { return BF.session() || null } catch (_) { return null 
   await null
   if (me) {
     await LessonSaves.load('al-paper4')
-    LessonSaves.completedSet().forEach(i => p2Completed.add(i))
+    LessonSaves.completedIds('al-paper4').forEach(id => { if (P2_STAGE_INDEX[id] !== undefined) p2Completed.add(P2_STAGE_INDEX[id]) })
+    LessonSaves.completedSet('al-paper4').forEach(i => p2Completed.add(i))
+
+    // Paper 3 theory topics were localStorage-only until now (see
+    // markTopicDone) — pull any server-known completions back into
+    // localStorage so isTopicDone() sees them too on a fresh browser/device.
+    await LessonSaves.load('al-paper3-theory')
+    LessonSaves.completedIds('al-paper3-theory').forEach(id => {
+      if (!isTopicDone(id)) {
+        try { localStorage.setItem('bf-al-p3-' + id, JSON.stringify({ completed: true, xpEarned: TOPIC_XP })) } catch (e) {}
+      }
+    })
+
     // Bridge completions from the old Challenges tab into the Code Lab
     p2Completed.forEach(i => {
       const ex = AL_LAB_SETS.chal && AL_LAB_SETS.chal.exercises[i]

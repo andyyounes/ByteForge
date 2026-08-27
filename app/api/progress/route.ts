@@ -20,6 +20,15 @@ const ProgressSchema = z.object({
   code:          z.string().optional(),
   output:        z.string().optional(),
   score:         z.number().min(0).max(100).optional(),
+  // Concept-only calls (no exercise_id) award conceptCompletionXp() ONLY when
+  // this is explicitly true. Default false because every grade6-9/IGCSE
+  // lesson page that calls this already awards its own authored per-challenge
+  // XP via LessonSaves.save({xpEarned}) -> /api/lesson-saves, which writes
+  // straight to profiles.xp independently of this route. Without this flag,
+  // every challenge completion double-awarded XP: once from LessonSaves'
+  // ch.xp, and again from this route's flat per-concept bonus. Only a caller
+  // with no other XP source for this concept should ever pass true.
+  awardXp:       z.boolean().default(false),
 })
 
 // â”€â”€ POST /api/progress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -40,7 +49,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 422 })
   }
 
-  const { concept_id, correct, time_spent_ms, weaknesses, exercise_id, lesson_id, code, output, score } = parsed.data
+  const { concept_id, correct, time_spent_ms, weaknesses, exercise_id, lesson_id, code, output, score, awardXp } = parsed.data
 
   // â”€â”€ Fetch existing mastery record â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let { data: existingRow } = await supabase
@@ -148,11 +157,15 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Concept-only report (Grade 6-9, IGCSE, AS/A Level lesson pages — no
-  // exercises table row to look up xp_reward from). Award a grade-differentiated
-  // amount once per concept, otherwise these calls granted ~0 XP despite
-  // correctly updating mastery/status.
-  if (!exercise_id && correct && isFirstAttemptAtConcept) {
+  // Concept-only report with no other XP source. This was added under the
+  // (wrong) assumption that Grade 6-9/IGCSE lesson pages granted ~0 XP for
+  // concept-only calls — they don't: every one of those pages already awards
+  // its own authored per-challenge XP via LessonSaves.save({xpEarned}), which
+  // writes straight to profiles.xp independently of this route. Awarding here
+  // too was double-counting XP on every single challenge completion. Now
+  // opt-in (awardXp) for any future caller that genuinely has no other XP
+  // source for this concept.
+  if (awardXp && !exercise_id && correct && isFirstAttemptAtConcept) {
     xpGained += conceptCompletionXp(stageToGrade(profile.stage))
   }
 

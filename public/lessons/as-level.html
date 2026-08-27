@@ -3504,6 +3504,11 @@ function isTopicDone(id) {
 function markTopicDone(id) {
   try { localStorage.setItem('bf-as-p1-' + id, JSON.stringify({ completed: true, xpEarned: TOPIC_XP })) } catch {}
   try { refreshP2TabLocks() } catch (e) {}
+  // Previously localStorage-only — invisible to /student/dashboard, lost on
+  // a cleared browser or a different device. 45 Paper 1 topics x 100 XP each
+  // is real coursework that deserves real persistence, same as every other
+  // grade's challenges.
+  try { LessonSaves.save('as-paper1-theory', id, { passed: true, xpEarned: TOPIC_XP }) } catch (e) {}
 }
 
 function getChapterNum(topicId) {
@@ -4797,6 +4802,11 @@ OUTPUT Pop()   // expected: 20`,
   },
 ]
 
+// mod is unique per challenge — stable identity for saves (survives new
+// challenges being inserted anywhere), unlike a numeric index.
+const P2_STAGE_INDEX = {}
+P2_CHALLENGES.forEach((c, i) => { P2_STAGE_INDEX[c.mod] = i })
+
 const p2Completed = new Set()
 let p2ActiveIdx   = 0
 let p2HintIdx     = 0
@@ -5383,7 +5393,7 @@ function p2ValidateChallenge(code, result) {
       p2Completed.add(p2ActiveIdx); p2RenderPills()
       showToast('Challenge complete! +' + ch.xp + ' XP')
       if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'asp2-c' + p2ActiveIdx, { passed: true, score: 100 }) }
-      LessonSaves.save('as-paper2', p2ActiveIdx, { passed: true, xpEarned: ch.xp, code })
+      LessonSaves.save('as-paper2', ch.mod, { passed: true, xpEarned: ch.xp, code })
     }
     p2AppendOut('✓ Challenge passed! +' + ch.xp + ' XP', 'out-ok')
   }
@@ -7856,7 +7866,19 @@ const me = (() => { try { return BF.session() || null } catch (_) { return null 
   await null
   if (me) {
     await LessonSaves.load('as-paper2')
-    LessonSaves.completedSet().forEach(i => p2Completed.add(i))
+    LessonSaves.completedIds('as-paper2').forEach(id => { if (P2_STAGE_INDEX[id] !== undefined) p2Completed.add(P2_STAGE_INDEX[id]) })
+    LessonSaves.completedSet('as-paper2').forEach(i => p2Completed.add(i))
+
+    // Paper 1 theory topics were localStorage-only until now (see
+    // markTopicDone) — pull any server-known completions back into
+    // localStorage so isTopicDone() sees them too on a fresh browser/device.
+    await LessonSaves.load('as-paper1-theory')
+    LessonSaves.completedIds('as-paper1-theory').forEach(id => {
+      if (!isTopicDone(id)) {
+        try { localStorage.setItem('bf-as-p1-' + id, JSON.stringify({ completed: true, xpEarned: TOPIC_XP })) } catch (e) {}
+      }
+    })
+
     // Pre-fetch classId then check which chapter exams are approved
     fetchClassId().then(() => checkApprovedExams())
 

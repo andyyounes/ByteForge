@@ -27,26 +27,38 @@
  *   // On next page load — get last saved workspace
  *   const ws = LessonSaves.savedWorkspace()   // returns save_data object or null
  *   const code = LessonSaves.savedCode()      // returns code string or null
+ *
+ *   // A page with TWO independent tracks (e.g. AS/A Level: Paper 1 theory +
+ *   // Paper 2 challenges) loads both and reads each back by name — every
+ *   // read function takes an optional lessonKey; omitted, it defaults to
+ *   // whichever lesson was loaded most recently (unchanged behaviour for
+ *   // every single-track page):
+ *   await LessonSaves.load('as-paper1-theory')
+ *   await LessonSaves.load('as-paper2')
+ *   LessonSaves.completedIds('as-paper1-theory').forEach(...)
+ *   LessonSaves.completedIds('as-paper2').forEach(...)
  */
 const LessonSaves = (() => {
   'use strict'
 
-  let _saves = null   // null = not yet loaded; [] = loaded but empty
+  const _byLesson = {}   // lessonKey -> save rows (or undefined if never loaded)
+  let _lastKey = null     // most recently load()ed lessonKey — the read-function default
 
   // ── load ────────────────────────────────────────────────────────────────────
   // Fetches all saves for this lesson from the server.
-  // Call once during page init; await it before restoring state.
+  // Call once per lesson key during page init; await it before restoring state.
   async function load(lessonKey) {
+    _lastKey = lessonKey
     try {
       const res = await fetch(`/api/lesson-saves?lesson=${encodeURIComponent(lessonKey)}`)
-      if (res.status === 401) { _saves = []; return [] }   // not logged in — skip silently
-      if (!res.ok) { console.warn('[LessonSaves] load error', res.status); _saves = []; return [] }
+      if (res.status === 401) { _byLesson[lessonKey] = []; return [] }   // not logged in — skip silently
+      if (!res.ok) { console.warn('[LessonSaves] load error', res.status); _byLesson[lessonKey] = []; return [] }
       const json = await res.json()
-      _saves = json.saves ?? []
-      return _saves
+      _byLesson[lessonKey] = json.saves ?? []
+      return _byLesson[lessonKey]
     } catch (e) {
       console.warn('[LessonSaves] load failed (offline?):', e.message)
-      _saves = []
+      _byLesson[lessonKey] = []
       return []
     }
   }
@@ -54,7 +66,7 @@ const LessonSaves = (() => {
   // ── save ────────────────────────────────────────────────────────────────────
   // Writes one save row. Fire-and-forget — errors are logged, not thrown.
   //
-  // lessonKey     string          e.g. 'grade7', 'grade9', 'grade6-patterns'
+  // lessonKey     string          e.g. 'grade7', 'grade9', 'as-paper1-theory'
   // challengeKey  string | number A challenge's stable `id` string (preferred —
   //                               survives new challenges being inserted
   //                               anywhere), or -1 for workspace autosave.
@@ -91,38 +103,47 @@ const LessonSaves = (() => {
     }
   }
 
+  function _rows(lessonKey) {
+    const key = lessonKey || _lastKey
+    return _byLesson[key] || null
+  }
+
   // ── completedSet ────────────────────────────────────────────────────────────
   // Legacy: returns a Set<number> of challenge indices that were previously
   // passed via the old index-keyed path. Prefer completedIds() in any page
   // that saves by challenge id.
-  function completedSet() {
-    if (!_saves) return new Set()
-    return new Set(_saves.filter(s => s.passed && s.challenge_idx != null && s.challenge_idx >= 0).map(s => s.challenge_idx))
+  function completedSet(lessonKey) {
+    const rows = _rows(lessonKey)
+    if (!rows) return new Set()
+    return new Set(rows.filter(s => s.passed && s.challenge_idx != null && s.challenge_idx >= 0).map(s => s.challenge_idx))
   }
 
   // ── completedIds ────────────────────────────────────────────────────────────
   // Returns a Set<string> of challenge ids that were previously passed.
   // Must call load() first.
-  function completedIds() {
-    if (!_saves) return new Set()
-    return new Set(_saves.filter(s => s.passed && s.challenge_id).map(s => s.challenge_id))
+  function completedIds(lessonKey) {
+    const rows = _rows(lessonKey)
+    if (!rows) return new Set()
+    return new Set(rows.filter(s => s.passed && s.challenge_id).map(s => s.challenge_id))
   }
 
   // ── savedWorkspace ──────────────────────────────────────────────────────────
   // Returns the save_data object from the workspace-level save (challenge_idx = -1),
   // or null if no workspace has been autosaved yet.
-  function savedWorkspace() {
-    if (!_saves) return null
-    const ws = _saves.find(s => s.challenge_idx === -1)
+  function savedWorkspace(lessonKey) {
+    const rows = _rows(lessonKey)
+    if (!rows) return null
+    const ws = rows.find(s => s.challenge_idx === -1)
     return ws ? ws.save_data : null
   }
 
   // ── savedCode ───────────────────────────────────────────────────────────────
   // Returns the code string from the workspace-level save (challenge_idx = -1),
   // or null if not saved.
-  function savedCode() {
-    if (!_saves) return null
-    const ws = _saves.find(s => s.challenge_idx === -1)
+  function savedCode(lessonKey) {
+    const rows = _rows(lessonKey)
+    if (!rows) return null
+    const ws = rows.find(s => s.challenge_idx === -1)
     return ws ? ws.code : null
   }
 
