@@ -422,6 +422,16 @@
     /* P2 right panel */
     .right-panel { display:flex; flex-direction:column; overflow:hidden; }
     .ch-header   { flex-shrink:0; background:#111320; border-bottom:1px solid rgba(255,255,255,.1); padding:10px 14px; }
+    .ch-lesson { flex-shrink:0; background:#0d0f1a; border:1px solid rgba(125,211,252,.18); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .cl-toggle { padding:8px 12px; font-size:12px; font-weight:800; color:#7dd3fc; cursor:pointer;
+                 display:flex; align-items:center; gap:6px; user-select:none; }
+    .cl-toggle:hover { color:#a5e8ff; }
+    .cl-body { padding:0 12px 12px; font-size:12px; color:#c7d2e0; line-height:1.7; }
+    .cl-body.collapsed { display:none; }
+    .cl-block { background:#111320; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
+    .cl-block:last-child { margin-bottom:0; }
+    .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
+    .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
     .ch-pills    { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
     .ch-pill     { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                    border:1px solid rgba(255,255,255,.1); color:#9ca3af; cursor:pointer; transition:.15s; }
@@ -1523,6 +1533,13 @@
       <div class="p2-pane active" id="p2pane-challenge">
         <div class="ch-header">
           <div class="ch-pills" id="p2-pills"></div>
+          <!-- Full lesson for a loaded PRACTICE exercise (PRACTICE_LESSON) —
+               numbered P2_CHALLENGES already have their own dedicated
+               📖 Lesson tab, so this stays hidden for those. -->
+          <div class="ch-lesson" id="prac-lesson" style="display:none;">
+            <div class="cl-toggle" id="pl-toggle-prac" onclick="togglePracticeLesson()">📘 <span id="pl-title-prac"></span> <span id="pl-arrow-prac">▾</span></div>
+            <div class="cl-body" id="pl-body-prac"></div>
+          </div>
           <div class="ch-row">
             <div class="ch-text" id="p2-ch-text">Select a challenge.</div>
             <div class="ch-meta">
@@ -5051,6 +5068,144 @@ const PRACTICE_EXERCISES = [
     expected:'1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz ...' },
 ]
 
+// ══════════════════════════════════════════════════════════════════════════════
+// 📘 PRACTICE_LESSON — one real explainer per practice exercise, keyed by id.
+// ══════════════════════════════════════════════════════════════════════════════
+const PRACTICE_LESSON = {
+  p01: { title: 'OUTPUT — the simplest statement', html: `
+    <div class="cl-block"><h4>Every program starts somewhere</h4><p>OUTPUT is Cambridge pseudocode's version of print — displaying text is usually the very first thing any language teaches, since it's the only way to SEE what your program did.</p></div>
+    <div class="cl-block"><h4>String literals need quotes</h4><p>Text inside quotes is a literal string, shown exactly as written — no quotes means pseudocode would try to treat it as a variable name instead.</p></div>` },
+  p02: { title: 'DECLARE and assignment', html: `
+    <div class="cl-block"><h4>Declaring gives a variable a name AND a type</h4><p><code>DECLARE x : INTEGER</code> creates a named box that can only ever hold whole numbers — Cambridge pseudocode requires the type up front, unlike some languages that infer it.</p></div>
+    <div class="cl-block"><h4>← is assignment, not equality</h4><p><code>x ← 12</code> stores 12 into x — the ← arrow (sometimes written :=) means "becomes", completely different from a later equality check like <code>x = 12</code>.</p></div>` },
+  p03: { title: 'IF — a single-branch decision', html: `
+    <div class="cl-block"><h4>Only run something when a condition holds</h4><p>An IF with no ELSE just does nothing when the condition is false — appropriate here since "not positive" already covers everything else without a separate message needed.</p></div>
+    <div class="cl-block"><h4>Comparing with &gt;</h4><p><code>n > 0</code> is true only for STRICTLY positive numbers — zero itself needs its own thinking about which branch it belongs in.</p></div>` },
+  p04: { title: 'FOR loops — a known number of repeats', html: `
+    <div class="cl-block"><h4>FOR i ← 1 TO 10 counts inclusively both ends</h4><p>Unlike some languages' loops, Cambridge pseudocode's FOR...TO is inclusive of both the start AND the end value — 1 TO 10 really does run exactly 10 times.</p></div>
+    <div class="cl-block"><h4>The loop variable is available inside</h4><p>Every pass through the loop, <code>i</code> holds the current count — OUTPUT-ing it directly is the simplest possible use of a loop variable.</p></div>` },
+  p05: { title: 'A nested calculation inside a loop', html: `
+    <div class="cl-block"><h4>Reusing the loop variable in a formula</h4><p>Each pass computes <code>i * n</code> using BOTH the loop variable and an outer variable — the loop variable isn't just a counter, it's real data you calculate with.</p></div>
+    <div class="cl-block"><h4>12 rows, one loop</h4><p>A full multiplication table needs 12 separate calculations — one FOR loop replaces 12 individual OUTPUT lines you'd otherwise have to write by hand.</p></div>` },
+  p06: { title: 'PROCEDURE — a reusable named block', html: `
+    <div class="cl-block"><h4>Define once, CALL as many times as needed</h4><p>A PROCEDURE groups instructions under one name — CALLing it runs that whole block, without retyping it. This is Cambridge pseudocode's version of a function that doesn't return a value.</p></div>
+    <div class="cl-block"><h4>Parameters customise each call</h4><p>Passing a different name into <code>Greet(name)</code> each time changes what gets greeted — the SAME procedure definition, genuinely different behaviour per call.</p></div>` },
+  p07: { title: 'FUNCTION — a procedure that RETURNS a value', html: `
+    <div class="cl-block"><h4>RETURNS declares what type comes back</h4><p><code>FUNCTION Square(n : INTEGER) RETURNS INTEGER</code> promises the caller a real INTEGER value back — unlike a PROCEDURE, which never hands anything back.</p></div>
+    <div class="cl-block"><h4>RETURN exits immediately with a value</h4><p>The moment RETURN executes, the function ends and that value is what the CALL site receives — code after RETURN inside the same branch never runs.</p></div>` },
+  p08: { title: 'Arrays and a FOR loop, together', html: `
+    <div class="cl-block"><h4>ARRAY[1:5] — five slots, indexed from 1</h4><p>Cambridge pseudocode arrays are 1-indexed by convention here — <code>nums[1]</code> is the FIRST element, not the second.</p></div>
+    <div class="cl-block"><h4>An accumulator loop</h4><p>A running total variable, updated once per pass through the array, is the standard "sum everything" pattern — you'll use this exact shape again and again.</p></div>` },
+  p09: { title: 'LENGTH() — measuring a string', html: `
+    <div class="cl-block"><h4>LENGTH(word) counts characters</h4><p>A built-in function that returns how many characters a string contains — the pseudocode equivalent of Python's len().</p></div>
+    <div class="cl-block"><h4>Comparing a count against a threshold</h4><p>Once you have a number (the length), deciding "long" vs "short" is just the same IF/comparison pattern from every other selection exercise.</p></div>` },
+  p10: { title: 'MOD — the remainder operator', html: `
+    <div class="cl-block"><h4>n MOD 2 — 0 means even, anything else means odd</h4><p>MOD gives the remainder after division — for MOD 2 specifically, that remainder can only ever be 0 or 1, making it the standard way to test odd/even.</p></div>
+    <div class="cl-block"><h4>Same idea as Grade 8's % operator</h4><p>Cambridge pseudocode's MOD and Python's % do exactly the same job — just different keywords for the identical concept.</p></div>` },
+  p11: { title: 'WHILE — repeat until a condition fails', html: `
+    <div class="cl-block"><h4>Checked BEFORE each pass, not after</h4><p>WHILE count >= 1 DO checks the condition first — if it's already false, the loop body never runs even once, unlike a REPEAT...UNTIL which always runs at least once.</p></div>
+    <div class="cl-block"><h4>The loop variable must actually change</h4><p>Decrementing count inside the loop is what eventually makes the condition false — omit that and the loop runs forever.</p></div>` },
+  p12: { title: 'Nested/compound comparisons', html: `
+    <div class="cl-block"><h4>Finding a maximum among three values</h4><p>Comparing a against b, then the winner against c (or one compound condition) — either approach correctly finds the largest of three, a small building block for far larger sorting/searching algorithms.</p></div>
+    <div class="cl-block"><h4>AND for a single compound condition</h4><p><code>IF a > b AND a > c THEN</code> checks BOTH conditions in one line — an alternative to nested IFs that some students find clearer.</p></div>` },
+  p12b: { title: 'Denary to binary — repeated division', html: `
+    <div class="cl-block"><h4>Divide by 2, record the remainder, repeat</h4><p>Each division by 2 peels off one binary digit (the remainder) — reading the remainders bottom-to-top (last found to first) gives the correct binary number.</p></div>
+    <div class="cl-block"><h4>Padding to a fixed width</h4><p>Real 8-bit registers always show all 8 digits — padding short results with leading zeros keeps every number the same visual width.</p></div>` },
+  p13b: { title: 'Binary addition — bit by bit with carry', html: `
+    <div class="cl-block"><h4>Add from the right, tracking a carry</h4><p>Exactly like column addition in decimal — work from the rightmost bit, and whenever a column sums to 2 or 3, carry 1 into the next column left.</p></div>
+    <div class="cl-block"><h4>Overflow — the sign bit lies to you</h4><p>In an 8-bit two's complement register, a carry left over past the leftmost bit signals overflow — the true mathematical result no longer fits in 8 bits.</p></div>` },
+  p13c: { title: "Binary subtraction via two's complement", html: `
+    <div class="cl-block"><h4>Subtraction becomes addition of a negative</h4><p>Invert every bit of the number you're subtracting, add 1, then just ADD — this reuses the exact same addition circuit/logic for both operations.</p></div>
+    <div class="cl-block"><h4>Discard the overflow carry</h4><p>Any carry that spills out past the leftmost bit during this addition is simply discarded — it's expected, not an error, in two's complement subtraction.</p></div>` },
+  p13d: { title: 'Detecting overflow — comparing sign bits', html: `
+    <div class="cl-block"><h4>Overflow only happens between SAME-signed operands</h4><p>Adding two positives can never overflow into a negative unless the true result was too big to fit — the tell-tale sign is the RESULT'S sign bit disagreeing with both operands' shared sign.</p></div>
+    <div class="cl-block"><h4>A function that returns a BOOLEAN</h4><p>RETURNS BOOLEAN means the function's whole job is answering a yes/no question — TRUE or FALSE, nothing else.</p></div>` },
+  p13: { title: 'Factorial — iterative accumulation', html: `
+    <div class="cl-block"><h4>Multiplying a running result by each number in turn</h4><p>result starts at 1 (not 0 — multiplying by 0 would always give 0), then each loop pass multiplies it by the next number up to n.</p></div>
+    <div class="cl-block"><h4>Same accumulator shape as summing an array</h4><p>Just like p08's running total, but multiplying instead of adding — the SAME loop pattern, a different combining operation.</p></div>` },
+  p14: { title: 'Factorial — recursively', html: `
+    <div class="cl-block"><h4>A base case AND a recursive case</h4><p>n ≤ 1 returns 1 directly (the base case, stopping the recursion); otherwise it returns n × Factorial(n-1) — calling itself with a SMALLER problem.</p></div>
+    <div class="cl-block"><h4>Compare directly with p13's iterative version</h4><p>Same result, completely different mechanism — recursion builds up a chain of pending calls, iteration just loops. Cambridge often asks you to compare the two directly.</p></div>` },
+  p15: { title: 'Fibonacci — each term from the two before it', html: `
+    <div class="cl-block"><h4>Tracking two previous values, not just one</h4><p>Unlike factorial (which only needs the running product), Fibonacci needs BOTH of the last two terms to compute the next one — two variables updating together each pass.</p></div>
+    <div class="cl-block"><h4>A famous, genuinely useful sequence</h4><p>Fibonacci shows up constantly in computer science examples specifically because it needs this "remember the last two" pattern, distinct from a simple running total.</p></div>` },
+  p16: { title: 'Prime checking — a function with a loop inside', html: `
+    <div class="cl-block"><h4>No factors between 2 and n-1 means prime</h4><p>Loop through possible factors — the moment ANY of them divides n evenly, you know n isn't prime and can stop immediately (no need to keep checking).</p></div>
+    <div class="cl-block"><h4>RETURN exits a loop from inside a function</h4><p>Returning FALSE the instant a factor is found is more efficient than finishing the whole loop and checking a flag afterward.</p></div>` },
+  p17: { title: 'Linear search — check every element in order', html: `
+    <div class="cl-block"><h4>No shortcuts — just look at everything, in order</h4><p>Linear search doesn't require sorted data, unlike binary search — it simply checks each element one at a time until it finds a match (or reaches the end).</p></div>
+    <div class="cl-block"><h4>Worst case: O(n)</h4><p>If the target is last (or absent entirely), linear search checks every single element — its worst-case time grows directly with the size of the data.</p></div>` },
+  p18: { title: 'Bubble sort — adjacent swaps, pass by pass', html: `
+    <div class="cl-block"><h4>Compare neighbours, swap if out of order</h4><p>Each pass "bubbles" the largest unsorted value up toward its correct position — repeated passes gradually sort the whole array from one end.</p></div>
+    <div class="cl-block"><h4>A temp variable is required to swap</h4><p>Swapping two array elements needs a third variable to briefly hold one value — direct assignment between them would overwrite and lose data.</p></div>` },
+  p19: { title: 'Counting characters that match a set', html: `
+    <div class="cl-block"><h4>A counter incremented inside a loop with an IF</h4><p>Loop through every character, testing each one against the set of vowels — the same "loop + IF + counter" pattern behind every counting task you'll ever write.</p></div>
+    <div class="cl-block"><h4>Case-sensitivity is a real trap</h4><p>Checking only lowercase vowels would miss capital letters — real string-processing code has to explicitly decide how to handle case.</p></div>` },
+  p20: { title: 'Reversing a string, character by character', html: `
+    <div class="cl-block"><h4>Building a new string from the end backward</h4><p>Looping from the LAST character to the first, appending each one to a new result string, produces the reverse — no built-in reverse operator needed in pseudocode.</p></div>
+    <div class="cl-block"><h4>The original string is never modified</h4><p>Just like Grade 8's [::-1], this builds an entirely NEW reversed string — the original stays completely untouched.</p></div>` },
+  p21: { title: 'BYVAL vs BYREF, tested directly', html: `
+    <div class="cl-block"><h4>A copy vs. the real variable</h4><p>BYVAL receives a COPY — changes inside the procedure never escape it. BYREF receives the REAL variable — changes inside genuinely persist after the procedure ends.</p></div>
+    <div class="cl-block"><h4>This exact distinction is a classic Cambridge exam question</h4><p>Predicting the FINAL value of a variable after a BYVAL vs BYREF call is one of the most common short-answer questions in the real 9618 exam.</p></div>` },
+  p22: { title: '2D arrays — nested loops over rows and columns', html: `
+    <div class="cl-block"><h4>Two indices, two nested loops</h4><p>Summing every cell in a grid needs an outer loop for rows and an inner loop for columns — visiting <code>grid[r,c]</code> for every combination of r and c.</p></div>
+    <div class="cl-block"><h4>The accumulator lives OUTSIDE both loops</h4><p>Declaring the running total before either loop starts (and never resetting it inside) is what lets it correctly sum across the WHOLE grid, not just one row.</p></div>` },
+  p23: { title: 'Stack — array-based PUSH and POP', html: `
+    <div class="cl-block"><h4>top tracks the most recently added item</h4><p>PUSH increments top then writes; POP reads then decrements top — the array itself never shrinks, only the "how much of it counts as filled" pointer moves.</p></div>
+    <div class="cl-block"><h4>LIFO — last in, first out</h4><p>Whatever was pushed most recently is always the first thing popped — the defining behaviour of every stack, from undo history to function call stacks.</p></div>` },
+  p24: { title: 'A multi-branch grade classifier', html: `
+    <div class="cl-block"><h4>Checking boundaries from the top down</h4><p>Testing the HIGHEST grade band first (and using ELSE IF for the rest) ensures each score lands in exactly the right band — checking in the wrong order can silently misclassify boundary values.</p></div>
+    <div class="cl-block"><h4>A final ELSE catches everything left over</h4><p>Every possible score needs SOME grade — the final ELSE is a safety net for anything that didn't match an explicit band above it.</p></div>` },
+  p25: { title: 'Validating input inside a loop', html: `
+    <div class="cl-block"><h4>Keep asking until the answer is acceptable</h4><p>A WHILE loop that re-prompts for input for as long as the value is invalid is the standard shape for real input validation — never trust the first thing a user types.</p></div>
+    <div class="cl-block"><h4>The condition checks the SAME variable being read</h4><p>Reading INPUT and checking its validity have to happen inside the same loop body — checking a stale value from before the latest INPUT would validate the wrong thing.</p></div>` },
+  p26: { title: 'Binary search — halving the search space', html: `
+    <div class="cl-block"><h4>Jump to the middle, discard half</h4><p>Compare the target to the middle element — if it doesn't match, an ENTIRE half of the remaining array can be safely discarded, since the data is sorted.</p></div>
+    <div class="cl-block"><h4>O(log n) vs. linear search's O(n)</h4><p>Discarding half the data every single comparison makes binary search dramatically faster than linear search on large, sorted datasets — but only IF the data is genuinely sorted first.</p></div>` },
+  p27: { title: 'Recursive power — repeated multiplication', html: `
+    <div class="cl-block"><h4>base^n = base × base^(n-1)</h4><p>Power(base, n) reduces to a smaller version of the same problem, exactly like Factorial — the base case is n=0, where any number to the power 0 is 1.</p></div>
+    <div class="cl-block"><h4>Another instance of the recursion pattern</h4><p>Base case + recursive case is the SAME shape as Factorial and Fibonacci — recognising this repeating pattern is the real skill, not memorising each individual example.</p></div>` },
+  p28: { title: 'Insertion sort — building a sorted section', html: `
+    <div class="cl-block"><h4>Insert each new element into its correct place</h4><p>Unlike bubble sort's repeated full passes, insertion sort grows a SORTED section one element at a time, shifting larger elements right to make room for each new insertion.</p></div>
+    <div class="cl-block"><h4>Efficient on nearly-sorted data</h4><p>If the array is already mostly in order, insertion sort does very little shifting — a real practical advantage over bubble sort in that specific case.</p></div>` },
+  p29: { title: 'Circular queue — wrapping indices with MOD', html: `
+    <div class="cl-block"><h4>Why "circular"?</h4><p>A plain array-based queue wastes space at the front once items are dequeued — a circular queue wraps front/rear pointers back to index 0 using MOD, reusing that freed space.</p></div>
+    <div class="cl-block"><h4>FIFO — first in, first out</h4><p>The opposite ordering from a stack — whatever was enqueued FIRST is always the first one dequeued, like a real queue of people.</p></div>` },
+  p30: { title: 'Linked list — following pointers, not indices', html: `
+    <div class="cl-block"><h4>Each node points to the next</h4><p>Unlike an array (fixed positions), a linked list is a chain of nodes, each holding a value AND a pointer to the next node — traversal means following that chain until you hit a null pointer.</p></div>
+    <div class="cl-block"><h4>No shifting required to insert/delete</h4><p>Because nodes aren't stored in fixed positions, inserting or deleting just re-points a couple of pointers — no need to shift every following element, unlike an array.</p></div>` },
+  p31: { title: 'Recursive string reversal', html: `
+    <div class="cl-block"><h4>First character last, recursively</h4><p>Reverse(s) = Reverse(the rest of s) + the first character — the recursive case peels off one character at a time, building the reversal from the base case (an empty or single-character string) outward.</p></div>
+    <div class="cl-block"><h4>Same idea as p20, different mechanism</h4><p>p20 reversed a string iteratively; this does the identical job recursively — comparing both approaches side by side deepens understanding of recursion itself.</p></div>` },
+  p32: { title: 'OOP — a class with attributes and a method', html: `
+    <div class="cl-block"><h4>PUBLIC attributes plus a constructor</h4><p>A BankAccount CLASS bundles data (balance) with behaviour (deposit/withdraw) into one unit — NEW calls the constructor, initialising a fresh object's starting state.</p></div>
+    <div class="cl-block"><h4>Methods act on the object's OWN data</h4><p>Calling <code>account.Withdraw(50)</code> changes THAT specific object's balance — a different BankAccount object created separately has its own completely independent balance.</p></div>` },
+  p33: { title: 'OOP — inheritance and SUPER', html: `
+    <div class="cl-block"><h4>A subclass reuses a superclass's setup</h4><p><code>CALL SUPER.NEW(...)</code> reuses the parent class's constructor logic instead of duplicating it — the subclass only adds what's genuinely NEW about it.</p></div>
+    <div class="cl-block"><h4>Overriding a method changes its behaviour</h4><p>A subclass can redefine a method it inherited to behave differently — the same method NAME, called the same way, doing something specific to the subclass.</p></div>` },
+  p34: { title: 'Tower of Hanoi — the classic recursive puzzle', html: `
+    <div class="cl-block"><h4>Move n-1 disks out of the way, move the big one, move them back</h4><p>Solving for n disks reduces to TWO smaller (n-1)-disk sub-problems plus one single move — a genuinely elegant example of recursion solving something that looks complicated at first glance.</p></div>
+    <div class="cl-block"><h4>Exponential growth — 2ⁿ − 1 moves</h4><p>Every extra disk roughly DOUBLES the total moves required — a real, concrete example of exponential time complexity from a very simple recursive definition.</p></div>` },
+  p35: { title: 'Palindrome check', html: `
+    <div class="cl-block"><h4>Compare the string to its own reverse</h4><p>Building the reverse (p20's technique) and comparing it to the original is the most direct way to test whether a string reads the same both ways.</p></div>
+    <div class="cl-block"><h4>Cleaning first avoids false negatives</h4><p>Ignoring case and spaces before comparing means "A man a plan a canal Panama" can correctly register as a palindrome despite its capitalisation and spacing.</p></div>` },
+  p36: { title: 'Matrix multiplication — three nested loops', html: `
+    <div class="cl-block"><h4>Row × column, summed, for every output cell</h4><p>Each result cell is the SUM of pairwise products between a row of the first matrix and a column of the second — needing a third loop just to compute that one sum.</p></div>
+    <div class="cl-block"><h4>Real, useful maths — not just an exercise</h4><p>Matrix multiplication genuinely underlies computer graphics transformations, physics simulations, and machine learning — this isn't an invented drill, it's a real, widely-used operation.</p></div>` },
+  p37: { title: 'File handling — write, close, then read back', html: `
+    <div class="cl-block"><h4>OPENFILE / WRITEFILE / CLOSEFILE, in that order</h4><p>Every file operation follows the same shape: open with the right mode, do your read/write operations, then always close when finished.</p></div>
+    <div class="cl-block"><h4>Reading back proves the write genuinely happened</h4><p>Re-opening and reading a file you just wrote to is the real way to confirm data was actually saved, not just that the write command ran without an error.</p></div>` },
+  p38: { title: 'Recursive sum of an array', html: `
+    <div class="cl-block"><h4>The sum of an array = its first element + the sum of the rest</h4><p>SumArray(arr) reduces the array by one element each recursive call — the base case is an empty array, whose sum is trivially 0.</p></div>
+    <div class="cl-block"><h4>Compare directly with p08's iterative sum</h4><p>Same result as the very first array exercise, computed completely differently — a good way to see recursion and iteration as two tools for the SAME job.</p></div>` },
+  p39: { title: 'A queue built from two stacks', html: `
+    <div class="cl-block"><h4>Reversing order twice gets you back to the original order</h4><p>Pushing everything onto stack A, then popping it all into stack B, reverses the order TWICE overall — which means stack B pops items out in the original FIFO order a queue needs.</p></div>
+    <div class="cl-block"><h4>A genuinely clever real technique</h4><p>Building one data structure's behaviour entirely out of a DIFFERENT one is a real, classic technique in computer science — not just an artificial exercise.</p></div>` },
+  p40: { title: 'FizzBuzz — combining MOD with chained conditions', html: `
+    <div class="cl-block"><h4>Check the MOST specific condition first</h4><p>A number divisible by BOTH 3 and 15 must be checked before "divisible by 3 alone" — otherwise the more general condition would incorrectly catch it first.</p></div>
+    <div class="cl-block"><h4>A genuinely famous exercise</h4><p>FizzBuzz is one of the most well-known programming interview questions in the world — precisely because it tests whether chained conditions are ordered correctly, a real, common source of bugs.</p></div>` },
+}
+
 // ── Practice state ────────────────────────────────────────────────────────────
 let _pracFilter   = 'all'
 let _pracLoaded   = null   // currently loaded exercise id
@@ -5109,7 +5264,30 @@ function loadPractice(id) {
 
   // Switch to challenge/editor view
   switchP2Tab('challenge')
+  renderPracticeLesson(ex)
   setTimeout(() => p2Editor.refresh(), 60)
+}
+
+// 📘 Full lesson for a loaded practice exercise — PRACTICE_LESSON is defined
+// right after PRACTICE_EXERCISES, keyed by exercise id.
+let _plExpandedPrac = true
+function renderPracticeLesson(ex) {
+  const wrap  = document.getElementById('prac-lesson')
+  const body  = document.getElementById('pl-body-prac')
+  const title = document.getElementById('pl-title-prac')
+  if (!wrap) return
+  const lesson = typeof PRACTICE_LESSON !== 'undefined' ? PRACTICE_LESSON[ex.id] : null
+  if (!lesson) { wrap.style.display = 'none'; return }
+  wrap.style.display = ''
+  title.textContent = lesson.title
+  body.innerHTML = lesson.html
+  body.classList.toggle('collapsed', !_plExpandedPrac)
+  document.getElementById('pl-arrow-prac').textContent = _plExpandedPrac ? '▾' : '▸'
+}
+function togglePracticeLesson() {
+  _plExpandedPrac = !_plExpandedPrac
+  document.getElementById('pl-body-prac').classList.toggle('collapsed', !_plExpandedPrac)
+  document.getElementById('pl-arrow-prac').textContent = _plExpandedPrac ? '▾' : '▸'
 }
 
 // Generate more exercises via Groq AI
@@ -5381,6 +5559,11 @@ function p2SelectChallenge(i) {
   if (output) output.innerHTML = ''
   p2ClearTrace()
   p2RenderPills()
+  // Numbered challenges have their own dedicated 📖 Lesson tab already —
+  // hide the practice-specific lesson panel so it doesn't linger from a
+  // previously-loaded practice exercise.
+  const pracLessonEl = document.getElementById('prac-lesson')
+  if (pracLessonEl) pracLessonEl.style.display = 'none'
   // Update other panes if visible
   if (document.getElementById('p2pane-lesson')?.classList.contains('active')) renderP2Lesson(i)
   const aiWrap = document.getElementById('p2-ai-wrap')
