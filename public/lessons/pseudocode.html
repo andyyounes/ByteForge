@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ByteForge â€” Pseudocode Sandbox</title>
+  <title>ByteForge — Pseudocode Sandbox</title>
   <link rel="stylesheet" href="/styles.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
@@ -12,7 +12,7 @@
     body { padding-top:64px; background:var(--bg); color:var(--fg); }
     .layout { display:grid; grid-template-columns:260px 1fr 320px; height:calc(100vh - 64px); overflow:hidden; }
 
-    /* â”€â”€ Left: exercises â”€â”€ */
+    /* ── Left: exercises ── */
     .ex-sidebar { background:var(--bg-card); border-right:1px solid var(--border); overflow-y:auto; padding:12px; }
     .sidebar-title { font-size:13px; font-weight:700; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.08em; padding:4px 8px 10px; }
     .ex-item { padding:12px; border-radius:9px; cursor:pointer; transition:.15s; border:1px solid transparent; margin-bottom:6px; }
@@ -24,7 +24,7 @@
     .diff-dot { width:6px; height:6px; border-radius:50%; background:var(--border-hi); }
     .diff-dot.on { background:var(--green); }
 
-    /* â”€â”€ Editor â”€â”€ */
+    /* ── Editor ── */
     .editor-col { display:flex; flex-direction:column; overflow:hidden; }
     .editor-header { padding:10px 16px; background:var(--bg-card); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; flex-shrink:0; }
     .spacer { flex:1; }
@@ -39,7 +39,7 @@
     .CodeMirror { height:100% !important; font-size:14px; font-family:var(--mono); background:#0a0c18; }
     .CodeMirror-scroll { overflow:auto !important; }
 
-    /* â”€â”€ Right: desc + output â”€â”€ */
+    /* ── Right: desc + output ── */
     .right-col { display:flex; flex-direction:column; border-left:1px solid var(--border); background:var(--bg-card); overflow:hidden; }
     .desc-panel { flex:1; overflow-y:auto; padding:20px; border-bottom:1px solid var(--border); }
     .desc-title { font-size:18px; font-weight:800; margin-bottom:10px; }
@@ -89,8 +89,8 @@
 <body>
 
   <nav class="nav">
-    <div class="nav-logo"><div class="logo-icon">âš’</div><span class="logo-text">Byte<span>Forge</span></span></div>
-    <div class="nav-links"><a href="/student/dashboard">â† Dashboard</a></div>
+    <div class="nav-logo"><div class="logo-icon">⚒</div><span class="logo-text">Byte<span>Forge</span></span></div>
+    <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
     <a href="../login.html" class="nav-cta" id="nav-auth">Sign In</a>
   </nav>
 
@@ -108,7 +108,7 @@
         <span style="font-family:var(--mono);font-size:13px;color:var(--fg-dim)">pseudocode.txt</span>
         <div class="spacer"></div>
         <button class="btn btn-ghost" onclick="resetEditor()">Reset</button>
-        <button class="btn btn-green" onclick="runPseudocode()">â–¶ Run</button>
+        <button class="btn btn-green" onclick="runPseudocode()">▶ Run</button>
       </div>
       <div id="editor-wrap"></div>
     </div>
@@ -118,9 +118,9 @@
       <div class="desc-panel">
         <div class="desc-title" id="desc-title">Cambridge Pseudocode</div>
         <div class="desc-body" id="desc-body">
-          <p>This sandbox runs <strong>Cambridge A-Level pseudocode</strong> â€” the standard used in CIE Computer Science exams.</p>
+          <p>This sandbox runs <strong>Cambridge A-Level pseudocode</strong> — the standard used in CIE Computer Science exams.</p>
           <p>Supported: <code>DECLARE</code>, <code>OUTPUT</code>, <code>INPUT</code>, <code>IF/THEN/ELSE/ENDIF</code>, <code>FOR/TO/NEXT</code>, <code>WHILE/DO/ENDWHILE</code>, <code>PROCEDURE</code>, <code>FUNCTION</code>, arrays, and more.</p>
-          <div><span class="ref-toggle" onclick="toggleRef()">Show syntax reference â–¼</span>
+          <div><span class="ref-toggle" onclick="toggleRef()">Show syntax reference ▼</span>
           <div class="ref-panel" id="ref-panel">
             <span class="ref-kw">DECLARE</span> x : INTEGER<br>
             <span class="ref-kw">OUTPUT</span> "Hello, " &amp; name<br>
@@ -130,26 +130,26 @@
             <span class="ref-kw">ELSE</span><br>
             &nbsp;&nbsp;<span class="ref-kw">OUTPUT</span> "negative"<br>
             <span class="ref-kw">ENDIF</span><br>
-            <span class="ref-kw">FOR</span> i â† 1 <span class="ref-kw">TO</span> 10<br>
+            <span class="ref-kw">FOR</span> i ← 1 <span class="ref-kw">TO</span> 10<br>
             &nbsp;&nbsp;<span class="ref-kw">OUTPUT</span> i<br>
             <span class="ref-kw">NEXT</span> i<br>
             <span class="ref-kw">WHILE</span> x &lt; 10 <span class="ref-kw">DO</span><br>
-            &nbsp;&nbsp;x â† x + 1<br>
+            &nbsp;&nbsp;x ← x + 1<br>
             <span class="ref-kw">ENDWHILE</span><br>
             <span class="ref-kw">DECLARE</span> arr : <span class="ref-kw">ARRAY</span>[1:5] OF INTEGER<br>
-            arr[1] â† 42
+            arr[1] ← 42
           </div></div>
         </div>
       </div>
       <div class="output-panel">
         <div class="output-header"><span>Output</span><button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="clearOutput()">Clear</button></div>
-        <div class="output-body" id="output-body"><div class="out-line sys">Write pseudocode and click â–¶ Run</div></div>
+        <div class="output-body" id="output-body"><div class="out-line sys">Write pseudocode and click ▶ Run</div></div>
       </div>
     </div>
 
   </div>
 
-  <div class="xp-popup" id="xp-popup">âš¡ <span id="xp-amount">+100 XP</span></div>
+  <div class="xp-popup" id="xp-popup">⚡ <span id="xp-amount">+100 XP</span></div>
 
   <script src="/js/db.js"></script>
   <script src="/js/auth.js"></script>
@@ -159,28 +159,28 @@
     const me = BF.session();
     if (me) { document.getElementById('nav-auth').textContent='Dashboard'; document.getElementById('nav-auth').href=me.role==='teacher'?'/teacher/dashboard':'/student/dashboard'; }
 
-    // â”€â”€ Exercises â”€â”€
+    // ── Exercises ──
     const EXERCISES = [
       { id:'pc1', title:'Hello World', difficulty:1, xp:25, starter:'OUTPUT "Hello, World!"', desc:'<p>Write a single line of pseudocode to output <code>Hello, World!</code></p>', tests:[{expected:'Hello, World!'}] },
-      { id:'pc2', title:'Sum Two Numbers', difficulty:1, xp:40, starter:'DECLARE a : INTEGER\nDECLARE b : INTEGER\na â† 5\nb â† 3\n// OUTPUT a + b', desc:'<p>Declare two INTEGER variables, assign values 5 and 3, then OUTPUT their sum.</p>', tests:[{expected:'8'}] },
+      { id:'pc2', title:'Sum Two Numbers', difficulty:1, xp:40, starter:'DECLARE a : INTEGER\nDECLARE b : INTEGER\na ← 5\nb ← 3\n// OUTPUT a + b', desc:'<p>Declare two INTEGER variables, assign values 5 and 3, then OUTPUT their sum.</p>', tests:[{expected:'8'}] },
       { id:'pc3', title:'Count 1 to 10', difficulty:1, xp:40, starter:'// Use FOR loop to output 1 to 10\n', desc:'<p>Use a <code>FOR</code> loop to output the numbers 1 through 10, each on a new line.</p>', tests:[{expected:'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'}] },
-      { id:'pc4', title:'FizzBuzz', difficulty:2, xp:75, starter:'FOR i â† 1 TO 20\n  // FizzBuzz logic here\nNEXT i\n', desc:'<p>Output 1â€“20. Print <code>Fizz</code> for multiples of 3, <code>Buzz</code> for multiples of 5, <code>FizzBuzz</code> for both.</p>', tests:[{expected:'FizzBuzz'}] },
-      { id:'pc5', title:'Array Average', difficulty:2, xp:75, starter:'DECLARE scores : ARRAY[1:5] OF INTEGER\nscores[1] â† 80\nscores[2] â† 90\nscores[3] â† 70\nscores[4] â† 85\nscores[5] â† 95\n// Calculate and OUTPUT the average\n', desc:'<p>Declare an array of 5 scores, sum them using a FOR loop, then OUTPUT the average.</p>', tests:[{expected:'84'}] },
-      { id:'pc6', title:'Bubble Sort', difficulty:3, xp:100, starter:'DECLARE arr : ARRAY[1:5] OF INTEGER\narr[1] â† 64\narr[2] â† 34\narr[3] â† 25\narr[4] â† 12\narr[5] â† 22\n// Implement bubble sort and OUTPUT sorted array\n', desc:'<p>Implement the bubble sort algorithm on the given array. Output each element of the sorted array on a new line.</p>', tests:[{expected:'12'}] },
+      { id:'pc4', title:'FizzBuzz', difficulty:2, xp:75, starter:'FOR i ← 1 TO 20\n  // FizzBuzz logic here\nNEXT i\n', desc:'<p>Output 1–20. Print <code>Fizz</code> for multiples of 3, <code>Buzz</code> for multiples of 5, <code>FizzBuzz</code> for both.</p>', tests:[{expected:'FizzBuzz'}] },
+      { id:'pc5', title:'Array Average', difficulty:2, xp:75, starter:'DECLARE scores : ARRAY[1:5] OF INTEGER\nscores[1] ← 80\nscores[2] ← 90\nscores[3] ← 70\nscores[4] ← 85\nscores[5] ← 95\n// Calculate and OUTPUT the average\n', desc:'<p>Declare an array of 5 scores, sum them using a FOR loop, then OUTPUT the average.</p>', tests:[{expected:'84'}] },
+      { id:'pc6', title:'Bubble Sort', difficulty:3, xp:100, starter:'DECLARE arr : ARRAY[1:5] OF INTEGER\narr[1] ← 64\narr[2] ← 34\narr[3] ← 25\narr[4] ← 12\narr[5] ← 22\n// Implement bubble sort and OUTPUT sorted array\n', desc:'<p>Implement the bubble sort algorithm on the given array. Output each element of the sorted array on a new line.</p>', tests:[{expected:'12'}] },
       { id:'pc7', title:'Function: Factorial', difficulty:3, xp:100, starter:'FUNCTION Factorial(n : INTEGER) RETURNS INTEGER\n  // TODO: implement recursive factorial\nENDFUNCTION\n\nOUTPUT Factorial(5)\n', desc:'<p>Write a <code>FUNCTION</code> called <code>Factorial</code> that takes an integer n and returns n! (n factorial). Call it with n=5.</p>', tests:[{expected:'120'}] },
     ];
 
     let currentEx = null;
 
-    // â”€â”€ Editor â”€â”€
+    // ── Editor ──
     const DEFAULT_CODE = `// Cambridge A-Level Pseudocode Sandbox
 // Try the exercises on the left, or write your own!
 
 DECLARE name : STRING
-name â† "ByteForge"
+name ← "ByteForge"
 OUTPUT "Welcome to " & name & "!"
 
-FOR i â† 1 TO 5
+FOR i ← 1 TO 5
     OUTPUT i * i
 NEXT i`;
 
@@ -213,7 +213,7 @@ NEXT i`;
         <div class="ex-item ${currentEx?.id===e.id?'active':''}" onclick="loadEx('${e.id}')">
           <div class="ex-title">${e.title}</div>
           <div class="diff-row">${Array.from({length:5},(_,i)=>`<div class="diff-dot ${i<e.difficulty?'on':''}"></div>`).join('')}</div>
-          <div class="ex-meta">âš¡ ${e.xp} XP</div>
+          <div class="ex-meta">⚡ ${e.xp} XP</div>
         </div>`).join('');
     }
 
@@ -236,9 +236,9 @@ NEXT i`;
     function resetEditor() { editor.setValue(currentEx?.starter || DEFAULT_CODE); }
     function toggleRef()   { document.getElementById('ref-panel').classList.toggle('open'); }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ════════════════════════════════════════════════
     //  Cambridge Pseudocode Interpreter
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ════════════════════════════════════════════════
     function runPseudocode() {
       clearOutput();
       const code = editor.getValue();
@@ -248,7 +248,7 @@ NEXT i`;
         const output = interp.output.join('\n');
         if (output) output.split('\n').forEach(l => addOutput(l,'out'));
         else addOutput('(no output)','sys');
-        addOutput('âœ“ Done','ok');
+        addOutput('✓ Done','ok');
         checkTests(output);
       } catch(e) { addOutput('Error: ' + e.message, 'err'); }
     }
@@ -258,7 +258,7 @@ NEXT i`;
       const pass = currentEx.tests.every(t => !t.expected || actualOutput.trim().includes(t.expected.trim()));
       const exIdx = EXERCISES.findIndex(e => e.id === currentEx?.id);
       if (pass) {
-        addOutput('âœ… All tests passed!','ok');
+        addOutput('✅ All tests passed!','ok');
         if (me) {
           const already = BF.progress(me.id).completedExercises.includes(currentEx.id);
           BF.recordAttempt(me.id, currentEx.id, {passed:true,score:100,code:editor.getValue()});
@@ -270,7 +270,7 @@ NEXT i`;
         }
         // Persist to Supabase (awards XP only on first pass)
         LessonSaves.save('pseudocode', exIdx, { passed: true, xpEarned: currentEx.xp, code: editor.getValue() });
-      } else { addOutput('âœ— Output does not match expected â€” keep trying!','err'); }
+      } else { addOutput('✗ Output does not match expected — keep trying!','err'); }
     }
 
     function showXP(xp) { document.getElementById('xp-amount').textContent='+'+xp+' XP'; const el=document.getElementById('xp-popup'); el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000); }
@@ -290,9 +290,9 @@ NEXT i`;
       markExCompleted()
     })()
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ════════════════════════════════════════════════
     //  Pseudocode Interpreter Implementation
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ════════════════════════════════════════════════
     class PseudocodeInterpreter {
       constructor() {
         this.vars   = {};
@@ -326,8 +326,8 @@ NEXT i`;
           // INPUT
           if (/^INPUT\s+/i.test(line)) { this._input(line); continue; }
 
-          // Assignment: var â† expr or var := expr or var = expr
-          if (/^[A-Za-z_]\w*(\[[^\]]+\])?\s*(â†|:=|=(?!=))\s*/.test(line)) { this._assign(line); continue; }
+          // Assignment: var ← expr or var := expr or var = expr
+          if (/^[A-Za-z_]\w*(\[[^\]]+\])?\s*(←|:=|=(?!=))\s*/.test(line)) { this._assign(line); continue; }
 
           // IF / THEN
           if (/^IF\s+/i.test(line)) {
@@ -401,7 +401,7 @@ NEXT i`;
       }
 
       _assign(line) {
-        const m = line.match(/^([A-Za-z_]\w*)(\[([^\]]+)\])?\s*(?:â†|:=|=(?!=))\s*(.+)$/);
+        const m = line.match(/^([A-Za-z_]\w*)(\[([^\]]+)\])?\s*(?:←|:=|=(?!=))\s*(.+)$/);
         if (!m) return;
         const [,name,,idxExpr,valExpr] = m;
         const val = this._eval(valExpr.trim());
@@ -459,7 +459,7 @@ NEXT i`;
 
       _execFor(lines, start, end) {
         const header = lines[start].trim();
-        const m = header.match(/^FOR\s+([A-Za-z_]\w*)\s*â†\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i);
+        const m = header.match(/^FOR\s+([A-Za-z_]\w*)\s*←\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i);
         if (!m) throw new Error('Invalid FOR at line '+(start+1));
         const [,v,fromE,toE,stepE]=m;
         const from=Number(this._eval(fromE.trim()));
@@ -481,7 +481,7 @@ NEXT i`;
         let count=0;
         while (this._evalBool(m[1])) {
           this._exec(lines, start+1, end-1);
-          if (++count > 10000) throw new Error('Infinite loop â€” check your condition');
+          if (++count > 10000) throw new Error('Infinite loop — check your condition');
         }
       }
 
@@ -603,7 +603,7 @@ NEXT i`;
           if (this.funcs[biM[1]]) return this._callFunc(biM[1], argStr?argStr.split(','):[]);
         }
 
-        // arithmetic â€” safe eval via JS (avoid eval, use expression parser)
+        // arithmetic — safe eval via JS (avoid eval, use expression parser)
         // Integer division. This used to be
         //   .replace(/DIV/gi, 'Math.floor(({0})/({1}))'.slice(0,14))
         // where .slice(0,14) yields the 14-character FRAGMENT "Math.floor(({0",

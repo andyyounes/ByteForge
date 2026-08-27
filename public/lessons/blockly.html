@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ByteForge â€” Blockly Coding</title>
+  <title>ByteForge — Blockly Coding</title>
   <link rel="stylesheet" href="/styles.css"/>
   <!-- Google Blockly CDN -->
   <script src="https://unpkg.com/blockly@10.4.3/blockly_compressed.js"></script>
@@ -16,7 +16,7 @@
 
     .layout { display:grid; grid-template-columns:1fr 400px; height:calc(100vh - 64px); overflow:hidden; }
 
-    /* â”€â”€ Left: Blockly workspace â”€â”€ */
+    /* ── Left: Blockly workspace ── */
     .blockly-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); }
     .panel-header { padding:14px 20px; background:var(--bg-card); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; }
     .panel-title { font-size:15px; font-weight:700; }
@@ -29,7 +29,7 @@
     .btn-green  { background:rgba(34,197,94,.2); color:var(--green); border:1px solid var(--green); }
     #blockly-div { flex:1; width:100%; }
 
-    /* â”€â”€ Right: Simulation + Code â”€â”€ */
+    /* ── Right: Simulation + Code ── */
     .right-panel { display:flex; flex-direction:column; overflow:hidden; }
 
     /* Simulation canvas */
@@ -76,8 +76,8 @@
 <body>
 
   <nav class="nav">
-    <div class="nav-logo"><div class="logo-icon">âš’</div><span class="logo-text">Byte<span>Forge</span></span></div>
-    <div class="nav-links"><a href="/student/dashboard">â† Dashboard</a></div>
+    <div class="nav-logo"><div class="logo-icon">⚒</div><span class="logo-text">Byte<span>Forge</span></span></div>
+    <div class="nav-links"><a href="/student/dashboard">← Dashboard</a></div>
     <a href="../login.html" class="nav-cta" id="nav-auth">Sign In</a>
   </nav>
 
@@ -86,10 +86,10 @@
     <!-- Left: Blockly -->
     <div class="blockly-panel">
       <div class="panel-header">
-        <div class="panel-title">ðŸ§± Block Coding</div>
+        <div class="panel-title">🧱 Block Coding</div>
         <div class="btn-row">
           <button class="btn btn-ghost" onclick="clearWorkspace()">Clear</button>
-          <button class="btn btn-orange" onclick="runCode()">â–¶ Run</button>
+          <button class="btn btn-orange" onclick="runCode()">▶ Run</button>
         </div>
       </div>
       <div id="blockly-div"></div>
@@ -101,7 +101,7 @@
       <!-- Simulation canvas -->
       <div class="sim-panel">
         <div class="sim-header">
-          <div class="sim-title">ðŸŽ® Simulation</div>
+          <div class="sim-title">🎮 Simulation</div>
           <button class="btn btn-ghost" style="padding:5px 12px;font-size:12px" onclick="resetSim()">Reset</button>
         </div>
         <canvas id="sim-canvas" width="400" height="200"></canvas>
@@ -121,7 +121,7 @@
 
       <!-- Output log -->
       <div class="output-panel" id="output-panel">
-        <div class="output-line sys">Output will appear hereâ€¦</div>
+        <div class="output-line sys">Output will appear here…</div>
       </div>
 
     </div>
@@ -173,7 +173,7 @@
     const me = BF.session();
     if (me) { document.getElementById('nav-auth').textContent='Dashboard'; document.getElementById('nav-auth').href=me.role==='teacher'?'/teacher/dashboard':'/student/dashboard'; }
 
-    // â”€â”€ Simulation state â”€â”€
+    // ── Simulation state ──
     const canvas  = document.getElementById('sim-canvas');
     const ctx     = canvas.getContext('2d');
     let sim = { x:200, y:100, angle:0, color:'#f97316', size:20, penDown:false, trail:[], speech:'' };
@@ -223,7 +223,7 @@
 
     resetSim();
 
-    // â”€â”€ Custom Blockly blocks â”€â”€
+    // ── Custom Blockly blocks ──
     Blockly.Blocks['bf_move_forward'] = {
       init() { this.appendValueInput('STEPS').setCheck('Number').appendField('move forward'); this.appendDummyInput().appendField('steps'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(30); }
     };
@@ -261,7 +261,7 @@
       init() { this.appendValueInput('TEXT').setCheck(null).appendField('say'); this.setPreviousStatement(true);this.setNextStatement(true);this.setColour(200); }
     };
 
-    // â”€â”€ Code generators â”€â”€
+    // ── Code generators ──
     Blockly.JavaScript['bf_move_forward']  = b => `BF_move(${Blockly.JavaScript.valueToCode(b,'STEPS',0)||50});\n`;
     Blockly.JavaScript['bf_move_backward'] = b => `BF_move(-(${Blockly.JavaScript.valueToCode(b,'STEPS',0)||50}));\n`;
     Blockly.JavaScript['bf_turn_left']     = b => `BF_turn(-${b.getFieldValue('DEGREES')});\n`;
@@ -275,7 +275,7 @@
     Blockly.JavaScript['bf_print']         = b => `BF_print(${Blockly.JavaScript.valueToCode(b,'TEXT',0)||'""'});\n`;
     Blockly.JavaScript['bf_say']           = b => `BF_say(${Blockly.JavaScript.valueToCode(b,'TEXT',0)||'""'});\n`;
 
-    // â”€â”€ Simulation API â”€â”€
+    // ── Simulation API ──
     const STEPS = [];
     function BF_move(d) {
       const r=sim.angle*Math.PI/180;
@@ -293,7 +293,7 @@
     function BF_print(t)       { addOutput(String(t)); }
     function BF_say(t)         { sim.speech=String(t); setTimeout(()=>{sim.speech='';drawSim();},2000); }
 
-    // â”€â”€ Workspace â”€â”€
+    // ── Workspace ──
     const workspace = Blockly.inject('blockly-div', {
       toolbox: document.getElementById('toolbox'),
       theme: Blockly.Theme.defineTheme('byteforge', {
@@ -317,17 +317,17 @@
       clearOutput();
       const code = Blockly.JavaScript.workspaceToCode(workspace);
       if (!code.trim()) { addOutput('No blocks to run! Drag some blocks onto the workspace.','sys'); return; }
-      addOutput('â–¶ Runningâ€¦','sys');
+      addOutput('▶ Running…','sys');
       try {
         // eslint-disable-next-line no-new-func
         new Function('BF_move','BF_turn','BF_jump','BF_goto','BF_setColor','BF_setSize','BF_penDown','BF_penUp','BF_print','BF_say', code)(BF_move,BF_turn,BF_jump,BF_goto,BF_setColor,BF_setSize,BF_penDown,BF_penUp,BF_print,BF_say);
         drawSim();
-        addOutput('âœ“ Done','ok');
+        addOutput('✓ Done','ok');
         checkChallenge();
       } catch(e) { addOutput('Error: '+e.message,'err'); }
     }
 
-    // â”€â”€ Output log â”€â”€
+    // ── Output log ──
     function addOutput(msg, type='') {
       const p = document.getElementById('output-panel');
       const d = document.createElement('div');
@@ -336,7 +336,7 @@
     }
     function clearOutput() { document.getElementById('output-panel').innerHTML=''; }
 
-    // â”€â”€ Challenges â”€â”€
+    // ── Challenges ──
     const CHALLENGES = [
       // These checks used to be pure SEGMENT COUNTS: 'sq' was trail.length>=4
       // and 'tri' was trail.length>=3. checkChallenge() evaluates every
@@ -373,9 +373,9 @@
     function renderChallenges() {
       document.getElementById('challenge-list').innerHTML = CHALLENGES.map(c => `
         <div class="challenge-item ${completedChallenges.includes(c.id)?'active':''}">
-          <span class="ch-icon">${completedChallenges.includes(c.id)?'âœ…':'ðŸŽ¯'}</span>
+          <span class="ch-icon">${completedChallenges.includes(c.id)?'✅':'🎯'}</span>
           <span class="ch-name">${c.name}</span>
-          <span class="ch-xp">âš¡${c.xp} XP</span>
+          <span class="ch-xp">⚡${c.xp} XP</span>
         </div>`).join('');
     }
 

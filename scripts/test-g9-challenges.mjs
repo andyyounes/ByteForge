@@ -213,6 +213,53 @@ ENDFUNCTION
 OUTPUT BinarySearch(22)
 OUTPUT BinarySearch(99)`,
   },
+
+  // ── Recovered set ──────────────────────────────────────────────────────────
+  // These three were unreachable: the CHALLENGES array was closed early by a
+  // stray "]" and they sat orphaned after it as dead syntax, which threw
+  // "Unexpected identifier 'total'" and killed grade9.html's ENTIRE script.
+  'M12/Temperature Function': {
+    inputs: [],
+    code: `FUNCTION CtoF(celsius : REAL) RETURNS REAL
+   RETURN celsius * 9 / 5 + 32
+ENDFUNCTION
+
+OUTPUT CtoF(0)
+OUTPUT CtoF(100)
+OUTPUT CtoF(37)`,
+  },
+
+  'M12/Array Processing': {
+    inputs: [],
+    code: `DECLARE nums : ARRAY[1:5] OF INTEGER
+DECLARE i : INTEGER
+FOR i ← 1 TO 5
+   nums[i] ← i * 2
+NEXT i
+FOR i ← 1 TO 5
+   OUTPUT nums[i]
+NEXT i`,
+  },
+
+  'M13/Linear Search': {
+    inputs: [],
+    code: `DECLARE nums : ARRAY[1:5] OF INTEGER
+DECLARE i    : INTEGER
+FOR i ← 1 TO 5
+   nums[i] ← i * 10
+NEXT i
+
+PROCEDURE Search(arr : ARRAY[1:5] OF INTEGER, size : INTEGER, target : INTEGER)
+   DECLARE j : INTEGER
+   FOR j ← 1 TO size
+      IF arr[j] = target THEN
+         OUTPUT "Found at position " & j
+      ENDIF
+   NEXT j
+ENDPROCEDURE
+
+CALL Search(nums, 5, 30)`,
+  },
 }
 
 // ── Run ──────────────────────────────────────────────────────────────────────

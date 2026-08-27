@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ByteForge â€” Algorithm Visualizer</title>
+  <title>ByteForge — Algorithm Visualizer</title>
   <link rel="stylesheet" href="/styles.css"/>
   <style>
     body { padding-top:64px; background:var(--bg); }
@@ -11,14 +11,14 @@
     .page-title { font-size:26px; font-weight:800; letter-spacing:-.03em; margin-bottom:4px; }
     .page-sub   { font-size:14px; color:var(--fg-dim); margin-bottom:28px; }
 
-    /* â”€â”€ Algo selector â”€â”€ */
+    /* ── Algo selector ── */
     .algo-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-bottom:28px; }
     .algo-btn  { padding:12px 16px; border-radius:12px; border:1px solid var(--border); background:var(--bg-card); font-size:13px; font-weight:700; cursor:pointer; transition:.2s; color:var(--fg-dim); text-align:left; }
     .algo-btn:hover { border-color:var(--border-hi); color:var(--fg); }
     .algo-btn.active { background:rgba(249,115,22,.12); border-color:rgba(249,115,22,.4); color:var(--orange); }
     .algo-tag  { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-faint); margin-bottom:4px; }
 
-    /* â”€â”€ Controls â”€â”€ */
+    /* ── Controls ── */
     .controls { display:flex; align-items:center; gap:12px; background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:14px 20px; margin-bottom:20px; flex-wrap:wrap; }
     .ctrl-btn  { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:.15s; }
     .ctrl-play  { background:var(--orange); color:#fff; }
@@ -30,12 +30,12 @@
     .step-info  { margin-left:auto; font-size:13px; color:var(--fg-dim); }
     .step-info strong { color:var(--fg); }
 
-    /* â”€â”€ Visualizer canvas â”€â”€ */
+    /* ── Visualizer canvas ── */
     .viz-wrap { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:20px; min-height:180px; }
     .viz-title { font-size:13px; font-weight:700; color:var(--fg-dim); margin-bottom:16px; }
     #viz-canvas { display:block; width:100%; max-height:200px; }
 
-    /* â”€â”€ Two-column: pseudocode + info â”€â”€ */
+    /* ── Two-column: pseudocode + info ── */
     .bottom-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .pseudo-panel, .info-panel { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:20px; }
     .panel-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-faint); margin-bottom:12px; }
@@ -52,19 +52,19 @@
     .comp-val.ok   { color:#eab308; }
     .comp-val.bad  { color:#f87171; }
 
-    /* â”€â”€ Stack/Queue â”€â”€ */
+    /* ── Stack/Queue ── */
     .ds-wrap { display:flex; align-items:flex-end; gap:8px; min-height:100px; flex-wrap:wrap; }
     .ds-box  { width:52px; height:52px; border-radius:10px; border:2px solid; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800; transition:.3s; }
     .ds-label { font-size:10px; text-align:center; color:var(--fg-faint); margin-top:4px; }
     .ds-pointer { font-size:11px; color:var(--orange); font-weight:700; text-align:center; }
 
-    /* â”€â”€ Custom array input â”€â”€ */
+    /* ── Custom array input ── */
     .array-input-wrap { display:flex; align-items:center; gap:8px; margin-left:auto; }
     .array-input-wrap input { padding:7px 10px; border-radius:7px; background:var(--bg); border:1px solid var(--border); color:var(--fg); font-size:12px; font-family:var(--mono); width:180px; outline:none; }
     .array-input-wrap input:focus { border-color:var(--orange); }
     .array-input-wrap button { padding:7px 12px; border-radius:7px; background:var(--orange); color:#fff; border:none; font-size:12px; font-weight:700; cursor:pointer; }
 
-    /* â”€â”€ Toast â”€â”€ */
+    /* ── Toast ── */
     .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
     .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
     .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
@@ -77,17 +77,17 @@
 
   <nav class="nav">
     <div class="nav-logo">
-      <div class="logo-icon">âš’</div>
+      <div class="logo-icon">⚒</div>
       <span class="logo-text">Byte<span>Forge</span></span>
     </div>
     <div class="nav-links">
-      <a href="/student/dashboard">â† Dashboard</a>
+      <a href="/student/dashboard">← Dashboard</a>
     </div>
     <button class="nav-cta" onclick="location.href='/student/dashboard'" style="background:var(--bg-raised);border:1px solid var(--border-hi);color:var(--fg);">Back</button>
   </nav>
 
   <div class="page">
-    <div class="page-title">ðŸ” Algorithm Visualizer</div>
+    <div class="page-title">🔍 Algorithm Visualizer</div>
     <div class="page-sub">Watch algorithms run step-by-step, with pseudocode highlighting and complexity analysis.</div>
 
     <!-- Algorithm selector -->
@@ -114,9 +114,9 @@
 
     <!-- Controls -->
     <div class="controls">
-      <button class="ctrl-btn ctrl-play"  id="btn-play"  onclick="togglePlay()">â–¶ Play</button>
-      <button class="ctrl-btn ctrl-step"  id="btn-step"  onclick="stepOnce()">Step â†’</button>
-      <button class="ctrl-btn ctrl-reset" id="btn-reset" onclick="reset()">â†º Reset</button>
+      <button class="ctrl-btn ctrl-play"  id="btn-play"  onclick="togglePlay()">▶ Play</button>
+      <button class="ctrl-btn ctrl-step"  id="btn-step"  onclick="stepOnce()">Step →</button>
+      <button class="ctrl-btn ctrl-reset" id="btn-reset" onclick="reset()">↺ Reset</button>
       <div class="speed-wrap">
         Speed: <input type="range" id="speed-range" min="1" max="10" value="5"> <span id="speed-val">5</span>
       </div>
@@ -150,16 +150,16 @@
   <script src="/js/db.js"></script>
   <script src="/js/auth.js"></script>
   <script>
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   // Algorithm definitions
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   const ALGOS = {
     bubble: {
       name: 'Bubble Sort',
-      complexity: { time:'O(nÂ²)', best:'O(n)', space:'O(1)', quality:{time:'bad',best:'ok',space:'good'} },
+      complexity: { time:'O(n²)', best:'O(n)', space:'O(1)', quality:{time:'bad',best:'ok',space:'good'} },
       pseudo: [
-        'FOR i â† 0 TO n-2',
-        '  FOR j â† 0 TO n-2-i',
+        'FOR i ← 0 TO n-2',
+        '  FOR j ← 0 TO n-2-i',
         '    IF arr[j] > arr[j+1] THEN',
         '      SWAP arr[j] AND arr[j+1]',
         '    ENDIF',
@@ -177,22 +177,22 @@
             }
           }
         }
-        steps.push({ arr:[...a], compare:[], swapped:false, sorted:Array.from({length:a.length},(_,k)=>k), pseudoLine:-1, msg:'âœ… Array is sorted!' });
+        steps.push({ arr:[...a], compare:[], swapped:false, sorted:Array.from({length:a.length},(_,k)=>k), pseudoLine:-1, msg:'✅ Array is sorted!' });
         return steps;
       }
     },
     insertion: {
       name: 'Insertion Sort',
-      complexity: { time:'O(nÂ²)', best:'O(n)', space:'O(1)', quality:{time:'bad',best:'ok',space:'good'} },
+      complexity: { time:'O(n²)', best:'O(n)', space:'O(1)', quality:{time:'bad',best:'ok',space:'good'} },
       pseudo: [
-        'FOR i â† 1 TO n-1',
-        '  key â† arr[i]',
-        '  j â† i - 1',
-        '  WHILE j â‰¥ 0 AND arr[j] > key',
-        '    arr[j+1] â† arr[j]',
-        '    j â† j - 1',
+        'FOR i ← 1 TO n-1',
+        '  key ← arr[i]',
+        '  j ← i - 1',
+        '  WHILE j ≥ 0 AND arr[j] > key',
+        '    arr[j+1] ← arr[j]',
+        '    j ← j - 1',
         '  ENDWHILE',
-        '  arr[j+1] â† key',
+        '  arr[j+1] ← key',
         'NEXT i',
       ],
       generate(arr) {
@@ -207,7 +207,7 @@
           a[j+1]=key;
           steps.push({ arr:[...a], compare:[j+1], key:j+1, sorted:Array.from({length:i+1},(_,k)=>k), pseudoLine:7, msg:`Placed <strong>${key}</strong> at position ${j+1}` });
         }
-        steps.push({ arr:[...a], compare:[], sorted:Array.from({length:a.length},(_,k)=>k), pseudoLine:-1, msg:'âœ… Array is sorted!' });
+        steps.push({ arr:[...a], compare:[], sorted:Array.from({length:a.length},(_,k)=>k), pseudoLine:-1, msg:'✅ Array is sorted!' });
         return steps;
       }
     },
@@ -215,7 +215,7 @@
       name: 'Linear Search',
       complexity: { time:'O(n)', best:'O(1)', space:'O(1)', quality:{time:'ok',best:'good',space:'good'} },
       pseudo: [
-        'FOR i â† 0 TO n-1',
+        'FOR i ← 0 TO n-1',
         '  IF arr[i] = target THEN',
         '    RETURN i',
         '  ENDIF',
@@ -226,7 +226,7 @@
         const steps = [];
         const t = target || arr[Math.floor(arr.length*0.6)];
         for (let i=0;i<arr.length;i++) {
-          steps.push({ arr:[...arr], compare:[i], found:arr[i]===t?i:-2, target:t, pseudoLine:1, msg:`Checking index ${i}: <strong>${arr[i]}</strong> ${arr[i]===t?'= âœ… Found!':'â‰  '+t}` });
+          steps.push({ arr:[...arr], compare:[i], found:arr[i]===t?i:-2, target:t, pseudoLine:1, msg:`Checking index ${i}: <strong>${arr[i]}</strong> ${arr[i]===t?'= ✅ Found!':'≠ '+t}` });
           if (arr[i]===t) break;
         }
         const found = arr.indexOf(t);
@@ -238,15 +238,15 @@
       name: 'Binary Search',
       complexity: { time:'O(log n)', best:'O(1)', space:'O(1)', quality:{time:'good',best:'good',space:'good'} },
       pseudo: [
-        'low â† 0 ; high â† n-1',
-        'WHILE low â‰¤ high',
-        '  mid â† (low + high) DIV 2',
+        'low ← 0 ; high ← n-1',
+        'WHILE low ≤ high',
+        '  mid ← (low + high) DIV 2',
         '  IF arr[mid] = target THEN',
         '    RETURN mid',
         '  ELSE IF arr[mid] < target THEN',
-        '    low â† mid + 1',
+        '    low ← mid + 1',
         '  ELSE',
-        '    high â† mid - 1',
+        '    high ← mid - 1',
         '  ENDIF',
         'ENDWHILE',
         'RETURN -1',
@@ -261,7 +261,7 @@
           const mid = Math.floor((lo+hi)/2);
           steps.push({ arr:a, low:lo, high:hi, mid, found:-2, target, pseudoLine:2, msg:`mid = (${lo}+${hi})/2 = ${mid}, arr[mid] = <strong>${a[mid]}</strong>` });
           if (a[mid]===target) {
-            steps.push({ arr:a, low:lo, high:hi, mid, found:mid, target, pseudoLine:4, msg:`âœ… Found <strong>${target}</strong> at index ${mid}!` });
+            steps.push({ arr:a, low:lo, high:hi, mid, found:mid, target, pseudoLine:4, msg:`✅ Found <strong>${target}</strong> at index ${mid}!` });
             break;
           } else if (a[mid]<target) {
             lo = mid+1;
@@ -280,13 +280,13 @@
       pseudo: [
         'PUSH(item):',
         '  IF stack is full THEN ERROR',
-        '  top â† top + 1',
-        '  stack[top] â† item',
+        '  top ← top + 1',
+        '  stack[top] ← item',
         '',
         'POP():',
         '  IF stack is empty THEN ERROR',
-        '  item â† stack[top]',
-        '  top â† top - 1',
+        '  item ← stack[top]',
+        '  top ← top - 1',
         '  RETURN item',
       ],
       generate() {
@@ -297,10 +297,10 @@
           if (op.startsWith('PUSH')) {
             const val = parseInt(op.split(' ')[1]);
             stack.push(val);
-            steps.push({ stack:[...stack], op:'push', val, msg:`PUSH <strong>${val}</strong> â†’ placed on top of stack`, pseudoLine:3 });
+            steps.push({ stack:[...stack], op:'push', val, msg:`PUSH <strong>${val}</strong> → placed on top of stack`, pseudoLine:3 });
           } else {
             const val = stack.pop();
-            steps.push({ stack:[...stack], op:'pop', val, msg:`POP â†’ removed <strong>${val}</strong> from top`, pseudoLine:8 });
+            steps.push({ stack:[...stack], op:'pop', val, msg:`POP → removed <strong>${val}</strong> from top`, pseudoLine:8 });
           }
         });
         return steps;
@@ -312,13 +312,13 @@
       pseudo: [
         'ENQUEUE(item):',
         '  IF queue is full THEN ERROR',
-        '  rear â† rear + 1',
-        '  queue[rear] â† item',
+        '  rear ← rear + 1',
+        '  queue[rear] ← item',
         '',
         'DEQUEUE():',
         '  IF queue is empty THEN ERROR',
-        '  item â† queue[front]',
-        '  front â† front + 1',
+        '  item ← queue[front]',
+        '  front ← front + 1',
         '  RETURN item',
       ],
       generate() {
@@ -329,10 +329,10 @@
           if (op.startsWith('ENQ')) {
             const val = parseInt(op.split(' ')[1]);
             queue.push(val);
-            steps.push({ queue:[...queue], op:'enq', val, msg:`ENQUEUE <strong>${val}</strong> â†’ added to rear of queue`, pseudoLine:3 });
+            steps.push({ queue:[...queue], op:'enq', val, msg:`ENQUEUE <strong>${val}</strong> → added to rear of queue`, pseudoLine:3 });
           } else {
             const val = queue.shift();
-            steps.push({ queue:[...queue], op:'deq', val, msg:`DEQUEUE â†’ removed <strong>${val}</strong> from front`, pseudoLine:8 });
+            steps.push({ queue:[...queue], op:'deq', val, msg:`DEQUEUE → removed <strong>${val}</strong> from front`, pseudoLine:8 });
           }
         });
         return steps;
@@ -340,9 +340,9 @@
     },
   };
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   // State
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   let currentAlgo = 'bubble';
   let steps = [];
   let stepIdx = 0;
@@ -353,9 +353,9 @@
   const canvas  = document.getElementById('viz-canvas');
   const ctx     = canvas.getContext('2d');
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   // Init
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   function selectAlgo(name) {
     currentAlgo = name;
     document.querySelectorAll('.algo-btn').forEach(b => b.classList.toggle('active', b.textContent.includes(ALGOS[name].name)));
@@ -393,9 +393,9 @@
     toast('Array updated!');
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   // Playback
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   function stepOnce() {
     if (stepIdx >= steps.length - 1) return;
     stepIdx++;
@@ -410,14 +410,14 @@
   function startPlay() {
     if (stepIdx >= steps.length - 1) stepIdx = 0;
     playing = true;
-    document.getElementById('btn-play').textContent = 'â¸ Pause';
+    document.getElementById('btn-play').textContent = '⏸ Pause';
     scheduleNext();
   }
 
   function stopPlay() {
     playing = false;
     clearTimeout(playTimer);
-    document.getElementById('btn-play').textContent = 'â–¶ Play';
+    document.getElementById('btn-play').textContent = '▶ Play';
   }
 
   function scheduleNext() {
@@ -449,9 +449,9 @@
     document.getElementById('step-total').textContent = steps.length - 1;
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   // Drawing
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   function drawStep(s) {
     if (!s) return;
     canvas.width = canvas.offsetWidth || 600;
@@ -555,7 +555,7 @@
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     ctx.fillStyle='#4a5568'; ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('TOP â†“', pad, 20);
+    ctx.fillText('TOP ↓', pad, 20);
 
     stack.slice().reverse().forEach((v,i) => {
       const x=pad, y=30+i*(boxH+gap);
@@ -580,9 +580,9 @@
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     ctx.fillStyle='#4a5568'; ctx.font='bold 11px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('â† DEQUEUE', pad, 16);
+    ctx.fillText('← DEQUEUE', pad, 16);
     ctx.textAlign='right';
-    ctx.fillText('ENQUEUE â†’', canvas.width-pad, 16);
+    ctx.fillText('ENQUEUE →', canvas.width-pad, 16);
 
     queue.forEach((v,i) => {
       const x=pad+i*(boxW+gap), y=30;
@@ -609,9 +609,9 @@
     ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   // Pseudocode panel
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   function renderPseudo(lines, activeLine) {
     document.getElementById('pseudo-code').innerHTML = lines.map((l,i) =>
       `<span class="pseudo-line ${i===activeLine?'active':''}">${escHtml(l) || '&nbsp;'}</span>`
@@ -631,7 +631,7 @@
   // Resize canvas on window resize
   window.addEventListener('resize', () => { if (steps[stepIdx]) drawStep(steps[stepIdx]); });
 
-  // â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Init ──────────────────────────────────────────────────────────
   reset();
   </script>
 </body>

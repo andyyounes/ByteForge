@@ -1,14 +1,20 @@
 // Parse every inline <script> block in the lesson pages with acorn and
 // report any syntax errors — catches broken pages before students do.
-import { readFileSync } from 'fs'
+import { readFileSync, readdirSync } from 'fs'
 import * as acorn from 'acorn'
 
+// EVERY lesson page, not just two. This used to check only as-level.html and
+// a-level.html — and meanwhile grade9.html's entire script had been dead:
+// a stray "]" closed the CHALLENGES array early, leaving three further
+// challenges orphaned after it as bare syntax, which threw
+// "Unexpected identifier 'total'" and stopped the whole page from running.
+// The per-grade suites never caught it because they extract only the slice of
+// source they need (the Interpreter, the CHALLENGES array) and so never parse
+// the file as a whole.
+const LESSON_DIR = 'c:/Users/user/Downloads/ICT website/public/lessons'
 const files = process.argv.slice(2).length
   ? process.argv.slice(2)
-  : [
-      'c:/Users/user/Downloads/ICT website/public/lessons/as-level.html',
-      'c:/Users/user/Downloads/ICT website/public/lessons/a-level.html',
-    ]
+  : readdirSync(LESSON_DIR).filter(f => f.endsWith('.html')).sort().map(f => `${LESSON_DIR}/${f}`)
 
 let bad = 0
 for (const file of files) {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ByteForge â€” Binary Cards</title>
+  <title>ByteForge — Binary Cards</title>
   <link rel="stylesheet" href="/styles.css"/>
   <style>
     body { padding-top:64px; min-height:100vh; }
@@ -12,13 +12,13 @@
     .page-title  { font-size:32px; font-weight:800; letter-spacing:-.03em; margin-bottom:10px; }
     .page-sub    { font-size:16px; color:var(--fg-dim); }
 
-    /* â”€â”€ Mode tabs â”€â”€ */
+    /* ── Mode tabs ── */
     .modes { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:36px; }
     .mode-btn { padding:10px 22px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; background:var(--bg-card); border:1px solid var(--border); color:var(--fg-dim); transition:.2s; }
     .mode-btn:hover  { border-color:var(--border-hi); color:var(--fg); }
     .mode-btn.active { background:var(--orange); border-color:var(--orange); color:#fff; }
 
-    /* â”€â”€ Cards grid â”€â”€ */
+    /* ── Cards grid ── */
     .cards-grid { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:28px; }
     .bit-card {
       width:88px; perspective:600px; cursor:pointer;
@@ -42,7 +42,7 @@
     .bit-face-back  .bit-digit { color:#fff; }
     .bit-card:hover .bit-face-front { border-color:var(--orange); }
 
-    /* â”€â”€ Display â”€â”€ */
+    /* ── Display ── */
     .display-row { display:flex; align-items:center; justify-content:center; gap:32px; margin-bottom:28px; flex-wrap:wrap; }
     .display-block { text-align:center; }
     .display-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--fg-faint); margin-bottom:6px; }
@@ -52,7 +52,7 @@
     .display-value.hex { color:var(--purple); }
     .display-sep { font-size:24px; color:var(--border-hi); }
 
-    /* â”€â”€ Challenge panel â”€â”€ */
+    /* ── Challenge panel ── */
     .challenge-box { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:28px 32px; text-align:center; margin-bottom:28px; max-width:600px; margin-left:auto; margin-right:auto; }
     .challenge-question { font-size:20px; font-weight:700; margin-bottom:8px; }
     .challenge-target { font-size:48px; font-weight:900; letter-spacing:-.04em; color:var(--orange); margin-bottom:20px; font-family:var(--mono); }
@@ -65,34 +65,34 @@
     .btn-ghost { background:var(--bg-raised); color:var(--fg); border:1px solid var(--border-hi); }
     .btn-ghost:hover { background:rgba(255,255,255,.07); }
 
-    /* â”€â”€ Feedback â”€â”€ */
+    /* ── Feedback ── */
     .feedback { padding:14px 20px; border-radius:12px; font-size:15px; font-weight:600; text-align:center; margin-bottom:16px; display:none; }
     .feedback.correct { background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.3); color:var(--green); display:block; }
     .feedback.wrong   { background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.3); color:#fca5a5; display:block; }
 
-    /* â”€â”€ Progress â”€â”€ */
+    /* ── Progress ── */
     .progress-bar { background:rgba(255,255,255,.07); border-radius:999px; height:8px; margin-bottom:20px; overflow:hidden; }
     .progress-fill { height:8px; border-radius:999px; background:linear-gradient(90deg,var(--orange),#f59e0b); transition:width .5s ease; }
     .round-info { font-size:13px; color:var(--fg-dim); text-align:center; margin-bottom:16px; }
 
-    /* â”€â”€ Score â”€â”€ */
+    /* ── Score ── */
     .score-board { display:flex; gap:20px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
     .score-item { text-align:center; padding:12px 20px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); }
     .score-num { font-size:24px; font-weight:800; letter-spacing:-.02em; }
     .score-lbl { font-size:11px; color:var(--fg-dim); margin-top:2px; }
 
-    /* â”€â”€ Addition mode â”€â”€ */
+    /* ── Addition mode ── */
     .addition-wrap { max-width:600px; margin:0 auto; }
     .addition-row  { display:flex; gap:10px; align-items:center; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
     .num-input { width:80px; padding:10px; border-radius:8px; background:var(--bg); border:2px solid var(--border); color:var(--fg); font-size:18px; font-family:var(--mono); font-weight:700; text-align:center; outline:none; transition:.2s; }
     .num-input:focus { border-color:var(--orange); }
     .plus-sign { font-size:28px; font-weight:800; color:var(--fg-dim); }
 
-    /* â”€â”€ Help tooltip â”€â”€ */
+    /* ── Help tooltip ── */
     .help-bar { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:14px 20px; font-size:14px; color:var(--fg-dim); line-height:1.6; margin-bottom:24px; max-width:700px; margin-left:auto; margin-right:auto; }
     .help-bar strong { color:var(--fg); }
 
-    /* â”€â”€ Toast â”€â”€ */
+    /* ── Toast ── */
     .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
     .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
     .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
@@ -104,9 +104,9 @@
 <body>
 
   <nav class="nav">
-    <div class="nav-logo"><div class="logo-icon">âš’</div><span class="logo-text">Byte<span>Forge</span></span></div>
+    <div class="nav-logo"><div class="logo-icon">⚒</div><span class="logo-text">Byte<span>Forge</span></span></div>
     <div class="nav-links">
-      <a href="/student/dashboard">â† Dashboard</a>
+      <a href="/student/dashboard">← Dashboard</a>
     </div>
     <a href="../login.html" class="nav-cta" id="nav-auth">Sign In</a>
   </nav>
@@ -114,16 +114,16 @@
   <div class="container">
     <div class="page-header">
       <div class="section-label">Binary & Number Systems</div>
-      <div class="page-title">ðŸƒ Binary Cards</div>
+      <div class="page-title">🃏 Binary Cards</div>
       <div class="page-sub">Flip cards to explore binary numbers, then try the challenges!</div>
     </div>
 
     <!-- Mode selector -->
     <div class="modes">
-      <button class="mode-btn active" onclick="setMode('explore')">ðŸ” Explore</button>
-      <button class="mode-btn" onclick="setMode('dec2bin')">ðŸŽ¯ Decimal â†’ Binary</button>
-      <button class="mode-btn" onclick="setMode('bin2dec')">ðŸ”¢ Binary â†’ Decimal</button>
-      <button class="mode-btn" onclick="setMode('addition')">âž• Binary Addition</button>
+      <button class="mode-btn active" onclick="setMode('explore')">🔍 Explore</button>
+      <button class="mode-btn" onclick="setMode('dec2bin')">🎯 Decimal → Binary</button>
+      <button class="mode-btn" onclick="setMode('bin2dec')">🔢 Binary → Decimal</button>
+      <button class="mode-btn" onclick="setMode('addition')">➕ Binary Addition</button>
     </div>
 
     <!-- Cards -->
@@ -164,7 +164,7 @@
       <div class="feedback" id="feedback"></div>
       <div class="challenge-box">
         <div class="challenge-question" id="challenge-question">Convert to binary:</div>
-        <div class="challenge-target" id="challenge-target">â€”</div>
+        <div class="challenge-target" id="challenge-target">—</div>
         <div class="answer-row" id="answer-row"></div>
       </div>
     </div>
@@ -202,7 +202,7 @@
       document.getElementById('nav-auth').href = me.role==='teacher' ? '/teacher/dashboard' : '/student/dashboard';
     }
 
-    // â”€â”€ State â”€â”€
+    // ── State ──
     const BITS   = [128, 64, 32, 16, 8, 4, 2, 1];
     let state    = [0,0,0,0,0,0,0,0]; // 0=off, 1=on
     let mode     = 'explore';
@@ -212,7 +212,7 @@
     let score    = { correct:0, wrong:0, xp:0 };
     let cardsLocked = false;
 
-    // â”€â”€ Render cards â”€â”€
+    // ── Render cards ──
     function buildCards() {
       const grid = document.getElementById('cards-grid');
       grid.innerHTML = BITS.map((v,i) => `
@@ -260,7 +260,7 @@
       updateDisplay();
     }
 
-    // â”€â”€ Mode switching â”€â”€
+    // ── Mode switching ──
     function setMode(m) {
       mode = m;
       document.querySelectorAll('.mode-btn').forEach((b,i) => {
@@ -286,7 +286,7 @@
         aa.style.display = '';
         hb.style.display = 'none';
         renderAddition();
-        // lock cards in addition mode â€“ just show the values
+        // lock cards in addition mode – just show the values
         cardsLocked = true;
         showAdditionCards(6);
       } else {
@@ -297,7 +297,7 @@
       }
     }
 
-    // â”€â”€ Dec â†’ Bin challenge â”€â”€
+    // ── Dec → Bin challenge ──
     function nextChallenge() {
       if (round >= ROUNDS) { endGame(); return; }
       resetCards();
@@ -310,9 +310,9 @@
         target = Math.floor(Math.random() * 200) + 1;
         document.getElementById('challenge-question').textContent = 'Flip the cards to make this decimal:';
         document.getElementById('challenge-target').textContent   = target;
-        document.getElementById('answer-row').innerHTML = `<button class="btn btn-orange" onclick="checkDec2Bin()">Check âœ“</button><button class="btn btn-ghost" onclick="showHint()">Hint ðŸ’¡</button>`;
+        document.getElementById('answer-row').innerHTML = `<button class="btn btn-orange" onclick="checkDec2Bin()">Check ✓</button><button class="btn btn-ghost" onclick="showHint()">Hint 💡</button>`;
       } else {
-        // Bin â†’ Dec: pick random, set cards, ask for decimal
+        // Bin → Dec: pick random, set cards, ask for decimal
         target = Math.floor(Math.random() * 254) + 1;
         const bits = target.toString(2).padStart(8,'0').split('').map(Number);
         bits.forEach((b,i) => { state[i]=b; updateCard(i); });
@@ -322,7 +322,7 @@
         document.getElementById('challenge-target').textContent   = '';
         document.getElementById('answer-row').innerHTML = `
           <input type="number" id="user-answer" class="answer-input" placeholder="?" min="0" max="255" autofocus onkeydown="if(event.key==='Enter')checkBin2Dec(true)"/>
-          <button class="btn btn-orange" onclick="checkBin2Dec(true)">Check âœ“</button>`;
+          <button class="btn btn-orange" onclick="checkBin2Dec(true)">Check ✓</button>`;
         setTimeout(()=>document.getElementById('user-answer')?.focus(), 100);
       }
     }
@@ -347,7 +347,7 @@
       score.correct++;
       score.xp += 10;
       updateScore();
-      showFeedback('correct', 'âœ“ Correct! +10 XP');
+      showFeedback('correct', '✓ Correct! +10 XP');
       cardsLocked = true;
       round++;
       setTimeout(nextChallenge, 1600);
@@ -356,7 +356,7 @@
     function wrong(msg) {
       score.wrong++;
       updateScore();
-      showFeedback('wrong', 'âœ— ' + msg);
+      showFeedback('wrong', '✗ ' + msg);
       setTimeout(() => { hideFeedback(); if(mode==='dec2bin'){resetCards(); cardsLocked=false;} else{ const ans=document.getElementById('user-answer'); if(ans){ans.value='';ans.focus();} } }, 2000);
     }
 
@@ -372,7 +372,7 @@
       cardsLocked = true;
       document.getElementById('prog-fill').style.width = '100%';
       document.getElementById('round-info').textContent = 'Complete!';
-      showFeedback('correct', `ðŸŽ‰ Game over! ${score.correct}/${ROUNDS} correct Â· ${score.xp} XP earned`);
+      showFeedback('correct', `🎉 Game over! ${score.correct}/${ROUNDS} correct · ${score.xp} XP earned`);
       // Award XP if logged in
       if (me) {
         BF.addXP(me.id, score.xp);
@@ -394,7 +394,7 @@
       document.getElementById('sc-xp').textContent      = score.xp;
     }
 
-    // â”€â”€ Addition mode â”€â”€
+    // ── Addition mode ──
     function renderAddition() {
       const a = parseInt(document.getElementById('add-a').value)||0;
       const b = parseInt(document.getElementById('add-b').value)||0;
@@ -444,13 +444,13 @@
       updateDisplay();
     }
 
-    // â”€â”€ Init â”€â”€
+    // ── Init ──
     buildCards();
     updateDisplay();
 
     // Back link
     if (!me) {
-      document.querySelectorAll('a[href*="dashboard"]').forEach(a => { a.href='../login.html'; a.textContent='â† Back'; });
+      document.querySelectorAll('a[href*="dashboard"]').forEach(a => { a.href='../login.html'; a.textContent='← Back'; });
     }
   </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ByteForge â€” Code IDE</title>
+  <title>ByteForge — Code IDE</title>
   <link rel="stylesheet" href="/styles.css"/>
   <!-- CodeMirror -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
@@ -20,7 +20,7 @@
     body { padding-top:64px; background:var(--bg); }
     .ide-layout { display:grid; grid-template-columns:220px 1fr 340px; height:calc(100vh - 64px); overflow:hidden; }
 
-    /* â”€â”€ Sidebar: exercises â”€â”€ */
+    /* ── Sidebar: exercises ── */
     .ex-sidebar { background:var(--bg-card); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
     .ex-sidebar-header { padding:14px 16px; border-bottom:1px solid var(--border); }
     .ex-sidebar-title { font-size:14px; font-weight:700; margin-bottom:8px; }
@@ -37,7 +37,7 @@
     .diff-dot  { width:5px; height:5px; border-radius:50%; background:var(--border-hi); }
     .diff-dot.on { background:var(--orange); }
 
-    /* â”€â”€ Center: Editor â”€â”€ */
+    /* ── Center: Editor ── */
     .editor-panel { display:flex; flex-direction:column; overflow:hidden; }
     .editor-header { padding:10px 16px; background:var(--bg-card); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-shrink:0; }
     .editor-filename { font-family:var(--mono); font-size:13px; color:var(--fg-dim); }
@@ -53,7 +53,7 @@
     .CodeMirror { height:100% !important; font-size:14px; font-family:var(--mono); background:#0a0c18; color:#abb2bf; }
     .CodeMirror-scroll { overflow:auto !important; }
 
-    /* â”€â”€ Right: Description + Output â”€â”€ */
+    /* ── Right: Description + Output ── */
     .right-panel { display:flex; flex-direction:column; border-left:1px solid var(--border); overflow:hidden; background:var(--bg-card); }
     .description-panel { flex:1; overflow-y:auto; padding:20px; border-bottom:1px solid var(--border); }
     .desc-title { font-size:17px; font-weight:800; margin-bottom:8px; }
@@ -97,7 +97,7 @@
 <body>
 
   <nav class="nav">
-    <div class="nav-logo"><div class="logo-icon">âš’</div><span class="logo-text">Byte<span>Forge</span></span></div>
+    <div class="nav-logo"><div class="logo-icon">⚒</div><span class="logo-text">Byte<span>Forge</span></span></div>
     <div class="nav-links" id="nav-links"></div>
     <a href="../login.html" class="nav-cta" id="nav-auth">Sign In</a>
   </nav>
@@ -119,7 +119,7 @@
         <span class="editor-filename" id="editor-filename">main.py</span>
         <div class="spacer"></div>
         <button class="btn btn-ghost" onclick="resetCode()">Reset</button>
-        <button class="btn btn-green" onclick="runCode()" id="run-btn">â–¶ Run</button>
+        <button class="btn btn-green" onclick="runCode()" id="run-btn">▶ Run</button>
       </div>
       <div id="editor-wrap"></div>
     </div>
@@ -140,14 +140,14 @@
           <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="clearOutput()">Clear</button>
         </div>
         <div class="output-body" id="output-body">
-          <div class="out-line sys">Ready. Click â–¶ Run to execute your code.</div>
+          <div class="out-line sys">Ready. Click ▶ Run to execute your code.</div>
         </div>
       </div>
     </div>
 
   </div>
 
-  <div class="xp-popup" id="xp-popup">âš¡ <span id="xp-amount">+50 XP</span></div>
+  <div class="xp-popup" id="xp-popup">⚡ <span id="xp-amount">+50 XP</span></div>
 
   <script src="/js/db.js"></script>
   <script src="/js/auth.js"></script>
@@ -159,7 +159,7 @@
       document.getElementById('nav-auth').href = me.role==='teacher'?'/teacher/dashboard':'/student/dashboard';
     }
 
-    // â”€â”€ Language config â”€â”€
+    // ── Language config ──
     const LANGS = {
       python:     { label:'Python',  ext:'py',   cm:'python',    pistonLang:'python',     pistonVer:'3.10.0', starter:'# Python\nprint("Hello, ByteForge!")\n' },
       javascript: { label:'JS',      ext:'js',   cm:'javascript',pistonLang:'javascript', pistonVer:'18.15.0',starter:'// JavaScript\nconsole.log("Hello, ByteForge!");\n' },
@@ -169,18 +169,18 @@
       vbnet:      { label:'VB.NET',  ext:'vb',   cm:'vbscript',   pistonLang:'vb',        pistonVer:'5.0.201',starter:'Module Main\n    Sub Main()\n        Console.WriteLine("Hello, ByteForge!")\n    End Sub\nEnd Module\n' },
     };
 
-    // â”€â”€ Built-in exercises â”€â”€
+    // ── Built-in exercises ──
     const EXERCISES = {
       python: [
         { id:'py1', title:'Hello World',      difficulty:1, xp:20,  desc:'<p>Print <code>Hello, World!</code> to the screen.</p>', starter:'# Print Hello, World!\nprint()\n', tests:[{input:'',expected:'Hello, World!'}] },
         { id:'py2', title:'Sum of numbers',   difficulty:1, xp:30,  desc:'<p>Ask the user for two numbers and print their sum.</p><pre>a = int(input())\nb = int(input())\n# print a + b</pre>', starter:'a = int(input())\nb = int(input())\n# TODO: print a + b\n', tests:[{input:'3\n5',expected:'8'}] },
-        { id:'py3', title:'FizzBuzz',          difficulty:2, xp:50,  desc:'<p>Print numbers 1â€“20. For multiples of 3 print <code>Fizz</code>, multiples of 5 print <code>Buzz</code>, both print <code>FizzBuzz</code>.</p>', starter:'for i in range(1, 21):\n    # TODO: FizzBuzz logic\n    pass\n', tests:[{input:'',expected:'FizzBuzz'}] },
+        { id:'py3', title:'FizzBuzz',          difficulty:2, xp:50,  desc:'<p>Print numbers 1–20. For multiples of 3 print <code>Fizz</code>, multiples of 5 print <code>Buzz</code>, both print <code>FizzBuzz</code>.</p>', starter:'for i in range(1, 21):\n    # TODO: FizzBuzz logic\n    pass\n', tests:[{input:'',expected:'FizzBuzz'}] },
         { id:'py4', title:'Fibonacci sequence',difficulty:3, xp:75,  desc:'<p>Print the first 10 Fibonacci numbers, one per line.</p>', starter:'# Generate Fibonacci numbers\na, b = 0, 1\n', tests:[{input:'',expected:'0\n1\n1\n2\n3\n5\n8\n13\n21\n34'}] },
         { id:'py5', title:'Bubble Sort',       difficulty:4, xp:100, desc:'<p>Given the list <code>[64, 34, 25, 12, 22, 11, 90]</code>, implement bubble sort and print the sorted list.</p>', starter:'arr = [64, 34, 25, 12, 22, 11, 90]\n# TODO: bubble sort\nprint(arr)\n', tests:[{input:'',expected:'[11, 12, 22, 25, 34, 64, 90]'}] },
       ],
       javascript: [
         { id:'js1', title:'Hello World',       difficulty:1, xp:20,  desc:'<p>Log <code>Hello, World!</code> to the console.</p>', starter:'console.log();\n', tests:[{input:'',expected:'Hello, World!'}] },
-        { id:'js2', title:'Even or Odd',       difficulty:1, xp:30,  desc:'<p>Print whether numbers 1â€“10 are Even or Odd.</p>', starter:'for (let i = 1; i <= 10; i++) {\n  // TODO\n}\n', tests:[] },
+        { id:'js2', title:'Even or Odd',       difficulty:1, xp:30,  desc:'<p>Print whether numbers 1–10 are Even or Odd.</p>', starter:'for (let i = 1; i <= 10; i++) {\n  // TODO\n}\n', tests:[] },
         { id:'js3', title:'Reverse a string',  difficulty:2, xp:50,  desc:'<p>Reverse the string <code>"ByteForge"</code> and print it.</p>', starter:'const s = "ByteForge";\n// TODO: reverse and print\n', tests:[{input:'',expected:'egroFetyB'}] },
       ],
       java: [
@@ -203,7 +203,7 @@
     let currentEx   = null;
     let editor;
 
-    // â”€â”€ Build language buttons â”€â”€
+    // ── Build language buttons ──
     Object.entries(LANGS).forEach(([k,v]) => {
       const btn = document.createElement('button');
       btn.className = 'lang-btn' + (k===currentLang?' active':'');
@@ -212,7 +212,7 @@
       document.getElementById('lang-btns').appendChild(btn);
     });
 
-    // â”€â”€ CodeMirror editor â”€â”€
+    // ── CodeMirror editor ──
     editor = CodeMirror(document.getElementById('editor-wrap'), {
       value: LANGS.python.starter,
       mode: LANGS.python.cm,
@@ -245,7 +245,7 @@
         <div class="ex-item ${currentEx?.id===e.id?'active':''}" onclick="loadExercise('${currentLang}','${e.id}')">
           <div class="ex-item-title">${e.title}</div>
           <div class="diff-dots">${Array.from({length:5},(_,i)=>`<div class="diff-dot ${i<e.difficulty?'on':''}"></div>`).join('')}</div>
-          <div class="ex-item-meta">âš¡ ${e.xp} XP</div>
+          <div class="ex-item-meta">⚡ ${e.xp} XP</div>
         </div>`).join('') || '<div style="padding:16px;font-size:13px;color:var(--fg-faint)">No exercises for this language yet</div>';
     }
 
@@ -262,7 +262,7 @@
       let html = ex.desc || '';
       if (ex.tests?.length) {
         html += '<div class="test-cases"><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--fg-faint);margin-bottom:8px">Test Cases</div>';
-        ex.tests.forEach((t,i)=>{ html+=`<div class="test-case"><div class="tc-label">Test ${i+1}</div>${t.input?`<div class="tc-code" id="tc-in-${i}">Input: ${t.input}</div>`:''}${t.expected?`<div class="tc-code" id="tc-exp-${i}">Expected: <strong>${t.expected}</strong></div>`:''}${t.result?`<div class="tc-code ${t.pass?'tc-pass':'tc-fail'}">${t.pass?'âœ“':'âœ—'} ${t.result}</div>`:''}</div>`; });
+        ex.tests.forEach((t,i)=>{ html+=`<div class="test-case"><div class="tc-label">Test ${i+1}</div>${t.input?`<div class="tc-code" id="tc-in-${i}">Input: ${t.input}</div>`:''}${t.expected?`<div class="tc-code" id="tc-exp-${i}">Expected: <strong>${t.expected}</strong></div>`:''}${t.result?`<div class="tc-code ${t.pass?'tc-pass':'tc-fail'}">${t.pass?'✓':'✗'} ${t.result}</div>`:''}</div>`; });
         html += '</div>';
       }
       document.getElementById('desc-body').innerHTML = html;
@@ -272,7 +272,7 @@
     function showDefaultDesc() {
       currentEx = null;
       document.getElementById('desc-title').textContent = `${LANGS[currentLang].label} Sandbox`;
-      document.getElementById('desc-body').innerHTML = '<p>Select an exercise from the left panel, or write your own code and press <strong>â–¶ Run</strong>.</p><p style="margin-top:8px;font-size:13px;color:var(--fg-faint)">Tip: Press <code>Ctrl+Enter</code> to run.</p>';
+      document.getElementById('desc-body').innerHTML = '<p>Select an exercise from the left panel, or write your own code and press <strong>▶ Run</strong>.</p><p style="margin-top:8px;font-size:13px;color:var(--fg-faint)">Tip: Press <code>Ctrl+Enter</code> to run.</p>';
       renderExList();
     }
 
@@ -281,13 +281,13 @@
       else editor.setValue(LANGS[currentLang].starter);
     }
 
-    // â”€â”€ Run code via Piston API â”€â”€
+    // ── Run code via Piston API ──
     async function runCode() {
       const btn = document.getElementById('run-btn');
       btn.disabled = true;
-      btn.innerHTML = '<span class="spin"></span> Runningâ€¦';
+      btn.innerHTML = '<span class="spin"></span> Running…';
       clearOutput();
-      addOutput('â–¶ Executingâ€¦', 'sys');
+      addOutput('▶ Executing…', 'sys');
 
       const code = editor.getValue();
       const lang = LANGS[currentLang];
@@ -313,14 +313,14 @@
         if (currentEx?.tests?.length) {
           checkTests(stdout.trim(), currentEx.tests);
         } else {
-          addOutput('âœ“ Execution complete', 'ok');
+          addOutput('✓ Execution complete', 'ok');
         }
       } catch(e) {
-        addOutput('Network error â€” check your connection', 'err');
+        addOutput('Network error — check your connection', 'err');
         addOutput(e.message, 'err');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = 'â–¶ Run';
+        btn.innerHTML = '▶ Run';
       }
     }
 
@@ -339,7 +339,7 @@
       const submittedCode = editor.getValue();
       if (currentEx) loadExercise(currentLang, currentEx.id, true);
       if (allPassed) {
-        addOutput(`âœ… All tests passed!`, 'ok');
+        addOutput(`✅ All tests passed!`, 'ok');
         if (me && currentEx) {
           // Check completion BEFORE recording: recordAttempt() itself adds the
           // id to completedExercises on a pass, so testing afterwards was
@@ -351,7 +351,7 @@
           }
         }
       } else {
-        addOutput('âœ— Some tests failed â€” check the expected output', 'err');
+        addOutput('✗ Some tests failed — check the expected output', 'err');
       }
     }
 

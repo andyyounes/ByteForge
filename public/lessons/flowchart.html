@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ByteForge â€” Flowchart Builder</title>
+  <title>ByteForge — Flowchart Builder</title>
   <link rel="stylesheet" href="/styles.css"/>
   <style>
     body { padding-top:64px; background:var(--bg); overflow:hidden; }
     .shell { display:grid; grid-template-columns:220px 1fr 280px; height:calc(100vh - 64px); }
 
-    /* â”€â”€ Left panel: shapes palette â”€â”€ */
+    /* ── Left panel: shapes palette ── */
     .shapes-panel { background:var(--bg-card); border-right:1px solid var(--border); padding:20px 14px; display:flex; flex-direction:column; gap:8px; overflow-y:auto; }
     .panel-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--fg-faint); margin:12px 0 6px; }
     .shape-btn { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:var(--bg); cursor:pointer; transition:.15s; font-size:13px; font-weight:600; color:var(--fg-dim); }
@@ -19,7 +19,7 @@
     .mode-btn.active { background:rgba(249,115,22,.12); border-color:rgba(249,115,22,.4); color:var(--orange); }
     .mode-btn:hover:not(.active) { background:rgba(255,255,255,.05); }
 
-    /* â”€â”€ Canvas area â”€â”€ */
+    /* ── Canvas area ── */
     .canvas-wrap { position:relative; overflow:hidden; background:#0d1117; cursor:default; }
     #fc-svg { width:100%; height:100%; }
     .canvas-toolbar { position:absolute; top:14px; left:50%; transform:translateX(-50%); display:flex; gap:8px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:8px 12px; z-index:10; }
@@ -33,7 +33,7 @@
     .tb-run    { background:linear-gradient(135deg,var(--orange),#f59e0b); color:#000; }
     .tb-export { background:rgba(34,197,94,.1); color:var(--green); }
 
-    /* â”€â”€ Right panel: properties + pseudocode â”€â”€ */
+    /* ── Right panel: properties + pseudocode ── */
     .right-panel { background:var(--bg-card); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
     .rp-tabs { display:flex; border-bottom:1px solid var(--border); }
     .rp-tab  { flex:1; padding:12px; text-align:center; font-size:12px; font-weight:700; cursor:pointer; color:var(--fg-dim); transition:.15s; }
@@ -49,13 +49,13 @@
 
     .pseudo-area { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; font-family:var(--mono); font-size:12px; line-height:1.8; min-height:200px; white-space:pre; overflow:auto; }
 
-    /* â”€â”€ Simulation overlay â”€â”€ */
+    /* ── Simulation overlay ── */
     .sim-bar { position:absolute; bottom:0; left:0; right:0; background:rgba(13,17,23,.95); border-top:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; gap:12px; z-index:20; display:none; }
     .sim-msg { flex:1; font-size:14px; font-weight:600; }
     .sim-step-btn { padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; border:none; background:var(--orange); color:#fff; }
     .sim-stop-btn { padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; border:none; background:rgba(255,255,255,.08); color:var(--fg-dim); }
 
-    /* â”€â”€ Toast â”€â”€ */
+    /* ── Toast ── */
     .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:10px; font-size:14px; font-weight:600; transform:translateY(60px); opacity:0; transition:.3s; z-index:9999; }
     .toast-success { background:#166534; color:#bbf7d0; border:1px solid #16a34a; }
     .toast-error   { background:#7f1d1d; color:#fecaca; border:1px solid #dc2626; }
@@ -67,11 +67,11 @@
 
   <nav class="nav">
     <div class="nav-logo">
-      <div class="logo-icon">âš’</div>
+      <div class="logo-icon">⚒</div>
       <span class="logo-text">Byte<span>Forge</span></span>
     </div>
     <div class="nav-links">
-      <a href="/student/dashboard">â† Dashboard</a>
+      <a href="/student/dashboard">← Dashboard</a>
     </div>
     <button class="nav-cta" onclick="location.href='/student/dashboard'" style="background:var(--bg-raised);border:1px solid var(--border-hi);color:var(--fg);">Back</button>
   </nav>
@@ -79,7 +79,7 @@
   <div class="shell">
     <!-- Left palette -->
     <div class="shapes-panel">
-      <div style="font-size:15px;font-weight:800">ðŸ“Š Flowchart</div>
+      <div style="font-size:15px;font-weight:800">📊 Flowchart</div>
       <div style="font-size:12px;color:var(--fg-dim);margin-top:2px">Drag shapes onto the canvas</div>
 
       <div class="panel-label">Shapes</div>
@@ -106,16 +106,16 @@
       <button class="mode-btn" onclick="loadTemplate('linear')">Linear sequence</button>
 
       <div class="panel-label">Actions</div>
-      <button class="mode-btn" onclick="clearCanvas()" style="color:#f87171">ðŸ—‘ï¸ Clear all</button>
+      <button class="mode-btn" onclick="clearCanvas()" style="color:#f87171">🗑️ Clear all</button>
     </div>
 
     <!-- Canvas -->
     <div class="canvas-wrap" id="canvas-wrap">
       <div class="canvas-toolbar">
-        <button class="toolbar-btn tb-select active" id="btn-select" onclick="setMode('select')">â¬† Select</button>
-        <button class="toolbar-btn tb-connect" id="btn-connect" onclick="setMode('connect')">â†— Connect</button>
-        <button class="toolbar-btn tb-delete" onclick="deleteSelected()">âœ• Delete</button>
-        <button class="toolbar-btn tb-run" onclick="startSim()">â–¶ Simulate</button>
+        <button class="toolbar-btn tb-select active" id="btn-select" onclick="setMode('select')">⬆ Select</button>
+        <button class="toolbar-btn tb-connect" id="btn-connect" onclick="setMode('connect')">↗ Connect</button>
+        <button class="toolbar-btn tb-delete" onclick="deleteSelected()">✕ Delete</button>
+        <button class="toolbar-btn tb-run" onclick="startSim()">▶ Simulate</button>
         <button class="toolbar-btn tb-export" onclick="showTab('pseudo');generatePseudo()">{ } Export</button>
       </div>
       <svg id="fc-svg" xmlns="http://www.w3.org/2000/svg">
@@ -133,7 +133,7 @@
       </svg>
       <div class="sim-bar" id="sim-bar">
         <div class="sim-msg" id="sim-msg">Simulation running...</div>
-        <button class="sim-step-btn" onclick="simStep()">Next Step â†’</button>
+        <button class="sim-step-btn" onclick="simStep()">Next Step →</button>
         <button class="sim-stop-btn" onclick="stopSim()">Stop</button>
       </div>
     </div>
@@ -146,7 +146,7 @@
       </div>
       <div class="rp-body" id="rp-body">
         <div class="prop-no-selection">
-          <div style="font-size:28px;margin-bottom:8px">ðŸ”²</div>
+          <div style="font-size:28px;margin-bottom:8px">🔲</div>
           Click a shape to edit its label,<br>or drag shapes onto the canvas.
         </div>
       </div>
@@ -156,9 +156,9 @@
   <script src="/js/db.js"></script>
   <script src="/js/auth.js"></script>
   <script>
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   // State
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ────────────────────────────────────────────────────────────────────
   let nodes = [];       // { id, type, x, y, w, h, label, branches:{yes,no} }
   let edges = [];       // { id, from, to, label }
   let selectedId = null;
@@ -176,13 +176,13 @@
   const SHAPE_W = { start:120, process:140, decision:130, io:140 };
   const SHAPE_H = { start:48,  process:52,  decision:64,  io:52  };
 
-  // â”€â”€ Coordinate helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Coordinate helpers ──────────────────────────────────────────────
   function svgXY(e) {
     const r = svg.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
 
-  // â”€â”€ Node rendering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Node rendering ──────────────────────────────────────────────────
   function nodeShape(n) {
     const c = SHAPE_COLORS[n.type];
     const cx = n.x + n.w/2, cy = n.y + n.h/2;
@@ -259,7 +259,7 @@
     edges.forEach(e => drawEdge(e));
   }
 
-  // â”€â”€ Edge rendering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Edge rendering ──────────────────────────────────────────────────
   function nodeCenter(nid) {
     const n = nodes.find(x => x.id === nid);
     if (!n) return {x:0,y:0};
@@ -287,7 +287,7 @@
     connsG.appendChild(g);
   }
 
-  // â”€â”€ Selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Selection ───────────────────────────────────────────────────────
   function selectNode(id) {
     selectedId = id;
     redrawAll();
@@ -303,7 +303,7 @@
     }
   });
 
-  // â”€â”€ Connect mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Connect mode ────────────────────────────────────────────────────
   function handleConnectClick(id) {
     if (!connectFrom) {
       connectFrom = id;
@@ -334,7 +334,7 @@
     prevLine.style.display = '';
   });
 
-  // â”€â”€ Drop from palette â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Drop from palette ───────────────────────────────────────────────
   let draggingType = null;
   document.querySelectorAll('.shape-btn[data-type]').forEach(btn => {
     btn.addEventListener('dragstart', e => { draggingType = btn.dataset.type; });
@@ -359,7 +359,7 @@
 
   function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-  // â”€â”€ Mode switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Mode switching ──────────────────────────────────────────────────
   function setMode(m) {
     mode = m;
     connectFrom = null;
@@ -370,7 +370,7 @@
     redrawAll();
   }
 
-  // â”€â”€ Delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Delete ──────────────────────────────────────────────────────────
   function deleteSelected() {
     if (!selectedId) return;
     nodes  = nodes.filter(n => n.id !== selectedId);
@@ -381,13 +381,13 @@
     generatePseudo();
   }
 
-  // â”€â”€ Properties panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Properties panel ────────────────────────────────────────────────
   function showPropsPanel(id) {
     const rp = document.getElementById('rp-body');
     const tab = document.getElementById('rptab-props');
     if (!id) {
       if (tab.classList.contains('active')) {
-        rp.innerHTML = '<div class="prop-no-selection"><div style="font-size:28px;margin-bottom:8px">ðŸ”²</div>Click a shape to edit its label,<br>or drag shapes onto the canvas.</div>';
+        rp.innerHTML = '<div class="prop-no-selection"><div style="font-size:28px;margin-bottom:8px">🔲</div>Click a shape to edit its label,<br>or drag shapes onto the canvas.</div>';
       }
       return;
     }
@@ -415,7 +415,7 @@
         <div class="prop-label">Decision branches</div>
         <div style="font-size:12px;color:var(--fg-dim)">Connect arrows from this diamond. The first arrow is "Yes", the second is "No".</div>
       </div>` : ''}
-      <button class="mode-btn" onclick="deleteSelected()" style="color:#f87171;margin-top:8px">ðŸ—‘ï¸ Delete shape</button>`;
+      <button class="mode-btn" onclick="deleteSelected()" style="color:#f87171;margin-top:8px">🗑️ Delete shape</button>`;
   }
 
   function updateLabel(id, val) {
@@ -427,7 +427,7 @@
     if (n) { n[axis] = parseFloat(val)||0; rerenderNode(n); rerenderEdges(); }
   }
 
-  // â”€â”€ Tab switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Tab switching ────────────────────────────────────────────────────
   function showTab(name) {
     document.getElementById('rptab-props').classList.toggle('active', name==='props');
     document.getElementById('rptab-pseudo').classList.toggle('active', name==='pseudo');
@@ -435,7 +435,7 @@
     if (name === 'pseudo') { generatePseudo(); }
   }
 
-  // â”€â”€ Pseudocode generation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Pseudocode generation ─────────────────────────────────────────────
   function generatePseudo() {
     const rp = document.getElementById('rp-body');
     if (!document.getElementById('rptab-pseudo').classList.contains('active')) return;
@@ -465,7 +465,7 @@
         if (yes) traverse(yes.to, indent+1);
         if (no)  { lines.push(pad + 'ELSE'); traverse(no.to, indent+1); }
         lines.push(pad + 'ENDIF');
-        // After the diamond â€“ skip default traversal
+        // After the diamond – skip default traversal
         return;
       }
 
@@ -483,7 +483,7 @@
     starts.forEach(s => traverse(s.id, 0));
     rp.innerHTML = `<div class="prop-label" style="margin-bottom:10px">Generated Pseudocode</div>
       <div class="pseudo-area">${lines.map(l=>`<span>${escHtml(l)}</span>`).join('\n')}</div>
-      <button class="mode-btn" onclick="copyPseudo()" style="margin-top:10px">ðŸ“‹ Copy</button>`;
+      <button class="mode-btn" onclick="copyPseudo()" style="margin-top:10px">📋 Copy</button>`;
   }
 
   function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -492,7 +492,7 @@
     navigator.clipboard.writeText(el.textContent).then(() => toast('Pseudocode copied!'));
   }
 
-  // â”€â”€ Simulation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Simulation ────────────────────────────────────────────────────────
   let simQueue = [];
   let simIndex = 0;
 
@@ -534,10 +534,10 @@
   }
 
   const SIM_MSGS = {
-    start: n => /^(end|stop|finish|done)/i.test(n.label||'') ? `Program ends — "${n.label}"` : `â–¶ Program starts â€” "${n.label}"`,
-    process: n => `âš™ï¸ Executing: ${n.label}`,
-    io: n => n.label.toLowerCase().includes('input') ? `ðŸ“¥ Waiting for input: ${n.label}` : `ðŸ“¤ Output: ${n.label}`,
-    decision: (n, branch) => `â“ Checking condition: ${n.label} â†’ taking ${branch === 'No' ? 'NO' : 'YES'} branch`,
+    start: n => /^(end|stop|finish|done)/i.test(n.label||'') ? `Program ends — "${n.label}"` : `▶ Program starts — "${n.label}"`,
+    process: n => `⚙️ Executing: ${n.label}`,
+    io: n => n.label.toLowerCase().includes('input') ? `📥 Waiting for input: ${n.label}` : `📤 Output: ${n.label}`,
+    decision: (n, branch) => `❓ Checking condition: ${n.label} → taking ${branch === 'No' ? 'NO' : 'YES'} branch`,
   };
 
   function startSim() {
@@ -557,7 +557,7 @@
     });
 
     if (simIndex >= simQueue.length) {
-      document.getElementById('sim-msg').textContent = 'âœ… Simulation complete!';
+      document.getElementById('sim-msg').textContent = '✅ Simulation complete!';
       return;
     }
 
@@ -576,7 +576,7 @@
       if (shape) shape.setAttribute('stroke', '#f97316');
     }
     document.getElementById('sim-msg').textContent = (SIM_MSGS[n.type] || (nn => nn.label))(n, branch);
-    if (simIndex >= simQueue.length) document.getElementById('sim-msg').textContent += '  âœ… Done!';
+    if (simIndex >= simQueue.length) document.getElementById('sim-msg').textContent += '  ✅ Done!';
   }
 
   function stopSim() {
@@ -585,7 +585,7 @@
     redrawAll();
   }
 
-  // â”€â”€ Templates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Templates ────────────────────────────────────────────────────────
   function loadTemplate(type) {
     clearCanvas();
     if (type === 'if') {
@@ -604,10 +604,10 @@
       edges.push({id:nextId++,from:nodes[4].id,to:nodes[5].id,label:''});
     } else if (type === 'loop') {
       addNode('start',    220, 40,  'Start');
-      addNode('process',  220, 130, 'count â† 1');
-      addNode('decision', 220, 230, 'count â‰¤ 10?');
+      addNode('process',  220, 130, 'count ← 1');
+      addNode('decision', 220, 230, 'count ≤ 10?');
       addNode('process',  220, 360, 'Process iteration');
-      addNode('process',  220, 450, 'count â† count + 1');
+      addNode('process',  220, 450, 'count ← count + 1');
       addNode('start',    220, 560, 'End');
       edges.push({id:nextId++,from:nodes[0].id,to:nodes[1].id,label:''});
       edges.push({id:nextId++,from:nodes[1].id,to:nodes[2].id,label:''});
