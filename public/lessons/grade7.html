@@ -66,6 +66,17 @@
                      background:none; border:1px solid var(--border); color:var(--fg-faint); }
     .ch-nav-toggle:hover { color:var(--fg); border-color:var(--border-hi); }
     .ch-nav-toggle.open { color:#60a5fa; border-color:#60a5fa; }
+    .ch-lesson { flex-shrink:0; background:#12141f; border:1px solid rgba(129,140,248,.18); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .cl-toggle { padding:8px 12px; font-size:12px; font-weight:800; color:#a5b4fc; cursor:pointer;
+                 display:flex; align-items:center; gap:6px; user-select:none; }
+    .cl-toggle:hover { color:#c7d2fe; }
+    #cl-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
+    .cl-body { padding:0 12px 12px; font-size:12px; color:#c7d2e0; line-height:1.7; }
+    .cl-body.collapsed { display:none; }
+    .cl-block { background:#0d0f1a; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
+    .cl-block:last-child { margin-bottom:0; }
+    .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
+    .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -206,11 +217,13 @@
         <button class="ch-nav-toggle" id="ch-nav-toggle" onclick="toggleChallengeList()">☰ All challenges</button>
       </div>
       <div class="ch-pills" id="ch-pills" style="display:none"></div>
-      <!-- Short concept lesson shown before each world's challenges — addresses
-           the 'no lessons in between challenges' complaint without needing a
-           full separate lesson tab. Collapsed by default so it doesn't crowd
-           the challenge text; expands on first visit to a new world. -->
-      <div id="world-lesson" style="display:none;background:rgba(129,140,248,.06);border:1px solid rgba(129,140,248,.2);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.6;color:#c7d2fe;"></div>
+      <!-- Full per-challenge lesson — one real explainer per practice (not
+           just a per-world summary), collapsible, populated by
+           renderChallengeLesson() from CHALLENGE_LESSON below. -->
+      <div class="ch-lesson" id="ch-lesson" style="display:none;">
+        <div class="cl-toggle" id="cl-toggle" onclick="toggleChallengeLesson()">📘 <span id="cl-title"></span> <span id="cl-arrow">▾</span></div>
+        <div class="cl-body" id="cl-body"></div>
+      </div>
       <div class="ch-row">
         <div class="ch-text"  id="ch-text">Select a challenge above.</div>
         <div class="ch-meta">
@@ -1343,6 +1356,232 @@ const WORLDS = [
 ]
 
 const CHALLENGES = WORLDS.filter(w => w.live).flatMap(w => w.stages.map(s => ({ ...s, mod: w.id.toUpperCase() })))
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 📘 CHALLENGE_LESSON — one real, full explainer per practice (not just the
+// per-world summary this replaced). Rendered by renderChallengeLesson().
+// ══════════════════════════════════════════════════════════════════════════════
+const CHALLENGE_LESSON = {
+  // ── G1 — Sprite Start: coordinates & sequence ──────────────────────────────
+  g1s1: { title: 'Coordinates — every sprite has an (x, y)', html: `
+    <div class="cl-block"><h4>x and y are just numbers</h4>
+      <p>Every shape on the canvas lives at a position described by two numbers: <strong>x</strong> (how far right) and <strong>y</strong> (how far down). X=0,Y=0 is the top-left corner — x grows as you move right, y grows as you move DOWN (the opposite of a maths graph, where y usually grows upward).</p></div>
+    <div class="cl-block"><h4>Why this matters for the whole year</h4>
+      <p>Every single thing you build in Grade 7 — movement, collision, aiming, patrol patterns — is really just reading and changing these two numbers. Get comfortable with x/y now and everything else gets easier.</p></div>` },
+  g1s2: { title: 'Reading coordinates precisely', html: `
+    <div class="cl-block"><h4>The four corners as numbers</h4>
+      <p>If the canvas is 480 wide and 260 tall, the four corners are roughly (20,20) top-left, (440,20) top-right, (20,220) bottom-left, (440,220) bottom-right — a small margin in from the true edges so shapes aren't half cut off.</p></div>
+    <div class="cl-block"><h4>Why the corner check is strict</h4>
+      <p>This challenge checks that a shape is actually NEAR each named corner, not just that you drew 4 shapes anywhere — that's deliberate. "Draw 4 things" and "draw 4 things in specific places" are very different tasks, and real programming challenges almost always care about WHERE, not just how many.</p></div>` },
+  g1s3: { title: 'Rectangles need FOUR numbers, not two', html: `
+    <div class="cl-block"><h4>Width and height, not just position</h4>
+      <p>A circle only needs a position and a radius. A rectangle needs a position (x, y) AND a size (width, height) — four numbers instead of three. Missing the width/height means the rectangle collapses to nothing or defaults to a weird size.</p></div>
+    <div class="cl-block"><h4>"Inside" means overlapping position ranges</h4>
+      <p>Drawing a circle "inside" a rectangle just means picking an (x,y) for the circle that falls between the rectangle's left/right and top/bottom edges — the same range-checking idea you'll meet again properly with IF statements in G3.</p></div>` },
+  g1s4: { title: 'Sequence — same Y, different X', html: `
+    <div class="cl-block"><h4>A line is just one number staying fixed</h4>
+      <p>Three shapes "in a line" means one coordinate (Y) stays THE SAME across all three, while the other (X) changes. This is worth noticing: a huge amount of layout in real interfaces (a row of buttons, a menu bar) is exactly this — one shared coordinate, several different values for the other.</p></div>
+    <div class="cl-block"><h4>Sequence = blocks run top to bottom</h4>
+      <p>Your three "draw shape" blocks run in the exact order you stacked them — first block drawn first, appearing underneath if anything overlaps. Order in a sequence always matters, even when the visual result looks the same either way.</p></div>` },
+  g1boss: { title: 'BOSS — Coordinates that update every frame', html: `
+    <div class="cl-block"><h4>"On every frame" runs your blocks repeatedly</h4>
+      <p>Until now every challenge ran ONCE. "On every frame" is different — it re-runs its contents dozens of times per second, forever. Combined with <code>mouse X</code>/<code>mouse Y</code> blocks (which always report the CURRENT mouse position), redrawing a circle there every frame makes it look like it's following your cursor live.</p></div>
+    <div class="cl-block"><h4>Why "clear canvas" comes first</h4>
+      <p>Without clearing first, every frame's circle would stay on screen forever, drawing a solid trail instead of a single following dot. Clear, then redraw, every single frame — that's the basic engine behind every animated game you've ever played.</p></div>` },
+
+  // ── G2 — Variables & State ──────────────────────────────────────────────────
+  g2s1: { title: 'Variables — a named box that can change', html: `
+    <div class="cl-block"><h4>What a variable actually is</h4>
+      <p>A <strong>variable</strong> is a named box that holds a value — r, g, b hold numbers 0-255 representing how much red/green/blue light to mix (the same RGB idea from Grade 6's Color Lab, now as real named variables instead of sliders).</p></div>
+    <div class="cl-block"><h4>Reading vs. changing</h4>
+      <p>Using a variable inside a block (like plugging r into "set fill") just READS its current value — it doesn't change it. Only a "set" or "change" block actually updates what's stored inside.</p></div>` },
+  g2s2: { title: 'One variable, many uses', html: `
+    <div class="cl-block"><h4>The same variable, plugged in anywhere</h4>
+      <p>The exact same <code>size</code> variable can be plugged into a circle's radius input — change the variable's value once, and every place that reads it shows the new value next time it's used. This is the whole point of variables: store a value ONCE, use it everywhere you need it.</p></div>
+    <div class="cl-block"><h4>Why not just type numbers everywhere?</h4>
+      <p>If you typed "50" directly into ten different blocks and later wanted to change it, you'd have to edit all ten. With one variable, you change it in exactly one place.</p></div>` },
+  g2s3: { title: 'A variable driving TWO different things', html: `
+    <div class="cl-block"><h4>One number, two visual jobs</h4>
+      <p><code>health</code> drives the rectangle's WIDTH directly — as health drops from 100 to 20, the bar visibly shrinks, with zero extra code needed beyond plugging the variable into the width input. This "one variable, automatically reflected in the visuals" pattern is exactly how every health bar, progress bar, and loading bar in every real game works.</p></div>
+    <div class="cl-block"><h4>Separate the icon from the bar</h4>
+      <p>The heart icon doesn't need to react to health at all — it's just decoration next to the functional part. Not everything on screen needs to be driven by a variable.</p></div>` },
+  g2boss: { title: 'BOSS — A variable that changes over time', html: `
+    <div class="cl-block"><h4>Combining a variable, a frame loop, and an IF</h4>
+      <p><code>score</code> starts at 0 and only changes when a condition is met (Space is held) inside "on every frame" — three ideas from this world and the last one, working together: a variable that persists between frames, a repeating loop, and a condition deciding when to act.</p></div>
+    <div class="cl-block"><h4>The bug this fix prevents</h4>
+      <p>This boss's check requires an ACTUAL variable and an ACTUAL if — a solution using neither (like g1boss's simple mouse-follow) used to slip through by accident. Real requirements should always be checked for real, not assumed.</p></div>` },
+
+  // ── G3 — Decisions (IF/ELSE) ─────────────────────────────────────────────────
+  g3s1: { title: 'IF/ELSE — choosing between paths', html: `
+    <div class="cl-block"><h4>A condition picks exactly one branch</h4>
+      <p>An <strong>IF</strong> block only runs its contents when a condition is true. Chaining IF/ELSE IF/ELSE lets you pick between THREE outcomes (red, amber, green) based on ONE variable's value — only one branch ever runs per check, never more than one.</p></div>
+    <div class="cl-block"><h4>Equality vs. other comparisons</h4>
+      <p><code>light = 1</code> checks for EXACT equality — a completely different comparison from <code>light > 1</code> (greater than) or <code>light < 1</code> (less than), which you'll use in the very next challenge.</p></div>` },
+  g3s2: { title: 'Comparisons — greater than, not just equal', html: `
+    <div class="cl-block"><h4>Ranges instead of exact matches</h4>
+      <p>Unlike the traffic light (exact matches: 1, 2, or 3), "bigger than 50" covers an entire RANGE of numbers — 51, 75, 1000, all count as true. Real conditions very often check ranges rather than one specific value.</p></div>
+    <div class="cl-block"><h4>Where the boundary goes matters</h4>
+      <p>Is exactly 50 "big" or "small"? This challenge defines 50 as NOT big (only numbers strictly greater than 50 count) — deciding exactly where a boundary sits is a real, common source of bugs in software (these are called "off-by-one" errors).</p></div>` },
+  g3s3: { title: 'Combining a variable, IF, and drawing', html: `
+    <div class="cl-block"><h4>Reacting to a value relative to a fixed point</h4>
+      <p>Checking <code>x > 400</code> against a wall drawn at a fixed position is a genuine collision-adjacent idea: comparing a CHANGING value (x) against a FIXED threshold (the wall's position) to decide what to draw. You'll build on this exact pattern properly in G6 — Collision & Physics.</p></div>
+    <div class="cl-block"><h4>Color as feedback</h4>
+      <p>Using red/green to instantly show "danger" vs. "safe" is a real design pattern called visual feedback — telling the player something is wrong without needing any text at all.</p></div>` },
+  g3boss: { title: 'BOSS — Multiple IFs, one per key', html: `
+    <div class="cl-block"><h4>Four separate IFs, checked every frame</h4>
+      <p>Each arrow key needs its OWN if block — "if left pressed, x = x − 4" is completely separate from "if right pressed, x = x + 4". Multiple IFs can all run within the same "on every frame" loop, each independently checking its own condition.</p></div>
+    <div class="cl-block"><h4>Why keyboard checks need "on every frame"</h4>
+      <p>A key can be HELD DOWN for many frames in a row — checking it once wouldn't feel like smooth movement. Checking every single frame, and moving a little each time the key is still down, is what makes movement feel continuous rather than jumpy.</p></div>` },
+
+  // ── G4 — My Blocks (functions) ──────────────────────────────────────────────
+  g4s1: { title: 'Functions — reusable named blocks', html: `
+    <div class="cl-block"><h4>Define once, call many times</h4>
+      <p>A <strong>function</strong> (Blockly calls it "My Blocks") is a reusable named set of instructions. <code>spawnEnemy(x, y)</code> is defined ONCE with two inputs (parameters), then CALLED three times with three different x/y values — three enemies from one function definition.</p></div>
+    <div class="cl-block"><h4>Parameters make a function flexible</h4>
+      <p>Without parameters, a function would always do the exact same thing every time you called it. Parameters (x, y here) let each CALL customise the result — same function, different outcome depending on what you pass in.</p></div>` },
+  g4s2: { title: 'A parameter that changes behaviour, not just position', html: `
+    <div class="cl-block"><h4>A true/false parameter branches inside the function</h4>
+      <p><code>isBig</code> isn't a position — it's a true/false value that makes the FUNCTION ITSELF decide what to draw, using an IF inside its own definition. A function can contain any blocks a normal sequence can, including IFs, loops, even calls to other functions.</p></div>
+    <div class="cl-block"><h4>Why put the IF inside the function?</h4>
+      <p>Putting the big/small decision inside <code>shoot()</code> means every CALL site stays simple — just pass true or false — rather than repeating the same if/else logic four separate times outside the function.</p></div>` },
+  g4s3: { title: 'A text parameter, not just numbers', html: `
+    <div class="cl-block"><h4>Parameters can hold more than numbers</h4>
+      <p>x and y were numbers; <code>isBig</code> was true/false; this function's third parameter is TEXT — a color name. Parameters can carry any type of value, and the function's job is always the same: use whatever was passed in to decide what happens this call.</p></div>
+    <div class="cl-block"><h4>Three parameters, one function</h4>
+      <p>A function isn't limited to one or two parameters — <code>powerUp(x, y, color)</code> takes three, and Blockly happily supports even more if a task needs it.</p></div>` },
+  g4boss: { title: 'BOSS — A function called from inside a loop', html: `
+    <div class="cl-block"><h4>Planning in pseudocode BEFORE building</h4>
+      <p>Writing "IF up-arrow pressed AND on ground THEN y = y − 40" in plain English before touching a single block is called <strong>pseudocode</strong> — planning the LOGIC first, separate from the actual block syntax. Real programmers do this constantly, especially for anything as fiddly as jump physics.</p></div>
+    <div class="cl-block"><h4>A function called from a frame loop</h4>
+      <p><code>jump()</code> takes no parameters — it's called from inside "on every frame" only when a key is pressed, changing a variable (velocity) that the SAME frame loop then uses to move the player. Function + variable + frame loop + IF: everything from this whole part of the year, combined.</p></div>` },
+
+  // ── G5 — Player Control (input) ─────────────────────────────────────────────
+  g5s1: { title: 'Keyboard input — four separate checks', html: `
+    <div class="cl-block"><h4>Each arrow key is its own condition</h4>
+      <p>"Is this specific key currently held down?" is a question you can ask separately for every key — checking all four arrow keys means four separate IF blocks, each changing x or y by a small fixed amount when true.</p></div>
+    <div class="cl-block"><h4>Small changes, every frame, feels smooth</h4>
+      <p>Moving 4 pixels every single frame (dozens of times per second) LOOKS like smooth continuous movement to the eye — the same illusion that makes a flip-book or a movie look like motion, even though it's really lots of tiny separate steps.</p></div>` },
+  g5s2: { title: 'Mouse position — always available, live', html: `
+    <div class="cl-block"><h4>mouseX()/mouseY() report right now, not a memory</h4>
+      <p>Unlike a variable you set once, <code>mouseX()</code> and <code>mouseY()</code> always report the CURRENT mouse position, live, the instant you read them — there's nothing to set or update, the engine tracks it for you automatically.</p></div>
+    <div class="cl-block"><h4>Following vs. controlling</h4>
+      <p>A reticle that "follows the mouse" needs no key checks at all — just read the live position every frame and draw there. Compare this to G5s1's arrow-key movement: two completely different input styles, same "on every frame" engine underneath.</p></div>` },
+  g5s3: { title: 'Two independent things, same frame loop', html: `
+    <div class="cl-block"><h4>Separate variables, separate control schemes</h4>
+      <p>Two players need two SEPARATE sets of variables (x1/y1 and x2/y2) and two separate groups of key checks — mixing them up (e.g. both players sharing one x variable) would make them move together instead of independently.</p></div>
+    <div class="cl-block"><h4>One loop, multiple independent behaviours</h4>
+      <p>A single "on every frame" loop can absolutely control multiple independent things at once — this is exactly how real games manage dozens of characters/objects simultaneously, all inside one shared loop.</p></div>` },
+  g5boss: { title: 'BOSS — Two input schemes, one game', html: `
+    <div class="cl-block"><h4>Keyboard AND mouse, at the same time</h4>
+      <p>Arrow keys move the player rectangle; the mouse independently controls a reticle — both running inside the SAME "on every frame" loop, neither interfering with the other. Real games constantly combine multiple input devices exactly like this.</p></div>
+    <div class="cl-block"><h4>Networking scale: PAN → LAN → WAN</h4>
+      <p>A wired keyboard and wireless mouse connecting to one computer is a tiny <strong>PAN</strong> (Personal Area Network). Your school's wifi linking many computers is a <strong>LAN</strong> (Local Area Network). The whole internet linking LANs worldwide is a <strong>WAN</strong> (Wide Area Network) — same idea, three different scales.</p></div>` },
+
+  // ── G6 — Collision & Physics ─────────────────────────────────────────────────
+  g6s1: { title: 'The distance formula — real Pythagoras', html: `
+    <div class="cl-block"><h4>Distance between two points</h4>
+      <p><code>dist = √((x2−x1)² + (y2−y1)²)</code> is the real distance formula — literally the Pythagorean theorem from maths class, applied to two circle centres. Two circles are touching exactly when that distance is LESS than the sum of their two radii.</p></div>
+    <div class="cl-block"><h4>Why maths class matters here</h4>
+      <p>This is a genuine, direct use of a formula you've likely already seen in maths — computer science and maths overlap far more than they might seem to at first.</p></div>` },
+  g6s2: { title: 'Gravity and bouncing — physics as a loop', html: `
+    <div class="cl-block"><h4>Gravity is just "add a bit, every frame"</h4>
+      <p>Real gravity constantly accelerates falling objects — you simulate that by increasing a <code>velocity</code> variable by a small fixed amount EVERY frame, then using that velocity to move the ball's position. No complicated physics engine needed, just a variable that grows slightly each loop.</p></div>
+    <div class="cl-block"><h4>Bouncing = reversing velocity</h4>
+      <p>Hitting the floor and reversing direction is just flipping the SIGN of velocity (multiplying by a negative number) — and multiplying by 0.8 instead of exactly -1 means each bounce loses a little energy, exactly like a real ball slowly stops bouncing as high.</p></div>` },
+  g6s3: { title: 'Combining collision detection with movement', html: `
+    <div class="cl-block"><h4>Two ideas from this world, together</h4>
+      <p>Knockback needs BOTH ideas from this world at once: the distance-formula collision check from Challenge 1, AND the frame-by-frame movement from Challenge 2. Detecting the hit is only half the job — reacting to it (reversing velocity) is the other half.</p></div>
+    <div class="cl-block"><h4>Cause and effect</h4>
+      <p>This is a clean example of "detect, then react" — a pattern that shows up constantly in real games: check for a condition (collision), then DO something as a direct result (bounce away).</p></div>` },
+  g6boss: { title: 'BOSS — Linear search through an array', html: `
+    <div class="cl-block"><h4>An array is a list with a shared name</h4>
+      <p>Instead of three separate brick variables, an <strong>array</strong> stores a whole LIST of bricks under one name — brick[0], brick[1], brick[2] — and you check them ONE AT A TIME, in order, stopping the moment you find a match. That's called a <strong>linear search</strong>.</p></div>
+    <div class="cl-block"><h4>Why linear search is fine here — and when it wouldn't be</h4>
+      <p>Checking 3 bricks one by one, every frame, is instant for a computer. If this game had 10,000 bricks, checking them ALL one by one every single frame would start to feel noticeably slow — that's exactly the kind of problem <strong>binary search</strong> (Grade 8) is built to solve.</p></div>` },
+
+  // ── G7 — Game States ─────────────────────────────────────────────────────────
+  g7s1: { title: 'A state is just a variable holding text', html: `
+    <div class="cl-block"><h4>One variable, completely different screens</h4>
+      <p><code>state = "menu"</code> is a text variable — nothing special about it mechanically. What makes it a "state machine" is using IF/ELSE to check its value and draw a COMPLETELY different screen depending on what it currently holds.</p></div>
+    <div class="cl-block"><h4>Why not just use separate pages?</h4>
+      <p>Unlike a website with separate pages, a game usually runs as ONE continuous program — a state variable lets that single program behave like several different screens, just by checking one value.</p></div>` },
+  g7s2: { title: 'A condition that changes the state itself', html: `
+    <div class="cl-block"><h4>The state can change itself, mid-game</h4>
+      <p><code>if (score >= 10) { state = "win" }</code> — the game changes ITS OWN state variable based on a condition, and from that frame onward, every check of <code>state</code> sees the new value. This self-modifying behaviour is exactly how a real game transitions between screens.</p></div>
+    <div class="cl-block"><h4>Order matters: check state AFTER updating it</h4>
+      <p>Update the state-changing condition FIRST each frame, then check "what state am I in now" to decide what to draw — check them in the wrong order and you'll always be one frame behind.</p></div>` },
+  g7s3: { title: 'A flag that gates everything else', html: `
+    <div class="cl-block"><h4>One true/false variable controlling the whole screen</h4>
+      <p><code>paused</code> is a simple true/false variable, but when true, it draws an overlay ON TOP of the normal game — the normal game code doesn't need to know or care that it's paused; the overlay just gets drawn last, covering everything beneath it.</p></div>
+    <div class="cl-block"><h4>Drawing order = stacking order</h4>
+      <p>Whatever you draw LAST appears on top of everything drawn before it in the same frame — that's why the pause overlay has to be one of the final things drawn each frame, not the first.</p></div>` },
+  g7boss: { title: 'BOSS — A real, multi-state machine', html: `
+    <div class="cl-block"><h4>Three+ states, all driven by conditions</h4>
+      <p>menu → playing → gameover, each with its own drawing, each transition triggered by a real condition (a timer, a score, a health value hitting zero) — this is a genuine, complete state machine, the exact pattern behind every real video game's screen flow.</p></div>
+    <div class="cl-block"><h4>Firewalls and echo checks, briefly</h4>
+      <p>If this were online multiplayer, a <strong>firewall</strong> decides who's even allowed to connect (like a bouncer checking IDs), and an <strong>echo check</strong> confirms a sent message actually arrived (a tiny reply confirming receipt). Your local state machine works identically whether it's just you playing or a thousand players online.</p></div>` },
+
+  // ── G8 — Smart NPCs (rule-based AI) ──────────────────────────────────────────
+  g8s1: { title: '"AI" made entirely of comparisons', html: `
+    <div class="cl-block"><h4>Chasing is just "move toward, one step at a time"</h4>
+      <p><code>if (enemyX < mouseX) { enemyX += 2 } else { enemyX -= 2 }</code> — comparing two positions and nudging one closer, every frame, in both x and y, creates the ILLUSION of an enemy actively hunting you. There's no real intelligence here, just a comparison repeated many times per second.</p></div>
+    <div class="cl-block"><h4>Rule-based, not learned</h4>
+      <p>This enemy's entire behaviour is IF statements a human (you) wrote directly — it never changes, never improves, never adapts. That's the key difference from real machine learning, which you'll explore properly in AI World concepts next year.</p></div>` },
+  g8s2: { title: 'A direction variable that flips', html: `
+    <div class="cl-block"><h4>Storing "which way" as +1 or -1</h4>
+      <p><code>direction = 1</code> (moving right) multiplied into the movement each frame, then FLIPPED to -1 once a boundary is crossed — a clean way to store "which way something is currently moving" as a single number rather than a separate true/false for each direction.</p></div>
+    <div class="cl-block"><h4>Two boundary checks, one pattern back and forth</h4>
+      <p>One IF flips direction at the right edge, another flips it back at the left edge — together they create an endless back-and-forth patrol using just one variable and two conditions.</p></div>` },
+  g8s3: { title: 'Matching text — the simplest kind of "AI"', html: `
+    <div class="cl-block"><h4>Comparing text with ===</h4>
+      <p>Comparing <code>message === "hello"</code> works exactly like comparing numbers — checking if two pieces of text are EXACTLY identical. A rule-based chatbot is just a chain of these text comparisons, each with its own canned reply.</p></div>
+    <div class="cl-block"><h4>What real chatbots looked like before machine learning</h4>
+      <p>This is genuinely what early chatbots were — long lists of "if the message matches THIS, reply with THAT" written entirely by hand. Modern AI chatbots replaced this with something that learns patterns from huge amounts of text instead of matching exact phrases.</p></div>` },
+  g8boss: { title: 'BOSS — Three behaviours, one distance check', html: `
+    <div class="cl-block"><h4>Distance decides which behaviour runs</h4>
+      <p>The SAME distance formula from Collision & Physics now decides between three behaviours: patrol (far away), chase (medium distance), flee (very close) — an if/else-if/else chain where only ONE branch runs each frame, chosen by how close the distance is.</p></div>
+    <div class="cl-block"><h4>Rules vs. real machine learning, one more time</h4>
+      <p>Every single behaviour here is a rule YOU wrote — "if distance < 30, flee". Real machine learning is fundamentally different: instead of a human writing the rules, the system is shown examples and works out ITS OWN rules — then keeps improving as it sees more data. Your enemy will do the exact same thing forever; a trained model changes.</p></div>` },
+
+  // ── G9 — Strings & Dialogue ──────────────────────────────────────────────────
+  g9s1: { title: 'Strings — text is just data too', html: `
+    <div class="cl-block"><h4>Joining text with +</h4>
+      <p><code>"Welcome, " + playerName + "!"</code> joins ("concatenates") pieces of text together into one message — the exact same + you'd use for numbers, just working on text instead.</p></div>
+    <div class="cl-block"><h4>Every character is secretly a number</h4>
+      <p><code>charCodeAt(0)</code> reveals something surprising: every letter is really stored as a number underneath (ASCII) — "H" is 72, "A" is 65. Text and numbers aren't as different as they look; text is just numbers with an agreed meaning attached.</p></div>` },
+  g9s2: { title: 'Comparing text to branch a conversation', html: `
+    <div class="cl-block"><h4>=== works on text, just like on numbers</h4>
+      <p><code>if (playerChoice === "yes")</code> compares text for EXACT equality — the same comparison operator from G3's numeric IFs, just applied to strings instead. This is the entire mechanism behind a dialogue tree: compare the player's choice, branch to different text.</p></div>
+    <div class="cl-block"><h4>A "tree" is just branching IFs</h4>
+      <p>Real dialogue trees in games (however complex they look) are built from exactly this: compare a choice, show different text, maybe offer a new set of choices, repeat.</p></div>` },
+  g9s3: { title: 'String methods — transforming text', html: `
+    <div class="cl-block"><h4>.toUpperCase() doesn't change the original</h4>
+      <p><code>line.toUpperCase()</code> returns a NEW, shouty version of the text — it doesn't modify the original <code>line</code> variable at all. This matters: string methods almost always hand back a new result rather than changing what you started with.</p></div>
+    <div class="cl-block"><h4>A boolean deciding which version to show</h4>
+      <p><code>shout</code> is just another true/false variable (like <code>isBig</code> back in G4) — deciding between two versions of the same underlying text, exactly the same "one flag, one IF, two outcomes" pattern you've used all year.</p></div>` },
+  g9boss: { title: 'BOSS — Text, arrays, and a loop, together', html: `
+    <div class="cl-block"><h4>An array of objects — structured data</h4>
+      <p><code>{name:"Alex", score:120}</code> groups TWO related pieces of data (a name and a number) into one structured item — an array of these is a real, proper data table, just like a simple version of a spreadsheet or database.</p></div>
+    <div class="cl-block"><h4>Looping through structured data</h4>
+      <p><code>for (i = 0; i < scores.length; i++) { text(scores[i].name + ": " + scores[i].score, ...) }</code> — a loop that reads each entry's name AND score together, drawing one line per entry. This exact pattern (loop + structured data + text) is how every leaderboard in every real game works.</p></div>` },
+
+  // ── G10 — Design & Capstone ───────────────────────────────────────────────────
+  g10s1: { title: 'Planning BEFORE building', html: `
+    <div class="cl-block"><h4>A clear win condition is easier to build AND test</h4>
+      <p>"Reach 20 points" is concrete and checkable — you'll know instantly whether your game is working. A vague goal ("make it fun") can't be tested at all. Real software projects always start by pinning down exactly what "done" looks like.</p></div>
+    <div class="cl-block"><h4>Reusing a function for the title screen</h4>
+      <p>Defining <code>drawTitle()</code> means you can call it from your menu state (G7) any time you need it — planning a function's name and job now, before you've even built your full game, is exactly how real developers sketch a project's structure early.</p></div>` },
+  g10s2: { title: 'Live, updating feedback for the player', html: `
+    <div class="cl-block"><h4>Redrawing text every frame keeps it current</h4>
+      <p><code>text("Score: " + score, 20, 20)</code> called every frame automatically shows the CURRENT score, because it re-reads the variable fresh each time — you never have to manually "update" the display, it just always reflects whatever the variable currently holds.</p></div>
+    <div class="cl-block"><h4>From "code that runs" to "a game a player understands"</h4>
+      <p>Code that works perfectly but never shows the player anything isn't really a game yet — a visible score/win screen is what turns your logic into something a player can actually follow and enjoy.</p></div>` },
+  g10boss: { title: 'FINAL BOSS — Everything from the whole year', html: `
+    <div class="cl-block"><h4>Four ideas, one finished game</h4>
+      <p>A state machine (G7), player input (G5), collision or a win condition (G6), and at least one function you define (G4) — every single major idea from this entire course, combined into one thing YOU designed, not a pre-set challenge.</p></div>
+    <div class="cl-block"><h4>Playtest, then iterate</h4>
+      <p>Play your own finished game and honestly ask: is it too easy? Too hard? Boring? Real developers ALWAYS playtest and adjust at least once before calling something finished — a first draft is rarely the final version.</p></div>` },
+}
 const STAGE_INDEX = {}
 CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.id] = i })
 
@@ -1434,21 +1673,30 @@ function toggleChallengeList() {
 
 let challengeStartedAt = Date.now()
 
-// One short concept intro per world (mod prefix), shown above the challenge
-// text. Not a full lesson tab like AS/A Level's — a bounded, real fix for
-// "no lessons in between" that doesn't require a new UI system.
-const G7_WORLD_LESSON = {
-  G1: "🚀 <strong>Coordinates & sequences.</strong> Every sprite lives at an (x, y) position on the canvas — x grows rightward, y grows downward. A sequence of drawing/move blocks runs top-to-bottom, one after another.",
-  G2: "🎚 <strong>Variables.</strong> A variable is a named box that holds a value that can change — score, health, a timer. Reading a variable never changes it; only an assignment block does.",
-  G3: "🚦 <strong>Selection (IF).</strong> An IF block only runs its contents when a condition is true — e.g. \"IF touching enemy THEN lose a life\". Conditions compare values with =, <, > etc.",
-  G4: "🧰 <strong>Functions (My Blocks).</strong> A function is a reusable named block of instructions — define it once (e.g. spawnEnemy()), then call it as many times as you like instead of repeating the same blocks.",
-  G5: "⌨️ <strong>Input.</strong> Keyboard and mouse blocks let the player control the game — \"on key pressed\" and \"on mouse moved\" run their contents every time that input happens.",
-  G6: "💥 <strong>Collision & physics.</strong> \"Touching\" blocks detect when two sprites overlap. Simple physics just means changing x/y a little every frame — gravity is \"add a bit to vertical speed every frame\".",
-  G7W: "🎬 <strong>Game states.</strong> Real games aren't just one screen — a single \"state\" variable (menu / playing / gameover) controls which blocks run each frame, so the same game loop can show different screens.",
-  G8: "🤖 <strong>Simple AI.</strong> NPCs don't need to be smart to feel alive — a few IF blocks comparing distance to the player (chase), a timer (patrol), or matching keywords (a rule-based chatbot) go a long way.",
-  G9W: "💬 <strong>Strings.</strong> A string is text in quotes. You can join strings together (concatenate) to build dialogue or messages, and compare them to branch a conversation.",
-  G10: "🏆 <strong>Bringing it together.</strong> A finished game combines everything so far: a state machine, player input, collision or a win condition, and at least one function you define. Plan on paper first, then build.",
+// 📘 Full per-challenge lesson content — CHALLENGE_LESSON is defined further
+// down (right after CHALLENGES), keyed by challenge id. Replaces the earlier
+// per-world summary (G7_WORLD_LESSON) with real per-practice explainers,
+// matching the depth given to Grade 6's per-stage lessons.
+let _clExpanded = true
+function renderChallengeLesson(ch) {
+  const wrap  = document.getElementById('ch-lesson')
+  const body  = document.getElementById('cl-body')
+  const title = document.getElementById('cl-title')
+  if (!wrap) return
+  const lesson = typeof CHALLENGE_LESSON !== 'undefined' ? CHALLENGE_LESSON[ch.id] : null
+  if (!lesson) { wrap.style.display = 'none'; return }
+  wrap.style.display = ''
+  title.textContent = lesson.title
+  body.innerHTML = lesson.html
+  body.classList.toggle('collapsed', !_clExpanded)
+  document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
 }
+function toggleChallengeLesson() {
+  _clExpanded = !_clExpanded
+  document.getElementById('cl-body').classList.toggle('collapsed', !_clExpanded)
+  document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
+}
+
 function selectChallenge(i) {
   activeIdx = i
   hintIdx   = 0
@@ -1460,12 +1708,7 @@ function selectChallenge(i) {
   stopLoop()
   ctx.clearRect(0,0,W,H)
   renderPills()
-  const lessonEl = document.getElementById('world-lesson')
-  if (lessonEl) {
-    const lesson = G7_WORLD_LESSON[ch.mod]
-    lessonEl.innerHTML = lesson ? '📘 ' + lesson : ''
-    lessonEl.style.display = lesson ? 'block' : 'none'
-  }
+  renderChallengeLesson(ch)
   log('Challenge: ' + ch.name, 'info')
 }
 
