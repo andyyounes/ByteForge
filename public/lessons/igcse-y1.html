@@ -51,6 +51,17 @@
     .ch-nav-btn:disabled { opacity:.35; cursor:default; }
     .ch-nav-current { font-size:11.5px; font-weight:700; color:var(--fg); flex:1; }
     .ch-nav-toggle { font-size:11px; color:#7dd3fc; cursor:pointer; font-weight:700; }
+    .ch-lesson { flex-shrink:0; background:var(--bg-card); border:1px solid rgba(125,211,252,.18); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .cl-toggle { padding:8px 12px; font-size:12px; font-weight:800; color:#7dd3fc; cursor:pointer;
+                 display:flex; align-items:center; gap:6px; user-select:none; }
+    .cl-toggle:hover { color:#a5e8ff; }
+    #cl-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
+    .cl-body { padding:0 12px 12px; font-size:12px; color:var(--fg-dim); line-height:1.7; }
+    .cl-body.collapsed { display:none; }
+    .cl-block { background:var(--bg-raised); border:1px solid var(--border); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
+    .cl-block:last-child { margin-bottom:0; }
+    .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
+    .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
     .ch-pill     { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                    border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -137,6 +148,11 @@
         <span class="ch-nav-toggle" onclick="toggleChallengeList()" id="ch-nav-toggle">☰ All challenges</span>
       </div>
       <div class="ch-pills" id="ch-pills"></div>
+      <!-- Full per-challenge lesson — populated from CHALLENGE_LESSON. -->
+      <div class="ch-lesson" id="ch-lesson" style="display:none;">
+        <div class="cl-toggle" id="cl-toggle" onclick="toggleChallengeLesson()">📘 <span id="cl-title"></span> <span id="cl-arrow">▾</span></div>
+        <div class="cl-body" id="cl-body"></div>
+      </div>
       <div class="ch-row">
         <div class="ch-text" id="ch-text">Select a challenge.</div>
         <div class="ch-meta">
@@ -488,6 +504,132 @@ const CHALLENGES = [
 const STAGE_INDEX = {}
 CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.mod + '/' + s.name] = i })
 
+// ══════════════════════════════════════════════════════════════════════════════
+// 📘 CHALLENGE_LESSON — one real, full explainer per practice, keyed by
+// "mod/name" (the same stable identity used everywhere else on this page).
+// ══════════════════════════════════════════════════════════════════════════════
+const CHALLENGE_LESSON = {
+  // ── M1 — Data Representation ────────────────────────────────────────────────
+  'M1/Binary→Decimal': { title: 'Binary place values, right to left', html: `
+    <div class="cl-block"><h4>Each position is worth a power of 2</h4>
+      <p>An 8-bit binary number's positions, right to left, are worth 1, 2, 4, 8, 16, 32, 64, 128 — sum the values of the positions that are "1" to get the decimal number.</p></div>
+    <div class="cl-block"><h4>Why base 2, not base 10</h4>
+      <p>A computer's memory is built from switches with only two real states (on/off) — binary is the natural way to count using exactly two symbols, the same way our normal counting uses ten (0-9) because we have ten fingers.</p></div>` },
+  'M1/Decimal→Hex': { title: 'Hexadecimal — base 16, using A-F for 10-15', html: `
+    <div class="cl-block"><h4>Divide by 16, track the remainder</h4>
+      <p>Converting to hex means repeatedly dividing by 16 and recording the remainder — since a single digit can't represent 10-15, hex borrows the letters A (10) through F (15) to keep each digit single-character.</p></div>
+    <div class="cl-block"><h4>Why hex exists at all</h4>
+      <p>Hex is popular because ONE hex digit represents exactly 4 binary digits (a "nibble") — a long, hard-to-read binary string becomes a short, human-friendly hex string, used constantly for memory addresses and colour codes.</p></div>` },
+  'M1/File Size': { title: 'File size = pixels × colour depth', html: `
+    <div class="cl-block"><h4>Every pixel needs a fixed number of bits</h4>
+      <p>Total bits = width × height × bits-per-pixel (colour depth) — an 800×600 image at 24-bit colour needs 800×600×24 bits just to store every pixel's colour.</p></div>
+    <div class="cl-block"><h4>Converting bits → bytes → MB</h4>
+      <p>Divide by 8 to get bytes (there are 8 bits in a byte), then divide by 1,048,576 (1024×1024) to get megabytes — the SAME "divide by 1024" idea from Grade 8's storage-units challenge, just chained twice.</p></div>` },
+  'M1/Binary Addition': { title: 'Binary addition — carrying, just like decimal', html: `
+    <div class="cl-block"><h4>The same column-addition method, base 2</h4>
+      <p>Add from the rightmost bit: 0+0=0, 0+1=1, 1+1=0 carry 1, 1+1+1=1 carry 1 — exactly the column-by-column carrying method you already know from decimal addition, just with only two digits instead of ten.</p></div>
+    <div class="cl-block"><h4>Overflow — running out of room</h4>
+      <p>If a carry is left over after adding the leftmost bit, that's called <strong>overflow</strong> — the true result needs MORE bits than the register has room for, an important limitation of fixed-width binary storage.</p></div>` },
+  'M1/Binary Subtraction': { title: "Two's complement — subtraction via addition", html: `
+    <div class="cl-block"><h4>Subtracting by adding a negative</h4>
+      <p>Computers don't have a separate "subtract" circuit for this — instead, they find the two's complement (the negative) of the second number, then just ADD, reusing the same addition circuit for both operations.</p></div>
+    <div class="cl-block"><h4>The two's complement recipe</h4>
+      <p>Invert every bit, then add 1 — that's it. This gives a genuinely correct negative representation that lets addition and subtraction share the exact same hardware.</p></div>` },
+  'M1/Sound Digitisation': { title: 'Sound is analogue — sampling makes it digital', html: `
+    <div class="cl-block"><h4>An ADC takes snapshots of a continuous wave</h4>
+      <p>Real sound is a continuous, smooth (analogue) wave — an Analogue-to-Digital Converter (ADC) takes regular snapshots (samples) of that wave's height, turning it into a series of discrete numbers a computer can store.</p></div>
+    <div class="cl-block"><h4>Sample rate and bit depth both affect quality</h4>
+      <p><strong>Sample rate</strong> = how many snapshots per second (more = smoother over time). <strong>Bit depth</strong> = how many possible height values each snapshot can have (more = more accurate amplitude). Both independently improve quality — and both cost more storage.</p></div>` },
+
+  // ── M2 — Hardware & Software ─────────────────────────────────────────────────
+  'M2/CPU Components': { title: 'ALU, CU, and registers — the CPU\'s core parts', html: `
+    <div class="cl-block"><h4>Three parts, three jobs</h4>
+      <p>The <strong>ALU</strong> (Arithmetic Logic Unit) does calculations and comparisons. The <strong>CU</strong> (Control Unit) fetches, decodes, and coordinates every instruction. <strong>Registers</strong> are tiny, ultra-fast storage locations right inside the CPU.</p></div>
+    <div class="cl-block"><h4>Why registers, when there's already RAM?</h4>
+      <p>Registers are dramatically faster than RAM but hold only a handful of values at a time — the CPU keeps whatever it's working on RIGHT NOW in registers, reaching out to slower RAM only when it must.</p></div>` },
+  'M2/RAM vs ROM': { title: 'Volatile vs. non-volatile memory', html: `
+    <div class="cl-block"><h4>RAM forgets when the power goes; ROM doesn\'t</h4>
+      <p><strong>RAM</strong> is volatile — everything in it vanishes the instant power is removed. <strong>ROM</strong> is non-volatile — it keeps its contents with no power at all, which is exactly why it's used to store a computer's startup instructions (firmware/BIOS).</p></div>
+    <div class="cl-block"><h4>Read AND write vs. read only</h4>
+      <p>RAM can be both read from and written to constantly, as programs run. ROM (Read-Only Memory) is normally only ever READ from during normal operation — that's literally what its name says.</p></div>` },
+  'M2/FDE Cycle': { title: 'Fetch — Decode — Execute, the CPU\'s heartbeat', html: `
+    <div class="cl-block"><h4>Every single instruction goes through all three stages</h4>
+      <p><strong>Fetch</strong>: the address in the PC is copied to the MAR, and the instruction at that address is copied into the MDR then the CIR. <strong>Decode</strong>: the CU figures out what the instruction in the CIR actually means. <strong>Execute</strong>: the ALU (or other component) carries it out.</p></div>
+    <div class="cl-block"><h4>A tight, endlessly repeating loop</h4>
+      <p>The moment one instruction finishes executing, the cycle immediately starts again on the NEXT instruction — this fetch-decode-execute loop runs continuously, billions of times per second, for as long as the computer is on.</p></div>` },
+  'M2/Device Types': { title: 'Input, output, and storage — three different jobs', html: `
+    <div class="cl-block"><h4>Getting data IN, showing results OUT, keeping data long-term</h4>
+      <p><strong>Input devices</strong> (keyboard, mouse, scanner) get data INTO the computer. <strong>Output devices</strong> (monitor, printer, speaker) present results back to the user. <strong>Storage devices</strong> (hard disk, SSD, USB) keep data even when the computer is off.</p></div>
+    <div class="cl-block"><h4>Some devices do more than one job</h4>
+      <p>A touchscreen is BOTH input (you touch it) and output (it displays) — a genuine exception worth noticing, since most devices cleanly fit into just one category.</p></div>` },
+
+  // ── M3 — Networking ───────────────────────────────────────────────────────────
+  'M3/LAN vs WAN': { title: 'Scale — local vs. wide area networks', html: `
+    <div class="cl-block"><h4>A LAN covers one site; a WAN spans many</h4>
+      <p>A <strong>LAN</strong> (Local Area Network) covers a small area, like one building, usually owned by one organisation. A <strong>WAN</strong> (Wide Area Network) spans huge geographic areas — cities, countries, even the whole planet — and typically links MULTIPLE organisations.</p></div>
+    <div class="cl-block"><h4>The internet is the ultimate WAN</h4>
+      <p>Your school's own network is a LAN; the internet itself — connecting millions of separate networks worldwide — is the largest WAN that exists.</p></div>` },
+  'M3/Client-Server vs P2P': { title: 'A central authority vs. everyone equal', html: `
+    <div class="cl-block"><h4>Client-server: one central provider</h4>
+      <p>In a client-server model, a central SERVER provides resources to many clients — easier to manage security and backups centrally, but if the server fails, EVERY client is affected at once.</p></div>
+    <div class="cl-block"><h4>Peer-to-peer: no single point of failure</h4>
+      <p>In peer-to-peer, every device is equal, sharing resources directly with each other — no single server to fail, but much harder to control security consistently across every device.</p></div>` },
+  'M3/TCP/IP Layers': { title: 'Four layers, each with its own job', html: `
+    <div class="cl-block"><h4>Application → Transport → Internet → Network Access</h4>
+      <p><strong>Application</strong> provides the services apps actually use (HTTP, FTP, DNS). <strong>Transport</strong> ensures reliable delivery end-to-end. <strong>Internet</strong> handles addressing and routing via IP addresses. <strong>Network Access</strong> handles the physical transmission over the local network.</p></div>
+    <div class="cl-block"><h4>Why split into layers at all?</h4>
+      <p>Each layer only has to worry about its OWN job — the Application layer doesn't need to know how bits physically travel down a cable, and the Network Access layer doesn't need to know what a web page is. This separation is what lets the internet's technology evolve one layer at a time.</p></div>` },
+  'M3/Protocols': { title: 'Different jobs need different protocols', html: `
+    <div class="cl-block"><h4>SMTP, HTTPS, and FTP each solve one specific task</h4>
+      <p><strong>SMTP</strong> (Simple Mail Transfer Protocol) sends email. <strong>HTTPS</strong> (HTTP Secure) is encrypted, secure web browsing. <strong>FTP</strong> (File Transfer Protocol) moves files between servers.</p></div>
+    <div class="cl-block"><h4>A protocol is just an agreed set of rules</h4>
+      <p>Every protocol is really just a shared agreement about HOW two computers should communicate for a specific purpose — matching the right protocol to the right task is exactly what this challenge tests.</p></div>` },
+
+  // ── M4 — Security & Privacy ───────────────────────────────────────────────────
+  'M4/Encryption': { title: 'Symmetric — one key; Asymmetric — two keys', html: `
+    <div class="cl-block"><h4>Encryption scrambles data using a key</h4>
+      <p>Encryption converts readable plaintext into scrambled ciphertext using an algorithm and a key — only someone with the correct key can reverse it back to plaintext.</p></div>
+    <div class="cl-block"><h4>Same key vs. a public/private pair</h4>
+      <p><strong>Symmetric</strong> encryption uses the SAME key for both encrypting and decrypting — fast, but sharing that key safely is a real problem. <strong>Asymmetric</strong> uses a public key to encrypt and a DIFFERENT private key to decrypt — slower, but solves the key-sharing problem.</p></div>` },
+  'M4/Malware Types': { title: 'Different malware, different behaviour', html: `
+    <div class="cl-block"><h4>A keylogger secretly records what you type</h4>
+      <p>Software that silently records every keystroke (including passwords) and sends it to an attacker is called a <strong>keylogger</strong> — a type of spyware.</p></div>
+    <div class="cl-block"><h4>Viruses, worms, trojans, ransomware — each spreads differently</h4>
+      <p>A <strong>virus</strong> attaches to files and replicates. A <strong>worm</strong> self-replicates across a network with no help needed. A <strong>trojan</strong> disguises itself as legitimate software. <strong>Ransomware</strong> encrypts your files and demands payment to unlock them.</p></div>` },
+  'M4/Network Protection': { title: 'Multiple layers of defence', html: `
+    <div class="cl-block"><h4>A firewall filters traffic based on rules</h4>
+      <p>A <strong>firewall</strong> monitors incoming/outgoing traffic and blocks anything unauthorised — like a security guard checking every packet against a rulebook.</p></div>
+    <div class="cl-block"><h4>Encryption and authentication protect differently</h4>
+      <p><strong>Encryption</strong> scrambles data so it's useless even if intercepted. <strong>Authentication</strong> (passwords, MFA, biometrics) ensures only the right PEOPLE get access in the first place. Real networks layer several of these methods together, since no single one covers every threat.</p></div>` },
+  'M4/Ethics Dilemma': { title: 'Security vs. privacy — a genuine trade-off', html: `
+    <div class="cl-block"><h4>There's rarely a clean right answer</h4>
+      <p>Mass surveillance genuinely could help catch criminals faster — but it also genuinely invades the privacy and freedom of everyone, not just wrongdoers. Real technology ethics questions like this usually involve balancing two legitimate concerns against each other.</p></div>
+    <div class="cl-block"><h4>A good answer acknowledges BOTH sides</h4>
+      <p>Dismissing one side entirely ("privacy doesn't matter" or "security doesn't matter") misses the point of the question — a strong answer engages honestly with the real trade-off between privacy, security, and freedom.</p></div>` },
+
+  // ── M5 — Algorithms ────────────────────────────────────────────────────────────
+  'M5/Bubble Sort Trace': { title: 'Bubble sort — swap adjacent pairs, pass after pass', html: `
+    <div class="cl-block"><h4>Compare neighbours, swap if out of order</h4>
+      <p>Each PASS walks through the array comparing every pair of neighbours, swapping them if they're in the wrong order — the largest unsorted value "bubbles" up to its correct position by the end of each pass.</p></div>
+    <div class="cl-block"><h4>Tracing every pass, not just the final result</h4>
+      <p>Showing the array after EVERY pass (not just the final sorted result) proves you understand the mechanism, not just that you know the array ends up sorted — the same "show your working" idea as a maths trace table.</p></div>` },
+  'M5/Search Complexity': { title: 'O(n) vs. O(log n) — why binary search wins', html: `
+    <div class="cl-block"><h4>Linear search checks everything; binary search halves each time</h4>
+      <p>Linear search's worst case is <strong>O(n)</strong> — it might have to check every single element. Binary search's worst case is <strong>O(log n)</strong> — it throws away half the remaining data with every single comparison.</p></div>
+    <div class="cl-block"><h4>Binary search only works on SORTED data</h4>
+      <p>The "throw away half" trick only works because sorted data lets you know instantly which half the target must be in — binary search on unsorted data would give completely wrong results.</p></div>` },
+  'M5/Stacks (LIFO)': { title: 'LIFO — Last In, First Out', html: `
+    <div class="cl-block"><h4>PUSH adds to the top; POP removes from the top</h4>
+      <p>A stack only ever adds or removes from ONE end — the top. <strong>PUSH</strong> adds a new item on top; <strong>POP</strong> removes whatever is currently on top. The last item pushed is always the first one popped — that's what LIFO means.</p></div>
+    <div class="cl-block"><h4>Real uses: undo, and the function call stack</h4>
+      <p>An editor's undo button is a real stack — the MOST RECENT action is always the first one undone. A program's own function calls work the same way: the call stack tracks which function to return to, most-recent-first.</p></div>` },
+  'M5/Trace Table': { title: 'Tracing a WHILE loop, step by step', html: `
+    <div class="cl-block"><h4>Update the variable, check the condition, repeat</h4>
+      <p>x starts at 1. Each pass: add 2 to x, then OUTPUT it, THEN check whether the loop condition (x &lt; 5) still holds before looping again.</p></div>
+    <div class="cl-block"><h4>The loop stops the moment the condition is false</h4>
+      <p>Once x reaches 5, the condition <code>x &lt; 5</code> is no longer true — the loop stops immediately, BEFORE running its body again. Getting the exact stopping point right is the single most common trace-table mistake.</p></div>` },
+}
+
 // ── State ─────────────────────────────────────────────────────────────────────
 function getAnswer() {
   const el = document.getElementById('ans-field')
@@ -552,6 +694,30 @@ function selectChallenge(i) {
   document.getElementById('feedback').textContent = ''
   renderAnswerInput(ch)
   renderPills()
+  renderChallengeLesson(ch)
+}
+
+// 📘 Full per-challenge lesson — CHALLENGE_LESSON defined after CHALLENGES,
+// keyed by "mod/name" (no dedicated id field on these challenges).
+let _clExpanded = true
+function renderChallengeLesson(ch) {
+  const wrap  = document.getElementById('ch-lesson')
+  const body  = document.getElementById('cl-body')
+  const title = document.getElementById('cl-title')
+  if (!wrap) return
+  const key = ch.mod + '/' + ch.name
+  const lesson = typeof CHALLENGE_LESSON !== 'undefined' ? CHALLENGE_LESSON[key] : null
+  if (!lesson) { wrap.style.display = 'none'; return }
+  wrap.style.display = ''
+  title.textContent = lesson.title
+  body.innerHTML = lesson.html
+  body.classList.toggle('collapsed', !_clExpanded)
+  document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
+}
+function toggleChallengeLesson() {
+  _clExpanded = !_clExpanded
+  document.getElementById('cl-body').classList.toggle('collapsed', !_clExpanded)
+  document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
 }
 
 function checkAnswer() {
