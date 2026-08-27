@@ -252,6 +252,23 @@ const t = (ok, label) => {
     'blockly: "say" no longer passes on the output panel\'s own text')
 }
 
+// ── turtle.html: advertised XP must actually be paid and persisted ───────────
+// checkChallenge() showed a toast reading "+N XP" and added the challenge to
+// an in-memory-only Set, but never called BF.addXP and never called
+// LessonSaves.save — so the XP was never really awarded, and completion reset
+// on every reload. This is the same bug class fixed earlier on canvas-code.html
+// (checks that don't actually gate anything) but on the awarding side instead.
+{
+  const h = readFileSync(`${ROOT}/public/lessons/turtle.html`, 'utf8')
+  const live = h.replace(/^\s*\/\/.*$/gm, '')
+  t(/lesson-saves\.js/.test(live), 'turtle: lesson-saves.js is loaded')
+  t(/BF\.addXP\(me\.id, ch\.xp\)/.test(live), 'turtle: a completed challenge actually calls BF.addXP')
+  t(/LessonSaves\.save\('turtle'/.test(live), 'turtle: a completed challenge is persisted via LessonSaves.save')
+  t(/LessonSaves\.load\('turtle'\)/.test(live), 'turtle: previously completed challenges are restored on load')
+  t(/LessonSaves\.completedSet\(\)\.forEach\(i => completed\.add\(i\)\)/.test(live),
+    'turtle: restored completions are merged into the completed Set before render')
+}
+
 // ── No stray control bytes anywhere in shipped source ────────────────────────
 {
   const BS = String.fromCharCode(8)

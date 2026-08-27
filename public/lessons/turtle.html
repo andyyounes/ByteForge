@@ -85,6 +85,7 @@
   </style>
   <script src="../js/db.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/lesson-saves.js"></script>
 </head>
 <body>
 
@@ -511,6 +512,14 @@ function checkChallenge() {
       renderChallenges()
       showToast('Challenge complete! +' + ch.xp + ' XP')
       log('Challenge complete! +' + ch.xp + ' XP', 'ok')
+      // Every other lesson page on the platform actually PAYS the XP it
+      // advertises and remembers what a student already solved. This page
+      // did neither — completed was an in-memory Set that reset on every
+      // reload, and the toast's "+N XP" was never followed by a real award.
+      if (me) BF.addXP(me.id, ch.xp)
+      LessonSaves.save('turtle', activeChallenge, {
+        passed: true, xpEarned: ch.xp, code: document.getElementById('code-editor').value,
+      })
     }
   }
 }
@@ -558,6 +567,11 @@ document.getElementById('speed-slider').addEventListener('input', function() {
 renderChallenges()
 clearAll()
 selectChallenge(0)
+;(async () => {
+  await LessonSaves.load('turtle')
+  LessonSaves.completedSet().forEach(i => completed.add(i))
+  renderChallenges()
+})()
 </script>
 </body>
 </html>
