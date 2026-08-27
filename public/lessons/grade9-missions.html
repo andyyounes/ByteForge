@@ -130,6 +130,19 @@
   #learn-continue-btn { width:100%; }
   #learn-matchup-score { font-weight:700; color:#4ade80; text-transform:none; letter-spacing:0; }
 
+  /* ── Binary Cards — flippable place-value cards ── */
+  .cards-intro { font-size:13px; color:#c7d2e0; line-height:1.6; margin-bottom:18px; }
+  .cards-row { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:18px; }
+  .bcard { width:64px; height:88px; border-radius:10px; cursor:pointer; display:flex; align-items:center;
+           justify-content:center; font-size:22px; font-weight:900; user-select:none; transition:.15s;
+           border:2px solid rgba(255,255,255,.15); background:#161927; color:#4b5563; }
+  .bcard.up { background:linear-gradient(135deg,#67e8f9,#818cf8); color:#0a0c18; border-color:#a5b4fc; transform:translateY(-4px); }
+  .bcard:hover { border-color:#67e8f9; }
+  .cards-status { text-align:center; font-size:15px; font-weight:800; margin-bottom:16px; color:#e2e8f0; }
+  .cards-status .target { color:#fbbf24; }
+  .cards-status .total.ok { color:#4ade80; }
+  #cards-check-btn { width:100%; }
+
   .mlist { position:fixed; inset:0; z-index:50; background:#0d0f1a; overflow-y:auto; display:none; }
   .mlist.open { display:block; }
   .mlist-hero { text-align:center; padding:30px 16px 10px; }
@@ -289,6 +302,26 @@
         <div class="learn-theory" id="learn-theory"></div>
       </div>
       <button class="btn btn-run" id="learn-continue-btn" onclick="completeLearnBubble()">✓ I've got it — Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Binary Cards — the classic "unplugged" activity: flip place-value cards
+     face-up/face-down (one-sided, like a domino) until their total matches
+     a target number. No code at all — this comes BEFORE variables/coding
+     are ever introduced, teaching binary as a real physical/hands-on idea
+     first. -->
+<div class="learn-wrap" id="cards-wrap" style="display:none;">
+  <div class="learn-card">
+    <div class="learn-hdr">
+      <span id="cards-title"></span>
+      <button class="mbar-back" onclick="mbarBack()">☰ Missions</button>
+    </div>
+    <div class="learn-body">
+      <p class="cards-intro" id="cards-intro"></p>
+      <div class="cards-row" id="cards-row"></div>
+      <div class="cards-status" id="cards-status"></div>
+      <button class="btn btn-run" id="cards-check-btn" onclick="checkCards()">✓ Check My Total</button>
     </div>
   </div>
 </div>
@@ -553,6 +586,7 @@ const MISSIONS = [
     learn: {
       videoQuery: 'what is binary explained simply GCSE computer science',
       terms: [
+        { term: 'Transistor', def: 'A tiny electronic switch — either letting current through (ON) or not (OFF). Billions of these are what a computer chip actually is.' },
         { term: 'Bit',      def: 'A single binary digit — either 0 or 1. Short for "binary digit".' },
         { term: 'Byte',     def: 'A group of 8 bits, treated as one unit.' },
         { term: 'Denary',   def: 'The everyday base-10 number system people use — digits 0-9 (also called decimal).' },
@@ -560,13 +594,36 @@ const MISSIONS = [
         { term: 'Place value', def: 'How much a digit is worth based on its POSITION — in binary: 1, 2, 4, 8, 16, 32...' },
       ],
       theory: `
-        <h4>Computers only ever store ON or OFF</h4>
-        <p>Deep inside a computer, everything is billions of tiny electronic switches — each one is either ON or OFF, with nothing in between. Binary (using only the digits 0 and 1) is the only number system that matches this exactly: 1 = ON, 0 = OFF.</p>
+        <h4>Transistors — the real, physical reason for binary</h4>
+        <p>Open up any computer chip and, underneath everything, you'd find billions of <b>transistors</b> — microscopic electronic switches. Each one is either letting electricity through, or not. That's it — just ON or OFF, nothing in between. Binary (0 and 1) is simply the number system that matches this exactly: 1 means "the switch is ON", 0 means "the switch is OFF". This is the actual physical reason computers use binary — it's not an arbitrary choice, it's the only thing the hardware itself can do.</p>
         <h4>Place values — the same idea as denary, just base 2</h4>
         <p>In denary, each digit's position is worth a power of 10 (1s, 10s, 100s...). In binary, each position is worth a power of 2 instead: <code>...32 16 8 4 2 1</code>. A binary digit only ADDS its place value if it's a 1 — a 0 in that position contributes nothing.</p>
         <h4>Worked example: 13 in binary</h4>
-        <p>13 = 8 + 4 + 1 (using the place values 8, 4, 2, 1). So the 8s, 4s, and 1s places get a 1, and the 2s place gets a 0: <code>1101</code>. Checking it: 8+4+0+1 = 13. ✓</p>`,
+        <p>13 = 8 + 4 + 1 (using the place values 8, 4, 2, 1). So the 8s, 4s, and 1s places get a 1, and the 2s place gets a 0: <code>1101</code>. Checking it: 8+4+0+1 = 13. ✓</p>
+        <h4>Binary addition — carrying works exactly like denary</h4>
+        <p>Adding 1 + 1 in binary gives 10 (that's "two", not "ten") — the 1 "carries" into the next place value, exactly like 9 + 1 = 10 carries in denary. E.g. 0011 (3) + 0001 (1): the rightmost 1+1 carries, giving 0100 (4).</p>`,
     },
+  },
+  {
+    id: 'cards-make', type: 'cards', phase: 'PHASE 0 · BINARY', emoji: '🃏', title: 'Binary Cards — Make the Number', xp: 25,
+    brief: 'The classic "unplugged" binary cards trick. Each card is worth a place value — flip cards face-up to ADD their value, face-down to leave them out. Flip cards until the total matches the target.',
+    api: [],
+    cards: { mode: 'match', values: [16, 8, 4, 2, 1], target: 22,
+      intro: 'Each card shows ONE side only — its place value (16, 8, 4, 2, or 1). Face-up = counted, face-down = not counted. This is exactly what a 1 or 0 means in binary — flip the right cards to make 22.' },
+  },
+  {
+    id: 'cards-add', type: 'cards', phase: 'PHASE 0 · BINARY', emoji: '➕', title: 'Binary Cards — Addition', xp: 30,
+    brief: 'Two signals need to be added together: 9 and 5. Work out 9 + 5 first, then flip the cards to represent the ANSWER in binary.',
+    api: [],
+    cards: { mode: 'match', values: [16, 8, 4, 2, 1], target: 14,
+      intro: '9 + 5 = 14. Now flip the cards to make 14 — the same trick as before, just starting from an addition instead of a number you were simply given.' },
+  },
+  {
+    id: 'cardsboss', type: 'cards', phase: 'PHASE 0 · CAPSTONE', emoji: '🏆', title: 'BOSS — Bigger Numbers', xp: 40,
+    brief: 'One more card added to the row — now you can make bigger numbers. Flip the cards to make 45.',
+    api: [],
+    cards: { mode: 'match', values: [32, 16, 8, 4, 2, 1], target: 45,
+      intro: 'Same trick, one more place value (32). Work from the biggest card down: does 32 fit into 45? Does 16 fit into what\'s left? Keep going.' },
   },
   {
     id: 'p0m1', type: 'data', phase: 'PHASE 0 · BINARY', emoji: '🔢', title: 'Denary to Binary', xp: 30,
@@ -2756,7 +2813,9 @@ function openMission(id) {
   if (!activeMission) return
   missionStartedAt = Date.now()
   if (activeMission.type === 'learn') { renderLearnBubble(); return }
+  if (activeMission.type === 'cards') { renderCardsBubble(); return }
   document.getElementById('learn-wrap').style.display = 'none'
+  document.getElementById('cards-wrap').style.display = 'none'
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
   document.getElementById('m-phase').textContent = activeMission.phase
   document.getElementById('m-par').textContent = parLabel(activeMission)
@@ -2799,6 +2858,7 @@ let _lmSelected = null   // currently-selected term index, or null
 let _lmMatched  = new Set()
 function renderLearnBubble() {
   const m = activeMission
+  document.getElementById('cards-wrap').style.display = 'none'
   document.getElementById('learn-wrap').style.display = 'flex'
   document.getElementById('learn-title').textContent = m.emoji + ' ' + m.title
   document.getElementById('learn-video').innerHTML =
@@ -2864,6 +2924,57 @@ function completeLearnBubble() {
   saveProg(p)
   try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
   mbarBack()
+}
+
+// ── Binary Cards — flip place-value cards until the total matches target ───
+let _cardsFlipped = new Set()
+function renderCardsBubble() {
+  const m = activeMission
+  document.getElementById('learn-wrap').style.display = 'none'
+  document.getElementById('cards-wrap').style.display = 'flex'
+  document.getElementById('cards-title').textContent = m.emoji + ' ' + m.title
+  document.getElementById('cards-intro').textContent = m.cards.intro
+  _cardsFlipped = new Set()
+  const row = document.getElementById('cards-row')
+  row.innerHTML = ''
+  m.cards.values.forEach((v, i) => {
+    const el = document.createElement('div')
+    el.className = 'bcard'
+    el.textContent = v
+    el.onclick = () => toggleCard(i, el)
+    row.appendChild(el)
+  })
+  updateCardsStatus()
+}
+function toggleCard(i, el) {
+  if (_cardsFlipped.has(i)) { _cardsFlipped.delete(i); el.classList.remove('up') }
+  else { _cardsFlipped.add(i); el.classList.add('up') }
+  updateCardsStatus()
+}
+function cardsTotal() {
+  return [..._cardsFlipped].reduce((sum, i) => sum + activeMission.cards.values[i], 0)
+}
+function updateCardsStatus() {
+  const total = cardsTotal()
+  const target = activeMission.cards.target
+  document.getElementById('cards-status').innerHTML =
+    'Your total: <span class="total' + (total === target ? ' ok' : '') + '">' + total + '</span>'
+    + ' — Target: <span class="target">' + target + '</span>'
+}
+function checkCards() {
+  const total = cardsTotal()
+  const target = activeMission.cards.target
+  if (total !== target) {
+    document.getElementById('cards-status').innerHTML =
+      '❌ Not quite — your total is <span class="total">' + total + '</span>, target is <span class="target">' + target + '</span>. Flip more cards or flip one back off.'
+    return
+  }
+  const p = getProg()
+  p[activeMission.id] = { stars: 3, xp: (p[activeMission.id] || {}).xp || activeMission.xp, lang, code: '' }
+  saveProg(p)
+  try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
+  document.getElementById('cards-status').innerHTML = '✅ Correct! ' + activeMission.cards.target + ' made from ' + [..._cardsFlipped].map(i => activeMission.cards.values[i]).join(' + ')
+  setTimeout(mbarBack, 1200)
 }
 
 // Draws each mission type's starting frame — routed by activeMission.type
@@ -3204,9 +3315,15 @@ const TIERS = [
   // added directly in response to real feedback that practice missions
   // (converting to binary, using a variable) were asking students to DO
   // something before ever teaching them WHAT it was.
+  // Binary comes FIRST of all, taught unplugged (no code at all) — a real
+  // concept lesson plus the classic "binary cards" hands-on activity —
+  // BEFORE variables or any coding is introduced. Directly requested:
+  // don't teach coding before the underlying idea (binary) is understood
+  // on its own terms; save actual piloting/coding for Semester 2.
+  { name: '🃏 PHASE 0 · BINARY (UNPLUGGED) — no code yet, just the idea', ids: ['learn-binary', 'cards-make', 'cards-add', 'cardsboss'] },
   { name: '📘 PHASE -1 · YOUR FIRST CODE', ids: ['learn-cb', 'cb1', 'cb2', 'cb3', 'cb4'] },
   { name: '🏆 PHASE -1 CAPSTONE', ids: ['cbboss'] },
-  { name: '🔢 PHASE 0 · BINARY & LOGIC — number systems, Boolean logic, data types', ids: ['learn-binary', 'p0m1', 'p0m2', 'p0m3', 'p0m4', 'p0m5', 'p0m6'] },
+  { name: '🔢 PHASE 0 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'p0m3', 'p0m4', 'p0m5', 'p0m6'] },
   { name: '🖼️ PHASE 0 · IMAGES — binary pixels', ids: ['p0m7', 'p0m8'] },
   { name: '🏆 PHASE 0 CAPSTONE', ids: ['p0boss'] },
   { name: '📟 PHASE 0B · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },
