@@ -180,6 +180,9 @@
         <button class="ch-nav-toggle" id="ch-nav-toggle" onclick="toggleChallengeList()">☰ All challenges</button>
       </div>
       <div class="ch-pills" id="ch-pills" style="display:none"></div>
+      <!-- Short concept lesson shown before each mission's challenges — same
+           bounded fix as grade7.html for the 'no lessons in between' complaint. -->
+      <div id="world-lesson" style="display:none;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.6;color:#a5f3fc;"></div>
       <div class="ch-row">
         <div class="ch-text" id="ch-text">Select a challenge.</div>
         <div class="ch-meta">
@@ -1469,6 +1472,20 @@ function toggleChallengeList() {
 
 let challengeStartedAt = Date.now()
 
+// One short concept intro per mod — same bounded fix as grade7.html: a real
+// pedagogical intro shown before the challenge, without a full lesson-tab
+// UI rebuild.
+const G9_MOD_LESSON = {
+  W6: "🌡 <strong>Variables & sequence.</strong> A variable stores a value that can change (DECLARE x : INTEGER). Pseudocode runs top to bottom — read input, transform it, then OUTPUT the result.",
+  W7: "🔐 <strong>Selection & strings.</strong> IF/ELSE branches choose between paths based on a condition. Strings can be inspected character-by-character with LENGTH(), MID(), LEFT() and RIGHT().",
+  W8: "⚙️ <strong>Procedures & functions.</strong> A PROCEDURE performs an action; a FUNCTION returns a value via RETURN. Both let you name and reuse a block of logic instead of repeating it.",
+  W9: "🔍 <strong>Trace tables.</strong> A trace table tracks every variable's value after each line executes — the way to prove (and debug) exactly what a piece of pseudocode does, step by step.",
+  W11: "🫧 <strong>Sorting.</strong> Bubble sort repeatedly compares neighbouring elements and swaps them if they're in the wrong order, 'bubbling' the largest value to the end each pass.",
+  W12: "🎯 <strong>Searching.</strong> Binary search only works on a sorted array — it compares the middle element to the target and discards half the remaining array each step (O(log n)).",
+  M12: "⚙️ <strong>Procedures & functions (extra practice).</strong> More reps on writing and calling your own PROCEDUREs/FUNCTIONs — the same skill as the W8 mission above.",
+  M13: "🎯 <strong>Searching (extra practice).</strong> More reps on binary search over a sorted array — the same skill as the W12 mission above.",
+}
+
 function selectChallenge(i) {
   activeIdx=i; hintIdx=0
   challengeStartedAt = Date.now()
@@ -1479,6 +1496,12 @@ function selectChallenge(i) {
   document.getElementById('output').innerHTML=''
   clearTraceTable()
   renderPills()
+  const lessonEl = document.getElementById('world-lesson')
+  if (lessonEl) {
+    const lesson = G9_MOD_LESSON[ch.mod]
+    lessonEl.innerHTML = lesson ? '📘 ' + lesson : ''
+    lessonEl.style.display = lesson ? 'block' : 'none'
+  }
 }
 
 // ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──

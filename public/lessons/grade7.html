@@ -206,6 +206,11 @@
         <button class="ch-nav-toggle" id="ch-nav-toggle" onclick="toggleChallengeList()">☰ All challenges</button>
       </div>
       <div class="ch-pills" id="ch-pills" style="display:none"></div>
+      <!-- Short concept lesson shown before each world's challenges — addresses
+           the 'no lessons in between challenges' complaint without needing a
+           full separate lesson tab. Collapsed by default so it doesn't crowd
+           the challenge text; expands on first visit to a new world. -->
+      <div id="world-lesson" style="display:none;background:rgba(129,140,248,.06);border:1px solid rgba(129,140,248,.2);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.6;color:#c7d2fe;"></div>
       <div class="ch-row">
         <div class="ch-text"  id="ch-text">Select a challenge above.</div>
         <div class="ch-meta">
@@ -1308,6 +1313,21 @@ function toggleChallengeList() {
 
 let challengeStartedAt = Date.now()
 
+// One short concept intro per world (mod prefix), shown above the challenge
+// text. Not a full lesson tab like AS/A Level's — a bounded, real fix for
+// "no lessons in between" that doesn't require a new UI system.
+const G7_WORLD_LESSON = {
+  G1: "🚀 <strong>Coordinates & sequences.</strong> Every sprite lives at an (x, y) position on the canvas — x grows rightward, y grows downward. A sequence of drawing/move blocks runs top-to-bottom, one after another.",
+  G2: "🎚 <strong>Variables.</strong> A variable is a named box that holds a value that can change — score, health, a timer. Reading a variable never changes it; only an assignment block does.",
+  G3: "🚦 <strong>Selection (IF).</strong> An IF block only runs its contents when a condition is true — e.g. \"IF touching enemy THEN lose a life\". Conditions compare values with =, <, > etc.",
+  G4: "🧰 <strong>Functions (My Blocks).</strong> A function is a reusable named block of instructions — define it once (e.g. spawnEnemy()), then call it as many times as you like instead of repeating the same blocks.",
+  G5: "⌨️ <strong>Input.</strong> Keyboard and mouse blocks let the player control the game — \"on key pressed\" and \"on mouse moved\" run their contents every time that input happens.",
+  G6: "💥 <strong>Collision & physics.</strong> \"Touching\" blocks detect when two sprites overlap. Simple physics just means changing x/y a little every frame — gravity is \"add a bit to vertical speed every frame\".",
+  G7W: "🎬 <strong>Game states.</strong> Real games aren't just one screen — a single \"state\" variable (menu / playing / gameover) controls which blocks run each frame, so the same game loop can show different screens.",
+  G8: "🤖 <strong>Simple AI.</strong> NPCs don't need to be smart to feel alive — a few IF blocks comparing distance to the player (chase), a timer (patrol), or matching keywords (a rule-based chatbot) go a long way.",
+  G9W: "💬 <strong>Strings.</strong> A string is text in quotes. You can join strings together (concatenate) to build dialogue or messages, and compare them to branch a conversation.",
+  G10: "🏆 <strong>Bringing it together.</strong> A finished game combines everything so far: a state machine, player input, collision or a win condition, and at least one function you define. Plan on paper first, then build.",
+}
 function selectChallenge(i) {
   activeIdx = i
   hintIdx   = 0
@@ -1319,6 +1339,12 @@ function selectChallenge(i) {
   stopLoop()
   ctx.clearRect(0,0,W,H)
   renderPills()
+  const lessonEl = document.getElementById('world-lesson')
+  if (lessonEl) {
+    const lesson = G7_WORLD_LESSON[ch.mod]
+    lessonEl.innerHTML = lesson ? '📘 ' + lesson : ''
+    lessonEl.style.display = lesson ? 'block' : 'none'
+  }
   log('Challenge: ' + ch.name, 'info')
 }
 
