@@ -55,7 +55,17 @@
     /* Challenge header */
     .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px;
                   max-height:38vh; overflow-y:auto; }
-    .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; max-height:220px; overflow-y:auto; }
+    .ch-nav-strip { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .ch-nav-btn { padding:4px 12px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
+                  background:var(--bg-raised); border:1px solid var(--border-hi); color:var(--fg-dim); }
+    .ch-nav-btn:hover { color:var(--fg); border-color:#60a5fa; }
+    .ch-nav-current { flex:1; font-size:12.5px; font-weight:700; color:var(--fg-dim); }
+    .ch-nav-current b { color:#60a5fa; }
+    .ch-nav-toggle { padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;
+                     background:none; border:1px solid var(--border); color:var(--fg-faint); }
+    .ch-nav-toggle:hover { color:var(--fg); border-color:var(--border-hi); }
+    .ch-nav-toggle.open { color:#60a5fa; border-color:#60a5fa; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -186,7 +196,16 @@
 
     <!-- Challenge bar -->
     <div class="ch-header">
-      <div class="ch-pills" id="ch-pills"></div>
+      <!-- Compact "Challenge N of TOTAL" strip replaces the always-visible
+           pill wall (29 challenges wrapping many rows) — see grade8.html for
+           the original fix; same pattern here. -->
+      <div class="ch-nav-strip">
+        <button class="ch-nav-btn" onclick="stepChallenge(-1)" title="Previous challenge">←</button>
+        <div class="ch-nav-current" id="ch-nav-current"></div>
+        <button class="ch-nav-btn" onclick="stepChallenge(1)" title="Next challenge">→</button>
+        <button class="ch-nav-toggle" id="ch-nav-toggle" onclick="toggleChallengeList()">☰ All challenges</button>
+      </div>
+      <div class="ch-pills" id="ch-pills" style="display:none"></div>
       <div class="ch-row">
         <div class="ch-text"  id="ch-text">Select a challenge above.</div>
         <div class="ch-meta">
@@ -1254,6 +1273,31 @@ function renderPills() {
     }
     row.appendChild(el)
   })
+  renderNavStrip()
+}
+
+// Compact "Challenge N of TOTAL" strip — see the ch-nav-strip comment above
+// the markup for why this replaced the always-visible pill wall.
+function renderNavStrip() {
+  const el = document.getElementById('ch-nav-current')
+  if (!el) return
+  const ch = CHALLENGES[activeIdx]
+  const done = completed.has(activeIdx) ? ' ✓' : ''
+  el.innerHTML = `<b>${activeIdx + 1}</b> / ${CHALLENGES.length} — ${ch ? ch.mod + ' ' + ch.name : ''}${done}`
+}
+function stepChallenge(delta) {
+  const next = activeIdx + delta
+  if (next < 0 || next >= CHALLENGES.length) return
+  const isLocked = next > 0 && !completed.has(next - 1) && !completed.has(next)
+  if (isLocked) return
+  selectChallenge(next)
+}
+function toggleChallengeList() {
+  const list = document.getElementById('ch-pills')
+  const btn  = document.getElementById('ch-nav-toggle')
+  const open = list.style.display === 'none'
+  list.style.display = open ? 'flex' : 'none'
+  btn.classList.toggle('open', open)
 }
 
 let challengeStartedAt = Date.now()

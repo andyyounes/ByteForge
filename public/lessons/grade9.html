@@ -59,7 +59,17 @@
     .right-panel { display:flex; flex-direction:column; overflow:hidden; }
 
     .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px; }
-    .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; max-height:220px; overflow-y:auto; }
+    .ch-nav-strip { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .ch-nav-btn { padding:4px 12px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
+                  background:var(--bg-raised); border:1px solid var(--border-hi); color:var(--fg-dim); }
+    .ch-nav-btn:hover { color:var(--fg); border-color:#60a5fa; }
+    .ch-nav-current { flex:1; font-size:12.5px; font-weight:700; color:var(--fg-dim); }
+    .ch-nav-current b { color:#60a5fa; }
+    .ch-nav-toggle { padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;
+                     background:none; border:1px solid var(--border); color:var(--fg-faint); }
+    .ch-nav-toggle:hover { color:var(--fg); border-color:var(--border-hi); }
+    .ch-nav-toggle.open { color:#60a5fa; border-color:#60a5fa; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -160,7 +170,15 @@
   <!-- Right panel -->
   <div class="right-panel">
     <div class="ch-header">
-      <div class="ch-pills" id="ch-pills"></div>
+      <!-- Compact "Challenge N of TOTAL" strip replaces the always-visible
+           pill wall — see grade8.html for the original fix; same pattern. -->
+      <div class="ch-nav-strip">
+        <button class="ch-nav-btn" onclick="stepChallenge(-1)" title="Previous challenge">←</button>
+        <div class="ch-nav-current" id="ch-nav-current"></div>
+        <button class="ch-nav-btn" onclick="stepChallenge(1)" title="Next challenge">→</button>
+        <button class="ch-nav-toggle" id="ch-nav-toggle" onclick="toggleChallengeList()">☰ All challenges</button>
+      </div>
+      <div class="ch-pills" id="ch-pills" style="display:none"></div>
       <div class="ch-row">
         <div class="ch-text" id="ch-text">Select a challenge.</div>
         <div class="ch-meta">
@@ -1393,10 +1411,36 @@ function renderPills() {
     el.onclick = ()=>selectChallenge(i)
     row.appendChild(el)
   })
+  renderNavStrip()
 }
+
+// Compact "Challenge N of TOTAL" strip — see the ch-nav-strip comment above
+// the markup for why this replaced the always-visible pill wall.
+function renderNavStrip() {
+  const el = document.getElementById('ch-nav-current')
+  if (!el) return
+  const ch = CHALLENGES[activeIdx]
+  const done = completed.has(activeIdx) ? ' ✓' : ''
+  el.innerHTML = `<b>${activeIdx + 1}</b> / ${CHALLENGES.length} — ${ch ? ch.mod + ' ' + ch.name : ''}${done}`
+}
+function stepChallenge(delta) {
+  const next = activeIdx + delta
+  if (next < 0 || next >= CHALLENGES.length) return
+  selectChallenge(next)
+}
+function toggleChallengeList() {
+  const list = document.getElementById('ch-pills')
+  const btn  = document.getElementById('ch-nav-toggle')
+  const open = list.style.display === 'none'
+  list.style.display = open ? 'flex' : 'none'
+  btn.classList.toggle('open', open)
+}
+
+let challengeStartedAt = Date.now()
 
 function selectChallenge(i) {
   activeIdx=i; hintIdx=0
+  challengeStartedAt = Date.now()
   const ch=CHALLENGES[i]
   document.getElementById('ch-text').innerHTML=ch.text
   document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
@@ -1404,6 +1448,33 @@ function selectChallenge(i) {
   document.getElementById('output').innerHTML=''
   clearTraceTable()
   renderPills()
+}
+
+// ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
+// Same fix as grade7.html/grade8.html: BF.addXP only ever wrote to the
+// localStorage-only mock database, invisible to /student/dashboard. Mapped by
+// challenge CONTENT (mod labels here are inconsistently W-prefixed vs the two
+// recovered M12/M13 ones — a pre-existing source typo, not fixed here) rather
+// than by mod string, onto the closest matching concept already defined for
+// Grade 9's 30-week curriculum in lib/concepts.ts.
+const G9_CHALLENGE_CONCEPT = {
+  'W6/Temperature Converter':'g9-pseudocode', 'W6/Leap Year Checker':'g9-pseudocode',
+  'W7/Password Strength':'g9-declarations',   'W7/Array & FOR':'g9-declarations',
+  'W8/PrintBorder Procedure':'g9-procedures', 'W8/Clamp Function':'g9-procedures',
+  'W9/Trace & Fix':'g9-trace-tables',         'W9/Factorial Function':'g9-trace-tables',
+  'W11/Bubble Sort':'g9-sort',                'W12/Binary Search':'g9-search',
+  'M12/Temperature Function':'g9-procedures', 'M12/Array Processing':'g9-declarations',
+  'M13/Linear Search':'g9-search',
+}
+async function reportRealProgress(ch, timeSpentMs) {
+  const concept_id = G9_CHALLENGE_CONCEPT[`${ch.mod}/${ch.name}`]
+  if (!concept_id) return
+  try {
+    await fetch('/api/progress', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ concept_id, correct: true, time_spent_ms: Math.max(0, Math.min(3600000, timeSpentMs)) }),
+    })
+  } catch (e) { console.warn('[grade9] progress report failed (offline?):', e.message) }
 }
 
 function resetStarter() {
@@ -1419,6 +1490,7 @@ function validateChallenge(code, result) {
     showToast('Challenge complete! +'+ch.xp+' XP')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + (ch.mod||'c') + activeIdx, { passed: true, score: 100 }); }
     LessonSaves.save('grade9', activeIdx, { passed: true, xpEarned: ch.xp, code })
+    reportRealProgress(ch, Date.now() - challengeStartedAt)
   }
 }
 
