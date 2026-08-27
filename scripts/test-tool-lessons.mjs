@@ -173,6 +173,41 @@ const t = (ok, label) => {
   t(/decision:\s*\(n,\s*branch\)/.test(src), 'flowchart: the decision message reports the real branch, not always YES')
 }
 
+// ── turtle.html: expression arguments must actually evaluate ─────────────────
+// parseLine used bare +m[1], so `forward(i * 3)` became +("i * 3") = NaN. The
+// Spiral challenge recorded 36 NaN moves, drew NOTHING, and still awarded 50 XP
+// because its check only counted them. pencolor() accepted only a QUOTED
+// literal, so `pencolor(colors[i % 6])` produced zero colour commands and the
+// Colourful Hexagon challenge was impossible. The loop variable was also
+// discarded entirely by parseCode, so `i` could never resolve.
+{
+  const src = readFileSync(`${ROOT}/public/lessons/turtle.html`, 'latin1')
+  const ps = src.indexOf('function parseCode(src)')
+  const pe = src.indexOf('function execStep(cmd)')
+  const cs = src.indexOf('const CHALLENGES = [')
+  const cm = src.slice(cs).match(/\r?\n\]\r?\n/)
+  const { parseCode, CHALLENGES } = new Function(
+    src.slice(ps, pe) + '\n' + src.slice(cs, cs + cm.index + cm[0].indexOf(']') + 1) +
+    '\nreturn { parseCode, CHALLENGES }')()
+
+  const allCmds = CHALLENGES.flatMap(c => parseCode(c.starter))
+  t(allCmds.every(c => typeof c.val !== 'number' || Number.isFinite(c.val)),
+    'turtle: no starter produces a NaN movement')
+
+  const spiral = CHALLENGES.find(c => c.name === 'Spiral')
+  const svals = parseCode(spiral.starter).filter(c => c.type === 'forward').map(c => c.val)
+  t(svals.length >= 20 && svals.every(Number.isFinite),
+    'turtle/Spiral: forward(i * 3) evaluates instead of yielding NaN')
+  t(new Set(svals).size > 5,
+    'turtle/Spiral: the distances actually grow (a real spiral, not a blank canvas)')
+
+  const hex = CHALLENGES.find(c => c.name === 'Colourful Hexagon')
+  const hcmds = parseCode(hex.starter)
+  t(hcmds.filter(c => c.type === 'color').length >= 3,
+    'turtle/Colourful Hexagon: pencolor(colors[i % 6]) resolves to real colours')
+  t(!!hex.check(hcmds), 'turtle/Colourful Hexagon: is completable at all')
+}
+
 // ── No stray control bytes anywhere in shipped source ────────────────────────
 {
   const BS = String.fromCharCode(8)

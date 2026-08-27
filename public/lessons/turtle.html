@@ -239,14 +239,29 @@ function parseCode(src) {
   const lines = src.split('\n')
   const indent = s => s.match(/^\s*/)[0].length
 
+  // Variables in scope for argument expressions: list assignments plus the
+  // current loop counter. Without these, parseLine saw the literal text
+  // "i * 3" and +("i * 3") is NaN.
+  const vars = {}
+
   let i = 0
   while (i < lines.length) {
     const line = lines[i].trim()
     if (!line || line.startsWith('#')) { i++; continue }
 
-    const forMatch = line.match(/^for\s+\w+\s+in\s+range\((\d+)\)\s*:/)
+    // e.g. colors = ['#f87171', '#fbbf24', ...]
+    const listMatch = line.match(/^(\w+)\s*=\s*(\[[^\]]*\])\s*$/)
+    if (listMatch) {
+      try { vars[listMatch[1]] = JSON.parse(listMatch[2].replace(/'/g, '"')) } catch (e) {}
+      i++; continue
+    }
+
+    // Capture the loop VARIABLE NAME too  it used to be discarded, so a body
+    // line like forward(i * 3) could never resolve i.
+    const forMatch = line.match(/^for\s+(\w+)\s+in\s+range\((\d+)\)\s*:/)
     if (forMatch) {
-      const count = parseInt(forMatch[1])
+      const loopVar = forMatch[1]
+      const count = parseInt(forMatch[2])
       const bodyIndent = indent(lines[i])
       const body = []
       i++
@@ -255,25 +270,56 @@ function parseCode(src) {
         i++
       }
       for (let n = 0; n < count; n++) {
-        body.forEach(bl => parseLine(bl, cmds))
+        vars[loopVar] = n
+        body.forEach(bl => parseLine(bl, cmds, vars))
       }
+      delete vars[loopVar]
       continue
     }
 
-    parseLine(line, cmds)
+    parseLine(line, cmds, vars)
     i++
   }
   return cmds
 }
 
-function parseLine(line, cmds) {
+// Evaluates a simple argument expression (numbers, arithmetic, loop variables,
+// list indexing such as colors[i % 6]). Deliberately restrictive: no function
+// calls, so nothing arbitrary can run. Returns undefined if it cannot evaluate,
+// and callers then record NO command rather than a NaN one.
+function evalArg(expr, vars) {
+  const src = String(expr).trim()
+  if (!/^[\w\s+\-*/%().[\]'"#,]+$/.test(src)) return undefined
+  try {
+    const names = Object.keys(vars || {})
+    const v = new Function(...names, 'return (' + src + ')')(...names.map(k => vars[k]))
+    return v
+  } catch (e) { return undefined }
+}
+function numArg(expr, vars) {
+  const v = evalArg(expr, vars)
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined
+}
+
+function parseLine(line, cmds, vars) {
   let m
-  if ((m = line.match(/^forward\(([^)]+)\)/)))   cmds.push({ type:'forward',  val: +m[1] })
-  if ((m = line.match(/^backward\(([^)]+)\)/)))  cmds.push({ type:'backward', val: +m[1] })
-  if ((m = line.match(/^right\(([^)]+)\)/)))     cmds.push({ type:'right',    val: +m[1] })
-  if ((m = line.match(/^left\(([^)]+)\)/)))      cmds.push({ type:'left',     val: +m[1] })
-  if ((m = line.match(/^pencolor\(['"](.+)['"]\)/))) cmds.push({ type:'color', val: m[1] })
-  if ((m = line.match(/^pensize\(([^)]+)\)/)))   cmds.push({ type:'size',   val: +m[1] })
+  // Each of these used to be +m[1], so any expression argument became NaN 
+  // forward(i * 3) recorded 36 NaN moves that drew nothing, yet the Spiral
+  // challenge counted them and awarded 50 XP for a blank canvas. A value that
+  // cannot be evaluated now records no command at all.
+  const push = (type, raw) => { const v = numArg(raw, vars); if (v !== undefined) cmds.push({ type, val: v }) }
+  if ((m = line.match(/^forward\(([^)]+)\)/)))   push('forward',  m[1])
+  if ((m = line.match(/^backward\(([^)]+)\)/)))  push('backward', m[1])
+  if ((m = line.match(/^right\(([^)]+)\)/)))     push('right',    m[1])
+  if ((m = line.match(/^left\(([^)]+)\)/)))      push('left',     m[1])
+  // Accepted only a QUOTED literal, so pencolor(colors[i % 6]) produced zero
+  // colour commands and the Colourful Hexagon challenge was unpassable.
+  if ((m = line.match(/^pencolor\((.+)\)\s*$/))) {
+    const lit = m[1].match(/^['"](.+)['"]$/)
+    const val = lit ? lit[1] : evalArg(m[1], vars)
+    if (typeof val === 'string' && val) cmds.push({ type:'color', val })
+  }
+  if ((m = line.match(/^pensize\(([^)]+)\)/)))   push('size', m[1])
   if (line === 'penup()')   cmds.push({ type:'up' })
   if (line === 'pendown()') cmds.push({ type:'down' })
   if (line === 'home()')    cmds.push({ type:'home' })
