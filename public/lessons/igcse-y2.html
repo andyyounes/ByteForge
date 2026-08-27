@@ -58,6 +58,17 @@
     .ch-nav-btn:disabled { opacity:.35; cursor:default; }
     .ch-nav-current { font-size:11.5px; font-weight:700; color:var(--fg); flex:1; }
     .ch-nav-toggle { font-size:11px; color:#7dd3fc; cursor:pointer; font-weight:700; }
+    .ch-lesson { flex-shrink:0; background:var(--bg-card); border:1px solid rgba(125,211,252,.18); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .cl-toggle { padding:8px 12px; font-size:12px; font-weight:800; color:#7dd3fc; cursor:pointer;
+                 display:flex; align-items:center; gap:6px; user-select:none; }
+    .cl-toggle:hover { color:#a5e8ff; }
+    #cl-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
+    .cl-body { padding:0 12px 12px; font-size:12px; color:var(--fg-dim); line-height:1.7; }
+    .cl-body.collapsed { display:none; }
+    .cl-block { background:var(--bg-raised); border:1px solid var(--border); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
+    .cl-block:last-child { margin-bottom:0; }
+    .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
+    .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -161,6 +172,11 @@
         <span class="ch-nav-toggle" onclick="toggleChallengeList()" id="ch-nav-toggle">☰ All challenges</span>
       </div>
       <div class="ch-pills" id="ch-pills"></div>
+      <!-- Full per-challenge lesson — populated from CHALLENGE_LESSON. -->
+      <div class="ch-lesson" id="ch-lesson" style="display:none;">
+        <div class="cl-toggle" id="cl-toggle" onclick="toggleChallengeLesson()">📘 <span id="cl-title"></span> <span id="cl-arrow">▾</span></div>
+        <div class="cl-body" id="cl-body"></div>
+      </div>
       <div class="ch-row">
         <div class="ch-text" id="ch-text">Select a challenge.</div>
         <div class="ch-meta">
@@ -1187,6 +1203,84 @@ CALL Dog_Info()`,
 const STAGE_INDEX = {}
 CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.mod + '/' + s.name] = i })
 
+// ══════════════════════════════════════════════════════════════════════════════
+// 📘 CHALLENGE_LESSON — one real, full explainer per practice, keyed by
+// "mod/name" (the same stable identity used everywhere else on this page).
+// ══════════════════════════════════════════════════════════════════════════════
+const CHALLENGE_LESSON = {
+  // ── M1 — 2D Arrays & Records ─────────────────────────────────────────────────
+  'M1/2D Array': { title: '2D arrays — a grid, not just a line', html: `
+    <div class="cl-block"><h4>Two indices instead of one</h4>
+      <p><code>ARRAY[1:3, 1:3]</code> declares a grid with THREE rows and THREE columns — every cell needs BOTH a row index and a column index to locate it, e.g. <code>grid[2,3]</code> means row 2, column 3.</p></div>
+    <div class="cl-block"><h4>Nested loops fill a 2D array</h4>
+      <p>A single FOR loop only walks one dimension — filling every cell of a grid needs a loop INSIDE a loop: the outer loop picks the row, the inner loop walks every column in that row.</p></div>` },
+  'M1/Record DECLARE': { title: 'Records — grouping related data together', html: `
+    <div class="cl-block"><h4>One "thing", several related pieces of data</h4>
+      <p>A student record genuinely has several DIFFERENT pieces of information (name, age, grade) that all belong to the SAME student — a record groups them together conceptually, even when (as here) simulated with separate variables.</p></div>
+    <div class="cl-block"><h4>& joins pieces of a message together</h4>
+      <p><code>studentName & " is " & studentAge</code> — the <code>&</code> operator concatenates (joins) text and values into one output line, the pseudocode equivalent of an f-string.</p></div>` },
+
+  // ── M2 — BYVAL / BYREF ───────────────────────────────────────────────────────
+  'M2/BYVAL': { title: 'BYVAL — the procedure gets a COPY', html: `
+    <div class="cl-block"><h4>Changes inside stay inside</h4>
+      <p><code>BYVAL n</code> means the procedure receives a completely separate COPY of the argument — doubling <code>n</code> inside <code>Double</code> has zero effect on the original variable <code>x</code> back where it was called from.</p></div>
+    <div class="cl-block"><h4>Why this matters</h4>
+      <p>BYVAL is the SAFE default — a procedure can freely modify its own copy of a parameter without any risk of accidentally corrupting the caller's original data.</p></div>` },
+  'M2/BYREF': { title: 'BYREF — the procedure gets the REAL variable', html: `
+    <div class="cl-block"><h4>Changes inside really do change the original</h4>
+      <p><code>BYREF n</code> means the procedure receives a REFERENCE to the actual original variable — tripling <code>n</code> inside <code>Triple</code> genuinely changes <code>y</code> itself, permanently, even after the procedure ends.</p></div>
+    <div class="cl-block"><h4>When you'd actually want this</h4>
+      <p>BYREF is exactly what you need when a procedure's WHOLE JOB is to modify a variable that already exists — like the stack PUSH/POP challenges coming up, which must genuinely change the shared array and top pointer.</p></div>` },
+
+  // ── M3 — File Handling ────────────────────────────────────────────────────────
+  'M3/Write File': { title: 'OPENFILE / WRITEFILE / CLOSEFILE', html: `
+    <div class="cl-block"><h4>Three steps, always in this order</h4>
+      <p>Every file operation follows the same shape: OPEN it (stating whether you're reading or writing), do your WRITEFILE/READFILE operations, then always CLOSE it when finished.</p></div>
+    <div class="cl-block"><h4>A loop can write many lines, one WRITEFILE at a time</h4>
+      <p>Each <code>WRITEFILE</code> call writes exactly ONE line — a FOR loop calling it three times, with different text each time, is how you write multiple lines without three separate hardcoded WRITEFILE statements.</p></div>` },
+  'M3/EOF Loop': { title: 'Writing, then reading the SAME file back', html: `
+    <div class="cl-block"><h4>Close before you reopen for a different purpose</h4>
+      <p>A file opened FOR WRITE has to be CLOSED before it can be reopened FOR READ — you can't write and read the same open file handle at once in this model.</p></div>
+    <div class="cl-block"><h4>READFILE pulls one line at a time, in order</h4>
+      <p>Just like WRITEFILE writes one line per call, READFILE reads back exactly one line per call — looping the same number of times as you originally wrote reads every line back, in the same order they were written.</p></div>` },
+
+  // ── M4 — Stacks & Queues ──────────────────────────────────────────────────────
+  'M4/Stack PUSH': { title: 'An array-based stack — PUSH', html: `
+    <div class="cl-block"><h4>top tracks where the next item goes</h4>
+      <p><code>top</code> starts at 0 (empty). PUSHing increments <code>top</code> FIRST, then stores the new value at <code>arr[top]</code> — top always points at the most recently pushed item.</p></div>
+    <div class="cl-block"><h4>Overflow — the stack has a fixed maximum size</h4>
+      <p>The array only holds 5 items — checking <code>IF top >= 5</code> BEFORE pushing catches overflow, the real, fixed-capacity limitation every array-based (rather than dynamically-growing) stack has.</p></div>` },
+  'M4/Stack POP': { title: 'POP — removing from the top, LIFO order', html: `
+    <div class="cl-block"><h4>Read the top value, THEN decrement top</h4>
+      <p>Popping reads <code>arr[top]</code> to get the value, THEN decrements <code>top</code> by 1 — the opposite order from PUSH (which increments first, then writes), since POP is removing what's already there.</p></div>
+    <div class="cl-block"><h4>Underflow — you can't pop an empty stack</h4>
+      <p><code>IF top = 0</code> means the stack is empty — popping anyway would try to read a cell that was never validly pushed. Checking for underflow before popping is exactly as important as checking overflow before pushing.</p></div>` },
+
+  // ── M5 — Sorting & Searching ──────────────────────────────────────────────────
+  'M5/Bubble Sort': { title: 'Bubble sort — nested loops, adjacent swaps', html: `
+    <div class="cl-block"><h4>Outer loop = number of passes; inner loop = comparisons</h4>
+      <p>The outer loop controls HOW MANY passes to make; the inner loop walks through the array comparing each adjacent pair — swapping whenever they're in the wrong order.</p></div>
+    <div class="cl-block"><h4>A temp variable is required to swap</h4>
+      <p>Swapping <code>arr[j]</code> and <code>arr[j+1]</code> needs a THIRD variable to hold one value temporarily — otherwise assigning one directly to the other would overwrite and lose it before the swap completes.</p></div>` },
+  'M5/Binary Search': { title: 'Binary search, in real pseudocode', html: `
+    <div class="cl-block"><h4>low/high/mid — narrowing the search window</h4>
+      <p><code>low</code> and <code>high</code> mark the current search window; <code>mid</code> is the middle. If the target is bigger than <code>arr[mid]</code>, the whole LEFT half (including mid) can be discarded by moving <code>low</code> up; otherwise discard the right half by moving <code>high</code> down.</p></div>
+    <div class="cl-block"><h4>The loop ends when the window closes or a match is found</h4>
+      <p><code>WHILE low <= high</code> keeps searching for as long as there's still a valid window left — the moment <code>low</code> passes <code>high</code>, the target genuinely isn't in the array, and the function returns -1.</p></div>` },
+
+  // ── M6 — OOP Basics ───────────────────────────────────────────────────────────
+  'M6/Class Declaration': { title: 'Simulating a class with named procedures', html: `
+    <div class="cl-block"><h4>A "constructor" is just a setup procedure</h4>
+      <p><code>Animal_New</code> plays the role of a constructor — a procedure that initialises an object's data (here, simulated with plain variables named by convention, <code>animalName</code>/<code>animalSound</code>).</p></div>
+    <div class="cl-block"><h4>A "method" is just a procedure that uses that data</h4>
+      <p><code>Animal_Speak</code> reads the data <code>Animal_New</code> set up and does something with it — exactly the relationship between a constructor and a method in real object-oriented code (which you'll write for real in AS/A Level).</p></div>` },
+  'M6/Inheritance': { title: 'Inheritance — building on top of an existing "class"', html: `
+    <div class="cl-block"><h4>Reusing Animal's setup, then adding something new</h4>
+      <p><code>Dog_New</code> calls <code>Animal_New</code> to reuse ALL of its existing setup logic, then adds ONE new piece of data (<code>breed</code>) specific to dogs — building on top of existing code instead of rewriting it from scratch.</p></div>
+    <div class="cl-block"><h4>Real inheritance works the same way</h4>
+      <p>A real <code>Dog</code> class inheriting from <code>Animal</code> gets every one of Animal's attributes and methods for free, then adds its own extras — exactly what this naming-convention simulation is standing in for.</p></div>` },
+}
+
 function renderPills(){
   const row=document.getElementById('ch-pills');row.innerHTML=''
   CHALLENGES.forEach((ch,i)=>{
@@ -1222,7 +1316,32 @@ function selectChallenge(i){
   document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
   editor.setValue(ch.starter||'')
   document.getElementById('output').innerHTML='';clearTraceTable();renderPills()
+  renderChallengeLesson(ch)
 }
+
+// 📘 Full per-challenge lesson — CHALLENGE_LESSON defined after CHALLENGES,
+// keyed by "mod/name" (no dedicated id field on these challenges).
+let _clExpanded = true
+function renderChallengeLesson(ch) {
+  const wrap  = document.getElementById('ch-lesson')
+  const body  = document.getElementById('cl-body')
+  const title = document.getElementById('cl-title')
+  if (!wrap) return
+  const key = ch.mod + '/' + ch.name
+  const lesson = typeof CHALLENGE_LESSON !== 'undefined' ? CHALLENGE_LESSON[key] : null
+  if (!lesson) { wrap.style.display = 'none'; return }
+  wrap.style.display = ''
+  title.textContent = lesson.title
+  body.innerHTML = lesson.html
+  body.classList.toggle('collapsed', !_clExpanded)
+  document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
+}
+function toggleChallengeLesson() {
+  _clExpanded = !_clExpanded
+  document.getElementById('cl-body').classList.toggle('collapsed', !_clExpanded)
+  document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
+}
+
 function resetStarter(){
   const ch=CHALLENGES[activeIdx];if(ch)editor.setValue(ch.starter||'')
   document.getElementById('output').innerHTML='';clearTraceTable()
