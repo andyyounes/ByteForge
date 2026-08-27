@@ -2943,6 +2943,18 @@ function winList() {
 // Mission list
 // ══════════════════════════════════════════════════════════════════════════════
 const TIERS = [
+  // Phase 0 and 0B existed in MISSIONS (with real, working, lesson-covered
+  // content) but were never added here — TIERS is a SEPARATE array from
+  // each mission's own `phase` field, and is what showJourney() actually
+  // renders onto the map. Missing here meant these 16 missions were
+  // completely invisible on the roadmap, even though openMission(id)
+  // worked fine directly — exactly why this went unnoticed by screenshot
+  // checks that always opened missions by id rather than through the map.
+  { name: '🔢 PHASE 0 · BINARY & LOGIC — number systems, Boolean logic, data types', ids: ['p0m1', 'p0m2', 'p0m3', 'p0m4', 'p0m5', 'p0m6'] },
+  { name: '🖼️ PHASE 0 · IMAGES — binary pixels', ids: ['p0m7', 'p0m8'] },
+  { name: '🏆 PHASE 0 CAPSTONE', ids: ['p0boss'] },
+  { name: '📟 PHASE 0B · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },
+  { name: '🏆 PHASE 0B CAPSTONE', ids: ['p0bboss'] },
   { name: '🧭 TIER 1 — SEQUENCING', ids: ['p1m1', 'p1m2', 'p1m3'] },
   { name: '🔁 TIER 2 — LOOPS (new: stars count code lines)', ids: ['p1m4', 'p1m5', 'p1m6', 'p1m7'] },
   { name: '🚦 TIER 3 — SIGNALS & DECISIONS', ids: ['p1m8', 'p1m9', 'p1m10'] },
