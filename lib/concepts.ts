@@ -186,6 +186,11 @@ export const CONCEPTS: Concept[] = [
 
   // ── Tier 8 ────────────────────────────────────────────────────────────────
   { id:'algorithms-complexity', name:'Algorithm Complexity',icon:'📈', color:'#a855f7', tier:8, xGroup:0, prerequisites:['sort-merge','search-binary'],           difficulty:4, gradeMin:10, estimatedMinutes:50, learningModes:['text','pseudocode'],    tags:['algorithms'],              lessonUrl:'/student/concept/algorithms-complexity' },
+
+  // ── IGCSE-specific (0478 Paper 1/2) — no equivalent concept existed yet ────
+  { id:'igcse-security', name:'Network Security & Ethics', icon:'🔐', color:'#06b6d4', tier:2, xGroup:11, prerequisites:['networking-basics'],                  difficulty:2, gradeMin:10, estimatedMinutes:30, learningModes:['text'],                  tags:['security','networking'],   lessonUrl:'/lessons/igcse-y1.html' },
+  { id:'igcse-params',   name:"Passing Parameters (BYVAL/BYREF)", icon:'📤', color:'#22c55e', tier:4, xGroup:12, prerequisites:['pseudocode-arrays'],           difficulty:3, gradeMin:10, estimatedMinutes:30, learningModes:['pseudocode'],             tags:['algorithms','pseudocode'], lessonUrl:'/lessons/igcse-y2.html' },
+  { id:'igcse-files',    name:'File Handling in Pseudocode', icon:'📁', color:'#22c55e', tier:4, xGroup:13, prerequisites:['pseudocode-arrays'],                difficulty:3, gradeMin:10, estimatedMinutes:30, learningModes:['pseudocode'],             tags:['algorithms','pseudocode'], lessonUrl:'/lessons/igcse-y2.html' },
 ]
 
 // ── Pathways ──────────────────────────────────────────────────────────────────

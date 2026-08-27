@@ -42,7 +42,15 @@
     /* ── Right panel ── */
     .right-panel { display:flex; flex-direction:column; overflow:hidden; }
     .ch-header   { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px; }
-    .ch-pills    { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pills    { display:none; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pills.expanded { display:flex; }
+    .ch-nav-strip  { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .ch-nav-btn    { padding:3px 10px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer;
+                     border:1px solid var(--border); background:var(--bg-raised); color:var(--fg-dim); }
+    .ch-nav-btn:hover { border-color:var(--border-hi); color:var(--fg); }
+    .ch-nav-btn:disabled { opacity:.35; cursor:default; }
+    .ch-nav-current { font-size:11.5px; font-weight:700; color:var(--fg); flex:1; }
+    .ch-nav-toggle { font-size:11px; color:#7dd3fc; cursor:pointer; font-weight:700; }
     .ch-pill     { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                    border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -122,6 +130,12 @@
   <!-- Right panel -->
   <div class="right-panel">
     <div class="ch-header">
+      <div class="ch-nav-strip">
+        <button class="ch-nav-btn" onclick="stepChallenge(-1)">◀</button>
+        <span class="ch-nav-current" id="ch-nav-current"></span>
+        <button class="ch-nav-btn" onclick="stepChallenge(1)">▶</button>
+        <span class="ch-nav-toggle" onclick="toggleChallengeList()" id="ch-nav-toggle">☰ All challenges</span>
+      </div>
       <div class="ch-pills" id="ch-pills"></div>
       <div class="ch-row">
         <div class="ch-text" id="ch-text">Select a challenge.</div>
@@ -149,6 +163,24 @@ const me = (() => { try { return BF.session() || null } catch(_) { return null }
 const completed = new Set()
 let activeIdx = 0
 let hintIdx   = 0
+let challengeStartedAt = Date.now()
+
+// ── Bridge to the real Supabase-backed progress system ───────────────────────
+// Mirrors the pattern used in grade7/8/9.html: BF.addXP/recordAttempt above is
+// a localStorage-only mock the real /student/dashboard never reads. Best-effort
+// module→concept mapping since IGCSE Y1's 5 theory modules don't map 1:1 onto
+// the pre-existing concept graph (M4 Security had no concept at all until now).
+const IGCSE_Y1_MODULE_CONCEPT = { M1:'binary-intro', M2:'cpu-basics', M3:'networking-basics', M4:'igcse-security', M5:'sort-bubble' }
+async function reportRealProgress(ch, timeSpentMs) {
+  const conceptId = IGCSE_Y1_MODULE_CONCEPT[ch.mod]
+  if (!conceptId) return
+  try {
+    await fetch('/api/progress', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ concept_id: conceptId, correct: true, time_spent_ms: timeSpentMs || 0 }),
+    })
+  } catch (e) {}
+}
 
 // ── Challenges ────────────────────────────────────────────────────────────────
 // type: 'convert' → exact numeric/text match
@@ -200,6 +232,18 @@ const CHALLENGES = [
     text:`<strong>Challenge 3 — File Size Calculation</strong><br>An image is <strong>800 × 600</strong> pixels with a colour depth of <strong>24 bits</strong>.<br>Calculate the file size in <strong>megabytes</strong> (1 MB = 1,048,576 bytes).<br>Give your answer to 2 decimal places (e.g. 1.37).`,
     hints:['Total bits = 800 × 600 × 24', 'Total bytes = total bits ÷ 8', 'MB = bytes ÷ 1,048,576. Answer ≈ 1.37'],
     check: ans => { const v = parseFloat(ans.trim()); return Math.abs(v - 1.37) < 0.05 },
+  },
+  {
+    mod:'M1', name:'Binary Addition', xp:40, type:'convert',
+    text:`<strong>Challenge 3b — Binary Addition</strong><br>Add the two 8-bit binary numbers <code>01001101</code> and <code>00100110</code>.<br>Type only the 8-bit binary result as your answer (no spaces).`,
+    hints:['Add from the rightmost bit, carrying 1s left: 0+0=0, 1+1=0 carry 1, 1+1+1=1 carry 1 …', 'Work column by column exactly like decimal addition, but base 2.', 'Answer: 01110011'],
+    check: ans => ans.trim().replace(/\s/g,'') === '01110011',
+  },
+  {
+    mod:'M1', name:'Binary Subtraction', xp:40, type:'convert',
+    text:`<strong>Challenge 3c — Binary Subtraction</strong><br>Using <strong>two's complement</strong>, calculate <code>01011010</code> − <code>00010110</code> as 8-bit binary numbers.<br>Type only the 8-bit binary result as your answer (no spaces).`,
+    hints:["Find the two's complement of 00010110: invert all bits (11101001), then add 1 → 11101010.", 'Add that to 01011010 using binary addition, discarding any overflow carry off the top.', 'Answer: 01000100'],
+    check: ans => ans.trim().replace(/\s/g,'') === '01000100',
   },
   {
     mod:'M1', name:'Sound Digitisation', xp:40, type:'theory',
@@ -471,10 +515,30 @@ function renderPills() {
     el.onclick = () => selectChallenge(i)
     row.appendChild(el)
   })
+  renderNavStrip()
+}
+
+function renderNavStrip() {
+  const cur = document.getElementById('ch-nav-current')
+  const ch  = CHALLENGES[activeIdx]
+  if (cur && ch) cur.textContent = (activeIdx + 1) + ' / ' + CHALLENGES.length + ' — ' + ch.mod + ' ' + ch.name + (completed.has(activeIdx) ? ' ✓' : '')
+}
+
+function stepChallenge(delta) {
+  const next = activeIdx + delta
+  if (next < 0 || next >= CHALLENGES.length) return
+  selectChallenge(next)
+}
+
+function toggleChallengeList() {
+  const row = document.getElementById('ch-pills')
+  const tog = document.getElementById('ch-nav-toggle')
+  const expanded = row.classList.toggle('expanded')
+  if (tog) tog.textContent = expanded ? '✕ Hide list' : '☰ All challenges'
 }
 
 function selectChallenge(i) {
-  activeIdx = i; hintIdx = 0
+  activeIdx = i; hintIdx = 0; challengeStartedAt = Date.now()
   const ch = CHALLENGES[i]
   document.getElementById('ch-text').innerHTML = ch.text
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
@@ -500,6 +564,7 @@ function checkAnswer() {
       showToast('Challenge complete! +' + ch.xp + ' XP')
       if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'gy1-c' + activeIdx, { passed: true, score: 100 }) }
       LessonSaves.save('igcse-y1', activeIdx, { passed: true, xpEarned: ch.xp, code: ans })
+      try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
     }
   } else {
     document.getElementById('feedback').className = 'feedback err'

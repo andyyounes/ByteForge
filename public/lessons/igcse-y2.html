@@ -49,7 +49,15 @@
     .input-section input:focus { outline:none; border-color:#7dd3fc; }
     .right-panel { display:flex; flex-direction:column; overflow:hidden; }
     .ch-header { flex-shrink:0; background:var(--bg-card); border-bottom:1px solid var(--border); padding:10px 14px; }
-    .ch-pills  { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pills  { display:none; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+    .ch-pills.expanded { display:flex; }
+    .ch-nav-strip  { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .ch-nav-btn    { padding:3px 10px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer;
+                     border:1px solid var(--border); background:var(--bg-raised); color:var(--fg-dim); }
+    .ch-nav-btn:hover { border-color:var(--border-hi); color:var(--fg); }
+    .ch-nav-btn:disabled { opacity:.35; cursor:default; }
+    .ch-nav-current { font-size:11.5px; font-weight:700; color:var(--fg); flex:1; }
+    .ch-nav-toggle { font-size:11px; color:#7dd3fc; cursor:pointer; font-weight:700; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -146,6 +154,12 @@
   <!-- Right panel -->
   <div class="right-panel">
     <div class="ch-header">
+      <div class="ch-nav-strip">
+        <button class="ch-nav-btn" onclick="stepChallenge(-1)">◀</button>
+        <span class="ch-nav-current" id="ch-nav-current"></span>
+        <button class="ch-nav-btn" onclick="stepChallenge(1)">▶</button>
+        <span class="ch-nav-toggle" onclick="toggleChallengeList()" id="ch-nav-toggle">☰ All challenges</span>
+      </div>
       <div class="ch-pills" id="ch-pills"></div>
       <div class="ch-row">
         <div class="ch-text" id="ch-text">Select a challenge.</div>
@@ -862,6 +876,21 @@ function toggleTrace(){traceVisible=!traceVisible;document.getElementById('trace
 BF.seed()
 const me=(() => {try{return BF.session()||null}catch(_){return null}})()
 const completed=new Set();let activeIdx=0;let hintIdx=0
+let challengeStartedAt = Date.now()
+
+// ── Bridge to the real Supabase-backed progress system (mirrors grade7/8/9) ──
+const IGCSE_Y2_MODULE_CONCEPT = { M1:'pseudocode-arrays', M2:'igcse-params', M3:'igcse-files', M4:'data-structures-intro', M6:'oop-concepts' }
+const IGCSE_Y2_NAME_OVERRIDE  = { 'Bubble Sort':'sort-bubble', 'Binary Search':'search-binary' }
+async function reportRealProgress(ch, timeSpentMs) {
+  const conceptId = IGCSE_Y2_NAME_OVERRIDE[ch.name] || IGCSE_Y2_MODULE_CONCEPT[ch.mod]
+  if (!conceptId) return
+  try {
+    await fetch('/api/progress', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ concept_id: conceptId, correct: true, time_spent_ms: timeSpentMs || 0 }),
+    })
+  } catch (e) {}
+}
 
 // ── Challenges ────────────────────────────────────────────────────────────────
 const CHALLENGES=[
@@ -1161,9 +1190,29 @@ function renderPills(){
     el.textContent=(completed.has(i)?'✓ ':'')+ch.mod+' '+ch.name
     el.onclick=()=>selectChallenge(i);row.appendChild(el)
   })
+  renderNavStrip()
+}
+
+function renderNavStrip() {
+  const cur = document.getElementById('ch-nav-current')
+  const ch  = CHALLENGES[activeIdx]
+  if (cur && ch) cur.textContent = (activeIdx + 1) + ' / ' + CHALLENGES.length + ' — ' + ch.mod + ' ' + ch.name + (completed.has(activeIdx) ? ' ✓' : '')
+}
+
+function stepChallenge(delta) {
+  const next = activeIdx + delta
+  if (next < 0 || next >= CHALLENGES.length) return
+  selectChallenge(next)
+}
+
+function toggleChallengeList() {
+  const row = document.getElementById('ch-pills')
+  const tog = document.getElementById('ch-nav-toggle')
+  const expanded = row.classList.toggle('expanded')
+  if (tog) tog.textContent = expanded ? '✕ Hide list' : '☰ All challenges'
 }
 function selectChallenge(i){
-  activeIdx=i;hintIdx=0;const ch=CHALLENGES[i]
+  activeIdx=i;hintIdx=0;challengeStartedAt=Date.now();const ch=CHALLENGES[i]
   document.getElementById('ch-text').innerHTML=ch.text
   document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
   editor.setValue(ch.starter||'')
@@ -1179,6 +1228,7 @@ function validateChallenge(code,result){
     completed.add(activeIdx);renderPills();showToast('Challenge complete! +'+ch.xp+' XP')
     if(me){BF.addXP(me.id,ch.xp);BF.recordAttempt(me.id,'gy2-c'+activeIdx,{passed:true,score:100})}
     LessonSaves.save('igcse-y2',activeIdx,{passed:true,xpEarned:ch.xp,code})
+    try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
   }
 }
 function showHint(){

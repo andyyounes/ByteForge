@@ -31,6 +31,8 @@ const ANSWERS = {
   'M1/Binary→Decimal': '214',
   'M1/Decimal→Hex': 'AF',
   'M1/File Size': '1.37',
+  'M1/Binary Addition': '01110011',
+  'M1/Binary Subtraction': '01000100',
   'M1/Sound Digitisation': 'Sound is an analogue wave. An ADC takes a sample at regular intervals — the sample rate is how many samples are taken per second, and the bit depth (sample depth) is how many levels each sample can have.',
   'M2/CPU Components': 'The ALU performs arithmetic and logical calculations. The CU (control unit) fetches, decodes and coordinates execution of instructions. Registers are tiny ultra-fast storage locations inside the CPU.',
   'M2/RAM vs ROM': 'RAM is volatile and loses its contents when power is removed, and can be both read and written. ROM is non-volatile and is read-only.',
