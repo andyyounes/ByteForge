@@ -16,10 +16,9 @@ export async function GET(request: NextRequest) {
 
   const { data: saves, error } = await supabase
     .from('lesson_saves')
-    .select('challenge_idx, passed, code, save_data, xp_earned, saved_at')
+    .select('challenge_idx, challenge_id, passed, code, save_data, xp_earned, saved_at')
     .eq('student_id', user.id)
     .eq('lesson_key', lesson)
-    .order('challenge_idx')
 
   if (error) {
     console.error('[lesson-saves GET]', error)
@@ -30,12 +29,20 @@ export async function GET(request: NextRequest) {
 }
 
 // ── POST /api/lesson-saves ────────────────────────────────────────────────────
-// Upserts a save record. Called when a student passes a challenge or when the
+// Writes a save record. Called when a student passes a challenge or when the
 // workspace is autosaved.
 //
 // Body fields:
 //   lesson        string   lesson key, e.g. 'grade7'
-//   challengeIdx  number   0-based challenge index, or -1 for workspace autosave
+//   challengeIdx  number?  legacy 0-based challenge index, or -1 for workspace
+//                          autosave. Still required (kept for back-compat with
+//                          any caller that hasn't migrated) — pass -1 when only
+//                          challengeId identifies a real challenge.
+//   challengeId   string?  stable per-challenge id (e.g. 'g1s1') — preferred
+//                          over challengeIdx for real challenge saves. Progress
+//                          keyed by id survives challenges being inserted
+//                          anywhere in a lesson's list; index-keyed progress
+//                          does not (see supabase/lesson_saves_challenge_id.sql).
 //   passed        boolean  true if the challenge was completed this call
 //   code          string?  student code/pseudocode text
 //   saveData      object?  arbitrary JSON (blockly XML, pixel art grid, etc.)
@@ -51,13 +58,58 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { lesson, challengeIdx, passed, code, saveData, xpEarned = 0 } = body
+  const { lesson, challengeIdx, challengeId = null, passed, code, saveData, xpEarned = 0 } = body
 
   if (!lesson || challengeIdx === undefined) {
     return NextResponse.json({ error: 'lesson and challengeIdx required' }, { status: 400 })
   }
 
-  // ── Award XP only on the FIRST pass of each challenge ────────────────────
+  // ID-keyed real-challenge row: select-then-write instead of upsert(), since
+  // the (student_id, lesson_key, challenge_id) uniqueness is a partial index
+  // (challenge_id IS NOT NULL) and supabase-js's upsert() onConflict can't
+  // express that partial predicate as a conflict target.
+  if (challengeId) {
+    const { data: existingRow } = await supabase
+      .from('lesson_saves')
+      .select('id, passed')
+      .eq('student_id', user.id)
+      .eq('lesson_key', lesson)
+      .eq('challenge_id', challengeId)
+      .maybeSingle()
+
+    const shouldAwardXp = passed && xpEarned > 0 && !existingRow?.passed
+
+    const row = {
+      student_id:    user.id,
+      lesson_key:    lesson,
+      challenge_idx: null,
+      challenge_id:  challengeId,
+      passed:        !!passed,
+      code:          code   ?? null,
+      save_data:     saveData ?? null,
+      xp_earned:     xpEarned ?? 0,
+      saved_at:      new Date().toISOString(),
+    }
+
+    const { error: writeError } = existingRow
+      ? await supabase.from('lesson_saves').update(row).eq('id', existingRow.id)
+      : await supabase.from('lesson_saves').insert(row)
+
+    if (writeError) {
+      console.error('[lesson-saves POST] id-keyed write:', writeError)
+      return NextResponse.json({ error: writeError.message }, { status: 500 })
+    }
+
+    if (shouldAwardXp) {
+      const { data: profile } = await supabase.from('profiles').select('xp').eq('id', user.id).single()
+      if (profile) await supabase.from('profiles').update({ xp: profile.xp + xpEarned }).eq('id', user.id)
+    }
+
+    return NextResponse.json({ ok: true, xpAwarded: shouldAwardXp ? xpEarned : 0 })
+  }
+
+  // ── Legacy index-keyed path (workspace autosave, challenge_idx = -1, and
+  // any caller that hasn't migrated to challengeId yet) ────────────────────
   let shouldAwardXp = false
   if (passed && xpEarned > 0 && challengeIdx >= 0) {
     const { data: existing } = await supabase
@@ -70,7 +122,6 @@ export async function POST(request: NextRequest) {
     shouldAwardXp = !existing?.passed   // only award if not previously passed
   }
 
-  // ── Upsert the save row ───────────────────────────────────────────────────
   const { error: upsertError } = await supabase
     .from('lesson_saves')
     .upsert(
@@ -92,20 +143,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: upsertError.message }, { status: 500 })
   }
 
-  // ── Increment profile XP ─────────────────────────────────────────────────
   if (shouldAwardXp) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('xp')
-      .eq('id', user.id)
-      .single()
-
-    if (profile) {
-      await supabase
-        .from('profiles')
-        .update({ xp: profile.xp + xpEarned })
-        .eq('id', user.id)
-    }
+    const { data: profile } = await supabase.from('profiles').select('xp').eq('id', user.id).single()
+    if (profile) await supabase.from('profiles').update({ xp: profile.xp + xpEarned }).eq('id', user.id)
   }
 
   return NextResponse.json({ ok: true, xpAwarded: shouldAwardXp ? xpEarned : 0 })

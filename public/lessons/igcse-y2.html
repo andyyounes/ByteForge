@@ -1182,6 +1182,11 @@ CALL Dog_Info()`,
   },
 ]
 
+// mod+name is the stable identity used for saves (no dedicated `id` field on
+// these challenges) — survives new challenges being inserted anywhere.
+const STAGE_INDEX = {}
+CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.mod + '/' + s.name] = i })
+
 function renderPills(){
   const row=document.getElementById('ch-pills');row.innerHTML=''
   CHALLENGES.forEach((ch,i)=>{
@@ -1227,7 +1232,7 @@ function validateChallenge(code,result){
   if(ch.check(code,result)){
     completed.add(activeIdx);renderPills();showToast('Challenge complete! +'+ch.xp+' XP')
     if(me){BF.addXP(me.id,ch.xp);BF.recordAttempt(me.id,'gy2-c'+activeIdx,{passed:true,score:100})}
-    LessonSaves.save('igcse-y2',activeIdx,{passed:true,xpEarned:ch.xp,code})
+    LessonSaves.save('igcse-y2', ch.mod + '/' + ch.name, {passed:true,xpEarned:ch.xp,code})
     try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
   }
 }
@@ -1269,6 +1274,7 @@ function showQuestMap() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 ;(async()=>{
   await LessonSaves.load('igcse-y2')
+  LessonSaves.completedIds().forEach(id => { if (STAGE_INDEX[id] !== undefined) completed.add(STAGE_INDEX[id]) })
   LessonSaves.completedSet().forEach(idx=>completed.add(idx))
   renderPills()
   showQuestMap()   // land on the map — nothing else renders until a stage is picked

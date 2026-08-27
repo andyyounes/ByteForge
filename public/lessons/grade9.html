@@ -1543,7 +1543,7 @@ function validateChallenge(code, result) {
     document.getElementById('pass-badge')?.remove?.()
     showToast('Challenge complete! +'+ch.xp+' XP')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + (ch.mod||'c') + activeIdx, { passed: true, score: 100 }); }
-    LessonSaves.save('grade9', activeIdx, { passed: true, xpEarned: ch.xp, code })
+    LessonSaves.save('grade9', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code })
     reportRealProgress(ch, Date.now() - challengeStartedAt)
   }
 }
@@ -1563,6 +1563,7 @@ function showToast(msg) {
 ;(async () => {
   await LessonSaves.load('grade9')
   // Restore completed challenges
+  LessonSaves.completedIds().forEach(id => { if (STAGE_INDEX[id] !== undefined) completed.add(STAGE_INDEX[id]) })
   LessonSaves.completedSet().forEach(idx => completed.add(idx))
   renderPills()
   selectChallenge(0)

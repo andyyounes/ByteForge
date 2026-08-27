@@ -2140,9 +2140,11 @@ function completeStage(stars) {
   p[activeStage.id] = { stars: Math.max(stars, prev.stars || 0), xp: (prev.xp || 0) + xp }
   saveProg(p)
 
-  // server best-effort
-  const idx = ALL_STAGES.indexOf(activeStage)
-  try { LessonSaves.save('grade6-quest', idx, { passed: true, xpEarned: xp }) } catch (e) {}
+  // server best-effort — id-keyed (grade6's real completion state is the
+  // localStorage getProg()/saveProg() above, keyed by activeStage.id already;
+  // this DB mirror is never read back, but keeps it consistent with every
+  // other grade's move away from index-keyed saves).
+  try { LessonSaves.save('grade6-quest', activeStage.id, { passed: true, xpEarned: xp }) } catch (e) {}
   try { if (typeof me !== 'undefined' && me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
   try { reportRealProgress(activeStage, firstTime) } catch (e) {}
 

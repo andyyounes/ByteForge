@@ -1633,7 +1633,7 @@ function validateChallenge(code) {
     showToast('Challenge complete! +' + ch.xp + ' XP')
     clog('Challenge complete! +' + ch.xp + ' XP', 'ok')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g8-c' + activeIdx, { passed: true, score: 100 }); }
-    LessonSaves.save('grade8', activeIdx, { passed: true, xpEarned: ch.xp, code })
+    LessonSaves.save('grade8', ch.id, { passed: true, xpEarned: ch.xp, code })
     reportRealProgress(ch, Date.now() - challengeStartedAt)
   }
 }
@@ -1672,6 +1672,10 @@ document.head.appendChild(style)
 initPyodide()
 ;(async () => {
   await LessonSaves.load('grade8')
+  // completedIds() is id-keyed (survives new challenges being inserted
+  // anywhere); completedSet() is the legacy index-keyed fallback for any
+  // save row written before this migration.
+  LessonSaves.completedIds().forEach(id => { if (STAGE_INDEX[id] !== undefined) completed.add(STAGE_INDEX[id]) })
   LessonSaves.completedSet().forEach(idx => completed.add(idx))
   renderPills()
   showJourney()   // land on the map — nothing else renders until a stage is picked
