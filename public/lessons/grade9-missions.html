@@ -518,6 +518,110 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
 
+  // ── Phase 0B · Flight Computer — algorithmic thinking, before you fly ───────
+  // Bridges Systems Check into Phase 1: the SAME real code + answer() format
+  // as everything else here, not a separate disconnected sandbox tool — one
+  // roadmap, one visual language, building from binary/logic straight into
+  // genuine algorithmic thinking (variables, loops, arrays, sorting,
+  // functions) before the ship ever leaves the pad.
+  {
+    id: 'p0bm1', type: 'data', phase: 'PHASE 0B · FLIGHT COMPUTER', emoji: '📟', title: 'First Transmission', xp: 30,
+    brief: 'Before launch, prove the flight computer can do real arithmetic. Store two numbers in variables and answer() their sum.',
+    api: ['answer(value)'],
+    dataTitle: 'Fuel Tanks', dataFields: ['a', 'b'],
+    data: [{ a: 5, b: 3 }],
+    starter: {
+      py: 'a = 5\nb = 3\n# TODO: answer() the sum of a and b\n',
+      ps: 'a ← 5\nb ← 3\n// TODO: answer() the sum of a and b\n',
+    },
+    answer: 8,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p0bm2', type: 'data', phase: 'PHASE 0B · FLIGHT COMPUTER', emoji: '🔋', title: 'Countdown Log', xp: 35,
+    brief: 'A real loop, not a print statement. Use a LOOP to add up every number from 1 to 10, and answer() the total.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Countdown', dataFields: [],
+    data: [],
+    starter: {
+      py: 'total = 0\n# TODO: loop i from 1 to 10, adding i to total each time\n\nanswer(total)\n',
+      ps: 'total ← 0\n// TODO: FOR i ← 1 TO 10 — total ← total + i\n\nanswer(total)\n',
+    },
+    answer: 55,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p0bm3', type: 'data', phase: 'PHASE 0B · FLIGHT COMPUTER', emoji: '📡', title: 'Fizz Report', xp: 40,
+    brief: 'Loop through 1 to 20. Count how many numbers are divisible by 3 OR 5 (MOD gives you a remainder — 0 means divides evenly). answer() the count.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Diagnostic Range', dataFields: [],
+    data: [],
+    starter: {
+      py: 'count = 0\n# TODO: loop i from 1 to 20 — if i % 3 == 0 OR i % 5 == 0, count += 1\n\nanswer(count)\n',
+      ps: 'count ← 0\n// TODO: FOR i ← 1 TO 20 — IF i MOD 3 = 0 OR i MOD 5 = 0 THEN count ← count + 1\n\nanswer(count)\n',
+    },
+    answer: 9,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p0bm4', type: 'data', phase: 'PHASE 0B · FLIGHT COMPUTER', emoji: '⛽', title: 'Average Fuel Reading', xp: 40,
+    brief: 'Five sensors report fuel readings. Loop through them, sum them, then answer() the AVERAGE.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Fuel Sensors', dataFields: ['reading'],
+    data: [{ reading: 80 }, { reading: 90 }, { reading: 70 }, { reading: 85 }, { reading: 95 }],
+    starter: {
+      py: "total = 0\nfor row in data:\n    # TODO: add row['reading'] to total\n    pass\n\n# TODO: answer() total divided by the number of readings\n",
+      ps: 'total ← 0\nFOR i ← 1 TO dataCount\n    // TODO: total ← total + dataReading[i]\nNEXT i\n\n// TODO: answer() total DIV dataCount\n',
+    },
+    answer: 84,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p0bm5', type: 'data', phase: 'PHASE 0B · FLIGHT COMPUTER', emoji: '📦', title: 'Sort the Manifest', xp: 50,
+    brief: 'Cargo weights arrived in a random order. Sort them (bubble sort — compare neighbours, swap if out of order, repeat) and answer() the sorted list, comma-separated.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Cargo Manifest', dataFields: ['weight'],
+    data: [{ weight: 64 }, { weight: 34 }, { weight: 25 }, { weight: 12 }, { weight: 22 }],
+    starter: {
+      py: "weights = [row['weight'] for row in data]\n# TODO: bubble sort weights — nested loops, swap adjacent out-of-order pairs\n\nanswer(','.join(str(w) for w in weights))\n",
+      ps: '// dataWeight[1..dataCount] holds the values to sort\n// TODO: bubble sort — nested FOR loops, swap adjacent out-of-order pairs\n\n// TODO: answer() the sorted values, comma-separated\n',
+    },
+    answer: '12,22,25,34,64',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p0bm6', type: 'data', phase: 'PHASE 0B · FLIGHT COMPUTER', emoji: 'ƒ', title: 'Recursive Fuel Calculation', xp: 50,
+    brief: 'Write a recursive FUNCTION Factorial(n) — the fuel formula needs n! (n factorial). Call it with n=5 and answer() the result.',
+    api: ['answer(value)'],
+    require: 'function',
+    dataTitle: 'Fuel Formula', dataFields: [],
+    data: [],
+    starter: {
+      py: 'def factorial(n):\n    # TODO: base case n <= 1 returns 1; otherwise return n * factorial(n - 1)\n    pass\n\nanswer(factorial(5))\n',
+      ps: 'FUNCTION Factorial(n : INTEGER) RETURNS INTEGER\n    // TODO: base case n <= 1 — RETURN 1; otherwise RETURN n * Factorial(n - 1)\nENDFUNCTION\n\nanswer(Factorial(5))\n',
+    },
+    answer: 120,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p0bboss', type: 'data', phase: 'PHASE 0B · CAPSTONE', emoji: '🏆', title: 'BOSS — Flight Computer Online', xp: 70,
+    brief: 'Loop through the sensor readings and count how many are ABOVE 80 — a loop AND a decision, working together, just like every real algorithm from this tier.',
+    api: ['answer(value)'],
+    require: 'loop',
+    dataTitle: 'Fuel Sensors', dataFields: ['reading'],
+    data: [{ reading: 80 }, { reading: 90 }, { reading: 70 }, { reading: 85 }, { reading: 95 }],
+    starter: {
+      py: "count = 0\nfor row in data:\n    # TODO: if row['reading'] > 80, count += 1\n    pass\n\nanswer(count)\n",
+      ps: 'count ← 0\nFOR i ← 1 TO dataCount\n    // TODO: IF dataReading[i] > 80 THEN count ← count + 1\nNEXT i\n\nanswer(count)\n',
+    },
+    answer: 3,
+    stars: { metric: 'pass' },
+  },
+
   // ── Tier 1 — Sequencing ──────────────────────────────────────────────────────
   {
     id: 'p1m1', phase: 'PHASE 1 · TURTLE', emoji: '🛰️', title: 'Dock at the Station', xp: 30,
@@ -1187,6 +1291,28 @@ const MISSION_LESSON = {
   p0boss: { title: 'BOSS — binary, logic, and types, together', html: `
     <div class="ml-block"><h4>Three ideas, one real diagnostic</h4>
       <p>Converting binary to denary (p0m1/p0m2) feeds directly into a genuine IF decision (even/odd) — exactly how real systems combine data representation with logic to make an actual decision, not just display a number.</p></div>` },
+  // ── Phase 0B · Flight Computer: algorithmic thinking ────────────────────────
+  p0bm1: { title: 'A variable is real memory the flight computer uses', html: `
+    <div class="ml-block"><h4>Store, then compute</h4>
+      <p>a and b aren't just labels — they're real stored values the computer can add, compare, or reuse. answer(a + b) computes something NEW from values already stored, the foundation every other mission here builds on.</p></div>` },
+  p0bm2: { title: 'A loop that COMPUTES something, not just repeats', html: `
+    <div class="ml-block"><h4>An accumulator — the same pattern as every "total so far"</h4>
+      <p>total starts at 0, then each pass through the loop adds ONE more number to it. By the time the loop ends, total holds the sum of everything — a genuinely different job than a loop that just moves a ship forward.</p></div>` },
+  p0bm3: { title: 'MOD tests divisibility — a real, common trick', html: `
+    <div class="ml-block"><h4>Remainder 0 means it divides evenly</h4>
+      <p>i % 3 == 0 is true exactly when i is a multiple of 3 — no remainder left over. Combining that with OR (multiple of 3 OR multiple of 5) and a counter is a genuinely common real algorithm shape.</p></div>` },
+  p0bm4: { title: 'Average = total ÷ count, but the loop does the real work', html: `
+    <div class="ml-block"><h4>Two steps, not one</h4>
+      <p>You can't skip straight to dividing — the loop has to genuinely visit every reading and add it to a running total FIRST, then (and only then) does dividing by the count make sense.</p></div>` },
+  p0bm5: { title: 'Bubble sort — the classic, done for real', html: `
+    <div class="ml-block"><h4>Compare neighbours, swap, repeat</h4>
+      <p>Each pass through the list compares adjacent pairs and swaps them if they're out of order — repeat enough passes and the largest values "bubble" to the end. Genuinely one of the oldest, most-taught sorting algorithms, for good reason: it's simple to trace by hand.</p></div>` },
+  p0bm6: { title: 'Recursion — a function that calls itself', html: `
+    <div class="ml-block"><h4>A base case, and a smaller version of the same problem</h4>
+      <p>Factorial(5) = 5 × Factorial(4), and Factorial(4) = 4 × Factorial(3), all the way down to Factorial(1) = 1 (the base case, where the recursion stops). Miss the base case and it never stops.</p></div>` },
+  p0bboss: { title: 'BOSS — a loop AND a decision, together', html: `
+    <div class="ml-block"><h4>Every real algorithm combines simple pieces</h4>
+      <p>Looping through data (p0bm4) and making a decision per item (p0bm3's MOD logic) combine here into one genuinely useful pattern: counting how many real-world readings cross a threshold — exactly the shape of a huge number of real data-processing tasks.</p></div>` },
   // ── Phase 1 · Turtle — sequencing ──────────────────────────────────────────
   p1m1: { title: 'Sequence — commands run one after another', html: `
     <div class="ml-block"><h4>A program is a list, done in order</h4>
@@ -2744,6 +2870,12 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
   p0m5: 'g9-declarations', p0m6: 'g9-declarations',
   p0boss: 'g9-binary',
+  // Phase 0B (Flight Computer) — real algorithmic thinking, mapped onto
+  // existing pseudocode/algorithm concepts rather than new ones, since
+  // these already matched closely.
+  p0bm1: 'pseudocode-intro', p0bm2: 'pseudocode-loops', p0bm3: 'pseudocode-loops',
+  p0bm4: 'pseudocode-arrays', p0bm5: 'sort-bubble', p0bm6: 'g9-procedures',
+  p0bboss: 'pseudocode-loops',
 }
 async function reportRealProgress(mission, timeSpentMs) {
   const prefix = (mission.id.match(/^(p\d)/) || [])[1]
