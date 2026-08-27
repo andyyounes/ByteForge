@@ -117,6 +117,16 @@
     .pass-next-btn { padding:3px 10px; border-radius:6px; font-size:11.5px; font-weight:800; cursor:pointer;
                       background:#4ade80; color:#052e12; border:none; }
     .pass-next-btn:hover { background:#86efac; }
+    /* Failure was only ever logged to the small console at the very bottom
+       of the page — easy to miss entirely, especially once the console
+       scrolls with other output. Mirrors pass-badge's placement/prominence
+       so pass/fail is ALWAYS visible right where the student is looking,
+       not just success. */
+    .fail-badge { position:absolute; top:8px; left:50%; transform:translateX(-50%);
+                  max-width:90%; padding:5px 13px; border-radius:8px; font-size:12px; font-weight:700;
+                  background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.5); color:#f87171;
+                  display:none; flex-direction:column; align-items:center; gap:2px; text-align:center; }
+    .fail-badge-detail { font-size:10.5px; font-weight:600; color:#fca5a5; }
     .canvas-overlay-btns { position:absolute; top:8px; right:10px; display:flex; gap:5px; }
 
     /* Sync indicator bar */
@@ -260,6 +270,10 @@
       <div class="pass-badge" id="pass-badge">
         <span>✓ Challenge complete!</span>
         <button class="pass-next-btn" id="pass-next-btn" onclick="stepChallenge(1)">Next →</button>
+      </div>
+      <div class="fail-badge" id="fail-badge">
+        <span>✗ Not quite yet</span>
+        <span class="fail-badge-detail" id="fail-badge-detail"></span>
       </div>
     </div>
 
@@ -1004,6 +1018,7 @@ function stopLoop() {
 // that, mirroring runCode()'s static (non-animated) branch above.
 function runPageCode() {
   document.getElementById('pass-badge').style.display = 'none'
+  document.getElementById('fail-badge').style.display = 'none'
   pageAPI.clearPage()
   const code = editor.getValue()
   if (!code.trim() || code.startsWith('// Start by dragging')) {
@@ -1072,6 +1087,7 @@ function runCode() {
   resetDrawState()
   ctx.clearRect(0,0,W,H)
   document.getElementById('pass-badge').style.display = 'none'
+  document.getElementById('fail-badge').style.display = 'none'
 
   const code = editor.getValue()
   if (!code.trim() || code.startsWith('// Start by dragging')) {
@@ -2540,6 +2556,7 @@ function selectChallenge(i) {
   document.getElementById('ch-text').innerHTML = ch.text
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
   document.getElementById('pass-badge').style.display = 'none'
+  document.getElementById('fail-badge').style.display = 'none'
   stopLoop()
   ctx.clearRect(0,0,W,H)
   // Story Studio's "page" stages render into a DOM preview, not the canvas —
@@ -2586,6 +2603,7 @@ function checkChallenge(log) {
   if (ch.check(log)) {
     completed.add(activeIdx)
     renderPills()
+    document.getElementById('fail-badge').style.display = 'none'
     document.getElementById('pass-badge').style.display = 'flex'
     // No "Next" button past the very last challenge — nothing to jump to.
     document.getElementById('pass-next-btn').style.display = (activeIdx + 1 < CHALLENGES.length) ? '' : 'none'
@@ -2617,8 +2635,11 @@ function checkChallenge(log) {
       if (ch.needsVarUpdate && !log.hasVarUpdate) missing.push(`a variable that's set, then given a NEW value later (a genuine update, not just one set-and-forget)`)
       if (ch.needsIf && !log.hasIf) missing.push(`an if/else block (Control → if)`)
       if (ch.needsElseIf && !log.hasElseIf) missing.push(`a THIRD path — an "else if" branch, not just if/else (Control → if/else if)`)
-      if (missing.length) logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
-      else logLine('❌ Not quite — your page built, but it doesn\'t meet this challenge\'s goal yet. Re-read the task above and try the 💡 Hint button.', 'err')
+      const pageDetail = missing.length ? missing.join(' · ') : 'your page built, but it doesn\'t meet this challenge\'s goal yet — re-read the task above.'
+      logLine('❌ Not quite — still needs: ' + pageDetail, 'err')
+      document.getElementById('pass-badge').style.display = 'none'
+      document.getElementById('fail-badge-detail').textContent = 'Still needs: ' + pageDetail
+      document.getElementById('fail-badge').style.display = 'flex'
       return
     }
     if (ch.needsFrames && (!log.frames || log.frames < 5)) missing.push('"On every frame" event block')
@@ -2634,14 +2655,13 @@ function checkChallenge(log) {
     const shapes = (log.circles || 0) + (log.rects || 0)
     if (ch.needsShapes && shapes < ch.needsShapes) missing.push(`at least ${ch.needsShapes} drawn shapes (you drew ${shapes})`)
     if (ch.needsTexts  && (log.texts || 0) < ch.needsTexts) missing.push(`at least ${ch.needsTexts} text label${ch.needsTexts > 1 ? 's' : ''} (Draw → text) — you drew ${log.texts || 0}`)
-    if (missing.length) {
-      logLine('❌ Not quite — still needs: ' + missing.join(' · '), 'err')
-    } else {
-      // Never fail silently: the check said no, so say so even when we can't
-      // name the specific shortfall.
-      logLine('❌ Not quite — your code ran, but it doesn\'t meet this challenge\'s goal yet. '
-            + 'Re-read the task above and try the 💡 Hint button.', 'err')
-    }
+    // Never fail silently: the check said no, so always say so somewhere
+    // visible — not just a line in the console, easy to miss below the fold.
+    const canvasDetail = missing.length ? missing.join(' · ') : 'your code ran, but it doesn\'t meet this challenge\'s goal yet — re-read the task above.'
+    logLine('❌ Not quite — still needs: ' + canvasDetail, 'err')
+    document.getElementById('pass-badge').style.display = 'none'
+    document.getElementById('fail-badge-detail').textContent = 'Still needs: ' + canvasDetail
+    document.getElementById('fail-badge').style.display = 'flex'
   }
 }
 
@@ -2676,6 +2696,7 @@ function clearWorkspace() {
   resetDrawState()
   drawCanvasPlaceholder()
   document.getElementById('pass-badge').style.display = 'none'
+  document.getElementById('fail-badge').style.display = 'none'
   if (!textMode) editor.setValue('// Workspace cleared — drag new blocks to begin')
   log('Workspace cleared.', 'info')
 }
