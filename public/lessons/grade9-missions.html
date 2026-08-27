@@ -716,6 +716,30 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
+    id: 'learn-logic', type: 'learn', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '📘', title: 'What Is Boolean Logic?', xp: 15,
+    brief: 'Before combining true/false values, learn what Boolean logic actually is and how AND/OR/NOT really work.',
+    api: [],
+    learn: {
+      videoQuery: 'boolean logic AND OR NOT explained simply GCSE computer science',
+      terms: [
+        { term: 'Boolean',     def: 'A data type with only two possible values: True or False.' },
+        { term: 'AND',         def: 'A logic operator that\'s TRUE only if BOTH inputs are true.' },
+        { term: 'OR',          def: 'A logic operator that\'s TRUE if AT LEAST ONE input is true.' },
+        { term: 'NOT',         def: 'A logic operator that FLIPS a value — True becomes False, and vice versa.' },
+        { term: 'Truth table',  def: 'A table showing every possible combination of inputs and the resulting output.' },
+      ],
+      theory: `
+        <h4>Boolean — the simplest possible data type</h4>
+        <p>Where an integer can be any whole number, a <b>Boolean</b> can only ever be one of exactly two values: True or False. This isn't a limitation — it's exactly what's needed for a computer to make a decision.</p>
+        <h4>AND vs. OR — the key difference</h4>
+        <p><b>AND</b> is strict: BOTH sides must be true, or the result is false. <b>OR</b> is generous: just ONE true side is enough. "It's raining AND I have an umbrella" needs both; "It's raining OR it's cold" needs just one.</p>
+        <h4>NOT flips things</h4>
+        <p><b>NOT</b> is the simplest operator of all — it just reverses whatever it's given. NOT True is False. NOT False is True. Nothing else.</p>
+        <h4>Worked example — a truth table for A AND B</h4>
+        <p>A=True,B=True → True. A=True,B=False → False. A=False,B=True → False. A=False,B=False → False. Notice ONLY the first row (both true) gives True — that's the whole definition of AND, laid out completely.</p>`,
+    },
+  },
+  {
     id: 'p0m3', type: 'data', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '🔀', title: 'AND Gate', xp: 30,
     brief: 'Two ship systems report their status as booleans. answer() the result of <b>a AND b</b> — True only if BOTH are true.',
     api: ['answer(value)'],
@@ -740,6 +764,28 @@ const MISSIONS = [
     },
     answer: 'False',
     stars: { metric: 'pass' },
+  },
+  {
+    id: 'learn-datatypes', type: 'learn', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '📘', title: 'What Are Data Types?', xp: 15,
+    brief: 'Before identifying types, learn what a data type actually is and why mixing them up causes real bugs.',
+    api: [],
+    learn: {
+      videoQuery: 'data types integer string boolean explained simply GCSE computer science',
+      terms: [
+        { term: 'Integer', def: 'A whole number, with no decimal point — e.g. 7, -3, 100.' },
+        { term: 'Real (float)', def: 'A number WITH a decimal point — e.g. 3.14, -0.5.' },
+        { term: 'String',  def: 'Text data — always written with quotes around it, e.g. "hello".' },
+        { term: 'Boolean', def: 'A value that can only ever be True or False.' },
+        { term: 'Data type', def: 'What KIND of value something is — this decides what operations even make sense on it.' },
+      ],
+      theory: `
+        <h4>Why data types matter — not every operation makes sense on every type</h4>
+        <p>You can add two integers (5 + 3 = 8). You can join two strings ("cat" + "fish" = "catfish"). But adding an integer to a string directly usually causes a real error — the computer genuinely doesn't know what 5 + "cat" should mean.</p>
+        <h4>Quotes decide the type — not how it looks</h4>
+        <p>"7" and 7 look almost identical, but they are genuinely different types. <code>7</code> is an integer; <code>"7"</code> is a string that just happens to contain a digit. This single distinction causes a huge share of real beginner bugs.</p>
+        <h4>Real (float) vs. Integer</h4>
+        <p>Both are numbers, but an integer can NEVER have a decimal part — 7 is an integer, 7.0 is a real/float, even though they represent the same value. Division between two integers can genuinely produce a real/float result (7 ÷ 2 = 3.5).</p>`,
+    },
   },
   {
     id: 'p0m5', type: 'data', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '🏷️', title: 'Pick the Type', xp: 30,
@@ -3305,7 +3351,8 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   // matched this topic closely.
   'learn-computer': 'g9-cpu-model', 'comp-p1': 'g9-cpu-model', 'comp-p2': 'g9-cpu-model',
   p0m1: 'g9-binary', p0m2: 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
-  p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
+  'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
+  'learn-datatypes': 'g9-declarations',
   p0m5: 'g9-declarations', p0m6: 'g9-declarations',
   p0boss: 'g9-binary',
   // Phase 0B (Flight Computer) — real algorithmic thinking, mapped onto
@@ -3406,7 +3453,7 @@ const TIERS = [
   { name: '🃏 FOUNDATIONS 2 · BINARY (UNPLUGGED) — no code yet, just the idea', ids: ['learn-binary', 'cards-make', 'cards-add', 'cardsboss'] },
   { name: '📘 FOUNDATIONS 3 · YOUR FIRST CODE', ids: ['learn-cb', 'cb1', 'cb2', 'cb3', 'cb4'] },
   { name: '🏆 FOUNDATIONS 3 CAPSTONE', ids: ['cbboss'] },
-  { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'p0m3', 'p0m4', 'p0m5', 'p0m6'] },
+  { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'learn-datatypes', 'p0m5', 'p0m6'] },
   { name: '🖼️ FOUNDATIONS 5 · IMAGES — binary pixels', ids: ['p0m7', 'p0m8'] },
   { name: '🏆 FOUNDATIONS 4-5 CAPSTONE', ids: ['p0boss'] },
   { name: '📟 FOUNDATIONS 6 · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },
