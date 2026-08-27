@@ -881,6 +881,56 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
 
+  // ── Foundations 6 · Flowcharts — planning an algorithm before writing it ───
+  {
+    id: 'learn-flowcharts', type: 'learn', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '📘', title: 'What Is a Flowchart?', xp: 15,
+    brief: 'Before writing real algorithms, learn how to plan one out visually — a flowchart, using standard shapes.',
+    api: [],
+    learn: {
+      videoQuery: 'flowchart symbols explained simply GCSE computer science',
+      terms: [
+        { term: 'Flowchart',        def: 'A diagram showing the steps of an algorithm, using standard shapes connected by arrows.' },
+        { term: 'Terminator (oval)', def: 'Marks where a flowchart begins or ends — every flowchart has exactly one start and at least one end.' },
+        { term: 'Process (rectangle)', def: 'A single step or action — e.g. "add 1 to total".' },
+        { term: 'Decision (diamond)', def: 'A yes/no question that sends the flow down TWO different paths, depending on the answer.' },
+        { term: 'Input/Output (parallelogram)', def: 'A step where data is entered by the user, or displayed to them.' },
+      ],
+      theory: `
+        <h4>Why plan with a flowchart before writing code?</h4>
+        <p>Code has to be exactly right — perfect punctuation, perfect spelling. A flowchart lets you work out the LOGIC first, in plain shapes and arrows, before worrying about getting any syntax right at all. Get the flowchart correct, and turning it into real code becomes far easier.</p>
+        <h4>The standard shapes each mean something specific</h4>
+        <p>A flowchart isn't just "boxes and arrows" — each shape has an agreed meaning: ovals for start/end, rectangles for a single action, diamonds for a yes/no decision, and parallelograms for input/output. Using the wrong shape for the wrong job makes a flowchart genuinely harder to read, not just "stylistically off".</p>
+        <h4>Decisions create branches</h4>
+        <p>A decision diamond is the ONLY shape with two arrows leading out of it — one for "yes", one for "no". This is exactly what an IF/ELSE becomes once you turn the flowchart into real code: the diamond is the condition, and each arrow is one branch.</p>`,
+    },
+  },
+  {
+    id: 'flow-p1', type: 'data', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart', xp: 25,
+    brief: 'Follow this flowchart by hand: START → INPUT a number → DECISION: is it even? → YES: OUTPUT "Even" → NO: OUTPUT "Odd" → END. With the number 7, what does it output? answer() the result.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart Trace', dataFields: [],
+    data: [],
+    starter: {
+      py: '# TODO: trace the flowchart by hand for input 7, then answer() what it outputs\n',
+      ps: '// TODO: trace the flowchart by hand for input 7, then answer() what it outputs\n',
+    },
+    answer: 'Odd',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'flow-p2', type: 'data', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '💠', title: 'Which Shape?', xp: 25,
+    brief: '"Checking if a password is correct" — which flowchart shape represents THIS step? answer() "Decision", "Process", or "Input/Output".',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart Step', dataFields: [],
+    data: [],
+    starter: {
+      py: '# TODO: answer() "Decision", "Process", or "Input/Output" — which shape checks a yes/no question?\n',
+      ps: '// TODO: answer() "Decision", "Process", or "Input/Output" — which shape checks a yes/no question?\n',
+    },
+    answer: 'Decision',
+    stars: { metric: 'pass' },
+  },
+
   // ── Phase 0B · Flight Computer — algorithmic thinking, before you fly ───────
   // Bridges Systems Check into Phase 1: the SAME real code + answer() format
   // as everything else here, not a separate disconnected sandbox tool — one
@@ -888,7 +938,7 @@ const MISSIONS = [
   // genuine algorithmic thinking (variables, loops, arrays, sorting,
   // functions) before the ship ever leaves the pad.
   {
-    id: 'p0bm1', type: 'data', phase: 'FOUNDATIONS 6 · FLIGHT COMPUTER', emoji: '📟', title: 'First Transmission', xp: 30,
+    id: 'p0bm1', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📟', title: 'First Transmission', xp: 30,
     brief: 'Before launch, prove the flight computer can do real arithmetic. Store two numbers in variables and answer() their sum.',
     api: ['answer(value)'],
     dataTitle: 'Fuel Tanks', dataFields: ['a', 'b'],
@@ -901,7 +951,7 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm2', type: 'data', phase: 'FOUNDATIONS 6 · FLIGHT COMPUTER', emoji: '🔋', title: 'Countdown Log', xp: 35,
+    id: 'p0bm2', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '🔋', title: 'Countdown Log', xp: 35,
     brief: 'A real loop, not a print statement. Use a LOOP to add up every number from 1 to 10, and answer() the total.',
     api: ['answer(value)'],
     require: 'loop',
@@ -915,7 +965,7 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm3', type: 'data', phase: 'FOUNDATIONS 6 · FLIGHT COMPUTER', emoji: '📡', title: 'Fizz Report', xp: 40,
+    id: 'p0bm3', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📡', title: 'Fizz Report', xp: 40,
     brief: 'Loop through 1 to 20. Count how many numbers are divisible by 3 OR 5 (MOD gives you a remainder — 0 means divides evenly). answer() the count.',
     api: ['answer(value)'],
     require: 'loop',
@@ -929,7 +979,7 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm4', type: 'data', phase: 'FOUNDATIONS 6 · FLIGHT COMPUTER', emoji: '⛽', title: 'Average Fuel Reading', xp: 40,
+    id: 'p0bm4', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '⛽', title: 'Average Fuel Reading', xp: 40,
     brief: 'Five sensors report fuel readings. Loop through them, sum them, then answer() the AVERAGE.',
     api: ['answer(value)'],
     require: 'loop',
@@ -943,7 +993,7 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm5', type: 'data', phase: 'FOUNDATIONS 6 · FLIGHT COMPUTER', emoji: '📦', title: 'Sort the Manifest', xp: 50,
+    id: 'p0bm5', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📦', title: 'Sort the Manifest', xp: 50,
     brief: 'Cargo weights arrived in a random order. Sort them (bubble sort — compare neighbours, swap if out of order, repeat) and answer() the sorted list, comma-separated.',
     api: ['answer(value)'],
     require: 'loop',
@@ -957,7 +1007,7 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm6', type: 'data', phase: 'FOUNDATIONS 6 · FLIGHT COMPUTER', emoji: 'ƒ', title: 'Recursive Fuel Calculation', xp: 50,
+    id: 'p0bm6', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: 'ƒ', title: 'Recursive Fuel Calculation', xp: 50,
     brief: 'Write a recursive FUNCTION Factorial(n) — the fuel formula needs n! (n factorial). Call it with n=5 and answer() the result.',
     api: ['answer(value)'],
     require: 'function',
@@ -971,7 +1021,7 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bboss', type: 'data', phase: 'FOUNDATIONS 6 · CAPSTONE', emoji: '🏆', title: 'BOSS — Flight Computer Online', xp: 70,
+    id: 'p0bboss', type: 'data', phase: 'FOUNDATIONS 7 · CAPSTONE', emoji: '🏆', title: 'BOSS — Flight Computer Online', xp: 70,
     brief: 'Loop through the sensor readings and count how many are ABOVE 80 — a loop AND a decision, working together, just like every real algorithm from this tier.',
     api: ['answer(value)'],
     require: 'loop',
@@ -3373,6 +3423,7 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   // matched this topic closely.
   'learn-computer': 'g9-cpu-model', 'comp-p1': 'g9-cpu-model', 'comp-p2': 'g9-cpu-model',
   p0m1: 'g9-binary', p0m2: 'g9-binary', 'learn-images': 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
+  'learn-flowcharts': 'g9-flowcharts-loops', 'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
   'learn-datatypes': 'g9-declarations',
   p0m5: 'g9-declarations', p0m6: 'g9-declarations',
@@ -3478,8 +3529,9 @@ const TIERS = [
   { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'learn-datatypes', 'p0m5', 'p0m6'] },
   { name: '🖼️ FOUNDATIONS 5 · IMAGES — binary pixels', ids: ['learn-images', 'p0m7', 'p0m8'] },
   { name: '🏆 FOUNDATIONS 4-5 CAPSTONE', ids: ['p0boss'] },
-  { name: '📟 FOUNDATIONS 6 · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },
-  { name: '🏆 FOUNDATIONS 6 CAPSTONE', ids: ['p0bboss'] },
+  { name: '📊 FOUNDATIONS 6 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'flow-p1', 'flow-p2'] },
+  { name: '📟 FOUNDATIONS 7 · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },
+  { name: '🏆 FOUNDATIONS 7 CAPSTONE', ids: ['p0bboss'] },
   { name: '🧭 TIER 1 — SEQUENCING', ids: ['p1m1', 'p1m2', 'p1m3'] },
   { name: '🔁 TIER 2 — LOOPS (new: stars count code lines)', ids: ['p1m4', 'p1m5', 'p1m6', 'p1m7'] },
   { name: '🚦 TIER 3 — SIGNALS & DECISIONS', ids: ['p1m8', 'p1m9', 'p1m10'] },

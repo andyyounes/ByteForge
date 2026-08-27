@@ -17,7 +17,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 // markers (BOT_LOCK_IDX = MISSIONS.length, CHAMPION_IDX = +1). Keep this in
 // sync if missions are added/removed; a stale (too-low) value only makes a
 // couple of achievement rows miscount as missions, it can't crash anything.
-const TOTAL_MISSIONS = 63
+const TOTAL_MISSIONS = 66
 
 async function requireUser() {
   const supabase = await createClient()
