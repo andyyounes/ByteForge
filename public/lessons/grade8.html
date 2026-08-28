@@ -534,6 +534,11 @@ async function runWebCode() {
     // genuinely runs — same principle as Grade 7's synthetic click — so fire
     // a REAL click on the page's button and compare the list before/after.
     hasClick: /\.addEventListener\s*\(\s*['"]click['"]|\.onclick\s*=/.test(js),
+    // New checks for ws1s4/ws1s5 — real array indexing / .length, and
+    // combining two conditions with && (not just a bare hasIf).
+    hasIndex:  /\[\s*\d+\s*\]/.test(js),
+    hasLength: /\.length\b/.test(js),
+    hasAnd:    /&&/.test(js),
   }
   const liBefore = doc.querySelectorAll('li').length
   const bodyBefore = webLog.bodyText
@@ -747,6 +752,36 @@ const MODULES = [
       },
       needsArray:true, needsPush:true, needsObject:true,
       check:(log) => log.hasArray && log.hasPush && log.hasObject && /true|false/i.test(log.bodyText),
+    },
+    { id:'ws1s4', name:'Read One Item, Count Them All', xp:35, lang:'web',
+      text:`<strong>Challenge 4</strong> — Start with an inventory array of 3+ items. Display the FIRST item specifically (using <code>inventory[0]</code>, not .join()) AND the total count (using <code>inventory.length</code>) — e.g. "First: sword (3 total)".`,
+      hints:[
+        'inventory[0] reads just the first item — index 0, not the whole array.',
+        'inventory.length gives you the total count as a real number, no counting by hand.',
+        'Both need to appear together in your #story message.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `let inventory = ["sword", "shield", "potion"];\n// TODO: show the FIRST item (inventory[0]) and the total count (inventory.length) in #story\n`,
+      },
+      needsArray:true,
+      check:(log) => log.hasArray && log.hasIndex && log.hasLength,
+    },
+    { id:'ws1s5', name:'Two Flags, One Decision', xp:35, lang:'web',
+      text:`<strong>Challenge 5</strong> — Create a flags object with TWO true/false properties (e.g. hasKey and hasMap). Use <code>&amp;&amp;</code> to check BOTH are true before showing one message; otherwise show a different message.`,
+      hints:[
+        'let flags = { hasKey: true, hasMap: false };',
+        'if (flags.hasKey && flags.hasMap) { /* both true */ } else { /* not both */ }',
+        'Harder than ws1s3 on purpose: ONE flag was enough there — this needs BOTH, combined with &&.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: an object with TWO true/false properties\n\n// TODO: if (BOTH are true) show one message in #story, else show a different one\n`,
+      },
+      needsObject:true,
+      check:(log) => log.hasObject && log.hasIf && log.hasAnd,
     },
   ]},
   // ── Web Story 2 — Semester 1, Week 2: functions organizing story logic ────
@@ -2516,6 +2551,16 @@ const CHALLENGE_LESSON = {
   ws1boss: { title: 'BOSS — arrays and objects, together', html: `
     <div class="cl-block"><h4>A real story tracks both kinds of state</h4>
       <p>An inventory (an ordered LIST of items) and a set of flags (NAMED yes/no facts) are genuinely different shapes of data, and a real interactive story needs both — this boss is the smallest real example of tracking each correctly.</p></div>` },
+  ws1s4: { title: 'Indexing and .length — reading ONE item, or the total count', html: `
+    <div class="cl-block"><h4>join() shows everything; [0] shows just one</h4>
+      <p><code>inventory[0]</code> reads ONE specific item by its position — index 0 is always the FIRST item, never the "1st" in everyday counting. This is genuinely different from <code>.join()</code>, which shows the whole array at once.</p></div>
+    <div class="cl-block"><h4>.length is a real property, not a method you call</h4>
+      <p><code>inventory.length</code> gives you the array's total count directly — no counting loop needed. Notice it has no brackets: it's a property being READ, not a function being called.</p></div>` },
+  ws1s5: { title: 'Combining two conditions with &&', html: `
+    <div class="cl-block"><h4>ONE flag was enough before — this needs BOTH</h4>
+      <p>ws1s3 only ever checked a single flag. <code>flags.hasKey &amp;&amp; flags.hasMap</code> is only true when BOTH sides are true — exactly the same strict AND idea from real Boolean logic, now doing real work on two object properties at once.</p></div>
+    <div class="cl-block"><h4>The else branch is just as real as the if</h4>
+      <p>Real code almost always needs to handle "not both" too, not just the success case — an if WITHOUT an else silently does nothing when the condition fails, which is rarely what you actually want.</p></div>` },
   // ── Web Story 2 — Organizing the Telling: functions ─────────────────────────
   ws2s1: { title: 'A function RETURNS a value — it doesn\'t display one', html: `
     <div class="cl-block"><h4>Two separate steps, on purpose</h4>

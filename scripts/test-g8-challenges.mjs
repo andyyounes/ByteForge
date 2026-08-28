@@ -41,12 +41,14 @@ const webMaximalLog = () => ({ bodyText: 'true false you see 1. item 3 items ' +
   hasFunction: true, functionCount: 999, hasReturn: true, hasIf: true,
   hasLSSet: true, hasLSGet: true, hasJSONStringify: true, hasJSONParse: true,
   hasLoop: true, listItems: 999,
-  hasClick: true, listItemsGrewOnClick: true, bodyChangedOnClick: true })
+  hasClick: true, listItemsGrewOnClick: true, bodyChangedOnClick: true,
+  hasIndex: true, hasLength: true, hasAnd: true })
 const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false,
   hasFunction: false, functionCount: 0, hasReturn: false, hasIf: false,
   hasLSSet: false, hasLSGet: false, hasJSONStringify: false, hasJSONParse: false,
   hasLoop: false, listItems: 0,
-  hasClick: false, listItemsGrewOnClick: false, bodyChangedOnClick: false })
+  hasClick: false, listItemsGrewOnClick: false, bodyChangedOnClick: false,
+  hasIndex: false, hasLength: false, hasAnd: false })
 
 let pass = 0, fail = 0
 for (const ch of CHALLENGES) {
