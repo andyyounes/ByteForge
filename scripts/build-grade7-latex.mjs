@@ -450,107 +450,68 @@ const PREAMBLE = String.raw`\documentclass[aspectratio=169]{beamer}
 \setbeamercolor{block body}{bg=cyan!5,fg=black}
 `
 
-// One subfolder per chapter (latex/grade7/<id>/), one file per lesson —
-// lesson1.tex, lesson2.tex, ... matching stages[0], stages[1], ..., plus
-// lessonBoss.tex for the BOSS, and lesson0-overview.tex for the whole
-// week's plan/real-world example/image/discoveries (shown once, not
-// repeated in every lesson file). This directly answers "which do I teach
-// this week, lesson 1, lesson 2, lesson 3" — open the exact file for the
-// specific day you're teaching, not one long combined deck for the week.
-// Images live one level up from these files, hence '../images/...' below.
+// One flat file per chapter (latex/grade7/<id>.tex) — reverted from the
+// one-folder-per-chapter/one-file-per-lesson split back to this, per
+// explicit request, while keeping everything from that detour: real
+// credited images (images/...), diagrams, worked examples, and multi-
+// discovery chapters.
 
-function conceptFrames(c) {
-  const diagramBlock = c.diagram ? String.raw`
+function chapterTex(id) {
+  const d = DECKS[id]
+  const stageItems = d.stages.map(s => '        \\item ' + esc(s)).join('\n')
+  const conceptFrames = d.concepts.map(c => {
+    // c.diagram: raw TikZ body (not escaped — it's real LaTeX, not prose).
+    // c.worked: an optional worked example, on its OWN frame — one frame per
+    // idea keeps each slide's content light enough to trust without a local
+    // LaTeX compiler to check for overflow (see latex/grade7/README.md).
+    const diagramBlock = c.diagram ? String.raw`
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
 ${c.diagram}
     \end{tikzpicture}
     \end{center}` : ''
-  const mainFrame = String.raw`
+    const mainFrame = String.raw`
 \begin{frame}{${md(c.h)}}
     \Large
     ${md(c.p)}${diagramBlock}
 \end{frame}
 `
-  const workedFrame = c.worked ? String.raw`
+    const workedFrame = c.worked ? String.raw`
 \begin{frame}{${md(c.h)} --- Worked Example}
     \Large
     ${md(c.worked)}
 \end{frame}
 ` : ''
-  return mainFrame + workedFrame
-}
+    return mainFrame + workedFrame
+  }).join('\n')
 
-function overviewTex(id) {
-  const d = DECKS[id]
-  const lessonItems = d.stages.map((s, i) => '        \\item Lesson ' + (i + 1) + ': ' + esc(s)).join('\n')
+  // d.image: a real, verified, credited photo (see images/ folder and
+  // images/CREDITS.md) — no video suggestion. Chapters without a
+  // well-fitting real photo simply have no image frame (their existing
+  // TikZ diagram carries the visual instead) rather than force one in.
   const imageFrame = d.image ? String.raw`
 \begin{frame}{Image}
     \begin{center}
-    \includegraphics[width=0.55\textwidth]{../images/${d.image.file}}
+    \includegraphics[width=0.55\textwidth]{images/${d.image.file}}
 
     \small ${md(d.image.credit)}
     \end{center}
 \end{frame}
 ` : ''
+
+  // Support either one `discovery` string (most chapters) or a `discoveries`
+  // array (a deeper chapter, spreading several prompts across the deck).
   const discoveryFrames = (d.discoveries || [d.discovery]).map((text, i) => String.raw`
 \begin{frame}{Let Them Discover${d.discoveries ? ' (' + (i + 1) + '/' + d.discoveries.length + ')' : ''}}
     \Large
     ${md(text)}
 \end{frame}
 `).join('\n')
-  const fileList = d.stages.map((s, i) => '        \\item \\texttt{lesson' + (i + 1) + '.tex} --- ' + esc(s)).join('\n')
 
   return PREAMBLE + String.raw`
 \title{${md(d.name)}}
 \subtitle{${md(d.sub)}}
-\author{ByteForge --- Grade 7 --- Game Maker --- Week Overview}
-\date{}
-
-\begin{document}
-
-\begin{frame}
-    \titlepage
-\end{frame}
-
-\begin{frame}{This Week's Plan}
-    \begin{itemize}
-${lessonItems}
-        \item[$\bigstar$] BOSS --- ${md(d.boss)} (\texttt{lessonBoss.tex})
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Real-World Example}
-    \Large
-    ${md(d.realWorld)}
-\end{frame}
-
-${imageFrame}${discoveryFrames}
-\begin{frame}{Files in This Folder}
-    \small
-    \begin{itemize}
-${fileList}
-        \item \texttt{lessonBoss.tex} --- BOSS: ${md(d.boss)}
-    \end{itemize}
-    \vspace{0.5em}
-    \normalsize Each lesson file is its own short deck --- open the one for
-    the specific day you're teaching, not this whole overview.
-\end{frame}
-
-\end{document}
-`
-}
-
-function lessonTex(id, stageName, lessonLabel, concept, isBoss, extraConcepts) {
-  const d = DECKS[id]
-  const yourTurnTarget = isBoss
-    ? 'the \\textbf{BOSS} challenge'
-    : 'the \\textbf{' + md(stageName) + '} challenge'
-  const extraFrames = (extraConcepts || []).map(c => conceptFrames(c)).join('\n')
-  return PREAMBLE + String.raw`
-\title{${md(d.name)}}
-\subtitle{${md(lessonLabel)}: ${md(stageName)}}
 \author{ByteForge --- Grade 7 --- Game Maker}
 \date{}
 
@@ -559,11 +520,24 @@ function lessonTex(id, stageName, lessonLabel, concept, isBoss, extraConcepts) {
 \begin{frame}
     \titlepage
 \end{frame}
-${conceptFrames(concept)}${extraFrames}
+
+\begin{frame}{Today's Plan}
+    \begin{itemize}
+${stageItems}
+        \item[$\bigstar$] BOSS --- ${md(d.boss)}
+    \end{itemize}
+\end{frame}
+${conceptFrames}
+\begin{frame}{Real-World Example}
+    \Large
+    ${md(d.realWorld)}
+\end{frame}
+
+${imageFrame}${discoveryFrames}
 \begin{frame}{Your Turn}
     \Large
-    Open the student map, find \textbf{${md(d.name)}}, and complete
-    ${yourTurnTarget} --- everything you just saw, they now do themselves.
+    Open the student map, find \textbf{${md(d.name)}}, and work through it
+    hands-on --- everything you just saw, they now do themselves.
 \end{frame}
 
 \end{document}
@@ -571,21 +545,7 @@ ${conceptFrames(concept)}${extraFrames}
 }
 
 for (const id of ORDER) {
-  const d = DECKS[id]
-  const dir = OUT_DIR + '/' + id
-  mkdirSync(dir, { recursive: true })
-
-  writeFileSync(dir + '/lesson0-overview.tex', overviewTex(id), 'utf8')
-
-  const n = d.stages.length
-  for (let i = 0; i < n; i++) {
-    const tex = lessonTex(id, d.stages[i], 'Lesson ' + (i + 1), d.concepts[i], false)
-    writeFileSync(dir + '/lesson' + (i + 1) + '.tex', tex, 'utf8')
-  }
-  // Boss concept is concepts[n]; any concepts beyond that (only g10 has one)
-  // are extra ideas with no matching stage — folded into the boss lesson.
-  const bossConcept = d.concepts[n]
-  const extra = d.concepts.slice(n + 1)
-  writeFileSync(dir + '/lessonBoss.tex', lessonTex(id, d.boss, 'BOSS', bossConcept, true, extra), 'utf8')
+  const tex = chapterTex(id)
+  writeFileSync(OUT_DIR + '/' + id + '.tex', tex, 'utf8')
 }
-console.log('Wrote ' + ORDER.length + ' chapter folders (overview + per-lesson .tex files) to ' + OUT_DIR)
+console.log('Wrote ' + ORDER.length + ' .tex files to ' + OUT_DIR)
