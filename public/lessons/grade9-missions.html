@@ -560,6 +560,8 @@ const MISSIONS = [
         { term: 'Storage', def: 'Permanent memory (a hard drive or SSD) — keeps data even after the power is switched off.' },
         { term: 'Input',   def: 'Getting data INTO the computer — e.g. a keyboard, mouse, or sensor.' },
         { term: 'Output',  def: 'Getting data OUT of the computer — e.g. a screen, speaker, or printer.' },
+        { term: 'Byte',    def: '8 bits — enough to store one single character. The basic unit storage sizes are built from.' },
+        { term: 'SSD',     def: 'Solid-state drive — storage with NO moving parts, faster and more reliable than a spinning HDD.' },
       ],
       theory: `
         <h4>Every computer does the same four things</h4>
@@ -567,7 +569,11 @@ const MISSIONS = [
         <h4>RAM vs. Storage — temporary vs. permanent</h4>
         <p>These are easy to confuse, but genuinely different jobs: RAM is fast but forgets everything the instant power is lost — it's where a program runs WHILE it's open. Storage is slower but permanent — it's where your files, photos, and installed programs live even when the computer is off.</p>
         <h4>The CPU — where the "thinking" happens</h4>
-        <p>The CPU doesn't store your files or run out of battery on its own — its ONE job is to carry out instructions, one after another, extremely fast. Every program you'll ever write is ultimately a list of instructions for the CPU to carry out.</p>`,
+        <p>The CPU doesn't store your files or run out of battery on its own — its ONE job is to carry out instructions, one after another, extremely fast. Every program you'll ever write is ultimately a list of instructions for the CPU to carry out.</p>
+        <h4>Storage is measured in units that each multiply by 1024</h4>
+        <p>A bit is one 0 or 1. 8 bits make a <b>byte</b> — enough to store one character. From there, each unit is roughly 1024 times bigger than the last: 1024 bytes = 1 <b>kilobyte (KB)</b>, 1024 KB = 1 <b>megabyte (MB)</b>, 1024 MB = 1 <b>gigabyte (GB)</b>, 1024 GB = 1 <b>terabyte (TB)</b>. A short text message might be a few hundred bytes; a phone photo is usually a few MB; a whole phone's storage is measured in GB.</p>
+        <h4>Not all storage devices work the same way</h4>
+        <p>A <b>HDD</b> (hard disk drive) stores data on a spinning magnetic disk — cheap and large, but slower, with moving parts that can wear out. An <b>SSD</b> (solid-state drive) has NO moving parts — it stores data electronically, so it's genuinely faster and more reliable, though usually more expensive per GB. <b>Cloud storage</b> isn't really a separate "type" of device at all — it's just storage (usually on SSDs/HDDs) sitting in someone else's data centre, accessed over the internet instead of sitting inside your own device.</p>`,
     },
   },
   {
@@ -594,6 +600,37 @@ const MISSIONS = [
       ps: '// TODO: answer() "Input", "Process", or "Output" — a printer producing paper is which stage?\n',
     },
     answer: 'Output',
+    stars: { metric: 'pass' },
+  },
+  {
+    // Harder than comp-p1/comp-p2 on purpose: a real calculation using the
+    // 1024-multiplier chain just taught in the theory (bytes -> KB -> MB ->
+    // GB), not a single-fact lookup.
+    id: 'comp-p3', type: 'data', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '📐', title: 'Storage Unit Conversion', xp: 30,
+    brief: 'A phone photo is 6 MB. Your cloud backup only shows storage used in KB. Remember: 1 MB = 1024 KB. answer() how many KB that photo actually is.',
+    api: ['answer(value)'],
+    dataTitle: 'Photo Size', dataFields: ['sizeMB'],
+    data: [{ sizeMB: 6 }],
+    starter: {
+      py: 'size_mb = 6\n# TODO: answer() size_mb converted to KB (1 MB = 1024 KB)\n',
+      ps: 'sizeMB ← 6\n// TODO: answer() sizeMB converted to KB (1 MB = 1024 KB)\n',
+    },
+    answer: 6144,
+    stars: { metric: 'pass' },
+  },
+  {
+    // Also harder: a real trade-off comparison across the three storage
+    // device types just taught (HDD/SSD/Cloud), not a single definition.
+    id: 'comp-p4', type: 'data', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '⚡', title: 'Pick the Right Storage', xp: 30,
+    brief: 'A laptop is being shipped overseas and needs storage that will not get damaged if it is dropped or shaken in transit — no spinning parts allowed. answer() "HDD", "SSD", or "Cloud".',
+    api: ['answer(value)'],
+    dataTitle: 'Scenario', dataFields: [],
+    data: [],
+    starter: {
+      py: '# TODO: answer() "HDD", "SSD", or "Cloud" — which has NO moving parts to damage in transit?\n',
+      ps: '// TODO: answer() "HDD", "SSD", or "Cloud" — which has NO moving parts to damage in transit?\n',
+    },
+    answer: 'SSD',
     stars: { metric: 'pass' },
   },
   // ── Phase -1 · Your First Code — absolute zero. Nothing here assumes ANY
@@ -3656,7 +3693,7 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   // Foundations 1 — What Is a Computer? — mapped onto the existing
   // g9-cpu-model concept ("W1 · The Human Computer"), which already
   // matched this topic closely.
-  'learn-computer': 'g9-cpu-model', 'comp-p1': 'g9-cpu-model', 'comp-p2': 'g9-cpu-model',
+  'learn-computer': 'g9-cpu-model', 'comp-p1': 'g9-cpu-model', 'comp-p2': 'g9-cpu-model', 'comp-p3': 'g9-cpu-model', 'comp-p4': 'g9-cpu-model',
   p0m1: 'g9-binary', p0m2: 'g9-binary', 'learn-images': 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
   'learn-flowcharts': 'g9-flowcharts-loops', 'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops', 'flow-build': 'g9-flowcharts-loops', 'flow-code': 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
@@ -3752,7 +3789,7 @@ const TIERS = [
   // The true starting point of Grade 9 — before binary, before variables,
   // before any coding: what a computer actually IS and what its real parts
   // are (CPU/RAM/storage/input/output).
-  { name: '🖥️ FOUNDATIONS 1 · WHAT IS A COMPUTER?', ids: ['learn-computer', 'comp-p1', 'comp-p2'] },
+  { name: '🖥️ FOUNDATIONS 1 · WHAT IS A COMPUTER?', ids: ['learn-computer', 'comp-p1', 'comp-p2', 'comp-p3', 'comp-p4'] },
   // Binary comes FIRST of all, taught unplugged (no code at all) — a real
   // concept lesson plus the classic "binary cards" hands-on activity —
   // BEFORE variables or any coding is introduced. Directly requested:
