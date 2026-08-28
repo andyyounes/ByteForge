@@ -150,15 +150,25 @@ const DECKS = {
     discovery: 'Before opening the platform: on paper, write down 3 real variables a video game needs to track (score, lives, time). For each one, is it a NUMBER or TEXT?' },
 
   f3boss: { section:'foundations', emoji:'🏆', name:'Foundations 3 Capstone — Your First Program', sub:'Combine text and numbers into one real message',
-    missions:['BOSS: Your First Program'],
+    missions:['BOSS: Your First Program','BOSS: Three Values, One Message','BOSS: Fix the Bug'],
     concepts:[
       { h:'Combining everything from this week', bullets:[
         'Store a callsign (text) AND a health number, together',
         '`str(health)` converts the NUMBER into text so it can join with other text',
         'The final message uses BOTH ideas from this week at once --- nothing new, just assembly',
       ] },
+      { h:'Three variables, one message --- not just two', bullets:[
+        'A callsign (text), a score (number), AND a Boolean (score >= 100) --- all three, combined',
+        '`str()` converts EVERY non-text value before joining, not just one',
+      ] },
+      { h:'Debugging --- fixing broken code, not writing from scratch', bullets:[
+        'A real, extremely common first bug: joining text and a number directly',
+        '`str()` fixes it --- convert the number to text FIRST, then join',
+        'Reading someone else\'s broken code and fixing it is a real, different skill from writing your own',
+      ] },
     ],
-    realWorld: ['Every "Player1 has 75 HP" message you have ever seen in a game is exactly this: text + a converted number, joined together.'],
+    realWorld: ['Every "Player1 has 75 HP" message you have ever seen in a game is exactly this: text + a converted number, joined together.',
+      'Every real programmer spends real time debugging code that ALMOST works --- fixing this exact type-mismatch crash is a genuine everyday task.'],
     discovery: 'Write out, on paper, the exact message you would want a game to show when a player takes damage. Which parts are text, and which part is a number that needs converting first?' },
 
   f4: { section:'foundations', emoji:'🔢', name:'Foundations 4 — Binary in Code & Logic', sub:'Real binary conversion, Boolean logic (AND/OR/NOT), and data types',
