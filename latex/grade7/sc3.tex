@@ -1,16 +1,18 @@
 \documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=cyan!60!black}
-\setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
-\setbeamercolor{block title}{bg=cyan!15,fg=black}
-\setbeamercolor{block body}{bg=cyan!5,fg=black}
+\setbeamercolor{title}{fg=white,bg=orange!85!red}
+\setbeamercolor{frametitle}{fg=white,bg=orange!85!red}
+\setbeamercolor{block title}{bg=orange!85!red!20,fg=black}
+\setbeamercolor{block body}{bg=orange!85!red!8,fg=black}
+\setbeamercolor{item}{fg=orange!85!red}
+\setbeamercolor{itemize item}{fg=orange!85!red}
+\setbeamertemplate{itemize item}[triangle]
 
 \title{Block Arcade 3 — Events}
 \subtitle{Keys are events — the stage reacts to what the player presses}
@@ -32,20 +34,29 @@
 \end{frame}
 
 \begin{frame}{Checking a key is a question, asked every frame}
-    \Large
-    Placed inside "on every frame", a key check is asked 60 times a second — that's what makes a held-down key feel like smooth movement.
+    \large
+    \begin{itemize}
+        \item Placed inside "on every frame", a key check is asked 60 times a second
+        \item That's what makes a held-down key feel like smooth movement.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Any key can trigger any action}
-    \Large
-    Space isn't special — it's just another key. What makes it feel like a "jump" is purely what you put inside the if.
+    \large
+    \begin{itemize}
+        \item Space isn't special
+        \item It's just another key. What makes it feel like a "jump" is purely what you put inside the if.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{BOSS — four keys, four directions}
-    \Large
-    Each arrow key gets its OWN separate if — pressing two at once genuinely moves the sprite diagonally, for free.
+    \large
+    \begin{itemize}
+        \item Each arrow key gets its OWN separate if
+        \item Pressing two at once genuinely moves the sprite diagonally, for free.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -61,9 +72,13 @@
     \end{center}
 \end{frame}
 
-\begin{frame}{Real-World Example}
-    \Large
-    A car's cruise control constantly re-checking your foot on the brake, or a lift constantly checking if a floor button is pressed — both are "ask the same question every moment", not a one-time check. Minecraft's own WASD + Space controls are literally this chapter's pattern — each key its own independent check, which is exactly why you can strafe (A/D) while jumping (Space) at the same time.
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item A car's cruise control constantly re-checking your foot on the brake, or a lift constantly checking if a floor button is pressed
+        \item Both are "ask the same question every moment", not a one-time check. Minecraft's own WASD + Space controls are literally this chapter's pattern
+        \item Each key its own independent check, which is exactly why you can strafe (A/D) while jumping (Space) at the same time.
+    \end{itemize}
 \end{frame}
 
 

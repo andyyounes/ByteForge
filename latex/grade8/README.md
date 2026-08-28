@@ -30,17 +30,29 @@ local TeX install — see `../grade7/README.md` for the full instructions
 
 1. Title slide
 2. Today's Plan
-3. One slide per key concept (kept consistent with `CHALLENGE_LESSON` in
-   `grade8.html`), some with a TikZ diagram (array-as-boxes, function-call
-   diagrams, if/else branches, binary-search array, a 3-state machine) and/
-   or a Worked Example on its own following slide.
-4. Real-World Example — including real Minecraft ties where they genuinely
-   fit (the `/function` command, the enchanting table's real Caesar-style
-   letter substitution, inventory sorting, world-save files as binary data).
+3. One slide per key concept, **as real bullet points** (`itemize`), kept
+   consistent with `CHALLENGE_LESSON` in `grade8.html` — worked examples
+   fold in as an extra bullet on the same slide, some with a TikZ diagram
+   (array-as-boxes, function-call diagrams, if/else branches, binary-search
+   array, a 3-state machine).
+4. Real-World Examples — a bullet list, including real Minecraft ties
+   where they genuinely fit (the `/function` command, the enchanting
+   table's real Caesar-style letter substitution, inventory sorting,
+   world-save files as binary data).
 5. Image (9 of 15 chapters) — a real, downloaded, verified, credited photo.
    No "suggested video" slide anywhere, same as Grade 7.
 6. Let Them Discover — one or more open-ended prompts.
 7. Your Turn.
+
+## Colour scheme (bright, per arc of the course)
+
+- **Web Story** (`ws*`): warm orange (`orange!85!red`)
+- **App Builder proper** (`m*`): green (`green!55!teal`, matching Builder
+  City's own map accent colour)
+
+Same automatic per-id-prefix theming as Grade 7 (`sectionFor()` in the
+generator) — title bar, frame titles, block colours, and triangle bullet
+markers all pick up the arc's accent.
 
 ## Images
 

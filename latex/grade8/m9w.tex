@@ -1,16 +1,18 @@
 \documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=blue!55!black}
-\setbeamercolor{frametitle}{fg=white,bg=blue!45!black}
-\setbeamercolor{block title}{bg=blue!15,fg=black}
-\setbeamercolor{block body}{bg=blue!5,fg=black}
+\setbeamercolor{title}{fg=white,bg=green!55!teal}
+\setbeamercolor{frametitle}{fg=white,bg=green!55!teal}
+\setbeamercolor{block title}{bg=green!55!teal!20,fg=black}
+\setbeamercolor{block body}{bg=green!55!teal!8,fg=black}
+\setbeamercolor{item}{fg=green!55!teal}
+\setbeamercolor{itemize item}{fg=green!55!teal}
+\setbeamertemplate{itemize item}[triangle]
 
 \title{M9 — Interactive Apps}
 \subtitle{A canvas app with real state: menu -> running -> results}
@@ -36,14 +38,19 @@
 \end{frame}
 
 \begin{frame}{Three kinds of bugs, three different fixes}
-    \Large
-    A syntax error means Python can't parse your code. A logic error runs but gives the wrong answer. A runtime error crashes only on certain inputs. Naming which kind you have points to the right fix.
+    \large
+    \begin{itemize}
+        \item A syntax error means Python can't parse your code. A logic error runs but gives the wrong answer. A runtime error crashes only on certain inputs. Naming which kind you have points to the right fix.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{app\_state — a real state machine}
-    \Large
-    \texttt{app\_state} is text ("menu", "running", "results") checked with if/elif — exactly Grade 7's state-machine idea, now controlling a real interactive app.
+    \large
+    \begin{itemize}
+        \item \texttt{app\_state} is text ("menu", "running", "results") checked with if/elif
+        \item Exactly Grade 7's state-machine idea, now controlling a real interactive app.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -59,19 +66,27 @@
 
 
 \begin{frame}{Combining state, guards, and drawing}
-    \Large
-    Checking a divisor isn't 0 BEFORE dividing (a guard) prevents a real crash on a genuinely possible input — percentage, app\_state, and drawing, all connected.
+    \large
+    \begin{itemize}
+        \item Checking a divisor isn't 0 BEFORE dividing (a guard) prevents a real crash on a genuinely possible input
+        \item Percentage, app\_state, and drawing, all connected.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{try/except — a different error, same pattern}
-    \Large
-    \texttt{int("abc")} raises a ValueError, caught with the exact same try/except pattern as any other error type — a real app can't just crash on unexpected input.
+    \large
+    \begin{itemize}
+        \item \texttt{int("abc")} raises a ValueError, caught with the exact same try/except pattern as any other error type
+        \item A real app can't just crash on unexpected input.
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Real-World Example}
-    \Large
-    Every real ATM walks through exactly this menu -> running -> results state pattern (select account -> processing -> show balance), with guard checks at every step (insufficient funds, wrong PIN) so it never just crashes on unexpected input.
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item Every real ATM walks through exactly this menu -> running -> results state pattern (select account -> processing -> show balance), with guard checks at every step (insufficient funds, wrong PIN) so it never just crashes on unexpected input.
+    \end{itemize}
 \end{frame}
 
 

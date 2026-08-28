@@ -229,25 +229,51 @@ const DECKS = {
 
 const ORDER = ['ws1','ws2','ws3','ws4','ws5','m1','m2','m3','m4','m5','m6','m7','m8','m9w','m10']
 
-const PREAMBLE = String.raw`\documentclass[aspectratio=169]{beamer}
+// Colorful, kid-friendly accent per arc — Web Story (real JS) vs.
+// App Builder (real Python) each read as a visually distinct "world".
+const SECTION_COLOR = {
+  webstory: 'orange!85!red',   // ws*: warm orange (matches the story/web arc)
+  appbuild: 'green!55!teal',   // m*: green (matches Builder City's map accent)
+}
+function sectionFor(id) { return id.startsWith('ws') ? 'webstory' : 'appbuild' }
+
+const PREAMBLE_HEAD = String.raw`\documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=blue!55!black}
-\setbeamercolor{frametitle}{fg=white,bg=blue!45!black}
-\setbeamercolor{block title}{bg=blue!15,fg=black}
-\setbeamercolor{block body}{bg=blue!5,fg=black}
 `
+function preambleFor(section) {
+  const c = SECTION_COLOR[section]
+  return PREAMBLE_HEAD + String.raw`\setbeamercolor{title}{fg=white,bg=${c}}
+\setbeamercolor{frametitle}{fg=white,bg=${c}}
+\setbeamercolor{block title}{bg=${c}!20,fg=black}
+\setbeamercolor{block body}{bg=${c}!8,fg=black}
+\setbeamercolor{item}{fg=${c}}
+\setbeamercolor{itemize item}{fg=${c}}
+\setbeamertemplate{itemize item}[triangle]
+`
+}
+
+// Splits one prose sentence/paragraph into 2+ real bullet points on an
+// em-dash boundary — turns existing, already-verified explanation text
+// into genuine itemize bullets rather than a wall of prose.
+function toBullets(text) {
+  const parts = text.split(/\s+—\s+/).map(s => s.trim()).filter(Boolean)
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+  return parts.length > 1 ? parts : [text]
+}
 
 function chapterTex(id) {
   const d = DECKS[id]
   const stageItems = d.stages.map(s => '        \\item ' + esc(s)).join('\n')
   const conceptFrames = d.concepts.map(c => {
+    const bullets = (c.bullets || toBullets(c.p)).slice()
+    if (c.worked) bullets.push('Worked example: ' + c.worked.replace(/^Worked example:\s*/, ''))
+    const bulletItems = bullets.map(b => '        \\item ' + md(b)).join('\n')
     const diagramBlock = c.diagram ? String.raw`
 
     \begin{center}
@@ -255,19 +281,14 @@ function chapterTex(id) {
 ${c.diagram}
     \end{tikzpicture}
     \end{center}` : ''
-    const mainFrame = String.raw`
+    return String.raw`
 \begin{frame}{${md(c.h)}}
-    \Large
-    ${md(c.p)}${diagramBlock}
+    \large
+    \begin{itemize}
+${bulletItems}
+    \end{itemize}${diagramBlock}
 \end{frame}
 `
-    const workedFrame = c.worked ? String.raw`
-\begin{frame}{${md(c.h)} --- Worked Example}
-    \Large
-    ${md(c.worked)}
-\end{frame}
-` : ''
-    return mainFrame + workedFrame
   }).join('\n')
 
   const imageFrame = d.image ? String.raw`
@@ -289,7 +310,10 @@ ${c.diagram}
 \end{frame}
 `).join('\n')
 
-  return PREAMBLE + String.raw`
+  const realWorldItems = (Array.isArray(d.realWorld) ? d.realWorld : toBullets(d.realWorld))
+    .map(t => '        \\item ' + md(t)).join('\n')
+
+  return preambleFor(sectionFor(id)) + String.raw`
 \title{${md(d.name)}}
 \subtitle{${md(d.sub)}}
 \author{ByteForge --- Grade 8 --- App Builder}
@@ -308,9 +332,11 @@ ${stageItems}
     \end{itemize}
 \end{frame}
 ${conceptFrames}
-\begin{frame}{Real-World Example}
-    \Large
-    ${md(d.realWorld)}
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+${realWorldItems}
+    \end{itemize}
 \end{frame}
 
 ${imageFrame}${discoveryFrames}

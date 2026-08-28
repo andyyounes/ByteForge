@@ -1,16 +1,18 @@
 \documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=cyan!60!black}
-\setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
-\setbeamercolor{block title}{bg=cyan!15,fg=black}
-\setbeamercolor{block body}{bg=cyan!5,fg=black}
+\setbeamercolor{title}{fg=white,bg=blue!70!cyan}
+\setbeamercolor{frametitle}{fg=white,bg=blue!70!cyan}
+\setbeamercolor{block title}{bg=blue!70!cyan!20,fg=black}
+\setbeamercolor{block body}{bg=blue!70!cyan!8,fg=black}
+\setbeamercolor{item}{fg=blue!70!cyan}
+\setbeamercolor{itemize item}{fg=blue!70!cyan}
+\setbeamertemplate{itemize item}[triangle]
 
 \title{G1 — Sprite Start}
 \subtitle{Coordinates, sequences — draw and move your first sprite}
@@ -34,8 +36,12 @@
 \end{frame}
 
 \begin{frame}{Coordinates — every sprite has an (x, y)}
-    \Large
-    x (how far right), y (how far down) — y grows DOWN, the opposite of a maths graph. Everything you build this year comes back to these two numbers.
+    \large
+    \begin{itemize}
+        \item X (how far right), y (how far down)
+        \item Y grows DOWN, the opposite of a maths graph. Everything you build this year comes back to these two numbers.
+        \item Worked example: a sprite at x=3, y=2 is 3 steps RIGHT of the left edge and 2 steps DOWN from the top edge — never "2 up", because y only ever counts downward on this canvas.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -49,15 +55,14 @@
     \end{center}
 \end{frame}
 
-\begin{frame}{Coordinates — every sprite has an (x, y) --- Worked Example}
-    \Large
-    Worked example: a sprite at x=3, y=2 is 3 steps RIGHT of the left edge and 2 steps DOWN from the top edge — never "2 up", because y only ever counts downward on this canvas.
-\end{frame}
-
 
 \begin{frame}{Reading coordinates precisely}
-    \Large
-    "Draw 4 things" and "draw 4 things in specific places" are very different tasks — real challenges almost always care about WHERE, not just how many.
+    \large
+    \begin{itemize}
+        \item "Draw 4 things" and "draw 4 things in specific places" are very different tasks
+        \item Real challenges almost always care about WHERE, not just how many.
+        \item Worked example: "top-left" isn't (0,0) exactly — it's (20,20), a small margin in from the true edge, so a sprite isn't drawn half off-screen.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -72,15 +77,14 @@
     \end{center}
 \end{frame}
 
-\begin{frame}{Reading coordinates precisely --- Worked Example}
-    \Large
-    Worked example: "top-left" isn't (0,0) exactly — it's (20,20), a small margin in from the true edge, so a sprite isn't drawn half off-screen.
-\end{frame}
-
 
 \begin{frame}{Rectangles need FOUR numbers, not two}
-    \Large
-    A rectangle needs a position AND a size (width, height) — four numbers instead of a circle's three.
+    \large
+    \begin{itemize}
+        \item A rectangle needs a position AND a size (width, height)
+        \item Four numbers instead of a circle's three.
+        \item Worked example: a 100x50 rectangle at (200,80) occupies from x=200 to x=300, and from y=80 to y=130 — the (x,y) is always the corner, never the centre.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -94,15 +98,13 @@
     \end{center}
 \end{frame}
 
-\begin{frame}{Rectangles need FOUR numbers, not two --- Worked Example}
-    \Large
-    Worked example: a 100x50 rectangle at (200,80) occupies from x=200 to x=300, and from y=80 to y=130 — the (x,y) is always the corner, never the centre.
-\end{frame}
-
 
 \begin{frame}{Sequence — same Y, different X}
-    \Large
-    Three shapes "in a line" means one coordinate stays the SAME while the other changes — a huge amount of real layout is exactly this.
+    \large
+    \begin{itemize}
+        \item Three shapes "in a line" means one coordinate stays the SAME while the other changes
+        \item A huge amount of real layout is exactly this.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -118,8 +120,11 @@
 
 
 \begin{frame}{BOSS — coordinates that update every frame}
-    \Large
-    "On every frame" re-runs its contents dozens of times a second — clear, then redraw, every frame, is the engine behind every animated game.
+    \large
+    \begin{itemize}
+        \item "On every frame" re-runs its contents dozens of times a second
+        \item Clear, then redraw, every frame, is the engine behind every animated game.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -132,9 +137,12 @@
     \end{center}
 \end{frame}
 
-\begin{frame}{Real-World Example}
-    \Large
-    Your phone's touchscreen reporting exactly WHERE you tapped (not just THAT you tapped) — every touch event carries an (x, y), same idea as this chapter's sprite position.
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item Your phone's touchscreen reporting exactly WHERE you tapped (not just THAT you tapped)
+        \item Every touch event carries an (x, y), same idea as this chapter's sprite position.
+    \end{itemize}
 \end{frame}
 
 

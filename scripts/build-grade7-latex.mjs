@@ -435,20 +435,50 @@ const DECKS = {
 
 const ORDER = ['st1','st2','st3','st4','st5','sc1','sc2','sc3','sc4','sc5','g1','g2','g3','g4','g5','g6','g7w','g8','g9w','g10']
 
-const PREAMBLE = String.raw`\documentclass[aspectratio=169]{beamer}
+// Colorful, kid-friendly accent per arc of the course (same idea as
+// Grade 9's per-section theme) — Story Studio / Block Arcade / Game
+// Maker each read as a visually distinct "world" on top of Madrid.
+const SECTION_COLOR = {
+  story:  'violet!70!purple',   // Story Studio (st*): playful purple
+  arcade: 'orange!85!red',      // Block Arcade (sc*): arcade orange
+  maker:  'blue!70!cyan',       // Game Maker proper (g*): bright blue
+}
+function sectionFor(id) {
+  if (id.startsWith('st')) return 'story'
+  if (id.startsWith('sc')) return 'arcade'
+  return 'maker'
+}
+
+const PREAMBLE_HEAD = String.raw`\documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=cyan!60!black}
-\setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
-\setbeamercolor{block title}{bg=cyan!15,fg=black}
-\setbeamercolor{block body}{bg=cyan!5,fg=black}
 `
+function preambleFor(section) {
+  const c = SECTION_COLOR[section]
+  return PREAMBLE_HEAD + String.raw`\setbeamercolor{title}{fg=white,bg=${c}}
+\setbeamercolor{frametitle}{fg=white,bg=${c}}
+\setbeamercolor{block title}{bg=${c}!20,fg=black}
+\setbeamercolor{block body}{bg=${c}!8,fg=black}
+\setbeamercolor{item}{fg=${c}}
+\setbeamercolor{itemize item}{fg=${c}}
+\setbeamertemplate{itemize item}[triangle]
+`
+}
+
+// Splits one prose sentence/paragraph into 2+ real bullet points on an
+// em-dash boundary (" — " or " --- " once escaped) — turns existing,
+// already-verified explanation text into genuine itemize bullets rather
+// than a wall of prose, without rewriting the underlying facts.
+function toBullets(text) {
+  const parts = text.split(/\s+—\s+/).map(s => s.trim()).filter(Boolean)
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+  return parts.length > 1 ? parts : [text]
+}
 
 // One flat file per chapter (latex/grade7/<id>.tex) — reverted from the
 // one-folder-per-chapter/one-file-per-lesson split back to this, per
@@ -460,10 +490,13 @@ function chapterTex(id) {
   const d = DECKS[id]
   const stageItems = d.stages.map(s => '        \\item ' + esc(s)).join('\n')
   const conceptFrames = d.concepts.map(c => {
-    // c.diagram: raw TikZ body (not escaped — it's real LaTeX, not prose).
-    // c.worked: an optional worked example, on its OWN frame — one frame per
-    // idea keeps each slide's content light enough to trust without a local
-    // LaTeX compiler to check for overflow (see latex/grade7/README.md).
+    // Bullets, not prose: explicit c.bullets wins; otherwise auto-split c.p
+    // on its em-dash boundary. c.worked (an existing worked example) folds
+    // in as one more bullet on the SAME slide — real extra depth from
+    // content already written, not a separate thin frame.
+    const bullets = (c.bullets || toBullets(c.p)).slice()
+    if (c.worked) bullets.push('Worked example: ' + c.worked.replace(/^Worked example:\s*/, ''))
+    const bulletItems = bullets.map(b => '        \\item ' + md(b)).join('\n')
     const diagramBlock = c.diagram ? String.raw`
 
     \begin{center}
@@ -471,19 +504,14 @@ function chapterTex(id) {
 ${c.diagram}
     \end{tikzpicture}
     \end{center}` : ''
-    const mainFrame = String.raw`
+    return String.raw`
 \begin{frame}{${md(c.h)}}
-    \Large
-    ${md(c.p)}${diagramBlock}
+    \large
+    \begin{itemize}
+${bulletItems}
+    \end{itemize}${diagramBlock}
 \end{frame}
 `
-    const workedFrame = c.worked ? String.raw`
-\begin{frame}{${md(c.h)} --- Worked Example}
-    \Large
-    ${md(c.worked)}
-\end{frame}
-` : ''
-    return mainFrame + workedFrame
   }).join('\n')
 
   // d.image: a real, verified, credited photo (see images/ folder and
@@ -511,7 +539,10 @@ ${c.diagram}
 \end{frame}
 `).join('\n')
 
-  return PREAMBLE + String.raw`
+  const realWorldItems = (Array.isArray(d.realWorld) ? d.realWorld : toBullets(d.realWorld))
+    .map(t => '        \\item ' + md(t)).join('\n')
+
+  return preambleFor(sectionFor(id)) + String.raw`
 \title{${md(d.name)}}
 \subtitle{${md(d.sub)}}
 \author{ByteForge --- Grade 7 --- Game Maker}
@@ -530,9 +561,11 @@ ${stageItems}
     \end{itemize}
 \end{frame}
 ${conceptFrames}
-\begin{frame}{Real-World Example}
-    \Large
-    ${md(d.realWorld)}
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+${realWorldItems}
+    \end{itemize}
 \end{frame}
 
 ${imageFrame}${discoveryFrames}

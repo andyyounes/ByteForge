@@ -45,16 +45,16 @@ Each chapter compiles independently. Files reference images as
 
 1. Title slide
 2. Today's Plan — the stages students will complete, plus the BOSS
-3. One slide per key concept (same explanations already taught in-app, kept
-   consistent with `CHALLENGE_LESSON` in `grade7.html`) — many now include a
-   **TikZ diagram** (coordinate grids, state machines, function-call
-   diagrams, distance/Pythagoras, traffic-light branches, etc.) and/or a
-   **Worked Example** on its own following slide (one frame per idea, kept
-   light on purpose — see the compiling note above on why).
-4. **Real-World Example** — a concrete, everyday analogy to open discussion,
-   including real Minecraft ties where they genuinely fit (F3 coordinates,
-   the `/function` command, mob AI chase/patrol, redstone logic gates,
-   hunger/health bars, crafting-recipe parameters, and more).
+3. One slide per key concept, **as real bullet points** (`itemize`), not
+   paragraphs — worked examples (where one exists) fold in as an extra
+   bullet on the SAME slide for real added depth, rather than a separate
+   thin frame. Many concepts also include a **TikZ diagram** (coordinate
+   grids, state machines, function-call diagrams, distance/Pythagoras,
+   traffic-light branches, etc.).
+4. **Real-World Examples** — a bullet list of concrete, everyday analogies
+   to open discussion, including real Minecraft ties where they genuinely
+   fit (F3 coordinates, the `/function` command, mob AI chase/patrol,
+   redstone logic gates, hunger/health bars, crafting-recipe parameters).
 5. **Image** (13 of 20 chapters) — a real, downloaded, verified, credited
    photo (Wikimedia Commons) — see "Images, not videos" below. No
    "suggested video" slide anywhere in these decks.
@@ -62,6 +62,18 @@ Each chapter compiles independently. Files reference images as
    for the class to talk through before touching the platform (some
    chapters — G1, G4, G8, st1, st5 — spread 2-3 across the deck).
 7. Your Turn — hands off to the real hands-on practice in the map
+
+## Colour scheme (bright, per arc of the course)
+
+- **Story Studio** (`st*`): playful purple (`violet!70!purple`)
+- **Block Arcade** (`sc*`): arcade orange (`orange!85!red`)
+- **Game Maker proper** (`g*`): bright blue (`blue!70!cyan`)
+
+Each `.tex` file picks its colour automatically from its id prefix
+(`sectionFor()` in the generator) — title bar, frame titles, block
+colours, and triangle-style bullet markers all pick up the arc's accent,
+so each arc visually reads as its own "world" on top of Beamer's Madrid
+layout, matching Grade 9's per-section theme.
 
 ## Images, not videos
 

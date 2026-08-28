@@ -1,16 +1,18 @@
 \documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=cyan!60!black}
-\setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
-\setbeamercolor{block title}{bg=cyan!15,fg=black}
-\setbeamercolor{block body}{bg=cyan!5,fg=black}
+\setbeamercolor{title}{fg=white,bg=blue!70!cyan}
+\setbeamercolor{frametitle}{fg=white,bg=blue!70!cyan}
+\setbeamercolor{block title}{bg=blue!70!cyan!20,fg=black}
+\setbeamercolor{block body}{bg=blue!70!cyan!8,fg=black}
+\setbeamercolor{item}{fg=blue!70!cyan}
+\setbeamercolor{itemize item}{fg=blue!70!cyan}
+\setbeamertemplate{itemize item}[triangle]
 
 \title{G5 — Player Control}
 \subtitle{Keyboard + mouse input schemes, aiming}
@@ -33,14 +35,20 @@
 \end{frame}
 
 \begin{frame}{Keyboard input — four separate checks}
-    \Large
-    Checking all four arrow keys means four separate IF blocks — small changes every frame LOOK like smooth continuous movement.
+    \large
+    \begin{itemize}
+        \item Checking all four arrow keys means four separate IF blocks
+        \item Small changes every frame LOOK like smooth continuous movement.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Mouse position — always available, live}
-    \Large
-    mouseX()/mouseY() always report the CURRENT position, live — nothing to set or update, the engine tracks it automatically.
+    \large
+    \begin{itemize}
+        \item MouseX()/mouseY() always report the CURRENT position, live
+        \item Nothing to set or update, the engine tracks it automatically.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -54,19 +62,28 @@
 
 
 \begin{frame}{Two independent things, same frame loop}
-    \Large
-    Two players need two SEPARATE sets of variables — a single loop can control multiple independent things at once.
+    \large
+    \begin{itemize}
+        \item Two players need two SEPARATE sets of variables
+        \item A single loop can control multiple independent things at once.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{BOSS — networking scale: PAN to LAN to WAN}
-    \Large
-    A keyboard+mouse on one PC is a PAN; school wifi is a LAN; the whole internet is a WAN — same idea, three different scales.
+    \large
+    \begin{itemize}
+        \item A keyboard+mouse on one PC is a PAN; school wifi is a LAN; the whole internet is a WAN
+        \item Same idea, three different scales.
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Real-World Example}
-    \Large
-    A split-screen couch co-op game (two controllers, two characters on one screen) is exactly this chapter's "two independent input schemes, one frame loop" idea, running in a real shipped game. Minecraft moves with WASD (keyboard) while the mouse independently aims/looks around — the exact keyboard+mouse split this chapter teaches.
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item A split-screen couch co-op game (two controllers, two characters on one screen) is exactly this chapter's "two independent input schemes, one frame loop" idea, running in a real shipped game. Minecraft moves with WASD (keyboard) while the mouse independently aims/looks around
+        \item The exact keyboard+mouse split this chapter teaches.
+    \end{itemize}
 \end{frame}
 
 

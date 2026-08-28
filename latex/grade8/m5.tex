@@ -1,16 +1,18 @@
 \documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=blue!55!black}
-\setbeamercolor{frametitle}{fg=white,bg=blue!45!black}
-\setbeamercolor{block title}{bg=blue!15,fg=black}
-\setbeamercolor{block body}{bg=blue!5,fg=black}
+\setbeamercolor{title}{fg=white,bg=green!55!teal}
+\setbeamercolor{frametitle}{fg=white,bg=green!55!teal}
+\setbeamercolor{block title}{bg=green!55!teal!20,fg=black}
+\setbeamercolor{block body}{bg=green!55!teal!8,fg=black}
+\setbeamercolor{item}{fg=green!55!teal}
+\setbeamercolor{itemize item}{fg=green!55!teal}
+\setbeamertemplate{itemize item}[triangle]
 
 \title{M5 — Strings \& Validation}
 \subtitle{Slicing, methods, checking input — the Caesar cipher in real code}
@@ -35,36 +37,47 @@
 \end{frame}
 
 \begin{frame}{.strip() and .lower() — cleaning text}
-    \Large
-    Real user input is messy — \texttt{.strip()} removes leading/trailing spaces, \texttt{.lower()} makes everything lowercase, chaining them does both in one line.
+    \large
+    \begin{itemize}
+        \item Real user input is messy
+        \item \texttt{.strip()} removes leading/trailing spaces, \texttt{.lower()} makes everything lowercase, chaining them does both in one line.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Never trust input blindly — validation}
-    \Large
-    A strong password needs length AND content checks — combining both with \texttt{and} means BOTH have to be true for acceptance.
+    \large
+    \begin{itemize}
+        \item A strong password needs length AND content checks
+        \item Combining both with \texttt{and} means BOTH have to be true for acceptance.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{The Caesar cipher, in real code}
-    \Large
-    \texttt{ord(ch)} converts a letter to its ASCII number; \texttt{chr(n)} converts back — the exact "text is secretly numbers" idea from Grade 7's ASCII challenge, now doing real work. \texttt{\% 26} wraps the alphabet around.
-\end{frame}
-
-\begin{frame}{The Caesar cipher, in real code --- Worked Example}
-    \Large
-    Worked example: shifting "z" forward by 1 should wrap to "a", not go past the alphabet — \texttt{(25 + 1) \% 26 = 0}, which IS the index for "a". That single \texttt{\% 26} is the whole wraparound trick.
+    \large
+    \begin{itemize}
+        \item \texttt{ord(ch)} converts a letter to its ASCII number; \texttt{chr(n)} converts back
+        \item The exact "text is secretly numbers" idea from Grade 7's ASCII challenge, now doing real work. \texttt{\% 26} wraps the alphabet around.
+        \item Worked example: shifting "z" forward by 1 should wrap to "a", not go past the alphabet — \texttt{(25 + 1) \% 26 = 0}, which IS the index for "a". That single \texttt{\% 26} is the whole wraparound trick.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Reversing a string with [::-1]}
-    \Large
-    A slice with no start, no end, and a step of -1 means "walk the whole string, but backward" — reverses an entire string in one expression.
+    \large
+    \begin{itemize}
+        \item A slice with no start, no end, and a step of -1 means "walk the whole string, but backward"
+        \item Reverses an entire string in one expression.
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Real-World Example}
-    \Large
-    Minecraft's enchanting table language is a real, deliberate obfuscation — every "Standard Galactic Alphabet" glyph maps to a real English letter, exactly like a Caesar cipher's letter-to-letter mapping, just visual instead of numeric.
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item Minecraft's enchanting table language is a real, deliberate obfuscation
+        \item Every "Standard Galactic Alphabet" glyph maps to a real English letter, exactly like a Caesar cipher's letter-to-letter mapping, just visual instead of numeric.
+    \end{itemize}
 \end{frame}
 
 

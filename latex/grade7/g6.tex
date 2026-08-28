@@ -1,16 +1,18 @@
 \documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=cyan!60!black}
-\setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
-\setbeamercolor{block title}{bg=cyan!15,fg=black}
-\setbeamercolor{block body}{bg=cyan!5,fg=black}
+\setbeamercolor{title}{fg=white,bg=blue!70!cyan}
+\setbeamercolor{frametitle}{fg=white,bg=blue!70!cyan}
+\setbeamercolor{block title}{bg=blue!70!cyan!20,fg=black}
+\setbeamercolor{block body}{bg=blue!70!cyan!8,fg=black}
+\setbeamercolor{item}{fg=blue!70!cyan}
+\setbeamercolor{itemize item}{fg=blue!70!cyan}
+\setbeamertemplate{itemize item}[triangle]
 
 \title{G6 — Collision \& Physics}
 \subtitle{Hitboxes, bouncing, gravity, knockback}
@@ -33,8 +35,11 @@
 \end{frame}
 
 \begin{frame}{The distance formula — real Pythagoras}
-    \Large
-    \texttt{dist = sqrt((x2-x1)\textasciicircum{}2 + (y2-y1)\textasciicircum{}2)} — literally Pythagoras' theorem, applied to two circle centres.
+    \large
+    \begin{itemize}
+        \item \texttt{dist = sqrt((x2-x1)\textasciicircum{}2 + (y2-y1)\textasciicircum{}2)}
+        \item Literally Pythagoras' theorem, applied to two circle centres.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -53,30 +58,39 @@
 
 
 \begin{frame}{Gravity and bouncing — physics as a loop}
-    \Large
-    Increase velocity by a small amount EVERY frame to simulate gravity — no complicated physics engine needed.
-\end{frame}
-
-\begin{frame}{Gravity and bouncing — physics as a loop --- Worked Example}
-    \Large
-    Worked example: velocity starts at 0, gains +0.5 every frame from gravity — after 10 frames it's 5, after 20 frames it's 10 — the ball falls FASTER over time, exactly like a real dropped object accelerating.
+    \large
+    \begin{itemize}
+        \item Increase velocity by a small amount EVERY frame to simulate gravity
+        \item No complicated physics engine needed.
+        \item Worked example: velocity starts at 0, gains +0.5 every frame from gravity — after 10 frames it's 5, after 20 frames it's 10 — the ball falls FASTER over time, exactly like a real dropped object accelerating.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Combining collision detection with movement}
-    \Large
-    "Detect, then react" — check for a condition (collision), then DO something as a direct result (bounce away).
+    \large
+    \begin{itemize}
+        \item "Detect, then react"
+        \item Check for a condition (collision), then DO something as a direct result (bounce away).
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{BOSS — linear search through an array}
-    \Large
-    An array stores a whole list under one name — checking each item one at a time, in order, is called a linear search.
+    \large
+    \begin{itemize}
+        \item An array stores a whole list under one name
+        \item Checking each item one at a time, in order, is called a linear search.
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Real-World Example}
-    \Large
-    A basketball's arc and bounce follows the exact same idea — gravity constantly pulling it down (velocity increasing each moment) until it hits the floor and reverses. Minecraft has real block physics too — sand and gravel actually fall when unsupported, using this exact gravity-as-a-loop idea (just without the bounce).
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item A basketball's arc and bounce follows the exact same idea
+        \item Gravity constantly pulling it down (velocity increasing each moment) until it hits the floor and reverses. Minecraft has real block physics too
+        \item Sand and gravel actually fall when unsupported, using this exact gravity-as-a-loop idea (just without the bounce).
+    \end{itemize}
 \end{frame}
 
 

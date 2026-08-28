@@ -1,16 +1,18 @@
 \documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
-\usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \setbeamertemplate{navigation symbols}{}
-\setbeamercolor{title}{fg=white,bg=blue!55!black}
-\setbeamercolor{frametitle}{fg=white,bg=blue!45!black}
-\setbeamercolor{block title}{bg=blue!15,fg=black}
-\setbeamercolor{block body}{bg=blue!5,fg=black}
+\setbeamercolor{title}{fg=white,bg=green!55!teal}
+\setbeamercolor{frametitle}{fg=white,bg=green!55!teal}
+\setbeamercolor{block title}{bg=green!55!teal!20,fg=black}
+\setbeamercolor{block body}{bg=green!55!teal!8,fg=black}
+\setbeamercolor{item}{fg=green!55!teal}
+\setbeamercolor{itemize item}{fg=green!55!teal}
+\setbeamertemplate{itemize item}[triangle]
 
 \title{M2 — Choices \& Loops}
 \subtitle{if/elif/else, while, for-range — predict the drawing before you run it}
@@ -35,8 +37,11 @@
 \end{frame}
 
 \begin{frame}{if/else — real syntax for a decision}
-    \Large
-    \texttt{number \% 2} gives what's LEFT OVER after dividing by 2 — 0 for even, 1 for odd. The exact same MOD idea from Grade 7, just written as \texttt{\%}.
+    \large
+    \begin{itemize}
+        \item \texttt{number \% 2} gives what's LEFT OVER after dividing by 2
+        \item 0 for even, 1 for odd. The exact same MOD idea from Grade 7, just written as \texttt{\%}.
+    \end{itemize}
 
     \begin{center}
     \begin{tikzpicture}[scale=0.9]
@@ -53,25 +58,37 @@
 
 
 \begin{frame}{for loops with range(), and elif chains}
-    \Large
-    \texttt{for i in range(1, 11):} loops through 1 to 10 — the second number is EXCLUSIVE, which is why you need 11 to reach 10. This trips up almost everyone the first time.
+    \large
+    \begin{itemize}
+        \item \texttt{for i in range(1, 11):} loops through 1 to 10
+        \item The second number is EXCLUSIVE, which is why you need 11 to reach 10. This trips up almost everyone the first time.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{while loops — repeat until a condition is false}
-    \Large
-    \texttt{for} is perfect when you know the count in advance. \texttt{while size > 0:} keeps going for as long as a CONDITION stays true — the loop MUST change the condition eventually, or it runs forever.
+    \large
+    \begin{itemize}
+        \item \texttt{for} is perfect when you know the count in advance. \texttt{while size > 0:} keeps going for as long as a CONDITION stays true
+        \item The loop MUST change the condition eventually, or it runs forever.
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Chained if/elif — order decides correctness}
-    \Large
-    Checking \texttt{>= 70} BEFORE \texttt{>= 90} would wrongly grade a 95 as a "B" — order in a chain of conditions genuinely changes the result.
+    \large
+    \begin{itemize}
+        \item Checking \texttt{>= 70} BEFORE \texttt{>= 90} would wrongly grade a 95 as a "B"
+        \item Order in a chain of conditions genuinely changes the result.
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Real-World Example}
-    \Large
-    Every "off by one" range bug (\texttt{range(1,11)} needing 11, not 10) is a genuinely common real bug professional developers still make. Minecraft's own farming/breeding cooldowns are \texttt{while} loops in disguise — "keep waiting while the cooldown timer is still above zero".
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item Every "off by one" range bug (\texttt{range(1,11)} needing 11, not 10) is a genuinely common real bug professional developers still make. Minecraft's own farming/breeding cooldowns are \texttt{while} loops in disguise
+        \item "keep waiting while the cooldown timer is still above zero".
+    \end{itemize}
 \end{frame}
 
 
