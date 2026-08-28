@@ -3,6 +3,8 @@
 \usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
 \setbeamertemplate{navigation symbols}{}
 \setbeamercolor{title}{fg=white,bg=cyan!60!black}
 \setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
@@ -32,12 +34,31 @@
 \begin{frame}{The distance formula — real Pythagoras}
     \Large
     \texttt{dist = sqrt((x2-x1)\textasciicircum{}2 + (y2-y1)\textasciicircum{}2)} — literally Pythagoras' theorem, applied to two circle centres.
+
+    \begin{center}
+    \begin{tikzpicture}[scale=0.9]
+
+        \draw[thick] (0,0) circle (0.4);
+        \node at (0,0) {\tiny A};
+        \draw[thick] (3,-2) circle (0.4);
+        \node at (3,-2) {\tiny B};
+        \draw[dashed] (0,0) -- (3,-2) node[midway, above] {\small dist};
+        \draw[dashed, gray] (0,0) -- (3,0) -- (3,-2);
+        \node[above] at (1.5,0) {\small $\Delta x$};
+        \node[right] at (3,-1) {\small $\Delta y$};
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 
 \begin{frame}{Gravity and bouncing — physics as a loop}
     \Large
     Increase velocity by a small amount EVERY frame to simulate gravity — no complicated physics engine needed.
+\end{frame}
+
+\begin{frame}{Gravity and bouncing — physics as a loop --- Worked Example}
+    \Large
+    Worked example: velocity starts at 0, gains +0.5 every frame from gravity — after 10 frames it's 5, after 20 frames it's 10 — the ball falls FASTER over time, exactly like a real dropped object accelerating.
 \end{frame}
 
 
@@ -54,7 +75,7 @@
 
 \begin{frame}{Real-World Example}
     \Large
-    A basketball's arc and bounce follows the exact same idea — gravity constantly pulling it down (velocity increasing each moment) until it hits the floor and reverses.
+    A basketball's arc and bounce follows the exact same idea — gravity constantly pulling it down (velocity increasing each moment) until it hits the floor and reverses. Minecraft has real block physics too — sand and gravel actually fall when unsupported, using this exact gravity-as-a-loop idea (just without the bounce).
 \end{frame}
 
 \begin{frame}{Watch}
@@ -66,6 +87,7 @@
     Search this on YouTube together, or swap in a specific video you've
     already vetted --- do not project an unverified link cold in class.
 \end{frame}
+
 
 \begin{frame}{Let Them Discover}
     \Large

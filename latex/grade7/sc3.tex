@@ -3,6 +3,8 @@
 \usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
 \setbeamertemplate{navigation symbols}{}
 \setbeamercolor{title}{fg=white,bg=cyan!60!black}
 \setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
@@ -43,11 +45,24 @@
 \begin{frame}{BOSS — four keys, four directions}
     \Large
     Each arrow key gets its OWN separate if — pressing two at once genuinely moves the sprite diagonally, for free.
+
+    \begin{center}
+    \begin{tikzpicture}[scale=0.9]
+
+        \node at (0,0) {\small W (up)};
+        \node at (0,-2) {\small S (down)};
+        \node at (-1.5,-1) {\small A (left)};
+        \node at (1.5,-1) {\small D (right)};
+        \draw[->, thick] (0,-0.3) -- (0,-1.7);
+        \draw[->, thick] (-1.2,-1) -- (1.2,-1);
+        \node at (0,-1) {\small +};
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 \begin{frame}{Real-World Example}
     \Large
-    A car's cruise control constantly re-checking your foot on the brake, or a lift constantly checking if a floor button is pressed — both are "ask the same question every moment", not a one-time check.
+    A car's cruise control constantly re-checking your foot on the brake, or a lift constantly checking if a floor button is pressed — both are "ask the same question every moment", not a one-time check. Minecraft's own WASD + Space controls are literally this chapter's pattern — each key its own independent check, which is exactly why you can strafe (A/D) while jumping (Space) at the same time.
 \end{frame}
 
 \begin{frame}{Watch}
@@ -60,9 +75,10 @@
     already vetted --- do not project an unverified link cold in class.
 \end{frame}
 
+
 \begin{frame}{Let Them Discover}
     \Large
-    Try holding two arrow keys at once in any real game (or your phone's on-screen d-pad). Does the character move diagonally? What would the code need to allow that — one if, or two separate ifs?
+    Try holding two arrow keys at once in any real game (or your phone's on-screen d-pad), or W+Space in Minecraft. Does the character move diagonally / jump-forward? What would the code need to allow that — one if, or two separate ifs?
 \end{frame}
 
 \begin{frame}{Your Turn}

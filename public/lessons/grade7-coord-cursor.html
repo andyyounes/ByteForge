@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 7 — Coordinate Cursor</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; height:100%; background:#0b0d16; color:#e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  h1 { font-size:20px; font-weight:900; color:#67e8f9; margin:0 0 4px; }
+  p.sub { color:#9ca3af; font-size:14px; margin:0 0 20px; text-align:center; max-width:640px; }
+  #wrap { position:relative; }
+  #canvas { background:#12162a; border:2px solid #2a3050; border-radius:8px; cursor:crosshair; display:block; }
+  #readout { position:absolute; top:-52px; left:0; right:0; text-align:center;
+    font-size:28px; font-weight:900; color:#5eead4; font-variant-numeric:tabular-nums; }
+  #corner-labels span { position:absolute; font-size:12px; font-weight:800; color:#f59e0b; pointer-events:none; }
+  #hint { margin-top:18px; color:#6b7280; font-size:13px; }
+  #margin { position:absolute; pointer-events:none; }
+</style>
+</head>
+<body>
+
+<h1>🎯 Where Am I? — a live coordinate readout</h1>
+<p class="sub">This is the exact 480&times;260 canvas Grade 7's Game Maker challenges use. Move the mouse
+  anywhere over it — the (x, y) reported is the SAME live position the platform's own <code>mouseX()</code>/
+  <code>mouseY()</code> blocks read every frame.</p>
+
+<div id="wrap">
+  <div id="readout">move the mouse over the grid</div>
+  <canvas id="canvas" width="480" height="260"></canvas>
+</div>
+<p id="hint">Click anywhere to drop a pin and keep its coordinate on screen — click again elsewhere to move it. Press <b>C</b> to clear all pins.</p>
+
+<script>
+const canvas = document.getElementById('canvas')
+const ctx = canvas.getContext('2d')
+const readout = document.getElementById('readout')
+const GRID = 40
+let pins = []
+
+function draw(hoverX, hoverY) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  // grid lines
+  ctx.strokeStyle = '#1f2437'
+  ctx.lineWidth = 1
+  for (let x = 0; x <= canvas.width; x += GRID) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke()
+  }
+  for (let y = 0; y <= canvas.height; y += GRID) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke()
+  }
+  // the four named corners (20px margin in, matching the real challenges)
+  const corners = [[20, 20, 'top-left'], [460, 20, 'top-right'], [20, 240, 'bottom-left'], [460, 240, 'bottom-right']]
+  ctx.fillStyle = '#f59e0b'
+  corners.forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill() })
+  ctx.font = '11px sans-serif'
+  ctx.fillStyle = '#fbbf24'
+  corners.forEach(([x, y, label]) => {
+    const dx = x < 240 ? 8 : -8
+    const dy = y < 130 ? 16 : -10
+    ctx.textAlign = x < 240 ? 'left' : 'right'
+    ctx.fillText(label + ' (' + x + ',' + y + ')', x + dx, y + dy)
+  })
+  // dropped pins
+  pins.forEach(([x, y]) => {
+    ctx.fillStyle = '#5eead4'
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, 7); ctx.fill()
+    ctx.fillStyle = '#5eead4'
+    ctx.font = 'bold 12px sans-serif'
+    ctx.textAlign = 'left'
+    ctx.fillText('(' + x + ', ' + y + ')', x + 8, y - 8)
+  })
+  // live hover marker
+  if (hoverX != null) {
+    ctx.strokeStyle = '#67e8f9'
+    ctx.setLineDash([4, 3])
+    ctx.beginPath(); ctx.moveTo(hoverX, 0); ctx.lineTo(hoverX, canvas.height); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(0, hoverY); ctx.lineTo(canvas.width, hoverY); ctx.stroke()
+    ctx.setLineDash([])
+    ctx.fillStyle = '#67e8f9'
+    ctx.beginPath(); ctx.arc(hoverX, hoverY, 5, 0, 7); ctx.fill()
+  }
+}
+
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect()
+  const x = Math.round(e.clientX - r.left)
+  const y = Math.round(e.clientY - r.top)
+  readout.textContent = '(' + x + ', ' + y + ')'
+  draw(x, y)
+})
+canvas.addEventListener('mouseleave', () => { readout.textContent = 'move the mouse over the grid'; draw(null, null) })
+canvas.addEventListener('click', e => {
+  const r = canvas.getBoundingClientRect()
+  const x = Math.round(e.clientX - r.left)
+  const y = Math.round(e.clientY - r.top)
+  pins.push([x, y])
+  draw(x, y)
+})
+document.addEventListener('keydown', e => {
+  if (e.key === 'c' || e.key === 'C') { pins = []; draw(null, null) }
+})
+
+draw(null, null)
+</script>
+</body>
+</html>

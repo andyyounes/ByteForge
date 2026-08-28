@@ -3,6 +3,8 @@
 \usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
 \setbeamertemplate{navigation symbols}{}
 \setbeamercolor{title}{fg=white,bg=cyan!60!black}
 \setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
@@ -33,6 +35,20 @@
 \begin{frame}{onclick — code that waits for a click}
     \Large
     Every block before this ran the instant you pressed Run. "When button is clicked" waits, doing nothing, until a real click happens.
+
+    \begin{center}
+    \begin{tikzpicture}[scale=0.9]
+
+        \node[draw, thick, rounded corners, minimum width=2.6cm, minimum height=1cm, fill=cyan!15] (btn) at (0,0) {Button};
+        \draw[->, thick] (btn) -- (3,0) node[midway, above] {\small click!};
+        \node[draw, thick, minimum width=3cm, minimum height=1cm] (act) at (5,0) {do something};
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{onclick — code that waits for a click --- Worked Example}
+    \Large
+    Worked example: nothing inside "when button is clicked" runs when you press Run — it only runs the moment a real click happens, which is why the checker fires one simulated click to test it.
 \end{frame}
 
 
@@ -61,7 +77,7 @@
 
 \begin{frame}{Real-World Example}
     \Large
-    Click an "Add to cart" button on a real shopping site — the label changing to "Added ✓" or a counter updating is exactly this week's "button talks back" idea, live in production software.
+    Click an "Add to cart" button on a real shopping site — the label changing to "Added \textbackslash\{\}checkmark" or a counter updating is exactly this week's "button talks back" idea, live in production software. A Minecraft crafting-table "craft" button is the same: click it, and it visibly does something (moves items) right there.
 \end{frame}
 
 \begin{frame}{Watch}
@@ -73,6 +89,7 @@
     Search this on YouTube together, or swap in a specific video you've
     already vetted --- do not project an unverified link cold in class.
 \end{frame}
+
 
 \begin{frame}{Let Them Discover}
     \Large

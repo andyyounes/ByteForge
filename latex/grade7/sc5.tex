@@ -3,6 +3,8 @@
 \usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
 \setbeamertemplate{navigation symbols}{}
 \setbeamercolor{title}{fg=white,bg=cyan!60!black}
 \setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
@@ -37,6 +39,18 @@
 \begin{frame}{IF can replace what's shown, not just add to it}
     \Large
     "You Win!" and the running score are in different branches of the same if/else — only one is ever drawn on a given frame.
+
+    \begin{center}
+    \begin{tikzpicture}[scale=0.9]
+
+        \draw[thick] (1,1) -- (2,0) -- (1,-1) -- (0,0) -- cycle;
+        \node at (1,0) {\small won?};
+        \draw[->, thick] (2,0) -- (3.5,0.7) node[midway, above] {\small yes};
+        \node[right] at (3.5,0.7) {\small "You Win!"};
+        \draw[->, thick] (2,0) -- (3.5,-0.7) node[midway, below] {\small no};
+        \node[right] at (3.5,-0.7) {\small show score};
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 
@@ -47,7 +61,7 @@
 
 \begin{frame}{Real-World Example}
     \Large
-    A car's parking sensor beeping only once you're within a set distance of a wall — the "beep" only fires past a threshold, exactly like this chapter's edge check.
+    A car's parking sensor beeping only once you're within a set distance of a wall — the "beep" only fires past a threshold, exactly like this chapter's edge check. In Minecraft, fall damage only triggers past a height threshold — no damage for a 1-block drop, real damage past \textasciitilde{}3 blocks — the exact same "past a threshold" rule.
 \end{frame}
 
 \begin{frame}{Watch}
@@ -60,9 +74,10 @@
     already vetted --- do not project an unverified link cold in class.
 \end{frame}
 
+
 \begin{frame}{Let Them Discover}
     \Large
-    Play any simple browser game for two minutes and try to spot its "win" condition and its "you hit a wall" condition. What number do you think each one is checking against?
+    Play any simple browser game (or recall Minecraft fall damage) for two minutes and try to spot its "win"/"damage" condition and its "you hit a wall" condition. What number do you think each one is checking against?
 \end{frame}
 
 \begin{frame}{Your Turn}

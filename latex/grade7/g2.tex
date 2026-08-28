@@ -3,6 +3,8 @@
 \usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
 \setbeamertemplate{navigation symbols}{}
 \setbeamercolor{title}{fg=white,bg=cyan!60!black}
 \setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
@@ -44,6 +46,20 @@
 \begin{frame}{A variable driving TWO different things}
     \Large
     health drives a bar's WIDTH directly — the "one variable, automatically reflected in visuals" pattern behind every health/progress bar.
+
+    \begin{center}
+    \begin{tikzpicture}[scale=0.9]
+
+        \draw[thick] (0,0) rectangle (5,-0.6);
+        \draw[thick, fill=green!60!black] (0,0) rectangle (3,-0.6);
+        \node[right] at (5.1,-0.3) {\small health = 60};
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{A variable driving TWO different things --- Worked Example}
+    \Large
+    Worked example: health at 100 draws a full-width bar; health at 20 draws a bar only one-fifth as wide — the SAME width calculation (health / max * barWidth) every single frame, no special "low health" case needed.
 \end{frame}
 
 
@@ -54,7 +70,7 @@
 
 \begin{frame}{Real-World Example}
     \Large
-    Any RPG or shooter's health bar visibly shrinking as you take damage — the bar's pixel width is driven directly by one number, exactly like this chapter's health-bar challenge.
+    Any RPG or shooter's health bar visibly shrinking as you take damage — the bar's pixel width is driven directly by one number, exactly like this chapter's health-bar challenge. Minecraft's ten hearts are the same idea drawn as icons instead of a bar — hearts remove as the health variable drops.
 \end{frame}
 
 \begin{frame}{Watch}
@@ -66,6 +82,7 @@
     Search this on YouTube together, or swap in a specific video you've
     already vetted --- do not project an unverified link cold in class.
 \end{frame}
+
 
 \begin{frame}{Let Them Discover}
     \Large

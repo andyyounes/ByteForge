@@ -3,6 +3,8 @@
 \usecolortheme{beaver}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
 \setbeamertemplate{navigation symbols}{}
 \setbeamercolor{title}{fg=white,bg=cyan!60!black}
 \setbeamercolor{frametitle}{fg=white,bg=cyan!50!black}
@@ -32,6 +34,17 @@
 \begin{frame}{A state is just a variable holding text}
     \Large
     What makes it a "state machine" is using IF/ELSE to draw a completely different screen depending on what the variable currently holds.
+
+    \begin{center}
+    \begin{tikzpicture}[scale=0.9]
+
+        \node[draw, thick, minimum width=2.2cm, minimum height=1cm, fill=cyan!15] (m) at (0,0) {menu};
+        \node[draw, thick, minimum width=2.2cm, minimum height=1cm, fill=cyan!15] (p) at (3.2,0) {playing};
+        \node[draw, thick, minimum width=2.2cm, minimum height=1cm, fill=cyan!15] (g) at (6.4,0) {gameover};
+        \draw[->, thick] (m) -- (p) node[midway, above]{\small start};
+        \draw[->, thick] (p) -- (g) node[midway, above]{\small lose};
+    \end{tikzpicture}
+    \end{center}
 \end{frame}
 
 
@@ -54,7 +67,7 @@
 
 \begin{frame}{Real-World Example}
     \Large
-    Every app you use has "states": a login screen, a loading spinner, the main screen, an error message — the same menu/playing/paused/gameover idea, just with different names.
+    Every app you use has "states": a login screen, a loading spinner, the main screen, an error message — the same menu/playing/paused/gameover idea, just with different names. Minecraft has this too: title screen, world-loading screen, playing, the ESC pause menu, and the respawn/death screen are all states of ONE running program.
 \end{frame}
 
 \begin{frame}{Watch}
@@ -67,9 +80,10 @@
     already vetted --- do not project an unverified link cold in class.
 \end{frame}
 
+
 \begin{frame}{Let Them Discover}
     \Large
-    List every distinct "screen" a mobile game shows you from opening the app to actually playing (splash screen, menu, loading, playing, pause, game over). How many states is that, really?
+    List every distinct "screen" Minecraft (or any game) shows you from opening the app to actually playing (splash screen, menu, loading, playing, pause, death/game over). How many states is that, really?
 \end{frame}
 
 \begin{frame}{Your Turn}
