@@ -29,7 +29,7 @@ function md(s) {
 
 const DECKS = {
   ws1: { emoji:'📗', name:'Web Story 1 — Remembering the Reader', sub:'Arrays and objects — a story that tracks the reader\'s inventory and flags',
-    stages:['Your First Array','Add to the Array','A Flag Object'], boss:'Inventory & Flags Together',
+    stages:['Your First Array','Add to the Array','A Flag Object','Read One Item, Count Them All','Two Flags, One Decision'], boss:'Inventory & Flags Together',
     concepts:[
       { h:'An array is an ordered list of values', p:'`["sword", "shield"]` is a genuine JavaScript array — an ordered collection, indexed from 0. `.join(", ")` turns it back into one readable string.',
         diagram: String.raw`
@@ -42,6 +42,8 @@ const DECKS = {
         worked: 'Worked example: `["sword","shield"].join(", ")` produces the exact text "sword, shield" — this is genuinely how a real inventory line of text gets built from structured data.' },
       { h:'.push() adds to the END of an array', p:'An array isn\'t fixed once written — `.push("potion")` genuinely adds a new element after the array already exists, exactly like a player finding a new item mid-story.' },
       { h:'An object groups related NAMED values', p:'An array is a list, ordered by position; an object is a set of NAMED properties (`flags.hasKey`) — both are "collections" but answer different questions.' },
+      { h:'[0] reads ONE item; .length counts them all', p:'`inventory[0]` reads a single specific item by position — index 0 is always the FIRST item. `.length` is a real PROPERTY (no brackets, nothing to call) giving the total count directly, no counting loop needed.' },
+      { h:'&& needs BOTH sides to be true', p:'`flags.hasKey && flags.hasMap` is only true when BOTH properties are true — the same strict AND idea from Boolean logic, now combining two real object properties into one decision, with a genuine else branch for "not both".' },
       { h:'BOSS — arrays and objects, together', p:'An inventory (an ordered LIST) and a set of flags (NAMED yes/no facts) are genuinely different shapes of data — a real interactive story needs both.' },
     ],
     realWorld: 'Every real e-commerce cart is an array of items plus a set of named flags ("giftWrapped", "expressShipping") — exactly this chapter\'s two data shapes, doing real work. Minecraft\'s own inventory (an ordered list of slots) plus achievement flags (has this player found diamonds yet?) is the same split.',
