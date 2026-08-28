@@ -782,6 +782,32 @@ const MISSIONS = [
       intro: 'Same trick, one more place value (32). Work from the biggest card down: does 32 fit into 45? Does 16 fit into what\'s left? Keep going.' },
   },
   {
+    // New teaching content: introduces "byte" concretely (8 bits, all
+    // flipped on = the biggest number 8 bits can hold) — ties directly
+    // back to Foundations 1's storage-units theory (comp-p3/comp-p4).
+    id: 'cards-byte', type: 'cards', phase: 'FOUNDATIONS 2 · BINARY', emoji: '📦', title: 'One Byte, Maxed Out', xp: 35,
+    brief: 'A byte is exactly 8 bits. Flip every single card face-up — the biggest number one whole byte can ever hold.',
+    api: [],
+    cards: { mode: 'match', values: [128, 64, 32, 16, 8, 4, 2, 1], target: 255,
+      intro: 'Eight cards this time — one full byte. Flip ALL of them face-up (every bit is a 1) and see what the maximum possible value actually is.' },
+  },
+  {
+    // Harder, and new: reasoning about HOW MANY bits a number needs,
+    // rather than just building one specific number — a genuine
+    // comparison/estimation skill, not a lookup.
+    id: 'bits-needed', type: 'data', phase: 'FOUNDATIONS 2 · BINARY', emoji: '📏', title: 'How Many Bits Do You Need?', xp: 35,
+    brief: 'A one-byte (8-bit) signal can only ever hold 0 to 255. Which of these two numbers would OVERFLOW a single byte and need a second byte to store: 200, or 400? answer() the one that overflows.',
+    api: ['answer(value)'],
+    dataTitle: 'Two Signals', dataFields: ['a', 'b'],
+    data: [{ a: 200, b: 400 }],
+    starter: {
+      py: 'a = 200\nb = 400\n# One byte holds 0-255. TODO: answer() whichever value (a or b) is TOO BIG to fit in one byte\n',
+      ps: 'a ← 200\nb ← 400\n// One byte holds 0-255. TODO: answer() whichever value (a or b) is TOO BIG to fit in one byte\n',
+    },
+    answer: 400,
+    stars: { metric: 'pass' },
+  },
+  {
     id: 'p0m1', type: 'data', phase: 'FOUNDATIONS 2 · BINARY', emoji: '🔢', title: 'Denary to Binary', xp: 30,
     brief: 'Before you can pilot anything, every system runs on <b>binary</b>. Convert the denary number below into binary (no "0b" prefix) and report it with <b>answer(value)</b>.',
     api: ['answer(value)'],
@@ -3694,6 +3720,12 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   // g9-cpu-model concept ("W1 · The Human Computer"), which already
   // matched this topic closely.
   'learn-computer': 'g9-cpu-model', 'comp-p1': 'g9-cpu-model', 'comp-p2': 'g9-cpu-model', 'comp-p3': 'g9-cpu-model', 'comp-p4': 'g9-cpu-model',
+  // Foundations 2 — Binary (Unplugged) — previously had NO mapping at all
+  // (not in this override, and 'cards'/'learn' don't match the phase-
+  // prefix fallback below), so completing them never counted toward any
+  // progress metric. Fixed alongside adding the 2 new missions here.
+  'learn-binary': 'g9-binary', 'cards-make': 'g9-binary', 'cards-add': 'g9-binary', 'cardsboss': 'g9-binary',
+  'cards-byte': 'g9-binary', 'bits-needed': 'g9-binary',
   p0m1: 'g9-binary', p0m2: 'g9-binary', 'learn-images': 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
   'learn-flowcharts': 'g9-flowcharts-loops', 'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops', 'flow-build': 'g9-flowcharts-loops', 'flow-code': 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
@@ -3795,7 +3827,7 @@ const TIERS = [
   // BEFORE variables or any coding is introduced. Directly requested:
   // don't teach coding before the underlying idea (binary) is understood
   // on its own terms; save actual piloting/coding for Semester 2.
-  { name: '🃏 FOUNDATIONS 2 · BINARY (UNPLUGGED) — no code yet, just the idea', ids: ['learn-binary', 'cards-make', 'cards-add', 'cardsboss'] },
+  { name: '🃏 FOUNDATIONS 2 · BINARY (UNPLUGGED) — no code yet, just the idea', ids: ['learn-binary', 'cards-make', 'cards-add', 'cardsboss', 'cards-byte', 'bits-needed'] },
   { name: '📘 FOUNDATIONS 3 · YOUR FIRST CODE', ids: ['learn-cb', 'cb1', 'cb2', 'cb3', 'cb4'] },
   { name: '🏆 FOUNDATIONS 3 CAPSTONE', ids: ['cbboss'] },
   { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'learn-datatypes', 'p0m5', 'p0m6'] },
