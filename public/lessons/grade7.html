@@ -2003,6 +2003,54 @@ const WORLDS = [
       check:(log) => log.hasIf && log.texts >= 4,
     },
   ]},
+  // ── Security Lab — genuine online-safety/digital-citizenship content,
+  // taught through the SAME Page/Variables/Control blocks as Story Studio —
+  // no new engine feature needed. Placed right before the Year Capstone:
+  // "protect what you built" fits naturally just before shipping a game.
+  // Real content: scam emails, stranger-danger in game chat, phishing
+  // "free skins" links — genuinely common things a 12-14 year old gamer
+  // actually encounters, not invented scenarios.
+  { id:'gsafe', name:'🛡️ Security Lab — Spot the Scam', sub:'Real online safety: scam messages, stranger danger, and phishing links', live:true, stages:[
+    { id:'gsafes1', name:'Too Good to Be True', xp:30, type:'page',
+      text:`<strong>Challenge 1</strong> — A message pops up: "Congratulations! You've won 10,000 free V-Bucks — click here to claim!" Add a heading titled your page, a variable called <code>isScam</code> set to true, an if/else block checking it, and a paragraph explaining WHY a surprise free prize from nowhere is a classic scam sign.`,
+      hints:[
+        'Variables → set isScam to → true (a free prize you never entered to win IS the red flag).',
+        'Control → if isScam → then show one paragraph, else show another.',
+        'The #1 real rule: nobody gives away expensive stuff for free to random strangers online.',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsVar:true, needsIf:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.hasVar && log.hasIf,
+    },
+    { id:'gsafes2', name:'Strangers Never Need Your Address', xp:30, type:'page',
+      text:`<strong>Challenge 2</strong> — Someone you only know from an online game asks for your home address to "send you a prize". Build a page with a heading, a variable <code>knowsThemInRealLife</code>, an if/else checking it, and a paragraph on why real name, school, and address should NEVER go to someone you only know from a game — even a friendly one.`,
+      hints:[
+        'Variables → set knowsThemInRealLife to → false.',
+        'Control → if knowsThemInRealLife → then "maybe OK to discuss with a trusted adult", else "never share personal info".',
+        'Being friendly in chat does not mean someone actually is who they say they are.',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsVar:true, needsIf:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.hasVar && log.hasIf,
+    },
+    { id:'gsafes3', name:'The "Free Skins" Trap', xp:35, type:'page',
+      text:`<strong>Challenge 3</strong> — A website promises free skins or in-game currency if you "log in with your real game account" first. Build a page with a heading, a variable <code>isOfficialSite</code>, an if/else, and a paragraph explaining that these sites exist to STEAL your real password, not give you anything free.`,
+      hints:[
+        'Variables → set isOfficialSite to → false.',
+        'Control → if isOfficialSite → then "safe to log in", else "never enter your real password here".',
+        'A genuine, extremely common real scam — entering your password on a fake site hands it straight to whoever made that site.',
+      ],
+      needsHeadings:1, needsParagraphs:1, needsVar:true, needsIf:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.hasVar && log.hasIf,
+    },
+    { id:'gsafeboss', name:'BOSS — Build a Scam Checker', xp:65, type:'page', boss:true,
+      text:`<strong>BOSS</strong> — Combine everything: a heading, TWO variables (e.g. <code>isFromStranger</code> and <code>offersFreeStuff</code>), an if/else combining them, and at least 2 paragraphs — one explaining the verdict, one explaining the real reason why.`,
+      hints:[
+        'This is every idea from gsafes1-gsafes3, combined into one "scam checklist" page.',
+        'Two variables, ONE if/else that considers both — nothing new, just assembly.',
+      ],
+      needsHeadings:1, needsParagraphs:2, needsVar:true, needsVar2:true, needsIf:true,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.hasVar && (log.varCount || 0) >= 2 && log.hasIf,
+    },
+  ]},
   { id:'g10', name:'🏆 G10 — Design & Capstone', sub:'Plan → build → test → ship YOUR game', live:true, stages:[
     { id:'g10s1', name:'Design Your Game', xp:60,
       text:`<strong>Challenge 1 — Plan It First</strong> — Before building, decide: what's your game called? What does the player control? What's the win condition? Sketch it with a function that draws your title screen, and a variable for your win condition (a score target, a timer, or a boss health value).`,
@@ -2416,6 +2464,28 @@ const CHALLENGE_LESSON = {
     <div class="cl-block"><h4>Looping through structured data</h4>
       <p><code>for (i = 0; i < scores.length; i++) { text(scores[i].name + ": " + scores[i].score, ...) }</code> — a loop that reads each entry's name AND score together, drawing one line per entry. This exact pattern (loop + structured data + text) is how every leaderboard in every real game works.</p></div>` },
 
+  // ── Security Lab — real online-safety content ───────────────────────────────
+  gsafes1: { title: 'A surprise free prize is the #1 real scam sign', html: `
+    <div class="cl-block"><h4>If it sounds too good to be true, it usually is</h4>
+      <p>Real companies do not give away expensive prizes to random strangers who never entered anything. A message promising free in-game currency "just for clicking" is designed to get you to click a dangerous link — the free prize is the bait, not a real gift.</p></div>
+    <div class="cl-block"><h4>The variable IS the decision</h4>
+      <p><code>isScam</code> holding true, checked by a real if/else, is exactly how a real spam filter works underneath — a rule checking a red flag, then acting on it.</p></div>` },
+  gsafes2: { title: 'Friendly in chat does not mean safe in real life', html: `
+    <div class="cl-block"><h4>Real name, school, and address are never needed to play a game</h4>
+      <p>Someone you only know from an online game has NO real reason to need your address, your school, or your real name — asking for these is a genuine, common red flag, even if they seem friendly.</p></div>
+    <div class="cl-block"><h4>People online are not always who they say they are</h4>
+      <p>A stranger can claim to be any age, anywhere — there is no way to verify this over game chat, which is exactly why personal details should never depend on trusting a claim you cannot check.</p></div>` },
+  gsafes3: { title: 'A "free skins" site exists to steal your password', html: `
+    <div class="cl-block"><h4>The real target is your login, not giving you a gift</h4>
+      <p>Sites promising free skins/currency in exchange for "logging in with your real account" are built to capture your actual password the instant you type it — a genuinely common, real scam pattern aimed specifically at gamers.</p></div>
+    <div class="cl-block"><h4>Only the real, official site or app is ever safe</h4>
+      <p>If a deal seems available ANYWHERE except the game's own official site or app, that is itself the warning sign — legitimate offers do not route through random third-party pages.</p></div>` },
+  gsafeboss: { title: 'BOSS — combining every red flag into one real check', html: `
+    <div class="cl-block"><h4>Real scam detection checks MULTIPLE signals at once</h4>
+      <p>A stranger AND a free offer together is a stronger warning than either alone — combining two variables in one if/else genuinely mirrors how real spam/scam filters weigh several signals together, not just one.</p></div>
+    <div class="cl-block"><h4>Nothing new — just this week's real-world judgment, assembled</h4>
+      <p>Every idea here came from gsafes1-gsafes3 — the actual skill this boss tests is recognising these patterns together in one realistic scenario, exactly like a real situation would present them.</p></div>` },
+
   // ── G10 — Design & Capstone ───────────────────────────────────────────────────
   g10s1: { title: 'Planning BEFORE building', html: `
     <div class="cl-block"><h4>A clear win condition is easier to build AND test</h4>
@@ -2590,6 +2660,9 @@ const G7_MODULE_CONCEPT = {
   // their own (also added when sc1-sc5 were built; same previously-missing
   // problem as Story Studio above).
   SC1: 'g7-variables', SC2: 'g7-variables', SC3: 'g7-keyboard', SC4: 'g7-variables', SC5: 'g7-conditionals',
+  // Security Lab — genuinely new territory (online safety/digital
+  // citizenship, not a game-programming skill), own concept.
+  GSAFE: 'g7-online-safety',
 }
 // G5 (Player Control) splits across two concepts depending on the challenge.
 const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }

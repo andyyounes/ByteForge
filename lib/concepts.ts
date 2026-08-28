@@ -61,6 +61,13 @@ export const CONCEPTS: Concept[] = [
   { id:'g7-web-structure',   name:'Story Studio — Structure & Style', icon:'📰', color:'#16a34a', tier:10, xGroup:3, prerequisites:[], difficulty:1, gradeMin:7, estimatedMinutes:60, learningModes:['grade7','canvas-code'], tags:['grade7','web'], lessonUrl:'/lessons/grade7.html' },
   { id:'g7-web-interactive', name:'Story Studio — Behaviour & Logic', icon:'👆', color:'#ca8a04', tier:11, xGroup:4, prerequisites:['g7-web-structure'], difficulty:2, gradeMin:7, estimatedMinutes:75, learningModes:['grade7','canvas-code'], tags:['grade7','web'], lessonUrl:'/lessons/grade7.html' },
 
+  // Security Lab — genuine online-safety/digital-citizenship content (scam
+  // emails, stranger-danger in game chat, phishing "free skins" links),
+  // taught through real variables/if-else logic (Page blocks), not a new
+  // engine feature. Placed right before the Year Capstone, since "protect
+  // what you built" fits naturally just before shipping a final game.
+  { id:'g7-online-safety', name:'Security Lab — Spot the Scam', icon:'🛡️', color:'#dc2626', tier:12, xGroup:9, prerequisites:['g7-web-interactive'], difficulty:2, gradeMin:7, estimatedMinutes:60, learningModes:['grade7','canvas-code'], tags:['grade7','safety'], lessonUrl:'/lessons/grade7.html' },
+
   // ══════════════════════════════════════════════════════════════════════════
   //  GRADE 8 — "The App Builder" — 10 modules (M1-M10), mirroring grade8.html's
   //  own MODULES array. Only 2 of these 10 concepts existed before — the other
