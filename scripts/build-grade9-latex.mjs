@@ -39,7 +39,7 @@ const SECTION_COLOR = {
 
 const DECKS = {
   f1: { section:'foundations', emoji:'🖥️', name:'Foundations 1 — What Is a Computer?', sub:'CPU, RAM, storage, input/output — the real physical parts',
-    missions:['Learn: What Is a Computer?','RAM or Storage?','Input, Process, or Output?'],
+    missions:['Learn: What Is a Computer?','RAM or Storage?','Input, Process, or Output?','Storage Unit Conversion','Pick the Right Storage'],
     concepts:[
       { h:'A computer is really just 4 jobs', bullets:[
         'INPUT --- getting information IN (keyboard, mouse, a sensor)',
@@ -57,6 +57,16 @@ const DECKS = {
         'Billions of tiny operations every second, but each one is dead simple',
         '"Smart" behaviour is really just A LOT of simple steps, very fast',
       ] },
+      { h:'Storage units --- each one is 1024x the last', bullets:[
+        '8 bits = 1 byte --- enough to store one single character',
+        '1024 bytes = 1 KB, 1024 KB = 1 MB, 1024 MB = 1 GB, 1024 GB = 1 TB',
+        'A text message: a few hundred bytes. A phone photo: a few MB. A whole phone: measured in GB',
+      ] },
+      { h:'Not all storage devices work the same way', bullets:[
+        'HDD --- a spinning magnetic disk, cheap and large, but slower with moving parts that wear out',
+        'SSD --- NO moving parts, genuinely faster and more reliable, usually costs more per GB',
+        'Cloud --- not really a different type at all, just storage in someone else\'s data centre, reached over the internet',
+      ] },
     ],
     images: [
       { file:'cpu.jpg', caption:'A real CPU --- hundreds of gold pins, each one carrying a real electrical signal in or out.', credit:'CPU photo --- Poooow, public domain, via Wikimedia Commons' },
@@ -68,7 +78,7 @@ const DECKS = {
       'List 3 things your phone does that are pure OUTPUT, and 3 that are pure INPUT. Is anything genuinely both at once (hint: a touchscreen)?'] },
 
   f2: { section:'foundations', emoji:'🃏', name:'Foundations 2 — Binary (Unplugged)', sub:'What is binary? Transistors, addition, and the classic binary cards',
-    missions:['Learn: What Is Binary?','Binary Cards --- Make the Number','Binary Cards --- Addition','BOSS: Bigger Numbers'],
+    missions:['Learn: What Is Binary?','Binary Cards --- Make the Number','Binary Cards --- Addition','BOSS: Bigger Numbers','One Byte, Maxed Out','How Many Bits Do You Need?'],
     concepts:[
       { h:'A transistor is a tiny ON/OFF switch', bullets:[
         'Billions of these inside every chip --- each one is either ON or OFF, nothing in between',
@@ -84,6 +94,16 @@ const DECKS = {
         '1 + 1 in one place = 0, carry 1 to the next place --- same idea as carrying in denary addition',
         'The card trick makes this physical: flip cards until their total matches the target number',
       ] },
+      { h:'A byte, maxed out --- 8 bits, all set to 1', bullets:[
+        '8 cards this time (128, 64, 32, 16, 8, 4, 2, 1) --- one whole byte',
+        'Flip EVERY card face-up: 128+64+32+16+8+4+2+1 = 255',
+        '255 is the biggest number a single byte can EVER hold --- ties directly to Foundations 1\'s storage units',
+      ] },
+      { h:'Some numbers need MORE bits than others', bullets:[
+        'One byte (8 bits) holds 0 to 255, no further',
+        'A number like 400 genuinely will not fit --- it needs a second byte',
+        'Bigger numbers are not just "bigger" --- they can outgrow the space you gave them',
+      ] },
     ],
     images: [
       { file:'cards.jpg', caption:'Real playing cards fanned out --- the same "flip to include, hide to exclude" idea as the binary cards activity.', credit:'Playing cards --- Imager Visioner, public domain, via Wikimedia Commons' },
@@ -94,7 +114,7 @@ const DECKS = {
       'Find a real switch in the room that is genuinely binary (only 2 states) and one that is NOT (has a range). What tells them apart?'] },
 
   f3: { section:'foundations', emoji:'📘', name:'Foundations 3 — Your First Code', sub:'Variables, text vs. numbers, arithmetic --- starting from absolute zero',
-    missions:['Learn: What Is a Variable?','Store a Number','What Kind of Value?','Do the Math','Combine Two Texts'],
+    missions:['Learn: What Is a Variable?','Store a Number','What Kind of Value?','Do the Math','Combine Two Texts','A Variable Can Change','True or False?'],
     concepts:[
       { h:'A variable is a labelled box, nothing more', bullets:[
         'It stores ONE value so your code can use it again later',
@@ -110,6 +130,16 @@ const DECKS = {
         'Numbers: `4 + 7` genuinely adds --- gives you `11`',
         'Text: `"Systems " + "Online"` STICKS them together --- gives you `"Systems Online"`',
         'Same symbol, completely different job, depending on the type',
+      ] },
+      { h:'A variable is not stuck with its first value', bullets:[
+        '`health = 100`, then LATER `health = health - 30`',
+        'The new value REPLACES the old one --- health now holds 70, permanently',
+        'This is exactly what the boss mission needs: store, THEN update',
+      ] },
+      { h:'A comparison hands back True or False, not a number', bullets:[
+        '`score >= 50` is not a number --- it evaluates to a Boolean',
+        '`passed = score >= 50` stores that True/False result, just like any other value',
+        'This is the exact idea Foundations 4\'s AND/OR/NOT build on next',
       ] },
     ],
     images: [
