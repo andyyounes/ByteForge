@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 7 — Teacher Presentations</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; height:100%; background:#0b0d16; color:#e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow:hidden; }
+
+  /* ── Picker bar ─────────────────────────────────────────────────────── */
+  #picker-bar { position:fixed; top:0; left:0; right:0; height:56px; z-index:50;
+    display:flex; align-items:center; gap:12px; padding:0 16px;
+    background:#0f1220; border-bottom:1px solid #1f2437; }
+  #picker-bar select { background:#161a2c; color:#e5e7eb; border:1px solid #2a3050; border-radius:8px;
+    padding:8px 12px; font-size:14px; font-weight:700; flex:1; max-width:520px; }
+  #picker-bar .brand { font-weight:900; letter-spacing:.5px; color:#67e8f9; font-size:14px; white-space:nowrap; }
+  #picker-bar button { background:#161a2c; color:#e5e7eb; border:1px solid #2a3050; border-radius:8px;
+    padding:8px 14px; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
+  #picker-bar button:hover { background:#1f2437; }
+  #picker-bar a.map-link { margin-left:auto; color:#67e8f9; text-decoration:none; font-size:13px; font-weight:800; }
+
+  /* ── Deck stage ─────────────────────────────────────────────────────── */
+  #stage { position:fixed; top:56px; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; }
+  .slide { display:none; width:min(1000px, 92vw); max-height:82vh; overflow:auto; padding:48px 56px;
+    animation: slideIn .25s ease; }
+  .slide.active { display:block; }
+  @keyframes slideIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
+
+  .s-emoji { font-size:64px; line-height:1; margin-bottom:18px; }
+  .s-kicker { font-size:13px; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:#67e8f9; margin-bottom:10px; }
+  .s-title { font-size:clamp(28px, 4vw, 44px); font-weight:900; line-height:1.15; margin:0 0 14px; }
+  .s-sub { font-size:18px; color:#9ca3af; line-height:1.5; margin:0; }
+  .s-body p { font-size:20px; line-height:1.6; color:#d1d5db; margin:0 0 18px; }
+  .s-body code { background:#161a2c; border:1px solid #2a3050; border-radius:5px; padding:1px 7px; font-size:.92em; color:#67e8f9; }
+  .s-body strong, .s-body b { color:#f0f9ff; }
+
+  .plan-list { list-style:none; margin:26px 0 0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .plan-list li { display:flex; align-items:center; gap:14px; font-size:19px; font-weight:700; color:#e5e7eb;
+    background:#12162a; border:1px solid #232a48; border-radius:10px; padding:14px 18px; }
+  .plan-list li .n { width:28px; height:28px; border-radius:50%; background:#1e293b; color:#67e8f9; font-size:13px;
+    display:flex; align-items:center; justify-content:center; font-weight:900; flex-shrink:0; }
+  .plan-list li.boss { border-color:#f59e0b55; background:#1c150a; }
+  .plan-list li.boss .n { background:#78350f; color:#fbbf24; }
+
+  .outro-cta { margin-top:28px; display:inline-flex; align-items:center; gap:10px; background:#0e2a2e; border:1px solid #134e4a;
+    color:#5eead4; font-weight:900; font-size:16px; padding:14px 22px; border-radius:12px; }
+
+  /* ── Nav controls ───────────────────────────────────────────────────── */
+  #nav { position:fixed; bottom:18px; left:0; right:0; display:flex; align-items:center; justify-content:center; gap:16px; z-index:40; }
+  #nav button { background:#161a2c; color:#e5e7eb; border:1px solid #2a3050; border-radius:99px; width:44px; height:44px;
+    font-size:18px; cursor:pointer; }
+  #nav button:hover { background:#1f2437; }
+  #nav button:disabled { opacity:.3; cursor:default; }
+  #nav .count { font-size:13px; font-weight:800; color:#9ca3af; min-width:64px; text-align:center; }
+  #progress { position:fixed; top:56px; left:0; height:3px; background:#67e8f9; z-index:41; transition:width .2s; }
+
+  ::-webkit-scrollbar { width:8px; }
+  ::-webkit-scrollbar-thumb { background:#2a3050; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<div id="picker-bar">
+  <span class="brand">🎓 ByteForge — Grade 7</span>
+  <select id="chapter-select" onchange="loadDeck(this.value)"></select>
+  <button onclick="prevSlide()" title="Previous (←)">◀</button>
+  <button onclick="nextSlide()" title="Next (→ / Space)">▶</button>
+  <a class="map-link" href="grade7.html" target="_blank">Open student map ↗</a>
+</div>
+<div id="progress"></div>
+
+<div id="stage"></div>
+
+<div id="nav">
+  <button id="prev-btn" onclick="prevSlide()">◀</button>
+  <span class="count" id="slide-count">1 / 1</span>
+  <button id="next-btn" onclick="nextSlide()">▶</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════
+// Grade 7 — Teacher Presentations
+//
+// One short (~8-10 min) front-of-class deck per Game Maker chapter, meant to
+// be shown BEFORE students open grade7.html and start the hands-on practice.
+// Content is drawn directly from CHALLENGE_LESSON in grade7.html (the same
+// explanations already taught in-app) so the classroom talk and the platform
+// stay consistent — this isn't separate content, it's the same pedagogy
+// condensed into a talk-through-it-first format.
+//
+// Each deck: title slide -> "today's plan" (one line per stage) -> one
+// concept slide per stage (headline + short takeaway) -> a closing slide
+// pointing students at the real hands-on practice in the map.
+// ══════════════════════════════════════════════════════════════════════════
+
+const DECKS = {
+  st1: { emoji:'📰', name:'Story Studio 1 — Page Basics', sub:'Headings, paragraphs, links, buttons — the tags every page starts with',
+    stages:['Front Page','Say More','Chapter One','Read More','Call to Action'], boss:'Ship the Front Page',
+    concepts:[
+      { h:'A heading is a page\'s title', p:'One big title, shown once near the top — the ONE thing that tells a reader what this whole page is about. This is what a real webpage\'s &lt;h1&gt; does.' },
+      { h:'A paragraph is the body of the page', p:'If the heading is the title, the paragraph is everything you actually want to SAY. Blocks run top to bottom — so does the page.' },
+      { h:'One paragraph per idea', p:'Good writing breaks text into separate paragraphs — one per idea — rather than one giant block. That\'s what makes a page skimmable.' },
+      { h:'A link connects one page to another', p:'Every link needs two things: the text someone clicks, and the address it goes to. Links are what turn separate pages into a connected site.' },
+      { h:'A button invites an action', p:'A link takes you somewhere else; a button triggers something HERE. Right now it does nothing yet — that comes next week.' },
+      { h:'BOSS — every block, one real page', p:'Heading → paragraphs → link → button is close to the actual shape of a huge number of real websites.' },
+    ] },
+  st2: { emoji:'🎨', name:'Story Studio 2 — Style It', sub:'Background, heading colour, alignment, font size — CSS for your page',
+    stages:['Paint the Page','Title Colour','Center Stage','Readable Text'], boss:'Style the Front Page',
+    concepts:[
+      { h:'Content vs. style — two different jobs', p:'Last week\'s blocks decided WHAT is on the page. This week\'s Style blocks decide how it LOOKS — colours, alignment, size.' },
+      { h:'A style rule can target ONE kind of block', p:'"Set heading colour" only changes headings — paragraphs stay whatever colour they already were. A targeted rule, not a blanket one.' },
+      { h:'Alignment is a choice, not a colour', p:'Unlike colour, alignment only has a few real choices — left, center, right. Centered paragraphs are actually harder to read line-by-line.' },
+      { h:'Font size affects real readability', p:'Text that\'s too small is a genuine accessibility problem — real design guidelines set a minimum readable size (commonly 16px).' },
+      { h:'BOSS — HTML gives structure, CSS gives style', p:'Unlike HTML tags, CSS rules apply no matter when you set them — style first or last, the result is identical.' },
+    ] },
+  st3: { emoji:'👆', name:'Story Studio 3 — Make It Click', sub:'onclick — a button that actually does something when pressed',
+    stages:['Click to Reveal','Click for More','Both at Once','Button Talks Back'], boss:'The Big Reveal',
+    concepts:[
+      { h:'onclick — code that waits for a click', p:'Every block before this ran the instant you pressed ▶ Run. "When button is clicked" waits, doing nothing, until a real click happens.' },
+      { h:'The same event, a different action', p:'The event ("when clicked") stays the same — what happens inside it is entirely up to you.' },
+      { h:'One event, multiple actions', p:'Anything placed inside "when clicked" all runs together, in order, from a single click — no limit to how many blocks you can stack.' },
+      { h:'A button can change itself', p:'It\'s easy to assume a button can only affect OTHER things — but it can just as easily change its own label.' },
+      { h:'BOSS — structure, style, and behaviour', p:'Week 1 gave structure, Week 2 gave style, Week 3 gives BEHAVIOUR — the same three-part split every real website is built from.' },
+    ] },
+  st4: { emoji:'🧠', name:'Story Studio 4 — Remember Things', sub:'Variables — a story that remembers the reader\'s choice',
+    stages:['Remember the Choice','Two Details, One Story','The Choice Updates'], boss:'The Choice Remembered',
+    concepts:[
+      { h:'A variable is a box with a name', p:'A named box holding a value your code can reuse, combine, or change later — the same code works no matter what\'s stored inside.' },
+      { h:'Multiple variables, remembered together', p:'A real interactive story remembers MANY details — which item they picked, which room they\'re in, how much health they have.' },
+      { h:'A variable is a box that can CHANGE', p:'health ← health − 20 reads the current value, subtracts 20, then stores the result back — that\'s what makes a variable useful for a story.' },
+      { h:'BOSS — a page that remembers', p:'HTML gave structure, CSS gave style, onclick gave behaviour — variables give the page MEMORY.' },
+    ] },
+  st5: { emoji:'🔀', name:'Story Studio 5 — Choose a Path', sub:'if/else — a story that branches on the reader\'s choice',
+    stages:['Two Endings','Three Paths','Branch on the Click'], boss:'Your Story, Your Ending',
+    concepts:[
+      { h:'A variable is only useful if something CHECKS it', p:'A variable stores a choice; IF/ELSE is what actually MAKES that choice matter — without a branch, every choice would look the same.' },
+      { h:'else if — a genuine third path', p:'Conditions are checked top to bottom, and the FIRST one that\'s true wins — order matters when ranges overlap.' },
+      { h:'Branching on a value THAT JUST CHANGED', p:'Update the variable first, THEN check it — get the order backwards and the branch is always one click behind reality.' },
+      { h:'BOSS — the whole semester, one real page', p:'Structure, style, behaviour, memory, decisions — a real interactive story needs genuinely all five.' },
+    ] },
+  sc1: { emoji:'🕹', name:'Block Arcade 1 — Sprites & the Stage', sub:'Every sprite lives at an (x, y) — coordinates in blocks',
+    stages:['Meet Your Sprite','Two Sprites, Two Corners'], boss:'Place Your Cast',
+    concepts:[
+      { h:'A sprite is just a shape at a position', p:'A "sprite" is any character or object on the stage — under the hood, it\'s a position (x, y) plus something drawn there.' },
+      { h:'Naming positions makes them easier to reason about', p:'"Top-left" and "bottom-right" are shorthand for specific (x,y) values — translating a description into coordinates is a skill you\'ll use constantly.' },
+      { h:'BOSS — three sprites, three positions', p:'Same skill, just repeated — real Scratch projects often start with exactly this.' },
+    ] },
+  sc2: { emoji:'🕹', name:'Block Arcade 2 — Motion & Repeat', sub:'"Repeat" blocks — do something several times without copy-pasting',
+    stages:['Repeat 3 Times','Marching Line'], boss:'Bouncing Sprite',
+    concepts:[
+      { h:'Repeat — do it without repeating yourself', p:'"Repeat 3" scales — drawing 30 sprites by hand would mean 30 blocks, while a repeat block handles any number.' },
+      { h:'A variable changing INSIDE a loop', p:'Changing x by 80 each pass through the loop is what actually spaces the sprites out.' },
+      { h:'BOSS — movement is a variable changing every frame', p:'"On every frame" is a repeat block that never stops. That\'s genuinely what ALL motion in ALL games actually is.' },
+    ] },
+  sc3: { emoji:'🕹', name:'Block Arcade 3 — Events', sub:'Keys are events — the stage reacts to what the player presses',
+    stages:['Press to Move','Jump on Space'], boss:'Full Control',
+    concepts:[
+      { h:'Checking a key is a question, asked every frame', p:'Placed inside "on every frame", a key check is asked 60 times a second — that\'s what makes a held-down key feel like smooth movement.' },
+      { h:'Any key can trigger any action', p:'Space isn\'t special — it\'s just another key. What makes it feel like a "jump" is purely what you put inside the if.' },
+      { h:'BOSS — four keys, four directions', p:'Each arrow key gets its OWN separate if — pressing two at once genuinely moves the sprite diagonally, for free.' },
+    ] },
+  sc4: { emoji:'🕹', name:'Block Arcade 4 — Variables', sub:'Score and lives — numbers the game tracks and shows the player',
+    stages:['Score Counter','Score Goes Up'], boss:'Score & Lives HUD',
+    concepts:[
+      { h:'A variable the PLAYER can see', p:'A score no one can see isn\'t really a score to the player — drawing it every frame turns an internal number into a real scoreboard.' },
+      { h:'Redrawing every frame keeps the display current', p:'Because the display re-reads the variable fresh every frame, it always shows whatever score currently IS.' },
+      { h:'BOSS — a real two-stat HUD', p:'Score AND lives, shown together, is genuinely what almost every simple arcade game\'s display actually is.' },
+    ] },
+  sc5: { emoji:'🕹', name:'Block Arcade 5 — If/Else', sub:'Rules that check a condition — a wall, an edge, a win',
+    stages:['Touching the Edge','Win Message'], boss:'Game Rules',
+    concepts:[
+      { h:'A rule that only fires past a threshold', p:'There\'s no special "edge" concept in code — "x > 400" IS the edge. Any boundary in a real game is built from exactly this.' },
+      { h:'IF can replace what\'s shown, not just add to it', p:'"You Win!" and the running score are in different branches of the same if/else — only one is ever drawn on a given frame.' },
+      { h:'BOSS — every Block Arcade idea, one sprite', p:'Coordinates, loops, key events, variables, if/else — every idea combines here into something genuinely close to a tiny real game.' },
+    ] },
+  g1: { emoji:'🚀', name:'G1 — Sprite Start', sub:'Coordinates, sequences — draw and move your first sprite',
+    stages:['First Sprite','Four Corners','Rectangle Room','Three in a Row'], boss:'Sprite Follows You',
+    concepts:[
+      { h:'Coordinates — every sprite has an (x, y)', p:'x (how far right), y (how far down) — y grows DOWN, the opposite of a maths graph. Everything you build this year comes back to these two numbers.' },
+      { h:'Reading coordinates precisely', p:'"Draw 4 things" and "draw 4 things in specific places" are very different tasks — real challenges almost always care about WHERE, not just how many.' },
+      { h:'Rectangles need FOUR numbers, not two', p:'A rectangle needs a position AND a size (width, height) — four numbers instead of a circle\'s three.' },
+      { h:'Sequence — same Y, different X', p:'Three shapes "in a line" means one coordinate stays the SAME while the other changes — a huge amount of real layout is exactly this.' },
+      { h:'BOSS — coordinates that update every frame', p:'"On every frame" re-runs its contents dozens of times a second — clear, then redraw, every frame, is the engine behind every animated game.' },
+    ] },
+  g2: { emoji:'🎚', name:'G2 — Variables & State', sub:'Score, health, timers — numbers that change',
+    stages:['Colour Square','Growing Circle','Health Bar'], boss:'Clicker Upgrade',
+    concepts:[
+      { h:'Variables — a named box that can change', p:'r, g, b hold numbers 0-255 for red/green/blue — using a variable READS its value; only a "set"/"change" block updates it.' },
+      { h:'One variable, many uses', p:'Change size once, and every place that reads it shows the new value — that\'s the whole point of variables.' },
+      { h:'A variable driving TWO different things', p:'health drives a bar\'s WIDTH directly — the "one variable, automatically reflected in visuals" pattern behind every health/progress bar.' },
+      { h:'BOSS — a variable that changes over time', p:'A variable, a frame loop, and an IF working together — score only rises when Space is held.' },
+    ] },
+  g3: { emoji:'🚦', name:'G3 — Decisions', sub:'Touching? Score > 10? Out of bounds?',
+    stages:['Traffic Light','Big or Small','Danger Zone'], boss:'Dodge at the Edges',
+    concepts:[
+      { h:'IF/ELSE — choosing between paths', p:'An IF only runs when a condition is true. Chaining IF/ELSE IF/ELSE picks between three outcomes — only one branch ever runs.' },
+      { h:'Comparisons — greater than, not just equal', p:'"Bigger than 50" covers a whole RANGE. Deciding exactly where a boundary sits is a real, common source of bugs ("off-by-one" errors).' },
+      { h:'Combining a variable, IF, and drawing', p:'Comparing a changing value against a fixed threshold — the exact pattern you\'ll build on properly in G6, Collision & Physics.' },
+      { h:'BOSS — multiple IFs, one per key', p:'Each arrow key needs its OWN if — checking every single frame is what makes movement feel continuous, not jumpy.' },
+    ] },
+  g4: { emoji:'🧰', name:'G4 — My Blocks', sub:'jump(), shoot(), spawnEnemy() — powers you define',
+    stages:['spawnEnemy()','shoot()','powerUp()'], boss:'Platformer Vertical Slice',
+    concepts:[
+      { h:'Functions — reusable named blocks', p:'A function is defined ONCE with parameters, then CALLED many times with different values — one definition, many different outcomes.' },
+      { h:'A parameter that changes behaviour', p:'A true/false parameter can make the FUNCTION ITSELF decide what to draw, using an IF inside its own definition.' },
+      { h:'A text parameter, not just numbers', p:'Parameters can carry any type of value — numbers, true/false, or text — the function\'s job is always to use whatever was passed in.' },
+      { h:'BOSS — planning in pseudocode BEFORE building', p:'Writing the logic in plain English first is called pseudocode — real programmers do this constantly for anything fiddly, like jump physics.' },
+    ] },
+  g5: { emoji:'⌨️', name:'G5 — Player Control', sub:'Keyboard + mouse input schemes, aiming',
+    stages:['Move with Arrow Keys','Aim with the Mouse','Two-Player Split'], boss:'Top-Down Shooter Controls',
+    concepts:[
+      { h:'Keyboard input — four separate checks', p:'Checking all four arrow keys means four separate IF blocks — small changes every frame LOOK like smooth continuous movement.' },
+      { h:'Mouse position — always available, live', p:'mouseX()/mouseY() always report the CURRENT position, live — nothing to set or update, the engine tracks it automatically.' },
+      { h:'Two independent things, same frame loop', p:'Two players need two SEPARATE sets of variables — a single loop can control multiple independent things at once.' },
+      { h:'BOSS — networking scale: PAN → LAN → WAN', p:'A keyboard+mouse on one PC is a PAN; school wifi is a LAN; the whole internet is a WAN — same idea, three different scales.' },
+    ] },
+  g6: { emoji:'💥', name:'G6 — Collision & Physics', sub:'Hitboxes, bouncing, gravity, knockback',
+    stages:['Hitbox Check','Bounce & Gravity','Knockback'], boss:'Breakout Clone',
+    concepts:[
+      { h:'The distance formula — real Pythagoras', p:'dist = √((x2−x1)² + (y2−y1)²) — literally Pythagoras\' theorem, applied to two circle centres.' },
+      { h:'Gravity and bouncing — physics as a loop', p:'Increase velocity by a small amount EVERY frame to simulate gravity — no complicated physics engine needed.' },
+      { h:'Combining collision detection with movement', p:'"Detect, then react" — check for a condition (collision), then DO something as a direct result (bounce away).' },
+      { h:'BOSS — linear search through an array', p:'An array stores a whole list under one name — checking each item one at a time, in order, is called a linear search.' },
+    ] },
+  g7w: { emoji:'🎬', name:'G7 — Game States', sub:'Menu → playing → paused → game-over → win',
+    stages:['The State Variable','Switching States','Pause Overlay'], boss:'Full Game Loop w/ Screens',
+    concepts:[
+      { h:'A state is just a variable holding text', p:'What makes it a "state machine" is using IF/ELSE to draw a completely different screen depending on what the variable currently holds.' },
+      { h:'A condition that changes the state itself', p:'The game changes its own state variable based on a condition — this self-modifying behaviour is exactly how real games transition between screens.' },
+      { h:'A flag that gates everything else', p:'A true/false "paused" variable draws an overlay on top — whatever you draw LAST appears on top of everything drawn before it.' },
+      { h:'BOSS — a real, multi-state machine', p:'menu → playing → gameover, each transition triggered by a real condition — the exact pattern behind every real video game\'s screen flow.' },
+    ] },
+  g8: { emoji:'🤖', name:'G8 — Smart NPCs', sub:'Enemies that chase, flee, patrol; a rule-based chatbot',
+    stages:['Chase the Player','Patrol Pattern','Rule-Based Chatbot'], boss:'Enemy with 3 Behaviours',
+    concepts:[
+      { h:'"AI" made entirely of comparisons', p:'Comparing two positions and nudging one closer, every frame, creates the ILLUSION of hunting — there\'s no real intelligence, just a repeated comparison.' },
+      { h:'A direction variable that flips', p:'Storing "which way" as +1 or -1, flipped at a boundary, creates an endless back-and-forth patrol from one variable and two conditions.' },
+      { h:'Matching text — the simplest kind of "AI"', p:'A rule-based chatbot is just a chain of exact text comparisons, each with its own canned reply — genuinely what early chatbots were.' },
+      { h:'BOSS — rules vs. real machine learning', p:'Every behaviour here is a rule YOU wrote. Real ML is different: instead of a human writing rules, the system is shown examples and works out its OWN rules.' },
+    ] },
+  g9w: { emoji:'💬', name:'G9 — Strings & Dialogue', sub:'Player names, dialogue trees, high-score tables',
+    stages:['Player Name & ASCII','Dialogue Tree','Shout Mode'], boss:'RPG Dialogue Scene',
+    concepts:[
+      { h:'Strings — text is just data too', p:'Every character is secretly a number (ASCII) — "H" is 72, "A" is 65. Text and numbers aren\'t as different as they look.' },
+      { h:'Comparing text to branch a conversation', p:'=== works on text just like on numbers — the entire mechanism behind a dialogue tree: compare a choice, branch to different text.' },
+      { h:'String methods — transforming text', p:'.toUpperCase() returns a NEW version — it doesn\'t modify the original variable. String methods almost always hand back a new result.' },
+      { h:'BOSS — text, arrays, and a loop, together', p:'An array of {name, score} objects is a real, proper data table — looping through it is exactly how every leaderboard works.' },
+    ] },
+  g10: { emoji:'🏆', name:'G10 — Design & Capstone', sub:'Plan → build → test → ship YOUR game',
+    stages:['Design Your Game','Score & Win Screen'], boss:'Ship Your Own Game',
+    concepts:[
+      { h:'Planning BEFORE building', p:'A clear, checkable win condition ("reach 20 points") is easier to build AND test than a vague goal like "make it fun".' },
+      { h:'Live, updating feedback for the player', p:'Redrawing the score every frame means you never have to manually "update" the display — it always reflects the current value.' },
+      { h:'FINAL BOSS — everything from the whole year', p:'A state machine, player input, a win condition, and at least one function you define — every major idea, combined into a game YOU designed.' },
+      { h:'Playtest, then iterate', p:'Real developers ALWAYS playtest and adjust at least once — a first draft is rarely the final version.' },
+    ] },
+}
+
+const ORDER = ['st1','st2','st3','st4','st5','sc1','sc2','sc3','sc4','sc5','g1','g2','g3','g4','g5','g6','g7w','g8','g9w','g10']
+
+let currentDeckId = null
+let slideEls = []
+let currentIdx = 0
+
+function buildOptions() {
+  const sel = document.getElementById('chapter-select')
+  sel.innerHTML = ORDER.map(id => {
+    const d = DECKS[id]
+    return `<option value="${id}">${d.emoji} ${d.name}</option>`
+  }).join('')
+}
+
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
+
+function loadDeck(id) {
+  const d = DECKS[id]
+  if (!d) return
+  currentDeckId = id
+  try { localStorage.setItem('bf-g7-slides-last', id) } catch (e) {}
+  document.getElementById('chapter-select').value = id
+
+  const slides = []
+  // Title slide
+  slides.push(`
+    <div class="s-emoji">${d.emoji}</div>
+    <div class="s-kicker">Grade 7 · Game Maker</div>
+    <h1 class="s-title">${esc(d.name)}</h1>
+    <p class="s-sub">${esc(d.sub)}</p>`)
+  // Plan slide
+  const planItems = d.stages.map((s, i) => `<li><span class="n">${i + 1}</span> ${esc(s)}</li>`).join('')
+    + `<li class="boss"><span class="n">★</span> ${esc(d.boss)}</li>`
+  slides.push(`
+    <div class="s-kicker">Today's Plan</div>
+    <h1 class="s-title">What you'll build</h1>
+    <ul class="plan-list">${planItems}</ul>`)
+  // Concept slides
+  d.concepts.forEach(c => {
+    slides.push(`
+      <div class="s-kicker">Key Idea</div>
+      <h1 class="s-title">${esc(c.h)}</h1>
+      <div class="s-body"><p>${c.p}</p></div>`)
+  })
+  // Outro slide
+  slides.push(`
+    <div class="s-emoji">🚀</div>
+    <div class="s-kicker">Your Turn</div>
+    <h1 class="s-title">Now go build it for real</h1>
+    <p class="s-sub">Open the map, find <b>${esc(d.name)}</b>, and work through it hands-on — everything you just saw, you'll now do yourself.</p>
+    <div class="outro-cta">👉 Head to the student map and start this chapter</div>`)
+
+  const stage = document.getElementById('stage')
+  stage.innerHTML = slides.map((html, i) => `<div class="slide${i === 0 ? ' active' : ''}" data-i="${i}">${html}</div>`).join('')
+  slideEls = [...stage.querySelectorAll('.slide')]
+  currentIdx = 0
+  updateNav()
+}
+
+function updateNav() {
+  slideEls.forEach((el, i) => el.classList.toggle('active', i === currentIdx))
+  document.getElementById('slide-count').textContent = (currentIdx + 1) + ' / ' + slideEls.length
+  document.getElementById('prev-btn').disabled = currentIdx === 0
+  document.getElementById('next-btn').disabled = currentIdx === slideEls.length - 1
+  const pct = slideEls.length > 1 ? (currentIdx / (slideEls.length - 1)) * 100 : 0
+  document.getElementById('progress').style.width = pct + '%'
+}
+
+function nextSlide() { if (currentIdx < slideEls.length - 1) { currentIdx++; updateNav() } }
+function prevSlide() { if (currentIdx > 0) { currentIdx--; updateNav() } }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide() }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide() }
+})
+
+buildOptions()
+let startId = 'st1'
+try { const saved = localStorage.getItem('bf-g7-slides-last'); if (saved && DECKS[saved]) startId = saved } catch (e) {}
+loadDeck(startId)
+</script>
+</body>
+</html>
