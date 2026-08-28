@@ -52,7 +52,7 @@ const DECKS = {
       { h:'BOSS — every block, one real page', p:'Heading, paragraphs, link, button is close to the actual shape of a huge number of real websites.' },
     ],
     realWorld: 'Open any news homepage (BBC, a school website) together: point out the ONE big headline, the body paragraphs underneath, a "read more" link, and a "subscribe" button — the exact same four blocks students are about to use. In Minecraft terms: a crafting recipe book page has exactly this shape too — one item name (heading), a description (paragraph), and a "craft" button.',
-    image: { file: 'html5.png', credit: 'HTML5 logo — W3C / Patio, CC BY 3.0, via Wikimedia Commons' },
+    image: { file: 'html5.png', caption: 'The real tag this page-building block stands in for.', credit: 'HTML5 logo — W3C / Patio, CC BY 3.0, via Wikimedia Commons' },
     discoveries: [
       'Before opening the platform: in pairs, look at 2-3 real websites and list which parts are "heading", "paragraph", "link", or "button". Which pages break the "one heading" rule — and does it make them harder to read?',
       'Open Minecraft\'s recipe book (or a screenshot of one) — find its "heading" (item name), its "paragraph" (ingredients list), and anything that acts like a button. Does every page in the game follow this same shape?',
@@ -73,7 +73,7 @@ const DECKS = {
       { h:'BOSS — HTML gives structure, CSS gives style', p:'Unlike HTML tags, CSS rules apply no matter when you set them — style first or last, the result is identical.' },
     ],
     realWorld: 'Toggle a phone\'s font size / "reader mode" setting live, or compare a site with tiny 10px body text against one with proper 16px+ text — ask which one people would actually keep reading. Minecraft\'s own "resource packs" are exactly this idea at game-scale: the SAME blocks and items (the content), completely re-skinned to look different (the style).',
-    image: { file: 'css.png', credit: 'CSS logo — W3C, public domain, via Wikimedia Commons' },
+    image: { file: 'css.png', caption: 'The real language behind every Style block you just used.', credit: 'CSS logo — W3C, public domain, via Wikimedia Commons' },
     discovery: 'Find one website that centers a whole paragraph of body text (not a title). Read it aloud line by line — does the centering make it harder to follow? Why do titles get away with it but paragraphs don\'t?' },
   st3: { emoji:'👆', name:'Story Studio 3 — Make It Click', sub:'onclick — a button that actually does something when pressed',
     stages:['Click to Reveal','Click for More','Both at Once','Button Talks Back'], boss:'The Big Reveal',
@@ -90,7 +90,7 @@ const DECKS = {
       { h:'BOSS — structure, style, and behaviour', p:'Week 1 gave structure, Week 2 gave style, Week 3 gives BEHAVIOUR — the same three-part split every real website is built from.' },
     ],
     realWorld: 'Click an "Add to cart" button on a real shopping site — the label changing to "Added \\checkmark" or a counter updating is exactly this week\'s "button talks back" idea, live in production software. A Minecraft crafting-table "craft" button is the same: click it, and it visibly does something (moves items) right there.',
-    image: { file: 'js.png', credit: 'JavaScript logo — Chris Williams, public domain, via Wikimedia Commons' },
+    image: { file: 'js.png', caption: 'The real language behind onclick --- what you just built with blocks.', credit: 'JavaScript logo — Chris Williams, public domain, via Wikimedia Commons' },
     discovery: 'Find a button on any app or website that changes itself when clicked (a like button, a "show password" eye icon, a checkbox). What exactly changes — text, colour, icon? Nothing else on the page needs to change too.' },
   st4: { emoji:'🧠', name:'Story Studio 4 — Remember Things', sub:'Variables — a story that remembers the reader\'s choice',
     stages:['Remember the Choice','Two Details, One Story','The Choice Updates'], boss:'The Choice Remembered',
@@ -114,7 +114,7 @@ const DECKS = {
       { h:'BOSS — a page that remembers', p:'HTML gave structure, CSS gave style, onclick gave behaviour — variables give the page MEMORY.' },
     ],
     realWorld: 'Your shopping cart total, a video\'s "watched 12:34 of 20:00" progress, a game\'s remembered high score between sessions — every one of these is a variable persisting a value. Minecraft\'s hunger bar (20 drumsticks, dropping as you act, refilling as you eat) is a variable your character carries constantly.',
-    image: { file: 'ram.jpg', credit: 'RAM modules, public domain (PD-self), via Wikimedia Commons' },
+    image: { file: 'ram.jpg', caption: 'RAM is exactly this chapter\'s \'named box that can change\' idea --- a variable, in physical form.', credit: 'RAM modules, public domain (PD-self), via Wikimedia Commons' },
     discovery: 'Name three things a website "remembers" about you between visits (logged-in name, cart items, dark mode setting). For each, is it stored as a variable in that one page-visit, or does it need to persist even after you close the tab?' },
   st5: { emoji:'🔀', name:'Story Studio 5 — Choose a Path', sub:'if/else — a story that branches on the reader\'s choice',
     stages:['Two Endings','Three Paths','Branch on the Click'], boss:'Your Story, Your Ending',
@@ -165,7 +165,7 @@ const DECKS = {
       { h:'BOSS — movement is a variable changing every frame', p:'"On every frame" is a repeat block that never stops. That\'s genuinely what ALL motion in ALL games actually is.' },
     ],
     realWorld: 'A marching band or a row of parked cars, evenly spaced — the spacing pattern (each one a fixed distance from the last) is the exact "loop + changing variable" idea. Minecraft building a straight fence or a row of torches is the same repeat pattern, just done by hand instead of by a loop.',
-    image: { file: 'gear.jpg', credit: 'Fixed gear cog — John Reaves, public domain, via Wikimedia Commons' },
+    image: { file: 'gear.jpg', caption: 'A gear does the same defined turn every time it\'s driven --- like a loop repeating the same steps.', credit: 'Fixed gear cog — John Reaves, public domain, via Wikimedia Commons' },
     discovery: 'Watch any 2D platformer character walk for 10 seconds. Roughly how many times does it "step" a tiny bit? Movement that looks smooth is secretly hundreds of small repeats — try to spot the individual frames.' },
   sc3: { emoji:'🕹', name:'Block Arcade 3 — Events', sub:'Keys are events — the stage reacts to what the player presses',
     stages:['Press to Move','Jump on Space'], boss:'Full Control',
@@ -183,7 +183,7 @@ const DECKS = {
         \node at (0,-1) {\small +};` },
     ],
     realWorld: 'A car\'s cruise control constantly re-checking your foot on the brake, or a lift constantly checking if a floor button is pressed — both are "ask the same question every moment", not a one-time check. Minecraft\'s own WASD + Space controls are literally this chapter\'s pattern — each key its own independent check, which is exactly why you can strafe (A/D) while jumping (Space) at the same time.',
-    image: { file: 'keyboard.jpg', credit: 'Computer keyboard, public domain, via Wikimedia Commons' },
+    image: { file: 'keyboard.jpg', caption: 'Every \'key pressed?\' check this chapter teaches is a real key on a real board like this.', credit: 'Computer keyboard, public domain, via Wikimedia Commons' },
     discovery: 'Try holding two arrow keys at once in any real game (or your phone\'s on-screen d-pad), or W+Space in Minecraft. Does the character move diagonally / jump-forward? What would the code need to allow that — one if, or two separate ifs?' },
   sc4: { emoji:'🕹', name:'Block Arcade 4 — Variables', sub:'Score and lives — numbers the game tracks and shows the player',
     stages:['Score Counter','Score Goes Up'], boss:'Score & Lives HUD',
@@ -196,7 +196,7 @@ const DECKS = {
         \node[draw, thick, fill=cyan!15, minimum width=2cm, minimum height=1cm] at (2.6,0) {Lives: 3};` },
     ],
     realWorld: 'Any arcade game\'s top-of-screen HUD (score, lives, timer) — point at three different real games\' HUDs and identify which numbers are tracked as variables. Minecraft\'s hotbar (which item is selected), hunger bar, and health hearts are all live variables displayed every frame, exactly like this chapter\'s HUD.',
-    image: { file: 'arcade.jpg', credit: 'Arcade controller — Carioca, CC BY-SA 3.0, via Wikimedia Commons' },
+    image: { file: 'arcade.jpg', caption: 'A real HUD --- score and lives --- on a real arcade cabinet.', credit: 'Arcade controller — Carioca, CC BY-SA 3.0, via Wikimedia Commons' },
     discovery: 'Screenshot or sketch three different games\' HUDs (including Minecraft\'s). What numbers do they ALL show? What\'s unique to just one of them (a timer, ammo count, a combo multiplier, Minecraft\'s armor bar)?' },
   sc5: { emoji:'🕹', name:'Block Arcade 5 — If/Else', sub:'Rules that check a condition — a wall, an edge, a win',
     stages:['Touching the Edge','Win Message'], boss:'Game Rules',
@@ -298,7 +298,7 @@ const DECKS = {
       { h:'BOSS — multiple IFs, one per key', p:'Each arrow key needs its OWN if — checking every single frame is what makes movement feel continuous, not jumpy.' },
     ],
     realWorld: 'A real traffic light\'s three states (red/amber/green) is literally an if/else-if/else chain in the controller software — same three-way branch this chapter teaches. Minecraft redstone comparators/repeaters build these same IF-style circuits entirely out of blocks, no typed code at all.',
-    image: { file: 'traffic.jpg', credit: 'LED traffic lights, public domain (PD-self), via Wikimedia Commons' },
+    image: { file: 'traffic.jpg', caption: 'A real three-way branch --- red, amber, green --- running on if/else logic.', credit: 'LED traffic lights, public domain (PD-self), via Wikimedia Commons' },
     discovery: 'Find a real rule with a fuzzy boundary (is a "tall" person over 180cm? over 175cm?). Where would YOU draw the line, and would someone exactly on that line be included or not? This is exactly the off-by-one problem in code.' },
   g4: { emoji:'🧰', name:'G4 — My Blocks', sub:'jump(), shoot(), spawnEnemy() — powers you define',
     stages:['spawnEnemy()','shoot()','powerUp()'], boss:'Platformer Vertical Slice',
@@ -315,7 +315,7 @@ const DECKS = {
       { h:'BOSS — planning in pseudocode BEFORE building', p:'Writing the logic in plain English first is called pseudocode — real programmers do this constantly for anything fiddly, like jump physics.' },
     ],
     realWorld: 'A recipe you cook many times (make pancakes) is a "function" — the same steps, but the exact ingredients (parameters) change each time depending on how many people you\'re feeding. Minecraft\'s own crafting recipes are functions too: the SAME recipe (function) run with different wood types (the parameter) gives an oak vs. a birch door.',
-    image: { file: 'gear.jpg', credit: 'Fixed gear cog — John Reaves, public domain, via Wikimedia Commons' },
+    image: { file: 'gear.jpg', caption: 'A gear always does the same defined turn no matter what drives it --- call a function as many times as you want, same job, different result depending on what\'s passed in.', credit: 'Fixed gear cog — John Reaves, public domain, via Wikimedia Commons' },
     discoveries: [
       'Think of something you do repeatedly with small variations (making a sandwich, getting ready for school). Write the general steps once, then note which parts change each time (the "parameters").',
       'Pick any Minecraft recipe that works with more than one material (a door, a boat, tools). What stays exactly the same across every version, and what\'s the "parameter" that changes?',
@@ -333,7 +333,7 @@ const DECKS = {
       { h:'BOSS — networking scale: PAN to LAN to WAN', p:'A keyboard+mouse on one PC is a PAN; school wifi is a LAN; the whole internet is a WAN — same idea, three different scales.' },
     ],
     realWorld: 'A split-screen couch co-op game (two controllers, two characters on one screen) is exactly this chapter\'s "two independent input schemes, one frame loop" idea, running in a real shipped game. Minecraft moves with WASD (keyboard) while the mouse independently aims/looks around — the exact keyboard+mouse split this chapter teaches.',
-    image: { file: 'keyboard.jpg', credit: 'Computer keyboard, public domain, via Wikimedia Commons' },
+    image: { file: 'keyboard.jpg', caption: 'The real keyboard half of this chapter\'s keyboard+mouse control scheme.', credit: 'Computer keyboard, public domain, via Wikimedia Commons' },
     discovery: 'Play any game with both keyboard movement AND mouse aiming (Minecraft included). Try to notice: does moving affect aiming, or are they genuinely independent? What would break if they shared one set of variables?' },
   g6: { emoji:'💥', name:'G6 — Collision & Physics', sub:'Hitboxes, bouncing, gravity, knockback',
     stages:['Hitbox Check','Bounce & Gravity','Knockback'], boss:'Breakout Clone',
@@ -354,7 +354,7 @@ const DECKS = {
       { h:'BOSS — linear search through an array', p:'An array stores a whole list under one name — checking each item one at a time, in order, is called a linear search.' },
     ],
     realWorld: 'A basketball\'s arc and bounce follows the exact same idea — gravity constantly pulling it down (velocity increasing each moment) until it hits the floor and reverses. Minecraft has real block physics too — sand and gravel actually fall when unsupported, using this exact gravity-as-a-loop idea (just without the bounce).',
-    image: { file: 'bounce.jpg', credit: 'Bouncing ball strobe photo — MichaelMaggs / Richard Bartz, CC BY-SA 3.0, via Wikimedia Commons' },
+    image: { file: 'bounce.jpg', caption: 'Each bounce loses a little height --- exactly the energy loss this chapter\'s Bounce & Gravity code simulates.', credit: 'Bouncing ball strobe photo — MichaelMaggs / Richard Bartz, CC BY-SA 3.0, via Wikimedia Commons' },
     discovery: 'Drop a ball (real or a video of one bouncing) and watch closely: does each bounce go exactly as high as the last, or does it lose a little height each time? What in the code (Bounce & Gravity) causes that?' },
   g7w: { emoji:'🎬', name:'G7 — Game States', sub:'Menu → playing → paused → game-over → win',
     stages:['The State Variable','Switching States','Pause Overlay'], boss:'Full Game Loop w/ Screens',
@@ -371,7 +371,7 @@ const DECKS = {
       { h:'BOSS — a real, multi-state machine', p:'menu to playing to gameover, each transition triggered by a real condition — the exact pattern behind every real video game\'s screen flow.' },
     ],
     realWorld: 'Every app you use has "states": a login screen, a loading spinner, the main screen, an error message — the same menu/playing/paused/gameover idea, just with different names. Minecraft has this too: title screen, world-loading screen, playing, the ESC pause menu, and the respawn/death screen are all states of ONE running program.',
-    image: { file: 'traffic.jpg', credit: 'LED traffic lights, public domain (PD-self), via Wikimedia Commons' },
+    image: { file: 'traffic.jpg', caption: 'Three distinct states --- red, amber, green --- the same idea as menu/playing/paused.', credit: 'LED traffic lights, public domain (PD-self), via Wikimedia Commons' },
     discovery: 'List every distinct "screen" Minecraft (or any game) shows you from opening the app to actually playing (splash screen, menu, loading, playing, pause, death/game over). How many states is that, really?' },
   g8: { emoji:'🤖', name:'G8 — Smart NPCs', sub:'Enemies that chase, flee, patrol; a rule-based chatbot',
     stages:['Chase the Player','Patrol Pattern','Rule-Based Chatbot'], boss:'Enemy with 3 Behaviours',
@@ -394,7 +394,7 @@ const DECKS = {
         \node at (0,-2.2) {\tiny patrol};` },
     ],
     realWorld: 'An automated customer-service chat that only understands exact phrases ("Track my order") and fails on anything slightly different is a real rule-based chatbot, exactly like this chapter\'s. Minecraft mobs are the clearest real-world version of this whole chapter: zombies chase within a distance (chase), iron golems patrol villages, and a chatbot-style villager only "understands" exact trade offers — all rules, no learning.',
-    image: { file: 'robot.jpg', credit: 'Industrial robot — KUKA Roboter GmbH / Jo Teichmann, public domain, via Wikimedia Commons' },
+    image: { file: 'robot.jpg', caption: 'A real industrial robot --- every motion programmed by hand, exactly like this chapter\'s rule-based NPCs.', credit: 'Industrial robot — KUKA Roboter GmbH / Jo Teichmann, public domain, via Wikimedia Commons' },
     discoveries: [
       'Try a simple customer-service chatbot online (a bank, a shop) and type something slightly unusual. Does it understand, or does it fail and repeat a canned response? What does that tell you about how it\'s built?',
       'Watch a Minecraft zombie or spider from a safe distance, then get close. At roughly what distance does it notice and start chasing? That switch is exactly this chapter\'s distance-based if/else-if/else.',
@@ -493,7 +493,9 @@ ${c.diagram}
   const imageFrame = d.image ? String.raw`
 \begin{frame}{Image}
     \begin{center}
-    \includegraphics[width=0.55\textwidth]{images/${d.image.file}}
+    \includegraphics[width=0.5\textwidth]{images/${d.image.file}}
+
+    \large ${md(d.image.caption)}
 
     \small ${md(d.image.credit)}
     \end{center}

@@ -45,7 +45,7 @@ const DECKS = {
       { h:'BOSS — arrays and objects, together', p:'An inventory (an ordered LIST) and a set of flags (NAMED yes/no facts) are genuinely different shapes of data — a real interactive story needs both.' },
     ],
     realWorld: 'Every real e-commerce cart is an array of items plus a set of named flags ("giftWrapped", "expressShipping") — exactly this chapter\'s two data shapes, doing real work. Minecraft\'s own inventory (an ordered list of slots) plus achievement flags (has this player found diamonds yet?) is the same split.',
-    image: { file: 'js.png', credit: 'JavaScript logo — Chris Williams, public domain, via Wikimedia Commons' },
+    image: { file: 'js.png', caption: 'Real JavaScript --- the language behind this week\'s arrays and objects.', credit: 'JavaScript logo — Chris Williams, public domain, via Wikimedia Commons' },
     discovery: 'Open your phone\'s shopping app cart. Is the item list ordered (an array) or does order not matter? Now think of one yes/no fact the app tracks about you (signed in? has a coupon?) — that\'s an object property.' },
   ws2: { emoji:'📘', name:'Web Story 2 — Organizing the Telling', sub:'Functions — reusable, named pieces of story logic',
     stages:['Your First Story Function','A Function That Changes State','Two Functions, One Page'], boss:'A Story Told By Functions',
@@ -60,7 +60,7 @@ const DECKS = {
       { h:'BOSS — a page organized entirely around functions', p:'Splitting work into functions, each with ONE clear job, is what makes a real project readable, testable, and changeable later.' },
     ],
     realWorld: 'A recipe app\'s "calculateServings()" function reused across every recipe on the site is exactly this chapter\'s idea. Minecraft\'s real `/function` command (a named, reusable set of commands) works identically — define once, call from anywhere.',
-    image: { file: 'gear.jpg', credit: 'Fixed gear cog — John Reaves, public domain, via Wikimedia Commons' },
+    image: { file: 'gear.jpg', caption: 'A function is defined once, does the same job every time it\'s called --- like a gear always doing the same defined turn.', credit: 'Fixed gear cog — John Reaves, public domain, via Wikimedia Commons' },
     discovery: 'Find one button in any app that clearly "computes something, then shows the result" (a checkout total, a BMI calculator). Which part do you think is the function\'s return value, and which part is just display?' },
   ws3: { emoji:'💾', name:'Web Story 3 — Remembering After You Leave', sub:'localStorage — data that survives a page refresh',
     stages:['Remember After Refresh','Save the Whole Inventory','Was Anything Saved Before?'], boss:'A Story That Remembers You',
@@ -72,7 +72,7 @@ const DECKS = {
       { h:'BOSS — real persistent story state', p:'Saving structured data, loading it back, and checking whether it existed first — this is genuinely how real websites remember your cart, progress, or preferences between visits.' },
     ],
     realWorld: 'Every website that remembers your dark-mode preference or your shopping cart after you close the tab is using exactly this mechanism. Minecraft\'s own save files work on the same principle at a bigger scale — your world genuinely persists between sessions, saved to disk, not just held in memory while running.',
-    image: { file: 'floppy.jpg', credit: 'Floppy disks, George Chernilevsky, public domain, via Wikimedia Commons' },
+    image: { file: 'floppy.jpg', caption: 'Old-school \'save to disk\' --- the exact idea localStorage recreates inside the browser.', credit: 'Floppy disks, George Chernilevsky, public domain, via Wikimedia Commons' },
     discovery: 'Close and reopen a website that remembers something about you (a cart, a login, a dark-mode setting). What do you think happens the very FIRST time anyone ever visits — before anything has been saved yet?' },
   ws4: { emoji:'🔁', name:'Web Story 4 — One Loop, Many Choices', sub:'A loop that builds page elements — one per item, automatically',
     stages:['A List of Choices','Numbered Items','Loop Inside a Function'], boss:'Full Inventory Display',
@@ -104,7 +104,7 @@ const DECKS = {
       { h:'A real formula, not just a print statement', p:'`celsius * 9 / 5 + 32` — Python does x and / before + and -, exactly like normal maths rules. A genuine, widely-used real-world formula.' },
     ],
     realWorld: 'Every weather app converting between Celsius and Fahrenheit runs this EXACT formula. Every sign-up form that asks your age and immediately validates it depends on the same input()-returns-text, then-convert pattern.',
-    image: { file: 'python.png', credit: 'Python logo, CC BY 2.5, via Wikimedia Commons' },
+    image: { file: 'python.png', caption: 'The real language you\'re about to start typing.', credit: 'Python logo, CC BY 2.5, via Wikimedia Commons' },
     discovery: 'Type `type(input("Enter a number: "))` for yourself conceptually — before running anything, guess: will Python say the result is a number, or text? Most students guess wrong the first time.' },
   m2: { emoji:'🚦', name:'M2 — Choices & Loops', sub:'if/elif/else, while, for-range — predict the drawing before you run it',
     stages:['Odd or Even','FizzBuzz Lite','Countdown Circles','Grade Classifier','Sum to N'], boss:'M2 Capstone',
@@ -122,7 +122,7 @@ const DECKS = {
       { h:'Chained if/elif — order decides correctness', p:'Checking `>= 70` BEFORE `>= 90` would wrongly grade a 95 as a "B" — order in a chain of conditions genuinely changes the result.' },
     ],
     realWorld: 'Every "off by one" range bug (`range(1,11)` needing 11, not 10) is a genuinely common real bug professional developers still make. Minecraft\'s own farming/breeding cooldowns are `while` loops in disguise — "keep waiting while the cooldown timer is still above zero".',
-    image: { file: 'traffic.jpg', credit: 'LED traffic lights, public domain (PD-self), via Wikimedia Commons' },
+    image: { file: 'traffic.jpg', caption: 'A real three-way branch --- the same if/elif/else idea from this chapter.', credit: 'LED traffic lights, public domain (PD-self), via Wikimedia Commons' },
     discovery: 'Before running anything: what does `range(1, 11)` actually produce — does it include 11? Write your guess down, then check — this exact mistake is one of the most common real beginner bugs.' },
   m3: { emoji:'🧰', name:'M3 — Functions', sub:'def, parameters, return — refactor copy-paste into reusable powers',
     stages:['Functions with Parameters','A Loop That Calls a Function','return — Handing Back a Value','A Function With a Loop Inside','Returning More Than One Value'], boss:'M3 Capstone',
@@ -137,7 +137,7 @@ const DECKS = {
       { h:'A function with a loop INSIDE it', p:'`is_prime(n)` has a real `for` loop inside its own definition — `return` exits IMMEDIATELY, even mid-loop, the moment the answer is known.' },
     ],
     realWorld: 'Minecraft\'s real `/function` command lets you name and reuse a whole set of commands, called from anywhere — the exact same idea, just in the game\'s own scripting system rather than Python.',
-    image: { file: 'gear.jpg', credit: 'Fixed gear cog — John Reaves, public domain, via Wikimedia Commons' },
+    image: { file: 'gear.jpg', caption: 'Same idea as Web Story 2\'s image --- one defined job, called repeatedly with different inputs.', credit: 'Fixed gear cog — John Reaves, public domain, via Wikimedia Commons' },
     discovery: 'Think of a calculation you might reuse often (a tip calculator, a grade average). Write just its NAME and what it needs as input (parameters) — you\'ve just designed a function\'s signature before writing a single line inside it.' },
   m4: { emoji:'📋', name:'M4 — Lists', sub:'Creating, indexing, appending, looping — list + loop = superpower',
     stages:['A List of Values','Tuples','sorted() and Slicing','Filtering','The "in" Keyword'], boss:'M4 Capstone',
@@ -185,7 +185,7 @@ const DECKS = {
       { h:'Run-length encoding — real compression', p:'"aaaabbbccd" stored as "4a3b2c1d" is genuinely shorter — a real compression technique, used in actual image and file formats.' },
     ],
     realWorld: 'Every JPEG/PNG file on your phone is really just numbers, exactly like M7\'s grayscale pixel maths, just with far more channels and compression on top. Minecraft\'s own world files are binary data on disk — the same "everything is really numbers" idea, at world-save scale.',
-    image: { file: 'circuit.jpg', credit: 'Computer circuit board, Jon Sullivan, public domain, via Wikimedia Commons' },
+    image: { file: 'circuit.jpg', caption: 'Real transistors and circuits --- what \'inside the machine\' actually looks like.', credit: 'Computer circuit board, Jon Sullivan, public domain, via Wikimedia Commons' },
     discovery: 'Take any small greyish photo (or imagine one). Roughly what do you think its "average" pixel brightness looks like as a single number — and would a photo of snow score higher or lower than one of a night sky?' },
   m8: { emoji:'🌐', name:'M8 — The Connected World', sub:'How the internet works, staying safe, a one-page HTML profile',
     stages:['Packets','Generating HTML with Python','Password Strength','https:// vs. http://','Linking Pages'], boss:'M8 Capstone',
@@ -196,7 +196,7 @@ const DECKS = {
       { h:'https:// vs. http:// — a real security check', p:'`url.startswith("https://")` checks the connection is encrypted — without it, anything typed (including passwords) travels unprotected.' },
     ],
     realWorld: 'Every online payment, every login form, depends on that padlock/https check being real — this chapter writes the exact check your own browser performs automatically, every single page load.',
-    image: { file: 'padlock.jpg', credit: 'Padlock — Alyson Hurt, CC BY 2.0, via Wikimedia Commons' },
+    image: { file: 'padlock.jpg', caption: 'What https:// actually protects --- this chapter\'s real security check.', credit: 'Padlock — Alyson Hurt, CC BY 2.0, via Wikimedia Commons' },
     discovery: 'Check the address bar on 3 different real websites you use. Do they all start with https://? What would you do differently on a page that only had http://?' },
   m9w: { emoji:'🖥', name:'M9 — Interactive Apps', sub:'A canvas app with real state: menu -> running -> results',
     stages:['Three Kinds of Bugs','Trace Tables','app_state','Guards & Drawing','A Growing List','try/except'], boss:'M9 Capstone',
@@ -213,7 +213,7 @@ const DECKS = {
       { h:'try/except — a different error, same pattern', p:'`int("abc")` raises a ValueError, caught with the exact same try/except pattern as any other error type — a real app can\'t just crash on unexpected input.' },
     ],
     realWorld: 'Every real ATM walks through exactly this menu -> running -> results state pattern (select account -> processing -> show balance), with guard checks at every step (insufficient funds, wrong PIN) so it never just crashes on unexpected input.',
-    image: { file: 'atm.jpg', credit: 'ATM interface, Moritz Platt, public domain, via Wikimedia Commons' },
+    image: { file: 'atm.jpg', caption: 'A real ATM walks through menu, then processing, then result --- the same state machine this chapter builds.', credit: 'ATM interface, Moritz Platt, public domain, via Wikimedia Commons' },
     discovery: 'Watch someone use an ATM (or recall using one). List the distinct "screens"/states it goes through from inserting a card to getting cash. Where do you think it needs a guard check (insufficient funds, wrong PIN)?' },
   m10: { emoji:'🏆', name:'M10 — Capstone: Data App', sub:'Plan -> build -> test -> ship a data-driven app of your own',
     stages:['Loading Data','Marking Answers','Write Then Read Back','The Whole App','A Real Leaderboard','Finishing Touches'], boss:'Ship Your Data App',
@@ -273,7 +273,9 @@ ${c.diagram}
   const imageFrame = d.image ? String.raw`
 \begin{frame}{Image}
     \begin{center}
-    \includegraphics[width=0.55\textwidth]{images/${d.image.file}}
+    \includegraphics[width=0.5\textwidth]{images/${d.image.file}}
+
+    \large ${md(d.image.caption)}
 
     \small ${md(d.image.credit)}
     \end{center}
