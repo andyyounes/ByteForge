@@ -1,0 +1,82 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{title}{fg=white,bg=green!60!teal}
+\setbeamercolor{frametitle}{fg=white,bg=green!60!teal}
+\setbeamercolor{block title}{bg=green!60!teal!20,fg=black}
+\setbeamercolor{block body}{bg=green!60!teal!8,fg=black}
+\setbeamercolor{item}{fg=green!60!teal}
+\setbeamercolor{itemize item}{fg=green!60!teal}
+\setbeamertemplate{itemize item}[triangle]
+
+\title{Full Strategy}
+\subtitle{Data-reading feeds directly into a live battle decision}
+\author{ByteForge --- Grade 9 --- The Deep Diver}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Today's Missions}
+    \Large
+    \begin{itemize}
+        \item Blind Contact
+        \item Hidden Threat
+        \item Two Mechanics, No Scaffolding
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{The data skill now feeds directly into combat}
+    \large
+    \begin{itemize}
+        \item Enemy attack values are hidden --- read \texttt{state["intel"]} first, like Phase 3's data missions
+        \item THEN use that to prioritize, exactly like Double Trouble
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Stale data is a real, important trap}
+    \large
+    \begin{itemize}
+        \item Intel is a SNAPSHOT from before the fight started --- it does not update as enemies die
+        \item Cross-check against the LIVE enemy list before acting on old intel
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Two functions working together}
+    \large
+    \begin{itemize}
+        \item \texttt{true\_attack(id)} looks up ONE enemy's real stat
+        \item \texttt{most\_dangerous()} calls it repeatedly while scanning everyone still alive
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item Using an old weather forecast instead of checking right now before deciding whether to bring an umbrella is exactly the "stale data" trap this tier warns about.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Let Them Discover}
+    \large
+    If your intel says an enemy has 50 attack, but it was destroyed 2 turns ago, is that intel still safe to act on? What should your code check first?
+\end{frame}
+
+\begin{frame}{Your Turn}
+    \Large
+    Open the mission map, find \textbf{Full Strategy}, and fly it for real ---
+    everything you just saw, you now do yourself.
+\end{frame}
+
+\end{document}
