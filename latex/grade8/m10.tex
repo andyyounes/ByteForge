@@ -1,0 +1,78 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{title}{fg=white,bg=blue!55!black}
+\setbeamercolor{frametitle}{fg=white,bg=blue!45!black}
+\setbeamercolor{block title}{bg=blue!15,fg=black}
+\setbeamercolor{block body}{bg=blue!5,fg=black}
+
+\title{M10 — Capstone: Data App}
+\subtitle{Plan -> build -> test -> ship a data-driven app of your own}
+\author{ByteForge --- Grade 8 --- App Builder}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Today's Plan}
+    \begin{itemize}
+        \item Loading Data
+        \item Marking Answers
+        \item Write Then Read Back
+        \item The Whole App
+        \item A Real Leaderboard
+        \item Finishing Touches
+        \item[$\bigstar$] BOSS --- Ship Your Data App
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Every real app starts with loading data}
+    \Large
+    Loading \texttt{questions} and \texttt{answers} as two SEPARATE lists, always appended together, keeps them lined up — \texttt{questions[i]} and \texttt{answers[i]} always belong to the same row.
+\end{frame}
+
+
+\begin{frame}{Writing a file, then reading it back to prove it}
+    \Large
+    \texttt{open(..., "w")} writes; a SEPARATE open afterward reads it back — proving the save genuinely persisted, not just that the write command ran.
+\end{frame}
+
+
+\begin{frame}{A real leaderboard from accumulated data}
+    \Large
+    Reading many appended entries back in and sorting is exactly how a real leaderboard works. \texttt{enumerate()} gives both position and value for a ranked display.
+\end{frame}
+
+
+\begin{frame}{What separates "working" from "finished"}
+    \Large
+    Code that works perfectly but shows the player nothing isn't really finished. \texttt{except FileNotFoundError:} means the app survives even if a data file goes missing.
+\end{frame}
+
+\begin{frame}{Real-World Example}
+    \Large
+    Every shipped quiz app, leaderboard, or scoring system went through exactly this: load real data, score it, save results, then handle the real world not always cooperating (a missing file, unexpected input) — never just crashing.
+\end{frame}
+
+
+\begin{frame}{Let Them Discover}
+    \Large
+    Before opening the platform: what's ONE thing that could realistically go wrong with your data app (a missing file, an empty list, bad input)? Real developers plan for at least one of these before calling anything "finished".
+\end{frame}
+
+\begin{frame}{Your Turn}
+    \Large
+    Open the student map, find \textbf{M10 — Capstone: Data App}, and work through it
+    hands-on --- everything you just saw, they now do themselves.
+\end{frame}
+
+\end{document}
