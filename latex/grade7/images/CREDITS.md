@@ -17,8 +17,9 @@ that uses it.
 | `traffic.jpg` | LED traffic lights | (self-published) | Public domain (PD-self) |
 | `bounce.jpg` | Bouncing ball strobe photo | MichaelMaggs / Richard Bartz | CC BY-SA 3.0 |
 | `robot.jpg` | Industrial robot arm | Jo Teichmann / KUKA Roboter GmbH | Public domain |
+| `padlock.jpg` | Padlock (reused from Grade 8's set) | Alyson Hurt | CC BY 2.0 |
 
-CC BY / CC BY-SA files (`html5.png`, `arcade.jpg`, `bounce.jpg`) require
+CC BY / CC BY-SA files (`html5.png`, `arcade.jpg`, `bounce.jpg`, `padlock.jpg`) require
 attribution if redistributed further — the inline slide credit covers this
 for classroom use, but keep the attribution if these images are reused
 elsewhere.

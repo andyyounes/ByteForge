@@ -415,6 +415,20 @@ const DECKS = {
     ],
     realWorld: 'Any RPG\'s dialogue choices ("Attack" / "Defend" / "Run") branching to different outcomes, and a game\'s online leaderboard listing name+score pairs, are both exactly this chapter\'s ideas in shipped games. Minecraft villager trading menus are a real dialogue tree too — compare your held item\'s name against what the villager wants, branch to "trade accepted" or not.',
     discovery: 'Play (or recall) a game with dialogue choices (or a Minecraft villager trade). Pick one branch and trace it: what text comparison do you think the code is making to decide which reply you see?' },
+  gsafe: { emoji:'🛡️', name:'Security Lab — Spot the Scam', sub:'Real online safety: scam messages, stranger danger, and phishing links',
+    stages:['Too Good to Be True','Strangers Never Need Your Address','The "Free Skins" Trap'], boss:'Build a Scam Checker',
+    concepts:[
+      { h:'A surprise free prize is the #1 real scam sign', p:'Real companies do not give away expensive prizes to random strangers who never entered anything — the free prize is the bait, not a real gift. `isScam` set to true, checked by a real if/else, is exactly how a real spam filter works underneath.' },
+      { h:'Friendly in chat does not mean safe in real life', p:'Someone you only know from an online game has NO real reason to need your address, school, or real name — asking for these is a genuine red flag, even if they seem friendly. There is no way to verify who someone really is over game chat.' },
+      { h:'A "free skins" site exists to steal your password', p:'Sites promising free skins in exchange for "logging in with your real account" are built to capture your actual password the instant you type it — a genuinely common real scam aimed specifically at gamers. Only the game\'s own official site or app is ever safe.' },
+      { h:'BOSS — combining every red flag into one real check', p:'A stranger AND a free offer together is a stronger warning than either alone — combining two variables in one if/else genuinely mirrors how real scam/spam filters weigh several signals together, not just one.' },
+    ],
+    image: { file: 'padlock.jpg', caption: 'What a real password is actually protecting --- exactly what a fake "free skins" site is trying to steal.', credit: 'Padlock — Alyson Hurt, CC BY 2.0, via Wikimedia Commons' },
+    realWorld: 'A message promising a free prize "just for clicking" uses the exact same bait-and-hook pattern as a real phishing email — designed to get a click before you think. A fake "free V-Bucks generator" asking you to log in first is a genuine, extremely common real scam, not a hypothetical one.',
+    discoveries: [
+      'Has anyone you know ever gotten a message online promising something free in exchange for personal info or a login? What made it feel suspicious (or NOT feel suspicious at first)?',
+      'Look at a real login page for a game or app you use. What would be different about a FAKE version of that same page trying to steal your password?',
+    ] },
   g10: { emoji:'🏆', name:'G10 — Design & Capstone', sub:'Plan → build → test → ship YOUR game',
     stages:['Design Your Game','Score & Win Screen'], boss:'Ship Your Own Game',
     concepts:[
@@ -433,7 +447,7 @@ const DECKS = {
     discovery: 'Before opening the platform: sketch your game idea on paper — one sentence for "how do you win", and one sketch of what the screen looks like. Trade with a partner and ask: is the win condition actually checkable?' },
 }
 
-const ORDER = ['st1','st2','st3','st4','st5','sc1','sc2','sc3','sc4','sc5','g1','g2','g3','g4','g5','g6','g7w','g8','g9w','g10']
+const ORDER = ['st1','st2','st3','st4','st5','sc1','sc2','sc3','sc4','sc5','g1','g2','g3','g4','g5','g6','g7w','g8','g9w','gsafe','g10']
 
 // Colorful, kid-friendly accent per arc of the course (same idea as
 // Grade 9's per-section theme) — Story Studio / Block Arcade / Game
@@ -442,10 +456,12 @@ const SECTION_COLOR = {
   story:  'violet!70!purple',   // Story Studio (st*): playful purple
   arcade: 'orange!85!red',      // Block Arcade (sc*): arcade orange
   maker:  'blue!70!cyan',       // Game Maker proper (g*): bright blue
+  safety: 'red!75!black',       // Security Lab (gsafe): serious red
 }
 function sectionFor(id) {
   if (id.startsWith('st')) return 'story'
   if (id.startsWith('sc')) return 'arcade'
+  if (id.startsWith('gsafe')) return 'safety'
   return 'maker'
 }
 
