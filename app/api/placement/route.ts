@@ -6,40 +6,40 @@ import { gradeToStageId } from '@/lib/stage-config'
 import { initialMasteryMap } from '@/lib/mastery'
 import type { StageId } from '@/types'
 
-// â”€â”€ Placement quiz scoring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Placement quiz scoring ────────────────────────────────────────────────────
 //
 // The placement quiz has 5 sections (18 questions total):
-//   section_1 â†’ computer fundamentals       (grade 7)
-//   section_2 â†’ number systems              (grade 8)
-//   section_3 â†’ algorithms + pseudocode     (grade 9)
-//   section_4 â†’ programming + data structs  (IGCSE Year 1)
-//   section_5 â†’ recursion + OOP + stacks    (AS Level)
+//   section_1 → computer fundamentals       (grade 7)
+//   section_2 → number systems              (grade 8)
+//   section_3 → algorithms + pseudocode     (grade 9)
+//   section_4 → programming + data structs  (IGCSE Year 1)
+//   section_5 → recursion + OOP + stacks    (AS Level)
 //
-// The recommended stage is the highest section where the student scored â‰¥ 50%.
+// The recommended stage is the highest section where the student scored ≥ 50%.
 
 const SECTION_STAGE_MAP: Record<string, StageId> = {
-  section_1: ‘grade7’,
-  section_2: ‘grade8’,
-  section_3: ‘grade9’,
-  section_4: ‘igcse_y1’,
-  section_5: ‘as_level’,
+  section_1: 'grade7',
+  section_2: 'grade8',
+  section_3: 'grade9',
+  section_4: 'igcse_y1',
+  section_5: 'as_level',
 }
 
 function recommendStage(sectionScores: Record<string, number>): StageId {
-  // Find highest section where score â‰¥ 50%
-  const sections = [‘section_5’, ‘section_4’, ‘section_3’, ‘section_2’, ‘section_1’]
+  // Find highest section where score ≥ 50%
+  const sections = ['section_5', 'section_4', 'section_3', 'section_2', 'section_1']
   for (const s of sections) {
     if ((sectionScores[s] ?? 0) >= 50) {
-      return SECTION_STAGE_MAP[s] ?? ‘grade7’
+      return SECTION_STAGE_MAP[s] ?? 'grade7'
     }
   }
-  return ‘grade6’
+  return 'grade6'
 }
 
-// â”€â”€ Validation schema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Validation schema ─────────────────────────────────────────────────────────
 
 const QuizSchema = z.object({
-  answers: z.record(z.string()),   // questionId â†’ chosen answer
+  answers: z.record(z.string()),   // questionId → chosen answer
 })
 
 // Simple answer key lookup â€” in production this would be in a DB table
@@ -82,7 +82,7 @@ function scoreQuiz(answers: Record<string, string>): {
   return { sectionScores, recommendedStage: recommendStage(sectionScores) }
 }
 
-// â”€â”€ POST /api/placement â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── POST /api/placement ───────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
