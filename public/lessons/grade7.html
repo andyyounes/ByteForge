@@ -1181,7 +1181,15 @@ function runPageCode() {
   }
   try {
     new Function(...Object.keys(pageAPI), code)(...Object.values(pageAPI))
-  } catch (e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
+  } catch (e) {
+    log('Error: ' + friendlyErr(e.message), 'err')
+    // Show the ACTUAL code that broke — a generic error message alone gave
+    // no way to diagnose a syntax error that couldn't be reproduced from
+    // the blocks' visual layout alone (e.g. a stray disconnected block).
+    log('Code that failed: ' + code.slice(0, 300), 'err')
+    console.error('[grade7] code that failed to run:', code)
+    return
+  }
 
   // Week 3 — buttons & onclick. A click HANDLER only proves anything once it
   // actually runs, so — rather than just checking the blocks exist — fire a
@@ -1287,7 +1295,12 @@ function runCode() {
     const extAPI = { ...monitoredAPI, __captureUpdate__: fn => { updateFn = fn } }
     try {
       new Function(...Object.keys(extAPI), captureCode)(...Object.values(extAPI))
-    } catch(e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
+    } catch(e) {
+      log('Error: ' + friendlyErr(e.message), 'err')
+      log('Code that failed: ' + code.slice(0, 300), 'err')
+      console.error('[grade7] code that failed to run:', code)
+      return
+    }
 
     if (!updateFn) { log('No update() function found.', 'err'); return }
 
@@ -1327,7 +1340,12 @@ function runCode() {
     drawLog.hasFunction = /\bfunction\s+(?!update\b)\w+\s*\(/.test(code)
     try {
       new Function(...Object.keys(trackedAPI), code)(...Object.values(trackedAPI))
-    } catch(e) { log('Error: ' + friendlyErr(e.message), 'err'); return }
+    } catch(e) {
+      log('Error: ' + friendlyErr(e.message), 'err')
+      log('Code that failed: ' + code.slice(0, 300), 'err')
+      console.error('[grade7] code that failed to run:', code)
+      return
+    }
     log('Done.', 'ok')
     checkChallenge(drawLog)
   }
