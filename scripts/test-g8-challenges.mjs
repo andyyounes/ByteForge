@@ -46,8 +46,8 @@ const webMaximalLog = () => ({ bodyText: 'true false you see 1. item 3 items ' +
   // Semester 1 (3-semester rebuild, web1-web4) — real element counts +
   // EXACT computed colors (getComputedStyle's rgb() form of #FFF7E6/#2F3B52).
   h1s: 999, paragraphs: 999, buttons: 999, links: 999,
-  headingText: ['My Page'], paragraphText: ['This is my page.'],
-  bgColor: 'rgb(255, 247, 230)', headingColor: 'rgb(47, 59, 82)' })
+  headingText: ['My Page','My Page'], paragraphText: ['This is my page.','This is my page.'],
+  bgColor: 'rgb(255, 247, 230)', headingColor: 'rgb(47, 59, 82)', hasVariable: true })
 const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false,
   hasFunction: false, functionCount: 0, hasReturn: false, hasIf: false,
   hasLSSet: false, hasLSGet: false, hasJSONStringify: false, hasJSONParse: false,
@@ -55,7 +55,7 @@ const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, 
   hasClick: false, listItemsGrewOnClick: false, bodyChangedOnClick: false,
   hasIndex: false, hasLength: false, hasAnd: false,
   h1s: 0, paragraphs: 0, buttons: 0, links: 0,
-  headingText: [], paragraphText: [], bgColor: '', headingColor: '' })
+  headingText: [], paragraphText: [], bgColor: '', headingColor: '', hasVariable: false })
 
 let pass = 0, fail = 0
 for (const ch of CHALLENGES) {
