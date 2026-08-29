@@ -22,6 +22,17 @@
       height:calc(100vh - 64px);
       overflow:hidden;
     }
+    /* No-blocks mode (quiz stages, ported from Grade 7's same fix) — neither
+       editor panel nor the console are relevant when there's no code
+       involved; collapse to a single full-width column. */
+    body.no-blocks-mode .layout { grid-template-columns: 1fr; }
+    body.no-blocks-mode .ch-header { max-height:none; overflow-y:visible; }
+    body.no-blocks-mode .right-panel { overflow-y:auto; }
+    body.no-blocks-mode #py-editor-panel,
+    body.no-blocks-mode #web-editor-panel,
+    body.no-blocks-mode .console-panel { display:none !important; }
+    body.no-blocks-mode .canvas-wrap { flex:1; height:auto; align-items:stretch; padding:24px; display:flex; justify-content:center; }
+    body.no-blocks-mode #output-quiz { max-width:1400px; margin:0 auto; padding:24px 32px; }
 
     /* ── Left: Python editor ── */
     .editor-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
@@ -78,14 +89,16 @@
                      background:none; border:1px solid var(--border); color:var(--fg-faint); }
     .ch-nav-toggle:hover { color:var(--fg); border-color:var(--border-hi); }
     .ch-nav-toggle.open { color:#60a5fa; border-color:#60a5fa; }
-    .ch-lesson { flex-shrink:0; background:#12141f; border:1px solid rgba(129,140,248,.18); border-radius:8px; margin-bottom:8px; overflow:hidden; }
-    .cl-toggle { padding:8px 12px; font-size:12px; font-weight:800; color:#a5b4fc; cursor:pointer;
-                 display:flex; align-items:center; gap:6px; user-select:none; }
+    .ch-lesson { flex-shrink:0; background:#12141f; border:1.5px solid rgba(129,140,248,.3); border-radius:12px;
+                 margin-bottom:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+    .cl-toggle { padding:12px 14px 4px; font-size:13px; font-weight:800; color:#a5b4fc; cursor:pointer;
+                 display:flex; flex-direction:column; align-items:flex-start; gap:6px; user-select:none; }
+    .cl-toggle .cl-toggle-row { display:flex; align-items:center; gap:6px; width:100%; }
     .cl-toggle:hover { color:#c7d2fe; }
     #cl-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
     .cl-body { padding:0 12px 12px; font-size:12px; color:#c7d2e0; line-height:1.7; }
     .cl-body.collapsed { display:none; }
-    .cl-block { background:#0d0f1a; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
+    .cl-block { background:#0d0f1a; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:16px 19px; margin-bottom:18px; line-height:1.7; }
     .cl-block:last-child { margin-bottom:0; }
     .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
     .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
@@ -102,13 +115,63 @@
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
     .ch-pill.active { background:rgba(59,130,246,.12); border-color:#60a5fa; color:#60a5fa; }
     .ch-pill.done   { background:rgba(34,197,94,.08); border-color:rgba(34,197,94,.35); color:#4ade80; }
-    .ch-row { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-    .ch-text { font-size:11.5px; color:var(--fg-dim); line-height:1.55; flex:1; }
+    /* Lesson/Exercise split (ported from Grade 7) — eyebrow-labelled,
+       visually distinct bubbles instead of one undifferentiated scroll. */
+    .cl-eyebrow, .ex-eyebrow { font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+                 padding:3px 9px; border-radius:999px; display:inline-block; margin-bottom:8px; }
+    .cl-eyebrow { background:rgba(129,140,248,.18); color:#a5b4fc; }
+    .ex-eyebrow { background:rgba(251,191,36,.18); color:#fbbf24; }
+    .review-lesson-link { font-size:11px; font-weight:700; color:#a5b4fc; text-decoration:none; cursor:pointer; }
+    .review-lesson-link:hover { color:#c7d2fe; text-decoration:underline; }
+    .world-xp-bar { margin-bottom:10px; }
+    .wxp-label { font-size:11px; font-weight:700; color:#fbbf24; margin-bottom:4px; }
+    .wxp-track { height:7px; border-radius:99px; background:var(--bg-raised); overflow:hidden; }
+    .wxp-fill  { height:100%; border-radius:99px; background:linear-gradient(90deg,#fbbf24,#f59e0b); transition:width .3s; }
+    .lesson-stage-break { height:1px; background:var(--border); margin:26px 0 22px; position:relative; }
+    .lesson-stage-break span { position:absolute; top:-9px; left:0; background:#12141f; padding-right:10px;
+      font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#a5b4fc; }
+    #hint-display:empty { display:none; }
+    #hint-display { margin-top:8px; font-size:12px; color:#fbbf24; background:rgba(251,191,36,.08);
+                     border:1px solid rgba(251,191,36,.25); border-radius:7px; padding:8px 10px; }
+    #hint-display .hint-line { margin-bottom:4px; }
+    #hint-display .hint-line:last-child { margin-bottom:0; }
+    .ch-row { display:flex; flex-direction:column; gap:6px;
+              background:rgba(251,191,36,.05); border:1.5px solid rgba(251,191,36,.22);
+              border-radius:12px; padding:12px 14px; }
+    .ch-row-inner { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .ch-text { font-size:12.5px; color:var(--fg-dim); line-height:1.6; flex:1; }
     .ch-text strong { color:var(--fg); }
     .ch-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
     .xp-pill { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
                background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); }
     .hint-btn { font-size:11px; color:#fbbf24; cursor:pointer; }
+    .ch-footer { flex-shrink:0; padding:10px 14px; background:var(--bg-card); border-bottom:1px solid var(--border); }
+    .ch-footer-next { width:100%; padding:12px; border-radius:9px; border:none; font-size:13.5px; font-weight:800;
+                       cursor:pointer; transition:.15s; }
+    .ch-footer-next:disabled { background:var(--bg-raised); color:var(--fg-faint); cursor:not-allowed; }
+    .ch-footer-next:not(:disabled) { background:linear-gradient(135deg,#4ade80,#22c55e); color:#052e12; }
+    .ch-footer-next:not(:disabled):hover { filter:brightness(1.08); }
+    #output-quiz { display:none; width:100%; max-width:640px; height:100%; overflow-y:auto;
+                   background:var(--bg-card); color:var(--fg);
+                   border:1px solid var(--border); border-radius:12px; padding:22px 26px;
+                   font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
+    #output-quiz .quiz-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; }
+    #output-quiz .q-item { background:var(--bg-raised); border:1px solid var(--border);
+      border-radius:9px; padding:10px 12px; }
+    #output-quiz .q-scenario { background:rgba(129,140,248,.1); border:1px solid rgba(129,140,248,.25);
+      border-radius:7px; padding:8px 10px; font-size:12px; margin-bottom:8px; color:var(--fg); }
+    #output-quiz .q-label { font-size:12.5px; font-weight:700; margin-bottom:6px; color:var(--fg); line-height:1.4; }
+    #output-quiz select, #output-quiz input[type=text] {
+      width:100%; font-size:12.5px; padding:7px 9px; border-radius:6px;
+      border:1px solid var(--border-hi); background:var(--bg); color:var(--fg); }
+    #output-quiz select:focus, #output-quiz input[type=text]:focus { outline:none; border-color:#818cf8; }
+    #output-quiz .q-check-btn { margin-top:14px; width:100%; max-width:420px; padding:13px 14px; border:none; border-radius:9px;
+      background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; font-weight:800; font-size:14px;
+      cursor:pointer; letter-spacing:.01em; display:block; margin-left:auto; margin-right:auto; }
+    #output-quiz .q-check-btn:hover { filter:brightness(1.08); }
+    #output-quiz .q-result { font-size:13px; margin-top:10px; text-align:center; padding:8px; border-radius:8px; }
+    #output-quiz .q-result.ok  { color:#4ade80; font-weight:700; background:rgba(34,197,94,.12); }
+    #output-quiz .q-result.bad { color:#f87171; font-weight:700; background:rgba(239,68,68,.1); }
 
     .canvas-wrap { flex-shrink:0; background:#030510; border-bottom:1px solid var(--border); position:relative; }
     #out-canvas  { display:block; }
@@ -232,18 +295,31 @@
         <button class="ch-nav-toggle" id="ch-nav-toggle" onclick="toggleChallengeList()">☰ All challenges</button>
       </div>
       <div class="ch-pills" id="ch-pills" style="display:none"></div>
+      <!-- Running XP progress for the CURRENT module — shown on both the
+           Lesson page and every Exercise page (ported from Grade 7). -->
+      <div class="world-xp-bar" id="world-xp-bar"></div>
       <!-- Full per-challenge lesson — one real explainer per practice,
            populated from CHALLENGE_LESSON. Same pattern as Grade 6/7/9. -->
       <div class="ch-lesson" id="ch-lesson" style="display:none;">
-        <div class="cl-toggle" id="cl-toggle" onclick="toggleChallengeLesson()">📘 <span id="cl-title"></span> <span id="cl-arrow">▾</span></div>
+        <div class="cl-toggle" id="cl-toggle" onclick="toggleChallengeLesson()">
+          <span class="cl-eyebrow">📘 Lesson</span>
+          <div class="cl-toggle-row"><span id="cl-title"></span> <span id="cl-arrow" style="margin-left:auto">▾</span></div>
+        </div>
         <div class="cl-body" id="cl-body"></div>
       </div>
-      <div class="ch-row">
-        <div class="ch-text" id="ch-text">Select a challenge to begin.</div>
-        <div class="ch-meta">
-          <span class="xp-pill" id="xp-pill">+40 XP</span>
-          <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+      <div class="ch-row" id="ch-row">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="ex-eyebrow">🎯 Exercise</span>
+          <a href="#" class="review-lesson-link" id="review-lesson-link" onclick="return false;">📘 Review Lesson</a>
         </div>
+        <div class="ch-row-inner">
+          <div class="ch-text" id="ch-text">Select a challenge to begin.</div>
+          <div class="ch-meta">
+            <span class="xp-pill" id="xp-pill">+40 XP</span>
+            <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+          </div>
+        </div>
+        <div id="hint-display"></div>
       </div>
     </div>
 
@@ -254,7 +330,15 @@
            resulting DOM/state after Run — safe here since the only code ever
            running inside it is the student's own, on their own machine. -->
       <iframe id="out-web" style="display:none;width:480px;height:260px;border:none;background:#fff;border-radius:6px;" sandbox="allow-scripts allow-same-origin"></iframe>
+      <div id="output-quiz"></div>
       <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
+    </div>
+
+    <!-- Always-visible Next control (ported from Grade 7) -->
+    <div class="ch-footer" id="ch-footer">
+      <button class="ch-footer-next" id="ch-footer-next" onclick="footerNextClick()" disabled>
+        Complete the exercise to continue →
+      </button>
     </div>
 
     <!-- Console / print output -->
@@ -558,6 +642,74 @@ async function runWebCode() {
   checkWebChallenge(webLog)
 }
 
+// ── Quiz stages (ported from Grade 7) — matching / fill-in-the-blank /
+// scenario judgment, no code editor involved at all. ──────────────────────
+function renderQuiz(ch) {
+  const box = document.getElementById('output-quiz')
+  const qs = ch.questions || []
+  const pfx = 'quiz-' + ch.id + '-'
+  box.innerHTML = '<div class="quiz-grid">' + qs.map((q, i) => {
+    if (q.type === 'judge') {
+      return `<div class="q-item">
+        <div class="q-scenario">${q.scenario}</div>
+        <div class="q-label">Fake or real?</div>
+        <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option><option value="FAKE">FAKE</option><option value="REAL">REAL</option></select>
+        ${q.flagOptions ? `<div class="q-label" style="margin-top:6px">Which red flag?</div>
+        <select id="${pfx}${i}-b" autocomplete="off"><option value="">Choose…</option>${q.flagOptions.map(f=>`<option value="${f}">${f}</option>`).join('')}</select>` : ''}
+      </div>`
+    }
+    if (q.type === 'match') {
+      return `<div class="q-item"><div class="q-label">${q.prompt}</div>
+        <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option>${q.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`
+    }
+    if (q.type === 'prompt' || q.type === 'any') {
+      return `<div class="q-item"><div class="q-label">${q.prompt}</div>
+        <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="Write your answer…" style="width:100%"></div>`
+    }
+    return `<div class="q-item"><div class="q-label">${q.prompt}</div>
+      <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="Type your answer…"></div>`
+  }).join('') + '</div>' + `<button class="q-check-btn" onclick="checkQuiz()">✅ Submit Answer</button><div class="q-result" id="quiz-result"></div>`
+}
+
+function checkQuiz() {
+  const ch = CHALLENGES[activeIdx]
+  const qs = ch.questions || []
+  const pfx = 'quiz-' + ch.id + '-'
+  let correct = 0
+  qs.forEach((q, i) => {
+    const a = (document.getElementById(pfx + i + '-a')?.value || '').trim().toLowerCase()
+    const bEl = document.getElementById(pfx + i + '-b')
+    if (q.type === 'judge') {
+      const okA = a === (q.answer || '').toLowerCase()
+      const okB = !bEl || !q.flagAnswers || q.flagAnswers.some(f => (bEl.value||'').toLowerCase() === f.toLowerCase())
+      if (okA && okB) correct++
+    } else {
+      const acceptable = Array.isArray(q.answer) ? q.answer : [q.answer]
+      if (acceptable.some(ans => a === String(ans).toLowerCase())) correct++
+    }
+  })
+  const need = ch.passCount != null ? ch.passCount : qs.length
+  const resultEl = document.getElementById('quiz-result')
+  const pass = correct >= need
+  resultEl.textContent = correct + ' / ' + qs.length + ' correct' + (pass ? ' — passed!' : ` — need ${need}`)
+  resultEl.className = 'q-result ' + (pass ? 'ok' : 'bad')
+  if (!completed.has(activeIdx) && pass) {
+    completed.add(activeIdx)
+    renderPills()
+    document.getElementById('pass-badge').textContent = '🎉 Great! +' + ch.xp + ' XP earned!'
+    document.getElementById('pass-badge').style.display = 'block'
+    showToast('Challenge complete! +' + ch.xp + ' XP 🎉')
+    clog('✅ Challenge complete! +' + ch.xp + ' XP', 'ok')
+    if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g8-c' + activeIdx, { passed:true, score:100 }) }
+    LessonSaves.save('grade8', ch.id, { passed:true, xpEarned: ch.xp })
+    reportRealProgress(ch, Date.now() - challengeStartedAt)
+    updateFooterNext()
+    renderModuleXPBar(findModuleForChallenge(ch))
+  } else if (!pass) {
+    clog('❌ Not quite — ' + correct + '/' + qs.length + ' correct, need ' + need, 'err')
+  }
+}
+
 function checkWebChallenge(log) {
   const ch = CHALLENGES[activeIdx]
   if (!ch || completed.has(activeIdx)) return
@@ -574,6 +726,8 @@ function checkWebChallenge(log) {
     // checkChallenge(), which does call it (just with the wrong-case lookup
     // fixed elsewhere in this file).
     reportRealProgress(ch, Date.now() - challengeStartedAt)
+    updateFooterNext()
+    renderModuleXPBar(findModuleForChallenge(ch))
   } else {
     clog('❌ Not quite — check the task above and try the 💡 Hint button.', 'err')
   }
@@ -697,6 +851,47 @@ function highlightError(line) {
 // is deliberately structural (right constructs used + it ran clean), same
 // leniency as the pre-existing M9/M10 content below.
 const MODULES = [
+  // ── Semester 1, Week 1: What Is a Website? — new for the 3-semester
+  // rebuild. No code editor — quiz-type stages (matching + judgment),
+  // reusing the engine ported from Grade 7's CB1-CB6.
+  { id:'web0', name:'🌐 What Is a Website?', sub:'Client/server, URLs, real browsers — no code yet, just the real parts', live:true, stages:[
+    { id:'web0s1', name:'Client & Server', xp:20, type:'quiz',
+      text:`<strong>Challenge 1</strong> — Match each description to the correct term.`,
+      hints:['You = customer, browser = waiter, server = kitchen.', 'The protocol comes first in a URL, before the domain.'],
+      passCount:4,
+      questions:[
+        { type:'match', prompt:'You ask for a page; this fetches it for you and shows the result.', options:['Browser','Server','URL','Domain'], answer:'Browser' },
+        { type:'match', prompt:'This actually stores the website\'s files and sends them back when asked.', options:['Browser','Server','URL','Domain'], answer:'Server' },
+        { type:'match', prompt:'https:// is an example of this — it tells the browser HOW to connect.', options:['Protocol','Domain','Page path','Browser'], answer:'Protocol' },
+        { type:'match', prompt:'wikipedia.org is an example of this — the site\'s actual name/address.', options:['Protocol','Domain','Page path','Browser'], answer:'Domain' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
+    { id:'web0s2', name:'Real Browsers & Devices', xp:20, type:'quiz',
+      text:`<strong>Challenge 2</strong> — Fill in the blank for each sentence.`,
+      hints:['Chrome, Firefox, Safari, and Edge are all real, different browsers.', 'JavaScript and Java are genuinely different languages, despite the similar name.'],
+      passCount:3,
+      questions:[
+        { type:'match', prompt:'Chrome, Firefox, Safari, and Edge are all examples of a ___.', options:['browser','server','domain','protocol'], answer:'browser' },
+        { type:'fill', prompt:'JavaScript and ___ are two completely different programming languages, despite the similar name.', answer:'Java' },
+        { type:'match', prompt:'HTML is like a building\'s ___ — the structure everything else sits on.', options:['skeleton','paint','electricity'], answer:'skeleton' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'web0boss', name:'BOSS — Inspect a Real Page', xp:60, type:'quiz', boss:true,
+      text:`<strong>BOSS</strong> — A mixed test on everything from this week, plus a real hands-on task.
+      <br><br><span style="opacity:.8;font-size:12px;">🖐 Hands-on (teacher-reviewed, not auto-checked): right-click → Inspect on 3 real websites. Screenshot one heading, one button, one link, and one image found in each site's Inspect view — notice the same tags underneath every one.</span>`,
+      hints:['Page Source shows the ORIGINAL html from the server. Inspect shows the LIVE current state, which can change.', 'HTML = structure, CSS = style, JS = behaviour — three separate jobs.'],
+      passCount:4,
+      questions:[
+        { type:'match', prompt:'This shows the original HTML sent by the server, unchanged.', options:['Page Source','Inspect','The URL bar','The console'], answer:'Page Source' },
+        { type:'match', prompt:'This shows the page\'s LIVE current state, which can be different from what the server first sent.', options:['Page Source','Inspect','The URL bar','The console'], answer:'Inspect' },
+        { type:'match', prompt:'CSS is like a building\'s ___ — colour and decoration, not structure.', options:['paint','skeleton','electricity'], answer:'paint' },
+        { type:'match', prompt:'JS is like a building\'s ___ — the things that move and respond.', options:['electricity','paint','skeleton'], answer:'electricity' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
+  ]},
   // ── Web Story 1 — Semester 1, Week 1: objects/arrays for story state ──────
   // Real HTML/CSS/JS text code (lang:'web') — Grade 8's story project is
   // "advanced" and matches Grade 8's own real-Python positioning, unlike
@@ -2633,6 +2828,23 @@ const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({
 // challenges). Rendered by renderChallengeLesson().
 // ══════════════════════════════════════════════════════════════════════════════
 const CHALLENGE_LESSON = {
+  web0s1: { title: 'Client, server, protocol, domain', html: `
+    <div class="cl-block"><h4>You = customer, browser = waiter, server = kitchen</h4>
+      <p>The browser is the client — it asks for a page. The server stores the site's real files and sends them back. A URL's protocol (https://) says HOW to connect; the domain (wikipedia.org) says WHERE.</p></div>
+    <div class="cl-block"><h4>A real example</h4>
+      <p>Type wikipedia.org into a browser: the browser (client) sends a request, Wikipedia's server finds the page, and sends the HTML back — same shape every single time, for every website.</p></div>` },
+  web0s2: { title: 'Real browsers, and the JS/Java mix-up', html: `
+    <div class="cl-block"><h4>Chrome, Firefox, Safari, Edge — all real browsers</h4>
+      <p>Different companies make different browsers, but they all do the same job: request a page, then draw the HTML/CSS/JS it gets back.</p></div>
+    <div class="cl-block"><h4>JavaScript ≠ Java</h4>
+      <p>Despite the similar name, they're two unrelated programming languages, made by different companies, used for different things. This mix-up is extremely common — worth remembering now.</p></div>
+    <div class="cl-block"><h4>The one analogy for the whole year</h4>
+      <p>HTML = skeleton/furniture (structure). CSS = paint/decoration (style). JS = electricity (things that move and respond). Every website is built from these three, always in this order of job.</p></div>` },
+  web0boss: { title: 'BOSS — Page Source vs. Inspect', html: `
+    <div class="cl-block"><h4>Two different views of the same page</h4>
+      <p>Page Source shows the ORIGINAL HTML exactly as the server sent it. Inspect shows the page's LIVE current state — which JavaScript can change after the page loads, so it can look different from Page Source.</p></div>
+    <div class="cl-block"><h4>Why this matters</h4>
+      <p>When you build your own portfolio later this semester, Inspect is how you'll check that your HTML/CSS actually did what you intended — it's the real tool professional developers use every day.</p></div>` },
   // ── Web Story 1 — Remembering the Reader: arrays & objects ──────────────────
   ws1s1: { title: 'An array is an ordered list of values', html: `
     <div class="cl-block"><h4>Real JavaScript, real syntax</h4>
@@ -3079,7 +3291,13 @@ function showJourney() {
       id: s.id, emoji: STAGE_EMO[i % STAGE_EMO.length], label: s.name,
       done: completed.has(STAGE_INDEX[s.id]),
     }))
-    return { name: m.name, sub: m.sub, live: true, stages }
+    // One Lesson bubble per module, same node style as exercises, placed
+    // first (ported from Grade 7). done:true always -- see Grade 7's
+    // same comment: the unlock chain checks stages[i-1].done, so a real,
+    // untracked lesson-visit flag would permanently lock every module's
+    // first exercise.
+    const lessonNode = { id: 'lesson-' + m.id, emoji: '📘', label: 'Lesson', done: true }
+    return { name: m.name, sub: m.sub, live: true, stages: [lessonNode, ...stages] }
   })
   QuestMap.show({
     title: '🏙 Builder City',
@@ -3088,7 +3306,7 @@ function showJourney() {
     layout: 'path', softLock: true,
     avatarSvg: '<span style="font-size:22px;">🐍</span>',
     worlds,
-    onOpen: (id) => selectChallenge(STAGE_INDEX[id]),
+    onOpen: (id) => id.startsWith('lesson-') ? openModuleLesson(id.slice(7)) : selectChallenge(STAGE_INDEX[id]),
   })
 }
 
@@ -3143,17 +3361,25 @@ function selectChallenge(i) {
   hintIdx   = 0
   challengeStartedAt = Date.now()
   const ch  = CHALLENGES[i]
+  document.getElementById('ch-row').style.display = ''
   document.getElementById('ch-text').innerHTML = ch.text
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
   document.getElementById('pass-badge').style.display = 'none'
+  document.getElementById('hint-display').innerHTML = ''
   // Web Story stages (lang:'web') swap in the real HTML/CSS/JS editor and
-  // iframe preview in place of the Python editor + canvas.
-  const isWeb = ch.lang === 'web'
-  document.getElementById('py-editor-panel').style.display  = isWeb ? 'none' : ''
-  document.getElementById('web-editor-panel').style.display = isWeb ? '' : 'none'
-  document.getElementById('out-canvas').style.display = isWeb ? 'none' : 'block'
-  document.getElementById('out-web').style.display    = isWeb ? 'block' : 'none'
-  if (isWeb) {
+  // iframe preview in place of the Python editor + canvas. Quiz stages
+  // (ported from Grade 7) need neither — no-blocks-mode hides both.
+  const isWeb  = ch.lang === 'web'
+  const isQuiz = ch.type === 'quiz'
+  document.body.classList.toggle('no-blocks-mode', isQuiz)
+  document.getElementById('py-editor-panel').style.display  = (isWeb || isQuiz) ? 'none' : ''
+  document.getElementById('web-editor-panel').style.display = (isWeb && !isQuiz) ? '' : 'none'
+  document.getElementById('out-canvas').style.display = (isWeb || isQuiz) ? 'none' : 'block'
+  document.getElementById('out-web').style.display    = (isWeb && !isQuiz) ? 'block' : 'none'
+  document.getElementById('output-quiz').style.display = isQuiz ? 'block' : 'none'
+  if (isQuiz) {
+    renderQuiz(ch)
+  } else if (isWeb) {
     webEditors.html.setValue((ch.webStarter && ch.webStarter.html) || '')
     webEditors.css.setValue((ch.webStarter && ch.webStarter.css) || '')
     webEditors.js.setValue((ch.webStarter && ch.webStarter.js) || '')
@@ -3165,8 +3391,82 @@ function selectChallenge(i) {
     ctx.clearRect(0,0,W,H)
   }
   renderPills()
-  renderChallengeLesson(ch)
+  // The Exercise page shows ONLY the exercise — the full lesson lives on its
+  // own dedicated per-module page (openModuleLesson), reachable via "Review
+  // Lesson", not shown inline competing for space (ported from Grade 7).
+  document.getElementById('ch-lesson').style.display = 'none'
+  const mod = findModuleForChallenge(ch)
+  const reviewLink = document.getElementById('review-lesson-link')
+  reviewLink.onclick = () => { openModuleLesson(mod ? mod.id : ''); return false }
+  renderModuleXPBar(mod)
+  updateFooterNext()
   clog('Challenge: ' + ch.name, 'info')
+}
+
+// ── Module XP progress + Lesson/Exercise split (ported from Grade 7) ───────
+function findModuleForChallenge(ch) {
+  return MODULES.find(m => m.id.toUpperCase() === ch.mod)
+}
+function moduleXPProgress(mod) {
+  let earned = 0, total = 0
+  mod.stages.forEach(s => { total += s.xp; if (completed.has(STAGE_INDEX[s.id])) earned += s.xp })
+  return { earned, total }
+}
+function renderModuleXPBar(mod) {
+  const el = document.getElementById('world-xp-bar')
+  if (!el || !mod) { if (el) el.innerHTML = ''; return }
+  const { earned, total } = moduleXPProgress(mod)
+  const pct = total ? Math.round(earned / total * 100) : 0
+  el.innerHTML = '<div class="wxp-label">🏆 ' + earned + ' / ' + total + ' XP earned — ' + mod.name + '</div>'
+    + '<div class="wxp-track"><div class="wxp-fill" style="width:' + pct + '%"></div></div>'
+}
+let _footerNextAction = () => stepChallenge(1)
+function footerNextClick() { _footerNextAction() }
+function updateFooterNext() {
+  _footerNextAction = () => stepChallenge(1)
+  const btn = document.getElementById('ch-footer-next')
+  if (!btn) return
+  const isLast = activeIdx + 1 >= CHALLENGES.length
+  if (completed.has(activeIdx)) {
+    btn.disabled = false
+    btn.textContent = isLast ? '🎉 All done here!' : 'Next Challenge →'
+    if (isLast) btn.disabled = true
+  } else {
+    btn.disabled = true
+    btn.textContent = 'Complete the exercise to continue →'
+  }
+}
+function openModuleLesson(modId) {
+  const mod = MODULES.find(m => m.id === modId)
+  if (!mod) return
+  document.body.classList.add('no-blocks-mode')
+  document.getElementById('py-editor-panel').style.display = 'none'
+  document.getElementById('web-editor-panel').style.display = 'none'
+  document.getElementById('out-canvas').style.display = 'none'
+  document.getElementById('out-web').style.display = 'none'
+  document.getElementById('output-quiz').style.display = 'none'
+  document.getElementById('pass-badge').style.display = 'none'
+  document.getElementById('ch-row').style.display = 'none'
+  document.getElementById('ch-nav-current').innerHTML = '<b>📘 Lesson</b> — ' + mod.name
+  const lessonEl = document.getElementById('ch-lesson')
+  lessonEl.style.display = ''
+  document.getElementById('cl-title').textContent = mod.name
+  const combined = mod.stages
+    .filter(s => !s.boss)
+    .map(s => ({ s, l: CHALLENGE_LESSON[s.id] }))
+    .filter(x => x.l)
+    .map((x, i) => (i > 0 ? '<div class="lesson-stage-break"><span>' + x.s.name + '</span></div>' : '') + x.l.html)
+    .join('')
+  document.getElementById('cl-body').innerHTML = combined || '<div class="cl-block"><p>No lesson content yet for this module.</p></div>'
+  document.getElementById('cl-body').classList.remove('collapsed')
+  document.getElementById('cl-arrow').textContent = '▾'
+  const firstStage = mod.stages[0]
+  const btn = document.getElementById('ch-footer-next')
+  btn.disabled = false
+  btn.textContent = '▶ Start Exercises →'
+  _footerNextAction = () => selectChallenge(STAGE_INDEX[firstStage.id])
+  renderModuleXPBar(mod)
+  clog('Lesson: ' + mod.name, 'info')
 }
 
 // 📘 Full per-challenge lesson content — CHALLENGE_LESSON is defined further
@@ -3199,6 +3499,8 @@ function toggleChallengeLesson() {
 // (8 of these 10 concepts did not exist before this fix — only
 // functions-params/lists-data did, for modules M3/M4).
 const G8_MODULE_CONCEPT = {
+  // Semester 1, Week 1 (3-semester rebuild) — genuinely new territory, own concept.
+  web0:'g8-what-is-a-website',
   m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
   m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
   // Web Story (Sem 1, ws1-ws5) — added when this world was built; was
@@ -3265,8 +3567,28 @@ function validateChallenge(code) {
 function showHint() {
   const ch = CHALLENGES[activeIdx]
   if (!ch) return
-  if (hintIdx < ch.hints.length) clog('Hint ' + (hintIdx+1) + ': ' + ch.hints[hintIdx++], 'info')
-  else clog('No more hints!', 'info')
+  // Hints must show up somewhere ALWAYS visible — clog() alone writes to
+  // .console-panel, which no-blocks-mode hides entirely for quiz stages
+  // (same bug class fixed in Grade 7).
+  const disp = document.getElementById('hint-display')
+  if (hintIdx < ch.hints.length) {
+    const hintText = ch.hints[hintIdx++]
+    clog('Hint ' + hintIdx + ': ' + hintText, 'info')
+    if (disp) {
+      const line = document.createElement('div')
+      line.className = 'hint-line'
+      line.textContent = '💡 Hint ' + hintIdx + ': ' + hintText
+      disp.appendChild(line)
+    }
+  } else {
+    clog('No more hints!', 'info')
+    if (disp && !disp.textContent) {
+      const line = document.createElement('div')
+      line.className = 'hint-line'
+      line.textContent = 'No more hints!'
+      disp.appendChild(line)
+    }
+  }
 }
 
 // ── Console ───────────────────────────────────────────────────────────────────

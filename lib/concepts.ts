@@ -98,6 +98,7 @@ export const CONCEPTS: Concept[] = [
   // password-length/https checks: lookalike domains, why hashing exists,
   // combining multiple real red flags in one function.
   { id:'g8-cyber', name:'Cyber Defense — Lookalikes, Hashing & Red Flags', icon:'🔐', color:'#dc2626', tier:5, xGroup:10, prerequisites:['g8-web'], difficulty:3, gradeMin:8, estimatedMinutes:60, learningModes:['grade8'], tags:['grade8','security'], lessonUrl:'/lessons/grade8.html' },
+  { id:'g8-what-is-a-website', name:'What Is a Website?', icon:'🌐', color:'#2f7d4f', tier:1, xGroup:1, prerequisites:[], difficulty:1, gradeMin:8, estimatedMinutes:30, learningModes:['grade8'], tags:['grade8','fundamentals'], lessonUrl:'/lessons/grade8.html' },
 
   // ══════════════════════════════════════════════════════════════════════════
   //  GRADE 9 — "The Deep Diver"
