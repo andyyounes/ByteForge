@@ -1265,6 +1265,41 @@ const WORLDS = [
       check:(log) => log.quizCorrect >= 4,
     },
   ]},
+  // ── Semester 1, Week 2: Files & Storage ─────────────────────────────────
+  // The real hands-on task (make a folder structure, screenshot it) needs a
+  // file-upload/review capability that doesn't exist on the platform — it
+  // stays a teacher-reviewed offline activity, described in the text below,
+  // not faked as an auto-check. Only the auto-checkable part (extensions)
+  // becomes a real quiz stage.
+  { id:'cb2', name:'🗂️ Computer Basics — Files & Storage', sub:'File extensions, folders, and what KB/MB/GB actually mean', live:true, stages:[
+    { id:'cb2s1', name:'Know Your File Types', xp:25, type:'quiz',
+      text:`<strong>Challenge 1</strong> — Match each file to the kind of file it is.
+      <br><br><span style="opacity:.8;font-size:12px;">🖐 Hands-on (teacher-reviewed, not auto-checked): create a folder called "Grade 7 ICT" with 3 sub-folders inside — Games, Pictures, Homework — save one real file into each, then show your teacher.</span>`,
+      hints:['.jpg and .png are images.', '.mp3 and .wav are audio.', '.docx is a document, .mp4 is video.'],
+      passCount:4,
+      questions:[
+        { type:'match', prompt:'holiday.jpg is a(n) ___ file.', options:['image','audio','document','video'], answer:'image' },
+        { type:'match', prompt:'song.mp3 is a(n) ___ file.', options:['image','audio','document','video'], answer:'audio' },
+        { type:'match', prompt:'essay.docx is a(n) ___ file.', options:['image','audio','document','video'], answer:'document' },
+        { type:'match', prompt:'clip.mp4 is a(n) ___ file.', options:['image','audio','document','video'], answer:'video' },
+        { type:'fill', prompt:'Storage is measured in KB, MB, and ___ — each about 1000× the last.', answer:'GB' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
+    { id:'cb2boss', name:'BOSS — File Types & Storage', xp:55, type:'quiz', boss:true,
+      text:`<strong>BOSS</strong> — A harder mixed set: file types plus storage size order.`,
+      hints:['game.exe is a program you run, not a document.', '1 GB is bigger than 1 MB, which is bigger than 1 KB.'],
+      passCount:4,
+      questions:[
+        { type:'match', prompt:'game.exe is a(n) ___ file.', options:['image','audio','document','program'], answer:'program' },
+        { type:'match', prompt:'photo.png is a(n) ___ file.', options:['image','audio','document','program'], answer:'image' },
+        { type:'fill', prompt:'Put these in order, smallest first: MB, KB, GB → ___, ___, ___ (comma-separated)', answer:['KB, MB, GB','KB,MB,GB'] },
+        { type:'fill', prompt:'A file called notes.docx is a ___ file.', answer:'document' },
+        { type:'fill', prompt:'A folder is a ___ that groups files together.', answer:'container' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
+  ]},
   // ── Story Studio — Semester 1, Week 1: HTML structure & tags ──────────────
   // Page-building blocks stand in for real HTML tags (heading→h1, paragraph→p,
   // link→a, button→button) so students learn what each tag is FOR before
@@ -2177,6 +2212,12 @@ const CHALLENGE_LESSON = {
   cb1boss: { title: 'BOSS — same five facts, mixed', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Every question here reuses a fact from Challenges 1–3. Score 4 out of 5 to pass.</p></div>` },
+  cb2s1: { title: 'A file extension tells you the type', html: `
+    <div class="cl-block"><h4>.jpg, .mp3, .docx, .mp4</h4>
+      <p>.jpg and .png are images. .mp3 and .wav are audio. .docx is a document. .mp4 is video. Storage is measured in KB, MB, GB — each about 1000× the last.</p></div>` },
+  cb2boss: { title: 'BOSS — file types and storage size order', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Same facts as Challenge 1, plus: KB is smaller than MB, which is smaller than GB. A folder is a container that groups files together.</p></div>` },
   // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
   st1s1: { title: 'A heading is a page\'s title', html: `
     <div class="cl-block"><h4>One big title, nothing more</h4>
@@ -2803,8 +2844,8 @@ const G7_MODULE_CONCEPT = {
   // Security Lab — genuinely new territory (online safety/digital
   // citizenship, not a game-programming skill), own concept.
   GSAFE: 'g7-online-safety',
-  // Computer Basics (Sem 1, Week 1) — genuinely new territory, own concept.
-  CB1: 'g7-computer-basics',
+  // Computer Basics (Sem 1, Weeks 1-2) — genuinely new territory, own concept.
+  CB1: 'g7-computer-basics', CB2: 'g7-computer-basics',
 }
 // G5 (Player Control) splits across two concepts depending on the challenge.
 const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }
