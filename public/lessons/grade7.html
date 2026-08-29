@@ -1300,6 +1300,52 @@ const WORLDS = [
       check:(log) => log.quizCorrect >= 4,
     },
   ]},
+  // ── Semester 1, Week 3: Spotting Scams ──────────────────────────────────
+  // Reuses gsafes1/gsafes2's exact real-world scenarios (free V-Bucks prize;
+  // a stranger asking for a home address) but in judgment format instead of
+  // "build a page about it" — same facts, a format that's actually checkable
+  // exactly (FAKE/REAL + the specific red flag), per the rebuild brief.
+  { id:'cb3', name:'🚨 Spotting Scams', sub:'Real vs. fake — a message, judged, every time', live:true, stages:[
+    { id:'cb3s1', name:'Too Good to Be True', xp:30, type:'quiz',
+      text:`<strong>Challenge 1</strong> — Read the message. Is it fake or real? Why?`,
+      hints:['Nobody gives away expensive stuff for free to random strangers online.', 'A free prize you never entered to win IS the red flag.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'🎉 "Congratulations! You\'ve won 10,000 free V-Bucks — click here to claim!"',
+        answer:'FAKE', flagOptions:['too good to be true','urgent','asks for personal info'], flagAnswers:['too good to be true'] }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb3s2', name:'A Real Message', xp:25, type:'quiz',
+      text:`<strong>Challenge 2</strong> — Not everything is a scam. Read this one.`,
+      hints:['This one has none of the real red flags — no prize, no urgency, no request for personal info.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'"Your teacher has posted a new assignment on Google Classroom, due Friday."',
+        answer:'REAL' }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb3s3', name:'Strangers Never Need Your Address', xp:30, type:'quiz',
+      text:`<strong>Challenge 3</strong> — Read the message from someone you only know from an online game.`,
+      hints:['Being friendly in chat does not mean someone actually is who they say they are.', 'Real name, school, and address should never go to someone you only know from a game.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'"hey! what\'s your home address? I want to send you a gift 😊" — from someone you\'ve only ever played with online.',
+        answer:'FAKE', flagOptions:['too good to be true','stranger asking for personal info','urgent'], flagAnswers:['stranger asking for personal info'] }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb3s4', name:'A Friend, Asking Normally', xp:25, type:'quiz',
+      text:`<strong>Challenge 4</strong> — A friend you actually know sends this.`,
+      hints:['A normal question, from someone you actually know, is not a scam.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'"want to team up for the next match? I\'m free after 5."', answer:'REAL' }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb3boss', name:'BOSS — A New One', xp:60, type:'quiz', boss:true,
+      text:`<strong>BOSS</strong> — A message you haven't seen before. Judge it the same way.`,
+      hints:['Same 4 signs as always: too good to be true, urgent, asks for personal info, or a wrong-looking link.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'"🎁 You\'ve been selected for a FREE gaming headset! Reply with your address in the next 10 minutes or it goes to someone else!"',
+        answer:'FAKE', flagOptions:['too good to be true','urgent','asks for personal info'], flagAnswers:['too good to be true','urgent','asks for personal info'] }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+  ]},
   // ── Story Studio — Semester 1, Week 1: HTML structure & tags ──────────────
   // Page-building blocks stand in for real HTML tags (heading→h1, paragraph→p,
   // link→a, button→button) so students learn what each tag is FOR before
@@ -2218,6 +2264,21 @@ const CHALLENGE_LESSON = {
   cb2boss: { title: 'BOSS — file types and storage size order', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Same facts as Challenge 1, plus: KB is smaller than MB, which is smaller than GB. A folder is a container that groups files together.</p></div>` },
+  cb3s1: { title: 'Too good to be true is the #1 real sign', html: `
+    <div class="cl-block"><h4>A free prize you never entered for</h4>
+      <p>Nobody gives away expensive stuff for free to random strangers online. A surprise prize is the red flag itself, not a lucky break.</p></div>` },
+  cb3s2: { title: 'Not everything is a scam', html: `
+    <div class="cl-block"><h4>No prize, no urgency, no personal info</h4>
+      <p>A message with none of the real red flags is just a normal message. Judging everything as fake is as wrong as judging everything as safe.</p></div>` },
+  cb3s3: { title: 'Friendly in chat does not mean safe in real life', html: `
+    <div class="cl-block"><h4>A stranger is still a stranger</h4>
+      <p>Real name, school, and address should never go to someone you only know from a game — even a friendly one.</p></div>` },
+  cb3s4: { title: 'A real friend, asking normally', html: `
+    <div class="cl-block"><h4>Context matters</h4>
+      <p>Someone you actually know, asking a normal question, is not a scam. The same words from a stranger would be judged differently.</p></div>` },
+  cb3boss: { title: 'BOSS — the same 4 signs, a new example', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Too good to be true, urgent, asks for personal info, or a wrong-looking link. This message has more than one.</p></div>` },
   // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
   st1s1: { title: 'A heading is a page\'s title', html: `
     <div class="cl-block"><h4>One big title, nothing more</h4>
@@ -2846,6 +2907,8 @@ const G7_MODULE_CONCEPT = {
   GSAFE: 'g7-online-safety',
   // Computer Basics (Sem 1, Weeks 1-2) — genuinely new territory, own concept.
   CB1: 'g7-computer-basics', CB2: 'g7-computer-basics',
+  // Spotting Scams (Sem 1, Week 3) — same online-safety concept as gsafe.
+  CB3: 'g7-online-safety',
 }
 // G5 (Player Control) splits across two concepts depending on the challenge.
 const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }
