@@ -1376,6 +1376,44 @@ print(f"{celsius}C is {fahrenheit}F")
     },
   ]},
 
+  // ── Semester 2, Week 2: If/Else — new for the 3-semester rebuild. Reuses
+  // M2's Odd/Even framing, but as fill-in-the-blank on starter code, and
+  // isolated to if/else alone — no loops mixed in the same week.
+  { id:'py2', name:'🔀 If/Else', sub:'Decisions in real code — one comparison operator this week: ==', live:true, stages:[
+    { id:'py2s1', name:'Odd or Even', xp:30,
+      text:`<strong>Challenge 1</strong> — Complete the missing condition and else branch below.`,
+      hints:[
+        'number % 2 gives the remainder after dividing by 2 — 0 means even.',
+        'The colon and indentation are part of real Python syntax — this is what Grade 7\'s if/else blocks actually compiled to underneath.',
+        'The else branch needs its own print() too — one for each outcome.',
+      ],
+      starter:`number = 7
+
+# TODO: complete the condition to check if number is even
+if number % 2 == ___:
+    print("Even")
+else:
+    print(___)
+`,
+      check:(code) => /if\s+number\s*%\s*2\s*==\s*0\s*:/.test(code) && /else\s*:\s*\n\s*print\s*\(/.test(code),
+    },
+    { id:'py2boss', name:'BOSS — Hot or Not', xp:45, boss:true,
+      text:`<strong>BOSS</strong> — A different comparison this time: complete the condition using <code>&gt;</code> to decide if the temperature counts as "Hot".`,
+      hints:[
+        'temperature > ___ — pick a real threshold, e.g. 25.',
+        'Same shape as Challenge 1: if / else, one print() in each branch.',
+      ],
+      starter:`temperature = 30
+
+# TODO: complete the condition — pick a real threshold temperature
+if temperature > ___:
+    print("Hot")
+else:
+    print("Not hot")
+`,
+      check:(code) => /if\s+temperature\s*>\s*\d+\s*:/.test(code) && /else\s*:\s*\n\s*print\s*\(/.test(code),
+    },
+  ]},
   { id:'m2', name:'🚦 M2 — Choices & Loops', sub:'if/elif/else, while, for-range — predict the drawing before you run it', live:true, stages:[
     { id:'m2s1', name:'Odd or Even', xp:35,
       text:`<strong>Challenge 1 — If / Else</strong> — Create a <em>number</em> variable. Use <code>%</code> (the remainder operator) and an if/else to print whether it's odd or even.`,
@@ -2888,6 +2926,14 @@ const CHALLENGE_LESSON = {
       <p>An f-string lets you drop variables straight into a sentence: <code>f"My name is {name}"</code>. The <code>f</code> right before the opening quote is what makes <code>{name}</code> get replaced with the variable's real value.</p></div>
     <div class="cl-block"><h4>Why this beats separate print() calls</h4>
       <p>Three separate print() calls make three separate lines. One f-string makes ONE real sentence — closer to how you'd actually write it.</p></div>` },
+  py2s1: { title: 'Real if/else — colons and indentation matter', html: `
+    <div class="cl-block"><h4>Same idea as Grade 7's if/else blocks</h4>
+      <p>A decision still checks a condition and picks one of two paths. What's new: a colon after the condition, and indentation to show what's INSIDE each branch — Python uses indentation instead of a visual block shape.</p></div>
+    <div class="cl-block"><h4>% finds the remainder</h4>
+      <p><code>number % 2</code> is what's left over after dividing by 2. A remainder of 0 means the number divided evenly — that's what "even" actually means.</p></div>` },
+  py2boss: { title: 'BOSS — a different comparison, same shape', html: `
+    <div class="cl-block"><h4>Nothing new structurally</h4>
+      <p><code>&gt;</code> works exactly like <code>==</code> did — it's still one condition, still if/else, still one print() per branch. Only the comparison itself changed.</p></div>` },
   web0s1: { title: 'Client, server, protocol, domain', html: `
     <div class="cl-block"><h4>You = customer, browser = waiter, server = kitchen</h4>
       <p>The browser is the client — it asks for a page. The server stores the site's real files and sends them back. A URL's protocol (https://) says HOW to connect; the domain (wikipedia.org) says WHERE.</p></div>
@@ -3564,6 +3610,9 @@ const G8_MODULE_CONCEPT = {
   // Semester 2, Week 1 (3-semester rebuild) — reuses M1's concept slot,
   // since it's a slower-paced replacement for the same "variables" idea.
   py1:'g8-text',
+  // Semester 2, Week 2 — reuses M2's concept slot (same underlying skill,
+  // slower-paced replacement).
+  py2:'g8-loops',
   m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
   m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
   // Web Story (Sem 1, ws1-ws5) — added when this world was built; was
