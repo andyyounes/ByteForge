@@ -17,14 +17,19 @@ export default async function StudentExamsPage() {
 
   // Get student's class
   const admin = await createAdminClient()
-  const { data: membership } = await admin
-    .from('class_members')
-    .select('class_id, classes(id, name)')
-    .eq('student_id', user.id)
-    .order('joined_at', { ascending: false })
-    .limit(1)
-    .single()
-    .catch(() => ({ data: null }))
+  let membership: { class_id: string; classes: { id: string; name: string } } | null = null
+  try {
+    const { data } = await admin
+      .from('class_members')
+      .select('class_id, classes(id, name)')
+      .eq('student_id', user.id)
+      .order('joined_at', { ascending: false })
+      .limit(1)
+      .single()
+    membership = data as typeof membership
+  } catch {
+    membership = null
+  }
 
   const classId   = (membership?.classes as { id: string; name: string } | null)?.id   ?? null
   const className = (membership?.classes as { id: string; name: string } | null)?.name ?? null
