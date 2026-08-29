@@ -28,6 +28,18 @@
       height: calc(100vh - 64px);
       overflow: hidden;
     }
+    /* No-blocks mode (quiz/chat/lesson) — the grid's second column (480px,
+       originally reserved for the code editor) stayed reserved as blank
+       space even with .blocks-panel hidden, since CSS Grid track sizing
+       doesn't collapse just because one item is display:none. Collapse to
+       a single full-width column so the lesson/exercise genuinely become
+       standalone pages, not a narrow column with dead space beside them. */
+    body.no-blocks-mode .layout { grid-template-columns: 1fr; }
+    /* Let the whole right-panel scroll as ONE page instead of ch-header
+       being its own separately-scrolling boxed widget (max-height:52vh) —
+       that's what made the lesson feel cramped into a small box. */
+    body.no-blocks-mode .ch-header { max-height:none; overflow-y:visible; }
+    body.no-blocks-mode .right-panel { overflow-y:auto; }
 
     /* ── Left: Blockly ── */
     .blocks-panel { display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden; }
