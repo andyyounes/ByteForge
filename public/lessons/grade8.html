@@ -1795,6 +1795,172 @@ print("The adventure ends.")
                     && /while\s+not\s+game_over\s*:/.test(code) && /game_over\s*=\s*True\b/.test(code),
     },
   ]},
+  // ── Semester 3, Week 1: Health & Attack Basics — new for the 3-semester
+  // rebuild ("Combat Coder"). Same core skills as Semester 2, reinforced
+  // through combat — no new heavy concepts, still zero functions.
+  { id:'cc1', name:'⚔️ Health & Attack Basics', sub:'A battle needs a health variable, an attack value, and arithmetic', live:true, stages:[
+    { id:'cc1s1', name:'Take a Hit', xp:35,
+      text:`<strong>Challenge 1</strong> — Complete the arithmetic so an attack actually reduces health.`,
+      hints:['health = health - attack_value — the same subtraction idea as Semester 2, now meaning something in a battle.'],
+      starter:`health = 100
+attack_value = 15
+
+# TODO: reduce health by attack_value
+health = health ___ attack_value
+print(health)
+`,
+      check:(code) => /health\s*=\s*health\s*-\s*attack_value\b/.test(code),
+    },
+  ]},
+  // ── Semester 3, Week 2: Win/Lose Conditions.
+  { id:'cc2', name:'🏳️ Win/Lose Conditions', sub:'if/else checks whether health has reached 0 or below', live:true, stages:[
+    { id:'cc2s1', name:'Game Over?', xp:35,
+      text:`<strong>Challenge 1</strong> — Complete the check: if health has reached 0 or below, print "You lose!" — otherwise print something else.`,
+      hints:['health <= 0 — reaching EXACTLY 0 should count as a loss too, not just going below it.'],
+      starter:`health = -5
+
+# TODO: complete the check
+if health ___ 0:
+    print("You lose!")
+else:
+    print(___)
+`,
+      check:(code) => /if\s+health\s*<=\s*0\s*:/.test(code) && /else\s*:\s*\n\s*print\s*\(/.test(code),
+    },
+  ]},
+  // ── Semester 3, Week 3: The Battle Loop — direct callback to Semester 2's
+  // while-loop week (unknown count, stop when a condition is met).
+  { id:'cc3', name:'🔁 The Battle Loop', sub:'Turns continue until someone wins — same while-loop idea as before', live:true, stages:[
+    { id:'cc3s1', name:'Keep Fighting', xp:40,
+      text:`<strong>Challenge 1</strong> — Complete the loop so it keeps attacking while health is above 0.`,
+      hints:['while health > 0: — same "unknown count, until it changes" idea as Semester 2.', 'The loop must change health each pass, or it never stops.'],
+      starter:`health = 100
+
+# TODO: keep looping while health is above 0
+while health ___ 0:
+    health = health - 10
+    print(health)
+`,
+      check:(code) => /while\s+health\s*>\s*0\s*:/.test(code) && /health\s*=\s*health\s*-\s*10\b/.test(code),
+    },
+  ]},
+  // ── Semester 3, Week 4: Tracking the Enemy — reinforces the Text
+  // Adventure's "multiple independent things tracked in parallel" idea.
+  { id:'cc4', name:'👹 Tracking the Enemy', sub:'A second, independent set of variables — the enemy\'s own health and attack', live:true, stages:[
+    { id:'cc4s1', name:'The Enemy Strikes Back', xp:40,
+      text:`<strong>Challenge 1</strong> — Complete the enemy's attack on the player.`,
+      hints:['player_health = player_health - enemy_attack — same subtraction idea, a different variable doing the attacking this time.'],
+      starter:`player_health = 100
+enemy_health = 80
+enemy_attack = 12
+
+# TODO: the enemy attacks the player
+player_health = player_health ___ enemy_attack
+print(player_health)
+`,
+      check:(code) => /player_health\s*=\s*player_health\s*-\s*enemy_attack\b/.test(code),
+    },
+  ]},
+  // ── Semester 3, Week 5: Bringing It Together — checkpoint before the project.
+  { id:'cc5', name:'🎯 Bringing It Together', sub:'Checkpoint — health, attack, win/lose, and turns, as one system', live:true, stages:[
+    { id:'cc5boss', name:'BOSS — Guided Mini-Battle', xp:60, boss:true,
+      text:`<strong>BOSS</strong> — Combine everything: a health variable, an attack that reduces it, a while loop that keeps fighting while health is above 0, and a win/lose message once it ends.`,
+      hints:[
+        'This is genuinely cc1-cc4 combined into one program — nothing new to learn.',
+        'while health > 0: attack, then check — after the loop ends, print the outcome.',
+      ],
+      starter:`health = 100
+attack_value = 15
+
+# TODO: loop while health is above 0, reducing it by attack_value each turn
+while health ___ 0:
+    health = health - ___
+    print(health)
+
+# TODO: print the outcome once the loop ends
+if health <= 0:
+    print(___)
+`,
+      check:(code) => /while\s+health\s*>\s*0\s*:/.test(code) && /health\s*=\s*health\s*-\s*attack_value\b/.test(code)
+                    && /if\s+health\s*<=\s*0\s*:\s*\n\s*print\s*\(\s*["']/.test(code),
+    },
+  ]},
+  // ── Semester 3, Weeks 7-11: Ship a Combat Encounter (project) — full
+  // player-vs-enemy battle, scaffold decreases as sessions progress (later
+  // stages have shorter/fewer TODOs than earlier ones), zero functions.
+  { id:'cc', name:'🏆 Ship a Combat Encounter', sub:'Player vs. enemy — health tracking for both, a turn loop, a clear outcome', live:true, stages:[
+    { id:'ccs1', name:'Two Fighters', xp:45,
+      text:`<strong>Sessions 1-4</strong> — Set up both fighters' stats, and complete one full turn: the player attacks the enemy, then the enemy attacks the player.`,
+      hints:[
+        'enemy_health = enemy_health - player_attack, then player_health = player_health - enemy_attack — two separate, independent reductions.',
+      ],
+      starter:`player_health = 100
+player_attack = 20
+enemy_health = 80
+enemy_attack = 12
+
+# TODO: player attacks enemy
+enemy_health = enemy_health - ___
+
+# TODO: enemy attacks player
+player_health = player_health - ___
+
+print("Enemy health:", enemy_health)
+print("Player health:", player_health)
+`,
+      check:(code) => /enemy_health\s*=\s*enemy_health\s*-\s*player_attack\b/.test(code) && /player_health\s*=\s*player_health\s*-\s*enemy_attack\b/.test(code),
+    },
+    { id:'ccs2', name:'The Turn Loop', xp:50,
+      text:`<strong>Sessions 5-8</strong> — Wrap the battle in a loop that continues while BOTH fighters are still alive — the fight ends the moment either one reaches 0.`,
+      hints:[
+        'while player_health > 0 and enemy_health > 0: — the loop needs BOTH conditions true to continue.',
+        'Same attacks from last time, now happening every turn, inside the loop.',
+      ],
+      starter:`player_health = 100
+player_attack = 20
+enemy_health = 80
+enemy_attack = 12
+
+# TODO: loop while BOTH fighters are still alive
+while player_health > 0 ___ enemy_health > 0:
+    enemy_health = enemy_health - player_attack
+    player_health = player_health - enemy_attack
+    print("Enemy:", enemy_health, "Player:", player_health)
+`,
+      check:(code) => /while\s+player_health\s*>\s*0\s+and\s+enemy_health\s*>\s*0\s*:/.test(code),
+    },
+    { id:'ccboss', name:'BOSS — Ship the Battle', xp:90, boss:true,
+      text:`<strong>Sessions 9-10 — BOSS</strong> — A complete, playable battle from start to a clear win or lose outcome: both fighters' health, a turn loop, and a final message announcing who won. Zero functions anywhere.`,
+      hints:[
+        'Everything already exists from ccs1-ccs2 — assemble it, then add the final if/else announcing the winner once the loop ends.',
+        'After the loop: if player_health <= 0: print a lose message, else print a win message.',
+      ],
+      starter:`player_health = 100
+player_attack = 20
+enemy_health = 80
+enemy_attack = 12
+
+while player_health > 0 and enemy_health > 0:
+    enemy_health = enemy_health - player_attack
+    player_health = player_health - enemy_attack
+    print("Enemy:", enemy_health, "Player:", player_health)
+
+# TODO: announce the winner
+if player_health <= 0:
+    print(___)
+else:
+    print(___)
+`,
+      // print(___) — the unedited blank itself — would satisfy a bare
+      // /print\s*\(/ check, since regex doesn't care WHAT's inside the
+      // parens. Require a real string literal in each print, so the
+      // starter's own placeholder can never pass by accident.
+      check:(code) => !/\bdef\s+\w+\s*\(/.test(code)
+                    && /while\s+player_health\s*>\s*0\s+and\s+enemy_health\s*>\s*0\s*:/.test(code)
+                    && /if\s+player_health\s*<=\s*0\s*:\s*\n\s*print\s*\(\s*["']/.test(code)
+                    && /else\s*:\s*\n\s*print\s*\(\s*["']/.test(code),
+    },
+  ]},
   { id:'m2', name:'🚦 M2 — Choices & Loops', sub:'if/elif/else, while, for-range — predict the drawing before you run it', live:true, stages:[
     { id:'m2s1', name:'Odd or Even', xp:35,
       text:`<strong>Challenge 1 — If / Else</strong> — Create a <em>number</em> variable. Use <code>%</code> (the remainder operator) and an if/else to print whether it's odd or even.`,
@@ -3297,6 +3463,30 @@ const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({
 // challenges). Rendered by renderChallengeLesson().
 // ══════════════════════════════════════════════════════════════════════════════
 const CHALLENGE_LESSON = {
+  cc1s1: { title: 'Health, attack, and subtraction', html: `
+    <div class="cl-block"><h4>A battle needs three things</h4>
+      <p>A health value, an attack value, and arithmetic connecting them: health = health - attack_value. Nothing new — the same subtraction from Semester 2, now meaning something in combat.</p></div>` },
+  cc2s1: { title: '<= 0, not just < 0', html: `
+    <div class="cl-block"><h4>Exactly 0 counts as a loss too</h4>
+      <p>health <= 0 catches BOTH "health is negative" and "health is exactly zero." Using < 0 alone would miss the exact-zero case — a genuine, easy-to-miss edge case.</p></div>` },
+  cc3s1: { title: 'Same while-loop rule, a combat context', html: `
+    <div class="cl-block"><h4>Nothing new structurally</h4>
+      <p>while health > 0: is the exact same "unknown count, until it changes" idea from Semester 2 — the loop still must change health each pass, or it never stops.</p></div>` },
+  cc4s1: { title: 'Two independent sets of variables', html: `
+    <div class="cl-block"><h4>The enemy has its own health and attack</h4>
+      <p>player_health and enemy_health are two SEPARATE variables, tracked in parallel — changing one never affects the other. Same idea as the Text Adventure's inventory, applied to combat.</p></div>` },
+  cc5boss: { title: 'BOSS — health, attack, loop, outcome, together', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Every piece from cc1-cc4, assembled: a health variable, an attack reducing it, a loop that keeps going until it ends, a message announcing the result.</p></div>` },
+  ccs1: { title: 'Two fighters, one full turn', html: `
+    <div class="cl-block"><h4>Two independent attacks</h4>
+      <p>The player's attack reduces the ENEMY's health; the enemy's attack reduces the PLAYER's health — two separate subtractions, each affecting a different variable.</p></div>` },
+  ccs2: { title: 'The loop needs BOTH fighters alive', html: `
+    <div class="cl-block"><h4>and combines two conditions</h4>
+      <p>while player_health > 0 and enemy_health > 0: — the battle continues only while NEITHER fighter has lost yet. The moment either one reaches 0, the loop stops.</p></div>` },
+  ccboss: { title: 'BOSS — a complete battle, zero functions', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>The loop already works from ccs2 — the only new piece is announcing who won once it ends: if the player's health reached 0, they lost; otherwise, they won.</p></div>` },
   advs1: { title: 'Branching on a stored choice', html: `
     <div class="cl-block"><h4>Real interactive input doesn't work here — a variable stands in for it</h4>
       <p>Instead of asking the player to type live, choice is set directly in code — same if/elif/else skill from Week 2, now deciding which ROOM the story shows.</p></div>` },
@@ -4089,6 +4279,7 @@ const G8_MODULE_CONCEPT = {
   py4:'g8-loops',
   py5:'lists-data',
   adv:'lists-data',
+  cc1:'g8-loops', cc2:'g8-loops', cc3:'g8-loops', cc4:'g8-loops', cc5:'g8-loops', cc:'g8-loops',
   m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
   m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
   // Web Story (Sem 1, ws1-ws5) — added when this world was built; was
