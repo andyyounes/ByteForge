@@ -89,6 +89,14 @@
     .cl-block:last-child { margin-bottom:0; }
     .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
     .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
+    .cl-key { margin:6px 0 0; padding-left:18px; }
+    .cl-key li { margin-bottom:4px; }
+    .cl-img { display:block; max-width:100%; border-radius:6px; margin:8px 0 4px; border:1px solid rgba(255,255,255,.1); }
+    .cl-caption { font-size:10.5px; color:#8b93a8; margin:0 0 8px; font-style:italic; }
+    .cl-example { background:rgba(99,102,241,.08); border:1px solid rgba(99,102,241,.25); border-radius:6px; padding:8px 12px; margin-top:8px; }
+    .cl-example h5 { font-size:10px; font-weight:800; color:#a5b4fc; text-transform:uppercase; letter-spacing:.03em; margin-bottom:4px; }
+    .cl-challenge { background:rgba(251,191,36,.08); border:1px dashed rgba(251,191,36,.4); border-radius:6px; padding:8px 12px; margin-top:8px; }
+    .cl-challenge h5 { font-size:10px; font-weight:800; color:#fbbf24; text-transform:uppercase; letter-spacing:.03em; margin-bottom:4px; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -2938,22 +2946,60 @@ const CHALLENGE_LESSON = {
   // ── Cyber Defense — genuinely new content beyond M8's basic checks ─────────
   cyber1: { title: '== checks EXACT equality — a lookalike is never equal', html: `
     <div class="cl-block"><h4>A lookalike domain LOOKS right but is not equal</h4>
-      <p>"rea1bank.com" (a "1" instead of "l") is visually close enough to fool a quick glance, but Python's <code>==</code> compares character by character — it is genuinely NOT equal to "realbank.com", even though a human skimming it might not notice the difference.</p></div>
-    <div class="cl-block"><h4>Real scammers rely on exactly this trick</h4>
-      <p>Typosquatting — registering a domain one character off from a real one — is a genuine, common real-world attack, and this challenge\'s exact-match check is the real defence against it.</p></div>` },
+      <p>"rea1bank.com" (a "1" instead of "l") is visually close enough to fool a quick glance, but Python's <code>==</code> compares character by character, position by position — it is genuinely NOT equal to "realbank.com", even though a human skimming it might not notice the difference. This trick has a name: <strong>typosquatting</strong> — registering a domain one character off from a real one, hoping you type or read it too fast to spot the swap.</p>
+      <ul class="cl-key">
+        <li><code>==</code> compares strings EXACTLY — one different character means "not equal", full stop.</li>
+        <li>Common swaps: "l" ↔ "1", "o" ↔ "0", "rn" ↔ "m", or an extra word tacked on the end.</li>
+        <li>A computer never gets fooled by "looks close enough" — that's exactly why we let it do this check, not our eyes.</li>
+      </ul>
+      <img class="cl-img" src="/lessons/images/padlock.jpg" alt="A padlock, representing a secure, verified connection">
+      <p class="cl-caption">What a real, verified https:// connection is protecting — this chapter builds the exact check behind it.</p>
+      <div class="cl-example"><h5>Worked example</h5>
+        <p><code>"https://www.realbank.com" == "https://www.realbank.com"</code> → <code>True</code> (identical, character for character)<br>
+        <code>"https://www.realbank.com" == "https://www.rea1bank.com"</code> → <code>False</code> ("l" vs "1" — different characters at that position)</p></div>
+      <div class="cl-challenge"><h5>Challenge</h5>
+        <p>Find 3 real website addresses you trust. For each, invent a lookalike version (swap one character). Would YOU have spotted it in a hurry?</p></div></div>` },
   cyber2: { title: 'Hashing — easy forwards, genuinely impractical backwards', html: `
     <div class="cl-block"><h4>ord() turns text into numbers you can add up</h4>
-      <p>Summing every character\'s ASCII code gives ONE number computed FROM the password — but given only that number, there is no way to work out which exact characters produced it (many different passwords could add up to the same total).</p></div>
-    <div class="cl-block"><h4>This is why a real data breach does not leak your real password</h4>
-      <p>Real sites store a (far more sophisticated) hash, not your actual password — even if a database leaks, what leaks is the hash, not something directly usable to log in as you.</p></div>` },
+      <p>Real websites never store your actual password in their database — they store a <strong>hash</strong>: the output of a one-way scrambling function. Summing every character's ASCII code (via <code>ord()</code>) gives ONE number computed FROM the password — but given only that number, there is no way to work out which exact characters produced it, because many different passwords could add up to the same total.</p>
+      <ul class="cl-key">
+        <li><code>ord(ch)</code> converts one character into its ASCII number, e.g. <code>ord('a')</code> is 97.</li>
+        <li>Add up every character's number → one total. That total is the "hash".</li>
+        <li>Going forwards (password → hash) is one line of code. Going backwards (hash → password) is genuinely not possible — too many passwords share the same total.</li>
+        <li>Real hashing (SHA-256, used by real websites) is far more complex than adding ASCII codes, but the core idea — easy forwards, impractical backwards — is identical.</li>
+      </ul>
+      <div class="cl-example"><h5>Worked example</h5>
+        <p><code>simple_hash("cat123")</code> sums <code>ord('c')+ord('a')+ord('t')+ord('1')+ord('2')+ord('3')</code> = <code>99+97+116+49+50+51</code> = <code>462</code>.<br>
+        Even knowing the hash is <code>462</code>, you cannot work out it came from "cat123" specifically — many other character combinations add up to 462 too.</p></div>
+      <div class="cl-challenge"><h5>Challenge</h5>
+        <p>Find two DIFFERENT short passwords that hash to the exact same total using <code>simple_hash</code>. This is called a "collision" — a real weakness real hash functions are designed hard to find.</p></div></div>` },
   cyber3: { title: 'Combining AND and OR — one function, three real signals', html: `
     <div class="cl-block"><h4>and requires the FIRST condition; or requires ONE of the rest</h4>
-      <p><code>asks_for_password and (urgent_language or urgent_sender)</code> makes asking for a password the non-negotiable requirement, with EITHER other signal being enough to confirm it — a genuinely more realistic model of how real phishing is detected than any single check alone.</p></div>
-    <div class="cl-block"><h4>Brackets change what the expression actually means</h4>
-      <p>Without the brackets around the <code>or</code>, Python\'s normal operator precedence would combine the conditions completely differently — a real, easy mistake worth testing carefully with the exact examples given.</p></div>` },
+      <p>A real phishing email usually shows SEVERAL warning signs at once, not just one. <code>asks_for_password and (urgent_language or unknown_sender)</code> makes asking for a password the non-negotiable requirement, with EITHER other signal being enough to confirm it — a genuinely more realistic model of how real phishing is detected than any single check alone.</p>
+      <ul class="cl-key">
+        <li><code>and</code> needs BOTH sides True. <code>or</code> needs AT LEAST ONE side True.</li>
+        <li>Brackets matter: <code>(urgent_language or unknown_sender)</code> is evaluated as one unit FIRST, then combined with <code>asks_for_password and</code>.</li>
+        <li>Without those brackets, Python's normal operator precedence would combine the three conditions completely differently — a real, easy mistake.</li>
+      </ul>
+      <div class="cl-example"><h5>Worked example</h5>
+        <p><code>is_phishing(True, True, False)</code> → asks for password AND urgent → <code>True</code><br>
+        <code>is_phishing(True, False, False)</code> → asks for password but NEITHER other signal → <code>False</code><br>
+        <code>is_phishing(False, True, True)</code> → never asked for a password at all → <code>False</code>, no matter what else is true</p></div>
+      <div class="cl-challenge"><h5>Challenge</h5>
+        <p>Real phishing scams sometimes target gamers specifically ("your account will be banned unless you verify now", or a "free skins" link asking for your login). Write down 2 example messages you could imagine getting — which of the 3 signals would each one trigger?</p></div></div>` },
   cyberboss: { title: 'BOSS — layering two real functions into one decision', html: `
     <div class="cl-block"><h4>A real security system is built from layers, not one check</h4>
-      <p>Calling <code>is_real_domain()</code> AND <code>not is_phishing()</code> together is genuinely how real systems work: no single check is trusted alone — multiple independent checks all have to agree before anything is called "safe".</p></div>` },
+      <p>Calling <code>is_real_domain()</code> AND <code>not is_phishing()</code> together is genuinely how real systems work: no single check is trusted alone — multiple independent checks all have to agree before anything is called "safe".</p>
+      <ul class="cl-key">
+        <li>Reusing a function you already wrote and tested (rather than rewriting its logic) is exactly how real software is built — small, trusted pieces combined into bigger decisions.</li>
+        <li><code>not is_phishing(...)</code> flips True/False — "definitely not flagged as phishing".</li>
+        <li>Both halves must be True for <code>is_safe_to_proceed</code> to return True — a lookalike domain fails even with zero phishing signals, and phishing signals fail even on the real domain.</li>
+      </ul>
+      <div class="cl-example"><h5>Worked example</h5>
+        <p><code>is_safe_to_proceed("https://www.realbank.com", False, False, False)</code> → real domain, no phishing signals → <code>True</code><br>
+        <code>is_safe_to_proceed("https://www.rea1bank.com", False, False, False)</code> → lookalike domain → <code>False</code>, even with zero red flags</p></div>
+      <div class="cl-challenge"><h5>Challenge</h5>
+        <p>Add a 4th real-world signal of your own (e.g. "contains a shortened link") to <code>is_phishing</code>. How does adding it change which of the earlier test cases pass or fail?</p></div></div>` },
 
   // ── M9 — Interactive Apps ────────────────────────────────────────────────────
   m9s1: { title: 'Three kinds of bugs, three different fixes', html: `
