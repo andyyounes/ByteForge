@@ -1692,6 +1692,109 @@ print(inventory[___])
       check:(code) => (code.match(/inventory\.append\s*\(/g) || []).length >= 3 && /print\s*\(\s*inventory\[\s*2\s*\]\s*\)/.test(code),
     },
   ]},
+  // ── Semester 2, Weeks 7-11: Build a Text Adventure (project) — new for the
+  // 3-semester rebuild. real input() confirmed broken in this Pyodide sandbox
+  // (raises OSError: I/O error — no real stdin) — choice is a pre-set
+  // variable throughout, same pattern PY2's if/else already uses, not live
+  // interactive input. Starter-code + TODOs continue throughout, per spec.
+  { id:'adv', name:'🗺️ Build a Text Adventure', sub:'Rooms (if/elif), an inventory (lists), a loop that keeps it running', live:true, stages:[
+    { id:'advs1', name:'The First Room', xp:40,
+      text:`<strong>Sessions 3-4</strong> — Complete the if/elif/else so the story branches on <code>choice</code>: "left" finds a torch, "right" finds a shield, anything else means staying put.`,
+      hints:[
+        'if choice == "left": ... elif choice == "right": ... else: ... — three real paths, one per outcome.',
+        'Change choice to "right" and re-run — does the story genuinely change?',
+      ],
+      starter:`choice = "left"
+
+# TODO: complete the branch for "left"
+if choice == ___:
+    print("You go left and find a torch.")
+elif choice == "right":
+    print("You go right and find a shield.")
+else:
+    print("You stay where you are.")
+`,
+      check:(code) => /if\s+choice\s*==\s*["']left["']\s*:/.test(code) && /elif\s+choice\s*==\s*["']right["']\s*:/.test(code) && /else\s*:/.test(code),
+    },
+    { id:'advs2', name:'Pick Up an Item', xp:40,
+      text:`<strong>Sessions 5-6</strong> — Add an inventory list. When the player picks a room, .append() that room's item to the inventory.`,
+      hints:[
+        'inventory = [] starts empty, before the if/elif/else.',
+        'inventory.append("torch") inside the "left" branch, same idea for "shield" in "right".',
+      ],
+      starter:`choice = "left"
+inventory = []
+
+if choice == "left":
+    print("You go left and find a torch.")
+    # TODO: add "torch" to the inventory
+    inventory.___("torch")
+elif choice == "right":
+    print("You go right and find a shield.")
+    inventory.append("shield")
+else:
+    print("You stay where you are.")
+
+print(inventory)
+`,
+      check:(code) => /inventory\s*=\s*\[\s*\]/.test(code) && (code.match(/inventory\.append\s*\(/g) || []).length >= 2 && /print\s*\(\s*inventory\s*\)/.test(code),
+    },
+    { id:'advs3', name:'The Turn Loop', xp:45,
+      text:`<strong>Sessions 7-8</strong> — Wrap the adventure in a loop that keeps going until <code>game_over</code> becomes True (after 3 turns).`,
+      hints:[
+        'while not game_over: — same "unknown count, until a condition changes" idea as Semester 2\'s while loops.',
+        'Inside: after 3 turns (turn >= 3), set game_over = True — the loop MUST change its own condition, same rule as before.',
+      ],
+      starter:`turn = 0
+game_over = False
+
+# TODO: loop while NOT game_over
+while ___ game_over:
+    print("Turn", turn)
+    turn = turn + 1
+    if turn >= 3:
+        game_over = ___
+
+print("The adventure ends.")
+`,
+      check:(code) => /while\s+not\s+game_over\s*:/.test(code) && /game_over\s*=\s*True\b/.test(code),
+    },
+    { id:'advboss', name:'BOSS — One Complete Adventure', xp:80, boss:true,
+      text:`<strong>Sessions 9-10 — BOSS</strong> — Combine everything: 2+ rooms/choices (if/elif/else), a growing inventory (.append()), and a while loop controlling the overall flow. Ship one complete, playable adventure.`,
+      hints:[
+        'This is genuinely advs1-advs3 combined into one program — nothing new to learn, just assembly.',
+        'Same rule as always: the while loop must change game_over eventually, or it never stops.',
+      ],
+      starter:`choice = "left"
+inventory = []
+turn = 0
+game_over = False
+
+# TODO: branch on choice, adding an item to inventory in each real branch
+if choice == ___:
+    print("You go left and find a torch.")
+    inventory.append("torch")
+elif choice == "right":
+    print("You go right and find a shield.")
+    inventory.append(___)
+else:
+    print("You stay where you are.")
+
+# TODO: loop turns until game_over becomes True
+while not game_over:
+    print("Turn", turn)
+    turn = turn + 1
+    if turn >= 3:
+        game_over = ___
+
+print("Inventory:", inventory)
+print("The adventure ends.")
+`,
+      check:(code) => /if\s+choice\s*==\s*["']left["']\s*:/.test(code) && /elif\s+choice\s*==\s*["']right["']\s*:/.test(code) && /else\s*:/.test(code)
+                    && (code.match(/inventory\.append\s*\(/g) || []).length >= 2
+                    && /while\s+not\s+game_over\s*:/.test(code) && /game_over\s*=\s*True\b/.test(code),
+    },
+  ]},
   { id:'m2', name:'🚦 M2 — Choices & Loops', sub:'if/elif/else, while, for-range — predict the drawing before you run it', live:true, stages:[
     { id:'m2s1', name:'Odd or Even', xp:35,
       text:`<strong>Challenge 1 — If / Else</strong> — Create a <em>number</em> variable. Use <code>%</code> (the remainder operator) and an if/else to print whether it's odd or even.`,
@@ -3194,6 +3297,18 @@ const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({
 // challenges). Rendered by renderChallengeLesson().
 // ══════════════════════════════════════════════════════════════════════════════
 const CHALLENGE_LESSON = {
+  advs1: { title: 'Branching on a stored choice', html: `
+    <div class="cl-block"><h4>Real interactive input doesn't work here — a variable stands in for it</h4>
+      <p>Instead of asking the player to type live, choice is set directly in code — same if/elif/else skill from Week 2, now deciding which ROOM the story shows.</p></div>` },
+  advs2: { title: 'An inventory that grows with the story', html: `
+    <div class="cl-block"><h4>append() inside a real branch</h4>
+      <p>Adding an item only happens inside the branch where it makes sense — the "left" branch adds a torch, the "right" branch adds a shield, never both at once.</p></div>` },
+  advs3: { title: 'The turn loop — same while-loop rule as before', html: `
+    <div class="cl-block"><h4>while not game_over</h4>
+      <p>The loop keeps going until game_over becomes True — same "must change its own condition" rule from Semester 2's while-loop week, now controlling an actual game.</p></div>` },
+  advboss: { title: 'BOSS — every piece, one adventure', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Branching rooms, a growing inventory, and a turn loop — three separate skills from this project, combined into one real, playable program.</p></div>` },
   py1s1: { title: 'A variable is still a named box', html: `
     <div class="cl-block"><h4>Same idea, real syntax now</h4>
       <p>A variable holds one value under a name — exactly like Grade 7's blocks. The difference is real syntax: an equals sign instead of a "set" block, quotes around text, no quotes around numbers.</p></div>
@@ -3973,6 +4088,7 @@ const G8_MODULE_CONCEPT = {
   py3:'g8-loops',
   py4:'g8-loops',
   py5:'lists-data',
+  adv:'lists-data',
   m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
   m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
   // Web Story (Sem 1, ws1-ws5) — added when this world was built; was
