@@ -1414,6 +1414,35 @@ else:
       check:(code) => /if\s+temperature\s*>\s*\d+\s*:/.test(code) && /else\s*:\s*\n\s*print\s*\(/.test(code),
     },
   ]},
+  // ── Semester 2, Week 3: For Loops — new for the 3-semester rebuild.
+  // Isolated to for-loops alone (no while, no elif chains this week) —
+  // range()'s "second number is exclusive" trap called out directly.
+  { id:'py3', name:'🔁 For Loops', sub:'range() — and the "second number is exclusive" trap', live:true, stages:[
+    { id:'py3s1', name:'Count to Five', xp:30,
+      text:`<strong>Challenge 1</strong> — Complete the loop so it prints 0, 1, 2, 3, 4 — five numbers, using <code>range()</code>.`,
+      hints:[
+        'range(5) counts 0, 1, 2, 3, 4 — five numbers, but STOPS before 5. The second number in range is exclusive — never actually reached.',
+        'print(i) inside the loop, once per pass.',
+      ],
+      starter:`# TODO: loop 5 times (0 to 4)
+for i in range(___):
+    print(___)
+`,
+      check:(code) => /for\s+i\s+in\s+range\s*\(\s*5\s*\)\s*:/.test(code) && /print\s*\(\s*i\s*\)/.test(code),
+    },
+    { id:'py3boss', name:'BOSS — Count 1 to 5, For Real', xp:45, boss:true,
+      text:`<strong>BOSS</strong> — Now print 1, 2, 3, 4, 5 (starting at 1, ending AT 5, not before it). range() can take two numbers — a start and a stop.`,
+      hints:[
+        'range(1, 6) starts at 1 and stops BEFORE 6 — landing exactly on 5 as the last number.',
+        'This is the exact trap named in the lesson: to include 5, the stop number has to be 6, one more than you want.',
+      ],
+      starter:`# TODO: loop from 1 to 5 (inclusive) -- remember range's stop is exclusive
+for i in range(___, ___):
+    print(i)
+`,
+      check:(code) => /for\s+i\s+in\s+range\s*\(\s*1\s*,\s*6\s*\)\s*:/.test(code),
+    },
+  ]},
   { id:'m2', name:'🚦 M2 — Choices & Loops', sub:'if/elif/else, while, for-range — predict the drawing before you run it', live:true, stages:[
     { id:'m2s1', name:'Odd or Even', xp:35,
       text:`<strong>Challenge 1 — If / Else</strong> — Create a <em>number</em> variable. Use <code>%</code> (the remainder operator) and an if/else to print whether it's odd or even.`,
@@ -2934,6 +2963,14 @@ const CHALLENGE_LESSON = {
   py2boss: { title: 'BOSS — a different comparison, same shape', html: `
     <div class="cl-block"><h4>Nothing new structurally</h4>
       <p><code>&gt;</code> works exactly like <code>==</code> did — it's still one condition, still if/else, still one print() per branch. Only the comparison itself changed.</p></div>` },
+  py3s1: { title: 'range()\'s stop number is exclusive', html: `
+    <div class="cl-block"><h4>range(5) means 0, 1, 2, 3, 4 — not 5</h4>
+      <p>range's second number is where it STOPS, but never actually reaches. range(5) starts at 0 (the default) and counts up to, but not including, 5 — five numbers total.</p></div>
+    <div class="cl-block"><h4>Why repeat instead of copy-paste</h4>
+      <p>print(i) five separate times would work, but a loop says the same thing once and lets the computer repeat it — the real reason loops exist.</p></div>` },
+  py3boss: { title: 'BOSS — range() with a real start and stop', html: `
+    <div class="cl-block"><h4>The exact trap, used on purpose</h4>
+      <p>To land on 5 as the last number, the stop has to be 6 — one MORE than the number you actually want included. This is the single most common range() mistake, worth getting wrong here first.</p></div>` },
   web0s1: { title: 'Client, server, protocol, domain', html: `
     <div class="cl-block"><h4>You = customer, browser = waiter, server = kitchen</h4>
       <p>The browser is the client — it asks for a page. The server stores the site's real files and sends them back. A URL's protocol (https://) says HOW to connect; the domain (wikipedia.org) says WHERE.</p></div>
@@ -3613,6 +3650,7 @@ const G8_MODULE_CONCEPT = {
   // Semester 2, Week 2 — reuses M2's concept slot (same underlying skill,
   // slower-paced replacement).
   py2:'g8-loops',
+  py3:'g8-loops',
   m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
   m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
   // Web Story (Sem 1, ws1-ws5) — added when this world was built; was
