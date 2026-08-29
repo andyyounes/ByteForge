@@ -1485,6 +1485,46 @@ print("Game Over")
       check:(code) => /while\s+health\s*>\s*0\s*:/.test(code) && /health\s*=\s*health\s*-\s*25\b/.test(code) && /print\s*\(\s*["']Game Over["']\s*\)/.test(code),
     },
   ]},
+  // ── Semester 2, Week 5: Lists — new for the 3-semester rebuild. Index
+  // and .append() only this week — no .length/slicing/sort (saved for
+  // reinforcement in the project), matching the rebuild's one-concept pace.
+  { id:'py5', name:'📋 Lists', sub:'Storing many things under one name — index and .append() only', live:true, stages:[
+    { id:'py5s1', name:'Your First List', xp:30,
+      text:`<strong>Challenge 1</strong> — Add "sword" to the list, then print the first item.`,
+      hints:[
+        'A list is a named box that holds MANY things, not just one — direct comparison to Grade 7\'s arrays.',
+        '.append("sword") adds an item to the end of the list.',
+        'inventory[0] reads the FIRST item — indexing starts at 0, not 1.',
+      ],
+      starter:`inventory = []
+
+# TODO: add "sword" to the list
+inventory.___("sword")
+
+# TODO: print the first item
+print(inventory[___])
+`,
+      check:(code) => /inventory\.append\s*\(\s*["']sword["']\s*\)/.test(code) && /print\s*\(\s*inventory\[\s*0\s*\]\s*\)/.test(code),
+    },
+    { id:'py5boss', name:'BOSS — Three Items, One List', xp:45, boss:true,
+      text:`<strong>BOSS</strong> — Add THREE items to the list, then print the THIRD one you added (remember: indexing starts at 0).`,
+      hints:[
+        'Three separate .append() calls, one per item.',
+        'The third item added is at index 2, not 3 — the first is 0, the second is 1, the third is 2.',
+      ],
+      starter:`inventory = []
+
+# TODO: add three items to the list
+inventory.___("sword")
+inventory.___("shield")
+inventory.___("potion")
+
+# TODO: print the THIRD item you added
+print(inventory[___])
+`,
+      check:(code) => (code.match(/inventory\.append\s*\(/g) || []).length >= 3 && /print\s*\(\s*inventory\[\s*2\s*\]\s*\)/.test(code),
+    },
+  ]},
   { id:'m2', name:'🚦 M2 — Choices & Loops', sub:'if/elif/else, while, for-range — predict the drawing before you run it', live:true, stages:[
     { id:'m2s1', name:'Odd or Even', xp:35,
       text:`<strong>Challenge 1 — If / Else</strong> — Create a <em>number</em> variable. Use <code>%</code> (the remainder operator) and an if/else to print whether it's odd or even.`,
@@ -3021,6 +3061,14 @@ const CHALLENGE_LESSON = {
   py4boss: { title: 'BOSS — same rule, a different countdown', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Same shape as Challenge 1 — a condition, a decrement, and something printed once the loop ends. The decrement amount and the ending message are the only things that changed.</p></div>` },
+  py5s1: { title: 'A list holds many things under one name', html: `
+    <div class="cl-block"><h4>Same idea as Grade 7's arrays</h4>
+      <p>Instead of one value, a list holds many — added with .append(), read back with a position number in [square brackets].</p></div>
+    <div class="cl-block"><h4>Indexing starts at 0, not 1</h4>
+      <p>The FIRST item is inventory[0], not inventory[1]. This trips up almost everyone at first — worth getting wrong here rather than later.</p></div>` },
+  py5boss: { title: 'BOSS — the third item is index 2', html: `
+    <div class="cl-block"><h4>Counting from 0</h4>
+      <p>First item added → index 0. Second → index 1. Third → index 2. The index is always one less than the "how many-th" item it is.</p></div>` },
   web0s1: { title: 'Client, server, protocol, domain', html: `
     <div class="cl-block"><h4>You = customer, browser = waiter, server = kitchen</h4>
       <p>The browser is the client — it asks for a page. The server stores the site's real files and sends them back. A URL's protocol (https://) says HOW to connect; the domain (wikipedia.org) says WHERE.</p></div>
@@ -3702,6 +3750,7 @@ const G8_MODULE_CONCEPT = {
   py2:'g8-loops',
   py3:'g8-loops',
   py4:'g8-loops',
+  py5:'lists-data',
   m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
   m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
   // Web Story (Sem 1, ws1-ws5) — added when this world was built; was
