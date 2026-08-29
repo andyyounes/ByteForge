@@ -1242,6 +1242,24 @@ function runPageCode() {
     hasElseIf: /\belse\s+if\s*\(/.test(code),
   }
   checkChallenge(pageLog)
+
+  // Restore the VISIBLE page back to its pre-click state after the synthetic
+  // test click above. Without this, Run leaves the page already "revealed"
+  // (heading/paragraph/button already showing their AFTER-click text) —
+  // the student's own click then does nothing VISIBLE, because there's
+  // nothing left to change. The check itself already ran against the real
+  // post-click state (captured into pageLog above); this only affects what
+  // the student sees, so their own click is the first time they actually
+  // witness the change happen.
+  if (lastButton) {
+    const h = pageEl.querySelector('h1')
+    const p = pageEl.querySelector('p')
+    const btns = pageEl.querySelectorAll('button')
+    const b = btns[btns.length - 1]
+    if (h && headingBefore !== null) h.textContent = headingBefore
+    if (p && paragraphBefore !== null) p.textContent = paragraphBefore
+    if (b && buttonTextBefore !== null) b.textContent = buttonTextBefore
+  }
 }
 
 function runCode() {
