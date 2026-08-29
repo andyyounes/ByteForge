@@ -1271,7 +1271,16 @@ function runPageCode() {
     // canvas worlds' hasIf; hasElseIf additionally requires a genuine
     // three-way (or more) branch, not just a single if/else.
     hasIf:     /\bif\s*\(/.test(code),
+    hasElse:   /\belse\b/.test(code),
     hasElseIf: /\belse\s+if\s*\(/.test(code),
+    // st5s1 — an if/else that shows a genuinely DIFFERENT heading per
+    // branch. Only one branch's heading ever renders in a single Run (the
+    // page rebuilds fresh each time), so this reads the LITERAL heading
+    // text straight out of the source for both branches, rather than
+    // relying on the one-shot DOM snapshot alone.
+    distinctHeadingLiteralCount: new Set(
+      [...code.matchAll(/addHeading\(\s*(['"])((?:(?!\1).)*)\1\s*\)/g)].map(m => m[2])
+    ).size,
   }
   checkChallenge(pageLog)
 
@@ -1929,14 +1938,15 @@ const WORLDS = [
   // with Page blocks, same as Variables did last week.
   { id:'st5', name:'🔀 Story Studio 5 — Choose a Path', sub:'if/else — a story that branches on the reader\'s choice', live:true, stages:[
     { id:'st5s1', name:'Two Endings', xp:30, type:'page',
-      text:`<strong>Challenge 1</strong> — Create a variable (e.g. <code>choice</code> set to "brave" or "cautious"). Use IF/ELSE to show a DIFFERENT heading depending on which one it is.`,
+      text:`<strong>Challenge 1</strong> — Create a variable <code>choice</code> set to the TEXT "brave" (try changing it to "cautious" later to see the other ending). Use IF/ELSE, comparing choice to "brave", to add ONE of two exact headings: if it's "brave", add heading "You charge forward!" — otherwise (else), add heading "You proceed carefully."`,
       hints:[
-        'Variables → set choice to "brave" (or "cautious").',
-        'Control → if/else, with Logic → "= " comparing choice to "brave" as the condition.',
-        'Put a different "add heading" (or "change heading text to") in each branch.',
+        'Variables → set choice to "brave" — it comes with an empty text box already, on this page.',
+        'Control → if/else. For the condition, use Logic → "=" — it also now defaults to empty text boxes here. Plug your choice variable into the left side, type "brave" into the right side.',
+        'Inside the IF branch: add heading "You charge forward!". Inside the ELSE branch: add heading "You proceed carefully." — two DIFFERENT exact headings, one per branch.',
       ],
       needsVar:true, needsIf:true, needsHeadings:1,
-      check:(log) => log.hasVar && log.hasIf && log.headings >= 1,
+      check:(log) => log.hasVar && log.hasIf && log.hasElse && log.headings >= 1
+                  && log.varIsStringLiteral && log.distinctHeadingLiteralCount >= 2,
     },
     { id:'st5s2', name:'Three Paths', xp:35, type:'page',
       text:`<strong>Challenge 2</strong> — Create a numeric variable (e.g. <code>score</code>). Use if / else if / else to show THREE different paragraphs depending on whether it's low, medium, or high.`,
@@ -3849,6 +3859,11 @@ workspace.addChangeListener(e => {
 // "0" just reads as "type a number here". Default to a TEXT shadow instead,
 // specifically on page-type stages, where remembering text is the actual point;
 // canvas/game stages (score, health, x/y) keep the number default they need.
+// Same fix applies to logic_compare ("=") — its toolbox shadow defaults are
+// BOTH math_number, so comparing a text variable to a word like "brave"
+// looked impossible (typing "brave" into a number field just doesn't work),
+// even though logic_compare's own sockets were never actually restricted
+// to numbers — real JS "===" compares strings fine.
 workspace.addChangeListener(e => {
   if (e.type !== Blockly.Events.BLOCK_CREATE) return
   try {
@@ -3856,15 +3871,21 @@ workspace.addChangeListener(e => {
     const isPageStage = CHALLENGES[activeIdx]?.type === 'page'
     ids.forEach(id => {
       const block = workspace.getBlockById(id)
-      if (!block || block.type !== 'variables_set') return
-      const conn = block.getInput('VALUE')?.connection
-      if (conn && !conn.targetBlock()) {
-        const shadow = workspace.newBlock(isPageStage ? 'text' : 'math_number')
-        shadow.setFieldValue(isPageStage ? '' : '0', isPageStage ? 'TEXT' : 'NUM')
-        shadow.setShadow(true)
-        shadow.initSvg(); shadow.render()
-        conn.connect(shadow.outputConnection)
-      }
+      if (!block) return
+      const inputNames = block.type === 'variables_set' ? ['VALUE']
+                        : block.type === 'logic_compare' ? ['A', 'B']
+                        : null
+      if (!inputNames) return
+      inputNames.forEach(inputName => {
+        const conn = block.getInput(inputName)?.connection
+        if (conn && !conn.targetBlock()) {
+          const shadow = workspace.newBlock(isPageStage ? 'text' : 'math_number')
+          shadow.setFieldValue(isPageStage ? '' : '0', isPageStage ? 'TEXT' : 'NUM')
+          shadow.setShadow(true)
+          shadow.initSvg(); shadow.render()
+          conn.connect(shadow.outputConnection)
+        }
+      })
     })
   } catch(_) {}
 })
