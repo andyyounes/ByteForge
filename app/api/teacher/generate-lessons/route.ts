@@ -23,7 +23,7 @@ async function generateLesson(chunk: {
   chapterLabel: string
   title: string
   text: string
-}, attempt = 0): Promise<object> {
+}, attempt = 0): Promise<{ subtitle?: string; [key: string]: unknown }> {
   const key = process.env.GROQ_API_KEY
   if (!key) throw new Error('GROQ_API_KEY not configured')
 
@@ -62,7 +62,7 @@ Rules: 4-6 keyTerms, 3 questions, Cambridge style, [1] notation in ms.`
     const msg     = errBody?.error?.message ?? ''
     const waitMatch = msg.match(/try again in (\d+(?:\.\d+)?)s/i)
     const waitMs    = waitMatch ? Math.ceil(parseFloat(waitMatch[1])) * 1000 + 500 : 20_000
-    console.log(`[generate-lessons] rate limited — waiting ${waitMs}ms then retrying ${chunk.topicKey}`)
+    console.log(`[generate-lessons] rate limited — waiting ${waitMs}ms then retrying ${chunk.title}`)
     await sleep(waitMs)
     return generateLesson(chunk, attempt + 1)
   }
