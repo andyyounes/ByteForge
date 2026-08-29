@@ -1346,6 +1346,51 @@ const WORLDS = [
       check:(log) => log.quizCorrect >= 1,
     },
   ]},
+  // ── Semester 1, Week 4: Phishing & Fake Logins ──────────────────────────
+  // Reuses gsafes3's exact scenario (a fake "free skins" login page) plus
+  // new text/email/URL examples per the rebuild brief — same judge format
+  // as CB3, one new example per step (text, email, URL, reused gsafes3).
+  { id:'cb4', name:'🎣 Phishing & Fake Logins', sub:'A fake domain looks ALMOST right — spot the exact difference', live:true, stages:[
+    { id:'cb4s1', name:'The Urgent Text', xp:30, type:'quiz',
+      text:`<strong>Challenge 1</strong> — A text message arrives. Judge it.`,
+      hints:['"robl0x" (zero instead of "o") is a misspelled domain, not the real one.', 'Urgency ("in 1 hour") is designed to stop you thinking it through.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'"URGENT: Your Roblox account will be deleted in 1 hour unless you verify now: robl0x-verify.com"',
+        answer:'FAKE', flagOptions:['misspelled domain','urgent language','asks for personal info'], flagAnswers:['misspelled domain','urgent language'] }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb4s2', name:'The Scary Email', xp:30, type:'quiz',
+      text:`<strong>Challenge 2</strong> — An email arrives. Judge it.`,
+      hints:['"paypa1-security.com" is not PayPal\'s real domain.', 'A scary, urgent subject line is designed to make you click without thinking.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'From: support@paypa1-security.com — Subject: "⚠️ Your account is LOCKED — act now!"',
+        answer:'FAKE', flagOptions:['mismatched sender domain','urgent subject line','too good to be true'], flagAnswers:['mismatched sender domain','urgent subject line'] }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb4s3', name:'Which One Is Real?', xp:30, type:'quiz',
+      text:`<strong>Challenge 3</strong> — Two addresses. Only one is Roblox's real domain.`,
+      hints:['Read every character — a lookalike swaps just one letter for a similar-looking symbol.'],
+      passCount:1,
+      questions:[{ type:'match', prompt:'Which is the REAL Roblox domain?', options:['roblox.com','robl0x-free-robux.com'], answer:'roblox.com' }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb4s4', name:'The "Free Skins" Trap', xp:35, type:'quiz',
+      text:`<strong>Challenge 4</strong> — A website promises free skins if you "log in with your real game account" first. (Same scenario as Security Lab's gsafes3.)`,
+      hints:['These sites exist to steal your real password, not give you anything free.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'"Get FREE skins instantly! Just log in with your real Roblox username and password to claim."',
+        answer:'FAKE', flagOptions:['fake login asking for password','too good to be true','urgent language'], flagAnswers:['fake login asking for password','too good to be true'] }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb4boss', name:'BOSS — A New One', xp:65, type:'quiz', boss:true,
+      text:`<strong>BOSS</strong> — An example you haven't seen before. Judge it the same way.`,
+      hints:['Same signs as always: a wrong domain, urgency, or a request for personal info/password.'],
+      passCount:1,
+      questions:[{ type:'judge', scenario:'"🎁 Claim your FREE Discord Nitro gift now: discord-nitro-gift.net — expires in 15 minutes!"',
+        answer:'FAKE', flagOptions:['mismatched/wrong domain','urgent language','too good to be true'], flagAnswers:['mismatched/wrong domain','urgent language','too good to be true'] }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+  ]},
   // ── Story Studio — Semester 1, Week 1: HTML structure & tags ──────────────
   // Page-building blocks stand in for real HTML tags (heading→h1, paragraph→p,
   // link→a, button→button) so students learn what each tag is FOR before
@@ -2279,6 +2324,21 @@ const CHALLENGE_LESSON = {
   cb3boss: { title: 'BOSS — the same 4 signs, a new example', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Too good to be true, urgent, asks for personal info, or a wrong-looking link. This message has more than one.</p></div>` },
+  cb4s1: { title: 'A fake domain looks almost right', html: `
+    <div class="cl-block"><h4>robl0x, not roblox</h4>
+      <p>A "0" instead of an "o" is a different domain, not a typo you can ignore. Urgency ("in 1 hour") is designed to stop you checking.</p></div>` },
+  cb4s2: { title: 'Check the sender, not just the message', html: `
+    <div class="cl-block"><h4>paypa1-security.com is not PayPal</h4>
+      <p>A scary subject line and a mismatched sender address are two separate red flags — either one alone is enough to stop and check.</p></div>` },
+  cb4s3: { title: 'Read every character', html: `
+    <div class="cl-block"><h4>roblox.com vs. robl0x-free-robux.com</h4>
+      <p>A lookalike domain swaps one letter for a similar symbol. Always check the exact spelling before you click or log in.</p></div>` },
+  cb4s4: { title: 'A fake login steals your real password', html: `
+    <div class="cl-block"><h4>"Free" skins, real theft</h4>
+      <p>These sites don't give anything away — they exist to collect the real password you type into them.</p></div>` },
+  cb4boss: { title: 'BOSS — the same signs, a new example', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>A wrong domain, urgency, and too-good-to-be-true, all in one message. Any one of these alone is enough to stop and check.</p></div>` },
   // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
   st1s1: { title: 'A heading is a page\'s title', html: `
     <div class="cl-block"><h4>One big title, nothing more</h4>
@@ -2908,7 +2968,7 @@ const G7_MODULE_CONCEPT = {
   // Computer Basics (Sem 1, Weeks 1-2) — genuinely new territory, own concept.
   CB1: 'g7-computer-basics', CB2: 'g7-computer-basics',
   // Spotting Scams (Sem 1, Week 3) — same online-safety concept as gsafe.
-  CB3: 'g7-online-safety',
+  CB3: 'g7-online-safety', CB4: 'g7-online-safety',
 }
 // G5 (Player Control) splits across two concepts depending on the challenge.
 const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }
