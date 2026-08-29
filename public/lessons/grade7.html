@@ -1652,22 +1652,22 @@ const WORLDS = [
       check:(log) => log.headings >= 1 && (log.headingText||[]).some(t => t.trim() === 'My Story'),
     },
     { id:'st1s2', name:'Say More', xp:25, type:'page',
-      text:`<strong>Challenge 2</strong> — A heading alone is just a title. Add your "My Story" heading AND a paragraph introducing your story: what it's about and who the main character is — at least 8 words, a real sentence, not a placeholder.`,
+      text:`<strong>Challenge 2</strong> — A heading alone is just a title. Add your "My Story" heading AND ONE paragraph (8+ words) that answers exactly two things: <u>who is your main character</u>, and <u>what do they want</u>?`,
       hints:[
         'Keep your heading from before, then drag out "add paragraph" below it.',
         'Blocks run top to bottom — order controls what appears first.',
-        'Write a real sentence, e.g. "This is the story of a young explorer named Mia who discovers a hidden island." — at least 8 words.',
+        'Example: "Mia is a young explorer who wants to find a hidden island nobody has ever seen." — names the character AND what they want, 8+ words.',
       ],
       needsHeadings:1, needsParagraphs:1,
       check:(log) => log.headings >= 1 && log.paragraphs >= 1
                   && (log.paragraphText||[]).some(t => t.trim().split(/\s+/).filter(Boolean).length >= 8),
     },
     { id:'st1s3', name:'Chapter One', xp:30, type:'page',
-      text:`<strong>Challenge 3</strong> — Real pages usually need MORE than one paragraph. Add one heading and THREE separate paragraphs (three separate "add paragraph" blocks, not one long one) — each one a DIFFERENT real sentence (at least 5 words each), not the same text repeated or left as a placeholder.`,
+      text:`<strong>Challenge 3</strong> — Add one heading and THREE separate paragraphs (three separate "add paragraph" blocks), each answering a DIFFERENT question: (1) WHERE and WHEN does your story happen? (2) WHO is the main character and what do they want? (3) WHAT problem or challenge do they face? Each paragraph needs 5+ real words — no placeholders, no repeats.`,
       hints:[
-        'Drag out three separate "add paragraph" blocks, each with genuinely different text — not "Some text here." three times.',
+        'Drag out three separate "add paragraph" blocks — one per question above.',
         'This is exactly how a real HTML page is built — one &lt;p&gt; tag per paragraph.',
-        'Try: paragraph 1 sets the scene, paragraph 2 introduces a problem, paragraph 3 hints at the adventure ahead.',
+        'Example: (1) "It is the year 3021, on a small island far from any city." (2) "Mia is a young explorer who wants to find out what happened there." (3) "But something dangerous is guarding the island\'s only entrance."',
       ],
       needsHeadings:1, needsParagraphs:3,
       check:(log) => {
@@ -1677,7 +1677,7 @@ const WORLDS = [
       },
     },
     { id:'st1s4', name:'Read More', xp:35, type:'page',
-      text:`<strong>Challenge 4</strong> — Pages link to OTHER pages. Add a heading, a real paragraph (8+ words, from Challenge 2's rule), and a link with the text EXACTLY "Read the next chapter".`,
+      text:`<strong>Challenge 4</strong> — Pages link to OTHER pages. Add a heading, ONE real paragraph (8+ words, answering who your character is and what they want — same rule as Challenge 2), and a link with the text EXACTLY "Read the next chapter".`,
       hints:[
         'Drag out "add link" from the Page category.',
         'The first slot is the text people click — type it exactly: "Read the next chapter". The second slot is where it goes (any URL works for practice).',
@@ -1688,7 +1688,7 @@ const WORLDS = [
                   && (log.linkText||[]).some(t => t.trim() === 'Read the next chapter'),
     },
     { id:'st1s5', name:'Call to Action', xp:35, type:'page',
-      text:`<strong>Challenge 5</strong> — Buttons invite the READER to do something. Add a heading, a real paragraph (8+ words), and a button with the text EXACTLY "Start Reading".`,
+      text:`<strong>Challenge 5</strong> — Buttons invite the READER to do something. Add a heading, ONE real paragraph (8+ words, who + what they want — same rule as Challenge 2), and a button with the text EXACTLY "Start Reading".`,
       hints:[
         'Drag out "add button" from the Page category.',
         'Type its label exactly: "Start Reading".',
@@ -1700,10 +1700,11 @@ const WORLDS = [
                   && (log.buttonText||[]).some(t => t.trim() === 'Start Reading'),
     },
     { id:'st1boss', name:'BOSS — Ship the Front Page', xp:60, type:'page', boss:true,
-      text:`<strong>BOSS</strong> — Build your story's real front page: heading EXACTLY "My Story", at least TWO different real paragraphs (5+ words each, a genuine blurb — not the same line twice), a link with text EXACTLY "Read the next chapter", and a button with text EXACTLY "Start Reading". Every tag from this week, together, for real.`,
+      text:`<strong>BOSS</strong> — Build your story's real front page: heading EXACTLY "My Story", TWO real paragraphs (5+ words each) — one answering WHO your character is and what they want, one answering WHAT problem they face — a link with text EXACTLY "Read the next chapter", and a button with text EXACTLY "Start Reading". Every tag from this week, together, for real.`,
       hints:[
         'This is everything from st1s1–st1s5 combined into one page — nothing new to learn, just assemble it with real content, not placeholders.',
         'Order matters for how it reads: heading first, then paragraphs, then link/button.',
+        'Reuse your Challenge 2/3 sentences — paragraph 1 = who + what they want, paragraph 2 = the problem they face.',
       ],
       needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1,
       check:(log) => {
@@ -1762,7 +1763,7 @@ const WORLDS = [
       hints:[
         'This is st1boss\'s content plus every Style block from this week — nothing new to learn, just combine both weeks.',
         'Order genuinely doesn\'t matter here — CSS rules apply no matter when they\'re set, unlike the tags themselves which appear in the order you add them.',
-        'Same exact-text rules as st1boss: heading "My Story", link "Read the next chapter", button "Start Reading", and two genuinely different paragraph sentences (5+ words each, not the same line twice).',
+        'Same exact-text rules as st1boss: heading "My Story", link "Read the next chapter", button "Start Reading", and st1boss\'s two paragraphs — who your character is/wants, and the problem they face.',
       ],
       needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
       check:(log) => {
@@ -1823,7 +1824,7 @@ const WORLDS = [
       hints:[
         'This is st2boss\'s entire page PLUS one "when button is clicked" block containing three change blocks inside it.',
         'Nothing here is new — it\'s every block from all three weeks, combined into one finished, interactive page.',
-        'Your TWO paragraphs must each be a real sentence of 5+ words, and genuinely different from each other — "i dont know" twice won\'t pass.',
+        'Reuse the same two paragraph ideas as st1boss: who your character is/wants, and the problem they face — each 5+ real words, genuinely different from each other.',
       ],
       needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
       needsHeadingChange:true, needsParagraphChange:true, needsButtonTextChange:true,
