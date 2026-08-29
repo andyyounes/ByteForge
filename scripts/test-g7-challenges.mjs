@@ -47,13 +47,16 @@ const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, t
   headingChangedByClick: true, paragraphChangedByClick: true, buttonTextChangedByClick: true,
   // st4* (variables & simple state) — hasVar is shared with the canvas
   // worlds' flag; varCount/hasVarUpdate are page-specific.
-  varCount: 999, hasVarUpdate: true, hasElseIf: true })
+  varCount: 999, hasVarUpdate: true, hasElseIf: true,
+  // cb1* (quiz stages) — a maximal quiz result is a perfect score.
+  quizCorrect: 999, quizTotal: 999 })
 const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   texts: 0,   hasIf: false, hasVar: false, hasFunction: false,
   positions: [],
   headings: 0, paragraphs: 0, links: 0, buttons: 0,
   bgColor: '', headingColor: '', align: '', fontSize: 0,
   headingChangedByClick: false, paragraphChangedByClick: false, buttonTextChangedByClick: false,
-  varCount: 0, hasVarUpdate: false, hasElseIf: false })
+  varCount: 0, hasVarUpdate: false, hasElseIf: false,
+  quizCorrect: 0, quizTotal: 0 })
 
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.id}`

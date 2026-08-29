@@ -106,6 +106,21 @@
                    border-radius:6px; padding:14px 16px; font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
     #output-page h1 { font-size:20px; margin:0 0 8px; color:#111; }
     #output-page p  { font-size:13px; margin:0 0 8px; color:#333; line-height:1.4; }
+    /* Quiz preview — used by the "quiz" stage type (Computer Basics /
+       Cybersecurity judgment stages), matching + fill-in-the-blank, no code
+       editor involved at all. */
+    #output-quiz { display:none; width:480px; height:260px; overflow-y:auto; background:#fff; color:#111;
+                   border-radius:6px; padding:14px 16px; font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
+    #output-quiz .q-item { margin-bottom:12px; }
+    #output-quiz .q-scenario { background:#f3f4f6; border-radius:6px; padding:8px 10px; font-size:12.5px; margin-bottom:6px; }
+    #output-quiz .q-label { font-size:12.5px; font-weight:700; margin-bottom:4px; color:#111; }
+    #output-quiz select, #output-quiz input[type=text] {
+      width:100%; font-size:12.5px; padding:6px 8px; border-radius:5px; border:1px solid #ccc; }
+    #output-quiz .q-check-btn { margin-top:6px; padding:8px 14px; border:none; border-radius:6px;
+      background:#7c3aed; color:#fff; font-weight:700; font-size:12.5px; cursor:pointer; }
+    #output-quiz .q-result { font-size:12px; margin-top:8px; }
+    #output-quiz .q-result.ok  { color:#16a34a; font-weight:700; }
+    #output-quiz .q-result.bad { color:#dc2626; font-weight:700; }
     #output-page a  { color:#6366f1; font-size:13px; }
     #output-page button { font-size:12px; padding:6px 12px; border-radius:6px; border:1px solid #6366f1;
                    background:#6366f1; color:#fff; cursor:pointer; margin-bottom:8px; }
@@ -267,6 +282,7 @@
     <div class="canvas-wrap">
       <canvas id="output-canvas" width="480" height="260"></canvas>
       <div id="output-page"></div>
+      <div id="output-quiz"></div>
       <div class="pass-badge" id="pass-badge">
         <span>✓ Challenge complete!</span>
         <button class="pass-next-btn" id="pass-next-btn" onclick="stepChallenge(1)">Next →</button>
@@ -1082,6 +1098,7 @@ function runPageCode() {
 function runCode() {
   const activeCh = CHALLENGES[activeIdx]
   if (activeCh && activeCh.type === 'page') { runPageCode(); return }
+  if (activeCh && activeCh.type === 'quiz') { checkQuiz(); return }
 
   stopLoop()
   resetDrawState()
@@ -1194,6 +1211,60 @@ function friendlyErr(msg) {
 // satisfied there — fixed alongside the
 // monitoredAPI closure-timing bug, see the G4 note in grade7-curriculum.md).
 const WORLDS = [
+  // ── Semester 1, Week 1: Computer Basics — What Is a Computer? ──────────────
+  // New for the 3-semester rebuild. No code editor at all — quiz-type stages
+  // (matching + fill-in-the-blank), rendered by renderQuiz()/checkQuiz().
+  { id:'cb1', name:'🖥️ Computer Basics — What Is a Computer?', sub:'CPU, RAM, storage, input, output — no code yet, just the real parts', live:true, stages:[
+    { id:'cb1s1', name:'Match the Parts', xp:20, type:'quiz',
+      text:`<strong>Challenge 1</strong> — Match each description to the correct computer part.`,
+      hints:['The CPU carries out instructions — it\'s the "brain".', 'RAM is memory that clears when the power turns off.', 'Storage keeps files saved even with the power off.'],
+      passCount:5,
+      questions:[
+        { type:'match', prompt:'This part carries out instructions — the "brain" of the computer.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'CPU' },
+        { type:'match', prompt:'This is temporary memory — cleared when the power turns off.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'RAM' },
+        { type:'match', prompt:'This keeps your files saved even when the power is off.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Storage' },
+        { type:'match', prompt:'You type on this to send information IN.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Keyboard' },
+        { type:'match', prompt:'This shows pictures and text OUT to you.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Monitor' },
+        { type:'match', prompt:'You click and point with this to send information IN.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Mouse' },
+      ],
+      check:(log) => log.quizCorrect >= 5,
+    },
+    { id:'cb1s2', name:'Fill In: CPU, RAM, Input', xp:20, type:'quiz',
+      text:`<strong>Challenge 2</strong> — Fill in the blank for each sentence.`,
+      hints:['The CPU is the brain.', 'RAM clears when power turns off.', 'A keyboard brings information IN.'],
+      passCount:3,
+      questions:[
+        { type:'fill', prompt:'The ___ is the brain of the computer.', answer:'CPU' },
+        { type:'fill', prompt:'___ is memory that clears when the power turns off.', answer:'RAM' },
+        { type:'fill', prompt:'A keyboard is an ___ device.', answer:'input' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'cb1s3', name:'Fill In: Output & Storage', xp:20, type:'quiz',
+      text:`<strong>Challenge 3</strong> — Fill in the blank for each sentence.`,
+      hints:['A monitor sends information OUT to you.', 'A microphone brings sound IN.', 'Storage keeps files even with no power.'],
+      passCount:3,
+      questions:[
+        { type:'fill', prompt:'A monitor is an ___ device.', answer:'output' },
+        { type:'fill', prompt:'A microphone is an ___ device.', answer:'input' },
+        { type:'fill', prompt:'Your files stay saved in ___ even with the power off.', answer:'storage' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'cb1boss', name:'BOSS — Mixed Test', xp:60, type:'quiz', boss:true,
+      text:`<strong>BOSS</strong> — A mixed test drawing on everything from this week. Score at least 4 out of 5 to pass.`,
+      hints:['Nothing new here — same facts as Challenges 1–3, just mixed together.'],
+      passCount:4,
+      questions:[
+        { type:'match', prompt:'This part carries out instructions.', options:['CPU','RAM','Storage'], answer:'CPU' },
+        { type:'fill', prompt:'___ is memory that clears when the power turns off.', answer:'RAM' },
+        { type:'fill', prompt:'Your files stay saved in ___ even with the power off.', answer:'storage' },
+        { type:'match', prompt:'A keyboard is this kind of device.', options:['input','output'], answer:'input' },
+        { type:'match', prompt:'A monitor is this kind of device.', options:['input','output'], answer:'output' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
+  ]},
   // ── Story Studio — Semester 1, Week 1: HTML structure & tags ──────────────
   // Page-building blocks stand in for real HTML tags (heading→h1, paragraph→p,
   // link→a, button→button) so students learn what each tag is FOR before
@@ -2092,6 +2163,20 @@ const CHALLENGES = WORLDS.filter(w => w.live).flatMap(w => w.stages.map(s => ({ 
 // per-world summary this replaced). Rendered by renderChallengeLesson().
 // ══════════════════════════════════════════════════════════════════════════════
 const CHALLENGE_LESSON = {
+  // ── Computer Basics — What Is a Computer? (plain, short style — state the
+  // concept, state the rule, stop) ────────────────────────────────────────
+  cb1s1: { title: 'Five real parts, one job each', html: `
+    <div class="cl-block"><h4>CPU. RAM. Storage. Input. Output.</h4>
+      <p>The CPU carries out instructions. RAM holds data only while the power is on. Storage keeps your files even with the power off. Input devices bring information in. Output devices send it back out.</p></div>` },
+  cb1s2: { title: 'CPU, RAM, and input', html: `
+    <div class="cl-block"><h4>Three facts, three blanks</h4>
+      <p>The CPU is the brain. RAM clears when the power turns off. A keyboard is an input device — it brings information in.</p></div>` },
+  cb1s3: { title: 'Output and storage', html: `
+    <div class="cl-block"><h4>The other two directions</h4>
+      <p>A monitor is output — it sends information out to you. A microphone is input — it brings sound in. Storage keeps files saved even with no power.</p></div>` },
+  cb1boss: { title: 'BOSS — same five facts, mixed', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Every question here reuses a fact from Challenges 1–3. Score 4 out of 5 to pass.</p></div>` },
   // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
   st1s1: { title: 'A heading is a page\'s title', html: `
     <div class="cl-block"><h4>One big title, nothing more</h4>
@@ -2632,12 +2717,67 @@ function selectChallenge(i) {
   // Story Studio's "page" stages render into a DOM preview, not the canvas —
   // swap which output element is visible to match this challenge's type.
   const isPageStage = ch.type === 'page'
-  document.getElementById('output-canvas').style.display = isPageStage ? 'none' : 'block'
+  const isQuizStage = ch.type === 'quiz'
+  document.getElementById('output-canvas').style.display = (isPageStage || isQuizStage) ? 'none' : 'block'
   document.getElementById('output-page').style.display   = isPageStage ? 'block' : 'none'
+  document.getElementById('output-quiz').style.display   = isQuizStage ? 'block' : 'none'
   if (isPageStage) pageAPI.clearPage()
+  if (isQuizStage) renderQuiz(ch)
   renderPills()
   renderChallengeLesson(ch)
   log('Challenge: ' + ch.name, 'info')
+}
+
+// ── Quiz stages — matching / fill-in-the-blank / scenario judgment. No code
+// editor involved: each question is either type:'match' (dropdown against a
+// word bank), type:'fill' (short text answer), or type:'judge' (a shown
+// scenario + a fake/real choice + a red-flag choice). Answers are checked
+// exactly (case-insensitive, trimmed) against ch.questions[i].answer.
+function renderQuiz(ch) {
+  const box = document.getElementById('output-quiz')
+  const qs = ch.questions || []
+  box.innerHTML = qs.map((q, i) => {
+    if (q.type === 'judge') {
+      return `<div class="q-item">
+        <div class="q-scenario">${q.scenario}</div>
+        <div class="q-label">Fake or real?</div>
+        <select id="quiz-${i}-a"><option value="">Choose…</option><option value="FAKE">FAKE</option><option value="REAL">REAL</option></select>
+        ${q.flagOptions ? `<div class="q-label" style="margin-top:6px">Which red flag?</div>
+        <select id="quiz-${i}-b"><option value="">Choose…</option>${q.flagOptions.map(f=>`<option value="${f}">${f}</option>`).join('')}</select>` : ''}
+      </div>`
+    }
+    if (q.type === 'match') {
+      return `<div class="q-item"><div class="q-label">${q.prompt}</div>
+        <select id="quiz-${i}-a"><option value="">Choose…</option>${q.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`
+    }
+    // 'fill'
+    return `<div class="q-item"><div class="q-label">${q.prompt}</div>
+      <input type="text" id="quiz-${i}-a" placeholder="Type your answer…"></div>`
+  }).join('') + `<button class="q-check-btn" onclick="checkQuiz()">Check Answers</button><div class="q-result" id="quiz-result"></div>`
+}
+
+function checkQuiz() {
+  const ch = CHALLENGES[activeIdx]
+  const qs = ch.questions || []
+  let correct = 0
+  qs.forEach((q, i) => {
+    const a = (document.getElementById('quiz-' + i + '-a')?.value || '').trim().toLowerCase()
+    const bEl = document.getElementById('quiz-' + i + '-b')
+    if (q.type === 'judge') {
+      const okA = a === (q.answer || '').toLowerCase()
+      const okB = !bEl || !q.flagAnswers || q.flagAnswers.some(f => (bEl.value||'').toLowerCase() === f.toLowerCase())
+      if (okA && okB) correct++
+    } else {
+      const acceptable = Array.isArray(q.answer) ? q.answer : [q.answer]
+      if (acceptable.some(ans => a === String(ans).toLowerCase())) correct++
+    }
+  })
+  const need = ch.passCount != null ? ch.passCount : qs.length
+  const resultEl = document.getElementById('quiz-result')
+  const pass = correct >= need
+  resultEl.textContent = correct + ' / ' + qs.length + ' correct' + (pass ? ' — passed!' : ` — need ${need}`)
+  resultEl.className = 'q-result ' + (pass ? 'ok' : 'bad')
+  checkChallenge({ quizCorrect: correct, quizTotal: qs.length })
 }
 
 // ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
@@ -2663,6 +2803,8 @@ const G7_MODULE_CONCEPT = {
   // Security Lab — genuinely new territory (online safety/digital
   // citizenship, not a game-programming skill), own concept.
   GSAFE: 'g7-online-safety',
+  // Computer Basics (Sem 1, Week 1) — genuinely new territory, own concept.
+  CB1: 'g7-computer-basics',
 }
 // G5 (Player Control) splits across two concepts depending on the challenge.
 const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }
@@ -2722,6 +2864,14 @@ function checkChallenge(log) {
       logLine('❌ Not quite — still needs: ' + pageDetail, 'err')
       document.getElementById('pass-badge').style.display = 'none'
       document.getElementById('fail-badge-detail').textContent = 'Still needs: ' + pageDetail
+      document.getElementById('fail-badge').style.display = 'flex'
+      return
+    }
+    if (ch.type === 'quiz') {
+      const quizDetail = `you got ${log.quizCorrect || 0} / ${log.quizTotal || 0} correct — need at least ${ch.passCount}`
+      logLine('❌ Not quite — ' + quizDetail, 'err')
+      document.getElementById('pass-badge').style.display = 'none'
+      document.getElementById('fail-badge-detail').textContent = quizDetail
       document.getElementById('fail-badge').style.display = 'flex'
       return
     }
