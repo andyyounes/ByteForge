@@ -622,6 +622,16 @@ async function runWebCode() {
     paragraphs: doc.querySelectorAll('p').length,
     buttons: doc.querySelectorAll('button').length,
     listItems: doc.querySelectorAll('li').length,
+    // Semester 1 (3-semester rebuild) — real typed HTML/CSS, checked the
+    // same exact-value way Grade 7's rebuilt Story Studio checks page
+    // blocks: link count, and REAL computed colors (getComputedStyle
+    // normalizes any CSS colour syntax to rgb(...), so exercises compare
+    // against the rgb() equivalent of the exact hex value given).
+    links: doc.querySelectorAll('a').length,
+    bgColor: doc.body ? getComputedStyle(doc.body).backgroundColor : '',
+    headingColor: doc.querySelector('h1,h2,h3') ? getComputedStyle(doc.querySelector('h1,h2,h3')).color : '',
+    headingText: [...doc.querySelectorAll('h1,h2,h3')].map(e => e.textContent.trim()),
+    paragraphText: [...doc.querySelectorAll('p')].map(e => e.textContent.trim()),
     // JS state — Week 1 (objects/arrays for story state). Read straight off
     // the iframe's global scope, since `let`/`const` at top level of a
     // classic (non-module) <script> attach to that window's globals.
@@ -917,6 +927,69 @@ const MODULES = [
         { type:'match', prompt:'JS is like a building\'s ___ — the things that move and respond.', options:['electricity','paint','skeleton'], answer:'electricity' },
       ],
       check:(log) => log.quizCorrect >= 4,
+    },
+  ]},
+  // ── Semester 1, Week 2: Your First Tags — new for the 3-semester rebuild.
+  // Real typed HTML via the existing lang:'web' editor (Web Story's own
+  // mechanism), checked via webLog's real element counts.
+  { id:'web1', name:'🏷️ Your First Tags', sub:'A heading and a paragraph — real HTML, typed', live:true, stages:[
+    { id:'web1s1', name:'Heading + Paragraph', xp:25, lang:'web',
+      text:`<strong>Challenge 1</strong> — Type a real <code>&lt;h1&gt;</code> heading and a real <code>&lt;p&gt;</code> paragraph. Both need real, non-empty text — not left blank.`,
+      hints:[
+        'A tag has an opening AND closing half: &lt;h1&gt;My Page&lt;/h1&gt;.',
+        'A page usually has exactly ONE heading — it\'s the title.',
+      ],
+      webStarter: { html: `<!-- TODO: add one <h1> heading and one <p> paragraph, both with real text -->\n`, css: ``, js: `` },
+      check:(log) => log.h1s >= 1 && log.paragraphs >= 1
+                  && log.headingText.some(t => t.length > 0) && log.paragraphText.some(t => t.length > 0),
+    },
+  ]},
+  // ── Semester 1, Week 3: More Tags — links vs. buttons.
+  { id:'web2', name:'🔗 More Tags', sub:'A link takes you elsewhere; a button does something here', live:true, stages:[
+    { id:'web2s1', name:'Link & Button', xp:30, lang:'web',
+      text:`<strong>Challenge 1</strong> — Keep last week's heading + paragraph, and add a real <code>&lt;a&gt;</code> link (any destination) and a real <code>&lt;button&gt;</code> (does nothing yet — that's next semester).`,
+      hints:[
+        'A link needs an href: &lt;a href="https://example.com"&gt;Click here&lt;/a&gt;.',
+        'A button on its own does nothing when clicked — that\'s expected this week.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<!-- TODO: add a real <a> link and a real <button> -->\n`, css: ``, js: `` },
+      check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1,
+    },
+  ]},
+  // ── Semester 1, Week 4: Colors & Shading — exact hex values, checked via
+  // real computed style (getComputedStyle normalizes to rgb(...)).
+  { id:'web3', name:'🎨 Colors & Shading', sub:'CSS — content vs. style, now with exact colors', live:true, stages:[
+    { id:'web3s1', name:'Background & Heading Color', xp:30, lang:'web',
+      text:`<strong>Challenge 1</strong> — Set the page background to EXACTLY <code>#FFF7E6</code> and the heading color to EXACTLY <code>#2F3B52</code>.`,
+      hints:[
+        'CSS: body { background-color: #FFF7E6; }',
+        'CSS: h1 { color: #2F3B52; }',
+        'Both go in the CSS tab, not the HTML tab.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
+        css: `/* TODO: set body background to #FFF7E6 and h1 color to #2F3B52 */\n`,
+        js: ``,
+      },
+      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)',
+    },
+  ]},
+  // ── Semester 1, Week 5: Structure + Style, Together — checkpoint boss
+  // requiring ALL of Weeks 2-4 together, not a subset.
+  { id:'web4', name:'🧩 Structure + Style, Together', sub:'Checkpoint — everything from Weeks 2-4, combined', live:true, stages:[
+    { id:'web4boss', name:'BOSS — The Warm-Up Page', xp:60, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — One page requiring EVERYTHING so far: a heading, a paragraph, a link, a button, background EXACTLY <code>#FFF7E6</code>, heading color EXACTLY <code>#2F3B52</code>. No subset accepted.`,
+      hints:[
+        'This is genuinely just Weeks 2-4 combined into one page — nothing new to learn.',
+        'HTML = structure (heading/paragraph/link/button). CSS = style (the two colors). Order doesn\'t matter — CSS applies no matter when it\'s set.',
+      ],
+      webStarter: {
+        html: `<!-- TODO: heading + paragraph + link + button -->\n`,
+        css: `/* TODO: body background #FFF7E6, h1 color #2F3B52 */\n`,
+        js: ``,
+      },
+      check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1
+                  && log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)',
     },
   ]},
   // ── Web Story 1 — Semester 1, Week 1: objects/arrays for story state ──────
@@ -3095,6 +3168,22 @@ const CHALLENGE_LESSON = {
   py5boss: { title: 'BOSS — the third item is index 2', html: `
     <div class="cl-block"><h4>Counting from 0</h4>
       <p>First item added → index 0. Second → index 1. Third → index 2. The index is always one less than the "how many-th" item it is.</p></div>` },
+  web1s1: { title: 'Opening and closing tags', html: `
+    <div class="cl-block"><h4>Every tag has two halves</h4>
+      <p>&lt;h1&gt;My Page&lt;/h1&gt; — the opening tag, the content, then the closing tag with a slash. A page usually has exactly ONE heading — it's the title, the single biggest thing on the page.</p></div>
+    <div class="cl-block"><h4>Heading vs. paragraph</h4>
+      <p>The heading is the title. The paragraph is the body — what you actually want to say. Almost every real page is built from exactly this pair, repeated.</p></div>` },
+  web2s1: { title: 'A link goes elsewhere; a button acts here', html: `
+    <div class="cl-block"><h4>Two different jobs</h4>
+      <p>&lt;a href="..."&gt; takes the reader to a different page or address. &lt;button&gt; does something on THIS page, right where you are — but only once JavaScript tells it what to do, which is next semester's job.</p></div>` },
+  web3s1: { title: 'CSS decides how it looks, not what\'s there', html: `
+    <div class="cl-block"><h4>Content vs. style, the Week 1 split, now concrete</h4>
+      <p>HTML said WHAT is on the page. CSS says how it LOOKS — background-color, color, and more. Same page, two completely separate jobs.</p></div>
+    <div class="cl-block"><h4>Exact hex values, exactly</h4>
+      <p>#FFF7E6 and #2F3B52 aren't "a warm cream" and "a dark blue" — they're specific, exact colors. A close-but-not-exact hex value won't pass, the same way a typo in a word wouldn't count as correct spelling.</p></div>` },
+  web4boss: { title: 'BOSS — structure and style, no subset accepted', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Heading, paragraph, link, button (Weeks 2-3) plus the two exact colors (Week 4) — every piece from this month, assembled into one real page.</p></div>` },
   web0s1: { title: 'Client, server, protocol, domain', html: `
     <div class="cl-block"><h4>You = customer, browser = waiter, server = kitchen</h4>
       <p>The browser is the client — it asks for a page. The server stores the site's real files and sends them back. A URL's protocol (https://) says HOW to connect; the domain (wikipedia.org) says WHERE.</p></div>
@@ -3790,6 +3879,7 @@ function toggleChallengeLesson() {
 const G8_MODULE_CONCEPT = {
   // Semester 1, Week 1 (3-semester rebuild) — genuinely new territory, own concept.
   web0:'g8-what-is-a-website',
+  web1:'g8-what-is-a-website', web2:'g8-what-is-a-website', web3:'g8-what-is-a-website', web4:'g8-what-is-a-website',
   // Semester 2, Week 1 (3-semester rebuild) — reuses M1's concept slot,
   // since it's a slower-paced replacement for the same "variables" idea.
   py1:'g8-text',
