@@ -121,6 +121,18 @@
     #output-quiz .q-result { font-size:12px; margin-top:8px; }
     #output-quiz .q-result.ok  { color:#16a34a; font-weight:700; }
     #output-quiz .q-result.bad { color:#dc2626; font-weight:700; }
+    /* Chat preview — used by the "chat" stage type (Semester 1 project: a
+       real AI connection, submit -> generate -> judge -> revise -> regenerate). */
+    #output-chat { display:none; width:480px; height:260px; overflow-y:auto; background:#fff; color:#111;
+                   border-radius:6px; padding:12px 14px; font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
+    #output-chat textarea { width:100%; font-size:12px; padding:6px 8px; border-radius:5px; border:1px solid #ccc; min-height:44px; resize:vertical; }
+    #output-chat .chat-gen-btn { margin-top:6px; padding:7px 14px; border:none; border-radius:6px;
+      background:#7c3aed; color:#fff; font-weight:700; font-size:12px; cursor:pointer; }
+    #output-chat .chat-gen-btn:disabled { opacity:.5; cursor:default; }
+    #output-chat .chat-turn { margin-top:10px; border-top:1px dashed #ddd; padding-top:8px; }
+    #output-chat .chat-turn .p { font-size:11.5px; font-weight:700; color:#7c3aed; margin-bottom:3px; }
+    #output-chat .chat-turn .r { font-size:12px; color:#333; white-space:pre-wrap; }
+    #output-chat .chat-status { font-size:11px; color:#888; margin-top:6px; }
     #output-page a  { color:#6366f1; font-size:13px; }
     #output-page button { font-size:12px; padding:6px 12px; border-radius:6px; border:1px solid #6366f1;
                    background:#6366f1; color:#fff; cursor:pointer; margin-bottom:8px; }
@@ -283,6 +295,7 @@
       <canvas id="output-canvas" width="480" height="260"></canvas>
       <div id="output-page"></div>
       <div id="output-quiz"></div>
+      <div id="output-chat"></div>
       <div class="pass-badge" id="pass-badge">
         <span>✓ Challenge complete!</span>
         <button class="pass-next-btn" id="pass-next-btn" onclick="stepChallenge(1)">Next →</button>
@@ -1099,6 +1112,7 @@ function runCode() {
   const activeCh = CHALLENGES[activeIdx]
   if (activeCh && activeCh.type === 'page') { runPageCode(); return }
   if (activeCh && activeCh.type === 'quiz') { checkQuiz(); return }
+  if (activeCh && activeCh.type === 'chat') { generateChat(); return }
 
   stopLoop()
   resetDrawState()
@@ -1424,6 +1438,38 @@ const WORLDS = [
       passCount:1,
       questions:[{ type:'prompt', prompt:'Your prompt:' }],
       check:(log) => log.quizCorrect >= 1,
+    },
+  ]},
+  // ── Semester 1, Weeks 7-11: "Stay Smart Online" Guide (project) ─────────
+  // A REAL AI connection — proxied via the existing /api/ai-check route,
+  // same GROQ_API_KEY the platform's "Check with AI" button already uses.
+  // Submit a prompt, get a genuine generated response, judge it, revise the
+  // prompt, and generate again — 3 separate real topics, each needing at
+  // least 2 real generations to pass (see checkChallenge's 'chat' branch).
+  { id:'cb6', name:'🌐 "Stay Smart Online" Guide', sub:'Three real AI-generated pieces, written and revised by you — a project, not a quiz', live:true, stages:[
+    { id:'cb6s1', name:'Explain: What Is a Computer?', xp:50, type:'chat',
+      chatTask: 'Write a prompt asking a chatbot to explain what a computer is. Read the result — if it\'s too generic or not quite right, revise your prompt (add a subject/constraint/format like Week 5 taught) and generate again.',
+      text:`<strong>Piece 1</strong> — Get a chatbot to explain what a computer is, using a prompt YOU write.`,
+      hints:['Use what Week 5 taught: a subject, a constraint, and a format.', 'If the first answer is too generic, add a constraint like "for a 12-year-old" or "in 3 sentences" and try again.'],
+      check:(log) => log.chatGenCount >= 2,
+    },
+    { id:'cb6s2', name:'Explain: How to Spot a Scam', xp:50, type:'chat',
+      chatTask: 'Write a prompt asking a chatbot how to spot a scam message. Revise and regenerate at least once.',
+      text:`<strong>Piece 2</strong> — Get a chatbot to explain how to spot a scam, using a prompt YOU write.`,
+      hints:['Reuse what CB3/CB4 taught — see if the chatbot\'s answer matches the same 4 real signs.'],
+      check:(log) => log.chatGenCount >= 2,
+    },
+    { id:'cb6s3', name:'Write: About Yourself', xp:50, type:'chat',
+      chatTask: 'Write a prompt asking a chatbot to help write something about yourself (this feeds into your Semester 3 portfolio "About Me" page). Revise and regenerate at least once.',
+      text:`<strong>Piece 3</strong> — Get a chatbot to help write something about YOU, using a prompt YOU write.`,
+      hints:['A vague prompt like "write about me" gets a generic result — give it real details to work with.'],
+      check:(log) => log.chatGenCount >= 2,
+    },
+    { id:'cb6boss', name:'BOSS — Combine Into One Guide', xp:80, type:'page', boss:true,
+      text:`<strong>BOSS</strong> — Build the final guide page: a heading ("Stay Smart Online"), and all THREE of your refined chatbot pieces from this project as separate paragraphs.`,
+      hints:['Copy your BEST (most recently revised) response from each of the 3 chat pieces into its own paragraph.', 'This is assembly, not new content — everything already exists from Pieces 1-3.'],
+      needsHeadings:1, needsParagraphs:3,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 3,
     },
   ]},
   // ── Story Studio — Semester 1, Week 1: HTML structure & tags ──────────────
@@ -2386,6 +2432,18 @@ const CHALLENGE_LESSON = {
   cb5boss: { title: 'BOSS — same 3-part checklist, your own prompt', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Subject, constraint, format — the same rule as Challenge 2, now for a task nobody gave you an example for.</p></div>` },
+  cb6s1: { title: 'A real chatbot, a real prompt', html: `
+    <div class="cl-block"><h4>Judge it, then revise it</h4>
+      <p>The first response might be too generic. If it is, add a constraint or a format to your prompt and generate again — that's the whole skill from Week 5, used for real.</p></div>` },
+  cb6s2: { title: 'Check the chatbot against what you already know', html: `
+    <div class="cl-block"><h4>Does it match the 4 real signs?</h4>
+      <p>You already learned the real red flags in Weeks 3-4. Use them to judge whether the chatbot's answer is actually correct.</p></div>` },
+  cb6s3: { title: 'Vague prompts get generic answers about you', html: `
+    <div class="cl-block"><h4>Give it real details</h4>
+      <p>"Write about me" has no subject to work with. Add your own real details and the result gets specific, not generic.</p></div>` },
+  cb6boss: { title: 'BOSS — assemble the guide', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Your 3 best revised answers, each as their own paragraph, under one heading. Assembly, not new writing.</p></div>` },
   // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
   st1s1: { title: 'A heading is a page\'s title', html: `
     <div class="cl-block"><h4>One big title, nothing more</h4>
@@ -2927,11 +2985,14 @@ function selectChallenge(i) {
   // swap which output element is visible to match this challenge's type.
   const isPageStage = ch.type === 'page'
   const isQuizStage = ch.type === 'quiz'
-  document.getElementById('output-canvas').style.display = (isPageStage || isQuizStage) ? 'none' : 'block'
+  const isChatStage = ch.type === 'chat'
+  document.getElementById('output-canvas').style.display = (isPageStage || isQuizStage || isChatStage) ? 'none' : 'block'
   document.getElementById('output-page').style.display   = isPageStage ? 'block' : 'none'
   document.getElementById('output-quiz').style.display   = isQuizStage ? 'block' : 'none'
+  document.getElementById('output-chat').style.display   = isChatStage ? 'block' : 'none'
   if (isPageStage) pageAPI.clearPage()
   if (isQuizStage) renderQuiz(ch)
+  if (isChatStage) renderChat(ch)
   renderPills()
   renderChallengeLesson(ch)
   log('Challenge: ' + ch.name, 'info')
@@ -3009,6 +3070,61 @@ function checkQuiz() {
   checkChallenge({ quizCorrect: correct, quizTotal: qs.length })
 }
 
+// ── Chat stages — a REAL AI connection (Semester 1 project). Submit a
+// prompt, get a real generated response (proxied server-side via the
+// existing /api/ai-check route, same one checkWithAI() already uses — the
+// GROQ_API_KEY never reaches the browser), then revise the prompt and
+// regenerate. Passing requires at least 2 real generations for this stage —
+// judging whether the SECOND one is actually better is the student's own
+// call, deliberately not auto-graded (see the rebuild brief's loose-note).
+const _chatHistory = {}
+function renderChat(ch) {
+  const box = document.getElementById('output-chat')
+  const hist = _chatHistory[ch.id] || []
+  box.innerHTML = `<div style="font-size:11.5px;color:#555;margin-bottom:6px">${ch.chatTask}</div>
+    <textarea id="chat-input" placeholder="Write your prompt…"></textarea>
+    <button class="chat-gen-btn" id="chat-gen-btn" onclick="generateChat()">🤖 Generate</button>
+    <span class="chat-status" id="chat-status"></span>
+    <div id="chat-turns">` +
+    hist.map((h,i) => `<div class="chat-turn"><div class="p">Attempt ${i+1} — "${h.prompt}"</div><div class="r">${h.response}</div></div>`).join('') +
+    `</div>`
+}
+async function generateChat() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch || ch.type !== 'chat') return
+  const input = document.getElementById('chat-input')
+  const prompt = (input?.value || '').trim()
+  if (!prompt) { document.getElementById('chat-status').textContent = 'Write a prompt first.'; return }
+  const btn = document.getElementById('chat-gen-btn')
+  const status = document.getElementById('chat-status')
+  btn.disabled = true
+  status.textContent = '🤖 Thinking…'
+  try {
+    const res = await fetch('/api/ai-check', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: (typeof ENV !== 'undefined' && ENV.GROQ_MODEL) || 'openai/gpt-oss-20b',
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant answering a 12-year-old student\'s own written prompt. Respond directly and simply to exactly what they asked, in 2-4 sentences.' },
+          { role: 'user', content: prompt },
+        ],
+        max_tokens: 200, temperature: 0.6,
+      }),
+    })
+    const data = await res.json()
+    if (data.error) throw new Error(data.error.message || data.error)
+    const reply = data.choices?.[0]?.message?.content?.trim() || '(no response)'
+    _chatHistory[ch.id] = [...(_chatHistory[ch.id] || []), { prompt, response: reply }]
+    status.textContent = ''
+    renderChat(ch)
+    checkChallenge({ chatGenCount: _chatHistory[ch.id].length })
+  } catch (e) {
+    status.textContent = 'Generation failed: ' + e.message
+  } finally {
+    btn.disabled = false
+  }
+}
+
 // ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
 // BF.addXP/recordAttempt below only ever wrote to a LOCAL browser mock
 // database (public/js/db.js is a pure localStorage layer) — a student could
@@ -3038,6 +3154,9 @@ const G7_MODULE_CONCEPT = {
   CB3: 'g7-online-safety', CB4: 'g7-online-safety',
   // Prompt Generation (Sem 1, Week 5) — genuinely new territory, own concept.
   CB5: 'g7-prompt-generation',
+  // "Stay Smart Online" project (Sem 1, Weeks 7-11) — reinforces both
+  // Prompt Generation and online-safety concepts, no separate concept of its own.
+  CB6: 'g7-prompt-generation',
 }
 // G5 (Player Control) splits across two concepts depending on the challenge.
 const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }
@@ -3105,6 +3224,14 @@ function checkChallenge(log) {
       logLine('❌ Not quite — ' + quizDetail, 'err')
       document.getElementById('pass-badge').style.display = 'none'
       document.getElementById('fail-badge-detail').textContent = quizDetail
+      document.getElementById('fail-badge').style.display = 'flex'
+      return
+    }
+    if (ch.type === 'chat') {
+      const chatDetail = `you've generated ${log.chatGenCount || 0} time(s) — write a first prompt, then revise and generate again`
+      logLine('❌ Not quite — ' + chatDetail, 'err')
+      document.getElementById('pass-badge').style.display = 'none'
+      document.getElementById('fail-badge-detail').textContent = chatDetail
       document.getElementById('fail-badge').style.display = 'flex'
       return
     }
@@ -3271,7 +3398,7 @@ The student wrote this ${lang} code. In 2-3 short sentences, say whether it look
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: (typeof ENV !== 'undefined' && ENV.GROQ_MODEL) || 'llama-3.1-8b-instant',
+        model: (typeof ENV !== 'undefined' && ENV.GROQ_MODEL) || 'openai/gpt-oss-20b',
         messages: [
           { role: 'system', content: prompt },
           { role: 'user',   content: `\`\`\`${lang.toLowerCase()}\n${code}\n\`\`\`` }
