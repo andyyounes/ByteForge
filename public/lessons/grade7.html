@@ -82,6 +82,8 @@
     .cl-block:last-child { margin-bottom:0; }
     .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
     .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
+    .cl-img { display:block; max-width:260px; max-height:170px; width:auto; object-fit:cover; border-radius:6px; margin:8px 0 4px; border:1px solid rgba(255,255,255,.1); }
+    .cl-caption { font-size:10.5px; color:#8b93a8; margin:0 0 8px; font-style:italic; }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -98,6 +100,15 @@
     /* Canvas */
     .canvas-wrap { flex-shrink:0; background:#030510; border-bottom:1px solid var(--border);
                    display:flex; align-items:center; justify-content:center; height:260px; position:relative; }
+    /* No-blocks mode — quiz/chat stages need no Blockly palette, no code
+       editor, no sync bar: none of it applies when there's nothing to code. */
+    body.no-blocks-mode .blocks-panel,
+    body.no-blocks-mode .sync-bar,
+    body.no-blocks-mode .editor-wrap,
+    body.no-blocks-mode .out-bar { display:none !important; }
+    body.no-blocks-mode .canvas-wrap { flex:1; height:auto; align-items:stretch; padding:24px; }
+    body.no-blocks-mode #output-quiz,
+    body.no-blocks-mode #output-chat { max-width:760px; margin:0 auto; padding:24px 32px; }
     #output-canvas { display:block; }
     /* Page-building preview — used by the "page" stage type (Story Studio
        world), a DOM preview standing in for a real browser page instead of
@@ -109,7 +120,7 @@
     /* Quiz preview — used by the "quiz" stage type (Computer Basics /
        Cybersecurity judgment stages), matching + fill-in-the-blank, no code
        editor involved at all. */
-    #output-quiz { display:none; width:480px; height:260px; overflow-y:auto; background:#fff; color:#111;
+    #output-quiz { display:none; width:100%; max-width:640px; height:100%; overflow-y:auto; background:#fff; color:#111;
                    border-radius:6px; padding:14px 16px; font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
     #output-quiz .q-item { margin-bottom:12px; }
     #output-quiz .q-scenario { background:#f3f4f6; border-radius:6px; padding:8px 10px; font-size:12.5px; margin-bottom:6px; }
@@ -123,7 +134,7 @@
     #output-quiz .q-result.bad { color:#dc2626; font-weight:700; }
     /* Chat preview — used by the "chat" stage type (Semester 1 project: a
        real AI connection, submit -> generate -> judge -> revise -> regenerate). */
-    #output-chat { display:none; width:480px; height:260px; overflow-y:auto; background:#fff; color:#111;
+    #output-chat { display:none; width:100%; max-width:640px; height:100%; overflow-y:auto; background:#fff; color:#111;
                    border-radius:6px; padding:12px 14px; font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
     #output-chat textarea { width:100%; font-size:12px; padding:6px 8px; border-radius:5px; border:1px solid #ccc; min-height:44px; resize:vertical; }
     #output-chat .chat-gen-btn { margin-top:6px; padding:7px 14px; border:none; border-radius:6px;
@@ -2374,76 +2385,130 @@ const CHALLENGE_LESSON = {
   // concept, state the rule, stop) ────────────────────────────────────────
   cb1s1: { title: 'Five real parts, one job each', html: `
     <div class="cl-block"><h4>CPU. RAM. Storage. Input. Output.</h4>
-      <p>The CPU carries out instructions. RAM holds data only while the power is on. Storage keeps your files even with the power off. Input devices bring information in. Output devices send it back out.</p></div>` },
+      <p>The CPU carries out instructions — every calculation, every game move, every click. RAM holds data only while the power is on — it's fast, but wiped the second you shut down. Storage keeps your files even with the power off. Input devices bring information in. Output devices send it back out.</p></div>
+    <img class="cl-img" src="/lessons/images/ram.jpg" alt="RAM memory modules">
+    <p class="cl-caption">Real RAM modules — this is what actually gets wiped every time you shut down.</p>
+    <div class="cl-block"><h4>Why RAM and storage are easy to confuse</h4>
+      <p>Both hold data, but only one survives losing power. That's the whole difference: RAM is your desk while you're working, storage is the filing cabinet. Close your laptop mid-game and RAM forgets your progress — storage doesn't.</p></div>` },
   cb1s2: { title: 'CPU, RAM, and input', html: `
     <div class="cl-block"><h4>Three facts, three blanks</h4>
-      <p>The CPU is the brain. RAM clears when the power turns off. A keyboard is an input device — it brings information in.</p></div>` },
+      <p>The CPU is the brain — it runs one instruction at a time, extremely fast (billions per second). RAM clears when the power turns off. A keyboard is an input device — it brings information in.</p></div>
+    <div class="cl-block"><h4>A real example</h4>
+      <p>When you press a key, the keyboard (input) sends that keystroke to the CPU, which decides what to do with it, and RAM holds the in-progress result until you save it to storage.</p></div>` },
   cb1s3: { title: 'Output and storage', html: `
     <div class="cl-block"><h4>The other two directions</h4>
-      <p>A monitor is output — it sends information out to you. A microphone is input — it brings sound in. Storage keeps files saved even with no power.</p></div>` },
+      <p>A monitor is output — it sends information out to you. A microphone is input — it brings sound in. Storage keeps files saved even with no power.</p></div>
+    <img class="cl-img" src="/lessons/images/keyboard.jpg" alt="A standard computer keyboard">
+    <p class="cl-caption">A keyboard — every key press is data going IN.</p>
+    <div class="cl-block"><h4>A quick way to remember it</h4>
+      <p>If it sends data TO the computer, it's input. If it sends data FROM the computer to you, it's output. A touchscreen is actually both at once — input when you tap it, output when it lights up.</p></div>` },
   cb1boss: { title: 'BOSS — same five facts, mixed', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>Every question here reuses a fact from Challenges 1–3. Score 4 out of 5 to pass.</p></div>` },
+      <p>Every question here reuses a fact from Challenges 1–3. Score 4 out of 5 to pass.</p></div>
+    <div class="cl-block"><h4>The one idea underneath all five</h4>
+      <p>Every real computer, from a phone to a games console, is built from these same five kinds of part — this isn't a "school version," it's genuinely how they all work.</p></div>` },
   cb2s1: { title: 'A file extension tells you the type', html: `
     <div class="cl-block"><h4>.jpg, .mp3, .docx, .mp4</h4>
-      <p>.jpg and .png are images. .mp3 and .wav are audio. .docx is a document. .mp4 is video. Storage is measured in KB, MB, GB — each about 1000× the last.</p></div>` },
+      <p>.jpg and .png are images. .mp3 and .wav are audio. .docx is a document. .mp4 is video. Storage is measured in KB, MB, GB — each about 1000× the last.</p></div>
+    <img class="cl-img" src="/lessons/images/floppy.jpg" alt="Floppy disks of different sizes">
+    <p class="cl-caption">Floppy disks — old, real storage. A 3.5" floppy held about 1.44 MB total; a modern phone photo alone is often bigger than that.</p>
+    <div class="cl-block"><h4>Why extensions matter beyond just naming</h4>
+      <p>The extension tells your computer WHICH program to open a file with — double-click a .docx and it opens Word; double-click a .mp3 and it opens a music player. Renaming a file's extension doesn't change what's actually inside it.</p></div>` },
   cb2boss: { title: 'BOSS — file types and storage size order', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>Same facts as Challenge 1, plus: KB is smaller than MB, which is smaller than GB. A folder is a container that groups files together.</p></div>` },
+      <p>Same facts as Challenge 1, plus: KB is smaller than MB, which is smaller than GB. A folder is a container that groups files together.</p></div>
+    <div class="cl-block"><h4>A real sense of scale</h4>
+      <p>A short text file might be 1 KB. A photo is usually 2-5 MB. A phone typically stores 64-256 GB total — enough for tens of thousands of photos.</p></div>` },
   cb3s1: { title: 'Too good to be true is the #1 real sign', html: `
     <div class="cl-block"><h4>A free prize you never entered for</h4>
-      <p>Nobody gives away expensive stuff for free to random strangers online. A surprise prize is the red flag itself, not a lucky break.</p></div>` },
+      <p>Nobody gives away expensive stuff for free to random strangers online. A surprise prize is the red flag itself, not a lucky break.</p></div>
+    <div class="cl-block"><h4>Why this trick works on smart people too</h4>
+      <p>Scams like this rely on excitement making you click FAST, before you think. The fix is always the same: the more exciting a message is, the more suspicious you should be of it.</p></div>` },
   cb3s2: { title: 'Not everything is a scam', html: `
     <div class="cl-block"><h4>No prize, no urgency, no personal info</h4>
-      <p>A message with none of the real red flags is just a normal message. Judging everything as fake is as wrong as judging everything as safe.</p></div>` },
+      <p>A message with none of the real red flags is just a normal message. Judging everything as fake is as wrong as judging everything as safe.</p></div>
+    <div class="cl-block"><h4>Why this step exists</h4>
+      <p>A real skill isn't "assume everything is a scam" — it's telling the difference. This message names a real class, a real platform, and a real deadline with nothing to gain from tricking you.</p></div>` },
   cb3s3: { title: 'Friendly in chat does not mean safe in real life', html: `
     <div class="cl-block"><h4>A stranger is still a stranger</h4>
-      <p>Real name, school, and address should never go to someone you only know from a game — even a friendly one.</p></div>` },
+      <p>Real name, school, and address should never go to someone you only know from a game — even a friendly one.</p></div>
+    <div class="cl-block"><h4>Why "they seem nice" isn't proof</h4>
+      <p>Anyone can type a friendly message — it costs nothing and proves nothing about who's actually on the other end. Trust is built over real time, not one nice chat.</p></div>` },
   cb3s4: { title: 'A real friend, asking normally', html: `
     <div class="cl-block"><h4>Context matters</h4>
-      <p>Someone you actually know, asking a normal question, is not a scam. The same words from a stranger would be judged differently.</p></div>` },
+      <p>Someone you actually know, asking a normal question, is not a scam. The same words from a stranger would be judged differently.</p></div>
+    <div class="cl-block"><h4>The real test</h4>
+      <p>Ask: do I actually know this person outside this one message? A real friend's message never needs urgency or secrecy to make sense.</p></div>` },
   cb3boss: { title: 'BOSS — the same 4 signs, a new example', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>Too good to be true, urgent, asks for personal info, or a wrong-looking link. This message has more than one.</p></div>` },
+      <p>Too good to be true, urgent, asks for personal info, or a wrong-looking link. This message has more than one.</p></div>
+    <div class="cl-block"><h4>Why real scams usually stack signs</h4>
+      <p>One red flag alone can sometimes be innocent. Two or three together, in the same message, is what actually confirms a scam.</p></div>` },
   cb4s1: { title: 'A fake domain looks almost right', html: `
     <div class="cl-block"><h4>robl0x, not roblox</h4>
-      <p>A "0" instead of an "o" is a different domain, not a typo you can ignore. Urgency ("in 1 hour") is designed to stop you checking.</p></div>` },
+      <p>A "0" instead of an "o" is a different domain, not a typo you can ignore. Urgency ("in 1 hour") is designed to stop you checking.</p></div>
+    <div class="cl-block"><h4>Why real companies don't do this</h4>
+      <p>Real accounts are never deleted with a 1-hour countdown over text. Real companies use their actual, existing app or website — never a rushed link in a message.</p></div>` },
   cb4s2: { title: 'Check the sender, not just the message', html: `
     <div class="cl-block"><h4>paypa1-security.com is not PayPal</h4>
-      <p>A scary subject line and a mismatched sender address are two separate red flags — either one alone is enough to stop and check.</p></div>` },
+      <p>A scary subject line and a mismatched sender address are two separate red flags — either one alone is enough to stop and check.</p></div>
+    <div class="cl-block"><h4>How to actually check a sender</h4>
+      <p>Look at the full domain AFTER the @ symbol, not just the display name — "PayPal Support" can be typed by anyone, but the real domain (paypal.com) can't be faked in the same way.</p></div>` },
   cb4s3: { title: 'Read every character', html: `
     <div class="cl-block"><h4>roblox.com vs. robl0x-free-robux.com</h4>
-      <p>A lookalike domain swaps one letter for a similar symbol. Always check the exact spelling before you click or log in.</p></div>` },
+      <p>A lookalike domain swaps one letter for a similar symbol. Always check the exact spelling before you click or log in.</p></div>
+    <div class="cl-block"><h4>A second real clue here</h4>
+      <p>Beyond the swapped letter, the fake domain is also longer and adds extra words ("free-robux") — real login pages almost never need to advertise what they're offering in the address itself.</p></div>` },
   cb4s4: { title: 'A fake login steals your real password', html: `
     <div class="cl-block"><h4>"Free" skins, real theft</h4>
-      <p>These sites don't give anything away — they exist to collect the real password you type into them.</p></div>` },
+      <p>These sites don't give anything away — they exist to collect the real password you type into them.</p></div>
+    <div class="cl-block"><h4>What actually happens after you type it in</h4>
+      <p>The moment you submit, your real username and password are sent straight to whoever built the fake page — they can now log into your real account with it, immediately.</p></div>` },
   cb4boss: { title: 'BOSS — the same signs, a new example', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>A wrong domain, urgency, and too-good-to-be-true, all in one message. Any one of these alone is enough to stop and check.</p></div>` },
+      <p>A wrong domain, urgency, and too-good-to-be-true, all in one message. Any one of these alone is enough to stop and check.</p></div>
+    <div class="cl-block"><h4>The one habit that beats every version of this</h4>
+      <p>Never click a link IN a suspicious message to "check" — instead, open the real app or type the real website address yourself, separately.</p></div>` },
   cb5s1: { title: 'A vague prompt gets a vague result', html: `
     <div class="cl-block"><h4>Before the fix</h4>
-      <p>"Write about dogs" doesn't say how long, what tone, or what shape the answer should take. This is the baseline you'll improve next.</p></div>` },
+      <p>"Write about dogs" doesn't say how long, what tone, or what shape the answer should take. This is the baseline you'll improve next.</p></div>
+    <div class="cl-block"><h4>Why the AI can't just guess right</h4>
+      <p>A chatbot answers exactly what you typed, not what you meant — it has no way to know you wanted 3 sentences instead of 3 paragraphs unless you say so.</p></div>` },
   cb5s2: { title: 'A good prompt has three parts', html: `
     <div class="cl-block"><h4>Subject. Constraint. Format.</h4>
-      <p>A subject is what you want. A constraint is length, tone, or audience. A format is list, paragraph, or steps. All three, every time.</p></div>` },
+      <p>A subject is what you want. A constraint is length, tone, or audience. A format is list, paragraph, or steps. All three, every time.</p></div>
+    <div class="cl-block"><h4>A real before/after</h4>
+      <p>Vague: "write about dogs." Specific: "Write a funny 3-sentence paragraph about why dogs are better than cats, for a 12-year-old." Same topic, completely different result.</p></div>` },
   cb5s3: { title: '"Make me a story" is missing all three', html: `
     <div class="cl-block"><h4>No subject, no constraint, no format</h4>
-      <p>It doesn't say what the story's about, how long, or what shape. That's why it's vague — not one thing missing, all three.</p></div>` },
+      <p>It doesn't say what the story's about, how long, or what shape. That's why it's vague — not one thing missing, all three.</p></div>
+    <div class="cl-block"><h4>Try fixing it yourself</h4>
+      <p>"Write a 5-sentence adventure story about a lost dog finding its way home, for a 10-year-old" fixes all three at once — subject, length, tone/audience.</p></div>` },
   cb5boss: { title: 'BOSS — same 3-part checklist, your own prompt', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>Subject, constraint, format — the same rule as Challenge 2, now for a task nobody gave you an example for.</p></div>` },
+      <p>Subject, constraint, format — the same rule as Challenge 2, now for a task nobody gave you an example for.</p></div>
+    <div class="cl-block"><h4>This is the actual real-world skill</h4>
+      <p>Nobody in real life hands you a labelled example first — being able to build a specific prompt from scratch, for a brand-new task, is the whole point of this unit.</p></div>` },
   cb6s1: { title: 'A real chatbot, a real prompt', html: `
     <div class="cl-block"><h4>Judge it, then revise it</h4>
-      <p>The first response might be too generic. If it is, add a constraint or a format to your prompt and generate again — that's the whole skill from Week 5, used for real.</p></div>` },
+      <p>The first response might be too generic. If it is, add a constraint or a format to your prompt and generate again — that's the whole skill from Week 5, used for real.</p></div>
+    <div class="cl-block"><h4>What "judging" actually means here</h4>
+      <p>Ask yourself: does this actually explain it clearly, at my level? If it's too technical or too short, that's specific, fixable feedback for your next prompt.</p></div>` },
   cb6s2: { title: 'Check the chatbot against what you already know', html: `
     <div class="cl-block"><h4>Does it match the 4 real signs?</h4>
-      <p>You already learned the real red flags in Weeks 3-4. Use them to judge whether the chatbot's answer is actually correct.</p></div>` },
+      <p>You already learned the real red flags in Weeks 3-4. Use them to judge whether the chatbot's answer is actually correct.</p></div>
+    <div class="cl-block"><h4>Why this check matters</h4>
+      <p>Chatbots can sound confident while being wrong or incomplete — you checking its answer against what you already know is a genuinely important habit, not just busywork.</p></div>` },
   cb6s3: { title: 'Vague prompts get generic answers about you', html: `
     <div class="cl-block"><h4>Give it real details</h4>
-      <p>"Write about me" has no subject to work with. Add your own real details and the result gets specific, not generic.</p></div>` },
+      <p>"Write about me" has no subject to work with. Add your own real details and the result gets specific, not generic.</p></div>
+    <div class="cl-block"><h4>A real example</h4>
+      <p>"Write a short, friendly paragraph about a 12-year-old who loves football and drawing, for a class introduction" gives the chatbot something real to work with — "write about me" doesn't.</p></div>` },
   cb6boss: { title: 'BOSS — assemble the guide', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>Your 3 best revised answers, each as their own paragraph, under one heading. Assembly, not new writing.</p></div>` },
+      <p>Your 3 best revised answers, each as their own paragraph, under one heading. Assembly, not new writing.</p></div>
+    <div class="cl-block"><h4>Why this is worth keeping</h4>
+      <p>You now have a real, working example of writing a vague prompt, judging its result, and fixing it — a skill that applies far beyond this one project.</p></div>` },
   // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
   st1s1: { title: 'A heading is a page\'s title', html: `
     <div class="cl-block"><h4>One big title, nothing more</h4>
@@ -2990,6 +3055,7 @@ function selectChallenge(i) {
   document.getElementById('output-page').style.display   = isPageStage ? 'block' : 'none'
   document.getElementById('output-quiz').style.display   = isQuizStage ? 'block' : 'none'
   document.getElementById('output-chat').style.display   = isChatStage ? 'block' : 'none'
+  document.body.classList.toggle('no-blocks-mode', isQuizStage || isChatStage)
   if (isPageStage) pageAPI.clearPage()
   if (isQuizStage) renderQuiz(ch)
   if (isChatStage) renderChat(ch)
