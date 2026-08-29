@@ -108,7 +108,14 @@
     #cl-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
     .cl-body { padding:0 12px 12px; font-size:12px; color:#c7d2e0; line-height:1.7; }
     .cl-body.collapsed { display:none; }
-    .cl-block { background:#0d0f1a; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:10px 13px; margin-bottom:8px; }
+    .cl-block { background:#0d0f1a; border:1px solid rgba(255,255,255,.07); border-radius:8px; padding:16px 19px; margin-bottom:18px; line-height:1.7; }
+    /* On the combined per-world Lesson page, each stage's lesson content is
+       concatenated one after another — without a visible break they read as
+       one undifferentiated wall of blocks. Insert a clear divider between
+       stages (see openWorldLesson). */
+    .lesson-stage-break { height:1px; background:var(--border); margin:26px 0 22px; position:relative; }
+    .lesson-stage-break span { position:absolute; top:-9px; left:0; background:#12141f; padding-right:10px;
+      font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#a5b4fc; }
     .cl-block:last-child { margin-bottom:0; }
     .cl-block h4 { font-size:10.5px; font-weight:800; color:#fbbf24; margin-bottom:5px; text-transform:uppercase; letter-spacing:.03em; }
     .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
@@ -185,6 +192,10 @@
     #output-quiz .q-result { font-size:13px; margin-top:10px; text-align:center; padding:8px; border-radius:8px; }
     #output-quiz .q-result.ok  { color:#4ade80; font-weight:700; background:rgba(34,197,94,.12); }
     #output-quiz .q-result.bad { color:#f87171; font-weight:700; background:rgba(239,68,68,.1); }
+    #output-quiz .q-sim-output:empty { display:none; }
+    #output-quiz .q-sim-output { margin-top:8px; font-size:12px; color:var(--fg-dim); background:rgba(129,140,248,.08);
+      border:1px solid rgba(129,140,248,.2); border-radius:7px; padding:8px 10px; line-height:1.5; }
+    #output-quiz .q-sim-output b { color:#a5b4fc; }
     /* Chat preview — used by the "chat" stage type (Semester 1 project: a
        real AI connection, submit -> generate -> judge -> revise -> regenerate). */
     #output-chat { display:none; width:100%; max-width:640px; height:100%; overflow-y:auto;
@@ -1144,11 +1155,27 @@ function stopLoop() {
 // Runner for "page" stages (Story Studio world) — no animation loop, no
 // canvas; builds real DOM elements into #output-page and checks against
 // that, mirroring runCode()'s static (non-animated) branch above.
+// The "Python" tab is a READ-ONLY preview — the run-button explicitly labels
+// itself "▶ Run (JS)" while viewing it, promising Run always executes the
+// real JS regardless of which language is currently displayed. But runCode/
+// runPageCode used to just grab editor.getValue() directly, which — while
+// viewing Python — holds Python text, not JS. Worse, page_* blocks have no
+// Python generator registered at all, so Blockly's fallback for an unknown
+// block emits a broken "???" placeholder into that Python text; running
+// THAT through `new Function()` throws "Unexpected token '?'". Regenerating
+// fresh JS straight from the blocks (whenever the student hasn't dropped
+// into manual text-editing mode) sidesteps the whole class of bug.
+function getRealJsCode() {
+  if (textMode) return editor.getValue()
+  try { return Blockly.JavaScript.workspaceToCode(workspace).trim() }
+  catch (e) { return editor.getValue() }
+}
+
 function runPageCode() {
   document.getElementById('pass-badge').style.display = 'none'
   document.getElementById('fail-badge').style.display = 'none'
   pageAPI.clearPage()
-  const code = editor.getValue()
+  const code = getRealJsCode()
   if (!code.trim() || code.startsWith('// Start by dragging')) {
     log('No code yet — drag some Page blocks!', 'info'); return
   }
@@ -1176,6 +1203,8 @@ function runPageCode() {
     buttons:    pageEl.querySelectorAll('button').length,
     headingText:   [...pageEl.querySelectorAll('h1')].map(e => e.textContent),
     paragraphText: [...pageEl.querySelectorAll('p')].map(e => e.textContent),
+    linkText:      [...pageEl.querySelectorAll('a')].map(e => e.textContent),
+    buttonText:    [...pageEl.querySelectorAll('button')].map(e => e.textContent),
     // Week 2 — CSS styling state, read straight off the DOM/style object so
     // the check reflects what's actually applied, not what was merely called.
     bgColor:     pageEl.style.backgroundColor || '',
@@ -1219,7 +1248,7 @@ function runCode() {
   document.getElementById('pass-badge').style.display = 'none'
   document.getElementById('fail-badge').style.display = 'none'
 
-  const code = editor.getValue()
+  const code = getRealJsCode()
   if (!code.trim() || code.startsWith('// Start by dragging')) {
     log('No code yet — drag some blocks!', 'info'); return
   }
@@ -1577,60 +1606,79 @@ const WORLDS = [
   // Grade 8 introduces the real text-based HTML/CSS/JS editor.
   { id:'st1', name:'📰 Story Studio 1 — Page Basics', sub:'Headings, paragraphs, links, buttons — the tags every page starts with', live:true, stages:[
     { id:'st1s1', name:'Front Page', xp:20, type:'page',
-      text:`<strong>Challenge 1</strong> — Every page starts with ONE big heading — its title. Add a heading that says "My Story".`,
+      text:`<strong>Challenge 1</strong> — Every page starts with ONE big heading — its title. Add a heading that says EXACTLY "My Story".`,
       hints:[
         'Open the Page category and drag out "add heading".',
-        'Type "My Story" into the text slot.',
+        'Type "My Story" into the text slot — exactly that, capital M and S.',
         'Press ▶ Run — you should see it appear as a big title.',
       ],
       needsHeadings:1,
-      check:(log) => log.headings >= 1,
+      check:(log) => log.headings >= 1 && (log.headingText||[]).some(t => t.trim() === 'My Story'),
     },
     { id:'st1s2', name:'Say More', xp:25, type:'page',
-      text:`<strong>Challenge 2</strong> — A heading alone is just a title. Add a heading AND a paragraph of body text underneath it.`,
+      text:`<strong>Challenge 2</strong> — A heading alone is just a title. Add your "My Story" heading AND a paragraph introducing your story: what it's about and who the main character is — at least 8 words, a real sentence, not a placeholder.`,
       hints:[
         'Keep your heading from before, then drag out "add paragraph" below it.',
         'Blocks run top to bottom — order controls what appears first.',
-        'Type any sentence into the paragraph text.',
+        'Write a real sentence, e.g. "This is the story of a young explorer named Mia who discovers a hidden island." — at least 8 words.',
       ],
       needsHeadings:1, needsParagraphs:1,
-      check:(log) => log.headings >= 1 && log.paragraphs >= 1,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 1
+                  && (log.paragraphText||[]).some(t => t.trim().split(/\s+/).filter(Boolean).length >= 8),
     },
     { id:'st1s3', name:'Chapter One', xp:30, type:'page',
-      text:`<strong>Challenge 3</strong> — Real pages usually need MORE than one paragraph. Add one heading and THREE separate paragraphs (three separate "add paragraph" blocks, not one long one).`,
+      text:`<strong>Challenge 3</strong> — Real pages usually need MORE than one paragraph. Add one heading and THREE separate paragraphs (three separate "add paragraph" blocks, not one long one) — each one a DIFFERENT real sentence (at least 5 words each), not the same text repeated or left as a placeholder.`,
       hints:[
-        'Drag out three separate "add paragraph" blocks, each with different text.',
+        'Drag out three separate "add paragraph" blocks, each with genuinely different text — not "Some text here." three times.',
         'This is exactly how a real HTML page is built — one &lt;p&gt; tag per paragraph.',
+        'Try: paragraph 1 sets the scene, paragraph 2 introduces a problem, paragraph 3 hints at the adventure ahead.',
       ],
       needsHeadings:1, needsParagraphs:3,
-      check:(log) => log.headings >= 1 && log.paragraphs >= 3,
+      check:(log) => {
+        if (log.headings < 1 || (log.paragraphs||0) < 3) return false
+        const real = (log.paragraphText||[]).map(t => t.trim()).filter(t => t.split(/\s+/).filter(Boolean).length >= 5)
+        return new Set(real).size >= 3
+      },
     },
     { id:'st1s4', name:'Read More', xp:35, type:'page',
-      text:`<strong>Challenge 4</strong> — Pages link to OTHER pages. Add a heading, a paragraph, and a link with the text "Read the next chapter".`,
+      text:`<strong>Challenge 4</strong> — Pages link to OTHER pages. Add a heading, a real paragraph (8+ words, from Challenge 2's rule), and a link with the text EXACTLY "Read the next chapter".`,
       hints:[
         'Drag out "add link" from the Page category.',
-        'The first slot is the text people click; the second is where it goes (any URL works for practice).',
+        'The first slot is the text people click — type it exactly: "Read the next chapter". The second slot is where it goes (any URL works for practice).',
       ],
       needsHeadings:1, needsParagraphs:1, needsLinks:1,
-      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.links >= 1,
+      check:(log) => log.headings >= 1 && (log.paragraphs||0) >= 1 && (log.links||0) >= 1
+                  && (log.paragraphText||[]).some(t => t.trim().split(/\s+/).filter(Boolean).length >= 8)
+                  && (log.linkText||[]).some(t => t.trim() === 'Read the next chapter'),
     },
     { id:'st1s5', name:'Call to Action', xp:35, type:'page',
-      text:`<strong>Challenge 5</strong> — Buttons invite the READER to do something. Add a heading, a paragraph, and a button that says "Start Reading".`,
+      text:`<strong>Challenge 5</strong> — Buttons invite the READER to do something. Add a heading, a real paragraph (8+ words), and a button with the text EXACTLY "Start Reading".`,
       hints:[
         'Drag out "add button" from the Page category.',
+        'Type its label exactly: "Start Reading".',
         'A button on its own does nothing yet — Week 3 teaches making it actually respond when clicked.',
       ],
       needsHeadings:1, needsParagraphs:1, needsButtons:1,
-      check:(log) => log.headings >= 1 && log.paragraphs >= 1 && log.buttons >= 1,
+      check:(log) => log.headings >= 1 && (log.paragraphs||0) >= 1 && (log.buttons||0) >= 1
+                  && (log.paragraphText||[]).some(t => t.trim().split(/\s+/).filter(Boolean).length >= 8)
+                  && (log.buttonText||[]).some(t => t.trim() === 'Start Reading'),
     },
     { id:'st1boss', name:'BOSS — Ship the Front Page', xp:60, type:'page', boss:true,
-      text:`<strong>BOSS</strong> — Build your story's real front page: ONE heading (your story's title), at least TWO paragraphs (a blurb), a link ("Read the next chapter"), and a button ("Start Reading"). Every tag from this week, together.`,
+      text:`<strong>BOSS</strong> — Build your story's real front page: heading EXACTLY "My Story", at least TWO different real paragraphs (5+ words each, a genuine blurb — not the same line twice), a link with text EXACTLY "Read the next chapter", and a button with text EXACTLY "Start Reading". Every tag from this week, together, for real.`,
       hints:[
-        'This is everything from st1s1–st1s5 combined into one page — nothing new to learn, just assemble it.',
+        'This is everything from st1s1–st1s5 combined into one page — nothing new to learn, just assemble it with real content, not placeholders.',
         'Order matters for how it reads: heading first, then paragraphs, then link/button.',
       ],
       needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1,
-      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1,
+      check:(log) => {
+        if (log.headings < 1 || (log.paragraphs||0) < 2 || (log.links||0) < 1 || (log.buttons||0) < 1) return false
+        if (!(log.headingText||[]).some(t => t.trim() === 'My Story')) return false
+        const real = (log.paragraphText||[]).map(t => t.trim()).filter(t => t.split(/\s+/).filter(Boolean).length >= 5)
+        if (new Set(real).size < 2) return false
+        if (!(log.linkText||[]).some(t => t.trim() === 'Read the next chapter')) return false
+        if (!(log.buttonText||[]).some(t => t.trim() === 'Start Reading')) return false
+        return true
+      },
     },
   ]},
   // ── Story Studio — Semester 1, Week 2: CSS styling basics ──────────────────
@@ -1680,8 +1728,15 @@ const WORLDS = [
         'Order genuinely doesn\'t matter here — CSS rules apply no matter when they\'re set, unlike the tags themselves which appear in the order you add them.',
       ],
       needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
-      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1
-                  && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16,
+      check:(log) => {
+        if (log.headings < 1 || (log.paragraphs||0) < 2 || (log.links||0) < 1 || (log.buttons||0) < 1) return false
+        if (!(log.headingText||[]).some(t => t.trim() === 'My Story')) return false
+        const real = (log.paragraphText||[]).map(t => t.trim()).filter(t => t.split(/\s+/).filter(Boolean).length >= 5)
+        if (new Set(real).size < 2) return false
+        if (!(log.linkText||[]).some(t => t.trim() === 'Read the next chapter')) return false
+        if (!(log.buttonText||[]).some(t => t.trim() === 'Start Reading')) return false
+        return !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16
+      },
     },
   ]},
   // ── Story Studio — Semester 1, Week 3: buttons & onclick ───────────────────
@@ -1734,9 +1789,18 @@ const WORLDS = [
       ],
       needsHeadings:1, needsParagraphs:2, needsLinks:1, needsButtons:1, needsBgColor:true, needsHeadingColor:true, needsAlign:'center', needsFontSize:16,
       needsHeadingChange:true, needsParagraphChange:true, needsButtonTextChange:true,
-      check:(log) => log.headings >= 1 && log.paragraphs >= 2 && log.links >= 1 && log.buttons >= 1
-                  && !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16
-                  && log.headingChangedByClick === true && log.paragraphChangedByClick === true && log.buttonTextChangedByClick === true,
+      check:(log) => {
+        if (log.headings < 1 || (log.paragraphs||0) < 2 || log.links < 1 || log.buttons < 1) return false
+        // Paragraph text is captured AFTER the synthetic click fires, so
+        // "distinct real content" is checked here rather than an exact
+        // original string — the whole point of this stage is that the
+        // paragraph text CHANGES on click, so there's no single fixed
+        // "before" value to pin an exact match to.
+        const real = (log.paragraphText||[]).map(t => t.trim()).filter(t => t.split(/\s+/).filter(Boolean).length >= 5)
+        if (new Set(real).size < 2) return false
+        return !!log.bgColor && !!log.headingColor && log.align === 'center' && log.fontSize >= 16
+            && log.headingChangedByClick === true && log.paragraphChangedByClick === true && log.buttonTextChangedByClick === true
+      },
     },
   ]},
   // ── Story Studio — Semester 1, Week 4: variables & simple state ────────────
@@ -2600,7 +2664,11 @@ const CHALLENGE_LESSON = {
     <div class="cl-block"><h4>A real before/after</h4>
       <p>Vague: "write about dogs." Specific: "Write a funny 3-sentence paragraph about why dogs are better than cats, for a 12-year-old." Same topic, completely different result — the second version tells the chatbot exactly how long, what tone, and who it's for.</p></div>
     <div class="cl-block"><h4>More real examples of each part</h4>
-      <p><b>Constraints:</b> "in under 50 words", "in a serious tone", "for someone who's never coded before". <b>Formats:</b> "as a numbered list", "as a short story", "as 3 bullet points", "step-by-step instructions".</p></div>` },
+      <p><b>Constraints:</b> "in under 50 words", "in a serious tone", "for someone who's never coded before". <b>Formats:</b> "as a numbered list", "as a short story", "as 3 bullet points", "step-by-step instructions".</p></div>
+    <div class="cl-block"><h4>Three versions of the same request — bad, okay, good</h4>
+      <p><b>Bad:</b> "tell me about space." (no subject focus, no constraint, no format — could be answered a thousand different ways.)<br>
+      <b>Okay:</b> "tell me 3 facts about Mars." (a real subject and a rough format — but no length, tone, or audience given.)<br>
+      <b>Good:</b> "Give me 3 short, exciting facts about Mars, written for a 10-year-old, as a bullet list." (subject + constraint + format, all three — nothing left for the chatbot to guess.)</p></div>` },
   cb5s3: { title: '"Make me a story" is missing all three', html: `
     <div class="cl-block"><h4>No subject, no constraint, no format</h4>
       <p>It doesn't say what the story's about, how long, or what shape. That's why it's vague — not one thing missing, all three.</p></div>
@@ -3277,9 +3345,9 @@ function openWorldLesson(worldId) {
   document.getElementById('cl-title').textContent = world.name
   const combined = world.stages
     .filter(s => !s.boss)
-    .map(s => CHALLENGE_LESSON[s.id])
-    .filter(Boolean)
-    .map(l => l.html)
+    .map(s => ({ s, l: CHALLENGE_LESSON[s.id] }))
+    .filter(x => x.l)
+    .map((x, i) => (i > 0 ? '<div class="lesson-stage-break"><span>' + x.s.name + '</span></div>' : '') + x.l.html)
     .join('')
   document.getElementById('cl-body').innerHTML = combined || '<div class="cl-block"><p>No lesson content yet for this world.</p></div>'
   document.getElementById('cl-body').classList.remove('collapsed')
@@ -3301,19 +3369,26 @@ function openWorldLesson(worldId) {
 function renderQuiz(ch) {
   const box = document.getElementById('output-quiz')
   const qs = ch.questions || []
+  // IDs are namespaced with the stage's own id (not just the question
+  // index) — every stage's question 0 used to share the literal DOM id
+  // "quiz-0-a", so browsers' form-field autofill would suggest an answer
+  // typed into a COMPLETELY unrelated earlier question (e.g. offering
+  // "CPU" inside a free-text prompt box). autocomplete="off" alone isn't
+  // reliably honoured by every browser for this; unique ids fix it for real.
+  const pfx = 'quiz-' + ch.id + '-'
   box.innerHTML = '<div class="quiz-grid">' + qs.map((q, i) => {
     if (q.type === 'judge') {
       return `<div class="q-item">
         <div class="q-scenario">${q.scenario}</div>
         <div class="q-label">Fake or real?</div>
-        <select id="quiz-${i}-a"><option value="">Choose…</option><option value="FAKE">FAKE</option><option value="REAL">REAL</option></select>
+        <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option><option value="FAKE">FAKE</option><option value="REAL">REAL</option></select>
         ${q.flagOptions ? `<div class="q-label" style="margin-top:6px">Which red flag?</div>
-        <select id="quiz-${i}-b"><option value="">Choose…</option>${q.flagOptions.map(f=>`<option value="${f}">${f}</option>`).join('')}</select>` : ''}
+        <select id="${pfx}${i}-b" autocomplete="off"><option value="">Choose…</option>${q.flagOptions.map(f=>`<option value="${f}">${f}</option>`).join('')}</select>` : ''}
       </div>`
     }
     if (q.type === 'match') {
       return `<div class="q-item"><div class="q-label">${q.prompt}</div>
-        <select id="quiz-${i}-a"><option value="">Choose…</option>${q.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`
+        <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option>${q.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`
     }
     if (q.type === 'prompt' || q.type === 'any') {
       // Free-text prompt-writing — checked against a real specificity
@@ -3321,21 +3396,23 @@ function renderQuiz(ch) {
       // 'any' is the same input but just requires SOMETHING written — used
       // for the baseline "write a vague prompt" observation step.
       return `<div class="q-item"><div class="q-label">${q.prompt}</div>
-        <input type="text" id="quiz-${i}-a" placeholder="Write your prompt…" style="width:100%"></div>`
+        <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="Write your prompt…" style="width:100%">
+        <div class="q-sim-output" id="${pfx}${i}-sim"></div></div>`
     }
     // 'fill'
     return `<div class="q-item"><div class="q-label">${q.prompt}</div>
-      <input type="text" id="quiz-${i}-a" placeholder="Type your answer…"></div>`
+      <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="Type your answer…"></div>`
   }).join('') + '</div>' + `<button class="q-check-btn" onclick="checkQuiz()">✅ Submit Answer</button><div class="q-result" id="quiz-result"></div>`
 }
 
 function checkQuiz() {
   const ch = CHALLENGES[activeIdx]
   const qs = ch.questions || []
+  const pfx = 'quiz-' + ch.id + '-'
   let correct = 0
   qs.forEach((q, i) => {
-    const a = (document.getElementById('quiz-' + i + '-a')?.value || '').trim().toLowerCase()
-    const bEl = document.getElementById('quiz-' + i + '-b')
+    const a = (document.getElementById(pfx + i + '-a')?.value || '').trim().toLowerCase()
+    const bEl = document.getElementById(pfx + i + '-b')
     if (q.type === 'judge') {
       const okA = a === (q.answer || '').toLowerCase()
       const okB = !bEl || !q.flagAnswers || q.flagAnswers.some(f => (bEl.value||'').toLowerCase() === f.toLowerCase())
@@ -3343,15 +3420,39 @@ function checkQuiz() {
     } else if (q.type === 'prompt') {
       // A specific prompt needs all 3: a subject noun, a constraint word
       // (length/tone/audience), and a format word (list/paragraph/steps).
-      const rawA = document.getElementById('quiz-' + i + '-a')?.value || ''
+      const rawA = document.getElementById(pfx + i + '-a')?.value || ''
       const hasSubject    = rawA.trim().split(/\s+/).length >= 3
       const constraintWords = ['short','long','funny','serious','simple','for kids','words','sentence','sentences','tone']
       const formatWords     = ['list','bullet','bullets','paragraph','steps','step-by-step']
       const hasConstraint = constraintWords.some(w => rawA.toLowerCase().includes(w))
       const hasFormat     = formatWords.some(w => rawA.toLowerCase().includes(w))
-      if (hasSubject && hasConstraint && hasFormat) correct++
+      const passed = hasSubject && hasConstraint && hasFormat
+      if (passed) correct++
+      // Simulated output — a real "what would come back" preview, so a
+      // specific prompt visibly earns a specific-sounding response instead
+      // of the exercise being pure text-in, nothing-out.
+      const simEl = document.getElementById(pfx + i + '-sim')
+      if (simEl) {
+        if (passed) {
+          simEl.innerHTML = '<b>🤖 Simulated response:</b> A focused, on-topic answer matching your length, tone, and format — because the prompt told it exactly what to produce.'
+        } else {
+          const missing = []
+          if (!hasSubject) missing.push('a clear subject')
+          if (!hasConstraint) missing.push('a constraint (length/tone/audience)')
+          if (!hasFormat) missing.push('a format (list/paragraph/steps)')
+          simEl.innerHTML = '<b>🤖 Simulated response:</b> Still too generic — try adding ' + missing.join(' and ') + '.'
+        }
+      }
     } else if (q.type === 'any') {
-      if ((document.getElementById('quiz-' + i + '-a')?.value || '').trim().length > 0) correct++
+      const rawA = document.getElementById(pfx + i + '-a')?.value || ''
+      if (rawA.trim().length > 0) correct++
+      // The whole point of this baseline step is SEEING a vague prompt
+      // produce a vague result — without this, it was pure text-in with no
+      // visible consequence at all.
+      const simEl = document.getElementById(pfx + i + '-sim')
+      if (simEl && rawA.trim()) {
+        simEl.innerHTML = '<b>🤖 Simulated response:</b> "Dogs are animals. People like dogs. Dogs make good pets." — vague and generic, because the prompt never said how long, what tone, or what shape the answer should take.'
+      }
     } else {
       const acceptable = Array.isArray(q.answer) ? q.answer : [q.answer]
       if (acceptable.some(ans => a === String(ans).toLowerCase())) correct++

@@ -39,6 +39,17 @@ const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, t
   // Story Studio's "page" stages (st1*) — a DOM preview, not the canvas —
   // check headings/paragraphs/links/buttons instead of shapes/frames.
   headings: 999, paragraphs: 999, links: 999, buttons: 999,
+  // st1*/st2*/st3boss now check EXACT text content, not just counts — a
+  // maximal log needs real strings satisfying every stage's exact-text
+  // requirement, plus enough DISTINCT real (5+/8+ word) paragraphs.
+  headingText: ['My Story'],
+  paragraphText: [
+    'This is the story of a young explorer who discovers a hidden island full of secrets.',
+    'Every day brought a new mystery to solve, and the explorer was determined to find the truth.',
+    'By the end of the journey, everything the explorer thought they knew had changed forever.',
+  ],
+  linkText: ['Read the next chapter'],
+  buttonText: ['Start Reading'],
   // st2* (CSS styling) — bgColor/headingColor are non-empty strings when
   // set, align matches whichever value a stage's needsAlign names ('center'
   // for every st2 stage today), fontSize is a generous px value.
