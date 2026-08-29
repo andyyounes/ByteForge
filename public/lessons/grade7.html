@@ -278,6 +278,22 @@
              background:#1a2e1a; color:#bbf7d0; border:1px solid #16a34a;
              opacity:0; transition:.3s; z-index:9999; pointer-events:none; }
     .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+    /* Win overlay — ported from Grade 9's mission-complete screen, simplified
+       (no efficiency-star metric — always 3, since Grade 7 doesn't score
+       attempts by turns/lines/commands). */
+    .win { position:fixed; inset:0; z-index:100; background:rgba(6,8,15,.86); backdrop-filter:blur(4px);
+           display:none; align-items:center; justify-content:center; }
+    .win.open { display:flex; }
+    .win-card { background:#141727; border:1px solid rgba(129,140,248,.35); border-radius:20px; padding:30px 40px;
+                text-align:center; max-width:400px; animation:winPop .4s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes winPop { 0%{transform:scale(.6);opacity:0} 100%{transform:scale(1);opacity:1} }
+    .win-stars { font-size:34px; letter-spacing:4px; margin-bottom:8px; }
+    .win-title { font-size:20px; font-weight:900; color:#fff; }
+    .win-sub { color:#9ca3af; font-size:13px; margin:8px 0 14px; line-height:1.5; }
+    .win-xp { font-size:15px; font-weight:900; color:#fbbf24; margin-bottom:16px; }
+    .win-btn { border:none; border-radius:10px; padding:11px 24px; font-size:13.5px; font-weight:800; cursor:pointer;
+               background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; margin:0 5px; }
+    .win-btn.ghost { background:none; border:1px solid rgba(255,255,255,.18); color:#9ca3af; }
 
     /* Blockly theme */
     .blocklyMainBackground { fill:#0c0f18 !important; }
@@ -451,6 +467,18 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Win overlay (same celebratory style as Grade 9's mission-complete screen) -->
+<div class="win" id="win">
+  <div class="win-card">
+    <div class="win-stars">⭐⭐⭐</div>
+    <div class="win-title">CHALLENGE COMPLETE</div>
+    <div class="win-sub" id="win-sub"></div>
+    <div class="win-xp" id="win-xp"></div>
+    <button class="win-btn" onclick="winNext()">Next challenge →</button>
+    <button class="win-btn ghost" onclick="winList()">Galaxy Map</button>
+  </div>
+</div>
 
 <!-- Blockly toolbox -->
 <xml id="toolbox" style="display:none">
@@ -3370,6 +3398,27 @@ function selectChallenge(i) {
 let _footerNextAction = () => stepChallenge(1)
 function footerNextClick() { _footerNextAction() }
 
+// ── Win overlay (ported from Grade 9's mission-complete screen) ───────────
+const WIN_FLAVORS = [
+  'Nailed it — straight through, no hints needed.',
+  'That\'s the real skill, applied for real.',
+  'Clean solve — on to the next one.',
+  'You\'ve got this pattern down now.',
+]
+function winShow(xp) {
+  document.getElementById('win-sub').textContent = WIN_FLAVORS[Math.floor(Math.random() * WIN_FLAVORS.length)]
+  document.getElementById('win-xp').textContent = '+' + xp + ' XP'
+  document.getElementById('win').classList.add('open')
+}
+function winNext() {
+  document.getElementById('win').classList.remove('open')
+  footerNextClick()
+}
+function winList() {
+  document.getElementById('win').classList.remove('open')
+  showJourney()
+}
+
 // ── World XP progress — a running total for the world the current stage
 // belongs to, shown on both the Lesson page and every Exercise page. ──────
 function findWorldForChallenge(ch) {
@@ -3659,10 +3708,7 @@ function checkChallenge(log) {
     completed.add(activeIdx)
     renderPills()
     document.getElementById('fail-badge').style.display = 'none'
-    document.getElementById('pass-badge-text').textContent = '🎉 Great! +' + ch.xp + ' XP earned!'
-    document.getElementById('pass-badge').style.display = 'flex'
-    // No "Next" button past the very last challenge — nothing to jump to.
-    document.getElementById('pass-next-btn').style.display = (activeIdx + 1 < CHALLENGES.length) ? '' : 'none'
+    winShow(ch.xp)
     showToast('Challenge complete! +' + ch.xp + ' XP 🎉')
     logLine('✅ Challenge complete! +' + ch.xp + ' XP', 'ok')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g7-c' + activeIdx, { passed: true, score: 100 }); }
