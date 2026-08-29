@@ -90,6 +90,15 @@
                  padding:3px 9px; border-radius:999px; display:inline-block; margin-bottom:8px; }
     .cl-eyebrow { background:rgba(129,140,248,.18); color:#a5b4fc; }
     .ex-eyebrow { background:rgba(251,191,36,.18); color:#fbbf24; }
+    .review-lesson-link { font-size:11px; font-weight:700; color:#a5b4fc; text-decoration:none; cursor:pointer; }
+    .review-lesson-link:hover { color:#c7d2fe; text-decoration:underline; }
+    /* Running world XP progress — visible on both the Lesson page and every
+       Exercise page, so XP accumulating is always on screen, not just
+       revealed in a toast after each individual pass. */
+    .world-xp-bar { margin-bottom:10px; }
+    .wxp-label { font-size:11px; font-weight:700; color:#fbbf24; margin-bottom:4px; }
+    .wxp-track { height:7px; border-radius:99px; background:var(--bg-raised); overflow:hidden; }
+    .wxp-fill  { height:100%; border-radius:99px; background:linear-gradient(90deg,#fbbf24,#f59e0b); transition:width .3s; }
     .ch-lesson { flex-shrink:0; background:#12141f; border:1.5px solid rgba(129,140,248,.3); border-radius:12px;
                  margin-bottom:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.15); }
     .cl-toggle { padding:12px 14px 4px; font-size:13px; font-weight:800; color:#a5b4fc; cursor:pointer;
@@ -329,6 +338,10 @@
         <button class="ch-nav-toggle" id="ch-nav-toggle" onclick="toggleChallengeList()">☰ All challenges</button>
       </div>
       <div class="ch-pills" id="ch-pills" style="display:none"></div>
+      <!-- Running XP progress for the CURRENT world — shown on both the
+           Lesson page and every Exercise page, so XP accumulating is always
+           visible, not just revealed after each individual pass. -->
+      <div class="world-xp-bar" id="world-xp-bar"></div>
       <!-- Full per-challenge lesson — one real explainer per practice (not
            just a per-world summary), collapsible, populated by
            renderChallengeLesson() from CHALLENGE_LESSON below. -->
@@ -340,7 +353,10 @@
         <div class="cl-body" id="cl-body"></div>
       </div>
       <div class="ch-row" id="ch-row">
-        <span class="ex-eyebrow">🎯 Exercise</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="ex-eyebrow">🎯 Exercise</span>
+          <a href="#" class="review-lesson-link" id="review-lesson-link" onclick="return false;">📘 Review Lesson</a>
+        </div>
         <div class="ch-row-inner">
           <div class="ch-text"  id="ch-text">Select a challenge above.</div>
           <div class="ch-meta">
@@ -3172,7 +3188,14 @@ function selectChallenge(i) {
   if (isQuizStage) renderQuiz(ch)
   if (isChatStage) renderChat(ch)
   renderPills()
-  renderChallengeLesson(ch)
+  // The Exercise page shows ONLY the exercise — the full lesson now lives on
+  // its own dedicated per-world page (openWorldLesson), reachable via the
+  // "Review Lesson" link, not shown inline competing for space here.
+  document.getElementById('ch-lesson').style.display = 'none'
+  const world = findWorldForChallenge(ch)
+  const reviewLink = document.getElementById('review-lesson-link')
+  reviewLink.onclick = () => { openWorldLesson(world ? world.id : ''); return false }
+  renderWorldXPBar(world)
   updateFooterNext()
   log('Challenge: ' + ch.name, 'info')
 }
@@ -3182,6 +3205,28 @@ function selectChallenge(i) {
 // miss once you've scrolled or moved on to reading the next hint).
 let _footerNextAction = () => stepChallenge(1)
 function footerNextClick() { _footerNextAction() }
+
+// ── World XP progress — a running total for the world the current stage
+// belongs to, shown on both the Lesson page and every Exercise page. ──────
+function findWorldForChallenge(ch) {
+  return WORLDS.find(w => w.id.toUpperCase() === ch.mod)
+}
+function worldXPProgress(world) {
+  let earned = 0, total = 0
+  world.stages.forEach(s => {
+    total += s.xp
+    if (completed.has(STAGE_INDEX[s.id])) earned += s.xp
+  })
+  return { earned, total }
+}
+function renderWorldXPBar(world) {
+  const el = document.getElementById('world-xp-bar')
+  if (!el || !world) { if (el) el.innerHTML = ''; return }
+  const { earned, total } = worldXPProgress(world)
+  const pct = total ? Math.round(earned / total * 100) : 0
+  el.innerHTML = '<div class="wxp-label">🏆 ' + earned + ' / ' + total + ' XP earned — ' + world.name + '</div>'
+    + '<div class="wxp-track"><div class="wxp-fill" style="width:' + pct + '%"></div></div>'
+}
 function updateFooterNext() {
   _footerNextAction = () => stepChallenge(1)
   const btn = document.getElementById('ch-footer-next')
@@ -3230,6 +3275,7 @@ function openWorldLesson(worldId) {
   btn.disabled = false
   btn.textContent = '▶ Start Exercises →'
   _footerNextAction = () => selectChallenge(STAGE_INDEX[firstStage.id])
+  renderWorldXPBar(world)
   log('Lesson: ' + world.name, 'info')
 }
 
@@ -3427,6 +3473,7 @@ function checkChallenge(log) {
     // Auto-unlock next
     renderPills()
     updateFooterNext()
+    renderWorldXPBar(findWorldForChallenge(ch))
   } else {
     // Specific feedback on what's missing — driven by each stage's own
     // needsVar/needsIf/needsFrames flags, so new worlds don't need a new branch here.
