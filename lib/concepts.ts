@@ -68,6 +68,7 @@ export const CONCEPTS: Concept[] = [
   // what you built" fits naturally just before shipping a final game.
   { id:'g7-online-safety', name:'Security Lab — Spot the Scam', icon:'🛡️', color:'#dc2626', tier:12, xGroup:9, prerequisites:['g7-web-interactive'], difficulty:2, gradeMin:7, estimatedMinutes:60, learningModes:['grade7','canvas-code'], tags:['grade7','safety'], lessonUrl:'/lessons/grade7.html' },
   { id:'g7-computer-basics', name:'What Is a Computer?', icon:'🖥️', color:'#0f7f72', tier:1, xGroup:1, prerequisites:[], difficulty:1, gradeMin:7, estimatedMinutes:30, learningModes:['grade7'], tags:['grade7','fundamentals'], lessonUrl:'/lessons/grade7.html' },
+  { id:'g7-prompt-generation', name:'Prompt Generation', icon:'💬', color:'#6650a3', tier:1, xGroup:1, prerequisites:['g7-computer-basics'], difficulty:2, gradeMin:7, estimatedMinutes:30, learningModes:['grade7'], tags:['grade7','ai-literacy'], lessonUrl:'/lessons/grade7.html' },
 
   // ══════════════════════════════════════════════════════════════════════════
   //  GRADE 8 — "The App Builder" — 10 modules (M1-M10), mirroring grade8.html's

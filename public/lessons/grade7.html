@@ -1391,6 +1391,41 @@ const WORLDS = [
       check:(log) => log.quizCorrect >= 1,
     },
   ]},
+  // ── Semester 1, Week 5: Prompt Generation ───────────────────────────────
+  // New unit. A good prompt needs 3 real things: a subject, a constraint
+  // (length/tone/audience), and a format — checked via keyword patterns on
+  // free text, not an exact string match.
+  { id:'cb5', name:'💬 Prompt Generation', sub:'A specific prompt has 3 parts: a subject, a constraint, and a format', live:true, stages:[
+    { id:'cb5s1', name:'A Vague Prompt', xp:20, type:'quiz',
+      text:`<strong>Challenge 1</strong> — Write a prompt for this task: "get help writing about dogs." Keep it as vague as you'd normally type it — you'll compare it to a specific version next.`,
+      hints:['Just write it the way you\'d normally ask — this step is the "before" example.'],
+      passCount:1,
+      questions:[{ type:'any', prompt:'Your vague prompt:' }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb5s2', name:'Make It Specific', xp:35, type:'quiz',
+      text:`<strong>Challenge 2</strong> — Rewrite the SAME request as a specific prompt. It must include: a subject (what you want), a constraint (length, tone, or audience), and a format (list, paragraph, or steps).`,
+      hints:['Example shape: "Write a [format] about [subject], [tone/length], for [audience]."', '"Write a funny 3-sentence paragraph about why dogs are better than cats, for a 12-year-old" has all 3.'],
+      passCount:1,
+      questions:[{ type:'prompt', prompt:'Your specific prompt:' }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb5s3', name:"What's Missing?", xp:25, type:'quiz',
+      text:`<strong>Challenge 3</strong> — The prompt "make me a story" is vague. What's missing from it?`,
+      hints:['It has no subject, no constraint, and no format — all three.'],
+      passCount:1,
+      questions:[{ type:'match', prompt:"What's missing from \"make me a story\"?",
+        options:['a subject','a constraint','a format','all of the above'], answer:'all of the above' }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'cb5boss', name:'BOSS — Write One From Scratch', xp:65, type:'quiz', boss:true,
+      text:`<strong>BOSS</strong> — Write one prompt from scratch for this task: "get help writing a birthday message for a friend." It must include a subject, a constraint, and a format — same 3-part checklist as Challenge 2.`,
+      hints:['Same rule as Challenge 2: subject + constraint + format, all in one prompt.'],
+      passCount:1,
+      questions:[{ type:'prompt', prompt:'Your prompt:' }],
+      check:(log) => log.quizCorrect >= 1,
+    },
+  ]},
   // ── Story Studio — Semester 1, Week 1: HTML structure & tags ──────────────
   // Page-building blocks stand in for real HTML tags (heading→h1, paragraph→p,
   // link→a, button→button) so students learn what each tag is FOR before
@@ -2339,6 +2374,18 @@ const CHALLENGE_LESSON = {
   cb4boss: { title: 'BOSS — the same signs, a new example', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>A wrong domain, urgency, and too-good-to-be-true, all in one message. Any one of these alone is enough to stop and check.</p></div>` },
+  cb5s1: { title: 'A vague prompt gets a vague result', html: `
+    <div class="cl-block"><h4>Before the fix</h4>
+      <p>"Write about dogs" doesn't say how long, what tone, or what shape the answer should take. This is the baseline you'll improve next.</p></div>` },
+  cb5s2: { title: 'A good prompt has three parts', html: `
+    <div class="cl-block"><h4>Subject. Constraint. Format.</h4>
+      <p>A subject is what you want. A constraint is length, tone, or audience. A format is list, paragraph, or steps. All three, every time.</p></div>` },
+  cb5s3: { title: '"Make me a story" is missing all three', html: `
+    <div class="cl-block"><h4>No subject, no constraint, no format</h4>
+      <p>It doesn't say what the story's about, how long, or what shape. That's why it's vague — not one thing missing, all three.</p></div>` },
+  cb5boss: { title: 'BOSS — same 3-part checklist, your own prompt', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Subject, constraint, format — the same rule as Challenge 2, now for a task nobody gave you an example for.</p></div>` },
   // ── Story Studio 1 — Page Basics: headings, paragraphs, links, buttons ─────
   st1s1: { title: 'A heading is a page\'s title', html: `
     <div class="cl-block"><h4>One big title, nothing more</h4>
@@ -2912,6 +2959,14 @@ function renderQuiz(ch) {
       return `<div class="q-item"><div class="q-label">${q.prompt}</div>
         <select id="quiz-${i}-a"><option value="">Choose…</option>${q.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`
     }
+    if (q.type === 'prompt' || q.type === 'any') {
+      // Free-text prompt-writing — checked against a real specificity
+      // rule (subject + constraint + format keyword), not an exact match.
+      // 'any' is the same input but just requires SOMETHING written — used
+      // for the baseline "write a vague prompt" observation step.
+      return `<div class="q-item"><div class="q-label">${q.prompt}</div>
+        <input type="text" id="quiz-${i}-a" placeholder="Write your prompt…" style="width:100%"></div>`
+    }
     // 'fill'
     return `<div class="q-item"><div class="q-label">${q.prompt}</div>
       <input type="text" id="quiz-${i}-a" placeholder="Type your answer…"></div>`
@@ -2929,6 +2984,18 @@ function checkQuiz() {
       const okA = a === (q.answer || '').toLowerCase()
       const okB = !bEl || !q.flagAnswers || q.flagAnswers.some(f => (bEl.value||'').toLowerCase() === f.toLowerCase())
       if (okA && okB) correct++
+    } else if (q.type === 'prompt') {
+      // A specific prompt needs all 3: a subject noun, a constraint word
+      // (length/tone/audience), and a format word (list/paragraph/steps).
+      const rawA = document.getElementById('quiz-' + i + '-a')?.value || ''
+      const hasSubject    = rawA.trim().split(/\s+/).length >= 3
+      const constraintWords = ['short','long','funny','serious','simple','for kids','words','sentence','sentences','tone']
+      const formatWords     = ['list','bullet','bullets','paragraph','steps','step-by-step']
+      const hasConstraint = constraintWords.some(w => rawA.toLowerCase().includes(w))
+      const hasFormat     = formatWords.some(w => rawA.toLowerCase().includes(w))
+      if (hasSubject && hasConstraint && hasFormat) correct++
+    } else if (q.type === 'any') {
+      if ((document.getElementById('quiz-' + i + '-a')?.value || '').trim().length > 0) correct++
     } else {
       const acceptable = Array.isArray(q.answer) ? q.answer : [q.answer]
       if (acceptable.some(ans => a === String(ans).toLowerCase())) correct++
@@ -2969,6 +3036,8 @@ const G7_MODULE_CONCEPT = {
   CB1: 'g7-computer-basics', CB2: 'g7-computer-basics',
   // Spotting Scams (Sem 1, Week 3) — same online-safety concept as gsafe.
   CB3: 'g7-online-safety', CB4: 'g7-online-safety',
+  // Prompt Generation (Sem 1, Week 5) — genuinely new territory, own concept.
+  CB5: 'g7-prompt-generation',
 }
 // G5 (Player Control) splits across two concepts depending on the challenge.
 const G7_ID_CONCEPT_OVERRIDE = { g5s1: ['g7-keyboard'], g5s2: ['g7-mouse'], g5boss: ['g7-keyboard', 'g7-mouse'] }
