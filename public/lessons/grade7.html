@@ -398,7 +398,7 @@
       <div id="output-quiz"></div>
       <div id="output-chat"></div>
       <div class="pass-badge" id="pass-badge">
-        <span>✓ Challenge complete!</span>
+        <span id="pass-badge-text">🎉 Great! Challenge complete!</span>
         <button class="pass-next-btn" id="pass-next-btn" onclick="stepChallenge(1)">Next →</button>
       </div>
       <div class="fail-badge" id="fail-badge">
@@ -3613,6 +3613,7 @@ function checkChallenge(log) {
     completed.add(activeIdx)
     renderPills()
     document.getElementById('fail-badge').style.display = 'none'
+    document.getElementById('pass-badge-text').textContent = '🎉 Great! +' + ch.xp + ' XP earned!'
     document.getElementById('pass-badge').style.display = 'flex'
     // No "Next" button past the very last challenge — nothing to jump to.
     document.getElementById('pass-next-btn').style.display = (activeIdx + 1 < CHALLENGES.length) ? '' : 'none'
