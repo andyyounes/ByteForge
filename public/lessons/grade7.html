@@ -71,9 +71,18 @@
                      background:none; border:1px solid var(--border); color:var(--fg-faint); }
     .ch-nav-toggle:hover { color:var(--fg); border-color:var(--border-hi); }
     .ch-nav-toggle.open { color:#60a5fa; border-color:#60a5fa; }
-    .ch-lesson { flex-shrink:0; background:#12141f; border:1px solid rgba(129,140,248,.18); border-radius:8px; margin-bottom:8px; overflow:hidden; }
-    .cl-toggle { padding:8px 12px; font-size:12px; font-weight:800; color:#a5b4fc; cursor:pointer;
-                 display:flex; align-items:center; gap:6px; user-select:none; }
+    /* Lesson and Exercise are now two clearly separate bubbles — an eyebrow
+       label + distinct accent colour on each, instead of one undifferentiated
+       scrolling block of text. */
+    .cl-eyebrow, .ex-eyebrow { font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+                 padding:3px 9px; border-radius:999px; display:inline-block; margin-bottom:8px; }
+    .cl-eyebrow { background:rgba(129,140,248,.18); color:#a5b4fc; }
+    .ex-eyebrow { background:rgba(251,191,36,.18); color:#fbbf24; }
+    .ch-lesson { flex-shrink:0; background:#12141f; border:1.5px solid rgba(129,140,248,.3); border-radius:12px;
+                 margin-bottom:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+    .cl-toggle { padding:12px 14px 4px; font-size:13px; font-weight:800; color:#a5b4fc; cursor:pointer;
+                 display:flex; flex-direction:column; align-items:flex-start; gap:6px; user-select:none; }
+    .cl-toggle .cl-toggle-row { display:flex; align-items:center; gap:6px; width:100%; }
     .cl-toggle:hover { color:#c7d2fe; }
     #cl-arrow { margin-left:auto; font-size:10px; color:#6b7280; }
     .cl-body { padding:0 12px 12px; font-size:12px; color:#c7d2e0; line-height:1.7; }
@@ -89,8 +98,11 @@
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
     .ch-pill.active { background:rgba(99,102,241,.12); border-color:#818cf8; color:#818cf8; }
     .ch-pill.done   { background:rgba(34,197,94,.08); border-color:rgba(34,197,94,.35); color:#4ade80; }
-    .ch-row    { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-    .ch-text   { font-size:11.5px; color:var(--fg-dim); line-height:1.5; flex:1; }
+    .ch-row    { display:flex; flex-direction:column; gap:6px;
+                 background:rgba(251,191,36,.05); border:1.5px solid rgba(251,191,36,.22);
+                 border-radius:12px; padding:12px 14px; }
+    .ch-row-inner { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .ch-text   { font-size:12.5px; color:var(--fg-dim); line-height:1.6; flex:1; }
     .ch-text strong { color:var(--fg); }
     .ch-meta   { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
     .xp-pill   { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
@@ -180,6 +192,12 @@
                   display:none; flex-direction:column; align-items:center; gap:2px; text-align:center; }
     .fail-badge-detail { font-size:10.5px; font-weight:600; color:#fca5a5; }
     .canvas-overlay-btns { position:absolute; top:8px; right:10px; display:flex; gap:5px; }
+    .ch-footer { flex-shrink:0; padding:10px 14px; background:var(--bg-card); border-bottom:1px solid var(--border); }
+    .ch-footer-next { width:100%; padding:12px; border-radius:9px; border:none; font-size:13.5px; font-weight:800;
+                       cursor:pointer; transition:.15s; }
+    .ch-footer-next:disabled { background:var(--bg-raised); color:var(--fg-faint); cursor:not-allowed; }
+    .ch-footer-next:not(:disabled) { background:linear-gradient(135deg,#4ade80,#22c55e); color:#052e12; }
+    .ch-footer-next:not(:disabled):hover { filter:brightness(1.08); }
 
     /* Sync indicator bar */
     .sync-bar { flex-shrink:0; padding:6px 14px; background:var(--bg-card); border-bottom:1px solid var(--border);
@@ -303,14 +321,20 @@
            just a per-world summary), collapsible, populated by
            renderChallengeLesson() from CHALLENGE_LESSON below. -->
       <div class="ch-lesson" id="ch-lesson" style="display:none;">
-        <div class="cl-toggle" id="cl-toggle" onclick="toggleChallengeLesson()">📘 <span id="cl-title"></span> <span id="cl-arrow">▾</span></div>
+        <div class="cl-toggle" id="cl-toggle" onclick="toggleChallengeLesson()">
+          <span class="cl-eyebrow">📘 Lesson</span>
+          <div class="cl-toggle-row"><span id="cl-title"></span> <span id="cl-arrow" style="margin-left:auto">▾</span></div>
+        </div>
         <div class="cl-body" id="cl-body"></div>
       </div>
       <div class="ch-row">
-        <div class="ch-text"  id="ch-text">Select a challenge above.</div>
-        <div class="ch-meta">
-          <span class="xp-pill" id="xp-pill">+30 XP</span>
-          <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+        <span class="ex-eyebrow">🎯 Exercise</span>
+        <div class="ch-row-inner">
+          <div class="ch-text"  id="ch-text">Select a challenge above.</div>
+          <div class="ch-meta">
+            <span class="xp-pill" id="xp-pill">+30 XP</span>
+            <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+          </div>
         </div>
       </div>
     </div>
@@ -329,6 +353,15 @@
         <span>✗ Not quite yet</span>
         <span class="fail-badge-detail" id="fail-badge-detail"></span>
       </div>
+    </div>
+
+    <!-- Always-visible Next control — separate from the pass-badge overlay
+         (which disappears once you scroll/interact), so there's always one
+         obvious way forward once a challenge is actually complete. -->
+    <div class="ch-footer" id="ch-footer">
+      <button class="ch-footer-next" id="ch-footer-next" onclick="stepChallenge(1)" disabled>
+        Complete the exercise to continue →
+      </button>
     </div>
 
     <!-- Sync indicator -->
@@ -3119,7 +3152,25 @@ function selectChallenge(i) {
   if (isChatStage) renderChat(ch)
   renderPills()
   renderChallengeLesson(ch)
+  updateFooterNext()
   log('Challenge: ' + ch.name, 'info')
+}
+
+// Always-visible Next control — reflects whether the CURRENT challenge is
+// already completed, separate from the pass-badge overlay (which is easy to
+// miss once you've scrolled or moved on to reading the next hint).
+function updateFooterNext() {
+  const btn = document.getElementById('ch-footer-next')
+  if (!btn) return
+  const isLast = activeIdx + 1 >= CHALLENGES.length
+  if (completed.has(activeIdx)) {
+    btn.disabled = false
+    btn.textContent = isLast ? '🎉 All done here!' : 'Next Challenge →'
+    if (isLast) btn.disabled = true
+  } else {
+    btn.disabled = true
+    btn.textContent = 'Complete the exercise to continue →'
+  }
 }
 
 // ── Quiz stages — matching / fill-in-the-blank / scenario judgment. No code
@@ -3155,7 +3206,7 @@ function renderQuiz(ch) {
     // 'fill'
     return `<div class="q-item"><div class="q-label">${q.prompt}</div>
       <input type="text" id="quiz-${i}-a" placeholder="Type your answer…"></div>`
-  }).join('') + `<button class="q-check-btn" onclick="checkQuiz()">Check Answers</button><div class="q-result" id="quiz-result"></div>`
+  }).join('') + `<button class="q-check-btn" onclick="checkQuiz()">✅ Submit Answer</button><div class="q-result" id="quiz-result"></div>`
 }
 
 function checkQuiz() {
@@ -3315,6 +3366,7 @@ function checkChallenge(log) {
     reportRealProgress(ch, Date.now() - challengeStartedAt)
     // Auto-unlock next
     renderPills()
+    updateFooterNext()
   } else {
     // Specific feedback on what's missing — driven by each stage's own
     // needsVar/needsIf/needsFrames flags, so new worlds don't need a new branch here.
