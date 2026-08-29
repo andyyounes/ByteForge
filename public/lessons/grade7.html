@@ -120,30 +120,44 @@
     /* Quiz preview — used by the "quiz" stage type (Computer Basics /
        Cybersecurity judgment stages), matching + fill-in-the-blank, no code
        editor involved at all. */
-    #output-quiz { display:none; width:100%; max-width:640px; height:100%; overflow-y:auto; background:#fff; color:#111;
-                   border-radius:6px; padding:14px 16px; font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
-    #output-quiz .q-item { margin-bottom:12px; }
-    #output-quiz .q-scenario { background:#f3f4f6; border-radius:6px; padding:8px 10px; font-size:12.5px; margin-bottom:6px; }
-    #output-quiz .q-label { font-size:12.5px; font-weight:700; margin-bottom:4px; color:#111; }
+    #output-quiz { display:none; width:100%; max-width:640px; height:100%; overflow-y:auto;
+                   background:var(--bg-card); color:var(--fg);
+                   border:1px solid var(--border); border-radius:12px; padding:22px 26px;
+                   font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
+    #output-quiz .q-item { background:var(--bg-raised); border:1px solid var(--border);
+      border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+    #output-quiz .q-scenario { background:rgba(129,140,248,.1); border:1px solid rgba(129,140,248,.25);
+      border-radius:8px; padding:10px 12px; font-size:13px; margin-bottom:10px; color:var(--fg); }
+    #output-quiz .q-label { font-size:13.5px; font-weight:700; margin-bottom:8px; color:var(--fg); line-height:1.5; }
     #output-quiz select, #output-quiz input[type=text] {
-      width:100%; font-size:12.5px; padding:6px 8px; border-radius:5px; border:1px solid #ccc; }
-    #output-quiz .q-check-btn { margin-top:6px; padding:8px 14px; border:none; border-radius:6px;
-      background:#7c3aed; color:#fff; font-weight:700; font-size:12.5px; cursor:pointer; }
-    #output-quiz .q-result { font-size:12px; margin-top:8px; }
-    #output-quiz .q-result.ok  { color:#16a34a; font-weight:700; }
-    #output-quiz .q-result.bad { color:#dc2626; font-weight:700; }
+      width:100%; font-size:13px; padding:9px 10px; border-radius:7px;
+      border:1px solid var(--border-hi); background:var(--bg); color:var(--fg); }
+    #output-quiz select:focus, #output-quiz input[type=text]:focus { outline:none; border-color:#818cf8; }
+    #output-quiz .q-check-btn { margin-top:4px; width:100%; padding:13px 14px; border:none; border-radius:9px;
+      background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; font-weight:800; font-size:14px;
+      cursor:pointer; letter-spacing:.01em; }
+    #output-quiz .q-check-btn:hover { filter:brightness(1.08); }
+    #output-quiz .q-result { font-size:13px; margin-top:10px; text-align:center; padding:8px; border-radius:8px; }
+    #output-quiz .q-result.ok  { color:#4ade80; font-weight:700; background:rgba(34,197,94,.12); }
+    #output-quiz .q-result.bad { color:#f87171; font-weight:700; background:rgba(239,68,68,.1); }
     /* Chat preview — used by the "chat" stage type (Semester 1 project: a
        real AI connection, submit -> generate -> judge -> revise -> regenerate). */
-    #output-chat { display:none; width:100%; max-width:640px; height:100%; overflow-y:auto; background:#fff; color:#111;
-                   border-radius:6px; padding:12px 14px; font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
-    #output-chat textarea { width:100%; font-size:12px; padding:6px 8px; border-radius:5px; border:1px solid #ccc; min-height:44px; resize:vertical; }
-    #output-chat .chat-gen-btn { margin-top:6px; padding:7px 14px; border:none; border-radius:6px;
-      background:#7c3aed; color:#fff; font-weight:700; font-size:12px; cursor:pointer; }
+    #output-chat { display:none; width:100%; max-width:640px; height:100%; overflow-y:auto;
+                   background:var(--bg-card); color:var(--fg);
+                   border:1px solid var(--border); border-radius:12px; padding:22px 26px;
+                   font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
+    #output-chat textarea { width:100%; font-size:13px; padding:9px 10px; border-radius:7px;
+      border:1px solid var(--border-hi); background:var(--bg); color:var(--fg); min-height:50px; resize:vertical; }
+    #output-chat textarea:focus { outline:none; border-color:#818cf8; }
+    #output-chat .chat-gen-btn { margin-top:8px; width:100%; padding:13px 14px; border:none; border-radius:9px;
+      background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; font-weight:800; font-size:14px; cursor:pointer; }
+    #output-chat .chat-gen-btn:hover:not(:disabled) { filter:brightness(1.08); }
     #output-chat .chat-gen-btn:disabled { opacity:.5; cursor:default; }
-    #output-chat .chat-turn { margin-top:10px; border-top:1px dashed #ddd; padding-top:8px; }
-    #output-chat .chat-turn .p { font-size:11.5px; font-weight:700; color:#7c3aed; margin-bottom:3px; }
-    #output-chat .chat-turn .r { font-size:12px; color:#333; white-space:pre-wrap; }
-    #output-chat .chat-status { font-size:11px; color:#888; margin-top:6px; }
+    #output-chat .chat-turn { margin-top:12px; background:var(--bg-raised); border:1px solid var(--border);
+      border-radius:10px; padding:12px 14px; }
+    #output-chat .chat-turn .p { font-size:12px; font-weight:700; color:#c4b5fd; margin-bottom:5px; }
+    #output-chat .chat-turn .r { font-size:13px; color:var(--fg-dim); white-space:pre-wrap; line-height:1.6; }
+    #output-chat .chat-status { display:block; font-size:12px; color:var(--fg-faint); margin-top:8px; text-align:center; }
     #output-page a  { color:#6366f1; font-size:13px; }
     #output-page button { font-size:12px; padding:6px 12px; border-radius:6px; border:1px solid #6366f1;
                    background:#6366f1; color:#fff; cursor:pointer; margin-bottom:8px; }
@@ -2385,40 +2399,54 @@ const CHALLENGE_LESSON = {
   // concept, state the rule, stop) ────────────────────────────────────────
   cb1s1: { title: 'Five real parts, one job each', html: `
     <div class="cl-block"><h4>CPU. RAM. Storage. Input. Output.</h4>
-      <p>The CPU carries out instructions — every calculation, every game move, every click. RAM holds data only while the power is on — it's fast, but wiped the second you shut down. Storage keeps your files even with the power off. Input devices bring information in. Output devices send it back out.</p></div>
+      <p>The CPU (Central Processing Unit) carries out instructions — every calculation, every game move, every click, one instruction at a time, billions of times per second. RAM (Random Access Memory) holds data only while the power is on — it's extremely fast, but wiped the instant you shut down. Storage (a hard drive or SSD) keeps your files even with the power off. Input devices bring information IN. Output devices send information OUT.</p></div>
     <img class="cl-img" src="/lessons/images/ram.jpg" alt="RAM memory modules">
     <p class="cl-caption">Real RAM modules — this is what actually gets wiped every time you shut down.</p>
     <div class="cl-block"><h4>Why RAM and storage are easy to confuse</h4>
-      <p>Both hold data, but only one survives losing power. That's the whole difference: RAM is your desk while you're working, storage is the filing cabinet. Close your laptop mid-game and RAM forgets your progress — storage doesn't.</p></div>` },
+      <p>Both hold data, but only one survives losing power. RAM is your desk while you're working — fast to reach, but cleared when you leave. Storage is the filing cabinet — slower to search, but nothing disappears. Close your laptop mid-game without saving and RAM forgets your progress instantly; storage doesn't, because it was never relying on power to remember.</p></div>
+    <div class="cl-block"><h4>Why computers need BOTH, not just one</h4>
+      <p>If a computer only had storage (no RAM), everything would be slow — storage takes much longer to read from than RAM. If it only had RAM (no storage), nothing would survive a restart — every file, every save, gone the moment you turn it off. Real computers always have both, doing two different jobs.</p></div>` },
   cb1s2: { title: 'CPU, RAM, and input', html: `
     <div class="cl-block"><h4>Three facts, three blanks</h4>
-      <p>The CPU is the brain — it runs one instruction at a time, extremely fast (billions per second). RAM clears when the power turns off. A keyboard is an input device — it brings information in.</p></div>
-    <div class="cl-block"><h4>A real example</h4>
-      <p>When you press a key, the keyboard (input) sends that keystroke to the CPU, which decides what to do with it, and RAM holds the in-progress result until you save it to storage.</p></div>` },
+      <p>The CPU is the brain — it runs one instruction at a time, extremely fast (billions per second, measured in GHz — a 3 GHz CPU does about 3 billion cycles every second). RAM clears when the power turns off. A keyboard is an input device — it brings information in.</p></div>
+    <div class="cl-block"><h4>A real example, step by step</h4>
+      <p>When you press a key: (1) the keyboard (input) sends that keystroke as a signal, (2) the CPU receives it and decides what to do — e.g. show the letter on screen, (3) RAM holds the in-progress document while you keep typing, (4) when you press Save, that data finally gets copied into storage, where it survives even after you shut down.</p></div>
+    <div class="cl-block"><h4>Other real examples of input devices</h4>
+      <p>Mouse, keyboard, microphone, webcam, game controller, touchscreen (when you tap it), scanner. Every one of these sends NEW information INTO the computer that wasn't there before.</p></div>` },
   cb1s3: { title: 'Output and storage', html: `
     <div class="cl-block"><h4>The other two directions</h4>
       <p>A monitor is output — it sends information out to you. A microphone is input — it brings sound in. Storage keeps files saved even with no power.</p></div>
     <img class="cl-img" src="/lessons/images/keyboard.jpg" alt="A standard computer keyboard">
     <p class="cl-caption">A keyboard — every key press is data going IN.</p>
+    <div class="cl-block"><h4>Other real examples of output devices</h4>
+      <p>Monitor/screen, speakers, headphones, printer (paper is a real, physical output), a game controller's rumble/vibration. Every one of these sends information FROM the computer, for a human to see, hear, or feel.</p></div>
     <div class="cl-block"><h4>A quick way to remember it</h4>
-      <p>If it sends data TO the computer, it's input. If it sends data FROM the computer to you, it's output. A touchscreen is actually both at once — input when you tap it, output when it lights up.</p></div>` },
+      <p>If it sends data TO the computer, it's input. If it sends data FROM the computer to you, it's output. A touchscreen is actually both at once — input when you tap it, output when it lights up. Two real storage types worth knowing: HDD (hard disk drive, older, spinning disk, cheaper) and SSD (solid state drive, newer, no moving parts, much faster).</p></div>` },
   cb1boss: { title: 'BOSS — same five facts, mixed', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Every question here reuses a fact from Challenges 1–3. Score 4 out of 5 to pass.</p></div>
     <div class="cl-block"><h4>The one idea underneath all five</h4>
       <p>Every real computer, from a phone to a games console, is built from these same five kinds of part — this isn't a "school version," it's genuinely how they all work.</p></div>` },
   cb2s1: { title: 'A file extension tells you the type', html: `
-    <div class="cl-block"><h4>.jpg, .mp3, .docx, .mp4</h4>
-      <p>.jpg and .png are images. .mp3 and .wav are audio. .docx is a document. .mp4 is video. Storage is measured in KB, MB, GB — each about 1000× the last.</p></div>
+    <div class="cl-block"><h4>Every file type has its own family of extensions</h4>
+      <p><b>Images:</b> .jpg, .jpeg, .png, .gif, .webp. <b>Audio:</b> .mp3, .wav, .m4a, .ogg. <b>Documents:</b> .docx, .pdf, .txt, .pptx (a slideshow), .xlsx (a spreadsheet). <b>Video:</b> .mp4, .mov, .avi. Each group behaves the same way — an image extension always opens in a photo viewer, an audio one always opens in a music player, no matter which exact extension it is.</p></div>
     <img class="cl-img" src="/lessons/images/floppy.jpg" alt="Floppy disks of different sizes">
     <p class="cl-caption">Floppy disks — old, real storage. A 3.5" floppy held about 1.44 MB total; a modern phone photo alone is often bigger than that.</p>
     <div class="cl-block"><h4>Why extensions matter beyond just naming</h4>
-      <p>The extension tells your computer WHICH program to open a file with — double-click a .docx and it opens Word; double-click a .mp3 and it opens a music player. Renaming a file's extension doesn't change what's actually inside it.</p></div>` },
+      <p>The extension tells your computer WHICH program to open a file with — double-click a .docx and it opens Word; double-click a .mp3 and it opens a music player. Renaming a file's extension does NOT change what's actually inside it — renaming "song.mp3" to "song.jpg" doesn't turn music into a picture, it just makes your computer try (and fail) to open it as an image.</p></div>
+    <div class="cl-block"><h4>Storage units — KB, MB, GB, and why "about 1000×"</h4>
+      <p>1 KB (kilobyte) ≈ 1,000 bytes. 1 MB (megabyte) ≈ 1,000 KB ≈ 1,000,000 bytes. 1 GB (gigabyte) ≈ 1,000 MB ≈ 1,000,000,000 bytes. Each step is roughly 1000× bigger — a GB isn't just "a bit more" than a KB, it's a MILLION times more.</p></div>
+    <div class="cl-block"><h4>Real sizes, so the units actually mean something</h4>
+      <p>A single text message: under 1 KB. A one-page Word document: 20-50 KB. A phone photo: 2-5 MB. A 3-minute MP3 song: about 3-5 MB. A 10-minute HD video: 200-500 MB. A modern video game install: often 20-100+ GB.</p></div>
+    <div class="cl-block"><h4>The hands-on task (teacher-reviewed, not auto-checked)</h4>
+      <p>Create a folder called "Grade 7 ICT" with 3 sub-folders inside — Games, Pictures, Homework. Save one real file into each — an image into Pictures, a document into Homework, anything relevant into Games. Look at each file's extension before you place it, so you're sorting by ACTUAL type, not just guessing from the name. Then show your teacher.</p></div>` },
   cb2boss: { title: 'BOSS — file types and storage size order', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>Same facts as Challenge 1, plus: KB is smaller than MB, which is smaller than GB. A folder is a container that groups files together.</p></div>
+      <p>Same facts as Challenge 1, plus: KB is smaller than MB, which is smaller than GB. A folder is a container that groups files together — it doesn't have its own file type; it holds OTHER files and folders.</p></div>
     <div class="cl-block"><h4>A real sense of scale</h4>
-      <p>A short text file might be 1 KB. A photo is usually 2-5 MB. A phone typically stores 64-256 GB total — enough for tens of thousands of photos.</p></div>` },
+      <p>A short text file might be 1 KB. A photo is usually 2-5 MB. A phone typically stores 64-256 GB total — enough for tens of thousands of photos, or a few dozen HD movies, or both at once.</p></div>
+    <div class="cl-block"><h4>Worked example — putting the order to use</h4>
+      <p>Which is bigger: 800 KB or 2 MB? Convert to the same unit first: 2 MB = 2,000 KB. So 2,000 KB > 800 KB — 2 MB is bigger. Always convert to the SAME unit before comparing.</p></div>` },
   cb3s1: { title: 'Too good to be true is the #1 real sign', html: `
     <div class="cl-block"><h4>A free prize you never entered for</h4>
       <p>Nobody gives away expensive stuff for free to random strangers online. A surprise prize is the red flag itself, not a lucky break.</p></div>
