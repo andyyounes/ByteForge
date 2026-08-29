@@ -200,6 +200,17 @@ const DECKS = {
     realWorld: 'Every online payment, every login form, depends on that padlock/https check being real — this chapter writes the exact check your own browser performs automatically, every single page load.',
     image: { file: 'padlock.jpg', caption: 'What https:// actually protects --- this chapter\'s real security check.', credit: 'Padlock — Alyson Hurt, CC BY 2.0, via Wikimedia Commons' },
     discovery: 'Check the address bar on 3 different real websites you use. Do they all start with https://? What would you do differently on a page that only had http://?' },
+  cyber: { emoji:'🔐', name:'Cyber Defense', sub:'Lookalike domains, why passwords are hashed, and combining real red flags',
+    stages:['Spot the Lookalike Domain','Why Sites Never Store Your Real Password','Phishing Email Red Flags'], boss:'Build a Full Security Check',
+    concepts:[
+      { h:'== checks EXACT equality — a lookalike is never equal', p:'"rea1bank.com" (a "1" instead of "l") looks right at a glance, but `==` compares character by character — genuinely NOT equal to the real domain, even when a human skimming it would not notice.' },
+      { h:'Hashing — easy forwards, genuinely impractical backwards', p:'Summing every character\'s ASCII code with `ord()` gives ONE number computed FROM the password — but given only that number, there is no way back to which exact characters produced it.' },
+      { h:'Combining AND and OR — one function, three real signals', p:'`asks_for_password and (urgent_language or unknown_sender)` makes asking for a password the non-negotiable requirement, with EITHER other signal enough to confirm it.' },
+      { h:'BOSS — layering two real functions into one decision', p:'`is_real_domain(url) and not is_phishing(...)` — a real security system trusts multiple independent checks agreeing, never just one alone.' },
+    ],
+    realWorld: 'Typosquatting (registering a domain one character off from a real one) is a genuine, common real attack, not a hypothetical — this chapter\'s exact-match check is the real defence against it. A real data breach leaking a hashed password database does not hand attackers your actual password.',
+    image: { file: 'padlock.jpg', caption: 'What a hash actually protects --- easy to compute forwards, genuinely impractical to reverse.', credit: 'Padlock — Alyson Hurt, CC BY 2.0, via Wikimedia Commons' },
+    discovery: 'Look closely at a real website address you trust. Could you spot a lookalike version of it (swapping a letter for a similar-looking number)? Try writing one out on paper.' },
   m9w: { emoji:'🖥', name:'M9 — Interactive Apps', sub:'A canvas app with real state: menu -> running -> results',
     stages:['Three Kinds of Bugs','Trace Tables','app_state','Guards & Drawing','A Growing List','try/except'], boss:'M9 Capstone',
     concepts:[
@@ -229,15 +240,20 @@ const DECKS = {
     discovery: 'Before opening the platform: what\'s ONE thing that could realistically go wrong with your data app (a missing file, an empty list, bad input)? Real developers plan for at least one of these before calling anything "finished".' },
 }
 
-const ORDER = ['ws1','ws2','ws3','ws4','ws5','m1','m2','m3','m4','m5','m6','m7','m8','m9w','m10']
+const ORDER = ['ws1','ws2','ws3','ws4','ws5','m1','m2','m3','m4','m5','m6','m7','m8','cyber','m9w','m10']
 
 // Colorful, kid-friendly accent per arc — Web Story (real JS) vs.
 // App Builder (real Python) each read as a visually distinct "world".
 const SECTION_COLOR = {
   webstory: 'orange!85!red',   // ws*: warm orange (matches the story/web arc)
   appbuild: 'green!55!teal',   // m*: green (matches Builder City's map accent)
+  cyber:    'red!75!black',    // cyber: serious red, matching Grade 7's Security Lab
 }
-function sectionFor(id) { return id.startsWith('ws') ? 'webstory' : 'appbuild' }
+function sectionFor(id) {
+  if (id.startsWith('ws')) return 'webstory'
+  if (id === 'cyber') return 'cyber'
+  return 'appbuild'
+}
 
 const PREAMBLE_HEAD = String.raw`\documentclass[aspectratio=169]{beamer}
 \usetheme{Madrid}
