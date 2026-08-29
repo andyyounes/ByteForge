@@ -327,7 +327,7 @@
         </div>
         <div class="cl-body" id="cl-body"></div>
       </div>
-      <div class="ch-row">
+      <div class="ch-row" id="ch-row">
         <span class="ex-eyebrow">🎯 Exercise</span>
         <div class="ch-row-inner">
           <div class="ch-text"  id="ch-text">Select a challenge above.</div>
@@ -359,7 +359,7 @@
          (which disappears once you scroll/interact), so there's always one
          obvious way forward once a challenge is actually complete. -->
     <div class="ch-footer" id="ch-footer">
-      <button class="ch-footer-next" id="ch-footer-next" onclick="stepChallenge(1)" disabled>
+      <button class="ch-footer-next" id="ch-footer-next" onclick="footerNextClick()" disabled>
         Complete the exercise to continue →
       </button>
     </div>
@@ -3024,7 +3024,15 @@ function showJourney() {
       id: s.id, emoji: s.boss ? '👑' : STAGE_EMO[i % STAGE_EMO.length], label: s.name,
       done: completed.has(STAGE_INDEX[s.id]), boss: !!s.boss,
     }))
-    return { name: w.name, sub: w.sub, live: true, stages }
+    // One Lesson bubble per world, same visual node style as the exercise
+    // bubbles, placed first on the path — "one lesson [node], the rest
+    // exercises" rather than a lesson bundled inside every single stage.
+    // done is hardcoded true: the unlock chain checks stages[i-1].done to
+    // decide if the NEXT stage is unlocked (see quest-map.js), so leaving
+    // this false would permanently lock every world's first real exercise
+    // behind a lesson visit that isn't actually being tracked as progress.
+    const lessonNode = { id: 'lesson-' + w.id, emoji: '📘', label: 'Lesson', done: true, boss: false }
+    return { name: w.name, sub: w.sub, live: true, stages: [lessonNode, ...stages] }
   })
   // layout:'path' + softLock:true — the winding-path view already used by
   // grade9/AS/A-Level/IGCSE. Grade 7 used to default to the grid layout,
@@ -3039,7 +3047,7 @@ function showJourney() {
     layout: 'path', softLock: true,
     avatarSvg: '<span style="font-size:22px;">🚀</span>',
     worlds,
-    onOpen: (id) => selectChallenge(STAGE_INDEX[id]),
+    onOpen: (id) => id.startsWith('lesson-') ? openWorldLesson(id.slice(7)) : selectChallenge(STAGE_INDEX[id]),
   })
 }
 
@@ -3131,6 +3139,7 @@ function selectChallenge(i) {
   hintIdx   = 0
   challengeStartedAt = Date.now()
   const ch  = CHALLENGES[i]
+  document.getElementById('ch-row').style.display = ''
   document.getElementById('ch-text').innerHTML = ch.text
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
   document.getElementById('pass-badge').style.display = 'none'
@@ -3159,7 +3168,10 @@ function selectChallenge(i) {
 // Always-visible Next control — reflects whether the CURRENT challenge is
 // already completed, separate from the pass-badge overlay (which is easy to
 // miss once you've scrolled or moved on to reading the next hint).
+let _footerNextAction = () => stepChallenge(1)
+function footerNextClick() { _footerNextAction() }
 function updateFooterNext() {
+  _footerNextAction = () => stepChallenge(1)
   const btn = document.getElementById('ch-footer-next')
   if (!btn) return
   const isLast = activeIdx + 1 >= CHALLENGES.length
@@ -3171,6 +3183,42 @@ function updateFooterNext() {
     btn.disabled = true
     btn.textContent = 'Complete the exercise to continue →'
   }
+}
+
+// ── World Lesson bubble — one per world on the Galaxy Map, separate from
+// the per-stage exercise bubbles. Opens all of that world's Learn-bubble
+// content combined into one read, with a button to jump into the first
+// real exercise — matches "one lesson [node], and the rest exercises".
+function openWorldLesson(worldId) {
+  const world = WORLDS.find(w => w.id === worldId)
+  if (!world) return
+  document.body.classList.add('no-blocks-mode')
+  document.getElementById('output-canvas').style.display = 'none'
+  document.getElementById('output-page').style.display = 'none'
+  document.getElementById('output-quiz').style.display = 'none'
+  document.getElementById('output-chat').style.display = 'none'
+  document.getElementById('pass-badge').style.display = 'none'
+  document.getElementById('fail-badge').style.display = 'none'
+  document.getElementById('ch-row').style.display = 'none'
+  document.getElementById('ch-nav-current').innerHTML = '<b>📘 Lesson</b> — ' + world.name
+  const lessonEl = document.getElementById('ch-lesson')
+  lessonEl.style.display = ''
+  document.getElementById('cl-title').textContent = world.name
+  const combined = world.stages
+    .filter(s => !s.boss)
+    .map(s => CHALLENGE_LESSON[s.id])
+    .filter(Boolean)
+    .map(l => l.html)
+    .join('')
+  document.getElementById('cl-body').innerHTML = combined || '<div class="cl-block"><p>No lesson content yet for this world.</p></div>'
+  document.getElementById('cl-body').classList.remove('collapsed')
+  document.getElementById('cl-arrow').textContent = '▾'
+  const firstStage = world.stages[0]
+  const btn = document.getElementById('ch-footer-next')
+  btn.disabled = false
+  btn.textContent = '▶ Start Exercises →'
+  _footerNextAction = () => selectChallenge(STAGE_INDEX[firstStage.id])
+  log('Lesson: ' + world.name, 'info')
 }
 
 // ── Quiz stages — matching / fill-in-the-blank / scenario judgment. No code
