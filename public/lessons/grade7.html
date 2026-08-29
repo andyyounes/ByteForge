@@ -789,7 +789,7 @@ Blockly.defineBlocksWithJsonArray([
   {
     type:'page_add_heading',
     message0:'add heading %1',
-    args0:[{type:'input_value', name:'STR'}],
+    args0:[{type:'input_value', name:'STR', check:'String'}],
     inputsInline:true,
     previousStatement:null, nextStatement:null,
     colour:'#16a34a',
@@ -798,7 +798,7 @@ Blockly.defineBlocksWithJsonArray([
   {
     type:'page_add_paragraph',
     message0:'add paragraph %1',
-    args0:[{type:'input_value', name:'STR'}],
+    args0:[{type:'input_value', name:'STR', check:'String'}],
     inputsInline:true,
     previousStatement:null, nextStatement:null,
     colour:'#16a34a',
@@ -808,8 +808,8 @@ Blockly.defineBlocksWithJsonArray([
     type:'page_add_link',
     message0:'add link %1  to %2',
     args0:[
-      {type:'input_value', name:'STR'},
-      {type:'input_value', name:'URL'},
+      {type:'input_value', name:'STR', check:'String'},
+      {type:'input_value', name:'URL', check:'String'},
     ],
     inputsInline:true,
     previousStatement:null, nextStatement:null,
@@ -819,7 +819,7 @@ Blockly.defineBlocksWithJsonArray([
   {
     type:'page_add_button',
     message0:'add button %1',
-    args0:[{type:'input_value', name:'STR'}],
+    args0:[{type:'input_value', name:'STR', check:'String'}],
     inputsInline:true,
     previousStatement:null, nextStatement:null,
     colour:'#16a34a',
@@ -871,7 +871,7 @@ Blockly.defineBlocksWithJsonArray([
   {
     type:'page_set_heading_text',
     message0:'change heading text to %1',
-    args0:[{type:'input_value', name:'STR'}],
+    args0:[{type:'input_value', name:'STR', check:'String'}],
     inputsInline:true, previousStatement:null, nextStatement:null,
     colour:'#ca8a04',
     tooltip:'Replaces the page\'s heading text with something new.',
@@ -879,7 +879,7 @@ Blockly.defineBlocksWithJsonArray([
   {
     type:'page_set_paragraph_text',
     message0:'change paragraph text to %1',
-    args0:[{type:'input_value', name:'STR'}],
+    args0:[{type:'input_value', name:'STR', check:'String'}],
     inputsInline:true, previousStatement:null, nextStatement:null,
     colour:'#ca8a04',
     tooltip:'Replaces the page\'s (first) paragraph text with something new.',
@@ -887,7 +887,7 @@ Blockly.defineBlocksWithJsonArray([
   {
     type:'page_set_button_text',
     message0:'change button text to %1',
-    args0:[{type:'input_value', name:'STR'}],
+    args0:[{type:'input_value', name:'STR', check:'String'}],
     inputsInline:true, previousStatement:null, nextStatement:null,
     colour:'#ca8a04',
     tooltip:'Replaces the button\'s own label text.',
@@ -1231,10 +1231,35 @@ function runPageCode() {
     // code rather than the DOM, since a variable's VALUE ends up looking
     // identical to a literal once it's on the page.
     hasVar:   /\b(var|let|const)\b/.test(code),
-    varCount: (code.match(/\b(?:let|const)\s+\w+\s*=/g) || []).length,
+    // Counts DISTINCT declared variable names. Blockly's real JS generator
+    // emits `var a, b;` (comma-separated, no inline assignment) — the old
+    // regex only matched `let|const name =`, which Blockly never generates
+    // at all, so varCount was silently ALWAYS 0 here regardless of how many
+    // variables a student actually created (making every needsVar2 page
+    // stage, e.g. st4s2/gsafeboss, literally impossible to pass).
+    varCount: (() => {
+      const names = new Set()
+      ;(code.match(/\bvar\s+[^;]+;/g) || []).forEach(stmt =>
+        stmt.replace(/^var\s+/, '').replace(/;$/, '').split(',')
+          .forEach(n => { const name = n.trim().split('=')[0].trim(); if (name) names.add(name) }))
+      ;(code.match(/\b(?:let|const)\s+\w+\s*=/g) || []).forEach(m =>
+        names.add(m.replace(/\b(?:let|const)\s+/, '').replace(/\s*=$/, '').trim()))
+      return names.size
+    })(),
     // A genuine reassignment exists if there are MORE '=' assignments than
     // declarations — i.e. some variable was set once, then set again later.
     hasVarUpdate: (code.match(/[^=!<>+\-*/%]=(?!=)/g) || []).length > (code.match(/\b(?:let|const)\s+\w+\s*=/g) || []).length,
+    // st4s1/s2 ask for a MEANINGFUL remembered choice (e.g. "a sword"),
+    // joined into real sentence text — hasVar alone was satisfied by
+    // "set choice to 0" plugged raw into addHeading(), with no string and
+    // no joining at all. varIsStringLiteral confirms at least one variable
+    // actually holds quoted text; headingJoinsText/paragraphJoinsText
+    // confirm the heading/paragraph combines that variable WITH other text
+    // (Blockly's "join"/"create text with" blocks compile to `+`), not
+    // just displaying the bare variable value alone.
+    varIsStringLiteral: /\w+\s*=\s*['"][^'"]*['"]/.test(code),
+    headingJoinsText:   /addHeading\(\s*[^)]*\+[^)]*\)/.test(code),
+    paragraphJoinsText: /addParagraph\(\s*[^)]*\+[^)]*\)/.test(code),
     // Week 5 — if/else branching. Same coarse source-text check as the
     // canvas worlds' hasIf; hasElseIf additionally requires a genuine
     // three-way (or more) branch, not just a single if/else.
@@ -1849,23 +1874,24 @@ const WORLDS = [
   // the rest of the platform already does (see Game Maker's g2s1 needsVar).
   { id:'st4', name:'🧠 Story Studio 4 — Remember Things', sub:'Variables — a story that remembers the reader\'s choice', live:true, stages:[
     { id:'st4s1', name:'Remember the Choice', xp:25, type:'page',
-      text:`<strong>Challenge 1</strong> — Create a variable to hold the reader's "choice" (e.g. set <code>item</code> to "a sword"). Add a heading that USES that variable — e.g. "You picked: " joined with item.`,
+      text:`<strong>Challenge 1</strong> — Create a variable called <code>item</code> and set it to a real piece of TEXT (e.g. "a sword") — NOT a number. Then add a heading that JOINS other text with that variable — e.g. "You picked: " joined with item — so the heading reads "You picked: a sword", not just the bare variable alone.`,
       hints:[
-        'Open Variables → "Create variable…", name it item, then drag "set item to" with a text block.',
-        'Use the Text category\'s "join" (or "create text with") block, or Text → "𝑥 & 𝑦" to combine "You picked: " with your variables_get(item) block.',
-        'Plug the joined text into "add heading".',
+        'Open Variables → "Create variable…", name it item, then drag out "set item to" — it comes with an empty text box built in on this page. Type "a sword" straight into it.',
+        'Drag the "join" block from the Text category — it combines two pieces of text into one. Put "You picked: " in the first slot, and your item variable (Variables category) in the second.',
+        'Plug the JOINED block into "add heading" — plugging item in by itself, with nothing joined to it, won\'t pass.',
       ],
       needsVar:true, needsHeadings:1,
-      check:(log) => log.hasVar && log.headings >= 1,
+      check:(log) => log.hasVar && log.headings >= 1 && log.varIsStringLiteral && log.headingJoinsText,
     },
     { id:'st4s2', name:'Two Details, One Story', xp:30, type:'page',
-      text:`<strong>Challenge 2</strong> — Create TWO variables (e.g. item and place). Show one in the heading and the other in a paragraph — the story now remembers two separate things about the reader's choice.`,
+      text:`<strong>Challenge 2</strong> — Create TWO text variables (e.g. item and place, both set to real words like "a sword" and "a hidden cave" — not numbers). Show one JOINED into the heading (like Challenge 1) and the other JOINED into a paragraph — the story now remembers two separate things about the reader's choice, in real sentences.`,
       hints:[
-        'Create a second variable the same way — Variables → "Create variable…".',
-        'One variable feeds "add heading", the other feeds "add paragraph".',
+        'Create a second variable the same way — Variables → "Create variable…" — its "set to" block also comes with an empty text box built in, ready to type into.',
+        'Use a "join" block (Text category) for each one — one joins text + item into "add heading", the other joins text + place into "add paragraph". Plugging a bare variable in alone, with nothing joined, won\'t pass either one.',
       ],
       needsVar2:true, needsHeadings:1, needsParagraphs:1,
-      check:(log) => (log.varCount || 0) >= 2 && log.headings >= 1 && log.paragraphs >= 1,
+      check:(log) => (log.varCount || 0) >= 2 && log.headings >= 1 && log.paragraphs >= 1
+                  && log.varIsStringLiteral && log.headingJoinsText && log.paragraphJoinsText,
     },
     { id:'st4s3', name:'The Choice Updates', xp:35, type:'page',
       text:`<strong>Challenge 3</strong> — A variable isn't stuck forever. Set a variable (e.g. <code>health</code> to 100), then give it a NEW value further down (e.g. subtract 20), and show the UPDATED value in your heading.`,
@@ -3808,17 +3834,26 @@ workspace.addChangeListener(e => {
 })
 
 // ── Auto-shadow on new variables_set blocks ───────────────────────────────────
+// Story Studio (page-type stages) is where students are asked to remember TEXT
+// ("a sword", not a number) — but every new "set X to" always auto-plugged a
+// NUMBER shadow with an editable numeric field. The VALUE socket itself has no
+// type restriction (a text block can always be swapped in instead), but
+// nothing ever showed a student that text was even an option — the visible
+// "0" just reads as "type a number here". Default to a TEXT shadow instead,
+// specifically on page-type stages, where remembering text is the actual point;
+// canvas/game stages (score, health, x/y) keep the number default they need.
 workspace.addChangeListener(e => {
   if (e.type !== Blockly.Events.BLOCK_CREATE) return
   try {
     const ids = e.ids || [e.blockId]
+    const isPageStage = CHALLENGES[activeIdx]?.type === 'page'
     ids.forEach(id => {
       const block = workspace.getBlockById(id)
       if (!block || block.type !== 'variables_set') return
       const conn = block.getInput('VALUE')?.connection
       if (conn && !conn.targetBlock()) {
-        const shadow = workspace.newBlock('math_number')
-        shadow.setFieldValue('0', 'NUM')
+        const shadow = workspace.newBlock(isPageStage ? 'text' : 'math_number')
+        shadow.setFieldValue(isPageStage ? '' : '0', isPageStage ? 'TEXT' : 'NUM')
         shadow.setShadow(true)
         shadow.initSvg(); shadow.render()
         conn.connect(shadow.outputConnection)

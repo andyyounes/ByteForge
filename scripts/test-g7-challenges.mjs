@@ -59,6 +59,7 @@ const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, t
   // st4* (variables & simple state) — hasVar is shared with the canvas
   // worlds' flag; varCount/hasVarUpdate are page-specific.
   varCount: 999, hasVarUpdate: true, hasElseIf: true,
+  varIsStringLiteral: true, headingJoinsText: true, paragraphJoinsText: true,
   // cb1* (quiz stages) — a maximal quiz result is a perfect score.
   quizCorrect: 999, quizTotal: 999,
   // cb6* (chat stages) — a maximal log has generated many times.
@@ -69,6 +70,7 @@ const emptyLog   = () => ({ frames: 0,   rects: 0,   circles: 0,   lines: 0,   t
   bgColor: '', headingColor: '', align: '', fontSize: 0,
   headingChangedByClick: false, paragraphChangedByClick: false, buttonTextChangedByClick: false,
   varCount: 0, hasVarUpdate: false, hasElseIf: false,
+  varIsStringLiteral: false, headingJoinsText: false, paragraphJoinsText: false,
   quizCorrect: 0, quizTotal: 0, chatGenCount: 0 })
 
 for (const ch of CHALLENGES) {
