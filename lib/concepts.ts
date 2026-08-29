@@ -92,6 +92,11 @@ export const CONCEPTS: Concept[] = [
   // Web Story runs at the start of the year, before the M1-M10 sequence.
   { id:'g8-web-story', name:'Web Story — Interactive Page Project', icon:'📗', color:'#16a34a', tier:4, xGroup:2, prerequisites:[], difficulty:2, gradeMin:8, estimatedMinutes:75, learningModes:['grade8'], tags:['grade8','web'], lessonUrl:'/lessons/grade8.html' },
 
+  // Cyber Defense — new standalone chapter, genuinely beyond M8's basic
+  // password-length/https checks: lookalike domains, why hashing exists,
+  // combining multiple real red flags in one function.
+  { id:'g8-cyber', name:'Cyber Defense — Lookalikes, Hashing & Red Flags', icon:'🔐', color:'#dc2626', tier:5, xGroup:10, prerequisites:['g8-web'], difficulty:3, gradeMin:8, estimatedMinutes:60, learningModes:['grade8'], tags:['grade8','security'], lessonUrl:'/lessons/grade8.html' },
+
   // ══════════════════════════════════════════════════════════════════════════
   //  GRADE 9 — "The Deep Diver"
   //  3 Terms × 10 Weeks × 2 Hours = 60 hours

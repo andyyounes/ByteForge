@@ -2166,6 +2166,99 @@ print(about_page)
       check:(code) => /<a\s+href\s*=\s*["']about\.html["']/.test(code),
     },
   ]},
+  // ── Cyber Defense — new standalone chapter, genuinely beyond M8's basic
+  // password-length/https checks: lookalike domains, why real sites never
+  // store your literal password, combining multiple red flags in one real
+  // function. Real Python throughout, same lang as M1-M10 (not lang:'web').
+  { id:'cyber', name:'🔐 Cyber Defense', sub:'Lookalike domains, why passwords are hashed, and combining real red flags', live:true, stages:[
+    {
+      id:'cyber1', name:'Spot the Lookalike Domain', xp:45,
+      text:`<strong>Challenge 1 — Not Quite the Real Thing</strong> — Scammers register domains that LOOK almost identical to a real one (swapping "l" for "1", "o" for "0", or adding an extra word). Write a function <code>is_real_domain(url)</code> that returns True ONLY if url is EXACTLY "https://www.realbank.com" — not a lookalike, not a similar one, EXACTLY that.`,
+      hints:[
+        'A lookalike like "https://www.rea1bank.com" (with a "1" instead of "l") looks right at a glance but is NOT equal to the real string.',
+        'Python == checks for EXACT equality, character by character — this is exactly the tool you need here.',
+        'return url == "https://www.realbank.com"',
+      ],
+      starter:`# Grade 8 — Spot the Lookalike Domain
+REAL_DOMAIN = "https://www.realbank.com"
+
+def is_real_domain(url):
+    # TODO: return True only if url is EXACTLY REAL_DOMAIN
+    pass
+
+test_urls = ["https://www.realbank.com", "https://www.rea1bank.com", "https://www.realbank.com.evil.net"]
+for url in test_urls:
+    print(url, "->", is_real_domain(url))
+`,
+      check:(code) => /def\s+is_real_domain/.test(code) && /==\s*REAL_DOMAIN|==\s*["']https:\/\/www\.realbank\.com["']/.test(code),
+    },
+    {
+      id:'cyber2', name:'Why Sites Never Store Your Real Password', xp:50,
+      text:`<strong>Challenge 2 — Hashing, Simplified</strong> — Real websites never store your actual password — they store a "hash": the result of a one-way scrambling function. Write <code>simple_hash(password)</code> that adds up the ASCII code of every character (using <code>ord()</code>). Two DIFFERENT passwords should (usually) produce different hashes, but you genuinely cannot work backwards from the hash to the original password.`,
+      hints:[
+        'ord(ch) converts one character to its ASCII number — sum ord(ch) for every character in the string.',
+        'total = 0 \\n for ch in password: total += ord(ch) \\n return total',
+        'Real hashing (SHA-256 etc.) is far more complex than this, but the core idea is identical: easy to compute forwards, genuinely impractical to reverse.',
+      ],
+      starter:`# Grade 8 — A simplified one-way "hash"
+def simple_hash(password):
+    total = 0
+    # TODO: for each character in password, add ord(ch) to total
+    return total
+
+print("hash of 'cat123':", simple_hash("cat123"))
+print("hash of 'dog456':", simple_hash("dog456"))
+# Notice: given ONLY the hash number, you cannot work out what the original password was.
+`,
+      check:(code) => /def\s+simple_hash/.test(code) && /\bord\s*\(/.test(code) && /for\s+\w+\s+in\s+password/.test(code),
+    },
+    {
+      id:'cyber3', name:'Phishing Email Red Flags', xp:50,
+      text:`<strong>Challenge 3 — More Than One Signal</strong> — A real phishing email usually shows SEVERAL warning signs at once. Write <code>is_phishing(asks_for_password, urgent_language, unknown_sender)</code> — three True/False inputs — that returns True if asks_for_password is True AND at least ONE of the other two is also True.`,
+      hints:[
+        'This needs AND combined with OR — asks_for_password and (urgent_language or unknown_sender).',
+        'Asking for a password is the single most serious signal on its own — but pairing it with urgency or an unknown sender makes it even more certain.',
+        'return asks_for_password and (urgent_language or unknown_sender)',
+      ],
+      starter:`# Grade 8 — Phishing Email Red Flags
+def is_phishing(asks_for_password, urgent_language, unknown_sender):
+    # TODO: True if asks_for_password AND (urgent_language OR unknown_sender)
+    pass
+
+print(is_phishing(True, True, False))   # expect True
+print(is_phishing(True, False, False))  # expect False — only one signal
+print(is_phishing(False, True, True))   # expect False — never actually asked for a password
+`,
+      check:(code) => /def\s+is_phishing/.test(code) && /\band\b/.test(code) && /\bor\b/.test(code),
+    },
+    {
+      id:'cyberboss', name:'BOSS — Build a Full Security Check', xp:70, boss:true,
+      text:`<strong>BOSS</strong> — Combine everything: write <code>is_safe_to_proceed(url, asks_for_password, urgent_language, unknown_sender)</code> that returns True ONLY if the url is the real domain (Challenge 1's check) AND it is NOT flagged as phishing (Challenge 3's check, inverted with <code>not</code>).`,
+      hints:[
+        'Reuse is_real_domain() and is_phishing() — call them both inside this new function.',
+        'return is_real_domain(url) and not is_phishing(asks_for_password, urgent_language, unknown_sender)',
+        'Nothing new here — just combining two already-working functions into one final decision, exactly like a real security system layers multiple checks.',
+      ],
+      starter:`# Grade 8 — BOSS: Build a Full Security Check
+REAL_DOMAIN = "https://www.realbank.com"
+
+def is_real_domain(url):
+    return url == REAL_DOMAIN
+
+def is_phishing(asks_for_password, urgent_language, unknown_sender):
+    return asks_for_password and (urgent_language or unknown_sender)
+
+def is_safe_to_proceed(url, asks_for_password, urgent_language, unknown_sender):
+    # TODO: True only if is_real_domain(url) AND NOT is_phishing(...)
+    pass
+
+print(is_safe_to_proceed("https://www.realbank.com", False, False, False))  # expect True
+print(is_safe_to_proceed("https://www.rea1bank.com", False, False, False))  # expect False — lookalike
+print(is_safe_to_proceed("https://www.realbank.com", True, True, False))    # expect False — phishing signals
+`,
+      check:(code) => /def\s+is_safe_to_proceed/.test(code) && /is_real_domain\s*\(/.test(code) && /is_phishing\s*\(/.test(code) && /\bnot\b/.test(code),
+    },
+  ]},
   { id:'m9w', name:'🖥 M9 — Interactive Apps', sub:'A canvas app with real state: menu -> running -> results', live:true, stages:[
     {
       id:'m9s1', name:'Name That Error', xp:45,
@@ -2842,6 +2935,26 @@ const CHALLENGE_LESSON = {
     <div class="cl-block"><h4>Real websites are many pages, connected</h4>
       <p>A single HTML page is rarely the whole story — real sites are collections of pages, all linked together, exactly like this two-page profile connecting a home page to an about page.</p></div>` },
 
+  // ── Cyber Defense — genuinely new content beyond M8's basic checks ─────────
+  cyber1: { title: '== checks EXACT equality — a lookalike is never equal', html: `
+    <div class="cl-block"><h4>A lookalike domain LOOKS right but is not equal</h4>
+      <p>"rea1bank.com" (a "1" instead of "l") is visually close enough to fool a quick glance, but Python's <code>==</code> compares character by character — it is genuinely NOT equal to "realbank.com", even though a human skimming it might not notice the difference.</p></div>
+    <div class="cl-block"><h4>Real scammers rely on exactly this trick</h4>
+      <p>Typosquatting — registering a domain one character off from a real one — is a genuine, common real-world attack, and this challenge\'s exact-match check is the real defence against it.</p></div>` },
+  cyber2: { title: 'Hashing — easy forwards, genuinely impractical backwards', html: `
+    <div class="cl-block"><h4>ord() turns text into numbers you can add up</h4>
+      <p>Summing every character\'s ASCII code gives ONE number computed FROM the password — but given only that number, there is no way to work out which exact characters produced it (many different passwords could add up to the same total).</p></div>
+    <div class="cl-block"><h4>This is why a real data breach does not leak your real password</h4>
+      <p>Real sites store a (far more sophisticated) hash, not your actual password — even if a database leaks, what leaks is the hash, not something directly usable to log in as you.</p></div>` },
+  cyber3: { title: 'Combining AND and OR — one function, three real signals', html: `
+    <div class="cl-block"><h4>and requires the FIRST condition; or requires ONE of the rest</h4>
+      <p><code>asks_for_password and (urgent_language or urgent_sender)</code> makes asking for a password the non-negotiable requirement, with EITHER other signal being enough to confirm it — a genuinely more realistic model of how real phishing is detected than any single check alone.</p></div>
+    <div class="cl-block"><h4>Brackets change what the expression actually means</h4>
+      <p>Without the brackets around the <code>or</code>, Python\'s normal operator precedence would combine the conditions completely differently — a real, easy mistake worth testing carefully with the exact examples given.</p></div>` },
+  cyberboss: { title: 'BOSS — layering two real functions into one decision', html: `
+    <div class="cl-block"><h4>A real security system is built from layers, not one check</h4>
+      <p>Calling <code>is_real_domain()</code> AND <code>not is_phishing()</code> together is genuinely how real systems work: no single check is trusted alone — multiple independent checks all have to agree before anything is called "safe".</p></div>` },
+
   // ── M9 — Interactive Apps ────────────────────────────────────────────────────
   m9s1: { title: 'Three kinds of bugs, three different fixes', html: `
     <div class="cl-block"><h4>Syntax, logic, and runtime errors are NOT the same thing</h4>
@@ -3046,6 +3159,7 @@ const G8_MODULE_CONCEPT = {
   // missing entirely before, so completing it silently never touched the
   // real profile/streak (same bug Grade 7's Story Studio/Block Arcade had).
   ws1:'g8-web-story', ws2:'g8-web-story', ws3:'g8-web-story', ws4:'g8-web-story', ws5:'g8-web-story',
+  cyber:'g8-cyber',
 }
 async function reportRealProgress(ch, timeSpentMs) {
   // ch.mod is UPPERCASE ('M1', 'WS1' — see CHALLENGES' m.id.toUpperCase()
