@@ -17,7 +17,7 @@ export default async function PastPapersPage() {
 
   // Get student's class (if any)
   const admin = await createAdminClient()
-  let membership: { class_id: string; classes: { id: string; name: string } } | null = null
+  let membership: any = null
   try {
     const { data } = await admin
       .from('class_members')
@@ -26,7 +26,7 @@ export default async function PastPapersPage() {
       .order('joined_at', { ascending: false })
       .limit(1)
       .single()
-    membership = data as typeof membership
+    membership = data
   } catch {
     membership = null
   }
