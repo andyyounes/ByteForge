@@ -140,7 +140,7 @@
     body.no-blocks-mode .editor-wrap,
     body.no-blocks-mode .out-bar { display:none !important; }
     body.no-blocks-mode .canvas-wrap { flex:1; height:auto; align-items:stretch; padding:24px; }
-    body.no-blocks-mode #output-quiz,
+    body.no-blocks-mode #output-quiz { max-width:1400px; margin:0 auto; padding:24px 32px; }
     body.no-blocks-mode #output-chat { max-width:760px; margin:0 auto; padding:24px 32px; }
     #output-canvas { display:block; }
     /* Page-building preview — used by the "page" stage type (Story Studio
@@ -157,18 +157,22 @@
                    background:var(--bg-card); color:var(--fg);
                    border:1px solid var(--border); border-radius:12px; padding:22px 26px;
                    font-family:'Plus Jakarta Sans',sans-serif; text-align:left; }
+    /* Questions arrange in a responsive grid instead of one long full-width
+       column — makes real use of the now-full-width page and keeps each
+       question card compact rather than an oversized single-column list. */
+    #output-quiz .quiz-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; }
     #output-quiz .q-item { background:var(--bg-raised); border:1px solid var(--border);
-      border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+      border-radius:9px; padding:10px 12px; margin-bottom:0; }
     #output-quiz .q-scenario { background:rgba(129,140,248,.1); border:1px solid rgba(129,140,248,.25);
-      border-radius:8px; padding:10px 12px; font-size:13px; margin-bottom:10px; color:var(--fg); }
-    #output-quiz .q-label { font-size:13.5px; font-weight:700; margin-bottom:8px; color:var(--fg); line-height:1.5; }
+      border-radius:7px; padding:8px 10px; font-size:12px; margin-bottom:8px; color:var(--fg); }
+    #output-quiz .q-label { font-size:12.5px; font-weight:700; margin-bottom:6px; color:var(--fg); line-height:1.4; }
     #output-quiz select, #output-quiz input[type=text] {
-      width:100%; font-size:13px; padding:9px 10px; border-radius:7px;
+      width:100%; font-size:12.5px; padding:7px 9px; border-radius:6px;
       border:1px solid var(--border-hi); background:var(--bg); color:var(--fg); }
     #output-quiz select:focus, #output-quiz input[type=text]:focus { outline:none; border-color:#818cf8; }
-    #output-quiz .q-check-btn { margin-top:4px; width:100%; padding:13px 14px; border:none; border-radius:9px;
+    #output-quiz .q-check-btn { margin-top:14px; width:100%; max-width:420px; padding:13px 14px; border:none; border-radius:9px;
       background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; font-weight:800; font-size:14px;
-      cursor:pointer; letter-spacing:.01em; }
+      cursor:pointer; letter-spacing:.01em; display:block; margin-left:auto; margin-right:auto; }
     #output-quiz .q-check-btn:hover { filter:brightness(1.08); }
     #output-quiz .q-result { font-size:13px; margin-top:10px; text-align:center; padding:8px; border-radius:8px; }
     #output-quiz .q-result.ok  { color:#4ade80; font-weight:700; background:rgba(34,197,94,.12); }
@@ -3287,7 +3291,7 @@ function openWorldLesson(worldId) {
 function renderQuiz(ch) {
   const box = document.getElementById('output-quiz')
   const qs = ch.questions || []
-  box.innerHTML = qs.map((q, i) => {
+  box.innerHTML = '<div class="quiz-grid">' + qs.map((q, i) => {
     if (q.type === 'judge') {
       return `<div class="q-item">
         <div class="q-scenario">${q.scenario}</div>
@@ -3312,7 +3316,7 @@ function renderQuiz(ch) {
     // 'fill'
     return `<div class="q-item"><div class="q-label">${q.prompt}</div>
       <input type="text" id="quiz-${i}-a" placeholder="Type your answer…"></div>`
-  }).join('') + `<button class="q-check-btn" onclick="checkQuiz()">✅ Submit Answer</button><div class="q-result" id="quiz-result"></div>`
+  }).join('') + '</div>' + `<button class="q-check-btn" onclick="checkQuiz()">✅ Submit Answer</button><div class="q-result" id="quiz-result"></div>`
 }
 
 function checkQuiz() {
