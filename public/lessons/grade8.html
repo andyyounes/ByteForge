@@ -716,6 +716,7 @@ function checkWebChallenge(log) {
   if (ch.check(log)) {
     completed.add(activeIdx)
     renderPills()
+    document.getElementById('pass-badge').textContent = '🎉 Great! +' + ch.xp + ' XP earned!'
     document.getElementById('pass-badge').style.display = 'block'
     showToast('Challenge complete! +' + ch.xp + ' XP 🎉')
     clog('✅ Challenge complete! +' + ch.xp + ' XP', 'ok')
@@ -1230,6 +1231,55 @@ const MODULES = [
       needsLoop:true, needsFunction:true, needsArray:true, needsObject:true, needsPush:true, needsClick:true, needsLSSet:true, needsJSON:true,
       check:(log) => log.hasLoop && log.hasFunction && log.hasArray && log.hasObject && log.hasPush && log.hasClick
                   && log.hasLSSet && log.hasJSONStringify && log.listItemsGrewOnClick && log.bodyChangedOnClick,
+    },
+  ]},
+  // ── Semester 2, Week 1: What Is Python? / Variables — new for the
+  // 3-semester rebuild. Reuses M1's "About Me" framing but simplified —
+  // starter-code + TODOs, no functions, f-strings introduced lightly.
+  { id:'py1', name:'🐍 What Is Python? / Variables', sub:'A variable is still a named box — now with real, exact syntax', live:true, stages:[
+    { id:'py1s1', name:'About You, In Variables', xp:25,
+      text:`<strong>Challenge 1</strong> — Complete the 3 variable assignments and 2 print() calls below.`,
+      hints:[
+        'A variable is still a named box, exactly like Grade 7\'s blocks — just typed now, with an = sign instead of a "set" block.',
+        'Text goes in quotes: name = "Alex". Numbers don\'t: age = 13.',
+        'print(name) shows the variable\'s value — no quotes needed around the variable name itself.',
+      ],
+      starter:`# TODO 1: set name to your own name (text)
+name = ___
+
+# TODO 2: set age to your own age (a number)
+age = ___
+
+# TODO 3: set fav_thing to something you enjoy (text)
+fav_thing = ___
+
+# TODO 4 & 5: print each one
+print(___)
+print(___)
+`,
+      check:(code) => /name\s*=\s*["'][^"']+["']/.test(code) && /age\s*=\s*\d+/.test(code)
+                    && /fav_thing\s*=\s*["'][^"']+["']/.test(code)
+                    && (code.match(/print\s*\(\s*(name|age|fav_thing)\s*\)/g) || []).length >= 2,
+    },
+    { id:'py1boss', name:'BOSS — One Line, Three Variables', xp:45, boss:true,
+      text:`<strong>BOSS</strong> — Combine all three variables into ONE print() using an f-string: <code>print(f"...")</code>.`,
+      hints:[
+        'An f-string starts with f before the quotes: f"My name is {name}".',
+        'Put all three variables inside ONE f-string: f"My name is {name}, I am {age}, and I like {fav_thing}."',
+      ],
+      starter:`name = "Alex"
+age = 13
+fav_thing = "gaming"
+
+# TODO: print all three in ONE f-string
+print(f"___")
+`,
+      check:(code) => {
+        const m = code.match(/print\s*\(\s*f["']([^"']*)["']\s*\)/)
+        if (!m) return false
+        const body = m[1]
+        return body.includes('{name}') && body.includes('{age}') && body.includes('{fav_thing}')
+      },
     },
   ]},
   { id:'m1', name:'🔤 M1 — From Blocks to Text', sub:'print, input, variables, types — the G7 skills, now in real Python', live:true, stages:[
@@ -2828,6 +2878,16 @@ const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({
 // challenges). Rendered by renderChallengeLesson().
 // ══════════════════════════════════════════════════════════════════════════════
 const CHALLENGE_LESSON = {
+  py1s1: { title: 'A variable is still a named box', html: `
+    <div class="cl-block"><h4>Same idea, real syntax now</h4>
+      <p>A variable holds one value under a name — exactly like Grade 7's blocks. The difference is real syntax: an equals sign instead of a "set" block, quotes around text, no quotes around numbers.</p></div>
+    <div class="cl-block"><h4>Text vs. number, exactly</h4>
+      <p><code>name = "Alex"</code> — quotes, because it's text. <code>age = 13</code> — no quotes, because it's a number. Mixing this up is the single most common typing mistake at this stage.</p></div>` },
+  py1boss: { title: 'BOSS — f-strings combine variables into one sentence', html: `
+    <div class="cl-block"><h4>f before the quotes</h4>
+      <p>An f-string lets you drop variables straight into a sentence: <code>f"My name is {name}"</code>. The <code>f</code> right before the opening quote is what makes <code>{name}</code> get replaced with the variable's real value.</p></div>
+    <div class="cl-block"><h4>Why this beats separate print() calls</h4>
+      <p>Three separate print() calls make three separate lines. One f-string makes ONE real sentence — closer to how you'd actually write it.</p></div>` },
   web0s1: { title: 'Client, server, protocol, domain', html: `
     <div class="cl-block"><h4>You = customer, browser = waiter, server = kitchen</h4>
       <p>The browser is the client — it asks for a page. The server stores the site's real files and sends them back. A URL's protocol (https://) says HOW to connect; the domain (wikipedia.org) says WHERE.</p></div>
@@ -3501,6 +3561,9 @@ function toggleChallengeLesson() {
 const G8_MODULE_CONCEPT = {
   // Semester 1, Week 1 (3-semester rebuild) — genuinely new territory, own concept.
   web0:'g8-what-is-a-website',
+  // Semester 2, Week 1 (3-semester rebuild) — reuses M1's concept slot,
+  // since it's a slower-paced replacement for the same "variables" idea.
+  py1:'g8-text',
   m1:'g8-text', m2:'g8-loops', m3:'functions-params', m4:'lists-data', m5:'g8-strings',
   m6:'g8-files', m7:'g8-hardware', m8:'g8-web', m9w:'g8-apps', m10:'g8-capstone',
   // Web Story (Sem 1, ws1-ws5) — added when this world was built; was
@@ -3555,12 +3618,15 @@ function validateChallenge(code) {
   if (ch.check(stripPyComments(code), drawLog, code)) {
     completed.add(activeIdx)
     renderPills()
+    document.getElementById('pass-badge').textContent = '🎉 Great! +' + ch.xp + ' XP earned!'
     document.getElementById('pass-badge').style.display = 'block'
     showToast('Challenge complete! +' + ch.xp + ' XP')
     clog('Challenge complete! +' + ch.xp + ' XP', 'ok')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g8-c' + activeIdx, { passed: true, score: 100 }); }
     LessonSaves.save('grade8', ch.id, { passed: true, xpEarned: ch.xp, code })
     reportRealProgress(ch, Date.now() - challengeStartedAt)
+    updateFooterNext()
+    renderModuleXPBar(findModuleForChallenge(ch))
   }
 }
 
