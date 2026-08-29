@@ -123,6 +123,14 @@
                  background:rgba(251,191,36,.05); border:1.5px solid rgba(251,191,36,.22);
                  border-radius:12px; padding:12px 14px; }
     .ch-row-inner { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    /* Hints must show up somewhere ALWAYS visible — showHint() used to only
+       log to #out-bar, which no-blocks-mode (every quiz/chat stage) hides
+       entirely, making the Hint button silently do nothing. */
+    #hint-display:empty { display:none; }
+    #hint-display { margin-top:8px; font-size:12px; color:#fbbf24; background:rgba(251,191,36,.08);
+                     border:1px solid rgba(251,191,36,.25); border-radius:7px; padding:8px 10px; }
+    #hint-display .hint-line { margin-bottom:4px; }
+    #hint-display .hint-line:last-child { margin-bottom:0; }
     .ch-text   { font-size:12.5px; color:var(--fg-dim); line-height:1.6; flex:1; }
     .ch-text strong { color:var(--fg); }
     .ch-meta   { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
@@ -368,6 +376,7 @@
             <span class="hint-btn" onclick="showHint()">💡 Hint</span>
           </div>
         </div>
+        <div id="hint-display"></div>
       </div>
     </div>
 
@@ -3169,6 +3178,7 @@ function toggleChallengeLesson() {
 function selectChallenge(i) {
   activeIdx = i
   hintIdx   = 0
+  document.getElementById('hint-display').innerHTML = ''
   challengeStartedAt = Date.now()
   const ch  = CHALLENGES[i]
   document.getElementById('ch-row').style.display = ''
@@ -3548,8 +3558,25 @@ function checkChallenge(log) {
 function showHint() {
   const ch = CHALLENGES[activeIdx]
   if (!ch) return
-  if (hintIdx < ch.hints.length) logLine('Hint ' + (hintIdx+1) + ': ' + ch.hints[hintIdx++], 'info')
-  else logLine('No more hints!', 'info')
+  const disp = document.getElementById('hint-display')
+  if (hintIdx < ch.hints.length) {
+    const hintText = ch.hints[hintIdx++]
+    logLine('Hint ' + hintIdx + ': ' + hintText, 'info')
+    if (disp) {
+      const line = document.createElement('div')
+      line.className = 'hint-line'
+      line.textContent = '💡 Hint ' + hintIdx + ': ' + hintText
+      disp.appendChild(line)
+    }
+  } else {
+    logLine('No more hints!', 'info')
+    if (disp && !disp.textContent) {
+      const line = document.createElement('div')
+      line.className = 'hint-line'
+      line.textContent = 'No more hints!'
+      disp.appendChild(line)
+    }
+  }
 }
 
 function log(msg, cls='')  { logLine(msg, cls) }
