@@ -50,7 +50,17 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/reset-password') ||
     pathname.startsWith('/join') ||
     pathname.startsWith('/api/auth') ||
-    pathname.startsWith('/api/classes/join')
+    pathname.startsWith('/api/classes/join') ||
+    // Next.js's generated metadata routes (favicon, social-share images) —
+    // these have no file extension so the matcher below can't exclude them
+    // by pattern, and browsers/crawlers fetch them unauthenticated.
+    pathname === '/icon' ||
+    pathname === '/apple-icon' ||
+    pathname === '/opengraph-image' ||
+    pathname === '/twitter-image' ||
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt' ||
+    pathname === '/manifest.webmanifest'
 
   // ── Already authenticated → redirect away from login ─────────────────────
   if (user && pathname.startsWith('/login')) {
