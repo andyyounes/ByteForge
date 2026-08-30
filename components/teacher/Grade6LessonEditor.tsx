@@ -104,24 +104,24 @@ export function Grade6LessonEditor({ classId }: { classId: string }) {
   if (!worlds) return <p className="text-xs text-fg-dim p-4">Loading Grade 6 content…</p>
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-4">
       {/* Live student-visual preview */}
-      <div className="card p-0 overflow-hidden" style={{ minHeight: 640 }}>
-        <div className="px-4 py-2.5 border-b border-b2 flex items-center justify-between">
-          <span className="text-xs font-semibold text-fg">🏝 Live student preview — The Creator Quest</span>
-          <span className="text-[11px] text-t3">Updates automatically after you publish an edit</span>
+      <div className="card p-0 overflow-hidden min-w-0">
+        <div className="px-3 sm:px-4 py-2.5 border-b border-b2 flex items-center justify-between gap-2 flex-wrap">
+          <span className="text-xs font-semibold text-fg whitespace-nowrap">🏝 Live student preview</span>
+          <span className="text-[11px] text-t3">Updates after you publish</span>
         </div>
         <iframe
           key={iframeKey}
           src={`/lessons/grade6.html?classId=${classId}&teacher=1`}
-          className="w-full"
-          style={{ height: 620, border: 0 }}
+          className="w-full h-[60vh] min-h-[420px] lg:h-[620px] lg:min-h-0"
+          style={{ border: 0 }}
           title="Grade 6 student preview"
         />
       </div>
 
       {/* World/stage list + editor */}
-      <div className="card p-4 overflow-y-auto" style={{ maxHeight: 660 }}>
+      <div className="card p-3 sm:p-4 min-w-0 lg:max-h-[660px] lg:overflow-y-auto">
         <h3 className="font-semibold text-fg text-sm mb-3">Worlds &amp; stages</h3>
         {error && <p className="text-xs text-rose mb-3">{error}</p>}
 
@@ -141,12 +141,12 @@ export function Grade6LessonEditor({ classId }: { classId: string }) {
               <div key={w.id} className="border border-b2 rounded-md p-2.5">
                 <button
                   onClick={() => openEdit({ scope: 'world', world: w })}
-                  className="w-full flex items-center justify-between text-left group"
+                  className="w-full flex items-center justify-between gap-2 text-left group"
                 >
-                  <span className="text-xs font-semibold text-fg group-hover:text-accent transition-colors">{w.name}</span>
-                  <span className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-fg group-hover:text-accent transition-colors truncate min-w-0">{w.name}</span>
+                  <span className="flex items-center gap-1.5 shrink-0">
                     {overridden.has(`world:${w.id}`) && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald/10 text-emerald border border-emerald/25">edited</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald/10 text-emerald border border-emerald/25 whitespace-nowrap">edited</span>
                     )}
                     <span className="text-[11px] text-t3">✎</span>
                   </span>
@@ -156,16 +156,16 @@ export function Grade6LessonEditor({ classId }: { classId: string }) {
                     <button
                       key={s.id}
                       onClick={() => openEdit({ scope: 'stage', world: w, stage: s })}
-                      className="w-full flex items-center justify-between text-left px-2 py-1 rounded hover:bg-s2 transition-colors group"
+                      className="w-full flex items-center justify-between gap-2 text-left px-2 py-1 rounded hover:bg-s2 transition-colors group"
                     >
-                      <span className="text-[11px] text-t2 group-hover:text-fg transition-colors">
+                      <span className="text-[11px] text-t2 group-hover:text-fg transition-colors truncate min-w-0">
                         {s.emoji} {s.title ?? s.id}
                       </span>
-                      <span className="flex items-center gap-1.5">
+                      <span className="flex items-center gap-1.5 shrink-0">
                         {overridden.has(`stage:${s.id}`) && (
-                          <span className="text-[9px] px-1 py-0.5 rounded bg-emerald/10 text-emerald border border-emerald/25">edited</span>
+                          <span className="text-[9px] px-1 py-0.5 rounded bg-emerald/10 text-emerald border border-emerald/25 whitespace-nowrap">edited</span>
                         )}
-                        <span className="text-[10px] text-t3 opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
+                        <span className="text-[10px] text-t3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">✎</span>
                       </span>
                     </button>
                   ))}
@@ -197,9 +197,9 @@ function EditPanel({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-fg">Editing: {label}</span>
-        <button onClick={onCancel} className="text-[11px] text-t3 hover:text-fg transition-colors">← back</button>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-fg truncate min-w-0">Editing: {label}</span>
+        <button onClick={onCancel} className="text-[11px] text-t3 hover:text-fg transition-colors shrink-0">← back</button>
       </div>
       <p className="text-[11px] text-fg-dim">
         Edit the raw content below (every field — title, xp, goal text, maze grid, colour target, etc.
@@ -212,7 +212,7 @@ function EditPanel({
         className="w-full h-64 text-[11px] font-mono bg-s2 border border-b2 rounded-md p-2.5 text-fg focus:border-accent focus:outline-none"
         spellCheck={false}
       />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <button
           onClick={onPublish}
           disabled={saving}
