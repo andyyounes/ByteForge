@@ -2608,10 +2608,50 @@ function toast(msg) {
 }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
 
+// ── Teacher-editable per-class content overrides ─────────────────────────────
+// Mutates the WORLDS/W*_STAGES objects IN PLACE (never reassigns them — they're
+// `const`) so every reference to them (ALL_STAGES, findStage, etc. all point
+// at the SAME objects) stays consistent. Silently does nothing if there's no
+// resolvable class (not logged in, or logged in but not in any class) —
+// same "fail quiet, never block the lesson" convention as LessonSaves.
+async function fetchClassIdG6() {
+  // Fast path: classId passed in the URL (teacher preview link, ?classId=&teacher=1)
+  const urlParam = new URLSearchParams(window.location.search).get('classId')
+  if (urlParam) return urlParam
+  if (!me) return null
+  try {
+    const res = await fetch('/api/profile')
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.classId ?? data.class_id ?? null
+  } catch (e) { return null }
+}
+async function applyClassOverrides() {
+  const classId = await fetchClassIdG6()
+  if (!classId) return
+  try {
+    const res = await fetch(`/api/class-lesson-overrides?classId=${encodeURIComponent(classId)}&lessonKey=grade6-quest`)
+    if (!res.ok) return
+    const { overrides } = await res.json()
+    if (!overrides || !overrides.length) return
+    const worldOv = new Map(overrides.filter(o => o.scope === 'world').map(o => [o.target_id, o.override_data]))
+    const stageOv = new Map(overrides.filter(o => o.scope === 'stage').map(o => [o.target_id, o.override_data]))
+    for (const w of WORLDS) {
+      const wo = worldOv.get(w.id)
+      if (wo) Object.assign(w, wo)
+      for (const s of w.stages) {
+        const so = stageOv.get(s.id)
+        if (so) Object.assign(s, so)
+      }
+    }
+  } catch (e) { console.warn('[grade6] override load failed (offline?):', e.message) }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 BF.seed()
 const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
 ;(async () => {
+  await applyClassOverrides()
   if (me) { try { await LessonSaves.load('grade6-quest') } catch (e) {} }
   showJourney()
 })()

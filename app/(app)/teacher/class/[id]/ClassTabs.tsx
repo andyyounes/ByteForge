@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 // useRef kept — used by ExercisesTab if needed; useRouter used by ExercisesTab
 import { clsx } from 'clsx'
 import { Avatar } from '@/components/ui/Avatar'
@@ -147,6 +148,23 @@ export function ClassTabs({ cls, classType, studentData, topics, draftExercises,
               >
                 Open as student →
               </a>
+            </div>
+          )}
+          {classType.id === 'grade6' && (
+            <div className="card p-5 flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <h3 className="font-semibold text-fg text-sm">🏝 The Creator Quest — the student view, editable</h3>
+                <p className="text-xs text-fg-dim mt-1 max-w-xl">
+                  See exactly what your students see, edit any world or stage (text, XP, maze layout,
+                  colour targets — everything), then publish. Changes apply to this class only.
+                </p>
+              </div>
+              <Link
+                href={`/teacher/class/${cls.id}/lessons/grade6`}
+                className="text-xs font-semibold px-4 py-2 rounded-md bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors whitespace-nowrap"
+              >
+                Edit lessons →
+              </Link>
             </div>
           )}
           {classType.id === 'grade9' && <G9MissionsPanel classId={cls.id} />}
