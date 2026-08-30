@@ -14,9 +14,6 @@ export const metadata: Metadata = {
   },
   description:
     'An adaptive ICT learning platform for secondary school students. Master algorithms, programming and computer science through interactive exercises.',
-  icons: {
-    icon: '/favicon.ico',
-  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
