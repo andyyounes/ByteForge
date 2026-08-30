@@ -130,6 +130,13 @@
                        width:14px; height:14px; border-radius:50%; font-size:10px; display:flex; align-items:center;
                        justify-content:center; font-weight:900; }
   .chip.active { border-color:#e879f9; background:rgba(232,121,249,.25); }
+  .chip-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .chip-moves { display:flex; gap:3px; }
+  .chip-move { width:17px; height:16px; border:none; border-radius:5px; background:rgba(255,255,255,.08);
+               color:#9ca3af; font-size:11px; font-weight:900; cursor:pointer; padding:0;
+               display:flex; align-items:center; justify-content:center; line-height:1; }
+  .chip-move:hover:not(:disabled) { background:rgba(232,121,249,.25); color:#e879f9; }
+  .chip-move:disabled { opacity:.25; cursor:default; }
   .prog-hint { color:#4b5563; font-size:11px; width:100%; text-align:center; padding:24px 0; }
   .run-row { display:flex; gap:8px; }
   .run-btn { flex:1; padding:13px; font-size:15px; font-weight:900; border:none; border-radius:12px;
@@ -2450,12 +2457,32 @@ function setRep(n) {
 function removeCmd(i) { if (!running) { program.splice(i, 1); renderProgram() } }
 function clearProgram() { if (!running) { program = []; renderProgram(); loadMaze() } }
 
+// Reorders one chip within the program — lets a student drop a new command
+// on the end (the only place addCmd can add one) and then walk it into the
+// middle of the sequence, or nudge any existing chip earlier/later, without
+// having to remove and re-add everything after it.
+function moveCmd(i, dir) {
+  if (running) return
+  const j = i + dir
+  if (j < 0 || j >= program.length) return
+  const tmp = program[i]; program[i] = program[j]; program[j] = tmp
+  renderProgram()
+}
+
 function renderProgram() {
   const el = document.getElementById('program')
   el.innerHTML = program.length
-    ? program.map((p, i) => '<div class="chip" id="chip-' + i + '" onclick="removeCmd(' + i + ')">'
-        + CMD_ICON[p.c] + (p.n > 1 ? '<span style="font-size:10px;font-weight:900;color:#fbbf24;">×' + p.n + '</span>' : '')
-        + '</div>').join('')
+    ? program.map((p, i) => '<div class="chip-wrap">'
+        + '<div class="chip" id="chip-' + i + '" onclick="removeCmd(' + i + ')" title="Click to remove">'
+          + CMD_ICON[p.c] + (p.n > 1 ? '<span style="font-size:10px;font-weight:900;color:#fbbf24;">×' + p.n + '</span>' : '')
+        + '</div>'
+        + '<div class="chip-moves">'
+          + '<button class="chip-move" onclick="event.stopPropagation(); moveCmd(' + i + ', -1)"'
+            + (i === 0 ? ' disabled' : '') + ' title="Move earlier">‹</button>'
+          + '<button class="chip-move" onclick="event.stopPropagation(); moveCmd(' + i + ', 1)"'
+            + (i === program.length - 1 ? ' disabled' : '') + ' title="Move later">›</button>'
+        + '</div>'
+      + '</div>').join('')
     : '<div class="prog-hint">Add commands, then press RUN ▶</div>'
   const m = currentMaze()
   const label = activeStage && activeStage.repeats ? 'chip' : 'command'
