@@ -15,11 +15,14 @@ credited inline on the slide that uses it.
 | `circuit.jpg` | Computer circuit board close-up | Jon Sullivan | Public domain |
 | `padlock.jpg` | Padlock | Alyson Hurt | CC BY 2.0 |
 | `atm.jpg` | ATM interface | Moritz Platt | Public domain |
+| `html5.png` | HTML5 logo | W3C / Patio | CC BY 3.0 |
 
-`js.png`, `gear.jpg`, and `traffic.jpg` are copies of the same files already
-verified for Grade 7 (`../../grade7/images/`) — reused here because they
-fit Grade 8 chapters too (Web Story is real JS; functions and if/elif/else
-are the same underlying ideas in Python).
+`js.png`, `gear.jpg`, `traffic.jpg`, and `html5.png` are copies of the same
+files already verified for Grade 7 (`../../grade7/images/`) — reused here
+because they fit Grade 8 chapters too (Web Story is real JS; functions and
+if/elif/else are the same underlying ideas in Python; `web1` is students'
+first real `<h1>`/`<p>` tags, the same real HTML `html5.png` already
+illustrates in Grade 7).
 
 CC BY files (`python.png`, `padlock.jpg`) require attribution if
 redistributed further — the inline slide credit covers this for classroom

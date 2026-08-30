@@ -28,6 +28,169 @@ function md(s) {
 }
 
 const DECKS = {
+  web0: { emoji:'🌐', name:'What Is a Website?', sub:'Client/server, URLs, real browsers — no code yet, just the real parts',
+    stages:['Client & Server','Real Browsers & Devices'], boss:'Inspect a Real Page',
+    concepts:[
+      { h:'Browser vs. server — two genuinely different jobs', p:'A browser is the customer that asks for a page; a server is the kitchen that actually stores the files and sends them back — a real, physical machine somewhere, not just an app on your device.' },
+      { h:'A URL\'s parts each do a different job', p:'`https://` is the protocol — HOW to connect; `wikipedia.org` is the domain — the site\'s real address. Neither one is optional or interchangeable.' },
+      { h:'JavaScript and Java are genuinely different languages', p:'Despite the similar name, JavaScript (a web scripting language) and Java (a completely separate language) share nothing but a marketing-era name collision from the 1990s — a real, common point of confusion worth clearing up early.' },
+      { h:'HTML/CSS/JS as skeleton, paint, electricity', p:'HTML is a building\'s skeleton (structure), CSS is the paint (style), JS is the electricity (things that move and respond) — three separate real jobs, never one file doing all three.' },
+      { h:'BOSS — Page Source vs. Inspect, a real distinction', p:'Page Source shows the ORIGINAL html the server sent, unchanged; Inspect shows the page\'s LIVE current state, which JavaScript can have already changed — genuinely different views of the same page.' },
+    ],
+    realWorld: 'Every time a phone or laptop loads a webpage, it is genuinely acting as a client asking a real server (often thousands of miles away) for files — the same client/server split every professional web developer works with daily, not a simplification invented for class.',
+    discovery: 'Right-click → Inspect on three real websites you use. Find one heading, one button, one link, and one image in each site\'s Inspect view — notice the same handful of tags underneath every single site, no matter how different they look.' },
+  web1: { emoji:'🏷️', name:'Web Story — Your First Tags', sub:'A heading and a paragraph — real HTML, typed',
+    stages:['Heading + Paragraph'], boss:'Ship a Real Heading + Paragraph',
+    concepts:[
+      { h:'A real `<h1>` tag needs an opening AND closing half', p:'`<h1>My Page</h1>` — this is genuinely the first real HTML most students ever type, moving from a drag-and-drop "heading" block to the actual tag underneath it.' },
+      { h:'A page usually has exactly ONE heading', p:'Just like Grade 7\'s Story Studio taught with blocks, a real page almost always has one `<h1>` — the single thing that says what the whole page is about.' },
+      { h:'A `<p>` paragraph needs real, non-empty text', p:'An empty tag technically exists but says nothing — the checker genuinely verifies there is real text inside, not just that the tag is present.' },
+    ],
+    realWorld: 'Every real news homepage, blog post, or product page still starts with exactly these two tags — a heading naming the page, a paragraph saying something real. Minecraft\'s recipe book pages have the same shape: one item name (heading), one description (paragraph).',
+    image: { file: 'html5.png', caption: 'The real tag behind every heading you type from here on.', credit: 'HTML5 logo — W3C / Patio, CC BY 3.0, via Wikimedia Commons' },
+    discovery: 'Open a real website\'s Inspect panel and find its actual `<h1>` tag. Is there really only one on the page — or did the designer break that rule?' },
+  web2: { emoji:'🔗', name:'Web Story — More Tags', sub:'A link takes you elsewhere; a button does something here',
+    stages:['Link & Button'], boss:'Ship Heading + Paragraph + Link + Button',
+    concepts:[
+      { h:'A link needs an `href` — a real destination', p:'`<a href="https://example.com">Click here</a>` — a link missing its href is like a signpost with an arrow but no name on it, technically still a tag but useless to a real reader.' },
+      { h:'A link goes elsewhere; a button acts here', p:'This is the exact same distinction Grade 7\'s Story Studio 1 taught with blocks — now typed as real, separate tags, `<a>` vs `<button>`.' },
+      { h:'A button on its own does genuinely nothing yet', p:'`<button>` with no JavaScript attached simply sits there when clicked — that is expected and correct this week; real behaviour attaches to it later (Web Story project, Session 5-6).' },
+    ],
+    realWorld: 'Every "read more" link and "subscribe" button on a real news site is exactly these two tags, doing exactly these two different jobs, at real scale.',
+    discovery: 'Find a real webpage with both a link and a button close together. Click each — does the link genuinely take you elsewhere, while the button changes something on the SAME page?' },
+  web3: { emoji:'🎨', name:'Web Story — Colors & Shading', sub:'CSS — content vs. style, now with exact colors',
+    stages:['Background & Heading Color'], boss:'Style a Real Page Exactly',
+    concepts:[
+      { h:'CSS decides HOW a page looks, not WHAT is on it', p:'`body { background-color: #FFF7E6; }` and `h1 { color: #2F3B52; }` change appearance only — the actual HTML content (heading, paragraph) is completely untouched by either rule.' },
+      { h:'An EXACT hex color, checked precisely', p:'The checker compares the browser\'s own computed style — `getComputedStyle` normalizes any hex color to an exact `rgb(...)` value, so "close enough" genuinely is not close enough; `#FFF7E6` must become exactly `rgb(255, 247, 230)`.' },
+      { h:'A rule can target just ONE kind of element', p:'`h1 { color: ... }` only touches headings — paragraphs keep whatever color they already had, a targeted rule rather than a blanket one.' },
+    ],
+    realWorld: 'Every real website\'s consistent brand colors (the exact blue on every Facebook button, the exact red on every YouTube icon) are hex values set in CSS exactly like this — designers hand developers precise hex codes, not "kind of blue".',
+    discovery: 'Open Inspect on a real site and find one exact hex color it uses for text or background. Would you have guessed that exact code just by looking at it?' },
+  web4: { emoji:'🧩', name:'Web Story — Structure + Style, Together', sub:'Checkpoint — everything from Weeks 2-4, combined',
+    stages:['BOSS — The Warm-Up Page'], boss:'The Warm-Up Page',
+    concepts:[
+      { h:'A checkpoint asks for everything at once, not a subset', p:'Heading, paragraph, link, button, exact background `#FFF7E6`, exact heading color `#2F3B52` — nothing here is new; it is genuinely just Weeks 2-4 combined onto one real page.' },
+      { h:'HTML and CSS can be written in any order', p:'Unlike some things in code, CSS applies no matter when it was written relative to the HTML it targets — style the page first or structure it first, the rendered result is identical.' },
+    ],
+    realWorld: 'Every real website is built this same way — structure and style, developed somewhat independently, then combined into one shipped page.',
+    discovery: 'Before opening the platform: sketch on paper where your heading, paragraph, link, and button will sit, and what two exact colors they\'ll use — plan the checkpoint before typing it.' },
+  web5: { emoji:'💼', name:'Web Story — Build Your Portfolio', sub:'Multiple sections, consistent style, then real JS — one idea at a time',
+    stages:['Plan & Skeleton','Consistent Styling','One Button, One Change','A Variable the Click Updates'], boss:'Ship the Portfolio',
+    concepts:[
+      { h:'A real project needs at least TWO real sections', p:'Two separate headings, each followed by its own real paragraph — genuinely two sections, not one long page with two headings jammed in.' },
+      { h:'One CSS rule, applied everywhere at once', p:'`body { background-color: #FFF7E6; }` and `h1 { color: #2F3B52; }` apply to the WHOLE page automatically — however many sections exist, the same two rules cover all of them with zero repetition.' },
+      { h:'The FIRST real JavaScript idea: one click, one change', p:'`document.querySelector("button").addEventListener("click", function() {...})` — a real click handler that changes exactly one piece of text, the smallest possible genuine interactive behaviour.' },
+      { h:'The SECOND real JS idea: a variable the click updates', p:'`let clicks = 0;` declared OUTSIDE the handler survives between clicks; inside the handler, `clicks = clicks + 1;` then displaying it is the exact same "read, change, store back" pattern from every variable chapter before it.' },
+    ],
+    realWorld: 'A real portfolio site — multiple consistently-styled sections, a working button that updates a visible counter or reveals content — is genuinely the shape of thousands of real personal and professional sites online today.',
+    discovery: 'Look at a real portfolio or personal website online. Count its distinct sections. Does it have any button that changes a number or piece of text when clicked, the same as this project\'s click counter?' },
+  py1: { emoji:'🐍', name:'What Is Python? / Variables', sub:'A variable is still a named box — now with real, exact syntax',
+    stages:['About You, In Variables'], boss:'One Line, Three Variables',
+    concepts:[
+      { h:'A variable is still a named box — just typed now', p:'`name = "Alex"` is exactly Grade 7\'s "set" block, just written with an `=` sign instead of snapped together — same idea, real Python syntax.' },
+      { h:'Text needs quotes; numbers don\'t', p:'`name = "Alex"` (text, in quotes) vs. `age = 13` (a number, no quotes) — mixing this up is a genuinely common first real Python bug.' },
+      { h:'BOSS — an f-string combines multiple variables in ONE print', p:'`print(f"My name is {name}, I am {age}, and I like {fav_thing}.")` — an f-string starts with `f` before the quotes, and drops variables directly inside `{}` without needing separate print calls or `+` concatenation.' },
+    ],
+    realWorld: 'Every real sign-up form storing your name, age, and a preference as separate named fields is doing exactly this — three named boxes, combined into one readable message on a confirmation screen.',
+    image: { file: 'python.png', caption: 'The real language behind every variable from here on.', credit: 'Python logo, CC BY 2.5, via Wikimedia Commons' },
+    discovery: 'Write your own name, age, and a favourite thing as three real Python variables on paper. Then write the ONE f-string that would combine all three into a single readable sentence.' },
+  py2: { emoji:'🔀', name:'If/Else', sub:'Decisions in real code — one comparison operator this week: ==',
+    stages:['Odd or Even'], boss:'Hot or Not',
+    concepts:[
+      { h:'`%` gives what\'s LEFT OVER after dividing', p:'`number % 2` is 0 for even numbers, 1 for odd — the exact same MOD idea from Grade 7\'s blocks, now written as a real operator.' },
+      { h:'Real syntax: a colon, then indentation', p:'`if number % 2 == 0:` followed by an indented `print("Even")` is exactly what Grade 7\'s if/else BLOCKS actually compiled to underneath — the visual nesting becomes real indentation.' },
+      { h:'BOSS — a different comparison, `>`', p:'`if temperature > 25:` — swapping `==` for `>` handles a whole RANGE of values rather than one exact match, the same shape of decision applied to a genuinely different kind of question.' },
+    ],
+    realWorld: 'Every real app checking "is this number even" (splitting a bill, alternating row colors in a table) or "is this value above a threshold" (a thermostat, a speed-limit warning) runs exactly this if/else shape.',
+    image: { file: 'traffic.jpg', caption: 'A real branch, decided by a condition — the same if/else idea from this chapter.', credit: 'LED traffic lights, public domain (PD-self), via Wikimedia Commons' },
+    discovery: 'Before typing anything: will `10 % 2` be 0 or 1? Will `7 % 2`? Write both guesses down, then check them against the actual rule this chapter teaches.' },
+  py3: { emoji:'🔁', name:'For Loops', sub:'range() — and the "second number is exclusive" trap',
+    stages:['Count to Five'], boss:'Count 1 to 5, For Real',
+    concepts:[
+      { h:'`range(5)` stops BEFORE 5', p:'`range(5)` produces 0, 1, 2, 3, 4 — five numbers total, but the number 5 itself is never reached. This exact trap catches nearly every student the first time.' },
+      { h:'`range(start, stop)` — stop is still exclusive', p:'`range(1, 6)` starts at 1 and stops before 6 — landing exactly on 5 as the last number actually printed. To include N, the stop argument must be N+1.' },
+      { h:'BOSS — applying the same trap deliberately', p:'Printing 1 through 5 inclusive requires spotting that the stop number needs to be one MORE than the last number you actually want.' },
+    ],
+    realWorld: 'This exact "off-by-one" mistake (using `range(1,10)` when you meant to include 10) is a genuinely common real bug that professional developers still make — not just a beginner trap.',
+    discovery: 'Before running anything: does `range(1, 11)` include the number 11? Write your answer down first, then check it — most people guess wrong the first time.' },
+  py4: { emoji:'⏳', name:'While Loops', sub:'For = exact count. While = until a condition changes.',
+    stages:['Countdown'], boss:'Countdown by 25s',
+    concepts:[
+      { h:'`for` is for a KNOWN count; `while` is for UNKNOWN', p:'A `for` loop is right when you know exactly how many times in advance; a `while` loop keeps going for as long as a condition stays true — right when you don\'t know the count ahead of time.' },
+      { h:'A while loop MUST change its own condition', p:'`while count > 0:` paired with `count = count - 1` inside the loop — skip the decrement and the loop genuinely never stops, a real and common bug.' },
+      { h:'BOSS — the same shape, a bigger step', p:'`health = health - 25` each pass, `while health > 0:` as the condition — identical structure to the countdown, just counting down by a different amount toward a real "Game Over" message.' },
+    ],
+    realWorld: 'A real video game health bar counting down by fixed damage amounts, or a countdown timer before a rocket launch, are both genuinely `while`-loop shaped — repeat until a condition (health, or the countdown itself) changes to false.',
+    discovery: 'Think of something you do "until" a condition changes, not a fixed number of times (eating until full, walking until you arrive). What is the condition, and what changes it each "pass"?' },
+  py5: { emoji:'📋', name:'Lists', sub:'Storing many things under one name — index and .append() only',
+    stages:['Your First List'], boss:'Three Items, One List',
+    concepts:[
+      { h:'A list holds MANY things under one name', p:'A direct comparison to Grade 7\'s arrays — `inventory = []` starts empty, ready to hold as many items as needed.' },
+      { h:'`.append()` adds to the END', p:'`inventory.append("sword")` genuinely adds a new item after the list already exists — the list grows one call at a time.' },
+      { h:'Indexing starts at 0, not 1', p:'`inventory[0]` reads the FIRST item ever added; the THIRD item added sits at index 2, not 3 — an off-by-one trap just like `range()`\'s.' },
+    ],
+    realWorld: 'Every shopping cart, playlist, or to-do list app stores its items in exactly this shape — an ordered list that grows one `.append()`-equivalent call at a time, read back by position.',
+    discovery: 'Add three real items to a list on paper (write them in order). Which index number is the SECOND item you added? Is it 1 or 2 — and why?' },
+  adv: { emoji:'🗺️', name:'Build a Text Adventure', sub:'Rooms (if/elif), an inventory (lists), a loop that keeps it running',
+    stages:['The First Room','Pick Up an Item','The Turn Loop'], boss:'One Complete Adventure',
+    concepts:[
+      { h:'if/elif/else branches a story on a real choice', p:'`if choice == "left": ... elif choice == "right": ... else: ...` — three genuinely different paths from ONE variable, exactly Grade 7\'s branching-story idea in real Python syntax.' },
+      { h:'An inventory that GROWS as the story plays', p:'`inventory = []` starts empty; each room branch calls `.append()` with that room\'s specific item — the SAME list ends up holding whatever the player actually picked up, not a fixed pre-written set.' },
+      { h:'A while loop wraps the whole adventure', p:'`while not game_over:` keeps the story running turn after turn until a condition (`game_over = True`, set after 3 turns) ends it — the loop must change its own condition, same rule as every while loop before it.' },
+      { h:'BOSS — branching, a growing list, and a loop, together', p:'A real playable text adventure needs genuinely all three: rooms that branch, an inventory that grows from real choices, and a turn loop controlling when it ends.' },
+    ],
+    realWorld: 'Every real text adventure (Zork and its descendants) and every branching dialogue system in a modern RPG is built from exactly these three ideas — if/elif branching, a growing inventory list, and a loop controlling how long play continues.',
+    discovery: 'Sketch your own text adventure\'s first two rooms on paper: what choice branches them, and what item does each room give the player? You\'ve just designed the if/elif structure before writing a line of it.' },
+  cc1: { emoji:'⚔️', name:'Health & Attack Basics', sub:'A battle needs a health variable, an attack value, and arithmetic',
+    stages:['Take a Hit'], boss:'Take a Hit',
+    concepts:[
+      { h:'Health is just a variable that goes DOWN', p:'`health = health - attack_value` — the exact same "read, subtract, store back" arithmetic from every earlier chapter, now genuinely meaning something inside a battle.' },
+      { h:'An attack is a fixed value, subtracted once per hit', p:'`attack_value = 15` is a plain number — the same value subtracted from health however many times an attack lands, no special "combat" syntax needed.' },
+    ],
+    realWorld: 'Every RPG\'s damage calculation, at its core, really is exactly this line of arithmetic — a health number decreasing by an attack number, dressed up with animations and sound.',
+    discovery: 'Pick a real game\'s starting health and a typical hit\'s damage (or estimate one). How many hits would it genuinely take to reach 0 using just subtraction?' },
+  cc2: { emoji:'🏳️', name:'Win/Lose Conditions', sub:'if/else checks whether health has reached 0 or below',
+    stages:['Game Over?'], boss:'Game Over?',
+    concepts:[
+      { h:'`<=` catches EXACTLY 0, not just below it', p:'`if health <= 0:` — using `<` instead would wrongly treat health of exactly 0 as still "alive", a genuine off-by-one bug in a real battle system.' },
+      { h:'Every branch needs its own outcome', p:'The `else` branch needs its own `print()` too — one message for losing, a different one for still fighting, never left blank.' },
+    ],
+    realWorld: 'Every real game\'s "you lose" check is exactly this — an inclusive `<= 0` comparison, because reaching exactly zero health should genuinely count as defeated, not a special edge case that slips through.',
+    discovery: 'If health reaches EXACTLY 0, should that count as a loss? Most people say yes immediately — but `health < 0` would actually say no. Which operator does the job correctly?' },
+  cc3: { emoji:'🔁', name:'The Battle Loop', sub:'Turns continue until someone wins — same while-loop idea as before',
+    stages:['Keep Fighting'], boss:'Keep Fighting',
+    concepts:[
+      { h:'A battle is a while loop wearing combat clothes', p:'`while health > 0:` is the exact same "unknown count, until a condition changes" idea from Semester 2\'s while loops — now controlling how many turns a fight lasts.' },
+      { h:'The loop must still change its own condition', p:'`health = health - 10` inside the loop is what eventually makes `health > 0` false — skip it, and the battle genuinely never ends.' },
+    ],
+    realWorld: 'Every turn-based RPG battle (Pokémon, Final Fantasy) runs on exactly this loop shape underneath — repeat combat turns while both sides remain above 0 health.',
+    discovery: 'Watch or recall a turn-based game battle. Roughly how many turns did it take? What "while" condition do you think stopped it — and could you have predicted the turn count in advance, or only find out by playing?' },
+  cc4: { emoji:'👹', name:'Tracking the Enemy', sub:'A second, independent set of variables — the enemy\'s own health and attack',
+    stages:['The Enemy Strikes Back'], boss:'The Enemy Strikes Back',
+    concepts:[
+      { h:'Two independent characters need two independent sets of variables', p:'`player_health`, `enemy_health`, `enemy_attack` — separate variables tracking separate things, the exact same "multiple independent pieces of state" idea from the Text Adventure\'s inventory, applied to combat.' },
+      { h:'The SAME subtraction pattern, a different attacker', p:'`player_health = player_health - enemy_attack` — identical shape to Player attacking Enemy, just with the roles and variable names swapped.' },
+    ],
+    realWorld: 'Every real multiplayer or PvE game genuinely tracks each character\'s stats as separate, independent variables — one player\'s health dropping never touches another character\'s completely separate health variable.',
+    discovery: 'In any 2-character battle you know (a boss fight, a PvP match), name the FOUR separate numbers being tracked (each side\'s health and attack). Are any of them ever mixed up, or genuinely kept independent?' },
+  cc5: { emoji:'🎯', name:'Bringing It Together', sub:'Checkpoint — health, attack, win/lose, and turns, as one system',
+    stages:['BOSS — Guided Mini-Battle'], boss:'Guided Mini-Battle',
+    concepts:[
+      { h:'A checkpoint combining cc1 through cc4, nothing new', p:'A health variable, an attack that reduces it, a while loop that keeps fighting while health is above 0, and a win/lose message once it ends — genuinely just assembly of ideas already learned.' },
+      { h:'The outcome check happens AFTER the loop ends', p:'`if health <= 0: print(...)` sits outside and after the `while` loop — checking the outcome only makes sense once the fighting has actually stopped.' },
+    ],
+    realWorld: 'This is genuinely the complete shape of the smallest possible real turn-based battle system — the same four pieces (state, change, loop, outcome) scale up to a full commercial RPG\'s combat engine.',
+    discovery: 'Before opening the platform: on paper, list the four separate pieces a mini-battle needs (a starting health, a way to reduce it, a loop, an outcome check) — in what order do they have to happen?' },
+  cc: { emoji:'🏆', name:'Ship a Combat Encounter', sub:'Player vs. enemy — health tracking for both, a turn loop, a clear outcome',
+    stages:['Two Fighters','The Turn Loop'], boss:'Ship the Battle',
+    concepts:[
+      { h:'Two independent reductions, one real turn', p:'`enemy_health = enemy_health - player_attack` then `player_health = player_health - enemy_attack` — both fighters act in the same turn, each reduction fully independent of the other.' },
+      { h:'`and` requires BOTH fighters still alive', p:'`while player_health > 0 and enemy_health > 0:` — the battle only continues while NEITHER side has been defeated yet; either one reaching 0 ends it immediately.' },
+      { h:'BOSS — zero functions, a complete playable battle', p:'Both fighters\' health, a turn loop, and a final `if/else` announcing the winner once the loop ends — a real, complete, playable encounter built from nothing but variables, loops, and if/else.' },
+    ],
+    realWorld: 'This is genuinely the same architecture behind the combat system of countless real shipped turn-based games — two independent health pools, a shared turn loop, and a clear win/lose message once it resolves.',
+    discovery: 'Design your own two fighters\' starting stats (health and attack) on paper. Roughly how many turns do you predict the battle will take? Was your prediction close once you actually ran it?' },
   ws1: { emoji:'📗', name:'Web Story 1 — Remembering the Reader', sub:'Arrays and objects — a story that tracks the reader\'s inventory and flags',
     stages:['Your First Array','Add to the Array','A Flag Object','Read One Item, Count Them All','Two Flags, One Decision'], boss:'Inventory & Flags Together',
     concepts:[
@@ -240,18 +403,29 @@ const DECKS = {
     discovery: 'Before opening the platform: what\'s ONE thing that could realistically go wrong with your data app (a missing file, an empty list, bad input)? Real developers plan for at least one of these before calling anything "finished".' },
 }
 
-const ORDER = ['ws1','ws2','ws3','ws4','ws5','m1','m2','m3','m4','m5','m6','m7','m8','cyber','m9w','m10']
+const ORDER = [
+  'web0','web1','web2','web3','web4','web5',
+  'ws1','ws2','ws3','ws4','ws5',
+  'py1','py2','py3','py4','py5','adv',
+  'm1','m2','m3','m4','m5','m6','m7','m8','cyber','m9w','m10',
+  'cc1','cc2','cc3','cc4','cc5','cc',
+]
 
-// Colorful, kid-friendly accent per arc — Web Story (real JS) vs.
-// App Builder (real Python) each read as a visually distinct "world".
+// Colorful, kid-friendly accent per arc — Web (real HTML/CSS/JS), Python
+// (Semester 2), App Builder (the older m*/cyber content), and Combat Coder
+// (Semester 3) each read as a visually distinct "world".
 const SECTION_COLOR = {
-  webstory: 'orange!85!red',   // ws*: warm orange (matches the story/web arc)
+  webstory: 'orange!85!red',   // ws*/web*: warm orange (matches the story/web arc)
+  python:   'blue!65!cyan',    // py*/adv: bright blue, distinct from web orange and appbuild green
   appbuild: 'green!55!teal',   // m*: green (matches Builder City's map accent)
   cyber:    'red!75!black',    // cyber: serious red, matching Grade 7's Security Lab
+  combat:   'red!45!black',    // cc*/cc: crimson, distinct from cyber's red — Combat Coder
 }
 function sectionFor(id) {
-  if (id.startsWith('ws')) return 'webstory'
+  if (id.startsWith('ws') || id.startsWith('web')) return 'webstory'
+  if (id.startsWith('py') || id === 'adv') return 'python'
   if (id === 'cyber') return 'cyber'
+  if (id.startsWith('cc')) return 'combat'
   return 'appbuild'
 }
 

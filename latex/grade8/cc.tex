@@ -1,0 +1,82 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{title}{fg=white,bg=red!45!black}
+\setbeamercolor{frametitle}{fg=white,bg=red!45!black}
+\setbeamercolor{block title}{bg=red!45!black!20,fg=black}
+\setbeamercolor{block body}{bg=red!45!black!8,fg=black}
+\setbeamercolor{item}{fg=red!45!black}
+\setbeamercolor{itemize item}{fg=red!45!black}
+\setbeamertemplate{itemize item}[triangle]
+
+\title{Ship a Combat Encounter}
+\subtitle{Player vs. enemy — health tracking for both, a turn loop, a clear outcome}
+\author{ByteForge --- Grade 8 --- App Builder}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Today's Plan}
+    \begin{itemize}
+        \item Two Fighters
+        \item The Turn Loop
+        \item[$\bigstar$] BOSS --- Ship the Battle
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Two independent reductions, one real turn}
+    \large
+    \begin{itemize}
+        \item \texttt{enemy\_health = enemy\_health - player\_attack} then \texttt{player\_health = player\_health - enemy\_attack}
+        \item Both fighters act in the same turn, each reduction fully independent of the other.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{\texttt{and} requires BOTH fighters still alive}
+    \large
+    \begin{itemize}
+        \item \texttt{while player\_health > 0 and enemy\_health > 0:}
+        \item The battle only continues while NEITHER side has been defeated yet; either one reaching 0 ends it immediately.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{BOSS — zero functions, a complete playable battle}
+    \large
+    \begin{itemize}
+        \item Both fighters' health, a turn loop, and a final \texttt{if/else} announcing the winner once the loop ends
+        \item A real, complete, playable encounter built from nothing but variables, loops, and if/else.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item This is genuinely the same architecture behind the combat system of countless real shipped turn-based games
+        \item Two independent health pools, a shared turn loop, and a clear win/lose message once it resolves.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Let Them Discover}
+    \Large
+    Design your own two fighters' starting stats (health and attack) on paper. Roughly how many turns do you predict the battle will take? Was your prediction close once you actually ran it?
+\end{frame}
+
+\begin{frame}{Your Turn}
+    \Large
+    Open the student map, find \textbf{Ship a Combat Encounter}, and work through it
+    hands-on --- everything you just saw, they now do themselves.
+\end{frame}
+
+\end{document}

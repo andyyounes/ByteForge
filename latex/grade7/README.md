@@ -1,6 +1,6 @@
 # Grade 7 — Teacher Presentations (LaTeX/Beamer)
 
-One Beamer deck per Game Maker chapter (20 total), meant to be presented by
+One Beamer deck per Grade 7 chapter (26 total), meant to be presented by
 the teacher for ~8-10 minutes before students open `grade7.html` and start
 the hands-on practice. This is a teacher-only tool — none of this content
 (images, real-world examples, discovery prompts) is duplicated into the
@@ -13,9 +13,11 @@ that script's `DECKS` object and re-run:
 node scripts/build-grade7-latex.mjs
 ```
 
-The 20 chapters, in teaching order: `st1`-`st5` (Story Studio), `sc1`-`sc5`
-(Block Arcade), `g1`-`g10` (Game Maker proper — note `g7w`/`g9w`, not
-`g7`/`g9`, matching the ids used in `grade7.html` itself).
+The 26 chapters, in teaching order: `cb1`-`cb6` (Computer Basics / Digital
+Citizenship — added when the platform's curriculum grew this unit),
+`st1`-`st5` (Story Studio), `sc1`-`sc5` (Block Arcade), `g1`-`g10` (Game
+Maker proper — note `g7w`/`g9w`, not `g7`/`g9`, matching the ids used in
+`grade7.html` itself).
 
 ## Compiling
 
@@ -55,7 +57,7 @@ Each chapter compiles independently. Files reference images as
    to open discussion, including real Minecraft ties where they genuinely
    fit (F3 coordinates, the `/function` command, mob AI chase/patrol,
    redstone logic gates, hunger/health bars, crafting-recipe parameters).
-5. **Image** (13 of 20 chapters) — a real, downloaded, verified, credited
+5. **Image** (14 of 26 chapters) — a real, downloaded, verified, credited
    photo (Wikimedia Commons) — see "Images, not videos" below. No
    "suggested video" slide anywhere in these decks.
 6. **Let Them Discover** — one or more open-ended prompts/mini-activities
@@ -78,11 +80,13 @@ layout, matching Grade 9's per-section theme.
 ## Images, not videos
 
 Per explicit instruction, there is no "suggested video" slide anywhere in
-these decks. 13 of the 20 chapters instead have a real, downloaded,
+these decks. 14 of the 26 chapters instead have a real, downloaded,
 verified, credited image (Wikimedia Commons) — see `images/CREDITS.md` for
-the full author/license table. The other 7 chapters (`st5`, `sc1`, `sc5`,
-`g1`, `g2`, `g9w`, `g10`) rely on their existing TikZ diagram or (for `g1`)
-the live coordinate-cursor tool instead of a forced, weakly-fitting photo.
+the full author/license table. `cb4` reuses Grade 8's already-credited
+`padlock.jpg`. The other 12 chapters (`cb1`, `cb2`, `cb3`, `cb5`, `cb6`,
+`st5`, `sc1`, `sc5`, `g1`, `g2`, `g9w`, `g10`) rely on their existing TikZ
+diagram, judgment-call content, or (for `g1`) the live coordinate-cursor
+tool instead of a forced, weakly-fitting photo.
 
 Every image was verified before use: fetched via Wikimedia's
 `Special:FilePath` redirect (confirms the file genuinely exists), checked

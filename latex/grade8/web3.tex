@@ -1,0 +1,81 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{title}{fg=white,bg=orange!85!red}
+\setbeamercolor{frametitle}{fg=white,bg=orange!85!red}
+\setbeamercolor{block title}{bg=orange!85!red!20,fg=black}
+\setbeamercolor{block body}{bg=orange!85!red!8,fg=black}
+\setbeamercolor{item}{fg=orange!85!red}
+\setbeamercolor{itemize item}{fg=orange!85!red}
+\setbeamertemplate{itemize item}[triangle]
+
+\title{Web Story — Colors \& Shading}
+\subtitle{CSS — content vs. style, now with exact colors}
+\author{ByteForge --- Grade 8 --- App Builder}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Today's Plan}
+    \begin{itemize}
+        \item Background \& Heading Color
+        \item[$\bigstar$] BOSS --- Style a Real Page Exactly
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{CSS decides HOW a page looks, not WHAT is on it}
+    \large
+    \begin{itemize}
+        \item \texttt{body \{ background-color: \#FFF7E6; \}} and \texttt{h1 \{ color: \#2F3B52; \}} change appearance only
+        \item The actual HTML content (heading, paragraph) is completely untouched by either rule.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{An EXACT hex color, checked precisely}
+    \large
+    \begin{itemize}
+        \item The checker compares the browser's own computed style
+        \item \texttt{getComputedStyle} normalizes any hex color to an exact \texttt{rgb(...)} value, so "close enough" genuinely is not close enough; \texttt{\#FFF7E6} must become exactly \texttt{rgb(255, 247, 230)}.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{A rule can target just ONE kind of element}
+    \large
+    \begin{itemize}
+        \item \texttt{h1 \{ color: ... \}} only touches headings
+        \item Paragraphs keep whatever color they already had, a targeted rule rather than a blanket one.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Real-World Examples}
+    \large
+    \begin{itemize}
+        \item Every real website's consistent brand colors (the exact blue on every Facebook button, the exact red on every YouTube icon) are hex values set in CSS exactly like this
+        \item Designers hand developers precise hex codes, not "kind of blue".
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Let Them Discover}
+    \Large
+    Open Inspect on a real site and find one exact hex color it uses for text or background. Would you have guessed that exact code just by looking at it?
+\end{frame}
+
+\begin{frame}{Your Turn}
+    \Large
+    Open the student map, find \textbf{Web Story — Colors \& Shading}, and work through it
+    hands-on --- everything you just saw, they now do themselves.
+\end{frame}
+
+\end{document}

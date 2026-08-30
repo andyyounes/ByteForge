@@ -32,6 +32,65 @@ function md(s) {
 }
 
 const DECKS = {
+  cb1: { emoji:'🖥️', name:'Computer Basics 1 — What Is a Computer?', sub:'CPU, RAM, storage, input, output — no code yet, just the real parts',
+    stages:['Match the Parts','Fill In: CPU, RAM, Input','Fill In: Output & Storage'], boss:'Mixed Test',
+    concepts:[
+      { h:'The CPU is the "brain" — it carries out instructions', p:'Every real computer has a CPU doing this exact job, whether it\'s a phone, a laptop, or a games console — the part that actually executes instructions, one after another.' },
+      { h:'RAM is temporary — it clears when power turns off', p:'RAM holds whatever is running RIGHT NOW; turn the power off and it\'s genuinely gone. This is what makes an unsaved document actually disappear after a crash.' },
+      { h:'Storage keeps files even with the power off', p:'Unlike RAM, storage (a hard drive, an SSD) is genuinely still there after a full shutdown — it\'s why your files are still there the next time you turn a computer on.' },
+      { h:'Input devices send information IN; output devices send it OUT', p:'A keyboard and mouse send information TO the computer; a monitor sends information FROM the computer back to you — a real, simple, universal split every device fits into.' },
+    ],
+    realWorld: 'Every real computer, phone, or games console genuinely has all five of these parts, even when they\'re hidden inside a sealed case — a phone\'s CPU, RAM, and storage are just much smaller than a desktop\'s.',
+    discovery: 'Look at your own phone or a family computer. Can you name which part is doing the CPU\'s job, which is RAM, and which is storage — even though you can\'t actually see them?' },
+  cb2: { emoji:'🗂️', name:'Computer Basics 2 — Files & Storage', sub:'File extensions, folders, and what KB/MB/GB actually mean',
+    stages:['Know Your File Types'], boss:'File Types & Storage',
+    concepts:[
+      { h:'A file extension tells you what KIND of file it is', p:'`.jpg`/`.png` are images, `.mp3`/`.wav` are audio, `.docx` is a document, `.mp4` is video, `.exe` is a program you run — the three letters after the dot are a real, meaningful signal, not decoration.' },
+      { h:'KB, MB, GB — each about 1000x the last', p:'A kilobyte, a megabyte, a gigabyte — each unit is roughly a thousand times bigger than the one before it, the same scaling idea used for every real file size you\'ve ever seen on a device.' },
+      { h:'A folder is a container, not a file', p:'A folder groups files together but isn\'t itself a document, image, or program — a genuinely different kind of thing on a real file system.' },
+    ],
+    realWorld: 'Every real device you own sorts files by extension behind the scenes — tapping a `.jpg` opens a photo viewer, tapping a `.mp4` opens a video player, because the extension genuinely tells the operating system what kind of file it is.',
+    discovery: 'Open any real folder on a computer or phone (Downloads, Photos) and list 3 different file extensions you find. What kind of file does each one actually turn out to be?' },
+  cb3: { emoji:'🚨', name:'Computer Basics 3 — Spotting Scams', sub:'Real vs. fake — a message, judged, every time',
+    stages:['Too Good to Be True','A Real Message','Strangers Never Need Your Address','A Friend, Asking Normally'], boss:'A New One',
+    concepts:[
+      { h:'A surprise free prize is the #1 real scam sign', p:'"You\'ve won 10,000 free V-Bucks — click here!" — nobody gives away expensive prizes to random strangers who never entered anything; the free prize IS the bait, not a real gift.' },
+      { h:'Not every message is a scam', p:'"Your teacher has posted a new assignment, due Friday" has none of the real red flags — no prize, no urgency, no request for personal info — genuinely just a normal message.' },
+      { h:'A stranger from an online game has no real reason to need your address', p:'Being friendly in chat does not mean someone actually is who they say they are — asking for a real name, school, or home address is a genuine red flag, even from someone who seems nice.' },
+      { h:'A message from someone you actually know, asking normally, is not a scam', p:'"want to team up for the next match?" from a real friend has no red flags at all — judging every message the same way means also correctly recognizing the safe ones.' },
+    ],
+    realWorld: 'Phishing messages promising free prizes or gift cards are a genuine, extremely common real attack — not a hypothetical classroom example — costing real victims real money and account access every single day.',
+    discovery: 'Has anyone you know ever gotten a message promising something free in exchange for personal info? What made it feel suspicious — or did it NOT feel suspicious at first?' },
+  cb4: { emoji:'🎣', name:'Computer Basics 4 — Phishing & Fake Logins', sub:'A fake domain looks ALMOST right — spot the exact difference',
+    stages:['The Urgent Text','The Scary Email','Which One Is Real?','The "Free Skins" Trap'], boss:'A New One',
+    concepts:[
+      { h:'A lookalike domain swaps just one character', p:'"robl0x-verify.com" (a zero instead of an "o") looks right at a glance but is genuinely a different, fake domain — reading every character carefully is the only real defence.' },
+      { h:'Urgency is designed to stop you thinking it through', p:'"acts now!", "in 1 hour", "expires in 15 minutes" — real companies rarely demand instant action; urgency is a deliberate pressure tactic used to prevent careful reading.' },
+      { h:'A mismatched sender domain is a real, checkable fact', p:'An email claiming to be from PayPal but sent from "paypa1-security.com" is verifiably NOT PayPal\'s real domain — this is a fact you can check, not a guess.' },
+      { h:'A "free skins" login page exists to steal your real password', p:'Sites promising free game skins in exchange for "logging in with your real account" are built to capture your actual password the instant you type it — a genuinely common real scam aimed specifically at gamers.' },
+    ],
+    realWorld: 'Typosquatting (registering a domain one character off from a real one, like "robl0x" instead of "roblox") is a genuine, common real attack technique, not a hypothetical one — real attackers register these domains by the thousand.',
+    image: { file: 'padlock.jpg', caption: 'What a real password protects --- exactly what a fake login page is built to steal.', credit: 'Padlock — Alyson Hurt, CC BY 2.0, via Wikimedia Commons' },
+    discovery: 'Look closely at a real website address you trust. Could you design a lookalike version of it (swapping one letter for a similar-looking number)? Try writing one out on paper.' },
+  cb5: { emoji:'💬', name:'Computer Basics 5 — Prompt Generation', sub:'A specific prompt has 3 parts: a subject, a constraint, and a format',
+    stages:['A Vague Prompt','Make It Specific','What\'s Missing?'], boss:'Write One From Scratch',
+    concepts:[
+      { h:'A vague prompt gets a vague, generic result', p:'"get help writing about dogs" gives an AI almost nothing to work with — no length, no tone, no audience, no format — so the result is whatever the AI guesses you might want.' },
+      { h:'A specific prompt has exactly 3 real parts', p:'A subject (what you want), a constraint (length, tone, or audience), and a format (list, paragraph, or steps) — "Write a funny 3-sentence paragraph about why dogs are better than cats, for a 12-year-old" has genuinely all three.' },
+      { h:'"Make me a story" is missing all three parts at once', p:'No subject (a story about WHAT), no constraint (how long, what tone), no format (a poem? a paragraph? a list of scenes?) — identifying exactly what\'s missing is the real skill, not just noticing it\'s vague.' },
+    ],
+    realWorld: 'Every professional who works with AI tools daily writes prompts with exactly these three parts, deliberately — the difference between a vague prompt and a specific one is genuinely the difference between a useless first draft and a usable one.',
+    discovery: 'Take a vague request you might normally type into an AI tool ("help me plan a party"). Rewrite it with a real subject, constraint, and format — does the improved version already feel more likely to get you something useful?' },
+  cb6: { emoji:'🌐', name:'"Stay Smart Online" Guide', sub:'Three real AI-generated pieces, written and revised by you — a project, not a quiz',
+    stages:['Explain: What Is a Computer?','Explain: How to Spot a Scam','Write: About Yourself'], boss:'Combine Into One Guide',
+    concepts:[
+      { h:'A first AI answer is rarely the final one', p:'Reading the first generated result and judging whether it\'s too generic — then revising the prompt with a real subject/constraint/format and generating again — is genuinely how real prompt-writing works, not a one-shot process.' },
+      { h:'Revising a prompt is a real, repeatable skill', p:'Adding a constraint like "for a 12-year-old" or "in 3 sentences" to an already-decent prompt and regenerating is the same specific-prompt skill from CB5, applied to a real back-and-forth with an AI tool.' },
+      { h:'A generic AI answer about scams should be checked against real signs', p:'Does the chatbot\'s explanation of "how to spot a scam" actually match the same 4 real signs from CB3/CB4 (too good to be true, urgency, mismatched domain, request for personal info)? A real answer should hold up against real facts.' },
+      { h:'BOSS — assembling real content into one real page', p:'A heading and three genuine paragraphs, each holding your best (most recently revised) AI-generated piece — this is assembly of real work already done, not new content.' },
+    ],
+    realWorld: 'Professional writers, marketers, and developers now routinely draft with an AI tool, then revise and combine the results into a finished piece — exactly this project\'s workflow, just at a larger scale.',
+    discovery: 'Compare your FIRST generated answer to your LAST (most revised) one for any of the three pieces. What specifically changed in your prompt between them, and did it genuinely produce a better result?' },
   st1: { emoji:'📰', name:'Story Studio 1 — Page Basics', sub:'Headings, paragraphs, links, buttons — the tags every page starts with',
     stages:['Front Page','Say More','Chapter One','Read More','Call to Action'], boss:'Ship the Front Page',
     concepts:[
@@ -447,18 +506,21 @@ const DECKS = {
     discovery: 'Before opening the platform: sketch your game idea on paper — one sentence for "how do you win", and one sketch of what the screen looks like. Trade with a partner and ask: is the win condition actually checkable?' },
 }
 
-const ORDER = ['st1','st2','st3','st4','st5','sc1','sc2','sc3','sc4','sc5','g1','g2','g3','g4','g5','g6','g7w','g8','g9w','gsafe','g10']
+const ORDER = ['cb1','cb2','cb3','cb4','cb5','cb6','st1','st2','st3','st4','st5','sc1','sc2','sc3','sc4','sc5','g1','g2','g3','g4','g5','g6','g7w','g8','g9w','gsafe','g10']
 
 // Colorful, kid-friendly accent per arc of the course (same idea as
-// Grade 9's per-section theme) — Story Studio / Block Arcade / Game
-// Maker each read as a visually distinct "world" on top of Madrid.
+// Grade 9's per-section theme) — Computer Basics / Story Studio / Block
+// Arcade / Game Maker each read as a visually distinct "world" on top of
+// Madrid.
 const SECTION_COLOR = {
+  basics: 'teal!60!black',      // Computer Basics (cb*): steady teal, distinct from every other arc
   story:  'violet!70!purple',   // Story Studio (st*): playful purple
   arcade: 'orange!85!red',      // Block Arcade (sc*): arcade orange
   maker:  'blue!70!cyan',       // Game Maker proper (g*): bright blue
   safety: 'red!75!black',       // Security Lab (gsafe): serious red
 }
 function sectionFor(id) {
+  if (id.startsWith('cb')) return 'basics'
   if (id.startsWith('st')) return 'story'
   if (id.startsWith('sc')) return 'arcade'
   if (id.startsWith('gsafe')) return 'safety'
