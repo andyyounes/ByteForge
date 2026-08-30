@@ -37,6 +37,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/login?error=missing_auth_params`)
   }
 
+  // ── An explicit `next` target (reset-password, an invite link, etc.)
+  // always wins — skip the role/auto-placement logic below entirely and go
+  // straight there. That logic used to run unconditionally and its redirect
+  // at the end ignored `next` completely, so a real password-reset email
+  // link silently logged the user in and sent them to their dashboard,
+  // never to the "set new password" form. Checking `next` here (not `type`)
+  // because Supabase's PKCE code-exchange flow — what resetPasswordForEmail
+  // actually uses — carries the `next=/reset-password` query param straight
+  // through from the original redirectTo, but does NOT add its own `type`
+  // param (that only appears on the older token_hash/verifyOtp flow above).
+  if (redirectTo) {
+    return NextResponse.redirect(`${origin}${next}`)
+  }
+
   // ── Auth succeeded — determine where to send the user ────────────────────
   const { data: { user } } = await supabase.auth.getUser()
 
