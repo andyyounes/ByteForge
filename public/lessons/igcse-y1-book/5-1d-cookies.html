@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.1d Cookies — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; border: 1px solid rgba(255,255,255,.08); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #60a5fa; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 5 · The Internet &amp; Its Uses</span>
+  <div class="topic-title">5.1d Cookies</div>
+  <div class="topic-subtitle">Small (key, data) lookup tables that remember you between visits — and quietly track you too.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Cookie</div><div class="key-term-def">A small file/code stored on a user's computer by a web server, holding (key, data) pairs.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Session cookie</div><div class="key-term-def">Temporary, no expiry date, exists only until the browser/session closes.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Persistent cookie</div><div class="key-term-def">Stored on the hard drive until its expiry date or manual deletion — survives closing the browser.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What cookies are and do</h4>
+    <ul>
+      <li>Small files/code, sent by a web server, stored on the USER'S computer — effectively a small look-up table of (key, data) pairs, e.g. (surname, Jones), (music, rock).</li>
+      <li>On each visit, the site checks if it set a cookie before; if so, the browser reads it — holding preferences (language, currency, past browsing).</li>
+      <li>Allows user TRACKING, maintaining preferences, and CUSTOMISING the page per user (e.g. "customers who bought X also bought Y").</li>
+      <li>Any cookie with NO expiry date is automatically a SESSION cookie.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card">
+      <h5>Session cookies</h5>
+      <ul>
+        <li>Used e.g. for a virtual shopping basket</li>
+        <li>Stored in TEMPORARY memory</li>
+        <li>Doesn't collect info or personally identify the user</li>
+        <li>Ceases to exist once browser/session closes</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <h5>Persistent (permanent) cookies</h5>
+      <ul>
+        <li>Remembers LOGIN details (authenticates the browser)</li>
+        <li>Stored on the HARD DRIVE until expiry/manual deletion</li>
+        <li>Remains active even after browser/session closes</li>
+        <li>Removes the need to re-type login details every visit</li>
+        <li>Legitimate sites ENCRYPT personal info stored this way</li>
+        <li>Many countries legally require deactivation after 6 months (even before expiry)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why persistent cookies are efficient</h4>
+    <ul>
+      <li>Carries data between sessions/related websites WITHOUT storing massive amounts of data on the web server itself.</li>
+      <li>Without cookies, retrieving a user's data would require the user to LOG IN every single visit.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Summary of (persistent) cookie uses</h4>
+    <ul>
+      <li>Remember passwords/emails/invoice details (no re-entry needed).</li>
+      <li>Recognise returning users.</li>
+      <li>Save shopping basket/cart items.</li>
+      <li>Track internet habits/website history/favourites.</li>
+      <li>Target ADVERTISING matching past buying/browsing habits.</li>
+      <li>Store user preferences (customised pages).</li>
+      <li>Used in online financial transactions.</li>
+      <li>Save progress in online games/quizzes.</li>
+      <li>Let social networks recognise preferences/browsing history.</li>
+      <li>Automatically apply the right LANGUAGE on login.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — cookies.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What determines whether a cookie is automatically classed as a session cookie?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>If it has NO expiry date associated with it, the cookie is always considered a session cookie.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Give two real differences between session cookies and persistent cookies.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any two of: session cookies are stored in TEMPORARY memory (persistent are stored on the HARD DRIVE); session cookies disappear when the browser/session closes (persistent remain until expiry/deletion); session cookies don't personally identify the user (persistent typically DO, storing login details).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Legitimate websites always ______ personal information stored in a persistent cookie, to prevent unauthorised use by a ______ party.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>encrypt</strong>. Blank 2: <strong>third</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Persistent cookies can legally be kept active forever, as long as the website sets a very far-future expiry date." What real legal safeguard from this lesson contradicts this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Many countries have laws requiring persistent cookies to be DEACTIVATED after six months, even if their set expiry date hasn't been reached yet — a far-future expiry date does NOT override this legal requirement.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      An online shopping site wants shoppers to be able to add items to a basket during their visit, WITHOUT storing any personally identifiable information about them. Which type of cookie should they use for this feature, and why, based on this lesson's content?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A <strong>session cookie</strong>. The lesson explicitly gives virtual shopping baskets as a session cookie use case — it doesn't collect information from the user's computer or personally identify them, and disappears once the browser/session closes, exactly matching the requirement.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why are persistent cookies described as an efficient way to carry data between sessions?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because they remove the need to store massive amounts of user data directly on the web server — the data instead lives on the user's own computer, and without this, retrieving user data would require logging in every single visit.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 5: The Internet &amp; Its Uses — 5.1d Cookies (completes Section 5.1)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 5.1
+  </div>
+
+</div>
+</body>
+</html>
