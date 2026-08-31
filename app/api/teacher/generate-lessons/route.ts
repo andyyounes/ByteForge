@@ -45,7 +45,7 @@ Rules: 4-6 keyTerms, 3 questions, Cambridge style, [1] notation in ms.`
     method:  'POST',
     headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model:       'llama-3.1-8b-instant',
+      model:       'openai/gpt-oss-20b',
       messages:    [
         { role: 'system', content: systemPrompt },
         { role: 'user',   content: userPrompt },

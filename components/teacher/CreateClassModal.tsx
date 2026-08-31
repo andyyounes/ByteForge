@@ -23,7 +23,7 @@ function randomJoinCode() {
 // The student dashboard picks lesson content purely off the numeric `grade`
 // column, so a mismatch here silently shows the wrong grade's content to
 // every student in the class even though the teacher's own view looks right.
-function validGradesFor(classTypeId: string): string[] {
+export function validGradesFor(classTypeId: string): string[] {
   switch (classTypeId) {
     case 'grade6': return ['6']
     case 'grade7': return ['7']

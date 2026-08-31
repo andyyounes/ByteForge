@@ -3324,6 +3324,15 @@ function stepChallenge(delta) {
   if (next < 0 || next >= CHALLENGES.length) return
   const isLocked = next > 0 && !completed.has(next - 1) && !completed.has(next)
   if (isLocked) return
+  // Stepping FORWARD into a new world's first exercise shows that world's
+  // Lesson bubble first, rather than silently skipping straight past it —
+  // same reasoning as updateFooterNext(). Stepping backward always goes
+  // straight to the exercise (re-reading a lesson on the way back isn't
+  // useful, and the world's own map node still opens it on demand).
+  if (delta > 0 && CHALLENGES[next].mod !== CHALLENGES[activeIdx]?.mod) {
+    const world = WORLDS.find(w => w.id.toUpperCase() === CHALLENGES[next].mod)
+    if (world) { openWorldLesson(world.id); return }
+  }
   selectChallenge(next)
 }
 function toggleChallengeList() {
@@ -3448,13 +3457,24 @@ function renderWorldXPBar(world) {
     + '<div class="wxp-track"><div class="wxp-fill" style="width:' + pct + '%"></div></div>'
 }
 function updateFooterNext() {
-  _footerNextAction = () => stepChallenge(1)
   const btn = document.getElementById('ch-footer-next')
   if (!btn) return
   const isLast = activeIdx + 1 >= CHALLENGES.length
+  // Crossing into a NEW world's first exercise used to jump straight there,
+  // silently skipping that world's own Lesson bubble every time but the
+  // very first world — a student would never see World 2+'s theory unless
+  // they happened to click back to the map and open it manually. Now the
+  // "Next" step always surfaces that world's Lesson first when the world
+  // actually changes; the Lesson's own "Start Exercises →" button (wired in
+  // openWorldLesson) is what steps into the real first exercise after that.
+  const nextCh = CHALLENGES[activeIdx + 1]
+  const crossesWorld = nextCh && nextCh.mod !== CHALLENGES[activeIdx]?.mod
+  // stepChallenge(1) itself now detects the world-crossing case and opens
+  // that world's Lesson instead of the exercise — this just picks the label.
+  _footerNextAction = () => stepChallenge(1)
   if (completed.has(activeIdx)) {
     btn.disabled = false
-    btn.textContent = isLast ? '🎉 All done here!' : 'Next Challenge →'
+    btn.textContent = isLast ? '🎉 All done here!' : (crossesWorld ? '📘 Next Lesson →' : 'Next Challenge →')
     if (isLast) btn.disabled = true
   } else {
     btn.disabled = true

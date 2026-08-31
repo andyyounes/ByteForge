@@ -4049,7 +4049,7 @@ function doAISend(topicId, topicTitle) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: systemPrompt },
         ...chat.messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
@@ -4188,7 +4188,7 @@ async function aiSend(ctx, systemPrompt) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'openai/gpt-oss-20b',
         messages: [
           { role: 'system', content: systemPrompt },
           ...chat.messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
@@ -5308,7 +5308,7 @@ async function generateMorePractice() {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'openai/gpt-oss-20b',
         messages: [{
           role: 'system',
           content: 'You are a Cambridge AS Level Computer Science teacher. Return ONLY valid JSON, no markdown fences.'
@@ -5524,7 +5524,7 @@ function doP2AISend(ctx, systemPrompt) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: systemPrompt },
         ...chat.messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
@@ -7415,7 +7415,7 @@ Reply ONLY as valid JSON (no markdown fences): {"correct":true/false,"feedback":
 
     const res = await fetch('/api/ai-check', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[
+      body: JSON.stringify({ model:'openai/gpt-oss-120b', messages:[
         { role:'system', content:'You are a concise SQL tutor. Always reply with valid JSON only.' },
         { role:'user', content:prompt }
       ], temperature:0.3, max_tokens:220 })
@@ -7733,7 +7733,7 @@ async function pseudoLabAiCheck() {
     const taskText = ex.title + ': ' + ex.desc.replace(/<[^>]+>/g, ' ').replace(/\s+/g,' ').trim()
     const res = await fetch('/api/ai-check', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[
+      body: JSON.stringify({ model:'openai/gpt-oss-120b', messages:[
         { role:'system', content:'You are a concise Cambridge AS Level pseudocode tutor. Always reply with valid JSON only.' },
         { role:'user', content:'Task: ' + taskText + '\n\nStudent pseudocode:\n```\n' + code + '\n```\n\nReply ONLY as valid JSON: {"correct":true/false,"feedback":"1-2 sentences","tip":"one tip or null"}' }
       ], temperature:0.3, max_tokens:220 })
@@ -7880,7 +7880,7 @@ async function _bfwSend() {
   try {
     const res = await fetch('/api/ai-check', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [
+      body: JSON.stringify({ model: 'openai/gpt-oss-20b', messages: [
         { role: 'system', content: sys },
         ...chat.messages.slice(-10).map(function(m) { return { role: m.role, content: m.content } })
       ], max_tokens: 500 })

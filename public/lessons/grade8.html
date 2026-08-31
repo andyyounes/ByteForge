@@ -4107,6 +4107,14 @@ function renderNavStrip() {
 function stepChallenge(delta) {
   const next = activeIdx + delta
   if (next < 0 || next >= CHALLENGES.length) return
+  // Stepping FORWARD into a new module's first exercise shows that module's
+  // Lesson bubble first, rather than silently skipping straight past it —
+  // same fix as Grade 7's stepChallenge(). Backward always goes straight to
+  // the exercise.
+  if (delta > 0 && CHALLENGES[next].mod !== CHALLENGES[activeIdx]?.mod) {
+    const mod = MODULES.find(m => m.id.toUpperCase() === CHALLENGES[next].mod)
+    if (mod) { openModuleLesson(mod.id); return }
+  }
   selectChallenge(next)
 }
 function toggleChallengeList() {
@@ -4208,13 +4216,17 @@ function winList() {
 }
 
 function updateFooterNext() {
+  // stepChallenge(1) itself detects the module-crossing case and opens that
+  // module's Lesson instead of the exercise — this just picks the label.
   _footerNextAction = () => stepChallenge(1)
   const btn = document.getElementById('ch-footer-next')
   if (!btn) return
   const isLast = activeIdx + 1 >= CHALLENGES.length
+  const nextCh = CHALLENGES[activeIdx + 1]
+  const crossesModule = nextCh && nextCh.mod !== CHALLENGES[activeIdx]?.mod
   if (completed.has(activeIdx)) {
     btn.disabled = false
-    btn.textContent = isLast ? '🎉 All done here!' : 'Next Challenge →'
+    btn.textContent = isLast ? '🎉 All done here!' : (crossesModule ? '📘 Next Lesson →' : 'Next Challenge →')
     if (isLast) btn.disabled = true
   } else {
     btn.disabled = true

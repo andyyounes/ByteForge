@@ -28,8 +28,8 @@ function modelForType(type: ExerciseType): string {
   const heavy: ExerciseType[] = ['ide', 'pseudocode', 'algo-viz']
   // Use the larger model for code exercises, fast model for MC/short-answer
   return heavy.includes(type)
-    ? 'llama-3.3-70b-versatile'
-    : 'llama-3.1-8b-instant'
+    ? 'openai/gpt-oss-120b'
+    : 'openai/gpt-oss-20b'
 }
 
 // ── Shared JSON completion helper ─────────────────────────────────────────────
@@ -185,7 +185,7 @@ export async function generateConceptExercises(
   concept: Concept
 ): Promise<GeneratedExercise[]> {
   const groq  = getGroq()
-  const model = 'llama-3.3-70b-versatile'
+  const model = 'openai/gpt-oss-120b'
 
   const prompt = `
 Generate exactly 5 multiple-choice exercises for the ICT concept: "${concept.name}".
@@ -284,7 +284,7 @@ Return a JSON object with a "topics" array.
 `.trim()
 
   try {
-    const parsed = await jsonComplete(groq, 'llama-3.1-8b-instant', prompt) as Record<string, unknown>
+    const parsed = await jsonComplete(groq, 'openai/gpt-oss-20b', prompt) as Record<string, unknown>
     const arr = Array.isArray(parsed) ? parsed : (parsed.topics as unknown[]) ?? []
     return arr as Array<{ name: string; description: string }>
   } catch {

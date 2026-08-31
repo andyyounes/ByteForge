@@ -25,7 +25,7 @@ async function callGroq(prompt: string, attempt = 0): Promise<string> {
     method:  'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model:       'llama-3.1-8b-instant',
+      model:       'openai/gpt-oss-20b',
       messages: [
         {
           role:    'system',

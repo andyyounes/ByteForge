@@ -3667,7 +3667,7 @@ function doAISend(topicId, topicTitle) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: systemPrompt },
         ...chat.messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
@@ -3780,7 +3780,7 @@ async function aiSend(ctx, systemPrompt) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'openai/gpt-oss-20b',
         messages: [
           { role: 'system', content: systemPrompt },
           ...chat.messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
@@ -5177,7 +5177,7 @@ async function generateMorePractice() {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'openai/gpt-oss-20b',
         messages: [{
           role: 'system',
           content: 'You are a Cambridge AS Level Computer Science teacher. Return ONLY valid JSON, no markdown fences.'
@@ -6063,7 +6063,7 @@ async function pseudoLabAiCheck() {
       : 'Freeform code review — no fixed task.'
     const res = await fetch('/api/ai-check', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages:[
+      body: JSON.stringify({ model:'openai/gpt-oss-120b', messages:[
         { role:'system', content:'You are a strict but encouraging Cambridge A Level (9618) computer science examiner. Always reply with valid JSON only.' },
         { role:'user', content: task + '\n\nStudent ' + AL_LANGS[alLab.lang] + ' code:\n```\n' + code + '\n```\n\nDoes this code correctly solve the task (would it produce exactly the expected output)? Reply ONLY as valid JSON: {"correct":true/false,"feedback":"1-2 sentences","tip":"one concrete improvement or null"}' }
       ], temperature:0.2, max_tokens:220 })
@@ -6696,7 +6696,7 @@ function doP2AISend(ctx, systemPrompt) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: systemPrompt },
         ...chat.messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
@@ -7122,7 +7122,7 @@ async function _bfwSend() {
   try {
     const res = await fetch('/api/ai-check', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [
+      body: JSON.stringify({ model: 'openai/gpt-oss-20b', messages: [
         { role: 'system', content: sys },
         ...chat.messages.slice(-10).map(function(m) { return { role: m.role, content: m.content } })
       ], max_tokens: 500 })

@@ -21,6 +21,8 @@ import {
   FlameIcon, ArrowRightIcon,
 } from '@/components/ui/Icons'
 import type { ClassType, SyllabusUnit } from '@/lib/class-types'
+import { CLASS_TYPES } from '@/lib/class-types'
+import { validGradesFor } from '@/components/teacher/CreateClassModal'
 import type { Profile, ConceptMastery, Topic } from '@/types'
 
 interface StudentData {
@@ -755,17 +757,42 @@ function ExercisesTab({ cls, classType, topics, draftExercises, teacherId }: {
 // ── Settings Tab ──────────────────────────────────────────────────────────────
 
 function SettingsTab({ cls, classType, onInvite }: {
-  cls:       { id: string; name: string; join_code: string; description: string; auto_accept?: boolean }
+  cls:       { id: string; name: string; join_code: string; description: string; auto_accept?: boolean; level?: string; grade?: string }
   classType: ClassType
   onInvite:  () => void
 }) {
   const { toast }    = useToast()
   const { supabase } = useSupabase()
+  const router       = useRouter()
   const appUrl    = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
   const joinUrl   = `${appUrl}/join?code=${cls.join_code}`
 
   const [autoAccept, setAutoAccept] = useState(cls.auto_accept ?? false)
   const [savingAA,   setSavingAA]   = useState(false)
+
+  // Editable name + type — previously the only way to fix a mislabeled class
+  // (e.g. one that ended up with level='general' instead of the intended
+  // curriculum type, showing a plain "General" badge and none of that
+  // curriculum's teacher tools) was direct database access.
+  const [editing,   setEditing]   = useState(false)
+  const [editName,  setEditName]  = useState(cls.name)
+  const [editLevel, setEditLevel] = useState(cls.level ?? 'general')
+  const [savingInfo, setSavingInfo] = useState(false)
+
+  async function saveClassInfo() {
+    if (!editName.trim()) { toast.error('Class name cannot be empty'); return }
+    setSavingInfo(true)
+    const newGrade = validGradesFor(editLevel)[0]
+    const { error } = await supabase
+      .from('classes')
+      .update({ name: editName.trim(), level: editLevel, grade: newGrade })
+      .eq('id', cls.id)
+    setSavingInfo(false)
+    if (error) { toast.error(error.message); return }
+    toast.info('Class updated')
+    setEditing(false)
+    router.refresh()
+  }
 
   async function toggleAutoAccept() {
     const next = !autoAccept
@@ -845,27 +872,71 @@ function SettingsTab({ cls, classType, onInvite }: {
 
       {/* Class info */}
       <Card>
-        <CardTitle className="mb-4">Class Info</CardTitle>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-fg-dim">Name</span>
-            <span className="text-fg font-medium">{cls.name}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-fg-dim">Type</span>
-            <span className="font-medium" style={{ color: classType.color }}>{classType.label}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-fg-dim">Grade range</span>
-            <span className="text-fg">{classType.gradeRange}</span>
-          </div>
-          {cls.description && (
-            <div>
-              <span className="text-fg-dim block mb-1">Description</span>
-              <span className="text-fg">{cls.description}</span>
-            </div>
+        <div className="flex items-center justify-between mb-4">
+          <CardTitle>Class Info</CardTitle>
+          {!editing && (
+            <button
+              onClick={() => { setEditName(cls.name); setEditLevel(cls.level ?? 'general'); setEditing(true) }}
+              className="text-xs font-semibold text-accent hover:opacity-80 transition-opacity"
+            >
+              ✏️ Edit
+            </button>
           )}
         </div>
+
+        {editing ? (
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs text-fg-dim mb-1">Name</label>
+              <input
+                value={editName} onChange={e => setEditName(e.target.value)}
+                className="w-full h-9 px-3 rounded-md bg-s2 border border-b2 text-fg text-sm focus:border-accent focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-fg-dim mb-1">Type</label>
+              <select
+                value={editLevel} onChange={e => setEditLevel(e.target.value)}
+                className="w-full h-9 px-3 rounded-md bg-s2 border border-b2 text-fg text-sm focus:border-accent focus:outline-none"
+              >
+                {CLASS_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+              </select>
+              <p className="text-[11px] text-fg-faint mt-1">
+                Changing this updates the grade/year students in this class see content for.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={saveClassInfo} loading={savingInfo}>Save</Button>
+              <button
+                onClick={() => setEditing(false)}
+                className="px-4 rounded-md border border-b2 text-fg-dim text-sm hover:text-fg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-fg-dim">Name</span>
+              <span className="text-fg font-medium">{cls.name}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-fg-dim">Type</span>
+              <span className="font-medium" style={{ color: classType.color }}>{classType.label}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-fg-dim">Grade range</span>
+              <span className="text-fg">{classType.gradeRange}</span>
+            </div>
+            {cls.description && (
+              <div>
+                <span className="text-fg-dim block mb-1">Description</span>
+                <span className="text-fg">{cls.description}</span>
+              </div>
+            )}
+          </div>
+        )}
       </Card>
     </div>
   )
