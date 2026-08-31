@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.3b Hard Disk Drives — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.3b Secondary Storage: Hard Disk Drives</div>
+  <div class="topic-subtitle">Spinning platters, read-write heads, latency, and fragmentation — the mechanics behind the classic HDD.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Platter</div><div class="key-term-def">A spinning magnetic disk inside an HDD where data is physically stored.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Read-write head</div><div class="key-term-def">An electromagnet that reads/writes data on the platter surface.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Latency</div><div class="key-term-def">The time taken for a specific block of data to rotate around to the read-write head.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Fragmentation</div><div class="key-term-def">Sectors of a file scattered non-adjacently across the disk, gradually slowing access over time.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What's inside an HDD</h4>
+    <ul>
+      <li>Data is stored digitally on magnetic <b>platters</b>, which can spin at up to about 7,000 times a MINUTE (the book's figure of "7000 times a second" describes rotational speed context — platters can be aluminium, glass, or ceramic).</li>
+      <li><b>Read-write heads</b> (electromagnets) read/write data — they can move from the disk's centre to its edge and back up to 50 times a second.</li>
+      <li>Each platter usually has TWO usable surfaces. Data is organised into <b>sectors</b> and <b>tracks</b> — a sector on a given track holds a fixed number of bytes.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="90" fill="none" stroke="#4b5563" stroke-width="1"/>
+      <circle cx="100" cy="100" r="70" fill="none" stroke="#60a5fa" stroke-width="1"/>
+      <circle cx="100" cy="100" r="50" fill="none" stroke="#60a5fa" stroke-width="1"/>
+      <circle cx="100" cy="100" r="30" fill="none" stroke="#4b5563" stroke-width="1"/>
+      <line x1="100" y1="10" x2="100" y2="190" stroke="#e879f9" stroke-width="0.5" stroke-dasharray="2,4"/>
+      <line x1="10" y1="100" x2="190" y2="100" stroke="#e879f9" stroke-width="0.5" stroke-dasharray="2,4"/>
+      <line x1="100" y1="100" x2="167" y2="55" stroke="#e879f9" stroke-width="0.5" stroke-dasharray="2,4"/>
+      <line x1="100" y1="100" x2="33" y2="145" stroke="#e879f9" stroke-width="0.5" stroke-dasharray="2,4"/>
+      <text x="100" y="103" text-anchor="middle" fill="#6b7280" font-size="8" font-family="system-ui">spindle</text>
+      <rect x="140" y="30" width="30" height="6" fill="#b8ef4a" transform="rotate(30 155 33)"/>
+      <text x="180" y="30" fill="#b8ef4a" font-size="8" font-family="system-ui">head</text>
+    </svg>
+    <div class="diagram-caption">Concentric TRACKS on the platter, each divided into SECTORS — the read-write head moves radially to reach the right track, then waits for the right sector to rotate underneath.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Latency and slow access</h4>
+    <ul>
+      <li>HDDs have much slower data access than RAM. <b>Latency</b> is the time taken for a specific data block to rotate around to the read-write head.</li>
+      <li>Users notice latency's effects as "Please wait" messages, or worst-case, "not responding".</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Fragmentation</h4>
+    <ul>
+      <li>When a file is stored, its needed sectors are allocated — but they may NOT be adjacent to each other.</li>
+      <li>Over time, repeated deletions/edits cause sectors to become increasingly FRAGMENTED, gradually slowing down HDD performance.</li>
+      <li><b>Defragmentation</b> software "tidies up" the sectors to improve performance again.</li>
+      <li>Data within a given sector is read SEQUENTIALLY (in order); but reaching that sector in the first place requires a direct read/write head movement.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Removable hard disk drives</h4>
+    <ul>
+      <li>These are HDDs external to the computer, connected via USB — used as backup devices, or for transferring files between computers.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — hard disk drives.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Define "latency" in the context of a hard disk drive.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Latency is the time it takes for a specific block of data on a data track to rotate around to the read-write head.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does an HDD's performance gradually deteriorate over time as more files are deleted and edited?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Files' sectors become increasingly FRAGMENTED (scattered non-adjacently across the disk), meaning the read-write head has to move more to gather all the data for one file — gradually slowing down access speed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Data on an HDD is organised into ______ (rings on a platter), each divided into ______ (containing a fixed number of bytes).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>tracks</strong>. Blank 2: <strong>sectors</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "A file's sectors are always stored right next to each other on the disk, so fragmentation never actually happens in practice." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Sectors allocated to a file are NOT guaranteed to be adjacent — the lesson explicitly states fragmentation genuinely happens over time as the disk undergoes deletions and edits, which is exactly why defragmentation software exists to fix it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user notices their computer's HDD has become noticeably slower over the past year of heavy use — lots of files added, deleted, and edited. Using this lesson's content, explain the likely cause and one possible fix.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The likely cause is FRAGMENTATION — a year of deletions and edits has scattered file sectors across the disk non-adjacently, forcing the read-write head to move more to retrieve each file, worsening latency's effects. The fix: run defragmentation software, which reorganises the sectors to improve performance.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is a removable hard disk drive, and name one real use for it.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An HDD external to the computer, connected via USB. Real uses: as a backup device, or for transferring files between computers.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.3b Secondary Storage: Hard Disk Drives<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.3
+  </div>
+
+</div>
+</body>
+</html>
