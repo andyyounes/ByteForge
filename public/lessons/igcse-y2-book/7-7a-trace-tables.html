@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.7a Trace Tables — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .trace-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 12px; margin-bottom: 16px; }
+  .trace-table th, .trace-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 10px; text-align: center; }
+  .trace-table th { background: rgba(96,165,250,.1); color: #60a5fa; font-family: system-ui, sans-serif; font-size: 11px; text-transform: uppercase; }
+  .trace-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.7a Trace Tables to Document Dry Runs of Algorithms</div>
+  <div class="topic-subtitle">Working through an algorithm by hand, one step at a time, and recording exactly what happens.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Dry run</div><div class="key-term-def">The manual exercise of working through an algorithm step by step, by hand.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Trace table</div><div class="key-term-def">A table used to record the value of each variable every time it changes during a dry run, plus a column for any output.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why trace tables are used</h4>
+    <ul>
+      <li>Finding out the purpose (or correctness) of an algorithm requires a thorough, structured approach — recording and studying the result of each individual step, using test data.</li>
+      <li>A trace table has one column for EACH variable in the algorithm, plus a column for any OUTPUT.</li>
+      <li>During the dry run: every time a variable's value CHANGES, the new value is written in that variable's column on a new row; every time a value is OUTPUT, it is written in the output column.</li>
+      <li>If a variable does not change on a given step, its column is usually left blank on that row (not re-written).</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="260" height="360" viewBox="0 0 260 360">
+      <g font-family="ui-monospace, monospace" font-size="11" text-anchor="middle">
+        <rect x="80" y="5" width="100" height="26" rx="13" fill="#111320" stroke="#60a5fa"/><text x="130" y="22" fill="#e2e8f0">START</text>
+        <line x1="130" y1="31" x2="130" y2="45" stroke="rgba(255,255,255,.3)"/>
+        <rect x="60" y="45" width="140" height="26" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="130" y="62" fill="#e2e8f0">A←0  B←0  C←100</text>
+        <line x1="130" y1="71" x2="130" y2="85" stroke="rgba(255,255,255,.3)"/>
+        <polygon points="130,85 200,110 130,135 60,110" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="130" y="114" fill="#e2e8f0">A &lt; 10?</text>
+        <line x1="130" y1="135" x2="130" y2="150" stroke="rgba(255,255,255,.3)"/><text x="145" y="146" fill="#4ade80" font-size="9">yes</text>
+        <rect x="60" y="150" width="140" height="26" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="130" y="167" fill="#e2e8f0">INPUT X</text>
+        <line x1="130" y1="176" x2="130" y2="190" stroke="rgba(255,255,255,.3)"/>
+        <polygon points="130,190 200,215 130,240 60,215" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="130" y="219" fill="#e2e8f0">X &gt; B?</text>
+        <line x1="130" y1="240" x2="130" y2="253" stroke="rgba(255,255,255,.3)"/><text x="145" y="250" fill="#4ade80" font-size="9">yes: B←X</text>
+        <polygon points="130,253 200,278 130,303 60,278" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="130" y="282" fill="#e2e8f0">X &lt; C?</text>
+        <line x1="130" y1="303" x2="130" y2="316" stroke="rgba(255,255,255,.3)"/><text x="145" y="313" fill="#4ade80" font-size="9">yes: C←X</text>
+        <text x="130" y="330" fill="#9ca3af" font-size="9">A←A+1, loop back</text>
+        <text x="10" y="345" fill="#f87171" font-size="9">no (A=10): OUTPUT B, C</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>The algorithm being traced</h4>
+    <ul>
+      <li>The flowchart initialises A←0, B←0, C←100, then loops 10 times: it inputs a value X, updates B (a running maximum) if X is bigger, updates C (a running minimum) if X is smaller, then increments the counter A.</li>
+      <li>Test data used: 9, 7, 3, 12, 6, 4, 15, 2, 8, 5</li>
+    </ul>
+  </div>
+
+  <table class="trace-table">
+    <tr><th>A</th><th>B</th><th>C</th><th>X</th><th>OUTPUT</th></tr>
+    <tr><td>0</td><td>0</td><td>100</td><td></td><td></td></tr>
+    <tr><td>1</td><td>9</td><td>9</td><td>9</td><td></td></tr>
+    <tr><td>2</td><td></td><td>7</td><td>7</td><td></td></tr>
+    <tr><td>3</td><td></td><td>3</td><td>3</td><td></td></tr>
+    <tr><td>4</td><td>12</td><td></td><td>12</td><td></td></tr>
+    <tr><td>5</td><td></td><td></td><td>6</td><td></td></tr>
+    <tr><td>6</td><td></td><td></td><td>4</td><td></td></tr>
+    <tr><td>7</td><td>15</td><td></td><td>15</td><td></td></tr>
+    <tr><td>8</td><td></td><td>2</td><td>2</td><td></td></tr>
+    <tr><td>9</td><td></td><td></td><td>8</td><td></td></tr>
+    <tr><td>10</td><td></td><td></td><td>5</td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td>15, 2</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>What the completed trace table shows</h4>
+    <ul>
+      <li>Reading the final output (15, 2) reveals the PURPOSE of the algorithm: it selects the LARGEST and SMALLEST numbers from a list of ten positive values (B ends up holding the largest, C the smallest).</li>
+      <li>Exam questions often deliberately use single-letter variables (A, B, C, X) instead of meaningful names precisely so you have to trace the algorithm to work out its purpose.</li>
+      <li>The exact same trace table works whether the algorithm is shown as a flowchart OR as equivalent pseudocode — the trace table only cares about the sequence of variable changes, not how the algorithm is written down.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">The same algorithm as pseudocode</span>A ← 0
+B ← 0
+C ← 100
+OUTPUT "Enter your ten values"
+REPEAT
+  INPUT X
+  IF X > B
+  THEN
+    B ← X
+  ENDIF
+  IF X < C
+  THEN
+    C ← X
+  ENDIF
+  A ← A + 1
+UNTIL A = 10
+OUTPUT B, C</div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — trace tables and dry runs.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is a "dry run"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The manual exercise of working through an algorithm step by step, by hand.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What goes into a trace table, and when is a new value written into a column?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>One column for each variable plus a column for output. A new value is written into a variable's column every time that variable's value CHANGES; a value is written into the output column every time something is output.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode / concept</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In the worked example, B tracks the running ______ of the input values, while C tracks the running ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>B tracks the running MAXIMUM (largest value seen so far); C tracks the running MINIMUM (smallest value seen so far).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student building a trace table re-writes EVERY variable's current value on EVERY row, even when a variable hasn't changed. Why is this against standard trace-table convention, even if not technically wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Standard convention only records a NEW value when a variable actually changes — leaving other columns blank on that row. Re-writing unchanged values on every row makes it harder to see, at a glance, exactly which step changed which variable, defeating the purpose of a clean trace.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the same algorithm and test data 400, 800, 190, 170, 300, 110, 600, 150, 130, 900 — what would the final OUTPUT be?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>900, 110 — B (the maximum) ends at 900, and C (the minimum) ends at 110.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why do exam questions sometimes deliberately use single-letter variable names like A, B, C, X instead of meaningful names?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>So the exam can ask you to work out the PURPOSE of the algorithm yourself by tracing it, rather than the variable names giving the purpose away.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.7a Trace Tables to Document Dry Runs<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.7
+  </div>
+
+</div>
+</body>
+</html>
