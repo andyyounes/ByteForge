@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.3e Virtual Memory — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.3e Virtual Memory</div>
+  <div class="topic-subtitle">The illusion of unlimited RAM — how the hard disk quietly extends memory, and the real cost when it's overused.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Virtual memory</div><div class="key-term-def">RAM (physical memory) PLUS swap space on the HDD/SSD, giving the illusion of more memory than actually exists.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Paging</div><div class="key-term-def">Moving fixed-length blocks of data (pages) between HDD/SSD and RAM.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Disk thrashing</div><div class="key-term-def">Excessive swapping between RAM and disk, causing the CPU to spend more time moving data than processing.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Thrash point</div><div class="key-term-def">The point where execution effectively halts because the system is entirely consumed by data-swapping.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The problem virtual memory solves</h4>
+    <ul>
+      <li>If multiple running programs exceed available RAM, this can cause a system crash.</li>
+      <li>Virtual memory solves this by using the HDD/SSD as extra memory: <b>RAM (physical memory) + swap space on disk = virtual memory</b>.</li>
+      <li>A 32-bit "map" tracks which programs are actually in RAM vs. swapped out to disk. When a program tries to access RAM, it's directed through this map.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How the swap actually works</h4>
+    <ul>
+      <li>Example: 5 programs (0-4) need RAM, but RAM only has 4 available address spaces. Without virtual memory, program 4 trying to access RAM with no space left would CRASH the system.</li>
+      <li>WITH virtual memory: the OLDEST data (e.g. program 0's) is moved OUT of RAM into HDD/SSD, freeing up that RAM space for program 4.</li>
+      <li>The 32-bit map is updated to reflect the new mapping — program 4 now has RAM access, and program 0's data lives on disk instead.</li>
+      <li>This continues as needed, giving the ILLUSION of unlimited memory even though RAM itself is genuinely full.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="360" height="90" viewBox="0 0 360 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="20" width="90" height="50" rx="6" fill="rgba(96,165,250,.1)" stroke="#60a5fa"/><text x="55" y="49" text-anchor="middle" fill="#60a5fa" font-size="10" font-family="system-ui">RAM (0-3)</text>
+      <path d="M 102 35 L 128 35" stroke="#f87171" stroke-width="1.5" marker-end="url(#vm1)"/>
+      <text x="115" y="27" text-anchor="middle" fill="#f87171" font-size="7" font-family="system-ui">out</text>
+      <path d="M 128 55 L 102 55" stroke="#4ade80" stroke-width="1.5" marker-end="url(#vm1)"/>
+      <text x="115" y="70" text-anchor="middle" fill="#4ade80" font-size="7" font-family="system-ui">in</text>
+      <defs><marker id="vm1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#9ca3af"/></marker></defs>
+      <rect x="135" y="20" width="90" height="50" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a"/><text x="180" y="49" text-anchor="middle" fill="#b8ef4a" font-size="10" font-family="system-ui">32-bit map</text>
+      <path d="M 227 35 L 253 35" stroke="#f87171" stroke-width="1.5" marker-end="url(#vm1)"/>
+      <path d="M 253 55 L 227 55" stroke="#4ade80" stroke-width="1.5" marker-end="url(#vm1)"/>
+      <rect x="260" y="20" width="90" height="50" rx="6" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="305" y="49" text-anchor="middle" fill="#e879f9" font-size="10" font-family="system-ui">HDD / SSD</text>
+    </svg>
+    <div class="diagram-caption">Data swaps back and forth between RAM and disk, tracked by the 32-bit map — programs "believe" they have direct RAM access.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Paging</h4>
+    <ul>
+      <li>A <b>page</b> is a fixed-length, consecutive block of data used in virtual memory systems.</li>
+      <li>Paging is how the operating system moves these blocks between HDD/SSD and RAM.</li>
+      <li>Accessing data via virtual memory is SLOWER than direct RAM access — which is exactly why larger RAM improves overall speed (less swapping needed).</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Benefits of virtual memory</div>
+    <p>Programs can be LARGER than physical memory and still run; no memory wasted on unused data (e.g. during error handling); reduces the need to buy/install more expensive RAM (though there are limits to how far this helps).</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Disk thrashing — the real drawback</h4>
+    <ul>
+      <li>As main memory fills up, MORE and more data must be swapped between RAM and disk, causing very high rates of HDD read/write head movement — this is <b>disk thrashing</b>.</li>
+      <li>If more time is spent MOVING data than actually processing, overall speed drops considerably. At the extreme, execution can effectively HALT — the <b>thrash point</b> — since the system is entirely busy swapping data.</li>
+      <li>Excessive head movements can also cause premature HDD failure.</li>
+      <li>Fixes: install more RAM, reduce the number of running programs, reduce the swap file size, or use an SSD instead of an HDD (faster, no moving parts).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — virtual memory.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Define "virtual memory" in terms of what it's actually made of.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Virtual memory = physical RAM + swap space on the HDD/SSD — the disk acts as an extension of RAM.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is "disk thrashing", and what real symptom does it cause?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Disk thrashing is excessive swapping between RAM and disk, causing very high rates of HDD read/write head movement. This causes overall processing speed to drop considerably, since more time is spent moving data than actually processing it — at worst, execution can effectively halt (the thrash point).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ is a fixed-length, consecutive block of data moved between HDD/SSD and RAM — this process is called ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>page</strong>. Blank 2: <strong>paging</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Virtual memory means a computer can genuinely have unlimited real RAM." What real distinction does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Virtual memory only gives the ILLUSION of unlimited memory — the actual RAM is still physically limited and genuinely full. Data is being swapped in and out of disk to create that illusion; it's not a real increase in RAM capacity, and accessing swapped-out data is genuinely slower.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user notices their computer has become extremely slow, with the hard disk light constantly flashing, while running several large programs at once. Using this lesson's content, diagnose the likely problem and suggest two possible fixes.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is likely <strong>disk thrashing</strong> — RAM is overloaded by too many running programs, forcing constant swapping to/from disk (explaining the flashing disk light and slowdown). Fixes: install more RAM, close some running programs, reduce the swap file size, or switch to an SSD.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name one genuine benefit of virtual memory, according to this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any of: programs can be larger than physical memory and still run; no memory is wasted on unused data; reduces the need to buy more expensive RAM.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.3e Virtual Memory<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.3
+  </div>
+
+</div>
+</body>
+</html>
