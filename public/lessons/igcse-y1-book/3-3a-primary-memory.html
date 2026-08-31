@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.3a Primary Memory: RAM &amp; ROM — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-size: 12px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 6px 8px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 10.5px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.3a Primary Memory: RAM &amp; ROM</div>
+  <div class="topic-subtitle">The memory the CPU can access directly — volatile RAM (DRAM/SRAM) and permanent ROM.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Primary memory</div><div class="key-term-def">Memory directly addressable by the CPU — RAM, ROM, and cache.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Volatile</div><div class="key-term-def">Memory contents are LOST when the power is turned off (true of RAM).</div></div>
+    <div class="key-term-card"><div class="key-term-name">DRAM</div><div class="key-term-def">Dynamic RAM — uses transistors/capacitors, needs constant refreshing, cheaper, higher capacity.</div></div>
+    <div class="key-term-card"><div class="key-term-name">SRAM</div><div class="key-term-def">Static RAM — uses flip-flops, no refreshing needed, much faster, used for CPU cache.</div></div>
+    <div class="key-term-card"><div class="key-term-name">ROM</div><div class="key-term-def">Read-Only Memory — non-volatile, permanent, cannot be written to; stores BIOS/bootstrap.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Primary memory vs. secondary storage — the basic split</h4>
+    <ul>
+      <li><b>Primary memory</b>: directly addressable by the CPU, contains RAM/ROM/cache.</li>
+      <li><b>Secondary storage</b>: NOT directly addressable by the CPU, all non-volatile, includes HDD/SSD/DVD/memory stick/Blu-ray — can be internal or external.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Random Access Memory (RAM)</h4>
+    <ul>
+      <li>"Random" means any memory location can be accessed independently of which was last used — not truly "random" data.</li>
+      <li>When an application runs, data moves temporarily from secondary storage into RAM (much faster to access than secondary storage).</li>
+      <li>RAM: can be written to/read from (data changeable), stores currently-used data/files/apps/OS parts, and is VOLATILE — contents lost on power-off.</li>
+      <li>More RAM generally = faster computer. RAM never technically "runs out" — it just gets slower as the CPU must repeatedly overwrite old RAM data with new data from secondary storage. More RAM reduces how often this has to happen.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">DRAM vs. SRAM</div>
+    <table>
+      <tr><th>DRAM (Dynamic RAM)</th><th>SRAM (Static RAM)</th></tr>
+      <tr><td>Transistors + capacitors</td><td>Flip-flops</td></tr>
+      <tr><td>Needs constant refreshing (every ~15 microseconds)</td><td>No refreshing needed</td></tr>
+      <tr><td>Cheaper to manufacture</td><td>Faster (~25ns access vs. DRAM's ~60ns)</td></tr>
+      <tr><td>Higher memory capacity</td><td>Used for CPU cache (speed matters most)</td></tr>
+      <tr><td>Consumes less power</td><td>Main memory uses DRAM; cache uses SRAM</td></tr>
+    </table>
+    <p style="margin-top:10px;">DRAM's capacitor HOLDS the bit value (0/1); its transistor acts as a switch letting the circuitry read/change that value. Without refreshing, the capacitor's charge leaks away, losing its value (defaulting to 0) — this is why DRAM needs constant refreshing and SRAM does not.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Read-Only Memory (ROM)</h4>
+    <ul>
+      <li>ROM is NON-VOLATILE (contents survive power-off) and PERMANENT (cannot be written to/changed by the user, computer, or any program).</li>
+      <li>Commonly stores the BIOS/start-up instructions ("bootstrap") the computer needs when first powering on.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Real example — RAM and ROM in a remote-controlled toy car</div>
+    <p><b>ROM</b>: stores factory settings (e.g. remote control frequency), start-up routines, and fixed button routines (turn left, accelerate, stop, etc.).</p>
+    <p><b>RAM</b>: stores any custom routines the user programs in, plus the live data/instructions received from the remote control unit as it operates.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — primary memory (RAM and ROM).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does "volatile" mean, and which of RAM/ROM is volatile?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Volatile" means the memory's contents are LOST when the power is switched off. <strong>RAM</strong> is volatile; ROM is non-volatile.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does DRAM need to be constantly refreshed, but SRAM does not?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>DRAM stores each bit as a charge in a capacitor, and that charge leaks away naturally over time unless recharged (refreshed) every ~15 microseconds. SRAM uses flip-flops instead, which hold their value stably without needing this constant recharging.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A CPU's memory cache uses ______ (for its speed), while main memory is built from ______ (for its cost and capacity).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>SRAM</strong>. Blank 2: <strong>DRAM</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "When RAM becomes completely full, the computer simply stops working and crashes." What real behaviour does this get wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>RAM never technically "runs out" in this crashing sense — it continues to operate, but becomes progressively SLOWER, since the CPU must keep overwriting old RAM data with new data fetched from secondary storage. Increasing RAM size reduces how often this slow overwrite process is needed, improving speed — it doesn't prevent a crash that wasn't going to happen anyway.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A microwave oven has circuitry containing both RAM and ROM chips. Suggest one realistic use for each type of chip in this device, based on this lesson's content and the toy-car example.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>ROM</strong>: could store the factory-set cooking programs/start-up routines (e.g. preset defrost or popcorn settings) that never change.</p>
+      <p><strong>RAM</strong>: could store the user's currently entered cooking time/power level while the microwave is running — data that's temporary and changes with every use, lost once the microwave is unplugged/reset.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does ROM typically store that a computer needs the very first moment it's switched on?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The <strong>BIOS</strong> (start-up instructions, or "bootstrap").</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.3a Primary Memory: RAM &amp; ROM<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.3
+  </div>
+
+</div>
+</body>
+</html>
