@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.2a Computer Systems &amp; Decomposition — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.2a Computer Systems, Sub-systems &amp; Decomposition</div>
+  <div class="topic-subtitle">Breaking a whole computer system down to inputs, processes, outputs, and storage — using an alarm app as the running example.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Sub-system</div><div class="key-term-def">A smaller, self-contained part of a larger computer system, performing one job.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Top-down design</div><div class="key-term-def">Decomposing a system into sub-systems, then those into smaller sub-systems, until each does just one action.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Stepwise refinement</div><div class="key-term-def">The process of repeatedly breaking a system down into smaller sub-systems.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Sub-routine</div><div class="key-term-def">The programmed implementation of one sub-system, expressed via flowchart or pseudocode.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What a computer system is made of</h4>
+    <ul>
+      <li>A computer system consists of: software, data, hardware, communications, and people.</li>
+      <li>Every computer system can be divided into SUB-SYSTEMS, and each sub-system can be divided further, until each sub-system performs just ONE action.</li>
+      <li>Systems vary hugely in size — from a small smartphone alarm app to some of the largest systems in the world (e.g. a weather forecast service) — and most people interact with many different systems daily without noticing.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Top-down design and stepwise refinement</h4>
+    <ul>
+      <li><b>Top-down design</b>: decompose a system into sub-systems, then break each sub-system into smaller sub-systems, repeating until each does one single action.</li>
+      <li>This repeated breaking-down process is called <b>stepwise refinement</b>.</li>
+      <li>Benefit: each part of a problem becomes smaller and more manageable. For large systems, this ALSO means several programmers can work INDEPENDENTLY on different sub-systems at the same time — reducing overall development and testing time.</li>
+      <li>Each sub-system can be developed as a SUB-ROUTINE, with its own flowchart or pseudocode showing how it works.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Decomposing into inputs, processes, outputs, storage</h4>
+    <ul>
+      <li>Any problem solved via computer system decomposes into these four component parts:</li>
+      <li><b>Inputs</b>: the data entered while the system is active.</li>
+      <li><b>Processes</b>: the tasks performed using the input data (and any previously stored data).</li>
+      <li><b>Outputs</b>: information displayed or printed for the user.</li>
+      <li><b>Storage</b>: data saved to files on a suitable medium, for future use.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — decomposing an alarm app</div>
+    <p><b>Inputs</b>: time to set the alarm; remove a previously set alarm time; switch an alarm off; press snooze.</p>
+    <p><b>Processes</b>: continuously check if the current time matches a set alarm time; storage/removal of alarm times; managing snooze.</p>
+    <p><b>Outputs</b>: continuous sound/tune (at alarm time, or after snooze expires).</p>
+    <p><b>Storage</b>: the time(s) for alarms currently set.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — computer systems, sub-systems, and decomposition into inputs/processes/outputs/storage.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is "stepwise refinement"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The process of repeatedly breaking a system down into smaller sub-systems, until each sub-system performs just one action.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does top-down design help when developing a LARGE computer system, beyond just making the problem smaller?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It allows several programmers to work independently on different sub-systems at the same time, reducing overall development and testing time.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Any computer-based problem decomposes into four component parts: ______, processes, ______, and storage.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>inputs</strong>. Blank 2: <strong>outputs</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Top-down design means writing the whole program in one go, then splitting it into pieces afterwards to check it works." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is backwards — top-down design DECOMPOSES the system into sub-systems FIRST (before coding), breaking it down repeatedly until each piece is small and manageable. It's not about writing the whole thing first and splitting it up afterwards.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A vending machine accepts coins, lets the user select an item, dispenses the item and any change, and keeps a running total of sales. Decompose this system into its inputs, processes, outputs, and storage.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Inputs</strong>: coins inserted, item selection. <strong>Processes</strong>: checking enough money inserted, calculating change owed, updating the running sales total. <strong>Outputs</strong>: dispensed item, dispensed change, display messages (e.g. amount owed). <strong>Storage</strong>: the running total of sales, and current stock levels of each item.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What are the five things a computer system is made up of, according to this lesson?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Software, data, hardware, communications, and people.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.2a Computer Systems, Sub-systems &amp; Decomposition<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.2
+  </div>
+
+</div>
+</body>
+</html>
