@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.1e Two's Complement — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0d0f1a; color: #e2e8f0;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    margin: 0; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a;
+    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 13px; }
+  .example-block td { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; text-align: center; }
+  .example-block td.heading { color: #9ca3af; font-size: 11px; }
+  .example-block td.neg-heading { color: #f87171; font-size: 11px; }
+  .example-block td.bit-1 { color: #b8ef4a; font-weight: 700; }
+  .example-block td.bit-0 { color: #6b7280; }
+
+  .pseudo-block { background: #080a14; border: 1px solid rgba(129,140,248,.2); border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #a5b4fc; margin-bottom: 10px; }
+  .pseudo-block pre { margin: 0; font-family: ui-monospace, monospace; font-size: 12.5px; color: #c7d2fe; line-height: 1.7; white-space: pre-wrap; }
+
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12);
+    border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.1e Two's Complement</div>
+  <div class="topic-subtitle">Representing NEGATIVE binary numbers, using one small change to the place-value headings.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card">
+      <div class="key-term-name">Two's complement</div>
+      <div class="key-term-def">A way of representing both positive and negative integers in binary, by making the left-most place value negative.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Sign bit</div>
+      <div class="key-term-def">The left-most bit — 0 means the number is positive, 1 means it's negative.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The one change that makes negative numbers possible</h4>
+    <ul>
+      <li>Up to now, every binary number has been assumed to be a positive integer. Two's complement is how negative integers get represented too.</li>
+      <li>The ONLY change needed: the left-most heading becomes NEGATIVE. For an 8-bit number, the headings become <code>−128, 64, 32, 16, 8, 4, 2, 1</code> — every other heading stays exactly the same.</li>
+      <li>This gives an 8-bit two's complement range of <b>−128 to +127</b>.</li>
+      <li>The left-most bit always determines the sign: a <b>1</b> there means the number is negative; a <b>0</b> there means it's positive.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Positive numbers work exactly as before</h4>
+    <ul>
+      <li>Writing a POSITIVE number in two's complement is no different from ordinary binary — just place a 0 in the −128 column, then fill in the rest exactly as before.</li>
+      <li>Reading a two's complement number back to denary also works the same way — add up the headings wherever there's a 1, except the −128 column subtracts if it's a 1.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — reading a two's complement number</div>
+    <p>Convert <code>11110101</code> (two's complement) to denary:</p>
+    <table>
+      <tr><td class="neg-heading">−128</td><td class="heading">64</td><td class="heading">32</td><td class="heading">16</td><td class="heading">8</td><td class="heading">4</td><td class="heading">2</td><td class="heading">1</td></tr>
+      <tr><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-0">0</td><td class="bit-1">1</td><td class="bit-0">0</td><td class="bit-1">1</td></tr>
+    </table>
+    <p><code>−128 + 64 + 32 + 16 + 4 + 1 = −11</code>. So <code>11110101</code> is <b>−11</b>.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Writing a NEGATIVE denary number in two's complement — two valid methods</h4>
+    <ul>
+      <li><b>Method 1 — direct place-value fitting.</b> Since the number is negative, the −128 column must hold a 1. Work out what remains (e.g. for −67: <code>−67 = −128 + 61</code>), then fit the remainder (61) into the ordinary positive headings.</li>
+      <li><b>Method 2 — invert and add 1 (the standard shortcut).</b> Write the POSITIVE version of the number in ordinary binary. INVERT every bit (swap every 0 for a 1 and every 1 for a 0). Then ADD 1 to the inverted result. This gives the two's complement negative version.</li>
+      <li>Both methods always agree — Method 2 is the one usually used in practice because it's a fixed, mechanical process that doesn't need you to re-derive place values by hand each time.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — negative denary to two's complement (Method 2)</div>
+    <p>Convert <b>−79</b> to an 8-bit two's complement binary number.</p>
+    <p>1. Write 79 in ordinary binary: <code>01001111</code></p>
+    <p>2. Invert every bit: <code>10110000</code></p>
+    <p>3. Add 1: <code>10110000 + 1 = 10110001</code></p>
+    <p>Answer: <b>10110001</b> represents −79.</p>
+  </div>
+
+  <div class="pseudo-block">
+    <div class="pseudo-block-title">Pseudocode — Method 2 as an algorithm</div>
+    <pre>INPUT positiveNumber
+binary ← ConvertToBinary(positiveNumber)
+inverted ← InvertEveryBit(binary)
+twosComplement ← inverted + 1
+OUTPUT twosComplement</pre>
+  </div>
+
+  <div class="theory-block">
+    <h4>Two's complement isn't limited to 8 bits</h4>
+    <ul>
+      <li>The same idea works for a register of ANY size — a 4-bit two's complement number uses headings <code>−8, 4, 2, 1</code>; a 12-bit one uses <code>−2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1</code>.</li>
+      <li>Whatever the register size, the process is identical: only the left-most heading becomes negative, and Method 2 (invert then add 1) still works exactly the same way.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — two's complement in a 4-bit register</div>
+    <p>The 4-bit binary number <code>0110</code> represents +6 (using headings −8, 4, 2, 1). Apply two's complement: invert (<code>1001</code>), then add 1 → <code>1010</code>.</p>
+    <p><code>1010</code> under headings −8, 4, 2, 1: <code>−8 + 2 = −6</code>. So <code>1010</code> represents <b>−6</b> — exactly the negative of the original +6, as expected.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — two's complement. Answer each one, then reveal the answer key to check.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Convert the two's complement binary number <code>11101100</code> into denary.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p><code>−128 + 64 + 32 + 8 + 4 = −20</code></p>
+        <p><strong>Answer: −20</strong></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Convert <b>−52</b> into an 8-bit two's complement binary number, using the invert-and-add-1 method. Show all three steps.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>52 in binary: <code>00110100</code>. Inverted: <code>11001011</code>. Add 1: <code>11001100</code>.</p>
+        <p><strong>Answer: 11001100</strong></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In an 8-bit two's complement number, the ______ bit determines the sign — a value of ______ there means the number is negative.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Blank 1: <strong>left-most</strong> (most significant). Blank 2: <strong>1</strong>.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student converts −40 to two's complement by writing 40 in binary (<code>00101000</code>), inverting it (<code>11010111</code>), and stopping there — giving the final answer <b>11010111</b>. What real step have they missed?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>They forgot to <strong>add 1</strong> after inverting — the invert-and-add-1 method genuinely has three steps, not two. The correct answer is <code>11010111 + 1 = 11011000</code>. Stopping after inverting alone gives what's called "one's complement", not two's complement, and it doesn't represent the correct negative value.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A temperature sensor stores readings as 8-bit two's complement numbers, since temperatures can genuinely be negative. It records the binary value <code>11111110</code>. (a) What real temperature (in the sensor's unit) does this represent? (b) Explain, using what this lesson taught about the range of two's complement, why an 8-bit register would NOT be suitable if this sensor needed to record temperatures as extreme as −200.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>(a) <code>−128 + 64 + 32 + 16 + 8 + 4 + 2 = −2</code>.</p>
+        <p>(b) An 8-bit two's complement register can only represent values from −128 to +127 — −200 falls outside that range entirely, so an 8-bit register genuinely could not store it correctly; a register with more bits (e.g. 16-bit) would be needed instead.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is the two's complement range of a 4-bit register (headings −8, 4, 2, 1)? Give both the smallest and largest values it can represent.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Smallest: <code>1000</code> = <strong>−8</strong>. Largest: <code>0111</code> = <strong>+7</strong>. So the full range is −8 to +7.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.1e Two's Complement<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.1
+  </div>
+
+</div>
+</body>
+</html>

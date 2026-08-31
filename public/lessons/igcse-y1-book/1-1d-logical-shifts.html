@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.1d Logical Binary Shifts — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0d0f1a; color: #e2e8f0;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    margin: 0; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a;
+    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 13px; }
+  .example-block td { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; text-align: center; }
+  .example-block td.heading { color: #9ca3af; font-size: 11px; }
+  .example-block td.moved { color: #b8ef4a; font-weight: 700; }
+  .example-block td.lost { color: #f87171; font-weight: 700; text-decoration: line-through; }
+  .example-block td.filled { color: #6b7280; }
+
+  .shift-visual { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
+  .shift-arrow { font-size: 20px; color: #a5b4fc; }
+
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12);
+    border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.1d Logical Binary Shifts</div>
+  <div class="topic-subtitle">Shifting bits left or right — genuinely multiplying or dividing by 2 — and when a shift loses information.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card">
+      <div class="key-term-name">Logical shift</div>
+      <div class="key-term-def">Moving every bit in a binary number one or more places left or right within its register.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Most significant bit</div>
+      <div class="key-term-def">The left-most bit in a binary number — the one worth the largest place value.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Least significant bit</div>
+      <div class="key-term-def">The right-most bit in a binary number — the one worth the smallest place value (1).</div>
+    </div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What a logical shift actually does</h4>
+    <ul>
+      <li>A logical shift moves every bit in a register a fixed number of places <b>left</b> or <b>right</b>.</li>
+      <li>Each shift <b>left</b> is exactly equivalent to multiplying the binary number by 2.</li>
+      <li>Each shift <b>right</b> is exactly equivalent to dividing the binary number by 2.</li>
+      <li>As bits move, any position left empty is filled with a <b>0</b>.</li>
+      <li>There's a real limit to how many shifts a register can perform correctly — eventually, real bits get pushed clean off the end of the register and are permanently lost.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — shifting left (multiplying)</div>
+    <p>The denary number 21 is <code>00010101</code> in an 8-bit register. Shift it ONE place left:</p>
+    <div class="shift-visual">
+      <span style="font-family:ui-monospace,monospace;font-size:14px;">00010101</span>
+      <span class="shift-arrow">→ shift left →</span>
+      <span style="font-family:ui-monospace,monospace;font-size:14px;">00101010</span>
+    </div>
+    <p><code>00101010</code> = 42 in denary — exactly <code>21 × 2¹</code>. Shifting two places left gives <code>01010100</code> = 84 (<code>21 × 2²</code>); three places left gives <code>10101000</code> = 168 (<code>21 × 2³</code>).</p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">When a left shift goes wrong</div>
+    <p>Shift the SAME original number, <code>00010101</code> (21), <b>FOUR</b> places left:</p>
+    <table>
+      <tr><td class="heading">128</td><td class="heading">64</td><td class="heading">32</td><td class="heading">16</td><td class="heading">8</td><td class="heading">4</td><td class="heading">2</td><td class="heading">1</td></tr>
+      <tr><td class="moved">0</td><td class="moved">1</td><td class="moved">0</td><td class="moved">1</td><td class="moved">0</td><td class="moved">0</td><td class="moved">0</td><td class="filled">0</td></tr>
+    </table>
+    <p>This gives <code>01010000</code> — but the real answer to <code>21 × 2⁴</code> (which is 336) genuinely needs more than 8 bits. The left-most 1-bit from the original number has been pushed clean off the register and lost — the register now holds an incorrect value, exactly the same kind of error as overflow in addition.</p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — shifting right (dividing)</div>
+    <p>The denary number 200 is <code>11001000</code>. Shift it ONE place right:</p>
+    <div class="shift-visual">
+      <span style="font-family:ui-monospace,monospace;font-size:14px;">11001000</span>
+      <span class="shift-arrow">→ shift right →</span>
+      <span style="font-family:ui-monospace,monospace;font-size:14px;">01100100</span>
+    </div>
+    <p><code>01100100</code> = 100 in denary — exactly <code>200 ÷ 2¹</code>. Two places right gives <code>00110010</code> = 50 (<code>200 ÷ 2²</code>); three places right gives <code>00011001</code> = 25 (<code>200 ÷ 2³</code>).</p>
+    <p>Shifting the same number a FOURTH place right loses the right-most 1-bit off the end of the register — the result (12) is wrong, since <code>200 ÷ 2⁴</code> is really 12.5, and the lost bit is the clear sign the shift has gone one step too far.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — logical binary shifts. Answer each one, then reveal the answer key to check.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Write 24 as an 8-bit binary number, then show the result of shifting it 2 places LEFT. What denary value does the shifted result represent?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>24 = <code>00011000</code>. Shifted 2 left: <code>01100000</code> = <strong>96</strong> (which is 24 × 2² = 96 — correct, no bits lost).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Take the same 24 (<code>00011000</code>) and shift it 3 places to the RIGHT instead. What denary value results, and is it correct?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p><code>00011000</code> shifted 3 right → <code>00000011</code> = <strong>3</strong>, which IS correct (24 ÷ 2³ = 3, and no 1-bits were lost off the right-hand end).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Each shift to the left is equivalent to ______ the number by 2; each shift to the right is equivalent to ______ the number by 2.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Blank 1: <strong>multiplying</strong>. Blank 2: <strong>dividing</strong>.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student shifts <code>00010101</code> (21) four places left in an 8-bit register, gets <code>01010000</code> (80), and confidently states "21 × 2⁴ = 80, so this is correct." What's actually wrong with this conclusion?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>21 × 2⁴ is genuinely <strong>336</strong>, not 80 — the student has mistaken a WRONG, bit-losing result for a correct one. The real left-most 1-bit was pushed off the register and lost during the shift, which is exactly why the 8-bit result (80) doesn't match the true mathematical answer (336). Getting a number back out doesn't automatically mean the shift was valid — it has to be checked against the real multiplication.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A programmer wants to quickly double a small number stored in an 8-bit register using a single left shift, instead of using a slower general multiplication instruction. (a) Which numbers, roughly, is this trick actually SAFE to use for? (b) Why does using it on a large starting value risk a wrong result?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>(a) It's safe for values where doubling still fits within 8 bits — genuinely, any starting value up to 127, since <code>127 × 2 = 254</code> still fits in an 8-bit register (max 255).</p>
+        <p>(b) For a starting value of 128 or more, doubling it would need a 9th bit — the most significant bit gets pushed off the register and lost, giving a wrong, smaller-than-expected result, the same overflow-style error covered in this lesson.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">When bits are shifted, what value fills the newly-empty position(s) left behind — and does this happen the same way for both a left shift and a right shift?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>A newly-empty position is always filled with a <strong>0</strong> — this is true for both directions: a left shift fills in new 0s on the right-hand end, and a right shift fills in new 0s on the left-hand end.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.1d Logical Binary Shifts<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.1
+  </div>
+
+</div>
+</body>
+</html>
