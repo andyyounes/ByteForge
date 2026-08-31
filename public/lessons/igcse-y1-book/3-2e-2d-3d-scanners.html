@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.2e 2D &amp; 3D Scanners — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-size: 12px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 6px 8px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 10.5px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.2e Input Devices: 2D &amp; 3D Scanners</div>
+  <div class="topic-subtitle">From flatbed document scanning and OCR to full 3D object scanning and CT/MRI imaging.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">2D scanner</div><div class="key-term-def">Scans flat, hard-copy documents into an electronic image, using a scan head, mirrors, lens, and CCD.</div></div>
+    <div class="key-term-card"><div class="key-term-name">OCR</div><div class="key-term-def">Optical Character Recognition — converts a scanned image of text into an editable text file.</div></div>
+    <div class="key-term-card"><div class="key-term-name">3D scanner</div><div class="key-term-def">Scans a solid object across x, y, z coordinates to build a 3D digital image.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Tomography</div><div class="key-term-def">Building a 3D image from a series of thin 2D "slices" — used in CT, MRI, and SPECT scanners.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>How a 2D scanner works</h4>
+    <ul>
+      <li>Cover raised → document placed on glass panel → cover closed.</li>
+      <li>A bright light (xenon lamp or LED) illuminates the document.</li>
+      <li>A scan head moves across the document; the image is sent via a series of mirrors to a lens, which focuses it.</li>
+      <li>The focused image falls onto a <b>CCD</b> — made of thousands of light-sensitive pixels, each generating an electric charge when light hits it, turning the image into electronic form.</li>
+      <li>Software then produces a digital image from this electronic data.</li>
+      <li>With <b>OCR</b> software, scanned TEXT can be converted into an editable text file (importable into a word processor). A scanned photo/image instead simply becomes an image file (e.g. JPEG).</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Real application — airport passport scanning</div>
+    <p>2D scanners with OCR read passport pages, automatically placing extracted text into the correct database fields (often stored as ASCII).</p>
+    <p>The passport photo is scanned/stored as a JPEG. A live 2D photo of the passenger is also taken. FACE RECOGNITION software compares key facial positions between the two images — e.g. distance between the eyes, nose width, cheekbone shape, jaw line length, eyebrow shape — to check if they represent the SAME face.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>3D scanners</h4>
+    <ul>
+      <li>3D scanners capture a solid object across its <b>x, y, and z</b> coordinates, forming a full digital 3D image.</li>
+      <li>Used in computer-aided design (CAD), or sent to a 3D printer to produce a physical model.</li>
+      <li>Many underlying technologies exist: lasers, magnetic resonance, white light, etc.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Tomography — building 3D images from 2D "slices"</h4>
+    <ul>
+      <li><b>Tomography</b> builds a 3D image of a solid object from a series of very thin 2D "slices". Each slice is stored as a digital image, and together they represent the whole object.</li>
+      <li>Each slice can be produced using different imaging methods — this is what distinguishes CT, MRI, and SPECT.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">CT, MRI, and SPECT compared</div>
+    <table>
+      <tr><th></th><th>CT Scanner</th><th>MRI</th><th>SPECT</th></tr>
+      <tr><td>Stands for</td><td>Computerised Tomography</td><td>Magnetic Resonance Imaging</td><td>Single Photon Emission Computed Tomography</td></tr>
+      <tr><td>Uses</td><td>X-rays</td><td>Radio frequencies</td><td>Gamma rays</td></tr>
+    </table>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="360" height="90" viewBox="0 0 360 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="20" width="50" height="50" rx="4" fill="rgba(96,165,250,.1)" stroke="#60a5fa"/><text x="35" y="80" text-anchor="middle" fill="#6b7280" font-size="7" font-family="system-ui">source</text>
+      <g fill="#111320" stroke="#b8ef4a">
+        <rect x="120" y="20" width="20" height="50"/><rect x="145" y="20" width="20" height="50"/><rect x="170" y="20" width="20" height="50"/>
+        <rect x="195" y="20" width="20" height="50"/><rect x="220" y="20" width="20" height="50"/>
+      </g>
+      <text x="180" y="80" text-anchor="middle" fill="#6b7280" font-size="7" font-family="system-ui">2D "slices" of solid object</text>
+      <path d="M 62 45 L 116 45" stroke="#f87171" stroke-width="1.5" stroke-dasharray="3,2"/>
+    </svg>
+    <div class="diagram-caption">An X-ray/radio-frequency/gamma source passes through the object, building up a series of thin digital "slices" that together form a 3D image.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — 2D and 3D scanners.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does OCR software allow you to do with a scanned document that a plain image file wouldn't?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>OCR converts scanned text into an EDITABLE text file format — the text can then be imported into a word processor and edited/manipulated, unlike a plain image which is just a picture of the text.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does a 3D scanner need to capture data across x, y, AND z coordinates, unlike a 2D scanner?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A solid object has depth as well as width and height — genuinely three dimensions — so capturing it fully requires images at multiple points along all three (x, y, z) coordinates, not just a flat 2D surface.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A CT scanner uses ______, while an MRI uses ______, and a SPECT scanner uses gamma rays.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>X-rays</strong>. Blank 2: <strong>radio frequencies</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "A CT scanner takes one single image of the whole object at once, just like a photo." What real process does this misunderstand?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A CT scanner (like other tomographic scanners) builds up the 3D image from a SERIES of very thin 2D "slices" — it does NOT capture the whole object in one single image. Each slice is stored separately as a digital image, and together they represent the full solid object.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      At airport passport control, the system needs to confirm the person standing at the gate matches their passport photo. Using this lesson's content, describe the process the system uses to do this.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The passport's photo page is scanned (often stored as a JPEG), and a live 2D photo of the passenger is also taken with a digital camera. Face recognition/detection software then compares KEY facial positions between the two images — e.g. distance between the eyes, nose width, cheekbone shape, jaw line length, eyebrow shape — to determine whether both images represent the same face.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name two real applications of a 3D digital scan, according to this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Computer-aided design (CAD), and producing a physical model via a 3D printer.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.2e Input Devices: 2D &amp; 3D Scanners<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.2
+  </div>
+
+</div>
+</body>
+</html>
