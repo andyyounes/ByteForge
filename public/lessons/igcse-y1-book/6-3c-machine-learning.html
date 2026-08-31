@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.3c Machine Learning — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-size: 12px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 6px 8px; text-align: left; vertical-align: top; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 10.5px; text-align: center; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 6 · Artificial Intelligence</span>
+  <div class="topic-title">6.3c Machine Learning</div>
+  <div class="topic-subtitle">How a spam filter, a shopping recommendation, and fraud detection all learn from data instead of being explicitly programmed.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Machine learning</div><div class="key-term-def">A subset of AI where algorithms are "trained" on data and learn from past experience, without explicit reprogramming for new data.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Training data set</div><div class="key-term-def">Sample data used to teach a machine learning model before it's used live.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Collaborative filtering</div><div class="key-term-def">Comparing customers with similar behaviour to recommend items one hasn't bought yet.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What machine learning is</h4>
+    <ul>
+      <li>A SUBSET of AI: algorithms are "trained" and learn from past experiences/examples, then make predictions or decisions on NEW data.</li>
+      <li>Offers fast, accurate outcomes due to powerful processing — able to manage/analyse huge, complex data volumes that would take humans years to process manually.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">AI vs. machine learning — the real distinction</div>
+    <table>
+      <tr><th>AI</th><th>Machine learning</th></tr>
+      <tr><td>Simulated intelligence in machines</td><td>Getting machines to make decisions WITHOUT being explicitly programmed to</td></tr>
+      <tr><td>Aims to build machines that think like humans</td><td>Aims to make machines learn through data acquisition, solving new problems</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-block">
+    <h4>Example 1 — spam email detection</h4>
+    <ul>
+      <li>Algorithm collects email data (content, headers, sender), then "cleans" it (removing stop-words like "the/and/a", punctuation).</li>
+      <li>Certain words/phrases ("lottery", "earn", "full-refund") strongly indicate spam.</li>
+      <li>A model is built, trained on a set of KNOWN spam emails, then evaluated, fine-tuned, and tested live.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Example 2 — recommending purchases (collaborative filtering)</h4>
+    <ul>
+      <li>Compares a new customer's shopping behaviour against EXISTING customers with similar patterns.</li>
+      <li>Example: Customer A (likes football) buys a jazz CD, a Roman history book, and health food. Customer B (likes cycling) buys the same jazz CD and Roman history book. Machine learning then recommends health food to Customer B, based on the shared pattern with A.</li>
+      <li>Also used to generate music playlists based on selected criteria.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Example 3 — fraud detection</h4>
+    <ul>
+      <li>The full machine learning model-building process: DATA COLLECTION (survey/web scraping) → DATA CLEANING (removing redundant data carefully, to avoid wrong predictions) → BUILDING A MODEL (trained on real customer purchasing examples) → the model can now flag unusual transactions (e.g. sudden large jewellery purchase) as likely fraud → MODEL EVALUATION (tested with known outcomes, modified if it doesn't meet criteria).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Search engines and self-improvement</h4>
+    <ul>
+      <li>A search engine counts it as SUCCESS if a user finds what they want on page 1 of results, and FAILURE if they need to dig to page 2/3/4.</li>
+      <li>The search engine LEARNS from this past performance, becoming more sophisticated and accurate over time.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — machine learning.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between AI generally and machine learning specifically?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>AI aims to build machines that think LIKE humans (simulated intelligence). Machine learning specifically aims to get machines making decisions WITHOUT being explicitly programmed to, by learning through data acquisition.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is "collaborative filtering", and give the example used in this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Comparing a customer's shopping behaviour to OTHER customers with similar patterns to make recommendations. Example: Customer A (football, jazz CD, Roman history book, health food) and Customer B (cycling, same jazz CD, same history book) — health food is recommended to B based on the shared pattern with A.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In fraud detection, an unusual transaction — like an unexpectedly large jewellery purchase — is flagged as a high chance of ______ activity.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Fraudulent</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "A spam filter must be manually reprogrammed by a human every time a new type of spam email appears." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is exactly what machine learning avoids — the definition explicitly states machine learning lets machines make decisions/predictions on NEW, UNSEEN data WITHOUT needing to be specifically reprogrammed for it, since it learned general patterns (like common spam words/phrases) from its training data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A bank wants to build a machine learning system to detect fraudulent credit card transactions. Using this lesson's content, describe the correct order of steps in building this system.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1. Data collection (survey/web scraping of transaction types, shopping habits, personal data). 2. Data cleaning (carefully removing redundant data to avoid wrong predictions). 3. Building a model (trained on real examples of customer purchasing behaviour). 4. Using the model to detect fraud (e.g. flagging unusual purchases). 5. Model evaluation (testing with known data/outcomes, modifying if criteria aren't met).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How does a search engine determine whether a search was a "success" or "failure", and what does it do with this information?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Success = the user finds relevant results on PAGE 1. Failure = the user needs to check pages 2, 3, or 4. The search engine learns from this past performance, becoming increasingly sophisticated and accurate over time.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 6: Artificial Intelligence — 6.3c Machine Learning (completes Section 6.3, Unit 6, and this session's IGCSE Y1 rewrite)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 6.3
+  </div>
+
+</div>
+</body>
+</html>

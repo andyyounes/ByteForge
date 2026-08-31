@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.3b Expert Systems — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-size: 11.5px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 5px 7px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; }
+  .compare-card.good { border: 1px solid rgba(74,222,128,.25); }
+  .compare-card.bad { border: 1px solid rgba(248,113,113,.25); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .compare-card.good h5 { color: #4ade80; }
+  .compare-card.bad h5 { color: #f87171; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 6 · Artificial Intelligence</span>
+  <div class="topic-title">6.3b Expert Systems</div>
+  <div class="topic-subtitle">Knowledge base + rules base + inference engine = a computer that reasons like a human specialist.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Expert system</div><div class="key-term-def">A computer system mimicking the decision-making ability and expert knowledge of a human specialist.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Knowledge base</div><div class="key-term-def">A repository of facts — a collection of objects and their attributes.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Rules base</div><div class="key-term-def">A set of inference rules (often IF-THEN statements) the inference engine uses to draw conclusions.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Inference engine</div><div class="key-term-def">The main processing element — searches the knowledge base using the rules base to find matches.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What an expert system does</h4>
+    <ul>
+      <li>Uses knowledge and inference to solve problems that would normally need a human expert — e.g. asking a series of symptom questions to diagnose a patient, then explaining its reasoning.</li>
+      <li>Supplies a CONCLUSION, suggested ACTIONS, and a PROBABILITY of the conclusion's accuracy (e.g. "the probability of finding oil-bearing rocks here is about 21%").</li>
+      <li>Real applications: oil/mineral prospecting, patient illness diagnosis, mechanical/electronic fault diagnostics, tax/financial calculations, strategy games (chess), delivery logistics, identifying plants/animals/chemical compounds.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good">
+      <h5>Expert system advantages</h5>
+      <ul>
+        <li>High level of expertise and accuracy</li>
+        <li>Consistent results</li>
+        <li>Can store vast amounts of ideas/facts</li>
+        <li>Traceable, logical solutions/diagnostics</li>
+        <li>Can hold MULTIPLE areas of expertise</li>
+        <li>Very fast response — much quicker than a human expert</li>
+        <li>Unbiased reporting/analysis</li>
+        <li>Indicates the probability of a solution being correct</li>
+      </ul>
+    </div>
+    <div class="compare-card bad">
+      <h5>Expert system disadvantages</h5>
+      <ul>
+        <li>Needs considerable user training to use correctly</li>
+        <li>Very high set-up/maintenance costs</li>
+        <li>Can give "cold" responses — inappropriate in some medical situations</li>
+        <li>Only as good as the facts entered into it</li>
+        <li>Users can dangerously assume it's infallible</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Expert system structure</h4>
+    <ul>
+      <li><b>User interface</b>: how the user interacts (dialogue boxes, prompts) — usually simple Yes/No or multiple-choice questions, each based on previous answers.</li>
+      <li><b>Inference engine</b>: the main processing element — acts like a search engine over the knowledge base, gathering information via a series of questions, using the rules base to find matching objects.</li>
+      <li><b>Knowledge base</b>: a repository of facts — a collection of OBJECTS and their ATTRIBUTES.</li>
+      <li><b>Rules base</b>: inference rules mimicking human reasoning, typically as IF-THEN statements, e.g. <code>IF continent="South America" AND language="Portuguese" THEN country="Brazil"</code>.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — identifying an animal from a knowledge base</div>
+    <table>
+      <tr><th>Object</th><th>Mammal?</th><th>Pet?</th><th>Habitat</th><th>Sound</th><th>Body</th><th>Legs</th></tr>
+      <tr><td>Dog</td><td>Yes</td><td>Yes</td><td>Land</td><td>Bark</td><td>Fur</td><td>4 legs</td></tr>
+      <tr><td>Whale</td><td>Yes</td><td>No</td><td>Water</td><td>Sonic</td><td>Skin</td><td>Swims, no legs</td></tr>
+      <tr><td>Duck</td><td>No</td><td>No</td><td>Water</td><td>Quack</td><td>Feathers</td><td>Swims, 2 legs</td></tr>
+    </table>
+    <p>Series of questions: Is it a mammal? YES. Can it be a pet? NO. Does it live in water? YES. Does it make sonic sounds? YES. Body covered in skin? YES. Any legs? NO.</p>
+    <p><b>Conclusion: it is a WHALE.</b> The inference engine matched the user's answers against the knowledge base's attributes, using the rules base's logic.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Setting up an expert system</h4>
+    <ul>
+      <li>Gather information from human experts/written sources.</li>
+      <li>Populate the KNOWLEDGE BASE with this data.</li>
+      <li>Build the RULES BASE (inference rules).</li>
+      <li>Set up the INFERENCE ENGINE (the main, complex processing element).</li>
+      <li>Develop the USER INTERFACE.</li>
+      <li>TEST thoroughly using known outcomes, adjusting as needed.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — expert systems.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference between the knowledge base and the rules base in an expert system?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The knowledge base is a repository of FACTS (objects and their attributes). The rules base is a set of INFERENCE RULES (often IF-THEN statements) used by the inference engine to draw conclusions from that knowledge.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What role does the inference engine play in an expert system?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It's the main PROCESSING element — it acts like a search engine, examining the knowledge base for matches, gathering information via a series of questions, and applying the rules base's inference rules to reach a conclusion.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      An expert system's conclusions include a suggested action and a ______ indicating how accurate the conclusion is likely to be.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Probability</strong> (percentage).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "An expert system's diagnosis is always correct, since it's based on expert knowledge." What real disadvantage from this lesson contradicts this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson explicitly states an expert system is only as GOOD as the information/facts entered into it, and warns that users can dangerously assume it's INFALLIBLE — its expertise is genuinely limited by the quality of its knowledge base, not guaranteed to be correct.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the animal knowledge base table in this lesson, a user answers: Is it a mammal? NO. Does it live in water? YES. What conclusion should the expert system reach, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Duck</strong> — of the three objects in the knowledge base, only the duck is NOT a mammal AND lives in water; dog is a mammal (fails the first condition) and whale is a mammal too (also fails), so duck is the only matching object.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name two real applications of expert systems mentioned in this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any two of: oil/mineral prospecting, patient illness diagnosis, equipment fault diagnostics, tax/financial calculations, chess strategy, delivery logistics, identifying plants/animals/compounds.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 6: Artificial Intelligence — 6.3b Expert Systems<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 6.3
+  </div>
+
+</div>
+</body>
+</html>

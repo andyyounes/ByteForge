@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.3a Artificial Intelligence: Fundamentals &amp; Examples — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 6 · Artificial Intelligence</span>
+  <div class="topic-title">6.3a Artificial Intelligence: Fundamentals &amp; Examples</div>
+  <div class="topic-subtitle">Narrow, general, and strong AI — and how Alexa, chatbots, and facial recognition all count as real-world AI.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Artificial Intelligence (AI)</div><div class="key-term-def">A branch of computer science simulating intelligent human behaviour (the brain's cognitive functions) in a computer.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Narrow AI</div><div class="key-term-def">A machine outperforming a human at ONE specific task.</div></div>
+    <div class="key-term-card"><div class="key-term-name">General AI</div><div class="key-term-def">A machine performing SIMILARLY (not superior) to a human at a specific task.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Strong AI</div><div class="key-term-def">A machine outperforming humans across MANY tasks.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Deductive reasoning</div><div class="key-term-def">Building correct facts into rules, then applying those rules to new, related problems.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What AI is</h4>
+    <ul>
+      <li>A branch of computer science simulating intelligent human behaviour — the "cognitive functions" of the brain (acquiring knowledge/understanding through thought, experience, the five senses).</li>
+      <li>AI is measured against human benchmarks: reasoning, speech, sight.</li>
+      <li>At its core, AI is a collection of RULES and DATA, plus the ability to reason, learn, and adapt to external stimuli.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Three categories of AI</h4>
+    <ul>
+      <li><b>Narrow AI</b>: superior to a human at ONE specific task.</li>
+      <li><b>General AI</b>: similar (not superior) to a human at a specific task.</li>
+      <li><b>Strong AI</b>: superior to a human across MANY tasks.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Reasoning and learning</h4>
+    <ul>
+      <li><b>Deductive reasoning</b>: correct facts are built into a set of RULES, then applied to other problems — e.g. an AI that learns to make a perfect cup of tea can apply the same learned rules/methodology to making coffee or hot chocolate, adjusting where needed.</li>
+      <li>Through repeated steps, the AI system learns and applies what it learns to NEW situations more effectively over time.</li>
+      <li>AI can spot patterns very quickly (sometimes patterns humans CAN'T see), then make predictions by adapting to new data.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Real-world AI examples</div>
+    <p><b>News generation</b>: based on live news feeds.</p>
+    <p><b>Smart home devices</b> (Alexa, Google Now, Siri, Cortana): recognise verbal commands, learn from the environment/data received, becoming more sophisticated over time — via repetitive learning. Voice is converted to binary for processing, and a verbal response is generated.</p>
+    <p><b>Chatbots</b>: interact through instant messaging, artificially replicating human interaction patterns, responding to typed/voice messages using currently-known information.</p>
+    <p><b>Autonomous cars</b>: covered in section 6.2.</p>
+    <p><b>Facial expression recognition</b>: algorithms identify key facial landmarks (eyebrow/mouth corners, etc.); combining these landmarks maps emotions like anger, fear, joy, surprise.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — AI fundamentals and real-world examples.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference between narrow AI and strong AI?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Narrow AI outperforms a human at only ONE specific task. Strong AI outperforms humans across MANY tasks.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Explain "deductive reasoning" using the tea/coffee example from this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Deductive reasoning builds correct facts into a set of rules — an AI that learns to make the perfect cup of tea from a set of facts can then APPLY those same learned rules (adjusted where necessary) to making coffee or hot chocolate, without starting from scratch each time.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A machine that performs SIMILARLY (not superior) to a human at a specific task is classed as ______ AI.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>General</strong> AI.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Facial expression recognition works by having AI directly 'read minds' to detect emotion." What real mechanism does this misunderstand?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Facial expression recognition works by algorithms identifying specific FACIAL LANDMARKS (eyebrow corners, mouth corners, etc.) and mapping COMBINATIONS of these landmarks to known emotions — it's analysing observable physical facial features, not reading minds.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A chess-playing AI consistently beats the best human grandmasters, but performs no better than an average human at general conversation. Using this lesson's content, classify this AI, and justify your answer.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is <strong>narrow AI</strong> — it has superior performance to humans at ONE specific task (chess), but does not outperform humans generally (its conversation ability is only average), which rules out strong AI or general AI classification for its OVERALL behaviour.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name three human benchmarks AI capability is measured against, according to this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Reasoning, speech, and sight.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 6: Artificial Intelligence — 6.3a AI: Fundamentals &amp; Examples<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 6.3
+  </div>
+
+</div>
+</body>
+</html>
