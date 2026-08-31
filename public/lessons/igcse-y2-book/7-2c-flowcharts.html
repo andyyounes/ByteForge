@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.2c Flowcharts — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .symbol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 12px; margin-bottom: 16px; }
+  .symbol-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 12px; text-align: center; }
+  .symbol-name { font-size: 11px; color: #b8ef4a; font-weight: 700; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.2c Flowcharts</div>
+  <div class="topic-subtitle">Four standard symbols, connected by arrows, are enough to describe any algorithm — from checking an alarm to calculating a ticket discount.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Algorithm</div><div class="key-term-def">The steps required to complete a task, together with the order they're performed in.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Terminator</div><div class="key-term-def">The oval symbol marking START and STOP.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Decision symbol</div><div class="key-term-def">A diamond with exactly two labelled outputs (yes/no), used for selection and repetition.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What a flowchart is</h4>
+    <ul>
+      <li>Shows diagrammatically the STEPS required to complete a task, and the ORDER they're performed in.</li>
+      <li>These steps + order together are called an <b>algorithm</b>.</li>
+      <li>Flowcharts effectively communicate how a system/sub-system's algorithm works, and are drawn using standard symbols.</li>
+    </ul>
+  </div>
+
+  <div class="symbol-grid">
+    <div class="symbol-card">
+      <svg width="60" height="30" viewBox="0 0 60 30"><ellipse cx="30" cy="15" rx="28" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.5"/><text x="30" y="19" text-anchor="middle" fill="#60a5fa" font-size="9">START</text></svg>
+      <div class="symbol-name">Terminator (START/STOP)</div>
+    </div>
+    <div class="symbol-card">
+      <svg width="60" height="30" viewBox="0 0 60 30"><rect x="2" y="2" width="56" height="26" fill="none" stroke="#b8ef4a" stroke-width="1.5"/><text x="30" y="19" text-anchor="middle" fill="#b8ef4a" font-size="8">A ← 0</text></svg>
+      <div class="symbol-name">Process (an action)</div>
+    </div>
+    <div class="symbol-card">
+      <svg width="60" height="30" viewBox="0 0 60 30"><polygon points="12,2 58,2 48,28 2,28" fill="none" stroke="#e879f9" stroke-width="1.5"/><text x="30" y="19" text-anchor="middle" fill="#e879f9" font-size="7">INPUT X</text></svg>
+      <div class="symbol-name">Input / Output</div>
+    </div>
+    <div class="symbol-card">
+      <svg width="60" height="34" viewBox="0 0 60 34"><polygon points="30,2 58,17 30,32 2,17" fill="none" stroke="#fbbf24" stroke-width="1.5"/><text x="30" y="21" text-anchor="middle" fill="#fbbf24" font-size="8">x&gt;B?</text></svg>
+      <div class="symbol-name">Decision (two outputs)</div>
+    </div>
+  </div>
+
+  <div class="theory-block">
+    <h4>The four standard symbols</h4>
+    <ul>
+      <li><b>Terminator</b>: an oval, used at the START and STOP of every flowchart.</li>
+      <li><b>Process</b>: a rectangle, showing an action (e.g. assigning a value to a variable). If a process is defined ELSEWHERE, its name is shown in this box instead of the full detail.</li>
+      <li><b>Input/output</b>: the SAME symbol is used for both — entering data (e.g. <code>INPUT X</code>) or displaying it (e.g. <code>OUTPUT "Error"</code>).</li>
+      <li><b>Decision</b>: a diamond, used to decide which action happens next — for both SELECTION and REPETITION/ITERATION. A decision box always has exactly TWO outputs, and both flow lines out of it should be clearly labelled (e.g. "yes"/"no").</li>
+      <li><b>Flow lines</b>: arrows showing the direction of flow — usually (but not always) top-to-bottom and left-to-right.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — checking the alarm time</h4>
+    <ul>
+      <li>START → Get Time → decision: "Time = Alarm Time?" → if NO, wait 30 seconds and check again → if YES, Sound Alarm → STOP.</li>
+      <li>This shows a REPEATING check (a loop back to "Get Time" via the "No" path) until the condition becomes true.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="240" height="260" viewBox="0 0 240 260" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="120" cy="20" rx="45" ry="16" fill="none" stroke="#60a5fa" stroke-width="1.5"/><text x="120" y="25" text-anchor="middle" fill="#60a5fa" font-size="10">START</text>
+      <path d="M 120 36 L 120 56" stroke="#6b7280" stroke-width="1" marker-end="url(#fa)"/>
+      <rect x="65" y="56" width="110" height="30" fill="none" stroke="#b8ef4a" stroke-width="1.5"/><text x="120" y="75" text-anchor="middle" fill="#b8ef4a" font-size="10">Get Time</text>
+      <path d="M 120 86 L 120 106" stroke="#6b7280" stroke-width="1" marker-end="url(#fa)"/>
+      <polygon points="120,106 190,136 120,166 50,136" fill="none" stroke="#fbbf24" stroke-width="1.5"/><text x="120" y="140" text-anchor="middle" fill="#fbbf24" font-size="9">Time = Alarm?</text>
+      <path d="M 190 136 L 220 136" stroke="#6b7280" stroke-width="1" marker-end="url(#fa)"/>
+      <text x="205" y="128" fill="#6b7280" font-size="8">no</text>
+      <path d="M 220 136 L 220 71 L 175 71" stroke="#6b7280" stroke-width="1" marker-end="url(#fa)"/>
+      <text x="220" y="60" text-anchor="middle" fill="#6b7280" font-size="7">wait 30s</text>
+      <path d="M 120 166 L 120 186" stroke="#6b7280" stroke-width="1" marker-end="url(#fa)"/>
+      <text x="130" y="180" fill="#6b7280" font-size="8">yes</text>
+      <rect x="55" y="186" width="130" height="30" fill="none" stroke="#b8ef4a" stroke-width="1.5"/><text x="120" y="205" text-anchor="middle" fill="#b8ef4a" font-size="10">Sound Alarm</text>
+      <path d="M 120 216 L 120 232" stroke="#6b7280" stroke-width="1" marker-end="url(#fa)"/>
+      <ellipse cx="120" cy="245" rx="42" ry="15" fill="none" stroke="#60a5fa" stroke-width="1.5"/><text x="120" y="249" text-anchor="middle" fill="#60a5fa" font-size="10">STOP</text>
+      <defs><marker id="fa" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#6b7280"/></marker></defs>
+    </svg>
+    <div class="diagram-caption">The "check alarm time" flowchart — the "no" path loops back to keep checking; the "yes" path sounds the alarm.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — concert ticket cost calculator</h4>
+    <ul>
+      <li>Tickets cost $20 each. 10+ tickets → 10% discount. 20+ tickets → 20% discount. Maximum 25 tickets per transaction.</li>
+      <li>Algorithm: START → output prompt → INPUT N (number of tickets) → check <code>N ≥ 1 AND N &lt; 26</code> (if not, stop/reject) → check <code>N &lt; 10</code> (discount D=0) → else check <code>N &lt; 20</code> (D=0.1) → else D=0.2 → calculate <code>Cost ← N * (1 - D)</code> → OUTPUT cost → STOP.</li>
+      <li>Variable names are kept SHORT (N for number of tickets, D for discount) so the text fits neatly inside flowchart boxes.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — flowcharts and their standard symbols.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">How many outputs does a decision flowchart symbol always have?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Always exactly <strong>two</strong>, and both flow lines out of it should be clearly labelled (e.g. yes/no).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Which single flowchart symbol is used for BOTH input and output?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The parallelogram — the same symbol shows both entering data (e.g. <code>INPUT X</code>) and displaying it (e.g. <code>OUTPUT "Error"</code>).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In the concert ticket example, buying 10 tickets gives a ______% discount, and buying 20 tickets gives a ______% discount.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>10</strong>. Blank 2: <strong>20</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student draws a decision box in their flowchart with only ONE flow line leaving it. What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A decision symbol must ALWAYS have exactly two outputs (e.g. yes/no) — a decision with only one way out isn't genuinely deciding between two possible paths, and doesn't match the standard symbol's definition.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A vending machine flowchart needs to: ask for a coin, check if enough money has been inserted, and either dispense the item or ask for more money. Describe which flowchart symbols would be used for each of these three steps.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Ask for a coin" and "insert coin" → an input/output symbol (parallelogram). "Check if enough money has been inserted" → a decision symbol (diamond), with two labelled paths (e.g. yes/no). "Dispense the item" or "ask for more money" → each a process symbol (rectangle) or another input/output symbol, depending on whether it's an action or a message shown to the user.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is shown inside a process box if that process is defined elsewhere (not fully detailed in this flowchart)?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Just the NAME of that process (e.g. "Sort list"), rather than the full detail of how it works.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.2c Flowcharts<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.2
+  </div>
+
+</div>
+</body>
+</html>
