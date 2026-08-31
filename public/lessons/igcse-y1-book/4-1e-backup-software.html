@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.1e Back-up Software — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 4 · Software</span>
+  <div class="topic-title">4.1e Back-up Software</div>
+  <div class="topic-subtitle">Three copies, three locations — how Windows File History and Mac Time Machine actually protect your data.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Restore point</div><div class="key-term-def">A saved snapshot of a computer's state at an earlier time, allowing rollback if something goes wrong.</div></div>
+    <div class="key-term-card"><div class="key-term-name">File History</div><div class="key-term-def">Windows' backup utility — takes snapshots of files at regular intervals onto an external drive.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Time Machine</div><div class="key-term-def">Mac OS's backup utility — replaces a drive's contents with backed-up data using hourly/daily/weekly backups.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why use the OS backup utility (not just manual backups)</h4>
+    <ul>
+      <li>Manual backups (e.g. to a memory stick) are sensible, but the OS backup utility adds real value: it allows a SCHEDULE for backing up files, and only backs up when there have been actual CHANGES to a file.</li>
+      <li>For total security, three versions of a file should exist: (1) the current working version on the internal HDD/SSD; (2) a LOCAL backup copy (e.g. portable SSD); (3) a REMOTE backup, stored well away from the computer (e.g. cloud storage).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Windows backup facilities</h4>
+    <ul>
+      <li>RESTORE data/files/the whole computer from a backup — useful if files are lost and need recovery.</li>
+      <li>Create a <b>restore point</b> — a "time machine" letting the computer be restored to an earlier state — very useful if an important file is deleted and can't be recovered any other way.</li>
+      <li>Options to choose WHERE backup files are saved — can be automated to a chosen device.</li>
+      <li><b>File History</b>: takes snapshots of files at regular intervals onto an external HDD, building up a library of past file versions over time. Defaults to backing up EVERY HOUR, and retains past versions FOREVER unless the user changes this setting.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Mac OS's Time Machine</h4>
+    <ul>
+      <li>Erases the selected drive's contents and replaces them with the backup's contents.</li>
+      <li>Requires an external HDD/SSD connected via USB, with Time Machine installed and activated.</li>
+      <li>Automatically backs up: EVERY HOUR; DAILY backups for the past month; WEEKLY backups for all months before that.</li>
+      <li>Once the backup drive is almost full, the OLDEST backups are deleted and replaced with the newest data.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Time Machine's backup schedule at a glance</div>
+    <p><b>Hourly</b> → most recent backups, high granularity. <b>Daily</b> → for the past month. <b>Weekly</b> → for everything before that. When storage runs low, the OLDEST data is dropped first, keeping the most recent backups intact.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — backup software.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">For "total security", what three versions of a file should exist?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1. The current working version (internal HDD/SSD). 2. A local backup copy (e.g. portable SSD). 3. A remote backup, stored well away from the computer (e.g. cloud storage).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is a "restore point", and when would it be especially useful?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A restore point saves the computer's state at an earlier time, letting it be rolled back to that point. It's especially useful if an important file has been deleted and can't be recovered by any other utility.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Windows File History backs up by default every ______, and retains past file versions ______ unless the user changes this setting.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>hour</strong>. Blank 2: <strong>forever</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "The OS backup utility performs a full backup of every single file, every single time it runs, regardless of whether anything changed." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson explicitly states the OS backup utility only carries out a backup procedure if there have been CHANGES made to a file — it doesn't blindly re-backup unchanged files every time.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A Mac user's Time Machine backup drive is nearly full, but they keep using it without buying a new one. Using this lesson's content, explain what will happen to their oldest backups.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Once the backup drive is almost full, the OLDEST backups are automatically deleted and replaced with the newest backup data — so their earliest historical backups will gradually be lost to make room for more recent ones.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What must be true of a drive before Time Machine can be used with it?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It must be an external HDD or SSD, connected via USB, with the Time Machine utility installed and activated on the computer.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 4: Software — 4.1e Back-up Software<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 4.1
+  </div>
+
+</div>
+</body>
+</html>
