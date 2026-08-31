@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.2c Check Digits — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block ol { margin: 6px 0; padding-left: 20px; font-size: 12.5px; color: #d1d5db; line-height: 1.8; font-family: ui-monospace, monospace; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 2 · Data Transmission</span>
+  <div class="topic-title">2.2c Check Digits</div>
+  <div class="topic-subtitle">The final digit that catches mis-typed barcodes and product codes — using two real algorithms: ISBN-13 and Modulo-11.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Check digit</div><div class="key-term-def">The final digit in a code, calculated from all the other digits, used to catch data-entry errors.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Transposition error</div><div class="key-term-def">Two digits swapping order by mistake, e.g. 5037 typed instead of 5307.</div></div>
+    <div class="key-term-card"><div class="key-term-name">ISBN-13</div><div class="key-term-def">A 13-digit book identification code whose 13th digit is a check digit, calculated from the other 12.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Modulo-11</div><div class="key-term-def">A check-digit method usable on numbers of varying length, using positional weightings (8,7,6,...) and division by 11.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What check digits catch</h4>
+    <ul>
+      <li>Check digits are used on barcodes such as ISBNs (books) and VINs (vehicles) to catch data-entry errors from mis-typing or mis-scanning.</li>
+      <li>They typically catch: an incorrect digit (5327 instead of 5307); a <b>transposition error</b> (5037 instead of 5307); omitted or extra digits (537 or 53107 instead of 5307); and phonetic errors (13 instead of 30).</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">ISBN-13 — generating the check digit</div>
+    <p>Algorithm: (1) add all odd-positioned digits; (2) add all even-positioned digits, ×3; (3) add both totals, ÷10; (4) if remainder is 0, that's the check digit — otherwise, check digit = 10 − remainder.</p>
+    <p>Worked example, using ISBN <code>978034098382</code> (12 digits, no check digit yet):</p>
+    <ol>
+      <li>Odd digits: 9+8+3+0+8+8 = 36</li>
+      <li>Even digits ×3: 3 × (7+0+4+9+3+2) = 3 × 25 = 75</li>
+      <li>(36 + 75) / 10 = 111/10 = 11 remainder 1</li>
+      <li>10 − 1 = <b>9</b> (the check digit)</li>
+    </ol>
+    <p>Final 13-digit ISBN: <code>9780340983829</code></p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">ISBN-13 — verifying a 13-digit code</div>
+    <p>Algorithm: (1) add all odd-positioned digits INCLUDING the check digit; (2) add even-positioned digits ×3; (3) add both totals, ÷10; (4) code is correct if remainder = 0.</p>
+    <p>Using the full 13-digit ISBN <code>9780340983829</code>:</p>
+    <ol>
+      <li>Odd digits (incl. check digit): 9+8+3+0+8+8+9 = 45</li>
+      <li>Even digits ×3: 3 × (7+0+4+9+3+2) = 75</li>
+      <li>(45 + 75) / 10 = 120/10 = 12 remainder <b>0</b></li>
+      <li>Remainder is 0 → the number is <b>correct</b>.</li>
+    </ol>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Modulo-11 — generating the check digit</div>
+    <p>Algorithm (for a 7-digit number): (1) weight each digit 8,7,6,5,4,3,2 from the left; (2) multiply each digit by its weighting and sum; (3) divide the total by 11; (4) check digit = 11 − remainder (if remainder is 10, use 'X').</p>
+    <p>Worked example, using 7-digit number <code>4156710</code>:</p>
+    <ol>
+      <li>(8×4)+(7×1)+(6×5)+(5×6)+(4×7)+(3×1)+(2×0) = 32+7+30+30+28+3+0 = 130</li>
+      <li>130 / 11 = 11 remainder 9</li>
+      <li>11 − 9 = <b>2</b> (the check digit)</li>
+    </ol>
+    <p>Final 8-digit number: <code>41567102</code></p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Modulo-11 — verifying an 8-digit code</div>
+    <p>Algorithm: (1) weight each digit 8,7,6,5,4,3,2,1 from the left (now including the check digit); (2) multiply and sum; (3) divide by 11; (4) correct if remainder = 0.</p>
+    <p>Using 8-digit number <code>41567102</code>:</p>
+    <ol>
+      <li>(8×4)+(7×1)+(6×5)+(5×6)+(4×7)+(3×1)+(2×0)+(1×2) = 32+7+30+30+28+3+0+2 = 132</li>
+      <li>132 / 11 = 12 remainder <b>0</b></li>
+      <li>Remainder is 0 → the number is <b>correct</b>.</li>
+    </ol>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — check digits (ISBN-13 and Modulo-11).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is a "transposition error", and give the example from this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A transposition error is when two adjacent digits swap places by mistake — e.g. <strong>5037</strong> entered instead of the correct <strong>5307</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the Modulo-11 method, what special check digit is used if the calculation produces a remainder of 10?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The letter <strong>'X'</strong> is used as the check digit.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In ISBN-13's generation algorithm, if the remainder after step 3 is NOT zero, the check digit = ______ − remainder.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>10</strong> − remainder.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student verifying an ISBN-13 code gets a remainder of 3 in the final step, and concludes: "The remainder isn't 0, so I need to recalculate the check digit and use 10 minus 3." What's wrong with this reasoning?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The "10 − remainder" step only applies when GENERATING a new check digit from the 12 other digits. During VERIFICATION of a full 13-digit code (already including its check digit), a non-zero remainder simply means the code is INCORRECT — there is no recalculation step; it just fails the check.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A 7-digit product code is <code>3216450</code>. Using the Modulo-11 method (weightings 8,7,6,5,4,3,2), calculate its check digit, showing each step.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1. (8×3)+(7×2)+(6×1)+(5×6)+(4×4)+(3×5)+(2×0) = 24+14+6+30+16+15+0 = 105.</p>
+      <p>2. 105 / 11 = 9 remainder 6.</p>
+      <p>3. 11 − 6 = <strong>5</strong> (the check digit). Final 8-digit code: <code>32164505</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name one real product/document type (besides books) that uses check digits, according to this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Vehicle Identification Numbers (VINs)</strong> — also, product barcodes generally.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 2: Data Transmission — 2.2c Check Digits<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 2.2
+  </div>
+
+</div>
+</body>
+</html>

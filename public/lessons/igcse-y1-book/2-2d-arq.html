@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.2d Automatic Repeat Requests (ARQ) — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.8; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 2 · Data Transmission</span>
+  <div class="topic-title">2.2d Automatic Repeat Requests (ARQ)</div>
+  <div class="topic-subtitle">A third error-checking method — acknowledgements and timeouts working together to guarantee data eventually arrives correctly.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">ARQ</div><div class="key-term-def">Automatic Repeat Request — uses acknowledgements and timeouts to detect errors and automatically request re-transmission.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Positive acknowledgement</div><div class="key-term-def">A message telling the sender the data was received correctly (no error detected).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Negative acknowledgement</div><div class="key-term-def">A message telling the sender an error WAS detected — requests re-transmission.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Timeout</div><div class="key-term-def">The time interval the sender waits for any acknowledgement before automatically re-sending the data.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>How ARQ works</h4>
+    <ul>
+      <li>ARQ is a THIRD method (alongside parity checks and echo checks) to verify data arrived unchanged.</li>
+      <li>It uses positive and negative <b>acknowledgements</b> — messages telling the sender whether data has/hasn't been received correctly — plus a <b>timeout</b>, the time allowed to elapse before an acknowledgement must arrive.</li>
+      <li>The receiving device gets an error-detection code with the data (typically a <b>Cyclic Redundancy Check</b>, CRC) to check for transmission errors.</li>
+      <li>If NO error is detected: a <b>positive acknowledgement</b> is sent back to the sender.</li>
+      <li>If an error IS detected: the receiver sends a <b>negative acknowledgement</b>, requesting re-transmission.</li>
+      <li>The sender waits a pre-determined time (the timeout). If NO acknowledgement of any kind arrives within that time, the sender automatically RE-SENDS the data.</li>
+      <li>This repeats until either a positive acknowledgement is received, OR a pre-determined maximum number of re-transmissions has been reached.</li>
+      <li>ARQ is commonly used by mobile phone networks to guarantee data integrity.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="420" height="150" viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="20" width="90" height="30" rx="6" fill="#111320" stroke="#60a5fa"/><text x="55" y="39" text-anchor="middle" fill="#60a5fa" font-size="10" font-family="system-ui">Sender</text>
+      <rect x="320" y="20" width="90" height="30" rx="6" fill="#111320" stroke="#e879f9"/><text x="365" y="39" text-anchor="middle" fill="#e879f9" font-size="10" font-family="system-ui">Receiver</text>
+      <path d="M 102 35 L 318 35" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#f1)"/>
+      <defs><marker id="f1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#9ca3af"/></marker></defs>
+      <text x="210" y="27" text-anchor="middle" fill="#6b7280" font-size="8">data + CRC</text>
+
+      <path d="M 318 65 L 102 65" stroke="#4ade80" stroke-width="1.5" marker-end="url(#f2)"/>
+      <defs><marker id="f2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#4ade80"/></marker></defs>
+      <text x="210" y="60" text-anchor="middle" fill="#4ade80" font-size="8">✓ positive ACK (no error)</text>
+
+      <path d="M 318 95 L 102 95" stroke="#f87171" stroke-width="1.5" marker-end="url(#f3)"/>
+      <defs><marker id="f3" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#f87171"/></marker></defs>
+      <text x="210" y="90" text-anchor="middle" fill="#f87171" font-size="8">✗ negative ACK (error!) → re-send</text>
+
+      <text x="210" y="120" text-anchor="middle" fill="#fbbf24" font-size="8">no ACK within timeout → sender re-sends automatically</text>
+    </svg>
+    <div class="diagram-caption">ARQ's three possible outcomes after data is sent: positive ACK, negative ACK, or silence (timeout triggers automatic resend).</div>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Pseudocode — sender-side ARQ logic</span>DECLARE maxRetries, attempts : INTEGER
+DECLARE ackReceived : BOOLEAN
+
+attempts ← 0
+ackReceived ← FALSE
+
+WHILE ackReceived = FALSE AND attempts < maxRetries
+  SEND data, crcCode
+  WAIT FOR acknowledgement UNTIL timeout
+
+  IF positiveAcknowledgementReceived THEN
+    ackReceived ← TRUE
+  ELSE
+    attempts ← attempts + 1
+    // negative ACK or timeout - loop repeats and resends
+  ENDIF
+ENDWHILE</div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — Automatic Repeat Requests (ARQ).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What TWO mechanisms does ARQ rely on to check and correct transmission errors?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Acknowledgements</strong> (positive/negative) and a <strong>timeout</strong> (the time allowed before an acknowledgement must arrive).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What error-detection code does the receiving device typically use to check the incoming data in ARQ?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A <strong>Cyclic Redundancy Check (CRC)</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      If NO acknowledgement of any kind is received within the ______, the sender automatically ______ the data.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>timeout</strong> (time limit). Blank 2: <strong>re-sends</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "ARQ will keep re-sending data forever until it succeeds, no matter what." What real limit from this lesson does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>ARQ re-sends data until EITHER a positive acknowledgement is received OR a pre-determined MAXIMUM number of re-transmissions has been reached — it does not necessarily continue "forever"; there's a built-in cap on retries.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A sender transmits a data packet, but due to a network fault, the packet never actually reaches the receiver at all. Using this lesson's content, explain what happens next in the ARQ process.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Since the packet never arrived, the receiver can send neither a positive nor a negative acknowledgement. The sender's timeout will therefore expire with NO acknowledgement received at all, which automatically triggers the sender to re-send the data — this is exactly the scenario the timeout mechanism is designed to catch (not just corrupted data, but data that never arrives).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name one real-world system mentioned in this lesson that commonly uses ARQ.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Mobile phone networks</strong> — ARQ is used there to guarantee data integrity.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 2: Data Transmission — 2.2d Automatic Repeat Requests (ARQ)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 2.2
+  </div>
+
+</div>
+</body>
+</html>
