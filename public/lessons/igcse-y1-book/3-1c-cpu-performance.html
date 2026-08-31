@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.1c Cores, Cache &amp; CPU Performance — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; border: 1px solid rgba(255,255,255,.08); text-align: center; }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #fbbf24; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.1c Cores, Cache &amp; Internal Clock</div>
+  <div class="topic-subtitle">The four real factors that determine CPU performance — and why more of any one of them doesn't simply mean "faster".</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Clock speed</div><div class="key-term-def">How many clock cycles occur per second, e.g. 3.5 GHz = 3.5 billion cycles/second.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Overclocking</div><div class="key-term-def">Running the CPU at a higher clock speed than it was designed for, via BIOS settings.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Cache memory</div><div class="key-term-def">Very fast memory located INSIDE the CPU, storing frequently-used instructions/data.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Core</div><div class="key-term-def">One complete processing unit (ALU + control unit + registers). A CPU can have multiple cores (dual, quad, etc.).</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Factor 1: Clock speed</h4>
+    <ul>
+      <li>The system clock defines the clock cycle that synchronises all computer operations, via timing signals on the control bus.</li>
+      <li>A higher clock speed increases processing speed — a typical modern value is <b>3.5 GHz</b> (3.5 billion clock cycles per second).</li>
+      <li>BUT: a higher clock speed alone does NOT necessarily mean better overall performance — other factors matter too.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Factor 2: Bus width</h4>
+    <ul>
+      <li>As covered previously, wider address and data buses can also improve performance (more addressable memory, larger word transport at once).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Factor 3: Overclocking (and its risks)</h4>
+    <ul>
+      <li><b>Overclocking</b> means changing the clock speed via BIOS settings, running the CPU faster than it was designed for.</li>
+      <li>Real risks: instructions executed outside design limits can cause seriously UNSYNCHRONISED operations — an instruction may not complete before the next is due, causing frequent crashes and instability.</li>
+      <li>Overclocking can also cause serious CPU OVERHEATING, leading to further unreliable performance.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Factor 4: Cache memory</h4>
+    <ul>
+      <li>Cache memory sits INSIDE the CPU itself (unlike RAM), giving much faster access times than RAM.</li>
+      <li>It stores frequently-used instructions/data that need faster access, improving CPU performance.</li>
+      <li>When the CPU wants to read memory, it checks the CACHE first, and only falls back to main memory/RAM if the data isn't in the cache.</li>
+      <li>Larger cache size generally means better CPU performance.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Factor 5: Multiple cores</h4>
+    <ul>
+      <li>One core = one ALU + one control unit + registers. CPUs commonly have 2 cores (dual-core) or 4 cores (quad-core).</li>
+      <li>More cores reduces the need to keep increasing clock speed to improve performance.</li>
+      <li>HOWEVER: doubling the number of cores does NOT simply double performance — the CPU must communicate with each core, and this communication overhead grows fast: a dual-core CPU needs just 1 communication channel between its 2 cores, but a quad-core CPU needs 6 channels to connect all 4 cores to each other — considerably reducing the potential performance gain.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="380" height="150" viewBox="0 0 380 150" xmlns="http://www.w3.org/2000/svg">
+      <text x="90" y="16" text-anchor="middle" fill="#9ca3af" font-size="10" font-family="system-ui">Dual-core: 1 channel</text>
+      <circle cx="50" cy="45" r="20" fill="rgba(96,165,250,.1)" stroke="#60a5fa"/><text x="50" y="49" text-anchor="middle" fill="#60a5fa" font-size="10">C1</text>
+      <circle cx="130" cy="45" r="20" fill="rgba(96,165,250,.1)" stroke="#60a5fa"/><text x="130" y="49" text-anchor="middle" fill="#60a5fa" font-size="10">C2</text>
+      <line x1="70" y1="45" x2="110" y2="45" stroke="#4ade80" stroke-width="1.5"/>
+
+      <text x="290" y="16" text-anchor="middle" fill="#9ca3af" font-size="10" font-family="system-ui">Quad-core: 6 channels</text>
+      <circle cx="250" cy="35" r="18" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="250" y="39" text-anchor="middle" fill="#e879f9" font-size="9">C1</text>
+      <circle cx="330" cy="35" r="18" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="330" y="39" text-anchor="middle" fill="#e879f9" font-size="9">C2</text>
+      <circle cx="250" cy="110" r="18" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="250" y="114" text-anchor="middle" fill="#e879f9" font-size="9">C3</text>
+      <circle cx="330" cy="110" r="18" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="330" y="114" text-anchor="middle" fill="#e879f9" font-size="9">C4</text>
+      <g stroke="#fbbf24" stroke-width="1">
+        <line x1="268" y1="35" x2="312" y2="35"/>
+        <line x1="250" y1="53" x2="250" y2="92"/>
+        <line x1="330" y1="53" x2="330" y2="92"/>
+        <line x1="268" y1="110" x2="312" y2="110"/>
+        <line x1="262" y1="47" x2="318" y2="98"/>
+        <line x1="318" y1="47" x2="262" y2="98"/>
+      </g>
+    </svg>
+    <div class="diagram-caption">More cores need exponentially more communication channels — this overhead eats into the theoretical performance gain.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — clock speed, overclocking, cache, and cores.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does a clock speed of 3.5 GHz actually mean?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>3.5 GHz means <strong>3.5 billion clock cycles per second</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Name TWO real risks of overclocking a CPU.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Unsynchronised operations causing frequent crashes/instability (instructions can't complete in time), and serious CPU overheating leading to unreliable performance.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      When the CPU wants to read memory, it first checks the ______, and only falls back to ______ if the required data isn't found there.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>cache</strong> (cache memory). Blank 2: <strong>main memory / RAM</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Doubling the number of CPU cores always doubles the computer's performance." What real factor does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It ignores the communication overhead BETWEEN cores. A dual-core needs only 1 channel between its cores, but a quad-core needs 6 channels to connect all 4 cores — this overhead genuinely reduces the performance gain, meaning doubling cores does NOT simply double performance.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user overclocks their CPU to make their computer run faster, and shortly afterwards notices frequent system crashes and a CPU that runs unusually hot. Using this lesson's content, explain the likely cause.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson identifies both symptoms as real risks of overclocking: running instructions beyond the CPU's design limits causes unsynchronised operations (instructions failing to complete in time), leading directly to crashes/instability, while operating outside design limits also causes serious overheating — both are direct, expected consequences of overclocking, not unrelated coincidences.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is cache memory, and what is its main advantage over RAM?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Cache memory is very fast memory located INSIDE the CPU itself, storing frequently-used instructions/data. Its main advantage is much FASTER access time than RAM, since it doesn't need to travel outside the CPU.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.1c Cores, Cache &amp; Internal Clock<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.1
+  </div>
+
+</div>
+</body>
+</html>
