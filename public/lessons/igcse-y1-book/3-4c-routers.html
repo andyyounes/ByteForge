@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.4c Routers — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.4c Routers</div>
+  <div class="topic-subtitle">The device that translates between networks — using IP addresses to find the right switch, and MAC addresses to find the right device.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Router</div><div class="key-term-def">Connects and routes data packets between different networks (e.g. a LAN to a WAN), converting protocols/formats as needed.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Switch</div><div class="key-term-def">Delivers data to the correct device on a LAN, using its MAC address.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Firewall</div><div class="key-term-def">Protects the computers on a network; broadband routers typically sit behind one.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What routers do</h4>
+    <ul>
+      <li>Routers enable data packets to move BETWEEN different networks — e.g. connecting a LAN to a WAN.</li>
+      <li>A router takes data in one network's format/protocol and CONVERTS it to a format the other network understands, allowing them to communicate.</li>
+      <li>A typical router has an internet cable plugged in, plus several cables to computers/devices on the LAN.</li>
+      <li>Broadband routers sit BEHIND a firewall, which protects the network's computers. The router's main job: transmit internet/transmission protocols between two networks, and connect private networks together.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="380" height="130" viewBox="0 0 380 130" xmlns="http://www.w3.org/2000/svg">
+      <text x="40" y="20" text-anchor="middle" fill="#6b7280" font-size="9" font-family="system-ui">Internet</text>
+      <path d="M 40 30 L 40 55" stroke="#6b7280" stroke-width="1.5" marker-end="url(#rt1)"/>
+      <defs><marker id="rt1" markerWidth="8" markerHeight="8" refX="4" refY="6" orient="auto"><path d="M0,0 L8,0 L4,8 Z" fill="#6b7280"/></marker></defs>
+      <rect x="10" y="55" width="60" height="30" rx="6" fill="rgba(96,165,250,.1)" stroke="#60a5fa"/><text x="40" y="74" text-anchor="middle" fill="#60a5fa" font-size="9" font-family="system-ui">Router</text>
+      <path d="M 72 70 L 130 70" stroke="#6b7280" stroke-width="1.5" marker-end="url(#rt2)"/>
+      <defs><marker id="rt2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6b7280"/></marker></defs>
+      <rect x="135" y="55" width="60" height="30" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a"/><text x="165" y="74" text-anchor="middle" fill="#b8ef4a" font-size="9" font-family="system-ui">Switch</text>
+      <path d="M 197 65 L 260 40" stroke="#6b7280" stroke-width="1"/>
+      <path d="M 197 70 L 260 70" stroke="#6b7280" stroke-width="1"/>
+      <path d="M 197 75 L 260 100" stroke="#6b7280" stroke-width="1"/>
+      <rect x="265" y="25" width="60" height="24" rx="4" fill="#111320" stroke="#e879f9"/><text x="295" y="41" text-anchor="middle" fill="#e879f9" font-size="8" font-family="system-ui">Computer</text>
+      <rect x="265" y="58" width="60" height="24" rx="4" fill="#111320" stroke="#e879f9"/><text x="295" y="74" text-anchor="middle" fill="#e879f9" font-size="8" font-family="system-ui">Server</text>
+      <rect x="265" y="91" width="60" height="24" rx="4" fill="#111320" stroke="#e879f9"/><text x="295" y="107" text-anchor="middle" fill="#e879f9" font-size="8" font-family="system-ui">Computer</text>
+    </svg>
+    <div class="diagram-caption">Router flow: internet → router (protocol conversion) → switch (uses IP to find the right switch, MAC to find the right device) → LAN devices.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>How a router delivers a packet to the right device</h4>
+    <ul>
+      <li>Routers INSPECT the data packet sent from any connected computer/network.</li>
+      <li>Since every device on the same network shares part of the same IP address structure, the router sends the packet to the correct SWITCH.</li>
+      <li>The switch then delivers the packet to the correct DEVICE using its MAC destination address.</li>
+      <li>If a MAC address doesn't match any device on that switch, the packet is passed to ANOTHER switch on the same network, until the right device is found.</li>
+      <li>Routers can be WIRED or WIRELESS devices.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — routers.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the core function of a router?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To enable data packets to be routed BETWEEN different networks (e.g. connecting a LAN to a WAN), converting the data's format/protocol so the two networks can communicate.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Once a router has directed a packet to the correct switch, what address does the switch use to find the exact right device?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The device's <strong>MAC destination address</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Broadband routers typically sit ______ a firewall, which protects the ______ on the network.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>behind</strong>. Blank 2: <strong>computers</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "A router alone delivers a packet all the way to the exact correct device, using only the IP address." What real step does this miss?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The router uses the IP address to find the correct SWITCH, but it's the SWITCH — not the router — that then delivers the packet to the exact correct device, using its MAC destination address. There are genuinely two separate steps here, using two different address types.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A switch receives a packet from a router, but the destination MAC address doesn't match any device currently connected to that switch. Using this lesson's content, explain what happens next.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The packet is passed on to ANOTHER switch on the same network, and this continues until a switch is found where a device's MAC address actually matches the destination — at which point the packet is delivered to that device.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Can a router be wireless? What form can routers take, according to this lesson?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Yes — routers can be either WIRED or WIRELESS devices.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.4c Routers (completes Unit 3)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.4
+  </div>
+
+</div>
+</body>
+</html>
