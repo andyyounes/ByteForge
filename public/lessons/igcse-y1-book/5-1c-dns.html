@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.1c Domain Name Servers (DNS) — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #93c5fd; line-height: 1.9; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .pseudo-block ol { margin: 0; padding-left: 20px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 5 · The Internet &amp; Its Uses</span>
+  <div class="topic-title">5.1c Domain Name Servers (DNS)</div>
+  <div class="topic-subtitle">Why you never have to memorise an IP address — the lookup chain behind every URL you type.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">HTML</div><div class="key-term-def">HyperText Markup Language — used to structure/display website content in a browser.</div></div>
+    <div class="key-term-card"><div class="key-term-name">DNS</div><div class="key-term-def">Domain Name Server/System — finds the IP address matching a URL's domain name.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why DNS is needed</h4>
+    <ul>
+      <li>Websites are written in HTML and hosted on a web server with its OWN IP address.</li>
+      <li>To retrieve pages, the browser needs that IP address — but users type a readable URL, not a raw IP.</li>
+      <li><b>DNS</b> converts a URL (e.g. www.hoddereducation.co.uk) into the matching IP address (e.g. 107.162.140.19) the computer understands.</li>
+      <li>DNS/URLs eliminate the need to MEMORISE IP addresses.</li>
+      <li>DNS servers hold a DATABASE of URLs matched to IP addresses. The lookup process can involve MORE THAN ONE server.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">The DNS lookup process — step by step</span><ol>
+<li>User types the URL into their browser; the browser asks DNS server (1) for the matching IP address</li>
+<li>If DNS server (1) can't find it in its own database/cache, it forwards the request to DNS server (2)</li>
+<li>DNS server (2) finds the URL and its matching IP address</li>
+<li>This IP address is sent BACK to DNS server (1), which now stores it in its own cache/database (for next time)</li>
+<li>The IP address is sent back to the user's computer</li>
+<li>The computer sets up communication with the website server directly; HTML pages are downloaded and the browser interprets/displays them</li>
+</ol></div>
+
+  <div class="diagram-box">
+    <svg width="380" height="110" viewBox="0 0 380 110" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="40" width="70" height="30" rx="6" fill="#111320" stroke="#60a5fa"/><text x="45" y="59" text-anchor="middle" fill="#60a5fa" font-size="9" font-family="system-ui">Computer</text>
+      <path d="M 82 50 L 128 30" stroke="#6b7280" stroke-width="1" marker-end="url(#dn1)"/>
+      <path d="M 82 60 L 128 80" stroke="#6b7280" stroke-width="1" marker-end="url(#dn1)"/>
+      <defs><marker id="dn1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6b7280"/></marker></defs>
+      <rect x="135" y="10" width="90" height="30" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a"/><text x="180" y="29" text-anchor="middle" fill="#b8ef4a" font-size="9" font-family="system-ui">DNS server 1</text>
+      <path d="M 227 25 L 253 25" stroke="#6b7280" stroke-width="1" marker-end="url(#dn1)"/>
+      <rect x="260" y="10" width="100" height="30" rx="6" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="310" y="29" text-anchor="middle" fill="#e879f9" font-size="9" font-family="system-ui">DNS server 2</text>
+      <rect x="135" y="70" width="90" height="30" rx="6" fill="rgba(251,191,36,.08)" stroke="#fbbf24"/><text x="180" y="89" text-anchor="middle" fill="#fbbf24" font-size="9" font-family="system-ui">Website server</text>
+    </svg>
+    <div class="diagram-caption">The computer first asks DNS server 1; if it doesn't know the answer, it checks DNS server 2, then relays the IP address back down the chain.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — retrieval/location of web pages via DNS.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the core job of a DNS server?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To find/convert the IP address matching a domain name given in a URL — turning a human-readable web address into the numeric IP address the computer needs.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does DNS server 1 store the IP address in its own cache/database after getting it from DNS server 2?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>So the NEXT time it's asked for that same URL, it already has the answer directly, without needing to forward the request to another DNS server again — speeding up future lookups.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      The DNS process converts a ______ (e.g. www.hoddereducation.co.uk) into an ______ (e.g. 107.162.140.19).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>URL</strong> (domain name). Blank 2: <strong>IP address</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "A user's computer contacts the website server directly using the URL, and the website server itself looks up its own IP address." What real step does this get backwards?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The USER'S computer must first get the IP address from a DNS server BEFORE it can contact the website server at all — the website server isn't involved in the lookup process; the DNS servers do the URL-to-IP conversion, and only afterwards does the computer set up direct communication with the website server using that IP.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user types a URL for a website they've never visited before. DNS server 1 doesn't have it cached. Using this lesson's content, describe the full sequence of events until the web page finally appears on their screen.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1. Browser asks DNS server 1 for the IP address. 2. Not found/cached there, so it's forwarded to DNS server 2. 3. DNS server 2 finds the matching IP address. 4. This is sent back to DNS server 1, which caches it. 5. The IP address is sent back to the user's computer. 6. The computer contacts the website server directly using that IP, downloads the HTML, and the browser interprets/displays it as the visible web page.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What language are websites written in, and what does the browser do with it?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Websites are written in <strong>HTML</strong>. The browser INTERPRETS this HTML to structure and display the content on the user's screen.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 5: The Internet &amp; Its Uses — 5.1c Domain Name Servers (DNS)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 5.1
+  </div>
+
+</div>
+</body>
+</html>
