@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.1a Von Neumann Architecture — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 12px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 5px 8px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 10.5px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.1a The CPU &amp; Von Neumann Architecture</div>
+  <div class="topic-subtitle">The stored-program concept that underlies every modern computer, and the CPU components that carry it out.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">CPU</div><div class="key-term-def">Central Processing Unit — executes all instructions and processes all data in a computer application.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Von Neumann architecture</div><div class="key-term-def">The "stored program" concept (1940s) — programs AND data are both stored together in memory and executed in sequence.</div></div>
+    <div class="key-term-card"><div class="key-term-name">ALU</div><div class="key-term-def">Arithmetic and Logic Unit — carries out arithmetic (+, −, shifts) and logic (AND, OR) operations.</div></div>
+    <div class="key-term-card"><div class="key-term-name">CU</div><div class="key-term-def">Control Unit — reads instructions from memory, decodes them, and generates signals to synchronise the rest of the computer.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Register</div><div class="key-term-def">A tiny, extremely fast storage location inside the CPU used to hold data mid-instruction.</div></div>
+    <div class="key-term-card"><div class="key-term-name">System bus</div><div class="key-term-def">A pathway connecting CPU, memory, and I/O — split into address bus, data bus, and control bus.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The CPU</h4>
+    <ul>
+      <li>The CPU (also called a microprocessor/processor) is central to EVERY modern computer system — including tablets and smartphones — usually built as a single integrated-circuit microchip.</li>
+      <li>The CPU is responsible for executing/processing all instructions and data in an application.</li>
+      <li>It consists of: the <b>control unit (CU)</b>, the <b>arithmetic and logic unit (ALU)</b>, and <b>registers and buses</b>.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The stored-program concept (Von Neumann architecture)</h4>
+    <ul>
+      <li>Early computers had to be FED data while running — they could not store programs or data, so they needed constant human intervention.</li>
+      <li>In the mid-1940s, John von Neumann introduced the "stored program computer" — the basis of computer architecture ever since.</li>
+      <li>Its main novel features (none of which existed before): the concept of a CPU; the CPU could access memory DIRECTLY; memory could store PROGRAMS as well as data; and stored programs are made of instructions executed in SEQUENTIAL order.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>ALU and CU in detail</h4>
+    <ul>
+      <li><b>ALU</b>: performs arithmetic (+, −, shifting) and logic (AND, OR) operations while a program runs. A computer can have more than one ALU for specific tasks. Multiplication and division are actually carried out as a SEQUENCE of addition/subtraction and logical shift operations.</li>
+      <li><b>CU</b>: reads an instruction from memory (its address is held in the Program Counter), interprets it via the Fetch-Decode-Execute cycle, and generates signals on the control bus telling other components what to do. It keeps everything SYNCHRONISED.</li>
+      <li>A <b>system clock</b> produces timing signals on the control bus to keep this synchronisation working — without it, the computer would simply crash.</li>
+      <li><b>RAM</b> (sometimes called the Immediate Access Store, IAS) holds data/programs the CPU needs. The CPU copies data from slower backing store (e.g. hard disk) into RAM temporarily, since RAM read/write is much faster — speeding up operations considerably.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">The five key special-purpose registers</div>
+    <table>
+      <tr><th>Register</th><th>Abbrev.</th><th>Purpose</th></tr>
+      <tr><td>Current Instruction Register</td><td>CIR</td><td>Stores the instruction currently being decoded/executed</td></tr>
+      <tr><td>Accumulator</td><td>ACC</td><td>Temporarily stores data during ALU calculations</td></tr>
+      <tr><td>Memory Address Register</td><td>MAR</td><td>Stores the address currently being read from/written to</td></tr>
+      <tr><td>Memory Data Register</td><td>MDR</td><td>Stores data just read from memory, or about to be written to it</td></tr>
+      <tr><td>Program Counter</td><td>PC</td><td>Stores the address of the NEXT instruction to be read</td></tr>
+    </table>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="420" height="110" viewBox="0 0 420 110" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="30" width="100" height="45" rx="6" fill="rgba(96,165,250,.1)" stroke="#60a5fa"/><text x="60" y="56" text-anchor="middle" fill="#60a5fa" font-size="11" font-family="system-ui">Memory</text>
+      <rect x="160" y="30" width="100" height="45" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a"/><text x="210" y="56" text-anchor="middle" fill="#b8ef4a" font-size="11" font-family="system-ui">CPU</text>
+      <rect x="310" y="30" width="100" height="45" rx="6" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="360" y="56" text-anchor="middle" fill="#e879f9" font-size="11" font-family="system-ui">I/O ports</text>
+      <path d="M 112 42 L 158 42" stroke="#f87171" stroke-width="1.5" marker-end="url(#h1)"/>
+      <path d="M 262 42 L 308 42" stroke="#f87171" stroke-width="1.5" marker-end="url(#h1)"/>
+      <text x="210" y="20" text-anchor="middle" fill="#f87171" font-size="8">address bus →</text>
+      <path d="M 158 55 L 112 55" stroke="#4ade80" stroke-width="1.5" marker-end="url(#h2)"/>
+      <path d="M 308 55 L 262 55" stroke="#4ade80" stroke-width="1.5" marker-end="url(#h2)"/>
+      <text x="210" y="95" text-anchor="middle" fill="#4ade80" font-size="8">← data bus (both ways)</text>
+      <defs>
+        <marker id="h1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#f87171"/></marker>
+        <marker id="h2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#4ade80"/></marker>
+      </defs>
+    </svg>
+    <div class="diagram-caption">The system bus connects CPU, memory, and I/O ports — split into address bus, data bus, and control bus (not shown, runs alongside).</div>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — reading from memory using MAR/MDR</div>
+    <p>Reading memory location <code>1111 0001</code>:</p>
+    <p>1. Address <code>1111 0001</code> is written into the <b>MAR</b>.</p>
+    <p>2. A "read signal" is sent to memory.</p>
+    <p>3. The contents at that address are placed into the <b>MDR</b>: <code>0101 1011</code>.</p>
+    <p style="margin-top:10px;">Writing value <code>1001 0101</code> to location <code>1111 1101</code>:</p>
+    <p>1. The data <code>1001 0101</code> is written into the <b>MDR</b>.</p>
+    <p>2. The target address <code>1111 1101</code> is written into the <b>MAR</b>.</p>
+    <p>3. A "write signal" is sent — the value is written into that memory location.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the CPU and Von Neumann architecture.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Name the four main novel features of Von Neumann's stored-program computer.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The concept of a CPU; the CPU could access memory directly; memory could store programs AS WELL AS data; stored programs are made of instructions executed in sequential order.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is RAM used, if backing store (e.g. hard disk) can already hold all the same data?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Read/write operations to RAM are considerably FASTER than to backing store. Copying key data into RAM temporarily speeds up processing significantly compared to constantly accessing the slower backing store.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      To read memory location X: write X into the ______, send a read signal, then the contents appear in the ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>MAR</strong> (Memory Address Register). Blank 2: <strong>MDR</strong> (Memory Data Register).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Multiplication and division are carried out directly by the ALU as single, one-step operations, just like addition." What does this get wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Multiplication and division are NOT single-step operations — they're carried out as a SEQUENCE of addition, subtraction, and left/right logical shift operations. Only addition/subtraction/shifts are the ALU's true single-step primitives.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A computer needs to write the value <code>1010 1100</code> into memory address <code>0000 1111</code>. Describe, step by step, which registers are used and in what order, based on this lesson's content.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1. The data <code>1010 1100</code> is first written into the <strong>MDR</strong> (Memory Data Register).</p>
+      <p>2. The target address <code>0000 1111</code> is written into the <strong>MAR</strong> (Memory Address Register).</p>
+      <p>3. A "write signal" is sent to memory, and the value is stored at that address.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What would happen to a computer without a working system clock, according to this lesson?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The computer would simply crash — the clock's timing signals on the control bus are what keep every component synchronised; without them, synchronisation breaks down entirely.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.1a The CPU &amp; Von Neumann Architecture<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.1
+  </div>
+
+</div>
+</body>
+</html>
