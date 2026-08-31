@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.1h Memory &amp; Security Management — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 4 · Software</span>
+  <div class="topic-title">4.1h Memory &amp; Security Management (Operating Systems)</div>
+  <div class="topic-subtitle">Two more essential OS jobs — stopping applications from colliding in memory, and keeping data confidential and intact.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Memory protection</div><div class="key-term-def">Ensuring two competing applications cannot use the same memory location at the same time.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Integrity</div><div class="key-term-def">Data being accurate and unaltered.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Confidentiality</div><div class="key-term-def">Data being accessible only to those authorised to see it.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Privilege</div><div class="key-term-def">Access-level restrictions preventing users from entering "private areas" they aren't authorised for.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Memory management</h4>
+    <ul>
+      <li>Manages primary storage (RAM), moving data between RAM and HDD/SSD as programs run.</li>
+      <li>Keeps track of ALL memory locations currently in use.</li>
+      <li>Carries out <b>memory protection</b> — ensuring two competing applications can never use the SAME memory location at the same time.</li>
+      <li>Without memory protection, real problems could occur: data loss; applications producing WRONG results (using incorrect data in memory); SECURITY issues (data in the wrong location becoming accessible to other software); and in extreme cases, a system CRASH.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Security management</h4>
+    <ul>
+      <li>Ensures the INTEGRITY, CONFIDENTIALITY, and AVAILABILITY of data. Achieved by:</li>
+      <li>Carrying out OS updates as they become available.</li>
+      <li>Keeping anti-virus/security software up to date, preserving data integrity/security/privacy.</li>
+      <li>Communicating with a FIREWALL to check all traffic to/from the computer.</li>
+      <li>Using PRIVILEGES to prevent users entering "private areas" on multi-user computers (via user accounts, passwords, user IDs) — protecting data privacy.</li>
+      <li>Maintaining ACCESS RIGHTS for all users.</li>
+      <li>Offering data RECOVERY (and system restore) if data is lost/corrupted.</li>
+      <li>Helping prevent ILLEGAL INTRUSION into the system — also protecting data privacy.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — memory management and security management.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is "memory protection", and why does it matter?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Memory protection ensures two competing applications cannot use the SAME memory location at the same time. Without it, data could be lost, applications could give wrong results, security issues could arise (data accessible to unauthorised software), or the computer could crash.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Name three things security management aims to ensure about data.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Its <strong>integrity</strong>, <strong>confidentiality</strong>, and <strong>availability</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Security management uses ______ — via user accounts, passwords, and user IDs — to prevent users entering "private areas" on a multi-user computer.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Privileges</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "If memory protection fails and two applications overlap in memory, the worst that could happen is one program runs a bit slower." What does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This significantly understates the real risks: the lesson lists data LOSS, applications producing genuinely INCORRECT results, real SECURITY issues (unauthorised access to misplaced data), and in extreme cases a full system CRASH — not just a minor slowdown.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A shared family computer has separate accounts for each family member. One child tries to access a parent's private financial documents stored on the same machine. Using this lesson's content, explain what OS feature would normally prevent this.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Privileges</strong>, set up via user accounts, passwords, and user IDs, as part of security management. These are specifically designed to prevent users from entering "private areas" on a multi-user computer, protecting the parent's private files from the child's account.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name one way security management helps if data is lost or corrupted.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It offers data RECOVERY (and system restore) capabilities.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 4: Software — 4.1h Memory &amp; Security Management (Operating Systems)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 4.1
+  </div>
+
+</div>
+</body>
+</html>
