@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.2n Sensors: Monitoring &amp; Control — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; border: 1px solid rgba(255,255,255,.08); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #fbbf24; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #93c5fd; line-height: 1.9; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .pseudo-block ol { margin: 0; padding-left: 20px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.2n Sensors: Fundamentals, Monitoring &amp; Control</div>
+  <div class="topic-subtitle">Turning the real, analogue world into digital data — and the crucial difference between just watching and actually acting.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Sensor</div><div class="key-term-def">An input device that reads/measures a physical property from its surroundings (e.g. temperature, pressure).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Feedback</div><div class="key-term-def">When a system's output (e.g. adjusting a valve) changes the very conditions the sensor measures next.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Monitoring system</div><div class="key-term-def">Watches a process and raises an alert if needed, but has NO effect on what it's watching.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Control system</div><div class="key-term-def">Actively changes the process (valves, motors, etc.) based on sensor readings.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>From analogue reality to digital data</h4>
+    <ul>
+      <li>Real-world physical data (temperature, pressure, etc.) is genuinely ANALOGUE — constantly changing, with no single discrete value. E.g. reading a mercury thermometer requires human judgement of where the mercury sits on the scale.</li>
+      <li>Computers cannot process analogue data directly — an <b>ADC</b> (Analogue-to-Digital Converter) converts the physical value into discrete digital data.</li>
+      <li>When a computer needs to CONTROL a device (motor, valve), it often needs a <b>DAC</b> (Digital-to-Analogue Converter) in reverse, since actuators frequently need analogue signals to operate.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Feedback</h4>
+    <ul>
+      <li>Sensors send CONSTANT readings — they don't wait for a change to occur before reporting.</li>
+      <li>It's the microprocessor that analyses the incoming data and decides what action (if any) to take.</li>
+      <li><b>Feedback</b>: a microprocessor's action (e.g. adjusting a valve or motor) can change the very conditions the sensor measures NEXT — the output affects the next input, forming a loop that keeps adjusting the system towards a desired state.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card">
+      <h5>Monitoring system</h5>
+      <ul>
+        <li>Sensor data → converted via ADC if needed → compared against stored values</li>
+        <li>If outside acceptable range: a WARNING message is shown, or an alarm sounds</li>
+        <li>The system has NO effect on what's being monitored — it simply "watches"</li>
+        <li>Examples: hospital patient vital-sign monitoring, burglar alarm systems, engine temperature checks, river pollution monitoring</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <h5>Control system</h5>
+      <ul>
+        <li>Same sensor → ADC → comparison steps as monitoring</li>
+        <li>If outside acceptable range: signals are sent to VALVES, MOTORS, etc. to actually change the process</li>
+        <li>The output DOES affect the next input (feedback loop)</li>
+        <li>Examples: street lights turning on/off automatically, central heating/AC control, chemical process control, anti-lock brakes, greenhouse environment control</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Real example — a security monitoring system</span><ol>
+<li>System armed via password on a keypad</li>
+<li>Infrared sensor detects intruder movement; acoustic sensor detects footsteps/breaking glass; pressure sensor detects weight through a door/window</li>
+<li>Analogue sensor data passed through an ADC to produce digital data</li>
+<li>Microprocessor samples this digital data at a set frequency (e.g. every 5 seconds)</li>
+<li>Data compared against stored acceptable values</li>
+<li>If any value is outside the acceptable range: signal sent to a siren (sound alarm) and/or a light (start flashing) — a DAC is used if these devices need analogue signals</li>
+<li>Alarm/lights continue until the system is reset with a password</li>
+</ol></div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — sensor fundamentals, monitoring, and control.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the essential difference between a monitoring system and a control system?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A monitoring system only WATCHES a process and raises an alert (warning/alarm) if needed — it has no effect on the process itself. A control system actively CHANGES the process (via valves, motors, etc.) in response to sensor readings.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is an ADC needed between a sensor and a computer?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Real-world sensor readings are analogue in nature, but computers can only process digital data — an ADC converts the continuous analogue value into discrete digital data the computer can work with.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In a feedback loop, the ______ of a control system affects the next set of ______ received by its sensors.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>output</strong>. Blank 2: <strong>inputs</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "A sensor only sends a reading the moment something changes — it stays silent otherwise." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Sensors send CONSTANT readings, regardless of whether anything has changed — they don't wait for a change event. It's the microprocessor receiving that constant stream of data that analyses it and decides whether any action is needed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A greenhouse system needs to keep the temperature within a specific range by automatically opening vents when it gets too hot. Is this a monitoring system or a control system? Justify your answer using this lesson's content.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is a <strong>control</strong> system, not just monitoring. The lesson defines a monitoring system as having no effect on what it watches, whereas a control system actively sends signals to actuators (here, opening vents) to change the process — automatically opening vents to correct the temperature is exactly this active control behaviour, which also creates a feedback loop (the vent opening changes the next temperature reading).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the security alarm example, what stops the alarm from sounding forever once triggered?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The alarm/lights continue until the system is RESET with a password — the reset is what stops it, not any automatic timeout.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.2n Sensors: Fundamentals, Monitoring &amp; Control<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.2
+  </div>
+
+</div>
+</body>
+</html>
