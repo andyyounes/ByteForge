@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.3c Lossless Compression &amp; RLE — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block .mono { font-family: ui-monospace, monospace; font-size: 12.5px; color: #d1d5db; background: rgba(255,255,255,.04); padding: 8px 10px; border-radius: 6px; display: block; margin: 6px 0; overflow-x: auto; white-space: nowrap; }
+  .grid-diagram { display: grid; grid-template-columns: repeat(8, 20px); gap: 1px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.15); width: fit-content; margin: 10px auto; }
+  .grid-diagram div { width: 20px; height: 20px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.8; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.3c Lossless Compression &amp; Run-Length Encoding (RLE)</div>
+  <div class="topic-subtitle">Compression that never throws data away — and RLE, the technique that exploits long runs of repeated data.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Lossless compression</div><div class="key-term-def">Compression where ALL original data can be reconstructed exactly — nothing is permanently discarded.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Run-length encoding (RLE)</div><div class="key-term-def">A lossless compression technique that shrinks runs of identical, adjacent data into a (count, value) pair.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Run</div><div class="key-term-def">A sequence of identical, adjacent data items — e.g. five identical characters in a row.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Flag</div><div class="key-term-def">A special marker value that tells the decoder "the next two values are a (count, code) pair", used when a run is too short to compress on its own.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Lossless compression</h4>
+    <ul>
+      <li>With lossless compression, ALL data from the original uncompressed file can be reconstructed — nothing is lost.</li>
+      <li>This matters for files where any data loss would be disastrous — e.g. a large, complex spreadsheet, or a downloaded application/program.</li>
+      <li><b>Run-length encoding (RLE)</b> is one lossless technique, usable across many file formats.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How RLE works</h4>
+    <ul>
+      <li>RLE reduces the size of a string of adjacent, IDENTICAL data (e.g. repeated colours in an image, or repeated characters in text).</li>
+      <li>A repeating run is encoded as TWO values: the COUNT of identical items in the run, and the CODE of that data item (e.g. its ASCII code for a character).</li>
+      <li>RLE only works well where there's a genuinely LONG run of repeated units — it's not effective on data that constantly changes.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — RLE on text</div>
+    <p>String: <span class="mono">aaaaabbbbccddddd</span> — 16 characters, 16 bytes uncompressed (1 byte/char, ASCII).</p>
+    <p>RLE encoding (count, ASCII code):</p>
+    <span class="mono">05 97 &nbsp; 04 98 &nbsp; 02 99 &nbsp; 05 100</span>
+    <p>This means: 5 characters of ASCII 97 ('a'), 4 of ASCII 98 ('b'), 2 of ASCII 99 ('c'), 5 of ASCII 100 ('d'). That's 8 numbers = <b>8 bytes</b> — exactly half the original file size.</p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">The problem case, and the "flag" fix</div>
+    <p>RLE struggles with a string like <span class="mono">cdcdcdcdcd</span> — there's no long run to compress, so naive RLE can make the file BIGGER, not smaller.</p>
+    <p>The fix: a <b>flag</b> value precedes a genuine (count, code) pair. Without a flag, the next byte(s) are taken at face value with an assumed run of 1 (e.g. <span class="mono">01 99</span> = one character of ASCII 99).</p>
+    <p>Example string: <span class="mono">aaaaaaaa bbbbbbbbbb c d c d c d eeeeeeee</span> (32 characters, 32 bytes uncompressed)</p>
+    <p>Without a flag: <span class="mono">08 97  10 98  01 99  01 100  01 99  01 100  01 99  01 100  08 101</span> → 18 values = 18 bytes.</p>
+    <p>With flag 255 (only added before genuine runs worth compressing): <span class="mono">255 08 97 · 255 10 98 · 99 100 99 100 99 100 · 255 08 101</span> → 15 values = 15 bytes, a <b>~53% reduction</b>.</p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">RLE on a black &amp; white image — the letter 'F'</div>
+    <p>An 8×8 grid, 1 byte per square: white = 1, black = 0.</p>
+    <div class="grid-diagram">
+      <div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div>
+      <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#fff"></div>
+      <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div>
+      <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div>
+      <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#000"></div><div style="background:#fff"></div><div style="background:#fff"></div>
+      <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div>
+      <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div>
+      <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div><div style="background:#fff"></div>
+    </div>
+    <p>Compressed RLE: <span class="mono">9W 6B 2W 1B 7W 1B 7W 5B 3W 1B 7W 1B 7W 1B 6W</span> (using W=1, B=0). The uncompressed grid needs 64 bytes; the RLE version has 30 values — needing only <b>30 bytes</b>.</p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">RLE on a coloured image</div>
+    <p>Each pixel here needs 3 bytes (one each for red, green, blue). An 8×8 coloured image uncompressed = 8 × 8 × 3 = <b>192 bytes</b>.</p>
+    <p>The RLE-compressed version of that same image needs only <b>92 bytes</b> (92 values, one byte each) — a file size reduction of about <b>52%</b>.</p>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Pseudocode — basic RLE encoder (single run)</span>DECLARE data : ARRAY OF CHARACTER
+DECLARE count : INTEGER
+DECLARE i : INTEGER
+
+count ← 1
+i ← 1
+WHILE i < LENGTH(data)
+  IF data[i] = data[i - 1] THEN
+    count ← count + 1
+  ELSE
+    OUTPUT count, ASCII(data[i - 1])
+    count ← 1
+  ENDIF
+  i ← i + 1
+ENDWHILE
+OUTPUT count, ASCII(data[LENGTH(data) - 1])</div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — lossless compression and RLE.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between lossy and lossless compression, in terms of what can be reconstructed?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Lossless compression allows the ORIGINAL file to be reconstructed EXACTLY, with no data lost. Lossy compression permanently discards some data, so the exact original can never be recovered.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">The string "eeeeeeee" (8 identical characters) is RLE-encoded as <code>08 101</code>. Explain what each of the two numbers represents.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>08</code> is the COUNT — how many identical characters are in the run (8). <code>101</code> is the CODE — the ASCII code of the repeated character ('e').</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">RLE only compresses data effectively when there is a long ______ of ______ units.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>run</strong>. Blank 2: <strong>repeated</strong> (identical).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "RLE always makes a file smaller, no matter what the data looks like." Using the "cdcdcdcdcd" example, explain what's wrong with this claim.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A string like "cdcdcdcdcd" has NO long runs of identical adjacent characters — every character is different from its neighbour. Naive RLE on this actually makes the file BIGGER, not smaller (each character needs its own count+code pair). A flag scheme is needed to avoid wasting space on non-runs.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A company needs to compress large spreadsheets containing critical financial data, where even a single incorrect digit could cause serious problems. Should they use a lossy or lossless technique? Justify your answer using this lesson's content.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Lossless</strong> — the lesson explicitly states that lossless compression is important for files where data loss would be "disastrous", giving a large/complex spreadsheet as its own example. Losing even a single value from a financial spreadsheet could be genuinely catastrophic, so a lossy technique (which permanently discards data) is not appropriate here.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">For the coloured 8×8 image example, what was the uncompressed file size, and by roughly what percentage did RLE reduce it?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Uncompressed: <strong>192 bytes</strong> (8 × 8 × 3 bytes per pixel for RGB). RLE reduced it to 92 bytes — a reduction of about <strong>52%</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.3c Lossless Compression &amp; Run-Length Encoding<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.3
+  </div>
+
+</div>
+</body>
+</html>

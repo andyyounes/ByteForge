@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.3a Units &amp; File Size — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block ol { margin: 6px 0; padding-left: 20px; font-size: 12.5px; color: #d1d5db; line-height: 1.8; font-family: ui-monospace, monospace; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 12.5px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 11.5px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.8; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.3a Units of Data Storage &amp; File Size Calculations</div>
+  <div class="topic-subtitle">How memory is measured, and how to actually calculate the size of an image or sound file.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Bit / Byte / Nibble</div><div class="key-term-def">A bit is 1 or 0 (binary digit). A byte is 8 bits. A nibble is 4 bits (half a byte).</div></div>
+    <div class="key-term-card"><div class="key-term-name">SI system (KB/MB/GB)</div><div class="key-term-def">Base-10 units where 1 kilo = 1000. Technically inaccurate for memory, but still commonly used for storage devices.</div></div>
+    <div class="key-term-card"><div class="key-term-name">IEC system (KiB/MiB/GiB)</div><div class="key-term-def">Base-2 units where 1 kibi = 1024 (2¹⁰). The accurate system for memory — used for RAM/ROM. This is the ONLY system covered in the syllabus.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Bandwidth</div><div class="key-term-def">The maximum rate of data transfer across a network, measured in bits per second.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Measuring data storage</h4>
+    <ul>
+      <li>A <b>bit</b> is the basic unit of memory — either 1 or 0. The word comes from "binary digit".</li>
+      <li>A <b>byte</b> is the smallest unit of memory in a computer — 1 byte = 8 bits.</li>
+      <li>A <b>nibble</b> is 4 bits — half a byte.</li>
+      <li>Since 1 byte alone can't store much, memory is measured in larger multiples.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">SI system vs. IEC system</div>
+    <table>
+      <tr><th>SI unit (base 10)</th><th>Value</th><th>IEC unit (base 2)</th><th>Value</th></tr>
+      <tr><td>1 KB</td><td>1,000 bytes</td><td>1 KiB</td><td>2¹⁰ = 1,024 bytes</td></tr>
+      <tr><td>1 MB</td><td>1,000,000 bytes</td><td>1 MiB</td><td>2²⁰ = 1,048,576 bytes</td></tr>
+      <tr><td>1 GB</td><td>1,000,000,000 bytes</td><td>1 GiB</td><td>2³⁰ = 1,073,741,824 bytes</td></tr>
+      <tr><td>1 TB</td><td>10¹² bytes</td><td>1 TiB</td><td>2⁴⁰ bytes</td></tr>
+    </table>
+    <p style="margin-top:10px;">The IEC system is the accurate one, since memory is really organised in powers of 2. Internal memories like RAM and ROM should be measured using IEC units — a 64 GiB RAM stores 64 × 2³⁰ = 68,719,476,736 bytes exactly.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Calculating file size</h4>
+    <ul>
+      <li><b>Image file size</b> = image resolution (in pixels) × colour depth (in bits) — giving the size in bits, which you then divide by 8 for bytes.</li>
+      <li><b>Mono sound file size</b> = sample rate (in Hz) × sample resolution (in bits) × length of sample (in seconds).</li>
+      <li>For a <b>stereo</b> sound file, multiply the mono result by two (there are two audio channels).</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example 1 — how many photos fit on a memory stick?</div>
+    <p>A photograph is 1024 × 1080 pixels, colour depth 32 bits. How many fit on a 64 GiB memory stick?</p>
+    <ol>
+      <li>Total pixels = 1024 × 1080 = 1,105,920 pixels</li>
+      <li>Bits = 1,105,920 × 32 = 35,389,440 bits → bytes = 35,389,440 / 8 = 4,423,680 bytes</li>
+      <li>64 GiB = 64 × 1024 × 1024 × 1024 = 68,719,476,736 bytes</li>
+      <li>Photos that fit = 68,719,476,736 / 4,423,680 = <b>15,534 photos</b></li>
+    </ol>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example 2 — audio CD file size</div>
+    <p>An audio CD: sample rate 44,100 Hz, sample resolution 16 bits, stereo (2 channels), 60-minute recording.</p>
+    <ol>
+      <li>Bits = 44,100 × 16 × (60 × 60) = 2,540,160,000 bits</li>
+      <li>Stereo → × 2 = 5,080,320,000 bits</li>
+      <li>Bytes = 5,080,320,000 / 8 = 635,040,000 bytes</li>
+      <li>MiB = 635,040,000 / 1,048,576 = <b>605 MiB</b></li>
+    </ol>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Pseudocode — image file size calculator</span>DECLARE width, height, colourDepth, totalBits, totalBytes : INTEGER
+
+INPUT width
+INPUT height
+INPUT colourDepth
+
+totalBits ← (width * height) * colourDepth
+totalBytes ← totalBits / 8
+
+OUTPUT "File size in bytes: ", totalBytes</div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — memory units and file size calculations.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which system — SI (KB/MB/GB) or IEC (KiB/MiB/GiB) — is the one covered in the syllabus, and why is it considered more accurate?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The <strong>IEC system</strong> is the one covered. It's more accurate because memory is genuinely organised in powers of 2, and the IEC system's units (e.g. 1 KiB = 1024 bytes) reflect that exactly, unlike the SI system's base-10 approximation (1 KB = 1000 bytes).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">The formula for an image's file size in bits is: image ______ (in pixels) × colour ______ (in bits).</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>resolution</strong>. Blank 2: <strong>depth</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete this pseudocode line that converts a mono sound file size in bits into bytes:<br>
+      <code>totalBytes ← totalBits ______ 8</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>totalBytes ← totalBits / 8</code> — dividing by 8 converts bits to bytes.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student calculates a stereo sound file's size as: <code>sample rate × resolution × length in seconds</code> — with no further step. What real step have they missed?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They've forgotten that for a STEREO file, the mono result must be multiplied by <strong>2</strong> (for the two audio channels) — the formula given only calculates the MONO file size on its own.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A camera detector has an array of 2048 × 2048 pixels and a colour depth of 16 bits. Calculate the size of one image from this camera, in MiB, showing each step.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1. Total pixels = 2048 × 2048 = 4,194,304 pixels.</p>
+      <p>2. Bits = 4,194,304 × 16 = 67,108,864 bits.</p>
+      <p>3. Bytes = 67,108,864 / 8 = 8,388,608 bytes.</p>
+      <p>4. MiB = 8,388,608 / 1,048,576 = <strong>8 MiB</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is "bandwidth", and in what unit is it measured?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Bandwidth is the maximum rate at which data can be transferred across a network, measured in <strong>bits per second</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.3a Units of Data Storage &amp; File Size Calculations<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.3
+  </div>
+
+</div>
+</body>
+</html>
