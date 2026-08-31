@@ -138,8 +138,17 @@ export function IgcseLessonEditor({ classId, file }: { classId: string; file: 'i
 
   // Group by `mod` for display only — it's a plain string tag, not a real
   // grouping object like Grade 6-9's worlds/modules/tiers.
+  //
+  // Self-check book-lesson bubbles (type:'lesson', injected by
+  // scripts/inject-book-lessons-into-map.mjs) are deliberately excluded here:
+  // their own edit path is the separate Textbook editor
+  // (/teacher/class/[id]/lessons/igcse-y1-book), which edits the actual
+  // lesson content the map bubble displays. Listing all 89 of them here too,
+  // as raw-JSON graded-challenge entries, would just be noise — this list
+  // stays focused on the real graded challenges (check(), hints, XP).
   const groups = new Map<string, { challenge: Challenge; index: number }[]>()
   challenges.forEach((ch, index) => {
+    if (ch.type === 'lesson') return
     const list = groups.get(ch.mod) ?? []
     list.push({ challenge: ch, index })
     groups.set(ch.mod, list)
@@ -241,7 +250,10 @@ export function IgcseLessonEditor({ classId, file }: { classId: string; file: 'i
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-[11px] text-fg-dim -mt-1">Click any challenge below to edit it.</p>
+            <p className="text-[11px] text-fg-dim -mt-1">
+              Click any challenge below to edit it. Textbook lessons (the 📗 reading bubbles on the map)
+              are edited separately from the class page&apos;s <strong>Textbook, editable</strong> card.
+            </p>
             {[...groups.entries()].map(([mod, items]) => (
               <div key={mod} className="border border-b2 rounded-md p-2.5">
                 <p className="text-xs font-semibold text-fg px-1.5">{mod}</p>
