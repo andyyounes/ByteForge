@@ -1985,6 +1985,13 @@ function musicTogglePlay() {
 }
 
 function musicStartPlaying() {
+  // Real browsers don't reliably auto-resume a freshly-created AudioContext
+  // even from inside a genuine click handler — some versions/OSes leave it
+  // 'suspended' regardless, which plays every node silently with no error at
+  // all (nothing to catch — the graph runs, nothing audible comes out).
+  // Explicitly resuming on every Play press is the standard defensive fix.
+  const ctx = musicAudioCtx()
+  if (ctx.state === 'suspended') ctx.resume()
   const cfg = activeStage.music || {}
   const steps = cfg.steps || 8
   const rows = (cfg.rows || ['Kick']).length

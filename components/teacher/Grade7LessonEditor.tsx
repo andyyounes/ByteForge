@@ -144,6 +144,7 @@ export function Grade7LessonEditor({ classId }: { classId: string }) {
         {edit ? (
           <EditPanel
             edit={edit}
+            classId={classId}
             jsonRef={jsonRef}
             lessonTitleRef={lessonTitleRef}
             lessonHtmlRef={lessonHtmlRef}
@@ -200,9 +201,10 @@ export function Grade7LessonEditor({ classId }: { classId: string }) {
 }
 
 function EditPanel({
-  edit, jsonRef, lessonTitleRef, lessonHtmlRef, currentLesson, saving, onCancel, onPublish, onRevert, isOverridden,
+  edit, classId, jsonRef, lessonTitleRef, lessonHtmlRef, currentLesson, saving, onCancel, onPublish, onRevert, isOverridden,
 }: {
   edit:           EditTarget
+  classId:        string
   jsonRef:        React.RefObject<HTMLTextAreaElement | null>
   lessonTitleRef: React.RefObject<HTMLInputElement | null>
   lessonHtmlRef:  React.RefObject<HTMLTextAreaElement | null>
@@ -217,6 +219,33 @@ function EditPanel({
     ? { name: edit.world.name, sub: edit.world.sub }
     : edit.stage
   const label = edit.scope === 'world' ? edit.world.name : (edit.stage.name ?? edit.stage.id)
+  const [uploading, setUploading] = useState(false)
+  const [uploadErr, setUploadErr] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleImageFile(file: File) {
+    setUploading(true)
+    setUploadErr('')
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      form.append('classId', classId)
+      const res = await fetch('/api/teacher/upload-image', { method: 'POST', body: form })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Upload failed')
+
+      const tag = `<img src="${data.url}" alt="" style="max-width:100%;border-radius:8px;">`
+      const ta = lessonHtmlRef.current
+      if (ta) {
+        const pos = ta.selectionStart ?? ta.value.length
+        ta.value = ta.value.slice(0, pos) + tag + ta.value.slice(pos)
+      }
+    } catch (e: unknown) {
+      setUploadErr((e as Error).message ?? 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   return (
     <div className="space-y-3">
@@ -227,10 +256,29 @@ function EditPanel({
 
       {edit.scope === 'stage' && (
         <div className="space-y-2 border border-b2 rounded-md p-2.5 bg-s2/40">
-          <p className="text-[11px] font-semibold text-fg">📘 Lesson content</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[11px] font-semibold text-fg">📘 Lesson content</p>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="text-[10.5px] font-semibold px-2 py-1 rounded-md bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {uploading ? 'Uploading…' : '📷 Add image'}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+              className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleImageFile(f); e.target.value = '' }}
+            />
+          </div>
           <p className="text-[10.5px] text-fg-dim">
             The real explainer text shown above this stage. Leave blank to hide the lesson panel for it.
+            Click "Add image" to upload a real photo/diagram — it's inserted into the HTML box below automatically.
           </p>
+          {uploadErr && <p className="text-[10.5px] text-rose">{uploadErr}</p>}
           <input
             ref={lessonTitleRef}
             defaultValue={currentLesson?.title ?? ''}
