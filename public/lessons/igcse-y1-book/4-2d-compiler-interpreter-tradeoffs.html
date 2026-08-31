@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.2d Compiler vs. Interpreter Trade-offs — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; }
+  .compare-card.good { border: 1px solid rgba(74,222,128,.25); }
+  .compare-card.bad { border: 1px solid rgba(248,113,113,.25); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .compare-card.good h5 { color: #4ade80; }
+  .compare-card.bad h5 { color: #f87171; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block p { font-size: 13px; color: #e2e8f0; line-height: 1.75; margin: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 4 · Software</span>
+  <div class="topic-title">4.2d Compiler vs. Interpreter — Advantages &amp; Disadvantages</div>
+  <div class="topic-subtitle">Why interpreters win during development, and compilers win once the program ships.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why the trade-off exists</h4>
+    <p>Compilers and interpreters translate code in fundamentally different ways (whole program at once vs. statement-by-statement), and this genuinely leads to different real strengths at different STAGES of a program's life — development vs. final distribution.</p>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good">
+      <h5>Interpreter — Advantages</h5>
+      <ul>
+        <li>Easier/quicker to debug and test during development</li>
+        <li>Easier to edit programs during development</li>
+      </ul>
+    </div>
+    <div class="compare-card bad">
+      <h5>Interpreter — Disadvantages</h5>
+      <ul>
+        <li>Programs cannot run without the interpreter present</li>
+        <li>Programs can take longer to execute</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good">
+      <h5>Compiler — Advantages</h5>
+      <ul>
+        <li>Compiled program can be stored ready for use</li>
+        <li>Can be executed WITHOUT the compiler present</li>
+        <li>Takes up LESS space in memory when executed</li>
+        <li>Executes in a SHORTER time</li>
+      </ul>
+    </div>
+    <div class="compare-card bad">
+      <h5>Compiler — Disadvantages</h5>
+      <ul>
+        <li>Takes longer to write, test, and debug during development</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Putting it together</h4>
+    <p>Compiled programs are run WITHOUT the compiler; interpreted programs CANNOT run without the interpreter. A compiled program is usually DISTRIBUTED for general use; an interpreter is often used WHILE a program is being developed — this is exactly why many real development workflows use an interpreter during writing/testing, then compile the final version for release.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — compiler vs. interpreter advantages/disadvantages.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why is an interpreter often preferred DURING program development, even though it's slower at runtime?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An interpreter is easier and quicker to debug and test, and easier to edit — since it runs statements immediately without a full recompile step, making the edit-test cycle much faster during development.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is a compiled program usually chosen for final distribution, rather than an interpreted one?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A compiled program can run WITHOUT the compiler present, uses less memory when executing, and runs in a shorter time — all genuine advantages for something being distributed to end-users who don't have (and shouldn't need) the development tools.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      An interpreted program CANNOT be run without the ______ present; a compiled program CAN be run without the ______ present.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>interpreter</strong>. Blank 2: <strong>compiler</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Compilers are strictly better than interpreters in every respect, so there's never a good reason to use an interpreter." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Interpreters have genuine advantages DURING development — easier and quicker debugging/testing/editing — which compilers, with their slower full-recompile cycle, don't match at that stage. Whether a compiler or interpreter is "better" depends on the STAGE (development vs. final release), not an absolute ranking.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A software company is finishing a large commercial application that will be sold to thousands of customers who don't have any development tools installed. Which translator type should be used for the FINAL release version, and why, based on this lesson's content?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A <strong>compiler</strong>. The lesson states a compiled program can be executed WITHOUT the compiler present, and is usually the version distributed for general use — exactly matching customers who have no development tools installed, unlike an interpreted program which would require the interpreter on every customer's machine.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name one real disadvantage of using a compiler during the development stage.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It takes a longer time to write, test, and debug programs during development (since the whole program must compile before it can be tested).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 4: Software — 4.2d Compiler vs. Interpreter — Advantages &amp; Disadvantages<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 4.2
+  </div>
+
+</div>
+</body>
+</html>
