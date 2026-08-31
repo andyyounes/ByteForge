@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.3a Explaining the Purpose of an Algorithm — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.3a Explaining the Purpose of an Algorithm</div>
+  <div class="topic-subtitle">Reading someone else's flowchart or pseudocode and correctly stating what it actually does.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What this skill involves</h4>
+    <ul>
+      <li>An algorithm sets out the steps to complete a task — usually shown as a flowchart or pseudocode.</li>
+      <li>Being able to explain an algorithm's PURPOSE means clearly identifying what the task is, and what PROCESSES are needed to complete it, just by reading it.</li>
+      <li>This skill improves with practice at writing algorithms, and at finding/correcting errors in them.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Worked example — what does this pseudocode do?</span>REPEAT
+  Wait (10)
+  Get (Time)
+UNTIL Time = Alarm_Time
+OUTPUT AlarmSound</div>
+
+  <div class="theory-block">
+    <h4>Explaining the example above</h4>
+    <ul>
+      <li><b>Purpose</b>: output the alarm sound at the correct time.</li>
+      <li><b>Processes</b>: waiting 10 seconds; getting the current time (from the system clock); checking the current time against the alarm time; outputting the alarm sound once they match.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">A second algorithm to explain</span>INPUT Num1, Num2
+IF Num1 > Num2
+THEN PRINT Num1, " is largest"
+ELSE PRINT Num2, " is largest"
+ENDIF</div>
+
+  <div class="diagram-box">
+    <svg width="220" height="230" viewBox="0 0 220 230" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="18" rx="40" ry="14" fill="none" stroke="#60a5fa" stroke-width="1.5"/><text x="110" y="22" text-anchor="middle" fill="#60a5fa" font-size="9">START</text>
+      <path d="M 110 32 L 110 50" stroke="#6b7280" stroke-width="1" marker-end="url(#pa)"/>
+      <polygon points="60,50 160,50 150,74 70,74" fill="none" stroke="#e879f9" stroke-width="1.5"/><text x="110" y="66" text-anchor="middle" fill="#e879f9" font-size="8">INPUT Num1, Num2</text>
+      <path d="M 110 74 L 110 94" stroke="#6b7280" stroke-width="1" marker-end="url(#pa)"/>
+      <polygon points="110,94 165,120 110,146 55,120" fill="none" stroke="#fbbf24" stroke-width="1.5"/><text x="110" y="124" text-anchor="middle" fill="#fbbf24" font-size="8">Num1&gt;Num2?</text>
+      <path d="M 165 120 L 195 120 L 195 60 L 160 60" stroke="#6b7280" stroke-width="1" marker-end="url(#pa)"/>
+      <text x="185" y="112" fill="#6b7280" font-size="7">no</text>
+      <path d="M 110 146 L 110 164" stroke="#6b7280" stroke-width="1" marker-end="url(#pa)"/>
+      <text x="120" y="158" fill="#6b7280" font-size="7">yes</text>
+      <polygon points="55,164 165,164 155,188 65,188" fill="none" stroke="#e879f9" stroke-width="1.5"/><text x="110" y="180" text-anchor="middle" fill="#e879f9" font-size="7">PRINT Num1 largest</text>
+      <path d="M 110 188 L 110 205" stroke="#6b7280" stroke-width="1" marker-end="url(#pa)"/>
+      <ellipse cx="110" cy="216" rx="38" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.5"/><text x="110" y="220" text-anchor="middle" fill="#60a5fa" font-size="9">STOP</text>
+      <defs><marker id="pa" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#6b7280"/></marker></defs>
+    </svg>
+    <div class="diagram-caption">The matching flowchart for the "largest of two numbers" algorithm.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Explaining the "largest number" example</h4>
+    <ul>
+      <li><b>Purpose</b>: find and display whichever of two entered numbers is larger.</li>
+      <li><b>Processes</b>: input two numbers; compare them; output whichever one is larger, labelled "is largest".</li>
+      <li><b>If 7 and 18 were entered</b>: since Num1 (7) is NOT greater than Num2 (18), the ELSE path runs, outputting <code>18 is largest</code>.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — explaining the purpose of an algorithm.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the purpose of the alarm-checking algorithm shown in this lesson?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To output the alarm sound at the correct time — repeatedly checking the current time against the set alarm time until they match.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What would the "largest number" algorithm output if Num1 = 25 and Num2 = 12?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>25 is largest</code> — since Num1 (25) IS greater than Num2 (12), the THEN path runs.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Explaining an algorithm's purpose means identifying WHAT the task is, and the ______ needed to complete it.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Processes</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says the alarm algorithm's purpose is "to wait 10 seconds". What's wrong with describing it this way?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Wait 10 seconds" is only ONE of several PROCESSES within the algorithm, not its overall PURPOSE. The actual purpose is to output the alarm sound at the correct time — waiting is just a step used to repeatedly check the time until it matches.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the "largest number" algorithm from this lesson, what would be output if the numbers 7 and 18 were entered?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>18 is largest</code> — since Num1 (7) is NOT greater than Num2 (18), the condition is false, so the ELSE path runs and outputs Num2.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name two forms an algorithm is usually shown in, so its purpose is clear to others.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A flowchart, or pseudocode.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.3a Explaining the Purpose of an Algorithm<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.3
+  </div>
+
+</div>
+</body>
+</html>
