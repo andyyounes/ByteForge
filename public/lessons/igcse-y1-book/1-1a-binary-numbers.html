@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.1a Binary Numbers — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0d0f1a; color: #e2e8f0;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    margin: 0; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a;
+    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 13px; }
+  .example-block td { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; text-align: center; }
+  .example-block td.heading { color: #9ca3af; font-size: 11px; }
+  .example-block td.bit-1 { color: #b8ef4a; font-weight: 700; }
+  .example-block td.bit-0 { color: #6b7280; }
+
+  .pseudo-block { background: #080a14; border: 1px solid rgba(129,140,248,.2); border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #a5b4fc; margin-bottom: 10px; }
+  .pseudo-block pre { margin: 0; font-family: ui-monospace, monospace; font-size: 12.5px; color: #c7d2fe; line-height: 1.7; white-space: pre-wrap; }
+  .pseudo-block .blank { color: #fbbf24; font-weight: 700; }
+
+  .switches-diagram { display: flex; gap: 6px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
+  .switch-label { font-size: 9px; text-align: center; color: #6b7280; margin-top: 4px; }
+
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12);
+    border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.1a Binary Numbers</div>
+  <div class="topic-subtitle">Why computers use binary, and how to convert between binary and denary (decimal).</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card">
+      <div class="key-term-name">Bit</div>
+      <div class="key-term-def">A single binary digit — either 0 or 1. Short for "binary digit".</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Byte</div>
+      <div class="key-term-def">A group of 8 bits, treated as one unit — e.g. <code>11101110</code>.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Denary</div>
+      <div class="key-term-def">The normal counting system with ten digits (0-9) — also called decimal. A base 10 system.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Binary</div>
+      <div class="key-term-def">The number system computers use internally — only two digits, 0 and 1. A base 2 system.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Base</div>
+      <div class="key-term-def">The number of distinct digits a number system uses. Denary is base 10; binary is base 2.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Place value</div>
+      <div class="key-term-def">What a digit's position is "worth" — in binary, each position is worth a power of 2 (1, 2, 4, 8, 16...).</div>
+    </div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why computers use binary in the first place</h4>
+    <ul>
+      <li>Any form of data — text, sound, images, instructions — has to be converted into a binary format before a computer can process it.</li>
+      <li>The basic building block of every computer is the binary number system, because it only needs two digits: <b>1</b> and <b>0</b>.</li>
+      <li>A computer is built from millions of tiny electronic <b>switches</b>, and each switch can only genuinely be in one of two states: ON or OFF.</li>
+      <li>A switch in the ON position is represented by <code>1</code>; a switch in the OFF position is represented by <code>0</code> — binary maps perfectly onto how the hardware itself actually works.</li>
+    </ul>
+    <div class="switches-diagram">
+      <svg width="260" height="70" viewBox="0 0 260 70">
+        <!-- 8 switches representing one byte: 1 1 1 0 1 1 1 0 -->
+        <g font-family="ui-monospace, monospace">
+          <!-- switch template repeated x8, ON = filled green circle+line up, OFF = hollow circle+line down -->
+        </g>
+        <!-- switch 1: ON -->
+        <g transform="translate(5,0)"><rect x="0" y="10" width="24" height="40" rx="6" fill="#1a1d2e" stroke="#374151"/><circle cx="12" cy="20" r="7" fill="#b8ef4a"/><text x="12" y="64" font-size="9" fill="#b8ef4a" text-anchor="middle" font-family="ui-monospace,monospace">1</text></g>
+        <!-- switch 2: ON -->
+        <g transform="translate(35,0)"><rect x="0" y="10" width="24" height="40" rx="6" fill="#1a1d2e" stroke="#374151"/><circle cx="12" cy="20" r="7" fill="#b8ef4a"/><text x="12" y="64" font-size="9" fill="#b8ef4a" text-anchor="middle" font-family="ui-monospace,monospace">1</text></g>
+        <!-- switch 3: ON -->
+        <g transform="translate(65,0)"><rect x="0" y="10" width="24" height="40" rx="6" fill="#1a1d2e" stroke="#374151"/><circle cx="12" cy="20" r="7" fill="#b8ef4a"/><text x="12" y="64" font-size="9" fill="#b8ef4a" text-anchor="middle" font-family="ui-monospace,monospace">1</text></g>
+        <!-- switch 4: OFF -->
+        <g transform="translate(95,0)"><rect x="0" y="10" width="24" height="40" rx="6" fill="#1a1d2e" stroke="#374151"/><circle cx="12" cy="40" r="7" fill="none" stroke="#6b7280" stroke-width="2"/><text x="12" y="64" font-size="9" fill="#6b7280" text-anchor="middle" font-family="ui-monospace,monospace">0</text></g>
+        <!-- switch 5: ON -->
+        <g transform="translate(125,0)"><rect x="0" y="10" width="24" height="40" rx="6" fill="#1a1d2e" stroke="#374151"/><circle cx="12" cy="20" r="7" fill="#b8ef4a"/><text x="12" y="64" font-size="9" fill="#b8ef4a" text-anchor="middle" font-family="ui-monospace,monospace">1</text></g>
+        <!-- switch 6: ON -->
+        <g transform="translate(155,0)"><rect x="0" y="10" width="24" height="40" rx="6" fill="#1a1d2e" stroke="#374151"/><circle cx="12" cy="20" r="7" fill="#b8ef4a"/><text x="12" y="64" font-size="9" fill="#b8ef4a" text-anchor="middle" font-family="ui-monospace,monospace">1</text></g>
+        <!-- switch 7: ON -->
+        <g transform="translate(185,0)"><rect x="0" y="10" width="24" height="40" rx="6" fill="#1a1d2e" stroke="#374151"/><circle cx="12" cy="20" r="7" fill="#b8ef4a"/><text x="12" y="64" font-size="9" fill="#b8ef4a" text-anchor="middle" font-family="ui-monospace,monospace">1</text></g>
+        <!-- switch 8: OFF -->
+        <g transform="translate(215,0)"><rect x="0" y="10" width="24" height="40" rx="6" fill="#1a1d2e" stroke="#374151"/><circle cx="12" cy="40" r="7" fill="none" stroke="#6b7280" stroke-width="2"/><text x="12" y="64" font-size="9" fill="#6b7280" text-anchor="middle" font-family="ui-monospace,monospace">0</text></g>
+      </svg>
+    </div>
+    <p style="text-align:center;font-size:10.5px;color:#6b7280;margin-top:-6px;">Eight real switches, ON/OFF — this is genuinely one byte: <code>11101110</code>.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>The denary (base 10) system, as a reminder</h4>
+    <ul>
+      <li>Denary uses ten separate digits, 0–9, to represent every value — it's a <b>base 10</b> system.</li>
+      <li>Each position in a denary number is worth a power of 10: reading right to left, the headings are 1, 10, 100, 1000, 10 000, and so on (10⁰, 10¹, 10², 10³, 10⁴...).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The binary (base 2) system</h4>
+    <ul>
+      <li>Binary is a <b>base 2</b> system — only the two digits 0 and 1 exist, so only two "values" can ever appear in any single position.</li>
+      <li>Using the same idea as denary, binary positions are worth powers of 2: reading right to left, the headings are 1, 2, 4, 8, 16, 32, 64, 128 (2⁰, 2¹, 2², 2³...) for an 8-bit number.</li>
+      <li>A typical 8-bit binary number looks like: <code>11101110</code>.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — binary to denary</div>
+    <p>Convert the binary number <code>11101110</code> into denary. Write the place-value headings above the bits, then add together the headings wherever there's a 1:</p>
+    <table>
+      <tr><td class="heading">128</td><td class="heading">64</td><td class="heading">32</td><td class="heading">16</td><td class="heading">8</td><td class="heading">4</td><td class="heading">2</td><td class="heading">1</td></tr>
+      <tr><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-0">0</td><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-0">0</td></tr>
+    </table>
+    <p>Only the columns with a 1 count: <code>128 + 64 + 32 + 8 + 4 + 2 = 238</code>. So <code>11101110</code> in binary is <b>238</b> in denary.</p>
+    <p>This method works for a binary number of any length — an 8-bit, 12-bit, or 16-bit number is converted exactly the same way, just with more place-value headings.</p>
+  </div>
+
+  <div class="pseudo-block">
+    <div class="pseudo-block-title">Pseudocode — the binary-to-denary algorithm</div>
+    <pre>total <span class="blank">←</span> 0
+placeValue <span class="blank">←</span> 1
+FOR each bit, starting from the RIGHTMOST digit
+    IF bit = 1 THEN
+        total <span class="blank">←</span> total + placeValue
+    ENDIF
+    placeValue <span class="blank">←</span> placeValue <span class="blank">*</span> 2
+NEXT bit
+OUTPUT total</pre>
+  </div>
+
+  <div class="theory-block">
+    <h4>Converting denary to binary — two valid methods</h4>
+    <ul>
+      <li><b>Method 1 — successive subtraction of powers of 2.</b> Subtract the largest possible power of 2 (128, 64, 32...) from the number, mark that position as 1, and repeat with what's left until you reach exactly 0.</li>
+      <li><b>Method 2 — successive division by 2.</b> Divide the number by 2 repeatedly, writing down the remainder (0 or 1) each time, until the result reaches 0. Reading the remainders in <b>reverse order</b> (bottom to top) gives the binary number.</li>
+      <li>Both methods always agree — they're just two different ways of arriving at the same binary number.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — denary to binary (Method 1: subtraction)</div>
+    <p>Convert the denary number 142 into an 8-bit binary number.</p>
+    <p><code>142 − 128 = 14</code> → <code>14 − 8 = 6</code> → <code>6 − 4 = 2</code> → <code>2 − 2 = 0</code>. We used 128, 8, 4, and 2.</p>
+    <table>
+      <tr><td class="heading">128</td><td class="heading">64</td><td class="heading">32</td><td class="heading">16</td><td class="heading">8</td><td class="heading">4</td><td class="heading">2</td><td class="heading">1</td></tr>
+      <tr><td class="bit-1">1</td><td class="bit-0">0</td><td class="bit-0">0</td><td class="bit-0">0</td><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-1">1</td><td class="bit-0">0</td></tr>
+    </table>
+    <p>So 142 in denary is <b>10001110</b> in binary.</p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — denary to binary (Method 2: division)</div>
+    <p>Convert the same number, 142, using successive division by 2 — write the remainder each time:</p>
+    <p><code>142 ÷ 2 = 71 r0</code> → <code>71 ÷ 2 = 35 r1</code> → <code>35 ÷ 2 = 17 r1</code> → <code>17 ÷ 2 = 8 r1</code> → <code>8 ÷ 2 = 4 r0</code> → <code>4 ÷ 2 = 2 r0</code> → <code>2 ÷ 2 = 1 r0</code> → <code>1 ÷ 2 = 0 r1</code></p>
+    <p>Reading the remainders from the <b>last one back to the first</b>: <code>1 0 0 0 1 1 1 0</code> — exactly the same answer as Method 1, confirming both approaches genuinely agree.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — binary/denary conversion. Answer each one, then reveal the answer key to check.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Convert the binary number <code>10110101</code> into denary. Show your place-value working.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Headings: 128, 64, 32, 16, 8, 4, 2, 1 → bits: 1 0 1 1 0 1 0 1</p>
+        <p><code>128 + 32 + 16 + 4 + 1 = 181</code></p>
+        <p><strong>Answer: 181</strong></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Convert the denary number <b>91</b> into an 8-bit binary number, using EITHER method.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Subtraction: <code>91 − 64 = 27</code>, <code>27 − 16 = 11</code>, <code>11 − 8 = 3</code>, <code>3 − 2 = 1</code>, <code>1 − 1 = 0</code> → used 64, 16, 8, 2, 1.</p>
+        <p><strong>Answer: 01011011</strong></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank — pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete this pseudocode for the binary-to-denary algorithm by filling in the two blanks:<br><br>
+      <code>placeValue ← 1</code><br>
+      <code>FOR each bit, starting from the rightmost digit</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;IF bit = 1 THEN total ← total + ______ ENDIF</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;placeValue ← placeValue ______ 2</code><br>
+      <code>NEXT bit</code>
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Blank 1: <code>placeValue</code> — you add the CURRENT place value to the running total, not a fixed number.</p>
+        <p>Blank 2: <code>*</code> (multiply) — each place value doubles as you move one position left, since binary place values are powers of 2.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student converts <code>1101</code> to denary like this: they line it up as 1-1-0-1 under headings 8-4-2-1, and calculate <code>8 + 4 + 1 = 13</code>, but then write down the FINAL answer as <b>14</b>. What exactly went wrong?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>The working (<code>8 + 4 + 1 = 13</code>) is actually correct — the error is a simple arithmetic/transcription slip at the very last step, writing "14" instead of the "13" they had just correctly calculated.</p>
+        <p>This is the single most common real mistake in these questions: getting the METHOD right, then making a small slip copying the final number down. Always double-check your own last line matches your own working.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A memory chip's status register uses <b>one bit per switch</b> to record whether 8 real hardware components are ON or OFF. The register currently reads <code>10010001</code>. (a) How many of the 8 components are currently ON? (b) What real-world reason from this lesson explains why a single bit is enough to record one component's ON/OFF status?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>(a) Three components are ON — there are three 1s in <code>10010001</code>.</p>
+        <p>(b) A single bit is genuinely enough because it only needs to represent TWO states, and a bit's own two possible values (0 and 1) map perfectly onto exactly two real states — a switch that's OFF and a switch that's ON. No more information than that is needed for a simple ON/OFF fact.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why can a denary number system NOT be built directly into a computer's electronic switches the way binary can?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>A denary digit needs to represent TEN different values (0–9), but a simple electronic switch only has two genuine physical states (ON/OFF) — there's no direct, reliable way for one switch to represent ten different states the way it naturally represents two. Binary's two digits map exactly onto a switch's two real states; denary's ten digits don't.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.1a Binary Numbers<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.1
+  </div>
+
+</div>
+</body>
+</html>
