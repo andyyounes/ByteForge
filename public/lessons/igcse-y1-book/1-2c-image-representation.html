@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.2c Image Representation — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0d0f1a; color: #e2e8f0;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    margin: 0; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a;
+    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 12.5px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 11.5px; }
+
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .pixel-row { display: flex; justify-content: center; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+  .pixel-grid-label { font-size: 10.5px; color: #9ca3af; margin-top: 6px; }
+  .grid { display: grid; gap: 1px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.15); }
+  .grid div { width: 8px; height: 8px; }
+
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12);
+    border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.2c Representation of (Bitmap) Images</div>
+  <div class="topic-subtitle">How a picture becomes a grid of numbers — pixels, colour depth, and image resolution.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card">
+      <div class="key-term-name">Pixel</div>
+      <div class="key-term-def">Short for "picture element" — the smallest single point of colour in a bitmap image.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Bitmap image</div>
+      <div class="key-term-def">An image made up of a two-dimensional matrix (grid) of pixels, each stored as a binary number.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Colour depth</div>
+      <div class="key-term-def">The number of bits used to represent each pixel's colour. More bits = more possible colours per pixel.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Image resolution</div>
+      <div class="key-term-def">The number of pixels that make up an image, e.g. 4096 × 3072 pixels. Higher resolution = more detail.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Pixels and colour depth</h4>
+    <ul>
+      <li>A bitmap image is made of <b>pixels</b> arranged as a two-dimensional matrix. Each pixel is stored as a binary number, so the whole image is stored as a series of binary numbers.</li>
+      <li>A black-and-white image needs only <b>1 bit per pixel</b> — each pixel is one of exactly two colours (0 or 1).</li>
+      <li>With <b>2 bits</b> per pixel, each pixel can be one of <b>four</b> colours (2² = 4): 00, 01, 10, or 11.</li>
+      <li>With <b>3 bits</b> per pixel, each pixel can be one of <b>eight</b> colours (2³ = 8): 000 through 111.</li>
+      <li>The number of bits used to represent each pixel's colour is called the <b>colour depth</b>.</li>
+      <li>An 8-bit colour depth gives 256 colours (2⁸ = 256). Modern computers typically use a <b>24-bit</b> colour depth, giving over 16 million colours.</li>
+      <li>The general rule: with <code>x</code> bits, <code>2^x</code> colours can be represented.</li>
+      <li>Increasing colour depth also increases the resulting file size.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <div class="pixel-row">
+      <div>
+        <div class="grid" style="grid-template-columns: repeat(4, 8px);">
+          <div style="background:#000"></div><div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div>
+          <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div><div style="background:#000"></div>
+          <div style="background:#000"></div><div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div>
+          <div style="background:#fff"></div><div style="background:#000"></div><div style="background:#fff"></div><div style="background:#000"></div>
+        </div>
+        <div class="pixel-grid-label">1-bit depth (2 colours)</div>
+      </div>
+      <div>
+        <div class="grid" style="grid-template-columns: repeat(4, 8px);">
+          <div style="background:#333"></div><div style="background:#999"></div><div style="background:#eee"></div><div style="background:#000"></div>
+          <div style="background:#999"></div><div style="background:#eee"></div><div style="background:#000"></div><div style="background:#333"></div>
+          <div style="background:#eee"></div><div style="background:#000"></div><div style="background:#333"></div><div style="background:#999"></div>
+          <div style="background:#000"></div><div style="background:#333"></div><div style="background:#999"></div><div style="background:#eee"></div>
+        </div>
+        <div class="pixel-grid-label">2-bit depth (4 colours)</div>
+      </div>
+      <div>
+        <div class="grid" style="grid-template-columns: repeat(4, 8px);">
+          <div style="background:#e879f9"></div><div style="background:#b8ef4a"></div><div style="background:#4ade80"></div><div style="background:#fbbf24"></div>
+          <div style="background:#f87171"></div><div style="background:#60a5fa"></div><div style="background:#e879f9"></div><div style="background:#4ade80"></div>
+          <div style="background:#b8ef4a"></div><div style="background:#fbbf24"></div><div style="background:#60a5fa"></div><div style="background:#f87171"></div>
+          <div style="background:#4ade80"></div><div style="background:#e879f9"></div><div style="background:#fbbf24"></div><div style="background:#b8ef4a"></div>
+        </div>
+        <div class="pixel-grid-label">3-bit depth (8 colours)</div>
+      </div>
+    </div>
+    <div class="diagram-caption">Same 4×4 pixel grid, three different colour depths. More bits per pixel unlocks more distinct colours — but also means more data stored per pixel.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Image resolution</h4>
+    <ul>
+      <li><b>Image resolution</b> is the number of pixels that make up the whole image — e.g. an image could be 4096 × 3072 pixels, which is 12,582,912 pixels in total.</li>
+      <li>Many cameras let you vary the resolution before taking a photo. Photos with a LOWER resolution have less detail than those with a HIGHER resolution.</li>
+      <li>An image with too low a resolution becomes <b>pixelated</b> ("fuzzy") — there simply aren't enough pixels to represent fine detail.</li>
+      <li>The main drawback of high-resolution images: a bigger file size. This affects how many images fit on a storage device, and how long an image takes to download or transfer.</li>
+      <li>A certain amount of resolution reduction is possible before the loss in quality is actually noticeable to a viewer.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — RGB colour combinations</div>
+    <p>A colour image is made of red, green, and blue components, each using 8 bits.</p>
+    <table>
+      <tr><th>Component</th><th>Bits</th><th>Possible values</th></tr>
+      <tr><td>Red</td><td>8</td><td>2⁸ = 256</td></tr>
+      <tr><td>Green</td><td>8</td><td>2⁸ = 256</td></tr>
+      <tr><td>Blue</td><td>8</td><td>2⁸ = 256</td></tr>
+    </table>
+    <p style="margin-top:8px;">Total possible colours = 256 × 256 × 256 = <b>16,777,216</b> — this is exactly the "24-bit colour depth, over 16 million colours" figure from the theory above (8+8+8 = 24 bits total).</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — pixels, colour depth, and image resolution.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is "colour depth", and how many colours can a pixel represent with a colour depth of 4 bits?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Colour depth is the number of bits used to represent each pixel's colour. With 4 bits: 2⁴ = <strong>16 colours</strong>.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is "image resolution", and what visible effect does a LOW resolution have on a photo?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Image resolution is the number of pixels making up the image. A low resolution means fewer pixels represent the same picture, so the image becomes pixelated ("fuzzy") and has visibly less detail.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A modern computer typically uses a ______-bit colour depth, giving over ______ million possible colours.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Blank 1: <strong>24</strong>. Blank 2: <strong>16</strong> (16,777,216 exactly).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "With 3 bits per pixel, a pixel can be one of six possible colours." What is wrong with this, and what's the correct number?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Wrong — the rule is 2^x colours for x bits, so 3 bits gives 2³ = <strong>8</strong> possible colours (000 through 111), not 6.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A budget smartphone camera app has to keep every photo small enough to send quickly over a slow connection. A professional photographer needs the maximum realistic detail for large prints. Recommend a general resolution AND colour-depth approach for each, and justify using this lesson's content.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Budget app: LOWER resolution and/or lower colour depth, since the lesson shows both genuinely reduce file size, at the cost of some detail loss — an acceptable trade-off for fast transfer over a slow connection.</p>
+        <p>Professional photographer: HIGHER resolution (more pixels, more detail) and higher colour depth (e.g. 24-bit), since the lesson shows this gives the most realistic, detailed image — the larger resulting file size is an acceptable trade-off for print quality.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How many bits per pixel are needed for a plain black-and-white image, and why?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p><strong>1 bit</strong> per pixel — since each pixel only ever needs to be one of exactly two colours (black or white), a single 0 or 1 is genuinely enough to represent it.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.2c Representation of (Bitmap) Images<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.2
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.2a ASCII &amp; Unicode — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0d0f1a; color: #e2e8f0;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    margin: 0; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a;
+    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 12.5px; }
+  .example-block td { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; text-align: center; }
+  .example-block td.heading { color: #9ca3af; font-size: 11px; }
+  .example-block td.diffbit { color: #fbbf24; font-weight: 700; }
+
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12);
+    border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.2a ASCII &amp; Unicode</div>
+  <div class="topic-subtitle">How a computer represents text as numbers, and why one character set alone isn't enough for the whole world.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card">
+      <div class="key-term-name">ASCII</div>
+      <div class="key-term-def">American Standard Code for Information Interchange — a 7-bit character set (0-127) for English letters, digits, and symbols, set up in 1963.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Extended ASCII</div>
+      <div class="key-term-def">An 8-bit version of ASCII (0-255) — the extra 128 codes allow non-English characters and graphical symbols.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Unicode</div>
+      <div class="key-term-def">A character set designed to represent every language in the world, using up to 4 bytes per character.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Character set</div>
+      <div class="key-term-def">The complete list of characters a coding system can represent, each mapped to a unique binary/denary/hex code.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>ASCII — the original standard</h4>
+    <ul>
+      <li>ASCII was set up in 1963 for communication and computer systems, with a newer version published in 1986.</li>
+      <li>Standard ASCII uses <b>7-bit</b> codes — 0 to 127 in denary, or 00 to 7F in hex — covering the letters, numbers, and characters on a standard keyboard.</li>
+      <li>32 of those codes (0-31 denary, 00-19 hex) are reserved <b>control codes</b>, not printable characters.</li>
+      <li>Character sets like a-z and 0-9 are deliberately grouped together in sequence, which makes them easier to work with programmatically.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — the uppercase/lowercase pattern</div>
+    <table>
+      <tr><td class="heading">Character</td><td class="heading">Binary</td><td class="heading">Hex</td><td class="heading">Case</td></tr>
+      <tr><td>a</td><td>110000<span class="diffbit">1</span></td><td>61</td><td>lowercase</td></tr>
+      <tr><td>A</td><td>100000<span class="diffbit">1</span></td><td>41</td><td>uppercase</td></tr>
+      <tr><td>y</td><td>111100<span class="diffbit">1</span></td><td>79</td><td>lowercase</td></tr>
+      <tr><td>Y</td><td>101100<span class="diffbit">1</span></td><td>59</td><td>uppercase</td></tr>
+    </table>
+    <p>Notice: only the SIXTH bit ever changes (highlighted) between a letter's uppercase and lowercase version — a genuinely deliberate design choice that makes converting between cases an easy, fast operation.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Extended ASCII — filling in more characters</h4>
+    <ul>
+      <li>Extended ASCII uses <b>8-bit</b> codes — 0 to 255 (00 to FF in hex) — giving 128 EXTRA codes beyond standard ASCII.</li>
+      <li>These extra codes were used for characters from non-English alphabets and some graphical characters.</li>
+      <li>A real limitation: different systems (e.g. DOS and Windows) sometimes used DIFFERENT characters for the SAME extended code — a genuine source of real compatibility problems.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why ASCII wasn't enough — the case for Unicode</h4>
+    <ul>
+      <li>ASCII's biggest real limitation: it cannot represent characters from non-Western languages at all, e.g. Chinese characters.</li>
+      <li>The Unicode Consortium was set up in 1991 to solve this, with Version 1.0 having five real goals: a universal standard covering all languages/writing systems; a more efficient coding system than ASCII; uniform 16-bit or 32-bit encoding; unambiguous encoding (one code always means one character); and reserved space for private/custom characters (useful for e.g. Chinese and Japanese character sets).</li>
+      <li>ASCII uses ONE byte per character; Unicode can use up to <b>FOUR bytes</b> per character — genuinely more space, but enough to support thousands of characters from every language, including Russian, Romanian, and Croatian.</li>
+      <li>Unicode deliberately OVERLAPS with ASCII — the first 128 characters are identical — so existing ASCII text remains valid Unicode text too.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — ASCII and Unicode. Answer each one, then reveal the answer key to check.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">How many bits does STANDARD ASCII use per character, and what is the resulting denary range of codes?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p><strong>7 bits</strong>, giving a range of <strong>0 to 127</strong>.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Name TWO of Unicode's five original design goals from 1991.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Any two of: a universal standard covering all languages/writing systems; a more efficient coding system than ASCII; uniform 16-bit or 32-bit encoding; unambiguous encoding; reserved space for private/custom characters.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Extended ASCII uses ______ bits per character, giving a denary range of 0 to ______.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Blank 1: <strong>8</strong>. Blank 2: <strong>255</strong>.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Unicode completely replaced ASCII, so a text file saved in ASCII would no longer be valid once opened as Unicode." What real fact from this lesson does this claim get wrong?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Unicode deliberately keeps the first 128 characters IDENTICAL to standard ASCII — there's genuine overlap, not a total replacement. This means an ASCII text file genuinely remains completely valid when read as Unicode; nothing about it breaks or changes.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A company builds a text-messaging app intended ONLY for English-speaking users in one country, prioritising the smallest possible file size per message. A separate global social media platform needs to support every world language. (a) Which character set is the better real choice for EACH app, and (b) why?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>(a) The English-only messaging app: <strong>ASCII</strong> (or Extended ASCII). The global platform: <strong>Unicode</strong>.</p>
+        <p>(b) ASCII uses only 1 byte per character, genuinely keeping message file sizes small — a real, deliberate trade-off that's fine ONLY because every character needed is covered by ASCII's limited character set. The global platform genuinely needs Unicode's much wider language support (up to 4 bytes per character) since its users need characters ASCII simply cannot represent at all.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What real, deliberate design choice makes converting a letter between uppercase and lowercase in ASCII a fast, easy operation?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Only ONE specific bit (the sixth bit) ever differs between a letter's uppercase and lowercase ASCII code — everything else stays the same, so converting case is genuinely just a single-bit flip, not a full recalculation.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.2a ASCII &amp; Unicode<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.2
+  </div>
+
+</div>
+</body>
+</html>

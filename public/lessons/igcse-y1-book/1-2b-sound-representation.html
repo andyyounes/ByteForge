@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.2b Sound Representation — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0d0f1a; color: #e2e8f0;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    margin: 0; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a;
+    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 12.5px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 11.5px; }
+  .example-block td.good { color: #4ade80; }
+  .example-block td.bad { color: #f87171; }
+
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12);
+    border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.2b Representation of Sound</div>
+  <div class="topic-subtitle">How a continuous, analogue sound wave gets turned into the discrete binary numbers a computer can store.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-name" style="display:none"></div>
+    <div class="key-term-card">
+      <div class="key-term-name">Sampling</div>
+      <div class="key-term-def">Measuring the amplitude of a sound wave at set, regular time intervals to turn it into digital data.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Amplitude</div>
+      <div class="key-term-def">The height of the sound wave at a given moment — how loud the sound is at that instant.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Sampling resolution</div>
+      <div class="key-term-def">Also called bit depth — the number of bits used per sample. More bits = more possible amplitude values = more accuracy.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Sampling rate</div>
+      <div class="key-term-def">The number of samples taken per second, measured in hertz (Hz). 1 Hz = one sample per second.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Turning a wave into numbers</h4>
+    <ul>
+      <li>A sound wave is naturally <b>analogue</b> — it varies smoothly and continuously — but a computer can only store discrete binary numbers, so the wave must be <b>sampled</b>.</li>
+      <li>Sampling means measuring the amplitude of the sound wave at set time intervals, giving only an APPROXIMATE representation of the original continuous wave (not a perfect copy).</li>
+      <li>Each sample is then encoded as a series of binary digits and stored.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="420" height="150" viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg">
+      <line x1="30" y1="130" x2="400" y2="130" stroke="#4b5563" stroke-width="1"/>
+      <line x1="30" y1="10" x2="30" y2="130" stroke="#4b5563" stroke-width="1"/>
+      <path d="M 30 70 Q 60 20, 90 60 T 150 90 T 210 40 T 270 100 T 330 55 T 390 80"
+            fill="none" stroke="#e879f9" stroke-width="1.5" opacity="0.55"/>
+      <g fill="#b8ef4a">
+        <circle cx="30" cy="70" r="3"/><circle cx="70" cy="35" r="3"/><circle cx="110" cy="75" r="3"/>
+        <circle cx="150" cy="90" r="3"/><circle cx="190" cy="60" r="3"/><circle cx="230" cy="45" r="3"/>
+        <circle cx="270" cy="100" r="3"/><circle cx="310" cy="65" r="3"/><circle cx="350" cy="55" r="3"/><circle cx="390" cy="80" r="3"/>
+      </g>
+      <g stroke="#374151" stroke-dasharray="2,2">
+        <line x1="30" y1="70" x2="30" y2="130"/><line x1="70" y1="35" x2="70" y2="130"/><line x1="110" y1="75" x2="110" y2="130"/>
+        <line x1="150" y1="90" x2="150" y2="130"/><line x1="190" y1="60" x2="190" y2="130"/><line x1="230" y1="45" x2="230" y2="130"/>
+        <line x1="270" y1="100" x2="270" y2="130"/><line x1="310" y1="65" x2="310" y2="130"/><line x1="350" y1="55" x2="350" y2="130"/>
+      </g>
+      <text x="200" y="145" text-anchor="middle" fill="#6b7280" font-size="10">time intervals →</text>
+      <text x="14" y="70" text-anchor="middle" fill="#6b7280" font-size="10" transform="rotate(-90 14 70)">amplitude</text>
+    </svg>
+    <div class="diagram-caption">The pink curve is the true analogue sound wave. Each green dot is a discrete sample — a single amplitude value read at one time interval. The gaps between samples are where information is lost.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Sampling resolution and sampling rate</h4>
+    <ul>
+      <li>If the amplitude range is 0 to 10, then 4 binary bits are enough to represent every possible value (e.g. 9 = <code>1001</code>).</li>
+      <li>Increasing the number of possible values used to represent amplitude — e.g. using a range of 0 to 127 instead of 0 to 10 — increases the ACCURACY of the sampled sound.</li>
+      <li>The number of bits used per sample is the <b>sampling resolution</b> (also called bit depth).</li>
+      <li>The <b>sampling rate</b> is how many samples are taken per second, measured in Hz.</li>
+      <li>Using a higher sampling rate OR a larger sampling resolution both give a more faithful (accurate) representation of the original sound — but BOTH also increase the resulting file size.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Benefits &amp; drawbacks of a larger sampling resolution</div>
+    <table>
+      <tr><th>Benefits</th><th>Drawbacks</th></tr>
+      <tr><td class="good">Larger dynamic range</td><td class="bad">Larger file size</td></tr>
+      <tr><td class="good">Better sound quality</td><td class="bad">Takes longer to transmit/download</td></tr>
+      <tr><td class="good">Less sound distortion</td><td class="bad">Requires greater processing power</td></tr>
+    </table>
+    <p style="margin-top:10px;">Real-world reference point: an audio CD uses a <b>16-bit</b> sampling resolution and a <b>44.1 kHz</b> sampling rate — that's 44,100 samples taken every single second — which is why CD audio sounds high quality.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — sound sampling, resolution, and rate.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Define "sampling rate" and state its unit of measurement.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Sampling rate is the number of sound samples taken per second, measured in <strong>hertz (Hz)</strong>.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">If an amplitude range of 0 to 127 is used instead of 0 to 10, what real effect does this have on the sound sample's accuracy?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Using the larger range genuinely INCREASES the accuracy of the sampled sound, since far more distinct amplitude values can be recorded.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      An audio CD uses a sampling resolution of ______ bits and a sampling rate of ______ kHz.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Blank 1: <strong>16</strong>. Blank 2: <strong>44.1</strong>.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes: "Increasing sampling resolution only improves sound quality — it has no other real effect on the file at all." What real drawback from this lesson does this claim miss?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>The claim misses that a larger sampling resolution ALSO produces a genuinely larger file size, takes longer to transmit/download, and requires more processing power — real drawbacks, not just a quality-only benefit.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A voice-memo app for quick, casual notes wants the smallest possible file size. A professional music-mastering studio wants the highest possible fidelity. Recommend a general sampling-resolution/rate approach for EACH, and justify your answer using this lesson's content.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Voice-memo app: a LOWER sampling resolution and/or rate, since the lesson shows this genuinely produces smaller files that are faster to transmit — an acceptable trade-off when voice clarity matters more than pristine audio quality.</p>
+        <p>Music studio: a HIGHER sampling resolution and rate (e.g. matching or exceeding CD-quality 16-bit/44.1kHz), since the lesson shows this genuinely gives a more faithful, less distorted representation of the original sound — the larger file size and slower transfer are an acceptable trade-off here.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why can a computer only ever store an APPROXIMATE version of a real sound wave, never a perfect one?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>A real sound wave is continuous (analogue), but sampling only measures its amplitude at set, discrete time intervals — the gaps between samples are genuinely not captured at all, so what's stored is only ever an approximation of the true wave.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.2b Representation of Sound<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.2
+  </div>
+
+</div>
+</body>
+</html>
