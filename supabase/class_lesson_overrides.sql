@@ -9,18 +9,26 @@
 --   - deleting an override row instantly reverts that piece to the original
 --
 -- scope + target_id together name what's being overridden:
---   scope='world', target_id='w1'     → world-level fields (name, sub, ...)
---   scope='stage', target_id='w1s1'   → one stage's fields (title, xp, grid, ...)
+--   scope='world',  target_id='w1'    → world-level fields (name, sub, ...)
+--   scope='stage',  target_id='w1s1'  → one stage's own fields (title, xp, grid, ...)
+--   scope='lesson', target_id='w1s1'  → that stage's SEPARATE STAGE_LESSON
+--                                        explainer content ({title, html}) —
+--                                        the real teaching text shown above a
+--                                        stage, distinct from its one-line goal
 -- override_data is a PARTIAL object — only the fields being changed need to be
 -- present; everything else in the original stage/world object is left as-is.
 --
 -- Run once in the Supabase SQL editor (dashboard → SQL editor → New query).
+-- If you already ran an earlier version of this file (without 'lesson' in the
+-- CHECK constraint below), run this first to widen it:
+--   ALTER TABLE class_lesson_overrides DROP CONSTRAINT class_lesson_overrides_scope_check;
+--   ALTER TABLE class_lesson_overrides ADD CONSTRAINT class_lesson_overrides_scope_check CHECK (scope IN ('world', 'stage', 'lesson'));
 
 CREATE TABLE IF NOT EXISTS class_lesson_overrides (
   id             UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
   class_id       UUID        NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
   lesson_key     TEXT        NOT NULL,   -- e.g. 'grade6-quest', 'grade7', 'grade8'
-  scope          TEXT        NOT NULL CHECK (scope IN ('world', 'stage')),
+  scope          TEXT        NOT NULL CHECK (scope IN ('world', 'stage', 'lesson')),
   target_id      TEXT        NOT NULL,   -- world id ('w1') or stage id ('w1s1')
   override_data  JSONB       NOT NULL,
   updated_by     UUID        REFERENCES profiles(id) ON DELETE SET NULL,

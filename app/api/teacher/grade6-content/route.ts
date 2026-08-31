@@ -6,7 +6,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { getGrade6Worlds, applyOverrides } from '@/lib/grade6-content'
+import { getGrade6Content, applyOverrides } from '@/lib/grade6-content'
 
 export const runtime = 'nodejs'
 
@@ -22,9 +22,9 @@ export async function GET(req: NextRequest) {
   const { data: cls } = await admin.from('classes').select('id').eq('id', classId).eq('teacher_id', user.id).maybeSingle()
   if (!cls) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  let worlds
+  let content
   try {
-    worlds = getGrade6Worlds()
+    content = getGrade6Content()
   } catch (e) {
     console.error('[teacher/grade6-content] failed to extract curriculum data', e)
     return NextResponse.json({ error: 'Failed to load curriculum data' }, { status: 500 })
@@ -38,6 +38,6 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const merged = applyOverrides(worlds, overrides ?? [])
-  return NextResponse.json({ worlds: merged })
+  const merged = applyOverrides(content, overrides ?? [])
+  return NextResponse.json({ worlds: merged.worlds, stageLessons: merged.stageLessons })
 }

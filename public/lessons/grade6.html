@@ -2663,14 +2663,25 @@ async function applyClassOverrides() {
     if (!res.ok) return
     const { overrides } = await res.json()
     if (!overrides || !overrides.length) return
-    const worldOv = new Map(overrides.filter(o => o.scope === 'world').map(o => [o.target_id, o.override_data]))
-    const stageOv = new Map(overrides.filter(o => o.scope === 'stage').map(o => [o.target_id, o.override_data]))
+    const worldOv  = new Map(overrides.filter(o => o.scope === 'world').map(o => [o.target_id, o.override_data]))
+    const stageOv  = new Map(overrides.filter(o => o.scope === 'stage').map(o => [o.target_id, o.override_data]))
+    const lessonOv = new Map(overrides.filter(o => o.scope === 'lesson').map(o => [o.target_id, o.override_data]))
     for (const w of WORLDS) {
       const wo = worldOv.get(w.id)
       if (wo) Object.assign(w, wo)
       for (const s of w.stages) {
         const so = stageOv.get(s.id)
         if (so) Object.assign(s, so)
+      }
+    }
+    // STAGE_LESSON is a SEPARATE object (keyed by stage id, {title, html}) from
+    // WORLDS — the real explainer text shown above a stage, not just its
+    // one-line `goal`. Mutated the same in-place way; a stage with no existing
+    // entry gets a real new one created (STAGE_LESSON[id] = {...}), so a
+    // teacher can add a lesson to a stage that never had one.
+    if (typeof STAGE_LESSON !== 'undefined') {
+      for (const [id, lo] of lessonOv) {
+        STAGE_LESSON[id] = STAGE_LESSON[id] ? Object.assign(STAGE_LESSON[id], lo) : lo
       }
     }
   } catch (e) { console.warn('[grade6] override load failed (offline?):', e.message) }
