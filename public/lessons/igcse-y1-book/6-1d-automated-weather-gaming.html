@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.1d Automated Systems: Weather Stations &amp; Gaming — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-size: 12px; width: 100%; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 6px 8px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 10.5px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 6 · Automated Systems</span>
+  <div class="topic-title">6.1d Automated Systems: Weather Stations &amp; Gaming</div>
+  <div class="topic-subtitle">A tipping bucket that measures rainfall on its own, and the sensors that make a game controller feel real.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Anemometer</div><div class="key-term-def">Measures wind speed.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Hygrometer</div><div class="key-term-def">Measures humidity.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Barometer</div><div class="key-term-def">Measures air pressure.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Tipping bucket rain gauge</div><div class="key-term-def">The one actuator-driven part of a weather station — tips a full bucket to measure rainfall.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Automated weather stations</h4>
+    <ul>
+      <li>Save labour, gather data from remote regions or wherever CONSTANT weather data is needed.</li>
+      <li>Needs: a microprocessor, storage (database), battery (often solar-charged), and a range of sensors:</li>
+      <li>Thermometer (temperature), anemometer (wind speed), hygrometer (humidity), barometer (air pressure), level sensor (rainfall), light sensor (hours of daylight).</li>
+      <li>All sensor data goes to the microprocessor, which performs calculations (e.g. daylight hours, actual rainfall, wind direction) and stores results in a central database.</li>
+      <li>Some stations near airports automatically send reports to nearby pilots every 5 MINUTES.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">The ONE part that needs an actuator</div>
+    <p>The <b>tipping bucket rain gauge</b> is the only weather-station component using an actuator. At a set time interval, the microprocessor signals an actuator to operate a piston, tipping a full bucket of collected rainwater into a vessel. Level sensors then measure how much rain fell in that interval.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Gaming</h4>
+    <ul>
+      <li>Sensors add realism to games:</li>
+      <li><b>Accelerometers</b>: measure acceleration/deceleration — respond to tilting the device forward/backward, side to side.</li>
+      <li><b>Proximity sensors</b>: used in smart touch pads — embedded electrodes detect hand/finger position, increasing user awareness.</li>
+      <li>Combined with a microcontroller, these sensors let players' physical actions simulate real events, creating a more IMMERSIVE gaming experience.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — automated weather stations and gaming sensors.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which part of an automated weather station is the ONLY one that uses an actuator, and what does it do?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The <strong>tipping bucket rain gauge</strong>. At a set interval, an actuator operates a piston that tips a full bucket of rainwater into a vessel, where level sensors measure how much rain fell.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Match each instrument to what it measures: anemometer, hygrometer, barometer.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Anemometer = wind speed. Hygrometer = humidity. Barometer = air pressure.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A gaming device's ______ measures tilting forward/backward and side to side; its ______ sensors detect finger/hand position on a touch pad.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>accelerometer</strong>. Blank 2: <strong>proximity</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Every sensor in an automated weather station is connected to its own dedicated actuator." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Only ONE part — the tipping bucket rain gauge — actually uses an actuator. All the other sensors (thermometer, anemometer, hygrometer, barometer, light sensor) simply send readings to the microprocessor for processing/storage; they don't drive any actuator at all.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      An airport uses a nearby automated weather station to keep incoming pilots updated on conditions. Using this lesson's content, describe how often this update happens, and why frequent updates matter for aviation.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Reports are sent automatically every <strong>5 minutes</strong> to pilots in the vicinity. Frequent updates matter because weather conditions (wind, pressure, visibility) can change quickly and are critical to safe landing/take-off decisions — a stale reading could be dangerously misleading.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why do gaming consoles combine accelerometers and proximity sensors with a microcontroller?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To allow increased human interaction with the game — physical actions (tilting, touching) can simulate real events, giving a more immersive gaming experience.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 6: Automated Systems — 6.1d Automated Systems: Weather Stations &amp; Gaming<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 6.1
+  </div>
+
+</div>
+</body>
+</html>

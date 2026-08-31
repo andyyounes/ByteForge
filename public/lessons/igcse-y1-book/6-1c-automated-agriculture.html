@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.1c Automated Systems: Agriculture — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; }
+  .compare-card.good { border: 1px solid rgba(74,222,128,.25); }
+  .compare-card.bad { border: 1px solid rgba(248,113,113,.25); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .compare-card.good h5 { color: #4ade80; }
+  .compare-card.bad h5 { color: #f87171; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 6 · Automated Systems</span>
+  <div class="topic-title">6.1c Automated Systems: Agriculture</div>
+  <div class="topic-subtitle">Watering a 10km² field with no one there — wireless irrigation control from Brazil.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Example 5 — automated Brazilian irrigation system</h4>
+    <ul>
+      <li>Fully automatic crop irrigation, relying heavily on WIRELESS transmission — allowing use across huge, remote fields (some over 10 km²).</li>
+      <li>An automatic WEATHER STATION sends data to the controller every 10 minutes, especially important for very wet/dry conditions.</li>
+      <li>Ultrasonic WATER LEVEL SENSORS in the irrigation channels measure water amounts, sending data via wireless transmitters to a wireless receiver, then on to the CONTROLLER.</li>
+      <li>The controller combines this with weather data to decide whether to START/STOP water pumps — done via signals to ACTUATORS operating the pumps.</li>
+      <li>A SUPERVISOR still monitors remotely via a schematic on-screen, overseeing MULTIPLE irrigation systems from one central point, and can OVERRIDE the controller if needed.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="380" height="100" viewBox="0 0 380 100" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="10" width="80" height="30" rx="6" fill="rgba(96,165,250,.1)" stroke="#60a5fa"/><text x="50" y="29" text-anchor="middle" fill="#60a5fa" font-size="8" font-family="system-ui">Weather station</text>
+      <rect x="10" y="55" width="80" height="30" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a"/><text x="50" y="74" text-anchor="middle" fill="#b8ef4a" font-size="8" font-family="system-ui">Water level sensors</text>
+      <path d="M 92 25 L 148 45" stroke="#6b7280" stroke-width="1"/>
+      <path d="M 92 70 L 148 55" stroke="#6b7280" stroke-width="1"/>
+      <rect x="155" y="35" width="70" height="30" rx="6" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="190" y="54" text-anchor="middle" fill="#e879f9" font-size="8" font-family="system-ui">Controller</text>
+      <path d="M 227 50 L 253 50" stroke="#6b7280" stroke-width="1" marker-end="url(#irr1)"/>
+      <defs><marker id="irr1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6b7280"/></marker></defs>
+      <rect x="260" y="35" width="60" height="30" rx="6" fill="rgba(251,191,36,.08)" stroke="#fbbf24"/><text x="290" y="54" text-anchor="middle" fill="#fbbf24" font-size="8" font-family="system-ui">Pumps</text>
+      <rect x="150" y="80" width="80" height="18" rx="4" fill="#111320" stroke="#6b7280"/><text x="190" y="93" text-anchor="middle" fill="#9ca3af" font-size="7" font-family="system-ui">Remote supervisor</text>
+    </svg>
+    <div class="diagram-caption">Weather station + water-level sensors feed the controller; the controller signals pumps; the supervisor oversees from a remote location.</div>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good">
+      <h5>Advantages</h5>
+      <ul>
+        <li>Reduced labour costs — one supervisor covers vast areas</li>
+        <li>Better, more efficient irrigation control</li>
+        <li>Better control of precious resources (water)</li>
+        <li>Faster response than manual checking of long channels</li>
+        <li>Safer (fields can reach 40°C+)</li>
+        <li>Can maintain different crop-specific conditions simultaneously (e.g. rice needs flooding, oranges need dry conditions)</li>
+      </ul>
+    </div>
+    <div class="compare-card bad">
+      <h5>Disadvantages</h5>
+      <ul>
+        <li>Expensive equipment/set-up</li>
+        <li>High maintenance costs, needs specialist technicians (a problem in remote areas)</li>
+        <li>Channels must be well-maintained — a blocked/collapsed channel wouldn't be detected, causing over- or under-watering</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — automated agriculture (irrigation).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why is wireless transmission such an important part of this irrigation system?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It allows the system to work across very remote, vast areas (some fields over 10 km²) where running physical cables between sensors and the controller would be impractical.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">How does the controller decide whether to start or stop the water pumps?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It combines data from the water level sensors (irrigation channel levels) with data from the automatic weather station (updated every 10 minutes) to decide, then sends signals to actuators that operate the pumps.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A single supervisor can oversee ______ irrigation systems from one central point, and can ______ the controller if needed.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>several/multiple</strong>. Blank 2: <strong>override</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "The system will always correctly detect if a field is being under-watered, since it's fully automated." What real gap in the lesson's content contradicts this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson explicitly notes that a blocked or collapsed irrigation CHANNEL would NOT be picked up by the automated system, which could result in some areas being over-watered and others starved of water — the system monitors sensor readings, not the physical integrity of the channels themselves.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A farm grows both rice (which needs flooded fields) and orange trees (which need dry conditions) on the same irrigation network. Using this lesson's content, explain how the automated system can manage both crops' very different needs at the same time.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The controllers can be PROGRAMMED so that different growing conditions are maintained simultaneously — this is explicitly given as an advantage, since different crops (like flood-loving rice vs. dry-loving oranges) can each have their own irrigation requirements managed independently within the same overall automated system.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How often does the automatic weather station send data to the irrigation controller?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Every <strong>10 minutes</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 6: Automated Systems — 6.1c Automated Systems: Agriculture<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 6.1
+  </div>
+
+</div>
+</body>
+</html>

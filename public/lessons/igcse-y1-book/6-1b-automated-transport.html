@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.1b Automated Systems: Transport — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #93c5fd; line-height: 1.9; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .pseudo-block ol { margin: 0; padding-left: 20px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; }
+  .compare-card.good { border: 1px solid rgba(74,222,128,.25); }
+  .compare-card.bad { border: 1px solid rgba(248,113,113,.25); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .compare-card.good h5 { color: #4ade80; }
+  .compare-card.bad h5 { color: #f87171; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 6 · Automated Systems</span>
+  <div class="topic-title">6.1b Automated Systems: Transport</div>
+  <div class="topic-subtitle">Self-parking cars and adaptive cruise control — the same sensor-microprocessor-actuator pattern, driving your car.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Example 3 — self-parking cars</h4>
+    <ul>
+      <li>Sensors/cameras gauge parking space size as the driver passes; the on-board computer warns when a suitable space is found.</li>
+      <li>Bumper sensors act as BOTH transmitters and receivers — they send signals that bounce off objects, and the time taken to return lets the computer calculate object positions, building a 3D image of surroundings.</li>
+      <li>Once "auto-parking" is selected, actuators control steering, brakes, and throttle — the car parks with NO driver intervention.</li>
+      <li>Note: cheaper/older systems are NOT fully automatic — they only control steering, leaving brakes/throttle to the driver.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good">
+      <h5>Self-parking — advantages</h5>
+      <ul>
+        <li>Same number of cars fit into fewer spaces</li>
+        <li>Avoids traffic disruption (faster than manual parking)</li>
+        <li>Fits into smaller spaces</li>
+        <li>Fewer dents/scratches (lower insurance claims)</li>
+        <li>Safer — stops if a new object (e.g. a child) appears</li>
+        <li>Very consistent results</li>
+      </ul>
+    </div>
+    <div class="compare-card bad">
+      <h5>Self-parking — disadvantages</h5>
+      <ul>
+        <li>Driver over-reliance — loss of manual skill</li>
+        <li>Faulty/dirty sensors can cause malfunctions</li>
+        <li>Kerbing wheels — low kerbs may go undetected</li>
+        <li>Expensive, doesn't really save the driver money</li>
+        <li>Needs additional maintenance</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Example 4 — adaptive cruise control</h4>
+    <ul>
+      <li>Driver sets a cruising speed (e.g. 100 kph). Bumper LASERS constantly send signals that bounce off the vehicle in front, reflecting back to sensors.</li>
+      <li>The on-board computer uses the signal's round-trip TIME to calculate the DISTANCE between vehicles.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Adaptive cruise control logic</span><ol>
+<li>Receive sensor signals; calculate distance to vehicle in front</li>
+<li>IF distance &lt; safe distance THEN send signals to actuators to apply brakes / reduce throttle</li>
+<li>ELSE (distance is safe): check if current speed = driver's set value</li>
+<li>IF speed ≠ set value THEN send signals to actuators to increase/decrease throttle accordingly</li>
+</ol></div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — self-parking cars and adaptive cruise control.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">How does a self-parking car's on-board computer calculate the position of nearby objects?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Bumper sensors transmit signals that bounce off objects and reflect back; the computer uses the TIME taken for the signal to return to calculate the object's position, building a 3D image of the surroundings.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In adaptive cruise control, what does the car's computer do if the vehicle in front is closer than the safe distance?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It sends signals to actuators to apply the brakes and/or reduce the throttle, slowing the car down.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      IF distance &lt; safe distance THEN send signals to actuators to ______; ELSE check IF speed ______ set value.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>apply brakes/reduce throttle</strong>. Blank 2: <strong>≠ (not equal to)</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "All self-parking systems, cheap or expensive, fully control steering, brakes, and throttle with no driver input at all." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson explicitly notes that CHEAPER/OLDER self-parking systems are NOT fully automatic — they only control the STEERING, requiring the driver to still operate the brakes and throttle manually. Only the fully automatic (typically more expensive) systems control all three.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A car using adaptive cruise control is travelling at a speed BELOW the driver's set value, with the vehicle in front at a perfectly safe distance. Using this lesson's logic, describe what the on-board computer will do.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Since the distance is safe, the computer checks if the current speed matches the set value — since it's below the set value, the speeds don't match, so the computer sends signals to actuators to INCREASE the throttle, bringing the car's speed up towards the driver's set cruising speed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name one real safety benefit of self-parking cars mentioned in this lesson, beyond just convenience.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Sensors monitor ALL objects, including young children — the car's manoeuvre is stopped if any new object is detected, making it genuinely safer than manual parking in this respect.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 6: Automated Systems — 6.1b Automated Systems: Transport<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 6.1
+  </div>
+
+</div>
+</body>
+</html>
