@@ -134,6 +134,9 @@
   .learn-theory h4 { color:#fbbf24; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; margin:14px 0 5px; }
   .learn-theory h4:first-child { margin-top:0; }
   .learn-theory code { background:#0a0c18; border:1px solid rgba(255,255,255,.1); border-radius:4px; padding:1px 6px; color:#b8ef4a; }
+  .learn-theory figure { margin:10px 0 16px; }
+  .learn-theory figure img { width:100%; max-width:420px; display:block; margin:0 auto; border-radius:8px; border:1px solid rgba(255,255,255,.12); }
+  .learn-theory figcaption { text-align:center; font-size:10.5px; color:#8b93a3; margin-top:5px; }
   #learn-continue-btn { width:100%; }
   #learn-matchup-score { font-weight:700; color:#4ade80; text-transform:none; letter-spacing:0; }
 
@@ -551,25 +554,66 @@ const MISSIONS = [
     learn: {
       videoId: 'YRqdkNRPaBs', videoTitle: 'CPU and RAM – how computers work #1',
       terms: [
-        { term: 'CPU',     def: 'The Central Processing Unit — carries out instructions. The "brain" of the computer.' },
-        { term: 'RAM',     def: 'Temporary, fast memory — holds data only while the computer is ON. Cleared when power is off.' },
-        { term: 'Storage', def: 'Permanent memory (a hard drive or SSD) — keeps data even after the power is switched off.' },
-        { term: 'Input',   def: 'Getting data INTO the computer — e.g. a keyboard, mouse, or sensor.' },
-        { term: 'Output',  def: 'Getting data OUT of the computer — e.g. a screen, speaker, or printer.' },
-        { term: 'Byte',    def: '8 bits — enough to store one single character. The basic unit storage sizes are built from.' },
-        { term: 'SSD',     def: 'Solid-state drive — storage with NO moving parts, faster and more reliable than a spinning HDD.' },
+        { term: 'CPU',        def: 'The Central Processing Unit — carries out instructions. The "brain" of the computer.' },
+        { term: 'RAM',        def: 'Temporary, fast memory — holds data only while the computer is ON. Cleared when power is off.' },
+        { term: 'Storage',    def: 'Permanent memory (a hard drive or SSD) — keeps data even after the power is switched off.' },
+        { term: 'Input',      def: 'Getting data INTO the computer — e.g. a keyboard, mouse, or sensor.' },
+        { term: 'Output',     def: 'Getting data OUT of the computer — e.g. a screen, speaker, or printer.' },
+        { term: 'Byte',       def: '8 bits — enough to store one single character. The basic unit storage sizes are built from.' },
+        { term: 'SSD',        def: 'Solid-state drive — storage with NO moving parts, faster and more reliable than a spinning HDD.' },
+        { term: 'Motherboard', def: 'The circuit board every other part plugs into — it physically connects the CPU, RAM, storage, and everything else.' },
+        { term: 'GPU',        def: 'Graphics Processing Unit — a separate chip specialised for drawing images, video, and 3D graphics to the screen.' },
+        { term: 'PSU',        def: 'Power Supply Unit — converts mains electricity into the exact voltages every other component needs to run.' },
       ],
       theory: `
         <h4>Every computer does the same four things</h4>
         <p>Whatever it looks like — a laptop, a phone, a games console — every computer follows the same basic pattern: <b>Input</b> (data comes in), <b>Process</b> (the CPU does something with it), <b>Output</b> (a result comes out), and <b>Storage</b> (data is kept for later). This is called the IPOS cycle.</p>
-        <h4>RAM vs. Storage — temporary vs. permanent</h4>
-        <p>These are easy to confuse, but genuinely different jobs: RAM is fast but forgets everything the instant power is lost — it's where a program runs WHILE it's open. Storage is slower but permanent — it's where your files, photos, and installed programs live even when the computer is off.</p>
+        <h4>The motherboard — where every part actually connects</h4>
+        <figure>
+          <img src="/images/hardware/motherboard.jpg" alt="A real computer motherboard, showing the CPU socket, RAM slots, and expansion slots" loading="lazy">
+          <figcaption>A real motherboard — the CPU socket sits in the middle (silver frame), RAM slots run along the right, and the long PCI Express slots on the left are where a graphics card plugs in.</figcaption>
+        </figure>
+        <p>Open up any desktop computer and the motherboard is the big circuit board everything else plugs into — the CPU sits in a socket in the middle, RAM sticks click into slots next to it, and cables run out to storage drives, the power supply, and the case's fans. If a part doesn't connect to the motherboard somehow, it isn't inside that computer.</p>
         <h4>The CPU — where the "thinking" happens</h4>
-        <p>The CPU doesn't store your files or run out of battery on its own — its ONE job is to carry out instructions, one after another, extremely fast. Every program you'll ever write is ultimately a list of instructions for the CPU to carry out.</p>
+        <figure>
+          <img src="/images/hardware/cpu.jpg" alt="A real Intel Pentium 4 CPU chip" loading="lazy">
+          <figcaption>A real CPU — this exact model plugs into a matching socket on a motherboard, metal-contact-side down.</figcaption>
+        </figure>
+        <p>The CPU doesn't store your files or run out of battery on its own — its ONE job is to carry out instructions, one after another, extremely fast. Every program you'll ever write is ultimately a list of instructions for the CPU to carry out. Because it works so hard, a CPU generates real heat — which is why it always sits under a cooler.</p>
+        <figure>
+          <img src="/images/hardware/cooler.jpg" alt="A real CPU heatsink and fan" loading="lazy">
+          <figcaption>A CPU cooler — a metal heatsink pulls heat away from the chip, and a fan blows it off into the case's airflow.</figcaption>
+        </figure>
+        <h4>RAM vs. Storage — temporary vs. permanent</h4>
+        <figure>
+          <img src="/images/hardware/ram.jpg" alt="A real DDR4 RAM memory stick" loading="lazy">
+          <figcaption>A real RAM stick — this one clicks into one of the slots visible on the motherboard photo above.</figcaption>
+        </figure>
+        <p>These are easy to confuse, but genuinely different jobs: RAM is fast but forgets everything the instant power is lost — it's where a program runs WHILE it's open. Storage is slower but permanent — it's where your files, photos, and installed programs live even when the computer is off.</p>
         <h4>Storage is measured in units that each multiply by 1024</h4>
         <p>A bit is one 0 or 1. 8 bits make a <b>byte</b> — enough to store one character. From there, each unit is roughly 1024 times bigger than the last: 1024 bytes = 1 <b>kilobyte (KB)</b>, 1024 KB = 1 <b>megabyte (MB)</b>, 1024 MB = 1 <b>gigabyte (GB)</b>, 1024 GB = 1 <b>terabyte (TB)</b>. A short text message might be a few hundred bytes; a phone photo is usually a few MB; a whole phone's storage is measured in GB.</p>
         <h4>Not all storage devices work the same way</h4>
-        <p>A <b>HDD</b> (hard disk drive) stores data on a spinning magnetic disk — cheap and large, but slower, with moving parts that can wear out. An <b>SSD</b> (solid-state drive) has NO moving parts — it stores data electronically, so it's genuinely faster and more reliable, though usually more expensive per GB. <b>Cloud storage</b> isn't really a separate "type" of device at all — it's just storage (usually on SSDs/HDDs) sitting in someone else's data centre, accessed over the internet instead of sitting inside your own device.</p>`,
+        <figure>
+          <img src="/images/hardware/hdd.jpg" alt="A real hard disk drive with its cover removed, showing the spinning platter" loading="lazy">
+          <figcaption>A real HDD (shown with its cover removed) — the shiny disc is the spinning magnetic platter; the arm reads and writes data as it spins.</figcaption>
+        </figure>
+        <p>A <b>HDD</b> (hard disk drive) stores data on a spinning magnetic disk — cheap and large, but slower, with moving parts that can wear out.</p>
+        <figure>
+          <img src="/images/hardware/ssd.jpg" alt="A real solid-state drive" loading="lazy">
+          <figcaption>A real SSD — no spinning disk inside at all, just electronic memory chips, which is why it's faster and more shock-resistant.</figcaption>
+        </figure>
+        <p>An <b>SSD</b> (solid-state drive) has NO moving parts — it stores data electronically, so it's genuinely faster and more reliable, though usually more expensive per GB. <b>Cloud storage</b> isn't really a separate "type" of device at all — it's just storage (usually on SSDs/HDDs) sitting in someone else's data centre, accessed over the internet instead of sitting inside your own device.</p>
+        <h4>The GPU and PSU — two more real parts worth knowing</h4>
+        <figure>
+          <img src="/images/hardware/gpu.jpg" alt="A real graphics card (GPU)" loading="lazy">
+          <figcaption>A real graphics card — its own cooling fans sit on top because, like the CPU, its chip works hard and gets hot.</figcaption>
+        </figure>
+        <p>Every computer needs SOME way to draw an image to the screen — sometimes that's a small chip built into the CPU, and sometimes it's a whole separate card like this one, built specifically to handle 3D graphics, video, and gaming faster than the CPU alone could.</p>
+        <figure>
+          <img src="/images/hardware/psu.jpg" alt="A real computer power supply unit" loading="lazy">
+          <figcaption>A real power supply unit (PSU) — it takes the electricity from the wall socket and converts it into the exact voltages the motherboard, CPU, and drives actually need.</figcaption>
+        </figure>
+        <p>None of the other parts run on raw mains electricity — the PSU's whole job is converting it into safe, steady, exact voltages first. A PSU rated too low for a power-hungry GPU is a genuinely common real build mistake.</p>`,
     },
   },
   {
