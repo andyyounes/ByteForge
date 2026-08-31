@@ -4041,8 +4041,67 @@ workspace.addChangeListener(e => {
   }, 3000)
 })
 
+// ── Teacher-editable per-class content overrides ─────────────────────────────
+// Mutates the WORLDS/stage/CHALLENGE_LESSON objects IN PLACE (never
+// reassigns them — they're `const`), so every reference (CHALLENGES,
+// STAGE_INDEX, etc.) sees the same merged data. Fails silently if there's no
+// resolvable class — same convention as LessonSaves. Overrides never contain
+// a `check` field (the teacher API strips real functions before they ever
+// reach the browser — see lib/grade7-content.ts), so a stage's actual
+// pass/fail logic can never be altered this way, only its safe/editable
+// fields (name, xp, text, hints, questions, ...).
+async function fetchClassIdG7() {
+  const urlParam = new URLSearchParams(window.location.search).get('classId')
+  if (urlParam) return urlParam
+  if (!me) return null
+  try {
+    const res = await fetch('/api/profile')
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.classId ?? data.class_id ?? null
+  } catch (e) { return null }
+}
+async function applyClassOverrides() {
+  const classId = await fetchClassIdG7()
+  if (!classId) return
+  try {
+    const res = await fetch(`/api/class-lesson-overrides?classId=${encodeURIComponent(classId)}&lessonKey=grade7`)
+    if (!res.ok) return
+    const { overrides } = await res.json()
+    if (!overrides || !overrides.length) return
+    const worldOv  = new Map(overrides.filter(o => o.scope === 'world').map(o => [o.target_id, o.override_data]))
+    const stageOv  = new Map(overrides.filter(o => o.scope === 'stage').map(o => [o.target_id, o.override_data]))
+    const lessonOv = new Map(overrides.filter(o => o.scope === 'lesson').map(o => [o.target_id, o.override_data]))
+    for (const w of WORLDS) {
+      const wo = worldOv.get(w.id)
+      if (wo) Object.assign(w, wo)
+      for (const s of w.stages) {
+        const so = stageOv.get(s.id)
+        if (so) Object.assign(s, so)
+      }
+    }
+    // CHALLENGES is built via `{...s, mod}` — a SHALLOW COPY of each stage,
+    // not the same object reference as WORLDS[i].stages[j] — computed once
+    // at module-load time, before this function ever runs. Mutating the
+    // WORLDS stage objects above does NOT reach CHALLENGES (confirmed live:
+    // an early version of this fix silently did nothing because of exactly
+    // this). CHALLENGES (via STAGE_INDEX) is what selectChallenge/rendering
+    // actually reads, so it needs the same override applied directly too.
+    for (const [id, so] of stageOv) {
+      const idx = STAGE_INDEX[id]
+      if (idx !== undefined) Object.assign(CHALLENGES[idx], so)
+    }
+    if (typeof CHALLENGE_LESSON !== 'undefined') {
+      for (const [id, lo] of lessonOv) {
+        CHALLENGE_LESSON[id] = CHALLENGE_LESSON[id] ? Object.assign(CHALLENGE_LESSON[id], lo) : lo
+      }
+    }
+  } catch (e) { console.warn('[grade7] override load failed (offline?):', e.message) }
+}
+
 // ── Init — restore Supabase saves, then render ───────────────────────────────
 ;(async () => {
+  await applyClassOverrides()
   const saves = await LessonSaves.load('grade7')
   // Restore completed challenges
   LessonSaves.completedIds().forEach(id => { if (STAGE_INDEX[id] !== undefined) completed.add(STAGE_INDEX[id]) })

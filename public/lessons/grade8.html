@@ -4426,9 +4426,61 @@ const style = document.createElement('style')
 style.textContent = `.cm-error-line { background:rgba(239,68,68,.18) !important; }`
 document.head.appendChild(style)
 
+// ── Teacher-editable per-class content overrides ─────────────────────────────
+// Same pattern as grade6.html/grade7.html — mutates MODULES/stage/
+// CHALLENGE_LESSON objects IN PLACE. CHALLENGES is built via `{...s, mod}`
+// (object spread — a COPY, not the same reference as MODULES[i].stages[j]),
+// so overrides must ALSO be applied directly onto CHALLENGES via STAGE_INDEX,
+// same fix as grade7.html needed (confirmed live there — mutating MODULES
+// alone silently does nothing to what selectChallenge/rendering actually
+// reads). Overrides never contain a `check` field (stripped server-side —
+// see lib/grade8-content.ts), so pass/fail logic can never be altered here.
+async function fetchClassIdG8() {
+  const urlParam = new URLSearchParams(window.location.search).get('classId')
+  if (urlParam) return urlParam
+  if (!me) return null
+  try {
+    const res = await fetch('/api/profile')
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.classId ?? data.class_id ?? null
+  } catch (e) { return null }
+}
+async function applyClassOverrides() {
+  const classId = await fetchClassIdG8()
+  if (!classId) return
+  try {
+    const res = await fetch(`/api/class-lesson-overrides?classId=${encodeURIComponent(classId)}&lessonKey=grade8`)
+    if (!res.ok) return
+    const { overrides } = await res.json()
+    if (!overrides || !overrides.length) return
+    const modOv    = new Map(overrides.filter(o => o.scope === 'world').map(o => [o.target_id, o.override_data]))
+    const stageOv  = new Map(overrides.filter(o => o.scope === 'stage').map(o => [o.target_id, o.override_data]))
+    const lessonOv = new Map(overrides.filter(o => o.scope === 'lesson').map(o => [o.target_id, o.override_data]))
+    for (const m of MODULES) {
+      const mo = modOv.get(m.id)
+      if (mo) Object.assign(m, mo)
+      for (const s of m.stages) {
+        const so = stageOv.get(s.id)
+        if (so) Object.assign(s, so)
+      }
+    }
+    for (const [id, so] of stageOv) {
+      const idx = STAGE_INDEX[id]
+      if (idx !== undefined) Object.assign(CHALLENGES[idx], so)
+    }
+    if (typeof CHALLENGE_LESSON !== 'undefined') {
+      for (const [id, lo] of lessonOv) {
+        CHALLENGE_LESSON[id] = CHALLENGE_LESSON[id] ? Object.assign(CHALLENGE_LESSON[id], lo) : lo
+      }
+    }
+  } catch (e) { console.warn('[grade8] override load failed (offline?):', e.message) }
+}
+
 // ── Init — restore Supabase saves, then render ───────────────────────────────
 initPyodide()
 ;(async () => {
+  await applyClassOverrides()
   await LessonSaves.load('grade8')
   // completedIds() is id-keyed (survives new challenges being inserted
   // anywhere); completedSet() is the legacy index-keyed fallback for any
