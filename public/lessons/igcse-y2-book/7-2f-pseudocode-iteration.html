@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.2f Pseudocode: Iteration (Loops) — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .compare-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 12px 14px; font-size: 11.5px; line-height: 1.6; border: 1px solid rgba(255,255,255,.08); }
+  .compare-card h5 { margin: 0 0 6px; font-size: 11px; color: #b8ef4a; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.2f Pseudocode: Iteration (Loops)</div>
+  <div class="topic-subtitle">Three loop structures, one job each — knowing exactly which one to reach for.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Iteration</div><div class="key-term-def">Repeating actions as part of an algorithm — implemented with loop structures.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Post-condition loop</div><div class="key-term-def">A loop that tests its exit condition at the END — REPEAT…UNTIL always runs at least once.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Pre-condition loop</div><div class="key-term-def">A loop that tests its condition at the START — WHILE…DO may never run at all.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Three loop structures</h4>
+    <ul>
+      <li><b>FOR … TO … NEXT</b>: a SET number of repetitions, known in advance.</li>
+      <li><b>REPEAT … UNTIL</b>: an UNKNOWN number of repeats, but always completed AT LEAST ONCE.</li>
+      <li><b>WHILE … DO … ENDWHILE</b>: an UNKNOWN number of repeats, that may NEVER run at all.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">All three loops doing the exact same job — printing ten stars</div>
+    <p><code>FOR Counter ← 1 TO 10<br>&nbsp;&nbsp;OUTPUT "*"<br>NEXT Counter</code></p>
+    <p><code>Counter ← 0<br>REPEAT<br>&nbsp;&nbsp;OUTPUT "*"<br>&nbsp;&nbsp;Counter ← Counter + 1<br>UNTIL Counter > 9</code></p>
+    <p><code>Counter ← 0<br>WHILE Counter < 10 DO<br>&nbsp;&nbsp;OUTPUT "*"<br>&nbsp;&nbsp;Counter ← Counter + 1<br>ENDWHILE</code></p>
+    <p style="margin-top:8px;"><b>FOR … TO … NEXT is the most efficient way to write this</b>, since the loop counter is managed automatically — no manual increment line needed.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>FOR … TO … NEXT</h4>
+    <ul>
+      <li>A variable is given a start value and an end value; it's incremented by ONE each time until the end value is reached.</li>
+      <li>The loop variable CAN be used inside the loop, as long as its value isn't changed there.</li>
+      <li>Very useful for reading values into a LIST (array) of known length.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">FOR loop — reading 10 student names into an array</span>FOR Counter ← 1 TO 10
+  OUTPUT "Enter Name of Student "
+  INPUT StudentName[Counter]
+NEXT</div>
+
+  <div class="theory-block">
+    <h4>REPEAT … UNTIL</h4>
+    <ul>
+      <li>Used when the number of repeats is unknown; repeats UNTIL a condition becomes TRUE.</li>
+      <li>Always runs AT LEAST ONCE — a <b>post-condition</b> loop, since the exit test is at the END.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">REPEAT loop — totalling marks until -1 is entered</span>Total ← 0
+Mark ← 0
+REPEAT
+  Total ← Total + Mark
+  OUTPUT "Enter value for mark, -1 to finish "
+  INPUT Mark
+UNTIL Mark = -1</div>
+
+  <div class="theory-block">
+    <h4>WHILE … DO … ENDWHILE</h4>
+    <ul>
+      <li>Used when the number of repeats is unknown; repeats WHILE a condition stays TRUE.</li>
+      <li>If the condition is FALSE the very first time, the loop body NEVER runs — a <b>pre-condition</b> loop, since the exit test is at the START.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">WHILE loop — the same totalling task</span>Total ← 0
+OUTPUT "Enter value for mark, -1 to finish "
+INPUT Mark
+WHILE Mark <> -1 DO
+  Total ← Total + Mark
+  OUTPUT "Enter value for mark, -1 to finish"
+  INPUT Mark
+ENDWHILE</div>
+
+  <div class="compare-grid">
+    <div class="compare-card"><h5>FOR…TO…NEXT</h5>Known number of repeats. Counter managed automatically.</div>
+    <div class="compare-card"><h5>REPEAT…UNTIL</h5>Unknown repeats. Runs at least once. Tests at the END (post-condition).</div>
+    <div class="compare-card"><h5>WHILE…DO…ENDWHILE</h5>Unknown repeats. May run zero times. Tests at the START (pre-condition).</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the three iteration/loop structures.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which loop type is the best choice when you know exactly how many times you need to repeat something?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>FOR … TO … NEXT</code> — it's the most efficient choice since the loop counter is managed automatically.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the key difference between REPEAT…UNTIL and WHILE…DO…ENDWHILE, in terms of how many times the loop body can run?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>REPEAT…UNTIL ALWAYS runs at least once (its test is at the end — post-condition). WHILE…DO…ENDWHILE might run ZERO times if the condition is already false the first time it's checked (its test is at the start — pre-condition).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete this FOR loop to output 5 stars: <code>FOR Counter ← 1 TO ______<br>&nbsp;&nbsp;OUTPUT "*"<br>______ Counter</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>5</strong>. Blank 2: <strong>NEXT</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student needs a loop that must NEVER run if the starting condition is already false (e.g. don't process an empty list at all), and chooses REPEAT…UNTIL. What's wrong with this choice?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>REPEAT…UNTIL always runs the loop body AT LEAST ONCE, regardless of the condition — it can never skip execution entirely. WHILE…DO…ENDWHILE is the correct choice here, since it tests the condition BEFORE running the body, and can skip it entirely if the condition is already false.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A program must keep asking the user to enter a password until they type it correctly — the very first attempt could be right or wrong, but the prompt must show at least once. Which loop type fits best, and write the pseudocode for it.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>REPEAT … UNTIL</strong> — the prompt must show at least once, matching REPEAT's guaranteed-first-run behaviour.</p>
+      <p><code>REPEAT<br>&nbsp;&nbsp;OUTPUT "Enter password: "<br>&nbsp;&nbsp;INPUT Password<br>UNTIL Password = "correctpassword"</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In a FOR loop, by how much is the loop variable incremented each time, according to this lesson?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>By steps of <strong>one</strong>, until the end value is reached.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.2f Pseudocode: Iteration (Loops)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.2
+  </div>
+
+</div>
+</body>
+</html>
