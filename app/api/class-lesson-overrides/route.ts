@@ -1,5 +1,6 @@
 /**
- * Per-class lesson-content overrides (Grade 6-9 static lesson pages).
+ * Per-class lesson-content overrides (Grade 6-9, IGCSE Y1/Y2 challenges, and
+ * the IGCSE Y1 book-lesson pages all share this one table/route).
  *
  * GET    ?classId=&lessonKey=          — any class member (student or the
  *                                        owning teacher) reads all overrides
@@ -9,7 +10,8 @@
  * DELETE ?classId=&lessonKey=&scope=&targetId= — teacher only: revert one
  *                                        override back to the original.
  *
- * Body/params scope is 'world' | 'stage', targetId is that world/stage's id.
+ * Body/params scope is 'world' | 'stage' | 'lesson', targetId is that
+ * world/stage/lesson's id (or, for the book lessons, the lesson's filename).
  * See supabase/class_lesson_overrides.sql for the full data-model rationale.
  */
 import { NextRequest, NextResponse } from 'next/server'
@@ -60,7 +62,7 @@ export async function PUT(req: NextRequest) {
 
   let body: {
     classId?: string; lessonKey?: string
-    scope?: 'world' | 'stage'; targetId?: string; overrideData?: Record<string, unknown>
+    scope?: 'world' | 'stage' | 'lesson'; targetId?: string; overrideData?: Record<string, unknown>
   }
   try { body = await req.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
@@ -70,8 +72,12 @@ export async function PUT(req: NextRequest) {
   if (!classId || !lessonKey || !scope || !targetId || !overrideData) {
     return NextResponse.json({ error: 'classId, lessonKey, scope, targetId, and overrideData are all required' }, { status: 400 })
   }
-  if (scope !== 'world' && scope !== 'stage') {
-    return NextResponse.json({ error: "scope must be 'world' or 'stage'" }, { status: 400 })
+  // DB CHECK constraint (class_lesson_overrides.sql) allows 'world' | 'stage' |
+  // 'lesson' — this validation must match, or 'lesson'-scope saves (used by
+  // IgcseLessonEditor's stage-explainer text, and the new book-lesson editor)
+  // silently 400 instead of persisting.
+  if (scope !== 'world' && scope !== 'stage' && scope !== 'lesson') {
+    return NextResponse.json({ error: "scope must be 'world', 'stage', or 'lesson'" }, { status: 400 })
   }
 
   if (!(await ownsClass(supabase, classId, user.id))) {

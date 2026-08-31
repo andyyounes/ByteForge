@@ -200,6 +200,24 @@ export function ClassTabs({ cls, classType, studentData, topics, draftExercises,
               </div>
             )
           })()}
+          {classType.id === 'igcse' && cls.grade !== '11' && (
+            <div className="card p-5 flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <h3 className="font-semibold text-fg text-sm">📘 IGCSE Year 1 — Textbook, editable</h3>
+                <p className="text-xs text-fg-dim mt-1 max-w-xl">
+                  89 lessons rewritten from the coursebook, with key terms, worked examples, and
+                  practice exercises. See exactly what your students see, edit any lesson&apos;s
+                  title and content, then publish. Changes apply to this class only.
+                </p>
+              </div>
+              <Link
+                href={`/teacher/class/${cls.id}/lessons/igcse-y1-book`}
+                className="text-xs font-semibold px-4 py-2 rounded-md bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors whitespace-nowrap"
+              >
+                Edit lessons →
+              </Link>
+            </div>
+          )}
           {classType.id === 'grade9' && <G9MissionsPanel classId={cls.id} />}
           {(classType.id === 'grade6' || classType.id === 'grade7' || classType.id === 'grade8') && (
             <GradeProgressPanel classId={cls.id} grade={classType.id} />
