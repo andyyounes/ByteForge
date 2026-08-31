@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.5b Verification — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; }
+  .compare-card.good { background: rgba(74,222,128,.06); border: 1px solid rgba(74,222,128,.25); color: #d1fae5; }
+  .compare-card.bad { background: rgba(248,113,113,.06); border: 1px solid rgba(248,113,113,.25); color: #fecaca; }
+  .compare-card b { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.5b Verification</div>
+  <div class="topic-subtitle">Checking data hasn't changed as it moved — a different job from validation's reasonableness checks.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Verification</div><div class="key-term-def">Checking that data has been accurately copied from one source to another, e.g. input into a computer or transferred between parts of a system.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Double entry</div><div class="key-term-def">Entering the same data twice (sometimes by different operators) and comparing the two entries.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Screen / visual check</div><div class="key-term-def">A manual check where the user confirms entered data is correct before continuing.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What verification is</h4>
+    <ul>
+      <li>Verification checks that data has been accurately copied from one source to another — for instance, input into a computer, or transferred from one part of a computer system to another.</li>
+      <li>This is a DIFFERENT job from validation: validation checks data is REASONABLE; verification checks data hasn't CHANGED or been mis-copied during entry or transfer.</li>
+      <li>Two verification methods for input data are covered here: double entry, and screen/visual check.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Double entry</h4>
+    <ul>
+      <li>The same data is entered TWICE — sometimes by two different operators.</li>
+      <li>The computer system compares both entries; if they DIFFER, an error message is shown asking for the data to be entered again.</li>
+      <li>Common for critical data such as passwords (type it, then "confirm password") or sensitive records entered by data-entry clerks.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Screen / visual check</h4>
+    <ul>
+      <li>A MANUAL check carried out by the user who is entering the data — not automated by the computer.</li>
+      <li>Once data entry is complete, the data is displayed on the screen and the user is asked to confirm it is correct before continuing.</li>
+      <li>The user either checks the displayed data against a paper document being used as the input source, OR confirms it is correct from their own knowledge.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good"><b>Validation</b>Automated. Checks data is REASONABLE (e.g. in range, right type, not blank). Can be done with a single entry.</div>
+    <div class="compare-card bad"><b>Verification</b>Often manual, or compares two independent entries. Checks data has NOT CHANGED / been mis-copied during entry or transfer.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — verification, and how it differs from validation.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does verification check, that validation does not?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Verification checks that data has been accurately COPIED from one source to another (e.g. entered correctly, or transferred correctly between systems) — whereas validation only checks that data is REASONABLE, without knowing whether it matches its original source.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">How does double entry detect an error?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The same data is entered twice (sometimes by different people), and the computer system compares the two entries — if they don't match, an error message asks for the data to be re-entered.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode / concept</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A screen/visual check is a ______ check completed by the user, while double entry is completed by the ______ system comparing two entries.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A screen/visual check is a MANUAL check completed by the user; double entry is completed by the COMPUTER system comparing two entries.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "A range check on an age field is a form of verification." Explain why this is incorrect.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A range check is a VALIDATION technique — it checks the value is reasonable (falls within an expected range), not whether it was copied/entered accurately from its original source. Verification methods are things like double entry or a screen/visual check.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A website asks a new user to type their password, then type it again into a "Confirm password" box. Which verification method is this, and why is it useful here specifically?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is double entry. It's especially useful for passwords because they are usually masked (shown as dots/asterisks) as they're typed, so a visual/screen check wouldn't catch a mis-typed character — comparing two independent entries is the only reliable way to confirm it was typed correctly both times.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">
+      A data-entry clerk types a customer's address from a paper form, then the system displays it back on screen and asks "Is this correct? Y/N" before saving. Name this verification method.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A screen/visual check — the user manually compares the displayed data against the original paper document before confirming.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.5b Verification (completes Section 7.5)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.5
+  </div>
+
+</div>
+</body>
+</html>

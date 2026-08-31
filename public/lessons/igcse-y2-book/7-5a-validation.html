@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.5a Validation — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; }
+  .compare-card.good { background: rgba(74,222,128,.06); border: 1px solid rgba(74,222,128,.25); color: #d1fae5; }
+  .compare-card.bad { background: rgba(248,113,113,.06); border: 1px solid rgba(248,113,113,.25); color: #fecaca; }
+  .compare-card b { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.5a Validation</div>
+  <div class="topic-subtitle">Automated checks that reject unreasonable data before it ever enters the system.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Validation</div><div class="key-term-def">An automated check that data is reasonable, carried out by a computer system as data is entered.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Range check</div><div class="key-term-def">Checks a value falls between a set lower and upper boundary.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Length check</div><div class="key-term-def">Checks the number of characters entered — either an exact count, or within a range.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Type check</div><div class="key-term-def">Checks data is of the expected data type, e.g. an integer.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Presence check</div><div class="key-term-def">Checks a required field has not been left blank.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Format check &amp; check digit</div><div class="key-term-def">Format check: data matches a pre-defined pattern. Check digit: a final digit calculated from the others, used to catch data-entry errors.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What validation is</h4>
+    <ul>
+      <li>For a computer system to only accept data that is reasonable and accurate, every item of data needs to be examined before it is accepted.</li>
+      <li>Validation is an AUTOMATED check carried out by the computer system as data is entered.</li>
+      <li>If data FAILS a validation check, it is REJECTED, an explanatory error message is shown, and the user is given the opportunity to re-enter it.</li>
+      <li>More than one validation check can apply to the same piece of data — for example, an exam mark could need a range check, a type check, AND a presence check all together.</li>
+      <li>Six validation check types are covered here: range, length, type, presence, format, and check digit.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Range check — a percentage mark, 0 to 100 inclusive</span>OUTPUT "Please enter the student's mark "
+REPEAT
+  INPUT StudentMark
+  IF StudentMark < 0 OR StudentMark > 100
+  THEN
+    OUTPUT "The student's mark should be in the range 0 to 100, please re-enter the mark "
+  ENDIF
+UNTIL StudentMark >= 0 AND StudentMark <= 100</div>
+
+  <div class="theory-block">
+    <h4>Length check — two forms</h4>
+    <ul>
+      <li><b>Exact length</b>: e.g. a password must be exactly 8 characters — 7-or-fewer or 9-or-more characters is rejected.</li>
+      <li><b>Range of lengths</b>: e.g. a family name between 2 and 30 characters inclusive — a 1-character or 31-plus-character name is rejected.</li>
+      <li><code>LENGTH(...)</code> is the pseudocode operation returning the number of characters in a string.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Length check — exact length (an 8-character password)</span>OUTPUT "Please enter your password of eight characters "
+REPEAT
+  INPUT Password
+  IF LENGTH(Password) <> 8
+  THEN
+    OUTPUT "Your password must be exactly eight characters, please re-enter "
+  ENDIF
+UNTIL LENGTH(Password) = 8</div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Length check — a range of lengths (family name, 2-30 characters)</span>OUTPUT "Please enter your family name "
+REPEAT
+  INPUT FamilyName
+  IF LENGTH(FamilyName) > 30 OR LENGTH(FamilyName) < 2
+  THEN
+    OUTPUT "Too short or too long, please re-enter "
+  ENDIF
+UNTIL LENGTH(FamilyName) <= 30 AND LENGTH(FamilyName) >= 2</div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Type check — the number of brothers must be a whole number</span>OUTPUT "How many brothers do you have? "
+REPEAT
+  INPUT NumberOfBrothers
+  IF NumberOfBrothers <> DIV(NumberOfBrothers, 1)
+  THEN
+    OUTPUT "This must be a whole number, please re-enter"
+  ENDIF
+UNTIL NumberOfBrothers = DIV(NumberOfBrothers, 1)</div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Presence check — an email address must not be left blank</span>OUTPUT "Please enter your email address "
+REPEAT
+  INPUT EmailAddress
+  IF EmailAddress = ""
+  THEN
+    OUTPUT "*Required "
+  ENDIF
+UNTIL EmailAddress <> ""</div>
+
+  <div class="theory-block">
+    <h4>Format check</h4>
+    <ul>
+      <li>A format check confirms that the characters entered conform to a pre-defined PATTERN — for example, a code that must be in the form CUB9999 (three letters, then four digits).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Check digit</h4>
+    <ul>
+      <li>A check digit is the FINAL digit in a code, calculated from all the other digits in that code.</li>
+      <li>Used on barcodes, product codes, ISBNs (International Standard Book Numbers), and VINs (Vehicle Identification Numbers).</li>
+      <li>Check digits are designed to catch errors made when typing or scanning data:</li>
+      <li>&mdash; an incorrect digit, e.g. 5327 entered instead of 5307</li>
+      <li>&mdash; a transposition error, where two digits swap places, e.g. 5037 instead of 5307</li>
+      <li>&mdash; omitted or extra digits, e.g. 537 or 53107 instead of 5307</li>
+      <li>&mdash; a phonetic error, e.g. entering "13" (thirteen) instead of "30" (thirty)</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good"><b>Validation catches</b>Data that is out of range, the wrong length, the wrong type, missing, badly formatted, or has a mistyped/mis-scanned digit.</div>
+    <div class="compare-card bad"><b>Validation does NOT catch</b>Data that is plausible but simply wrong — e.g. a valid-format but incorrect email address that was typed correctly but is not actually the user's own. That's verification's job (or beyond either check).</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the six validation check types.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What happens when data fails a validation check?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It is rejected, an explanatory error message is displayed, and the user is given the opportunity to re-enter the data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Which validation check would you use to make sure an "Age" field entered by a user is never left blank?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A presence check.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete this length check's loop condition, for a password that must be exactly 8 characters: <code>UNTIL LENGTH(Password) ____ 8</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>UNTIL LENGTH(Password) = 8</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A check digit system catches transposition errors (e.g. 5037 instead of 5307) and incorrect digits — but a student claims it will catch EVERY possible typing mistake. Is this true?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — check digits only reliably catch specific known error patterns (incorrect digit, transposition, omitted/extra digits, phonetic errors). Some combinations of multiple simultaneous errors could still produce a code that happens to pass the check digit calculation despite being wrong.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write pseudocode to validate a child's age for a fairground ride, where the age must be over 7 and under 12.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>OUTPUT "Please enter the child's age "<br>REPEAT<br>&nbsp;&nbsp;INPUT Age<br>&nbsp;&nbsp;IF Age &lt;= 7 OR Age &gt;= 12<br>&nbsp;&nbsp;THEN<br>&nbsp;&nbsp;&nbsp;&nbsp;OUTPUT "Age must be over 7 and under 12, please re-enter "<br>&nbsp;&nbsp;ENDIF<br>UNTIL Age &gt; 7 AND Age &lt; 12</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">
+      A part number must be in the form XXX999 (three letters followed by three digits). Which validation check type is this, and name one OTHER check that could ALSO reasonably apply to entering a telephone number.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The part number example is a FORMAT check. For a telephone number, a LENGTH check (a reasonable number of digits) and/or a TYPE check (digits only) could also reasonably apply — multiple checks are often combined on the same piece of data.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.5a Validation<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.5
+  </div>
+
+</div>
+</body>
+</html>
