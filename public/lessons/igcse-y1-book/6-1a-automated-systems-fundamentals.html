@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.1a Automated Systems: Fundamentals &amp; Industrial Applications — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; }
+  .compare-card.good { border: 1px solid rgba(74,222,128,.25); }
+  .compare-card.bad { border: 1px solid rgba(248,113,113,.25); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .compare-card.good h5 { color: #4ade80; }
+  .compare-card.bad h5 { color: #f87171; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 6 · Automated Systems</span>
+  <div class="topic-title">6.1a Automated Systems: Fundamentals &amp; Industrial Applications</div>
+  <div class="topic-subtitle">Sensors + microprocessor + actuators = a system that runs itself — a nuclear power station and a paracetamol factory, both explained the same way.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Automated system</div><div class="key-term-def">Software + hardware (sensors, microprocessors, actuators) designed to work WITHOUT human intervention — though often still monitored.</div></div>
+    <div class="key-term-card"><div class="key-term-name">DCS</div><div class="key-term-def">Distributed Control System — a powerful computer monitoring/controlling an entire industrial process with no human interaction needed.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The basic automated-system pattern</h4>
+    <ul>
+      <li><b>Sensors</b> (input devices) take readings from their surroundings, sending data to a microprocessor. Analogue data is first converted via ADC.</li>
+      <li>The <b>microprocessor</b> processes this data and decides on the necessary action based on its programming.</li>
+      <li>The result is OUTPUT — usually signals sent to <b>actuators</b> to control motors, wheels, solenoids, etc.</li>
+      <li>Every example in this unit follows this same sensor → microprocessor → actuator pattern, just applied to a different real process.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Real example 1 — a nuclear power station</div>
+    <p>Sensors used: temperature, pressure, flow level, gas (escape), and radiation level.</p>
+    <p>All sensor data feeds into the <b>DCS</b> (Distributed Control System) — analogue data converted via ADC first. The DCS checks this against a large database of operational parameters, and if action is needed, sends signals to actuators controlling valves, water pumps, gas pumps, or even an automatic shutdown.</p>
+    <p>A human SUPERVISOR sits in a remote control room, watching a schematic on a large screen — the process is fully automatic, but the supervisor CAN override the DCS and shut it down manually.</p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Real example 2 — manufacturing paracetamol</div>
+    <p>Two monitored processes: Process 1 (manufacturing the paracetamol) and Process 2 (making solid tablets). Sensors on both feed data to a central computer, which checks its database and sends signals to actuators (pumps, valves, heaters, stirrers, pistons) to keep both processes within correct parameters — again, fully automated but overridable by a remote operator.</p>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good">
+      <h5>Advantages (both examples)</h5>
+      <ul>
+        <li>Much faster than a human operator</li>
+        <li>Much safer — timely interventions, keeps humans out of danger</li>
+        <li>Process runs closer to optimum conditions</li>
+        <li>Cheaper long-term (replaces round-the-clock human monitoring)</li>
+        <li>More efficient material use, higher productivity, more consistent results (paracetamol example)</li>
+      </ul>
+    </div>
+    <div class="compare-card bad">
+      <h5>Disadvantages (both examples)</h5>
+      <ul>
+        <li>Expensive to set up, needs extensive testing</li>
+        <li>Untested condition combinations could still arise (safety risk) — hence the human supervisor</li>
+        <li>Vulnerable to cyberattacks, however good the system</li>
+        <li>Requires enhanced (expensive) maintenance</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="theory-block">
+    <h4>A real-world number worth remembering</h4>
+    <ul>
+      <li>Car engine piston installation: manual error rate ~1.5%; with automated systems, error rate falls to 0.00001% — a genuinely dramatic quality improvement from automation.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — automated system fundamentals and the nuclear/paracetamol examples.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is a DCS, and what is its main job in a nuclear power station?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A Distributed Control System — a powerful computer monitoring and controlling the entire power station process, with no human interaction required, sending signals to actuators (valves, pumps, shutdown systems) when needed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does the supervisor of a nuclear power station DCS still matter, even though the process is "fully automated"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because it's always possible for a set of conditions to occur that were never considered during testing, which could have safety implications — the human supervisor can OVERRIDE the DCS and shut the process down manually if something genuinely unexpected happens.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In an automated system, sensor data (if analogue) is first converted using an ______, processed by a ______, and the resulting output typically signals ______ to physically act.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>ADC</strong>. Blank 2: <strong>microprocessor/computer</strong>. Blank 3: <strong>actuators</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Since an automated system is fully automatic, it can never be vulnerable to a cyberattack." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson explicitly states any computerised system is subject to cyberattacks, no matter how good it is — full automation does NOT remove this risk; it's listed as a genuine disadvantage of both the nuclear power station and paracetamol examples.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A factory currently has workers manually monitoring a hazardous chemical process 24 hours a day. Using this lesson's content, explain two genuine benefits of replacing this with an automated system.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any two of: it's much SAFER (keeps humans out of the dangerous environment, and reacts faster/more reliably than a human); it's CHEAPER long-term (no need for round-the-clock human monitoring shifts); the process runs closer to OPTIMUM conditions since small deviations are caught and corrected very quickly.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">By roughly how much did automation reduce the piston-installation error rate in car engine manufacturing?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>From about <strong>1.5%</strong> (manual) down to <strong>0.00001%</strong> (automated) — a dramatic improvement.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 6: Automated Systems — 6.1a Automated Systems: Fundamentals &amp; Industrial Applications<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 6.1
+  </div>
+
+</div>
+</body>
+</html>
