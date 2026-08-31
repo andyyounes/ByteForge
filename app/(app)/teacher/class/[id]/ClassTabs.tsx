@@ -808,15 +808,33 @@ function SettingsTab({ cls, classType, onInvite }: {
   const [editing,   setEditing]   = useState(false)
   const [editName,  setEditName]  = useState(cls.name)
   const [editLevel, setEditLevel] = useState(cls.level ?? 'general')
+  // A type like 'igcse' spans MULTIPLE valid grades (10 = Year 1, 11 = Year
+  // 2) — always silently picking validGradesFor(...)[0] meant a teacher had
+  // no way to actually choose Year 2 through this form at all. Pre-fill
+  // from the class's current grade when it's still valid for the (possibly
+  // just-changed) type, falling back to that type's first valid grade only
+  // when the current one no longer applies.
+  const [editGrade, setEditGrade] = useState(cls.grade ?? validGradesFor(cls.level ?? 'general')[0])
   const [savingInfo, setSavingInfo] = useState(false)
+
+  const gradeOptions = validGradesFor(editLevel)
+  function gradeLabel(level: string, grade: string): string {
+    if (level === 'igcse') return grade === '11' ? 'Year 2 (Grade 11)' : 'Year 1 (Grade 10)'
+    return `Grade ${grade}`
+  }
+
+  function handleLevelChange(newLevel: string) {
+    setEditLevel(newLevel)
+    const options = validGradesFor(newLevel)
+    if (!options.includes(editGrade)) setEditGrade(options[0])
+  }
 
   async function saveClassInfo() {
     if (!editName.trim()) { toast.error('Class name cannot be empty'); return }
     setSavingInfo(true)
-    const newGrade = validGradesFor(editLevel)[0]
     const { error } = await supabase
       .from('classes')
-      .update({ name: editName.trim(), level: editLevel, grade: newGrade })
+      .update({ name: editName.trim(), level: editLevel, grade: editGrade })
       .eq('id', cls.id)
     setSavingInfo(false)
     if (error) { toast.error(error.message); return }
@@ -907,7 +925,7 @@ function SettingsTab({ cls, classType, onInvite }: {
           <CardTitle>Class Info</CardTitle>
           {!editing && (
             <button
-              onClick={() => { setEditName(cls.name); setEditLevel(cls.level ?? 'general'); setEditing(true) }}
+              onClick={() => { setEditName(cls.name); setEditLevel(cls.level ?? 'general'); setEditGrade(cls.grade ?? validGradesFor(cls.level ?? 'general')[0]); setEditing(true) }}
               className="text-xs font-semibold text-accent hover:opacity-80 transition-opacity"
             >
               ✏️ Edit
@@ -927,15 +945,28 @@ function SettingsTab({ cls, classType, onInvite }: {
             <div>
               <label className="block text-xs text-fg-dim mb-1">Type</label>
               <select
-                value={editLevel} onChange={e => setEditLevel(e.target.value)}
+                value={editLevel} onChange={e => handleLevelChange(e.target.value)}
                 className="w-full h-9 px-3 rounded-md bg-s2 border border-b2 text-fg text-sm focus:border-accent focus:outline-none"
               >
                 {CLASS_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
               </select>
-              <p className="text-[11px] text-fg-faint mt-1">
-                Changing this updates the grade/year students in this class see content for.
-              </p>
             </div>
+            {gradeOptions.length > 1 && (
+              <div>
+                <label className="block text-xs text-fg-dim mb-1">
+                  {editLevel === 'igcse' ? 'Year' : 'Grade'}
+                </label>
+                <select
+                  value={editGrade} onChange={e => setEditGrade(e.target.value)}
+                  className="w-full h-9 px-3 rounded-md bg-s2 border border-b2 text-fg text-sm focus:border-accent focus:outline-none"
+                >
+                  {gradeOptions.map(g => <option key={g} value={g}>{gradeLabel(editLevel, g)}</option>)}
+                </select>
+                <p className="text-[11px] text-fg-faint mt-1">
+                  This is what actually decides which content students in this class see.
+                </p>
+              </div>
+            )}
             <div className="flex gap-2">
               <Button onClick={saveClassInfo} loading={savingInfo}>Save</Button>
               <button
