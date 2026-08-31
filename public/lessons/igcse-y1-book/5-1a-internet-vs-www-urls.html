@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.1a Internet vs. World Wide Web &amp; URLs — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; border: 1px solid rgba(255,255,255,.08); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #60a5fa; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .url-diagram { display: flex; flex-wrap: wrap; gap: 3px; font-family: ui-monospace, monospace; font-size: 12px; margin: 10px 0; }
+  .url-part { padding: 4px 8px; border-radius: 5px; }
+  .url-protocol { background: rgba(96,165,250,.15); color: #60a5fa; }
+  .url-domain { background: rgba(184,239,74,.15); color: #b8ef4a; }
+  .url-path { background: rgba(232,121,249,.15); color: #e879f9; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 5 · The Internet &amp; Its Uses</span>
+  <div class="topic-title">5.1a The Internet vs. the World Wide Web, URLs &amp; HTTP(S)</div>
+  <div class="topic-subtitle">Two genuinely different things people use interchangeably — plus how a web address is actually structured.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Internet</div><div class="key-term-def">A worldwide collection of INTERconnected NETworks — the physical/logical infrastructure itself.</div></div>
+    <div class="key-term-card"><div class="key-term-name">World Wide Web (WWW)</div><div class="key-term-def">The collection of web pages/multimedia accessible via a browser — just ONE way of using the internet.</div></div>
+    <div class="key-term-card"><div class="key-term-name">URL</div><div class="key-term-def">Uniform Resource Locator — the text address typed to access a website.</div></div>
+    <div class="key-term-card"><div class="key-term-name">HTTPS</div><div class="key-term-def">HTTP with security (SSL/TLS) added — the 's' means secure, often shown with a padlock icon.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Internet vs. World Wide Web — genuinely different things</h4>
+    <ul>
+      <li>The <b>internet</b> is a CONCEPT, not something tangible — it's the worldwide collection of interconnected networks/devices, relying on physical infrastructure.</li>
+      <li>The <b>WWW</b> is only PART of the internet, accessed via a browser — a massive collection of web pages, based on the hypertext transfer protocol (HTTP).</li>
+      <li>So the WWW is a WAY of accessing information using the internet — they are NOT the same thing.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card">
+      <h5>Internet</h5>
+      <ul>
+        <li>Send/receive emails</li>
+        <li>Online chatting (text/audio/video)</li>
+        <li>Uses TCP and IP</li>
+        <li>Worldwide collection of interconnected networks/devices</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <h5>World Wide Web</h5>
+      <ul>
+        <li>Collection of multimedia web pages/websites</li>
+        <li>http(s) protocols written using HTML</li>
+        <li>URLs specify web page locations</li>
+        <li>Accessed via web browsers, using the internet to reach web servers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="theory-block">
+    <h4>URL structure</h4>
+    <ul>
+      <li>Format: <code>protocol://website address/path/file name</code></li>
+      <li><b>Protocol</b>: usually http or https.</li>
+      <li><b>Website address</b>: domain host (www), domain name (site name), domain type (.com, .org, .net, .gov), and sometimes a country code (.uk, .de, .cy).</li>
+      <li><b>Path</b>: the specific web page — often omitted, defaulting to the site's root directory.</li>
+      <li><b>File name</b>: the specific item on the page.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — breaking down a URL</div>
+    <div class="url-diagram">
+      <span class="url-part url-protocol">https://</span><span class="url-part url-domain">www.hoddereducation.co.uk</span><span class="url-part url-path">/ict</span>
+    </div>
+    <p>Protocol: <code>https</code>. Website address: <code>www.hoddereducation.co.uk</code> (domain host "www", domain name "hoddereducation", domain type ".co", country code ".uk"). Path: <code>/ict</code>.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>HTTP and HTTPS</h4>
+    <ul>
+      <li><b>HTTP</b> (HyperText Transfer Protocol): rules that must be obeyed when transferring files across the internet.</li>
+      <li><b>HTTPS</b>: HTTP WITH security added (SSL or TLS) — the 's' means "secure", offering a more secure way of sending/receiving data. Often shown with a green padlock icon in the browser.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — internet vs. WWW, URLs, and HTTP/HTTPS.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Explain the real difference between "the internet" and "the World Wide Web".</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The internet is the worldwide collection of interconnected networks and devices — the underlying infrastructure. The WWW is only PART of the internet — the collection of web pages accessible via a browser. The WWW is a WAY of using the internet, not the same thing as it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does the "s" in HTTPS stand for, and what does it indicate?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Secure" — it indicates the connection uses added security (SSL/TLS), making data transfer more secure than plain HTTP.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A URL follows the format: ______://website address/______/file name.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>protocol</strong>. Blank 2: <strong>path</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "The internet and the World Wide Web are just two different names for exactly the same thing." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They're genuinely different: the internet is the underlying worldwide network infrastructure, while the WWW is only ONE service that runs on top of it — the collection of web pages accessed via browsers using HTTP. The internet ALSO supports other things (email, online chat) that aren't part of the WWW at all.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user is sending an email and, separately, browsing a website — both using their internet connection. Using this lesson's content, explain which of these two activities is a WWW activity, and which is not.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Browsing the website IS a WWW activity — it uses a web browser to access a web page via HTTP(S), exactly what the WWW is. Sending an email is an INTERNET activity but NOT part of the WWW — the lesson lists sending/receiving emails as an internet function, separate from the web-page-based World Wide Web.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the URL "https://www.hoddereducation.co.uk/ict", identify the protocol and the path.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Protocol: <strong>https</strong>. Path: <strong>/ict</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 5: The Internet &amp; Its Uses — 5.1a Internet vs. WWW, URLs &amp; HTTP(S)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 5.1
+  </div>
+
+</div>
+</body>
+</html>
