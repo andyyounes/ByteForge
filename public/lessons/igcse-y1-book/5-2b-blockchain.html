@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.2b Blockchain — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .block-chain { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; margin: 10px 0; }
+  .block { background: #111320; border: 1px solid rgba(184,239,74,.3); border-radius: 6px; padding: 8px 10px; font-family: ui-monospace, monospace; font-size: 10px; text-align: center; color: #b8ef4a; }
+  .block .num { font-weight: 700; color: #e2e8f0; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 5 · The Internet &amp; Its Uses</span>
+  <div class="topic-title">5.2b Blockchain</div>
+  <div class="topic-subtitle">Why changing ONE block breaks the whole chain — hash values, proof-of-work, and mining explained.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Blockchain</div><div class="key-term-def">A decentralised database storing all networked members' transactions across many interconnected computers.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Hash value</div><div class="key-term-def">A unique "fingerprint" generated for each block by a cryptographic algorithm (e.g. SHA-256).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Genesis block</div><div class="key-term-def">The very first block in a chain — it points to no previous block.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Proof-of-work</div><div class="key-term-def">A deliberately slow (~10 min) verification process required before a new block can be added.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Miners</div><div class="key-term-def">Special network users who police proof-of-work and earn commission for each new block created.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What blockchain is</h4>
+    <ul>
+      <li>A DECENTRALISED database — all networked members' transactions are stored here, across interconnected computers with NO central server.</li>
+      <li>ALL transaction data is stored on ALL computers in the network. A new transaction is copied to EVERY networked computer, so it can't be changed without every network member's consent.</li>
+      <li>This removes major security risks like hacking. Used in: cryptocurrency exchanges, smart contracts, pharmaceutical research, politics, education.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>What's inside a block</h4>
+    <ul>
+      <li><b>Data</b>: e.g. sender/recipient names, amount transferred.</li>
+      <li><b>Hash value</b>: a unique fingerprint generated by a cryptographic algorithm (usually SHA-256), including a TIMESTAMP.</li>
+      <li><b>Previous hash value</b>: points BACK to the previous block in the chain — this is what actually links the chain together.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <div class="block-chain">
+      <div class="block"><span class="num">1</span><br>hash: A4BF<br>prev: 0000</div>
+      <div class="block"><span class="num">2</span><br>hash: 6AB1<br>prev: A4BF</div>
+      <div class="block"><span class="num">3</span><br>hash: 34EE<br>prev: 6AB1</div>
+      <div class="block"><span class="num">4</span><br>hash: FF12<br>prev: 34EE</div>
+      <div class="block"><span class="num">5</span><br>hash: AA00<br>prev: FF12</div>
+    </div>
+    <div class="diagram-caption">Block 1 is the "genesis block" (points to nothing). Each later block's "previous hash" must exactly match the block before it — this chain of matches is what makes tampering detectable.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why the chain is so hard to tamper with</h4>
+    <ul>
+      <li>If block 2's DATA changes, its hash value CHANGES too (no longer 6AB1) — this instantly breaks the link, since block 3's "previous hash" field (still 6AB1) no longer matches.</li>
+      <li>Every block AFTER the tampered one becomes INVALID.</li>
+      <li>Real defence against a hacker "recreating" a new valid chain fast: <b>proof-of-work</b> — deliberately takes about 10 MINUTES to verify each new block before it's added. This is policed by <b>miners</b> (special users earning commission per new block), which slows the whole process down enough to foil attackers.</li>
+      <li>To successfully hack the blockchain, an attacker would need to attack EVERY SINGLE block in the chain SIMULTANEOUSLY — genuinely close to impossible.</li>
+      <li>When a new block is created, it's sent to EVERY networked computer and checked for correctness before being added. A new network user receives a copy of the ENTIRE blockchain.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — what happens if block 2 is hacked</div>
+    <p>Original chain: Block 1 → Block 2 (hash 6AB1) → Block 3 (previous hash 6AB1) → Block 4 → Block 5.</p>
+    <p>If a hacker changes Block 2's data, its hash value changes — it's no longer 6AB1. Now Block 3's "previous hash" (still 6AB1) doesn't match Block 2's NEW hash. The chain is broken between Block 2 and Block 3, and every block from 3 onwards becomes INVALID — instantly revealing the tampering.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — blockchain.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the "genesis block"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The very first block in a blockchain — it doesn't point back to any previous block.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What happens to a block's hash value if its data is changed?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The hash value changes to a completely different value — this instantly breaks the link with the NEXT block, whose "previous hash" field no longer matches.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      ______ makes it deliberately take around ______ minutes to verify each new block before it can be added to the chain.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>Proof-of-work</strong>. Blank 2: <strong>10</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "A hacker just needs to change one block's hash to match its neighbour, and the whole chain would look valid again." What real defence from this lesson defeats this attempt?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Even if a hacker recalculates one block's hash, they'd then need to recalculate EVERY subsequent block's hash too (since each links to the one before it) — and proof-of-work deliberately slows each block's creation to about 10 minutes, policed by miners. Attacking the whole chain fast enough to beat detection would require attacking every single block simultaneously, which is close to impossible.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A pharmaceutical research team wants a tamper-evident record of experimental data, shared across many collaborating institutions, where no single institution can secretly alter past results. Using this lesson's content, explain why blockchain is well-suited to this.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson explicitly lists research (particularly pharmaceutical) as a real blockchain use case. Since all transaction/data records are copied to EVERY networked computer, and altering a record breaks the hash chain for every block afterward, no single institution could secretly change past data without it being immediately detectable across the whole network — exactly the tamper-evidence the team needs.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What role do "miners" play in a blockchain network?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They police the proof-of-work process and receive a commission for each new block created — their role helps slow down and secure the process of adding new blocks to the chain.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 5: The Internet &amp; Its Uses — 5.2b Blockchain (completes Section 5.2)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 5.2
+  </div>
+
+</div>
+</body>
+</html>
