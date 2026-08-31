@@ -1391,8 +1391,49 @@ function showQuestMap() {
   })
 }
 
+// ── Teacher-editable per-class content overrides ─────────────────────────────
+// Same as igcse-y1.html — see that file's comment for the full rationale
+// (index-keyed overrides, original mod/name captured before any rename).
+async function fetchClassIdIgcse() {
+  const urlParam = new URLSearchParams(window.location.search).get('classId')
+  if (urlParam) return urlParam
+  if (!me) return null
+  try {
+    const res = await fetch('/api/profile')
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.classId ?? data.class_id ?? null
+  } catch (e) { return null }
+}
+async function applyClassOverrides() {
+  const classId = await fetchClassIdIgcse()
+  if (!classId) return
+  try {
+    const res = await fetch(`/api/class-lesson-overrides?classId=${encodeURIComponent(classId)}&lessonKey=igcse-y2`)
+    if (!res.ok) return
+    const { overrides } = await res.json()
+    if (!overrides || !overrides.length) return
+    const stageOv  = new Map(overrides.filter(o => o.scope === 'stage').map(o => [o.target_id, o.override_data]))
+    const lessonOv = new Map(overrides.filter(o => o.scope === 'lesson').map(o => [o.target_id, o.override_data]))
+    const originalKeys = CHALLENGES.map(ch => ch.mod + '/' + ch.name)
+    CHALLENGES.forEach((ch, i) => {
+      const so = stageOv.get(String(i))
+      if (so) Object.assign(ch, so)
+    })
+    if (typeof CHALLENGE_LESSON !== 'undefined') {
+      CHALLENGES.forEach((ch, i) => {
+        const lo = lessonOv.get(String(i))
+        if (!lo) return
+        const key = originalKeys[i]
+        CHALLENGE_LESSON[key] = CHALLENGE_LESSON[key] ? Object.assign(CHALLENGE_LESSON[key], lo) : lo
+      })
+    }
+  } catch (e) { console.warn('[igcse-y2] override load failed (offline?):', e.message) }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 ;(async()=>{
+  await applyClassOverrides()
   await LessonSaves.load('igcse-y2')
   LessonSaves.completedIds().forEach(id => { if (STAGE_INDEX[id] !== undefined) completed.add(STAGE_INDEX[id]) })
   LessonSaves.completedSet().forEach(idx=>completed.add(idx))

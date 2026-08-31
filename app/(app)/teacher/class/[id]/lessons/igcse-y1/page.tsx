@@ -1,0 +1,41 @@
+import { redirect, notFound } from 'next/navigation'
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
+import { IgcseLessonEditor } from '@/components/teacher/IgcseLessonEditor'
+
+interface Props { params: Promise<{ id: string }> }
+
+export const metadata: Metadata = { title: 'Edit IGCSE Year 1 Lessons' }
+export const dynamic = 'force-dynamic'
+
+export default async function IgcseY1EditPage({ params }: Props) {
+  const { id } = await params
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: cls } = await supabase
+    .from('classes')
+    .select('id')
+    .eq('id', id)
+    .eq('teacher_id', user.id)
+    .maybeSingle()
+  if (!cls) notFound()
+
+  return (
+    <main className="max-w-6xl mx-auto px-4 py-6">
+      <div className="mb-4">
+        <Link href={`/teacher/class/${id}`} className="text-xs text-t3 hover:text-fg transition-colors">
+          ← back to class
+        </Link>
+        <h1 className="text-xl font-bold text-fg mt-1">Edit IGCSE Year 1 Lessons</h1>
+        <p className="text-xs text-fg-dim mt-1">
+          Edits published here only apply to this class — the original stays the same for every other class.
+        </p>
+      </div>
+      <IgcseLessonEditor classId={id} file="igcse-y1" />
+    </main>
+  )
+}

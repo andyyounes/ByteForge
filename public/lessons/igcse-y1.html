@@ -789,8 +789,58 @@ function showQuestMap() {
   })
 }
 
+// ── Teacher-editable per-class content overrides ─────────────────────────────
+// Mutates CHALLENGES entries IN PLACE (direct array indexing everywhere —
+// CHALLENGES[i] IS the same object real rendering reads, no object-spread
+// copy issue). Both scopes are keyed by INDEX, not the mod/name pair a
+// challenge is otherwise identified by (a rename would break a compound-key
+// lookup on the next edit — see lib/igcse-content.ts).
+async function fetchClassIdIgcse() {
+  const urlParam = new URLSearchParams(window.location.search).get('classId')
+  if (urlParam) return urlParam
+  if (!me) return null
+  try {
+    const res = await fetch('/api/profile')
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.classId ?? data.class_id ?? null
+  } catch (e) { return null }
+}
+async function applyClassOverrides() {
+  const classId = await fetchClassIdIgcse()
+  if (!classId) return
+  try {
+    const res = await fetch(`/api/class-lesson-overrides?classId=${encodeURIComponent(classId)}&lessonKey=igcse-y1`)
+    if (!res.ok) return
+    const { overrides } = await res.json()
+    if (!overrides || !overrides.length) return
+    const stageOv  = new Map(overrides.filter(o => o.scope === 'stage').map(o => [o.target_id, o.override_data]))
+    const lessonOv = new Map(overrides.filter(o => o.scope === 'lesson').map(o => [o.target_id, o.override_data]))
+    // Capture each challenge's ORIGINAL mod/name BEFORE applying any stage
+    // override — a stage override can rename `name`, and looking up
+    // CHALLENGE_LESSON with the already-renamed value would silently miss
+    // the real entry (the same pitfall this whole index-keyed design exists
+    // to avoid — must not reintroduce it here by ordering these two passes
+    // wrong).
+    const originalKeys = CHALLENGES.map(ch => ch.mod + '/' + ch.name)
+    CHALLENGES.forEach((ch, i) => {
+      const so = stageOv.get(String(i))
+      if (so) Object.assign(ch, so)
+    })
+    if (typeof CHALLENGE_LESSON !== 'undefined') {
+      CHALLENGES.forEach((ch, i) => {
+        const lo = lessonOv.get(String(i))
+        if (!lo) return
+        const key = originalKeys[i]
+        CHALLENGE_LESSON[key] = CHALLENGE_LESSON[key] ? Object.assign(CHALLENGE_LESSON[key], lo) : lo
+      })
+    }
+  } catch (e) { console.warn('[igcse-y1] override load failed (offline?):', e.message) }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 ;(async () => {
+  await applyClassOverrides()
   await LessonSaves.load('igcse-y1')
   LessonSaves.completedIds().forEach(id => { if (STAGE_INDEX[id] !== undefined) completed.add(STAGE_INDEX[id]) })
   LessonSaves.completedSet().forEach(idx => completed.add(idx))

@@ -48,7 +48,7 @@ interface StudentData {
 }
 
 interface ClassTabsProps {
-  cls:             { id: string; name: string; join_code: string; description: string; auto_accept?: boolean }
+  cls:             { id: string; name: string; join_code: string; description: string; auto_accept?: boolean; grade?: string }
   classType:       ClassType
   studentData:     StudentData[]
   topics:          Topic[]
@@ -175,6 +175,31 @@ export function ClassTabs({ cls, classType, studentData, topics, draftExercises,
               </Link>
             </div>
           )}
+          {classType.id === 'igcse' && (() => {
+            // One classType ('igcse') covers both years — the class's own
+            // `grade` field (10 or 11, set by CreateClassModal's
+            // validGradesFor) picks which file's content this class actually
+            // uses, same logic the student side already relies on.
+            const igcseFile = cls.grade === '11' ? 'igcse-y2' : 'igcse-y1'
+            const yearLabel = igcseFile === 'igcse-y2' ? 'Year 2' : 'Year 1'
+            return (
+              <div className="card p-5 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <h3 className="font-semibold text-fg text-sm">📗 IGCSE {yearLabel} — the student view, editable</h3>
+                  <p className="text-xs text-fg-dim mt-1 max-w-xl">
+                    See exactly what your students see, edit any challenge (name, XP, hints, text —
+                    everything except the pass/fail check logic itself), then publish. Changes apply to this class only.
+                  </p>
+                </div>
+                <Link
+                  href={`/teacher/class/${cls.id}/lessons/${igcseFile}`}
+                  className="text-xs font-semibold px-4 py-2 rounded-md bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors whitespace-nowrap"
+                >
+                  Edit lessons →
+                </Link>
+              </div>
+            )
+          })()}
           {classType.id === 'grade9' && <G9MissionsPanel classId={cls.id} />}
           {(classType.id === 'grade6' || classType.id === 'grade7' || classType.id === 'grade8') && (
             <GradeProgressPanel classId={cls.id} grade={classType.id} />
