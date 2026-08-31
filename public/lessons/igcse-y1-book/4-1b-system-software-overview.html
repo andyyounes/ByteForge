@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.1b System Software Overview — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 4 · Software</span>
+  <div class="topic-title">4.1b System Software: Drivers, OS, Compilers &amp; Linkers</div>
+  <div class="topic-subtitle">The five main categories of system software, and what each one is actually for.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Device driver</div><div class="key-term-def">Software letting a hardware device communicate with the operating system.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Operating system</div><div class="key-term-def">Background software managing basic computer functions (I/O, HCI, error handling, security).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Compiler</div><div class="key-term-def">Translates high-level language source code into machine code (object code).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Linker</div><div class="key-term-def">Combines multiple compiled object files (modules) into one runnable program.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Device drivers</h4>
+    <ul>
+      <li>Enables hardware devices to communicate with the OS. Without a driver, a device (e.g. a printer) can't work with the computer.</li>
+      <li>Every connected hardware device needs an associated driver. When plugged into USB, the OS searches for the matching driver — an error appears if it can't find one.</li>
+      <li>Examples: printer drivers, memory stick drivers, mouse drivers, CD drivers.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Operating systems (OS)</h4>
+    <ul>
+      <li>Runs in the BACKGROUND, managing basic functions. Without an OS, computers would be extremely user-unfriendly.</li>
+      <li>Operating systems allow: input/output operations; user communication with the computer (e.g. Windows interface); error handling; loading/running programs; managing security (user accounts, login passwords).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Compilers</h4>
+    <ul>
+      <li>Translates a program written in a HIGH-LEVEL LANGUAGE (HLL) into MACHINE CODE the computer can directly run.</li>
+      <li>The original program is <b>source code</b>; the compiled result is <b>object code</b>.</li>
+      <li>Once compiled, the machine code can run repeatedly WITHOUT recompiling.</li>
+      <li>Example HLLs: Java, Python, Visual Basic, Fortran, C++, Algol.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Linkers</h4>
+    <ul>
+      <li>Takes one or more object files (produced by a compiler) and COMBINES them into a single runnable program.</li>
+      <li>Programmers often split code into separate MODULES to simplify programming (breaking a big task into smaller manageable sub-tasks).</li>
+      <li>At some point, all modules must be joined together into the final program — this is the linker's job.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Utility programs — quick overview</h4>
+    <ul>
+      <li>Programs that help manage/maintain/control computer resources — examples include anti-virus, anti-spyware, backup software, disk repair/analysis, file management/compression, security tools, screensavers, and defragmentation software.</li>
+      <li>(Virus checkers and defragmentation are covered in detail in the following lessons.)</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — device drivers, operating systems, compilers, and linkers.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What happens if a device is plugged in but the operating system can't find a matching driver?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An error message is produced.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the difference between "source code" and "object code"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Source code is the ORIGINAL program written in a high-level language. Object code is the MACHINE CODE produced after compiling that source code.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ combines multiple compiled ______ (produced separately as modules) into one single runnable program.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>linker</strong>. Blank 2: <strong>object files</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Once source code is compiled, you must recompile it every single time you want to run the program again." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Once a program is compiled, the resulting machine code can be used AGAIN AND AGAIN to perform the task WITHOUT needing to recompile each time — recompilation is only needed if the source code itself changes.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A large software project is split by the development team into five separate modules, each written and compiled independently. Using this lesson's content, explain what tool is needed to combine these into one final runnable program, and why splitting the project into modules was useful in the first place.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A <strong>linker</strong> is needed to combine the five separately compiled object files into a single program. Splitting the project into modules was useful because it simplifies programming by breaking a big task into smaller, more manageable sub-tasks — something the lesson explicitly identifies as the reason programmers use modules.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name three functions the operating system provides, according to this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any three of: input/output operations; user communication with the computer (HCI); error handling; loading and running programs; managing security (accounts/passwords).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 4: Software — 4.1b System Software: Drivers, OS, Compilers &amp; Linkers<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 4.1
+  </div>
+
+</div>
+</body>
+</html>

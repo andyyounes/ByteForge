@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.1c Virus Checkers — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 4 · Software</span>
+  <div class="topic-title">4.1c Virus Checkers (Anti-Virus Software)</div>
+  <div class="topic-subtitle">Database matching AND behaviour watching — how anti-virus software catches both known and unknown threats.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Heuristic checking</div><div class="key-term-def">Checking software for suspicious BEHAVIOUR patterns, not just matching known virus signatures.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Quarantine</div><div class="key-term-def">Isolating a suspected infected file so it can be deleted or reviewed, without it causing harm.</div></div>
+    <div class="key-term-card"><div class="key-term-name">False positive</div><div class="key-term-def">A clean file wrongly flagged as infected — a genuine drawback of anti-virus software.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why virus checkers matter</h4>
+    <ul>
+      <li>ANY computer (including phones/tablets) can suffer a virus attack.</li>
+      <li>Virus checkers must be kept fully up to date AND run in the background to stay effective.</li>
+      <li>Other precautions help too (careful downloading, not opening unknown email attachments, avoiding non-original software) — but virus checkers remain the BEST defence.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How anti-virus software works</h4>
+    <ul>
+      <li>Checks software/files BEFORE they're run or loaded.</li>
+      <li>Compares potential viruses against a DATABASE of known viruses.</li>
+      <li>Carries out <b>heuristic checking</b> — examining software for suspicious BEHAVIOUR patterns, useful for catching viruses NOT YET in the database.</li>
+      <li>Infected files/programs are put into <b>quarantine</b> — either automatically deleted, or left for the user to decide (since a "false positive" is possible — a clean file wrongly flagged, one of the drawbacks of anti-virus software).</li>
+      <li>Must be kept up to date, since new viruses are constantly discovered.</li>
+      <li>Full system checks should run periodically (e.g. weekly) since some viruses lie DORMANT and are only caught by a complete scan.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="380" height="90" viewBox="0 0 380 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="25" width="90" height="40" rx="6" fill="#111320" stroke="#60a5fa"/><text x="55" y="49" text-anchor="middle" fill="#60a5fa" font-size="9" font-family="system-ui">File/program</text>
+      <path d="M 102 45 L 128 45" stroke="#6b7280" stroke-width="1.5" marker-end="url(#av1)"/>
+      <defs><marker id="av1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6b7280"/></marker></defs>
+      <rect x="135" y="10" width="110" height="30" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a"/><text x="190" y="29" text-anchor="middle" fill="#b8ef4a" font-size="9" font-family="system-ui">Database match?</text>
+      <rect x="135" y="50" width="110" height="30" rx="6" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="190" y="69" text-anchor="middle" fill="#e879f9" font-size="9" font-family="system-ui">Heuristic check?</text>
+      <path d="M 247 25 L 273 45" stroke="#6b7280" stroke-width="1"/>
+      <path d="M 247 65 L 273 45" stroke="#6b7280" stroke-width="1"/>
+      <rect x="280" y="30" width="90" height="30" rx="6" fill="#111320" stroke="#f87171"/><text x="325" y="49" text-anchor="middle" fill="#f87171" font-size="9" font-family="system-ui">Quarantine</text>
+    </svg>
+    <div class="diagram-caption">Two detection paths — matching a known-virus database, or spotting suspicious behaviour (heuristic checking) — both can lead to quarantine.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — virus checkers (anti-virus software).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is "heuristic checking", and why is it useful?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Heuristic checking examines software for suspicious BEHAVIOUR patterns that could indicate a virus, rather than matching it directly against a known-virus database. It's useful for catching viruses that aren't yet in the database.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is a "false positive" in the context of anti-virus software, and why is it considered a drawback?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A false positive is when a genuinely CLEAN file is wrongly flagged as infected. It's a drawback because it can lead to a perfectly safe file being unnecessarily quarantined or deleted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A full system check should be run periodically (e.g. weekly), since some viruses lie ______ and would only be caught by a complete ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>dormant</strong>. Blank 2: <strong>scan</strong> (system check).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Anti-virus software can only ever detect viruses that are already known and listed in its database." What real capability does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This ignores HEURISTIC checking — anti-virus software also examines software for suspicious BEHAVIOUR, which can catch viruses NOT YET listed in the database, not just known ones matched by direct comparison.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user's anti-virus software flags a file the user is confident is completely safe, and quarantines it. Using this lesson's content, explain what has likely happened, and what real choice the user might have.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is likely a <strong>false positive</strong> — a clean file wrongly flagged as infected. Depending on the software's settings, the user may be given the choice to review the quarantined file and decide themselves whether to restore or permanently delete it, rather than it being automatically deleted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why must virus checkers be kept constantly updated?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because new viruses are constantly being discovered — the known-virus database must stay current to keep detecting the latest threats.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 4: Software — 4.1c Virus Checkers (Anti-Virus Software)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 4.1
+  </div>
+
+</div>
+</body>
+</html>
