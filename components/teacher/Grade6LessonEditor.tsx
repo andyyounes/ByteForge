@@ -137,18 +137,19 @@ export function Grade6LessonEditor({ classId }: { classId: string }) {
           />
         ) : (
           <div className="space-y-3">
+            <p className="text-[11px] text-fg-dim -mt-1">Click any world or stage below to edit it.</p>
             {worlds.map(w => (
               <div key={w.id} className="border border-b2 rounded-md p-2.5">
                 <button
                   onClick={() => openEdit({ scope: 'world', world: w })}
-                  className="w-full flex items-center justify-between gap-2 text-left group"
+                  className="w-full flex items-center justify-between gap-2 text-left group rounded-md px-1.5 py-1 -mx-1.5 hover:bg-s2 border border-transparent hover:border-b2 transition-colors"
                 >
                   <span className="text-xs font-semibold text-fg group-hover:text-accent transition-colors truncate min-w-0">{w.name}</span>
                   <span className="flex items-center gap-1.5 shrink-0">
                     {overridden.has(`world:${w.id}`) && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald/10 text-emerald border border-emerald/25 whitespace-nowrap">edited</span>
                     )}
-                    <span className="text-[11px] text-t3">✎</span>
+                    <span className="text-[11px] text-accent">✎ Edit</span>
                   </span>
                 </button>
                 <div className="mt-1.5 space-y-1">
@@ -156,7 +157,7 @@ export function Grade6LessonEditor({ classId }: { classId: string }) {
                     <button
                       key={s.id}
                       onClick={() => openEdit({ scope: 'stage', world: w, stage: s })}
-                      className="w-full flex items-center justify-between gap-2 text-left px-2 py-1 rounded hover:bg-s2 transition-colors group"
+                      className="w-full flex items-center justify-between gap-2 text-left px-2 py-1.5 rounded-md border border-transparent hover:border-b2 hover:bg-s2 transition-colors group"
                     >
                       <span className="text-[11px] text-t2 group-hover:text-fg transition-colors truncate min-w-0">
                         {s.emoji} {s.title ?? s.id}
@@ -165,7 +166,7 @@ export function Grade6LessonEditor({ classId }: { classId: string }) {
                         {overridden.has(`stage:${s.id}`) && (
                           <span className="text-[9px] px-1 py-0.5 rounded bg-emerald/10 text-emerald border border-emerald/25 whitespace-nowrap">edited</span>
                         )}
-                        <span className="text-[10px] text-t3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">✎</span>
+                        <span className="text-[10px] text-accent opacity-70 group-hover:opacity-100 transition-opacity">✎ Edit</span>
                       </span>
                     </button>
                   ))}
