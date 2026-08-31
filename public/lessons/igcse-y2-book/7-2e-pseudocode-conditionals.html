@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.2e Pseudocode: Conditional Statements — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 12.5px; width: 100%; }
+  .example-block td { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; }
+  .example-block td.op { color: #b8ef4a; font-weight: 700; text-align: center; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.2e Pseudocode: Conditional Statements</div>
+  <div class="topic-subtitle">IF/ELSE, CASE OF, nested IFs, and every comparison operator you'll need to write them.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Conditional statement</div><div class="key-term-def">A statement that performs different actions depending on a condition's value.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Nested IF</div><div class="key-term-def">An IF statement placed inside another IF statement's THEN or ELSE path.</div></div>
+    <div class="key-term-card"><div class="key-term-name">CASE OF</div><div class="key-term-def">A conditional structure choosing between several specific values of one variable.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Two types of conditional statement</h4>
+    <ul>
+      <li>A condition that's TRUE or FALSE: <code>IF … THEN … ELSE … ENDIF</code>.</li>
+      <li>A choice between SEVERAL values: <code>CASE OF … OTHERWISE … ENDCASE</code>.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">IF … THEN … ELSE … ENDIF</span>IF Age < 18
+THEN
+  OUTPUT "Child"
+ELSE
+  OUTPUT "Adult"
+ENDIF</div>
+
+  <div class="theory-block">
+    <h4>How IF works</h4>
+    <ul>
+      <li>The THEN path runs if the condition is TRUE; the ELSE path runs if FALSE.</li>
+      <li>ELSE is OPTIONAL — an IF doesn't always need one.</li>
+      <li>The statement always ends with <code>ENDIF</code>.</li>
+      <li>A condition can use a BOOLEAN variable directly (e.g. <code>IF Found THEN …</code>), or a COMPARISON (e.g. <code>A &gt; B</code> means "A is greater than B").</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Comparison operators</div>
+    <table>
+      <tr><td class="op">&gt;</td><td>Greater than</td></tr>
+      <tr><td class="op">&lt;</td><td>Less than</td></tr>
+      <tr><td class="op">=</td><td>Equal</td></tr>
+      <tr><td class="op">&gt;=</td><td>Greater than or equal</td></tr>
+      <tr><td class="op">&lt;=</td><td>Less than or equal</td></tr>
+      <tr><td class="op">&lt;&gt;</td><td>Not equal</td></tr>
+      <tr><td class="op">AND</td><td>Both conditions must be true</td></tr>
+      <tr><td class="op">OR</td><td>Either condition must be true</td></tr>
+      <tr><td class="op">NOT</td><td>Reverses a condition's truth value</td></tr>
+    </table>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">A more complex condition</span>IF ((Height > 1) OR (Weight > 20)) AND (Age < 70) AND (Age > 5)
+THEN
+  OUTPUT "You can ride"
+ELSE
+  OUTPUT "Too small, too young or too old"
+ENDIF</div>
+
+  <div class="theory-block">
+    <h4>Nested IF statements</h4>
+    <ul>
+      <li>A <b>nested IF</b> is an IF statement placed inside another IF's THEN or ELSE path.</li>
+      <li>Shown clearly with an extra level of indentation.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Worked example — validating and grading a percentage mark (nested IF)</span>OUTPUT "Please enter a mark "
+INPUT PercentageMark
+IF PercentageMark < 0 OR PercentageMark > 100
+THEN
+  OUTPUT "Invalid Mark"
+ELSE
+  IF PercentageMark > 49
+  THEN
+    OUTPUT "Pass"
+  ELSE
+    OUTPUT "Fail"
+  ENDIF
+ENDIF</div>
+
+  <p style="font-size:12.5px;color:#9ca3af;">The mark is only tested for pass/fail if it's genuinely in the valid 0–100 range — the second IF is nested inside the first ELSE, so it only runs when the mark wasn't rejected as invalid.</p>
+
+  <div class="theory-block">
+    <h4>CASE OF … OTHERWISE … ENDCASE</h4>
+    <ul>
+      <li>The VALUE of a variable decides which path is taken.</li>
+      <li><code>OTHERWISE</code> handles all values not explicitly listed.</li>
+      <li>Ends with <code>ENDCASE</code>.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Worked example — a simple calculator using CASE OF</span>CASE OF Choice
+  1 : Answer ← Num1 + Num2
+  2 : Answer ← Num1 - Num2
+  3 : Answer ← Num1 * Num2
+  4 : Answer ← Num1 / Num2
+  OTHERWISE OUTPUT "Please enter a valid choice"
+ENDCASE</div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — IF and CASE OF conditional statements.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Is the ELSE path in an IF statement always required?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — there may or may not be an ELSE path; it's optional.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is a "nested IF"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An IF statement placed inside another IF statement's THEN or ELSE path — shown with an extra level of indentation.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete this comparison operator table entry: <code>______</code> means "not equal", and <code>______</code> means "greater than or equal".
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <code>&lt;&gt;</code>. Blank 2: <code>&gt;=</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes a CASE OF statement but forgets to include an OTHERWISE path, and their test data includes a value not listed in any of the CASE branches. What real problem does this cause?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Without OTHERWISE, there's no defined behaviour for values that don't match any listed branch — the algorithm doesn't specify what should happen, which is exactly the gap OTHERWISE exists to close (e.g. showing "Please enter a valid choice" for anything unexpected).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Re-write the nested-IF percentage mark algorithm from this lesson so it instead checks for a mark between 0 and 20, with a pass mark of 10.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>OUTPUT "Please enter a mark "<br>INPUT Mark<br>IF Mark &lt; 0 OR Mark &gt; 20<br>THEN<br>&nbsp;&nbsp;OUTPUT "Invalid Mark"<br>ELSE<br>&nbsp;&nbsp;IF Mark &gt; 9<br>&nbsp;&nbsp;THEN<br>&nbsp;&nbsp;&nbsp;&nbsp;OUTPUT "Pass"<br>&nbsp;&nbsp;ELSE<br>&nbsp;&nbsp;&nbsp;&nbsp;OUTPUT "Fail"<br>&nbsp;&nbsp;ENDIF<br>ENDIF</code></p>
+      <p>The valid range check changes to 0–20, and the pass condition becomes "greater than 9" (i.e. 10 or above) instead of "greater than 49".</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the CASE OF calculator example, what happens if the user enters Choice = 7?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Since 7 doesn't match any of the listed values (1, 2, 3, 4), the OTHERWISE path runs, outputting "Please enter a valid choice".</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.2e Pseudocode: Conditional Statements<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.2
+  </div>
+
+</div>
+</body>
+</html>
