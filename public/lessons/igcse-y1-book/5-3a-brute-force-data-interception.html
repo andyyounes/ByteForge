@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.3a Brute Force Attacks &amp; Data Interception — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #f87171; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #93c5fd; line-height: 1.9; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .pseudo-block ol { margin: 0; padding-left: 20px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 5 · The Internet &amp; Its Uses</span>
+  <div class="topic-title">5.3a Brute Force Attacks &amp; Data Interception</div>
+  <div class="topic-subtitle">Trying every password combination, and eavesdropping on a Wi-Fi signal from outside — two very different attacks.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Brute force attack</div><div class="key-term-def">Systematically trying every possible password combination until the correct one is found.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Packet sniffer</div><div class="key-term-def">A tool examining data packets sent over a network, used to intercept data on wired networks.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Wardriving</div><div class="key-term-def">Intercepting Wi-Fi signals from outside a building using a laptop/phone, antenna, and GPS.</div></div>
+    <div class="key-term-card"><div class="key-term-name">WEP</div><div class="key-term-def">Wired Equivalency Privacy — an encryption protocol recommended alongside a firewall to protect against wardriving.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Brute force attacks</h4>
+    <ul>
+      <li>Systematically trying EVERY combination of letters/numbers/symbols until the password is found — genuinely not a sophisticated technique.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">A smarter brute-force strategy (fewer attempts needed)</span><ol>
+<li>Check if the password is one of the 5 most common: 123456, password, qwerty, 111111, abc123</li>
+<li>If not found there, try a "strong word list" — a text file of common words (can contain a million+ entries) — still faster than pure trial and error, though still potentially several hours</li>
+</ol></div>
+
+  <div class="theory-block">
+    <h4>Why password length/complexity matters</h4>
+    <ul>
+      <li>The LONGER a password, and the GREATER the variety of characters used, the harder it is to crack via brute force.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Data interception</h4>
+    <ul>
+      <li>Stealing data by TAPPING into a wired or wireless communication link — compromising privacy or obtaining confidential information.</li>
+      <li><b>Wired networks</b>: intercepted via a <b>packet sniffer</b>, examining data packets sent over the network; intercepted data is sent back to the hacker.</li>
+      <li><b>Wireless (Wi-Fi) networks</b>: intercepted via <b>wardriving</b> (Access Point Mapping) — using a laptop/phone, antenna, GPS device, and software, from OUTSIDE a building. Often happens WITHOUT the victim knowing.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Defending against data interception</h4>
+    <ul>
+      <li>ENCRYPTION doesn't stop interception, but makes intercepted data MEANINGLESS without the decryption key.</li>
+      <li>Against wardriving: use <b>WEP</b> encryption + a FIREWALL, and complex passwords on the wireless router.</li>
+      <li>AVOID using Wi-Fi in public places (e.g. an airport) — no encryption typically exists there, leaving data open to anyone nearby.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — brute force attacks and data interception.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Name the five most common passwords a brute force attacker would check first.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>123456, password, qwerty, 111111, abc123.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is "wardriving", and what equipment does it typically use?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Wardriving is intercepting Wi-Fi signals from OUTSIDE a building, using a laptop or smartphone, an antenna, a GPS device, and software.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Encryption does NOT prevent data ______; it makes the intercepted data ______ without the decryption key.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>interception</strong>. Blank 2: <strong>meaningless</strong> (incomprehensible).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Since my password isn't in the top 5 most common list, it must be safe from any brute force attack." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Not being in the top 5 is only the FIRST step of a smarter brute-force strategy — attackers next try a "strong word list" containing potentially a million+ common words, which could still crack the password in hours. True safety depends on the password's LENGTH and CHARACTER VARIETY, not just avoiding the most obvious choices.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A traveller is at an airport and wants to check their bank account using the airport's free public Wi-Fi. Using this lesson's content, explain the real risk, and what they should do instead.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Public Wi-Fi at places like airports typically has NO data encryption, leaving data genuinely open to interception by anyone nearby — the lesson explicitly warns against using wireless connectivity in such places. They should avoid accessing sensitive accounts like banking over public Wi-Fi, using a more secure connection instead (e.g. mobile data, or a VPN if genuinely necessary).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is a packet sniffer used for?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Examining data packets being sent over a (typically wired) network, to intercept data and send it back to the hacker.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 5: The Internet &amp; Its Uses — 5.3a Brute Force Attacks &amp; Data Interception<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 5.3
+  </div>
+
+</div>
+</body>
+</html>

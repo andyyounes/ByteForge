@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.3b DDoS Attacks &amp; Hacking — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #f87171; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 5 · The Internet &amp; Its Uses</span>
+  <div class="topic-title">5.3b DDoS Attacks &amp; Hacking</div>
+  <div class="topic-subtitle">Flooding a server until it can't answer anyone — and the difference between illegal hacking and ethical hacking.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">DoS attack</div><div class="key-term-def">Denial of Service — preventing users from accessing part of a network (e.g. a server).</div></div>
+    <div class="key-term-card"><div class="key-term-name">DDoS attack</div><div class="key-term-def">Distributed DoS — spam traffic originates from MANY different computers, making it hard to block.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Hacking</div><div class="key-term-def">Gaining illegal access to a computer system without permission.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Ethical hacking</div><div class="key-term-def">Companies paying authorised hackers to legitimately test their own system's security.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Denial of Service (DoS) attacks</h4>
+    <ul>
+      <li>Attempts to prevent users accessing part of a network (notably an internet server) — usually TEMPORARY but potentially very damaging.</li>
+      <li>Can target individuals too, blocking access to: emails, websites/web pages, online services (e.g. banking).</li>
+      <li>Method: flood the network with USELESS spam traffic. A server can only handle a FINITE number of requests — if overloaded with thousands of fake requests, it can't service legitimate ones.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Distributed Denial of Service (DDoS)</h4>
+    <ul>
+      <li>The spam traffic originates from MANY different computers — making the attack much harder to BLOCK (no single source to stop).</li>
+      <li>Can also target an individual's email: attacker sends thousands of spam messages, exceeding the user's ISP data quota, clogging their inbox and blocking legitimate emails.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="360" height="100" viewBox="0 0 360 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="30" cy="20" r="10" fill="#111320" stroke="#f87171"/>
+      <circle cx="30" cy="50" r="10" fill="#111320" stroke="#f87171"/>
+      <circle cx="30" cy="80" r="10" fill="#111320" stroke="#f87171"/>
+      <circle cx="90" cy="20" r="10" fill="#111320" stroke="#f87171"/>
+      <circle cx="90" cy="80" r="10" fill="#111320" stroke="#f87171"/>
+      <path d="M 40 20 L 190 45" stroke="#f87171" stroke-width="1"/>
+      <path d="M 40 50 L 190 50" stroke="#f87171" stroke-width="1"/>
+      <path d="M 40 80 L 190 55" stroke="#f87171" stroke-width="1"/>
+      <path d="M 100 20 L 190 45" stroke="#f87171" stroke-width="1"/>
+      <path d="M 100 80 L 190 55" stroke="#f87171" stroke-width="1"/>
+      <rect x="200" y="30" width="80" height="40" rx="6" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="240" y="53" text-anchor="middle" fill="#e879f9" font-size="9" font-family="system-ui">Server</text>
+      <text x="240" y="90" text-anchor="middle" fill="#6b7280" font-size="8" font-family="system-ui">overloaded, can't serve real users</text>
+    </svg>
+    <div class="diagram-caption">DDoS traffic floods a server from many different sources at once — much harder to block than a single-source attack.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Guarding against DDoS</h4>
+    <ul>
+      <li>Up-to-date MALWARE checker.</li>
+      <li>FIREWALL to restrict traffic to/from the server or computer.</li>
+      <li>EMAIL FILTERS to filter out unwanted traffic (e.g. spam).</li>
+      <li>Warning signs of a DDoS victim: slow network performance, inability to access certain sites, large volumes of spam email.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Hacking</h4>
+    <ul>
+      <li>Gaining ILLEGAL access to a computer system without permission — can lead to identity theft, personal info theft; data can be deleted, passed on, changed, or corrupted.</li>
+      <li>Encryption does NOT stop hacking — it makes data meaningless to the hacker, but doesn't stop them deleting/corrupting/passing it on.</li>
+      <li>Prevented via: firewalls, user names, frequently-changed strong passwords, anti-hacking software, intrusion-detection software.</li>
+      <li><b>Malicious hacking</b>: always ILLEGAL, done without permission.</li>
+      <li><b>Ethical hacking</b>: companies AUTHORISE paid hackers to test their own security measures/robustness — a legitimate, professional practice.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — DDoS attacks and hacking.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why is a DDoS attack harder to block than a regular DoS attack?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>In a DDoS, the spam traffic comes from MANY different computers rather than one single source — there's no single origin to block, making the attack much harder to stop.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the key difference between malicious hacking and ethical hacking?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Malicious hacking is always ILLEGAL and done WITHOUT the owner's permission. Ethical hacking is AUTHORISED by the company itself, who pays hackers to legitimately test their own security systems.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Encryption does NOT stop ______; it only makes the data ______ to the hacker without the decryption key.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>hacking</strong>. Blank 2: <strong>meaningless</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Encrypting all your data completely stops hackers from deleting or corrupting it." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Encryption only makes DATA CONTENT meaningless to a hacker without the decryption key — it does NOT stop them from deleting, corrupting, or passing on the data itself. Encryption protects confidentiality of content, not the data's existence/integrity from deletion or tampering.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user notices their internet is unusually slow, certain websites won't load at all, and their email inbox is flooded with spam. Using this lesson's content, identify what's likely happening and one real defence they could use.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>These are the exact warning signs of a <strong>DDoS attack</strong> listed in this lesson: slow network performance, inability to access certain websites, and large amounts of spam email. Real defences: an up-to-date malware checker, a firewall to restrict traffic, and email filters to block spam.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why do universities and companies now run courses in ethical hacking?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>So companies can authorise paid hackers to legitimately test how robust their own computer systems are against hacking attacks — a professional, legal way of finding security weaknesses before malicious hackers do.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 5: The Internet &amp; Its Uses — 5.3b DDoS Attacks &amp; Hacking<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 5.3
+  </div>
+
+</div>
+</body>
+</html>
