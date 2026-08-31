@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.1j File Management &amp; Multitasking — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 4 · Software</span>
+  <div class="topic-title">4.1j File Management &amp; Multitasking (Operating Systems)</div>
+  <div class="topic-subtitle">How the OS organises your files, and how it juggles multiple running programs without them clashing.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">File extension</div><div class="key-term-def">The suffix after a filename's dot (e.g. .docx, .txt) indicating file type.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Multitasking</div><div class="key-term-def">The OS running more than one process at a time, sharing hardware resources.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Pre-emptive multitasking</div><div class="key-term-def">Allocating resources for a fixed time, allowing interruption, and using priority — how the OS keeps processes from clashing.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>File management</h4>
+    <ul>
+      <li>Uses FILE NAMING conventions, e.g. <code>filename.docx</code> (extension indicates type: .bat, .htm, .dbf, .txt, .xls, etc.)</li>
+      <li>Performs specific tasks: create, open, close, delete, rename, copy, move.</li>
+      <li>Maintains DIRECTORY structures (folders).</li>
+      <li>Ensures ACCESS CONTROL is maintained — file access rights, password protection, making files editable or locked.</li>
+      <li>Ensures MEMORY ALLOCATION for a file — reading it from HDD/SSD and loading it into memory when needed.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Multitasking</h4>
+    <ul>
+      <li>Lets a computer carry out MORE THAN ONE task (process) at a time — all sharing hardware resources, controlled by the OS.</li>
+      <li>To prevent processes clashing, the OS must constantly MONITOR each process's status. Three key mechanisms (together called <b>pre-emptive multitasking</b>):</li>
+      <li>Resources are allocated to a process for a SPECIFIC TIME LIMIT.</li>
+      <li>The process CAN be interrupted while running.</li>
+      <li>The process is given a PRIORITY, receiving resources accordingly — the risk: a low-priority process could be "starved" of resources.</li>
+      <li>Effective multitasking management improves use of main memory, HDD/SSD, virtual memory, and CPU time overall.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="380" height="110" viewBox="0 0 380 110" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="55" width="90" height="30" rx="6" fill="#111320" stroke="#60a5fa"/><text x="55" y="74" text-anchor="middle" fill="#60a5fa" font-size="9" font-family="system-ui">Spreadsheet</text>
+      <rect x="115" y="55" width="70" height="30" rx="6" fill="#111320" stroke="#e879f9"/><text x="150" y="74" text-anchor="middle" fill="#e879f9" font-size="9" font-family="system-ui">Emails</text>
+      <rect x="200" y="55" width="90" height="30" rx="6" fill="#111320" stroke="#fbbf24"/><text x="245" y="74" text-anchor="middle" fill="#fbbf24" font-size="9" font-family="system-ui">Web browser</text>
+      <rect x="305" y="55" width="65" height="30" rx="6" fill="#111320" stroke="#f87171"/><text x="337" y="74" text-anchor="middle" fill="#f87171" font-size="9" font-family="system-ui">Anti-virus</text>
+      <rect x="10" y="15" width="360" height="25" rx="6" fill="rgba(184,239,74,.1)" stroke="#b8ef4a"/><text x="190" y="32" text-anchor="middle" fill="#b8ef4a" font-size="10" font-family="system-ui">Operating System (CPU scheduler)</text>
+      <path d="M 55 55 L 55 40" stroke="#6b7280" stroke-width="1"/>
+      <path d="M 150 55 L 150 40" stroke="#6b7280" stroke-width="1"/>
+      <path d="M 245 55 L 245 40" stroke="#6b7280" stroke-width="1"/>
+      <path d="M 337 55 L 337 40" stroke="#6b7280" stroke-width="1"/>
+    </svg>
+    <div class="diagram-caption">The OS sits above all running processes, sharing the CPU's time between them.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — file management and multitasking.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Name three specific tasks that file management performs on files.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any three of: create, open, close, delete, rename, copy, move.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What real risk exists for a low-priority process under multitasking?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It could be "starved" of resources — since resources are allocated based on priority, a consistently low-priority process might not get enough CPU time to make meaningful progress.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Under pre-emptive multitasking, resources are allocated to a process for a specific ______, and the process can be ______ while running.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>time limit</strong>. Blank 2: <strong>interrupted</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Multitasking means a computer genuinely runs multiple programs at the exact same physical instant, using the CPU simultaneously." What real detail from this lesson does this oversimplify?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson describes multitasking as the OS allocating resources to EACH process for a specific TIME LIMIT and using priority to decide who gets resources — this implies processes take turns rapidly (with interruption), rather than genuinely running at the exact same instant on the same CPU resource.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user is running a spreadsheet, a web browser, and background anti-virus scanning at the same time. Using this lesson's content, explain how the operating system prevents these three processes from interfering with each other.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The OS constantly monitors each process's status, allocating each one resources for a specific time limit, allowing them to be interrupted, and giving each a priority level — this coordinated, monitored sharing of hardware resources under OS control is exactly what prevents the processes clashing with each other.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does file management do when a file needs to actually be used by a running program?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It ensures memory allocation for the file — reading it from the HDD/SSD and loading it into memory (RAM) so it can be used.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 4: Software — 4.1j File Management &amp; Multitasking (Operating Systems)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 4.1
+  </div>
+
+</div>
+</body>
+</html>
