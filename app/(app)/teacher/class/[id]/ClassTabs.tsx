@@ -152,17 +152,18 @@ export function ClassTabs({ cls, classType, studentData, topics, draftExercises,
               </a>
             </div>
           )}
-          {(classType.id === 'grade6' || classType.id === 'grade7' || classType.id === 'grade8') && (
+          {(classType.id === 'grade6' || classType.id === 'grade7' || classType.id === 'grade8' || classType.id === 'grade9') && (
             <div className="card p-5 flex items-center justify-between gap-4 flex-wrap">
               <div>
                 <h3 className="font-semibold text-fg text-sm">
                   {classType.id === 'grade6' && '🏝 The Creator Quest — the student view, editable'}
                   {classType.id === 'grade7' && '🎮 The Game Maker — the student view, editable'}
                   {classType.id === 'grade8' && '💻 The App Builder — the student view, editable'}
+                  {classType.id === 'grade9' && '🌊 The Deep Diver — the student view, editable'}
                 </h3>
                 <p className="text-xs text-fg-dim mt-1 max-w-xl">
-                  See exactly what your students see, edit any {classType.id === 'grade6' ? 'world' : classType.id === 'grade7' ? 'world' : 'module'} or
-                  stage (lesson text, XP, {classType.id === 'grade6' ? 'maze layout, colour targets' : 'quiz questions, hints'} — everything except
+                  See exactly what your students see, edit any {classType.id === 'grade9' ? 'chapter or mission' : classType.id === 'grade8' ? 'module or stage' : 'world or stage'} (lesson
+                  text, XP, {classType.id === 'grade6' ? 'maze layout, colour targets' : classType.id === 'grade9' ? 'brief, starter code, battle stats' : 'quiz questions, hints'} — everything except
                   the pass/fail check logic itself), then publish. Changes apply to this class only.
                 </p>
               </div>

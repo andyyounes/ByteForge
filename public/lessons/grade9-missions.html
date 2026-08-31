@@ -4288,10 +4288,57 @@ function mbarBack() {
   else showJourney()
 }
 
+// ── Teacher-editable per-class content overrides ─────────────────────────────
+// Mutates TIERS/MISSIONS/MISSION_LESSON entries IN PLACE — unlike Grade
+// 7/8's CHALLENGES, this page reads MISSIONS.find(...)/TIERS.map(...) fresh
+// every time (activeMission, showJourney), never a cached spread copy, so a
+// plain in-place mutation is sufficient here, no second patch-target needed.
+// A tier has no own id field — its ARRAY INDEX (stable, order never
+// changes) is the override key, not its name (name-keyed would silently
+// orphan itself the moment a teacher renamed a tier and edited it again).
+async function fetchClassIdG9() {
+  const urlParam = new URLSearchParams(window.location.search).get('classId')
+  if (urlParam) return urlParam
+  if (!me) return null
+  try {
+    const res = await fetch('/api/profile')
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.classId ?? data.class_id ?? null
+  } catch (e) { return null }
+}
+async function applyClassOverrides() {
+  const classId = await fetchClassIdG9()
+  if (!classId) return
+  try {
+    const res = await fetch(`/api/class-lesson-overrides?classId=${encodeURIComponent(classId)}&lessonKey=grade9-missions`)
+    if (!res.ok) return
+    const { overrides } = await res.json()
+    if (!overrides || !overrides.length) return
+    const tierOv    = new Map(overrides.filter(o => o.scope === 'world').map(o => [o.target_id, o.override_data]))
+    const missionOv = new Map(overrides.filter(o => o.scope === 'stage').map(o => [o.target_id, o.override_data]))
+    const lessonOv  = new Map(overrides.filter(o => o.scope === 'lesson').map(o => [o.target_id, o.override_data]))
+    TIERS.forEach((t, i) => {
+      const to = tierOv.get(String(i))
+      if (to) Object.assign(t, to)
+    })
+    for (const m of MISSIONS) {
+      const mo = missionOv.get(m.id)
+      if (mo) Object.assign(m, mo)
+    }
+    if (typeof MISSION_LESSON !== 'undefined') {
+      for (const [id, lo] of lessonOv) {
+        MISSION_LESSON[id] = MISSION_LESSON[id] ? Object.assign(MISSION_LESSON[id], lo) : lo
+      }
+    }
+  } catch (e) { console.warn('[grade9] override load failed (offline?):', e.message) }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 BF.seed()
 const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
 ;(async () => {
+  await applyClassOverrides()
   if (me) { try { await LessonSaves.load('grade9-missions') } catch (e) {} }
   showJourney()
 })()
