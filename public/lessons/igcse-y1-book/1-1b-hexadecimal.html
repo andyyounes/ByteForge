@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.1b Hexadecimal — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0d0f1a; color: #e2e8f0;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    margin: 0; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a;
+    border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block table { border-collapse: collapse; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 13px; }
+  .example-block td { border: 1px solid rgba(255,255,255,.15); padding: 5px 10px; text-align: center; }
+  .example-block td.heading { color: #9ca3af; font-size: 11px; }
+  .example-block td.hexval { color: #b8ef4a; font-weight: 700; }
+
+  .swatch-row { display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap; justify-content: center; }
+  .swatch { text-align: center; }
+  .swatch-box { width: 54px; height: 54px; border-radius: 8px; border: 1px solid rgba(255,255,255,.15); margin-bottom: 6px; }
+  .swatch-code { font-family: ui-monospace, monospace; font-size: 10.5px; color: #9ca3af; }
+
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12);
+    border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 1 · Data Representation</span>
+  <div class="topic-title">1.1b Hexadecimal</div>
+  <div class="topic-subtitle">The base-16 system, converting to/from binary and denary, and four genuine real-world uses.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card">
+      <div class="key-term-name">Hexadecimal</div>
+      <div class="key-term-def">A base 16 number system using digits 0-9 and letters A-F (A=10 ... F=15). Often just called "hex".</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">Nibble</div>
+      <div class="key-term-def">4 bits — exactly enough to represent one hexadecimal digit, since 16 = 2⁴.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">MAC address</div>
+      <div class="key-term-def">A 48-bit number, shown as 6 hex byte-pairs, that uniquely identifies a device's network interface card.</div>
+    </div>
+    <div class="key-term-card">
+      <div class="key-term-name">IPv6 address</div>
+      <div class="key-term-def">A 128-bit address written as hexadecimal chunks separated by colons — the successor to IPv4.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The hexadecimal system — base 16</h4>
+    <ul>
+      <li>Hexadecimal is closely related to binary, but is a <b>base 16</b> system — it needs 16 different "digits" to represent each value.</li>
+      <li>Because there are only ten normal digits (0-9), hex also uses the letters <b>A to F</b> to stand in for 10 through 15: A=10, B=11, C=12, D=13, E=14, F=15.</li>
+      <li>Using the same idea as denary and binary, hex positions are worth powers of 16: reading right to left, the headings are 1, 16, 256, 4096, 65 536 (16⁰, 16¹, 16², 16³, 16⁴...).</li>
+      <li>Since <code>16 = 2⁴</code>, exactly <b>four</b> binary digits (a nibble) are equivalent to one hexadecimal digit — this is the whole reason hex/binary conversion is so quick.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Reference — binary, hex, and denary side by side</div>
+    <table>
+      <tr><td class="heading">Binary</td><td class="heading">0000</td><td class="heading">0001</td><td class="heading">0010</td><td class="heading">0011</td><td class="heading">0100</td><td class="heading">0101</td><td class="heading">0110</td><td class="heading">0111</td></tr>
+      <tr><td class="heading">Hex</td><td class="hexval">0</td><td class="hexval">1</td><td class="hexval">2</td><td class="hexval">3</td><td class="hexval">4</td><td class="hexval">5</td><td class="hexval">6</td><td class="hexval">7</td></tr>
+    </table>
+    <table>
+      <tr><td class="heading">Binary</td><td class="heading">1000</td><td class="heading">1001</td><td class="heading">1010</td><td class="heading">1011</td><td class="heading">1100</td><td class="heading">1101</td><td class="heading">1110</td><td class="heading">1111</td></tr>
+      <tr><td class="heading">Hex</td><td class="hexval">8</td><td class="hexval">9</td><td class="hexval">A</td><td class="hexval">B</td><td class="hexval">C</td><td class="hexval">D</td><td class="hexval">E</td><td class="hexval">F</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-block">
+    <h4>Converting binary to hexadecimal</h4>
+    <ul>
+      <li>Starting from the RIGHT and moving left, split the binary number into groups of 4 bits (a nibble each).</li>
+      <li>If the leftmost group has fewer than 4 bits, pad it with 0s on the left.</li>
+      <li>Convert each group of 4 bits into its equivalent hex digit using the reference table above.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — binary to hex</div>
+    <p>Convert <code>100001111111101</code> to hex. First pad and split into nibbles: <code>0010 0001 1111 1101</code>.</p>
+    <p>Look up each nibble: <code>0010</code>→2, <code>0001</code>→1, <code>1111</code>→F, <code>1101</code>→D.</p>
+    <p>Answer: <b>21FD</b></p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Converting hexadecimal to binary, and hexadecimal to/from denary</h4>
+    <ul>
+      <li><b>Hex to binary:</b> the reverse process — take each hex digit and write down its exact 4-bit code, then join the groups together.</li>
+      <li><b>Hex to denary:</b> multiply each hex digit by its heading value (4096, 256, 16, 1...), remembering to convert A-F to 10-15 first, then add the results together.</li>
+      <li><b>Denary to hex:</b> use successive division by 16 (instead of by 2, as in binary), writing down the remainder each time, then reading the remainders in reverse order — exactly the same idea as denary-to-binary, just dividing by 16.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — hex to denary</div>
+    <p>Convert <code>4 5 A</code> to denary. Multiply each digit by its heading: <code>(4×256=1024) + (5×16=80) + (10×1=10)</code> — remember A=10.</p>
+    <p>Answer: <code>1024 + 80 + 10 = </code> <b>1114</b></p>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — denary to hex</div>
+    <p>Convert <b>2004</b> to hex using successive division by 16: <code>2004 ÷ 16 = 125 r4</code> → <code>125 ÷ 16 = 7 r13</code> → <code>7 ÷ 16 = 0 r7</code>.</p>
+    <p>Reading the remainders in reverse (7, 13, 4) and converting 13 to D gives: <b>7D4</b></p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why hexadecimal is genuinely useful — four real uses</h4>
+    <ul>
+      <li>Computer scientists still work with binary underneath, but hex is far easier for a human to remember, copy, and work with — a long binary number like <code>1101001010101111</code> is just <code>D2AF</code> in hex.</li>
+      <li><b>Error codes</b> — memory-location error codes generated automatically by a computer are usually shown in hex, and a programmer needs to be able to interpret them.</li>
+      <li><b>MAC addresses</b> — a Media Access Control address uniquely identifies a device's network card. It's usually 48 bits, shown as 6 pairs of hex digits (e.g. <code>00-1C-B3-4F-25-FE</code>) — the first half identifies the manufacturer, the second half is the device's serial number.</li>
+      <li><b>IP addresses</b> — an IPv4 address is a 32-bit number, written in denary or hex (e.g. <code>77.76.9e.01</code>). Its successor, IPv6, is a 128-bit address broken into hex chunks separated by colons, e.g. <code>a8fb:7a88:fff0:0fff:3d21:2085:66fb:f0fa</code>.</li>
+      <li><b>HTML colour codes</b> — a web colour is set using a <code>#</code> followed by SIX hex digits: two each for red, two for green, two for blue intensity. Since each pair can be 00-FF (0-255), there are 256×256×256 = 16 777 216 possible colours.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — HTML colour codes</div>
+    <p>The colour <code>#FF9966</code> breaks down into three real hex pairs: <code>FF</code> (red intensity), <code>99</code> (green intensity), <code>66</code> (blue intensity).</p>
+    <div class="swatch-row">
+      <div class="swatch"><div class="swatch-box" style="background:#FF0000"></div><div class="swatch-code">#FF0000</div></div>
+      <div class="swatch"><div class="swatch-box" style="background:#00FF00"></div><div class="swatch-code">#00FF00</div></div>
+      <div class="swatch"><div class="swatch-box" style="background:#0000FF"></div><div class="swatch-code">#0000FF</div></div>
+      <div class="swatch"><div class="swatch-box" style="background:#FF9966"></div><div class="swatch-code">#FF9966</div></div>
+    </div>
+    <p>Each of the three pairs is a genuine, independent hex-to-denary value from 0 (<code>00</code>) to 255 (<code>FF</code>) — exactly the hex-to-denary conversion covered above, just applied three times per colour.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — hexadecimal conversion and its uses. Answer each one, then reveal the answer key to check.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Convert the binary number <code>101111100001</code> into hexadecimal.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Split into nibbles: <code>1011 1110 0001</code> → B, E, 1</p>
+        <p><strong>Answer: BE1</strong></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Convert the hexadecimal number <code>C8F</code> into denary.</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p><code>(12×256=3072) + (8×16=128) + (15×1=15) = 3215</code></p>
+        <p><strong>Answer: 3215</strong></p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      To convert denary to hexadecimal, you divide repeatedly by ______ instead of by 2 (as you would for binary), and then read the remainders in ______ order.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>Blank 1: <strong>16</strong> — hex is base 16, so successive division uses 16, not 2.</p>
+        <p>Blank 2: <strong>reverse</strong> (the last remainder calculated becomes the FIRST digit of the answer).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student converts the binary number <code>11111101</code> to hex by splitting it into <code>1111</code> and <code>1101</code>, correctly getting F and D, but writes the FINAL hex answer as <b>DF</b> instead of <b>FD</b>. What went wrong?
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>The two nibbles were converted correctly, but they were written down in the WRONG order at the end — the nibbles must stay in the same left-to-right order they appeared in the original binary number. The first (leftmost) group, <code>1111</code> = F, must come first, then <code>1101</code> = D — giving <strong>FD</strong>, not DF.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A device's MAC address is <code>00-14-22-3A-9B-C1</code>. (a) Which manufacturer made the network card, based on the identification numbers given in this lesson? (b) Explain, using what this lesson taught about MAC addresses, why the SECOND half of a MAC address (<code>3A-9B-C1</code>) is different for every single device, even from the same manufacturer.
+    </div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p>(a) <strong>Dell</strong> — the manufacturer code <code>00-14-22</code> matches Dell's identification number given in this lesson.</p>
+        <p>(b) The first half of a MAC address identifies the MANUFACTURER (the same for every device that company makes), but the second half is that specific device's own <strong>serial number</strong> — since no two devices should share a serial number, the second half genuinely differs even between two devices made by the exact same company.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">An HTML colour is written as <code>#00FF00</code>. What real colour does this represent, and how many total distinct colours can the six-hex-digit HTML system represent altogether?</div>
+    <details class="answer-key">
+      <summary class="answer-key-toggle">Reveal answer</summary>
+      <div class="answer-body">
+        <p><code>#00FF00</code> has zero red, maximum (FF=255) green, and zero blue — this is pure <strong>green</strong>.</p>
+        <p>Total possible colours: <code>256 × 256 × 256 = 16 777 216</code> (256 values each for red, green, and blue).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 1: Data Representation — 1.1b Hexadecimal<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 1.1
+  </div>
+
+</div>
+</body>
+</html>
