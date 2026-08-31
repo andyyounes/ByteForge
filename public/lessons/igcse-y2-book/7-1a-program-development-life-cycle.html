@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.1a The Program Development Life Cycle — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.1a The Program Development Life Cycle</div>
+  <div class="topic-subtitle">Analysis, design, coding, and testing — the four stages every program passes through before it's finished.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Requirements specification</div><div class="key-term-def">A clear statement of exactly what a program needs to do, produced during analysis.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Abstraction</div><div class="key-term-def">Keeping only the key elements needed for the solution, discarding unnecessary detail.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Decomposition</div><div class="key-term-def">Breaking a complex problem into smaller, easier-to-solve parts.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Iterative testing</div><div class="key-term-def">Testing a module, fixing it, and re-testing repeatedly until it works as required.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The four stages covered in this chapter and the next</h4>
+    <ul>
+      <li>The full program development life cycle has FIVE stages: analysis, design, coding, testing, and maintenance.</li>
+      <li>This chapter (and Chapter 8) focus on the first FOUR: analysis, design, coding, testing.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Analysis</h4>
+    <ul>
+      <li>Before solving any problem, it must be clearly DEFINED so everyone working on it understands what's needed — this is the <b>requirements specification</b>.</li>
+      <li>Analysis uses two key tools: <b>abstraction</b> and <b>decomposition</b>.</li>
+      <li><b>Abstraction</b>: keep only the key elements needed for the solution, discard unnecessary detail. Example: a map only shows what's needed for travelling from A to B — a road map and a rail map show completely different details for the same journey, because each is abstracted for a different purpose.</li>
+      <li><b>Decomposition</b>: break a complex problem into smaller parts, which can be subdivided further until each part is easy to solve. Example: "getting dressed" decomposes into: select items to wear → remove clothes being worn → put selected items on in order.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Design</h4>
+    <ul>
+      <li>Uses the requirements specification from analysis to show HOW the program should be developed.</li>
+      <li>By the end of design, the programmer should know: what needs to be done, how each task is performed, and how the tasks work together.</li>
+      <li>Formally documented using structure charts, flowcharts, and pseudocode.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Coding and iterative testing</h4>
+    <ul>
+      <li>The program (or set of programs) is developed — each MODULE is written in a suitable language, then tested to check it works.</li>
+      <li><b>Iterative testing</b>: modular tests are run, code is amended, and tests repeated until the module performs as required — a genuine repeat cycle, not a one-shot check.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Testing</h4>
+    <ul>
+      <li>The COMPLETED program (or set of programs) is run many times with DIFFERENT sets of test data.</li>
+      <li>This ensures all the tasks work together correctly, exactly as specified in the design.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — abstraction in maps</div>
+    <p>A road map for driving between two towns shows roads, junctions, and distances — details a DRIVER needs. A rail map for the same journey shows stations and lines — details a TRAIN PASSENGER needs. Both are abstractions of the same real geography, each keeping only what's relevant to its purpose and discarding the rest.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the program development life cycle (analysis, design, coding, testing).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What are the four stages of the program development life cycle covered in this chapter and the next?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Analysis, design, coding, and testing.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Explain the difference between abstraction and decomposition.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Abstraction keeps only the key elements needed for a solution, discarding unnecessary detail (e.g. a map showing only what's relevant to travel). Decomposition breaks a complex problem into smaller, more manageable parts.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      ______ testing means modular tests are conducted, code is amended, and tests are ______ until the module performs as required.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>Iterative</strong>. Blank 2: <strong>repeated</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Testing only needs to happen once, right at the very end, using a single set of test data." What does this get wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Two things: testing happens iteratively DURING coding (module by module, repeated until each works), and the final testing stage explicitly uses MULTIPLE different sets of test data run MANY times — not a single one-off check.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A team is asked to build a program that manages a school's timetable. Using this lesson's content, describe what should happen in the ANALYSIS stage before any code is written.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The team should produce a clear requirements specification stating exactly what the program needs to do, using abstraction (keeping only the details genuinely relevant to timetabling, discarding irrelevant information) and decomposition (breaking "manage the timetable" into smaller sub-problems, e.g. assigning teachers, assigning rooms, avoiding clashes) — all BEFORE any coding begins.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What must a programmer know by the end of the design stage?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>What needs to be done (all the tasks), how each task is to be performed, and how the tasks work together.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.1a The Program Development Life Cycle<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.1
+  </div>
+
+</div>
+</body>
+</html>
