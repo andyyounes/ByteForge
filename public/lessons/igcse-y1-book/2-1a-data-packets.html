@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.1a Data Packets &amp; Packet Switching — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; }
+  .compare-card.good { border: 1px solid rgba(74,222,128,.25); }
+  .compare-card.bad { border: 1px solid rgba(248,113,113,.25); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .compare-card.good h5 { color: #4ade80; }
+  .compare-card.bad h5 { color: #f87171; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 2 · Data Transmission</span>
+  <div class="topic-title">2.1a Data Packets &amp; Packet Switching</div>
+  <div class="topic-subtitle">Why data is broken into packets before being sent, what's inside one, and how packets find their own way across a network.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Data packet</div><div class="key-term-def">A small chunk (typically ~64 KiB) of a larger message, sent separately across a network. Also called a datagram.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Packet header</div><div class="key-term-def">Contains sender/receiver IP addresses, sequence number, and packet size.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Payload</div><div class="key-term-def">The actual data being sent inside the packet (~64 KiB).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Packet trailer</div><div class="key-term-def">Marks the end of the packet and holds an error-checking value (a cyclic redundancy check, CRC).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Router</div><div class="key-term-def">A network device that receives a packet and decides, from its header, where to send it next.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Packet switching</div><div class="key-term-def">Sending a message as independently-routed packets that are reassembled at the destination.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why data is split into packets</h4>
+    <ul>
+      <li>Data sent over long distances is usually broken into <b>data packets</b> (or "datagrams") — typically around <b>64 KiB</b> each — since small packets are much easier to control than one long continuous stream.</li>
+      <li>Splitting data this way means each packet can travel a DIFFERENT route to the destination — a real benefit if one particular route is out of action or very busy.</li>
+      <li>The one clear drawback: the packets must be REASSEMBLED correctly once they all arrive.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="440" height="90" viewBox="0 0 440 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="20" width="70" height="50" rx="6" fill="rgba(96,165,250,.12)" stroke="#60a5fa" stroke-width="1.5"/>
+      <text x="45" y="40" text-anchor="middle" fill="#60a5fa" font-size="10" font-family="system-ui">Header</text>
+      <text x="45" y="54" text-anchor="middle" fill="#9ca3af" font-size="8" font-family="system-ui">IPs, seq #,</text>
+      <text x="45" y="64" text-anchor="middle" fill="#9ca3af" font-size="8" font-family="system-ui">size</text>
+      <rect x="85" y="20" width="270" height="50" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a" stroke-width="1.5"/>
+      <text x="220" y="40" text-anchor="middle" fill="#b8ef4a" font-size="10" font-family="system-ui">Payload</text>
+      <text x="220" y="54" text-anchor="middle" fill="#9ca3af" font-size="8" font-family="system-ui">the actual data being sent</text>
+      <text x="220" y="64" text-anchor="middle" fill="#9ca3af" font-size="8" font-family="system-ui">(~64 KiB)</text>
+      <rect x="360" y="20" width="70" height="50" rx="6" fill="rgba(232,121,249,.1)" stroke="#e879f9" stroke-width="1.5"/>
+      <text x="395" y="40" text-anchor="middle" fill="#e879f9" font-size="10" font-family="system-ui">Trailer</text>
+      <text x="395" y="54" text-anchor="middle" fill="#9ca3af" font-size="8" font-family="system-ui">end marker,</text>
+      <text x="395" y="64" text-anchor="middle" fill="#9ca3af" font-size="8" font-family="system-ui">CRC</text>
+    </svg>
+    <div class="diagram-caption">Structure of one data packet: header → payload → trailer.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>What's inside each part of a packet</h4>
+    <ul>
+      <li><b>Header</b> contains: the sender's IP address, the receiver's IP address, the packet's sequence number (so packets can be reassembled in the correct order), and the packet size (so the receiver can check nothing's missing). It often also states the total number of packets in the transmission.</li>
+      <li><b>Payload</b> is simply the actual data being carried — usually about 64 KiB.</li>
+      <li><b>Trailer</b> contains a way of marking the packet's end (so packets can be separated from each other), plus an error-checking method — a <b>cyclic redundancy check (CRC)</b>.</li>
+      <li>How CRC works: the sender adds up all the 1-bits in the payload and stores this as a hex value in the trailer. The receiver recalculates the same count on arrival and compares it to the stored value — if they match, no error occurred; if not, the packet must be re-sent.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Packet switching</h4>
+    <ul>
+      <li><b>Packet switching</b>: a message is broken into packets, each sent INDEPENDENTLY from start to end point, then reassembled at the destination using the header's sequence information.</li>
+      <li>At each stage, a <b>router</b> receives a packet and decides — from the header — which way to send it next.</li>
+      <li>Routing selection depends on how many packets are already waiting at each node; the shortest AVAILABLE path is chosen (not necessarily the shortest path overall, since some routes may be too busy or unsuitable).</li>
+      <li>Because each packet can take a different route, packets can genuinely arrive at the destination in a DIFFERENT ORDER than they were sent — the receiver must reassemble them correctly using their sequence numbers.</li>
+      <li><b>Hopping</b> (not on the syllabus, but useful for understanding): each packet starts with a maximum "hop number" in its header, reduced by 1 at every router it passes through. If the hop number hits zero before reaching the destination, the packet is deleted — preventing lost packets from endlessly bouncing around and clogging the network. The receiver then requests the missing packet be re-sent.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good">
+      <h5>Benefits of packet switching</h5>
+      <ul>
+        <li>No single communication line is tied up</li>
+        <li>Failed, busy, or faulty lines can be avoided by re-routing</li>
+        <li>Easy to expand usage</li>
+        <li>High data transmission rate possible</li>
+      </ul>
+    </div>
+    <div class="compare-card bad">
+      <h5>Drawbacks of packet switching</h5>
+      <ul>
+        <li>Packets can be lost and need re-sending</li>
+        <li>More error-prone for real-time streaming (e.g. a live sports broadcast)</li>
+        <li>Delay at the destination while packets are re-ordered</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — data packets and packet switching.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Name the three parts of a data packet's structure, in order.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Header</strong>, then <strong>payload</strong>, then <strong>trailer</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Explain how a cyclic redundancy check (CRC) detects a transmission error.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The sender counts all the 1-bits in the payload and stores this count (as hex) in the trailer. The receiver recalculates the same count when the packet arrives and compares it to the stored value — a mismatch means a transmission error occurred, and the packet must be re-sent.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A router decides where to send a packet next based on the information in its ______, and always selects the ______ available path.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>header</strong>. Blank 2: <strong>shortest</strong> (available).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Since packets always take the shortest path, they always arrive at the destination in the same order they were sent." What's wrong with this claim?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Packets do NOT all take the same route — different packets can travel different paths depending on network congestion at each node — so they genuinely CAN arrive in a different order than they were sent. This is exactly why the header's sequence number is needed, to let the receiver reassemble them correctly.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A live sports broadcast is being streamed over the internet using packet switching, and viewers notice occasional freezing/stuttering. Using this lesson's content, explain why packet switching can cause this, and name one drawback of packet switching that's directly responsible.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Packet switching is more prone to errors with real-time streaming — packets can be lost and need re-sending, and there's a genuine delay at the destination while out-of-order packets are reassembled. For a live broadcast, this delay/re-sending is exactly what causes the viewer-visible freezing or stuttering, since the video can't display until the correct packets have all arrived and been put back in order.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What problem does "hopping" solve, and how does it solve it?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Hopping prevents lost packets from endlessly bouncing between routers and clogging the network forever. Each packet gets a maximum hop number that's reduced by 1 at every router it passes through — once it hits zero without reaching the destination, the packet is deleted, and the receiver requests it be re-sent.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 2: Data Transmission — 2.1a Data Packets &amp; Packet Switching<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 2.1
+  </div>
+
+</div>
+</body>
+</html>
