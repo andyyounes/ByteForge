@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.1c Universal Serial Bus (USB) — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; line-height: 1.7; }
+  .compare-card.good { border: 1px solid rgba(74,222,128,.25); }
+  .compare-card.bad { border: 1px solid rgba(248,113,113,.25); }
+  .compare-card h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .compare-card.good h5 { color: #4ade80; }
+  .compare-card.bad h5 { color: #f87171; }
+  .compare-card ul { margin: 0; padding-left: 18px; color: #d1d5db; }
+  .compare-card li { margin-bottom: 6px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 2 · Data Transmission</span>
+  <div class="topic-title">2.1c Universal Serial Bus (USB)</div>
+  <div class="topic-subtitle">The most common I/O port on modern computers — how it works, its cable, USB-C, and its real benefits and drawbacks.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">USB</div><div class="key-term-def">Universal Serial Bus — a standardised serial data transmission method, now the most common input/output port on computers.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Device driver</div><div class="key-term-def">Software that lets the computer and a connected device communicate correctly; loaded automatically when a device is recognised.</div></div>
+    <div class="key-term-card"><div class="key-term-name">USB-C</div><div class="key-term-def">A newer, 24-pin, symmetrical (reversible) USB connector type — smaller, more powerful, and faster than older USB connectors.</div></div>
+    <div class="key-term-card"><div class="key-term-name">USB hub</div><div class="key-term-def">A device used to add more USB ports, or to extend cable length beyond the standard maximum.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What USB is and how it works</h4>
+    <ul>
+      <li>USB is a form of <b>serial</b> data transmission, and is now the most common type of input/output port on computers — it standardised how devices transfer data with a computer.</li>
+      <li>USB supports BOTH half-duplex AND full-duplex data transmission.</li>
+      <li>When a device is plugged in: the computer automatically DETECTS it (via a small voltage change on the data signal wires), the device is automatically RECOGNISED, and the matching device driver software is loaded so the computer and device can communicate.</li>
+      <li>If no matching driver is available, the user is prompted to download the correct driver software — some systems do this automatically, showing a permission prompt to connect to the device's website.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="360" height="90" viewBox="0 0 360 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="30" width="320" height="30" rx="15" fill="#111320" stroke="#4b5563"/>
+      <line x1="40" y1="30" x2="40" y2="60" stroke="#f87171" stroke-width="4"/>
+      <line x1="140" y1="30" x2="140" y2="60" stroke="#e5e7eb" stroke-width="4"/>
+      <line x1="220" y1="30" x2="220" y2="60" stroke="#4ade80" stroke-width="4"/>
+      <line x1="320" y1="30" x2="320" y2="60" stroke="#374151" stroke-width="4"/>
+      <text x="40" y="20" text-anchor="middle" fill="#f87171" font-size="9" font-family="system-ui">Red +5V</text>
+      <text x="140" y="20" text-anchor="middle" fill="#e5e7eb" font-size="9" font-family="system-ui">White Data+</text>
+      <text x="220" y="20" text-anchor="middle" fill="#4ade80" font-size="9" font-family="system-ui">Green Data−</text>
+      <text x="320" y="20" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="system-ui">Black Gnd</text>
+      <text x="180" y="80" text-anchor="middle" fill="#6b7280" font-size="9" font-family="system-ui">4-wire shielded USB cable</text>
+    </svg>
+    <div class="diagram-caption">A standard USB cable: two power wires (red +5V, black ground) and two data wires (white/green) inside a shielded cable.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>USB-C</h4>
+    <ul>
+      <li>USB-C is a newer connector becoming common on laptops, tablets, and phones — a <b>24-pin symmetrical</b> connector that fits either way round.</li>
+      <li>It's smaller and thinner than older USB connectors, offers up to 100 watts (20V) of power (enough to charge full-sized laptops), and carries data at up to <b>10 Gbps</b> — fast enough to support 4K video.</li>
+      <li>USB-C is backward compatible with USB 2.0/3.0 provided a suitable adaptor is used, and is expected to become the new universal industry standard.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good">
+      <h5>Benefits of USB</h5>
+      <ul>
+        <li>Devices auto-detected, drivers auto-loaded</li>
+        <li>Connectors only fit one way (prevents wrong connections)</li>
+        <li>Industry standard — wide support</li>
+        <li>Supports many data rates (1.5 Mbps to 5 Gbps)</li>
+        <li>Cable itself supplies +5V power — no external power source needed</li>
+        <li>Re-transmits data automatically if errors are detected — leads to error-free transmission</li>
+        <li>Easy to add more ports via USB hubs</li>
+        <li>Backward compatible with older versions</li>
+      </ul>
+    </div>
+    <div class="compare-card bad">
+      <h5>Drawbacks of USB</h5>
+      <ul>
+        <li>Standard USB max cable length is only 5 m; hubs needed beyond that</li>
+        <li>Very early USB (V1) may not always be supported by the latest computers</li>
+        <li>Even USB V3/V4 (USB-C) is slower than, e.g., Ethernet connections (USB V2's max rate is only 480 Mbps)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — USB and USB-C.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Is USB a form of serial or parallel data transmission? Which duplex modes does it support?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>USB is a form of <strong>serial</strong> transmission. It supports both <strong>half-duplex</strong> and <strong>full-duplex</strong> modes.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">How does a computer know a USB device has just been plugged in?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A small change in the voltage on the data signal wires in the USB cable triggers automatic detection.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      USB-C is a ______-pin, ______ connector — meaning it fits into a USB-C port either way round.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>24</strong>. Blank 2: <strong>symmetrical</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "USB is always faster than any other data transmission method, since it's the industry standard." What real drawback from this lesson contradicts this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The lesson states that even the latest USB versions (V3/V4, USB-C) have a data transfer rate that is genuinely SLOW compared to, for example, Ethernet connections — being an industry standard does not make USB the fastest transmission method available.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user wants to connect an external hard drive that is 10 metres away from their computer using a standard USB cable. Using this lesson's content, explain the problem they'll face and how it can be solved.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Standard USB only supports a maximum cable length of 5 m, so a single 10 m cable won't reliably work. The lesson's solution: use a USB hub to extend the cable length beyond the standard 5 m limit.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name two real advantages USB-C has over older USB connector types.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any two of: smaller/thinner; reversible (fits either way round); higher power delivery (100W/20V, enough for full-size laptops); faster data rate (10 Gbps, supporting 4K video).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 2: Data Transmission — 2.1c Universal Serial Bus (USB)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 2.1
+  </div>
+
+</div>
+</body>
+</html>
