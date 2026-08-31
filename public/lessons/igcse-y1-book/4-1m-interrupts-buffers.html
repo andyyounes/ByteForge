@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.1m Interrupts &amp; Buffers — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #93c5fd; line-height: 1.9; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .pseudo-block ol { margin: 0; padding-left: 20px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 4 · Software</span>
+  <div class="topic-title">4.1m Interrupts &amp; Buffers</div>
+  <div class="topic-subtitle">The signal that pauses the CPU, and the memory area that keeps slow devices from freezing everything up.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Interrupt</div><div class="key-term-def">A signal from a device or software telling the CPU to temporarily stop its current task and service the interrupt.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Buffer</div><div class="key-term-def">A memory area temporarily storing data, compensating for speed mismatches between devices.</div></div>
+    <div class="key-term-card"><div class="key-term-name">ISR</div><div class="key-term-def">Interrupt Service Routine — the code executed to handle a specific interrupt.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What causes an interrupt</h4>
+    <ul>
+      <li>A timing signal.</li>
+      <li>An I/O process needing attention (e.g. a disk drive/printer needing more data).</li>
+      <li>A hardware fault (e.g. printer paper jam).</li>
+      <li>User interaction (e.g. pressing <code>CTRL+ALT+BREAK</code>).</li>
+      <li>Software errors (e.g. a missing .exe file, two processes fighting for the same memory location, dividing by zero).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How an interrupt is serviced</h4>
+    <ul>
+      <li>The computer identifies the interrupt TYPE and establishes its PRIORITY.</li>
+      <li>The current task's status is SAVED — the Program Counter (PC) and other register contents are stored.</li>
+      <li>The <b>Interrupt Service Routine (ISR)</b> is executed — its start address is loaded into the PC.</li>
+      <li>Once fully serviced, the interrupted task's status is RESTORED (saved registers retrieved), and the process continues.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why buffers exist</h4>
+    <ul>
+      <li>Interrupts let a computer appear to run multiple tasks "simultaneously" — e.g. downloading a file while listening to music. In reality, data is rapidly passed in/out of memory, servicing both.</li>
+      <li>A <b>buffer</b> is a memory area storing data temporarily — needed whenever two devices/processes work at genuinely different SPEEDS.</li>
+      <li>Example: streaming a movie — the transmission rate from web server to buffer must be FASTER than the rate the buffer feeds the media player, otherwise the movie would constantly freeze.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Interrupts + buffers together — printing a document</span><ol>
+<li>Data from the document is sent to the (printer) buffer from computer memory</li>
+<li>The processor is FREE to carry out other tasks while the buffer empties to the printer</li>
+<li>The buffer's contents are emptied to the printer and printed</li>
+<li>Once all data is printed, the buffer is empty — an INTERRUPT signal is sent to request more data</li>
+<li>The current task is suspended while the interrupt is serviced (more data sent to buffer)</li>
+<li>This repeats until all document data has been sent — then the processor continues fully with other tasks</li>
+</ol></div>
+
+  <div class="diagram-box">
+    <svg width="380" height="90" viewBox="0 0 380 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="30" width="90" height="35" rx="6" fill="#111320" stroke="#60a5fa"/><text x="55" y="52" text-anchor="middle" fill="#60a5fa" font-size="9" font-family="system-ui">CPU (fast)</text>
+      <path d="M 102 47 L 128 47" stroke="#6b7280" stroke-width="1.5" marker-end="url(#buf1)"/>
+      <defs><marker id="buf1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6b7280"/></marker></defs>
+      <rect x="135" y="20" width="90" height="55" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a"/><text x="180" y="52" text-anchor="middle" fill="#b8ef4a" font-size="9" font-family="system-ui">Buffer</text>
+      <path d="M 227 47 L 253 47" stroke="#6b7280" stroke-width="1.5" marker-end="url(#buf1)"/>
+      <rect x="260" y="30" width="90" height="35" rx="6" fill="rgba(232,121,249,.08)" stroke="#e879f9"/><text x="305" y="52" text-anchor="middle" fill="#e879f9" font-size="9" font-family="system-ui">Printer (slow)</text>
+    </svg>
+    <div class="diagram-caption">The buffer absorbs the speed mismatch — the CPU writes fast, the printer drains slowly, and neither has to wait for the other directly.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why this matters — maximising CPU efficiency</h4>
+    <ul>
+      <li>Printing takes MUCH longer than sending data to the printer. Without buffers/interrupts, the microprocessor would sit IDLE waiting for printing to finish — a huge waste of processing power.</li>
+      <li>Buffers + interrupts let the microprocessor carry on with OTHER tasks while the buffer empties, maximising both processing power and speed.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — interrupts and buffers.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Give two real causes of an interrupt.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any two of: a timing signal; an I/O process needing attention; a hardware fault; user interaction (e.g. a key combination); a software error.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is a buffer needed when streaming a movie from the internet?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the download speed and the media player's playback speed are genuinely different rates — the buffer compensates for this mismatch, storing incoming data temporarily so playback doesn't freeze, as long as the incoming rate stays faster than the playback rate.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      When an interrupt occurs, the contents of the ______ and other registers are saved first, then the ______ is executed to handle it.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>Program Counter (PC)</strong>. Blank 2: <strong>Interrupt Service Routine (ISR)</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Without buffers, printing a document would just take slightly longer, but nothing else would really change." What real cost does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Without buffers (and interrupts), the microprocessor would sit COMPLETELY IDLE the entire time printing was happening — since printing takes far longer than sending data to the printer, this would be an enormous waste of processing power, not just a minor slowdown to the printing itself.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user is printing a large document while simultaneously browsing the web. Using this lesson's content, explain how buffers and interrupts together let both tasks happen without the computer freezing.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Document data is sent to the printer BUFFER from memory, and the buffer feeds the (slow) printer while the processor is freed up to work on other tasks — like the web browser. Once the buffer empties, an INTERRUPT is sent requesting more data; the browsing task is briefly suspended while this interrupt is serviced (buffer refilled), then both tasks continue — giving the impression they're running simultaneously.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name two things the computer must establish once an interrupt signal is received.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The interrupt TYPE, and its PRIORITY level.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 4: Software — 4.1m Interrupts &amp; Buffers (completes Section 4.1)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 4.1
+  </div>
+
+</div>
+</body>
+</html>
