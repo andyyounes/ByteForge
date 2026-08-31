@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.4b Linear Search — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(232,121,249,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #f0abfc; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #e879f9; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.4b Standard Methods: Linear Search</div>
+  <div class="topic-subtitle">Checking every item, one at a time, until you find what you're looking for (or run out of list).</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Linear search</div><div class="key-term-def">Searching a list from the start, checking each item in turn until a match is found or the list ends.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Flag</div><div class="key-term-def">A variable (e.g. boolean Found) used to record whether a target condition has been met.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>How a linear search works</h4>
+    <ul>
+      <li>Start at the FIRST item in the list, and compare it with the target value being searched for.</li>
+      <li>If it matches, the search stops — the item has been found.</li>
+      <li>If it doesn't match, move to the NEXT item and repeat the comparison.</li>
+      <li>Continue until either a match is found, OR the end of the list is reached with no match (item not found).</li>
+      <li>A linear search does not require the list to be sorted — it works on any list, but can be slow for very large lists since, in the worst case, every item must be checked.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="620" height="140" viewBox="0 0 620 140">
+      <text x="10" y="20" fill="#9ca3af" font-size="11" font-family="system-ui">Searching for target = 42</text>
+      <g font-family="ui-monospace, monospace" font-size="13">
+        <rect x="10" y="40" width="60" height="40" fill="#111320" stroke="#e879f9" stroke-width="1.5" rx="6"/>
+        <text x="40" y="65" fill="#e2e8f0" text-anchor="middle">17</text>
+        <rect x="80" y="40" width="60" height="40" fill="#111320" stroke="#e879f9" stroke-width="1.5" rx="6"/>
+        <text x="110" y="65" fill="#e2e8f0" text-anchor="middle">8</text>
+        <rect x="150" y="40" width="60" height="40" fill="#111320" stroke="#e879f9" stroke-width="1.5" rx="6"/>
+        <text x="180" y="65" fill="#e2e8f0" text-anchor="middle">55</text>
+        <rect x="220" y="40" width="60" height="40" fill="rgba(74,222,128,.15)" stroke="#4ade80" stroke-width="2" rx="6"/>
+        <text x="250" y="65" fill="#4ade80" text-anchor="middle" font-weight="700">42</text>
+        <rect x="290" y="40" width="60" height="40" fill="#111320" stroke="rgba(255,255,255,.15)" stroke-width="1.5" rx="6" opacity="0.4"/>
+        <text x="320" y="65" fill="#9ca3af" text-anchor="middle" opacity="0.5">9</text>
+        <text x="130" y="105" fill="#9ca3af" font-size="11" text-anchor="middle" font-family="system-ui">index 1</text>
+        <text x="345" y="105" fill="#4ade80" font-size="11" text-anchor="middle" font-family="system-ui">✓ found at index 4 — stop, remaining items never checked</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Linear search — using a Found flag</span>Counter ← 1
+Found ← FALSE
+REPEAT
+  IF Name[Counter] = "Ali"
+  THEN
+    Found ← TRUE
+  ELSE
+    Counter ← Counter + 1
+  ENDIF
+UNTIL Found = TRUE OR Counter > ClassSize
+IF Found = TRUE
+THEN
+  OUTPUT "Ali found at position ", Counter
+ELSE
+  OUTPUT "Ali not found"
+ENDIF</div>
+
+  <div class="theory-block">
+    <h4>Reading the algorithm</h4>
+    <ul>
+      <li>The loop condition <code>UNTIL Found = TRUE OR Counter &gt; ClassSize</code> is what stops the search EARLY once a match is found — without it, the algorithm would keep checking items pointlessly after already finding the target.</li>
+      <li><code>Counter &gt; ClassSize</code> is the safety condition — it stops the loop from running past the end of the list if the name is never found.</li>
+      <li>The Found flag starts as FALSE and is only ever set to TRUE — it never needs to be reset back to FALSE inside the loop.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the linear search algorithm.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does a linear search stop as soon as a match is found, rather than checking the rest of the list?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because there's no need — the target has already been located, so continuing to check the remaining items would just waste time.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the purpose of the condition <code>Counter &gt; ClassSize</code> in the loop's UNTIL line?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It's a safety check that stops the loop once every item in the list has been examined, so the algorithm doesn't try to read past the end of the list if the target is never found.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the initial values before a linear search begins: <code>Counter ← ____</code> and <code>Found ← ____</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>Counter ← 1</code> (start at the first item) and <code>Found ← FALSE</code> (nothing has been matched yet).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's linear search never increments Counter inside the ELSE branch when there's no match. What will happen when the target isn't the first item?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The algorithm will get stuck in an infinite loop — it keeps re-checking the same (non-matching) item forever, since Counter never advances to look at the next one.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A list has 500 items. In the WORST case, how many comparisons would a linear search need to make to determine an item is NOT in the list?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>500 — every single item must be checked before concluding the target isn't present, since there's no early match to stop on.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Does a linear search require the list to be sorted first?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — a linear search works on a list in any order, since it simply checks items one at a time from the start.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.4b Linear Search<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.4
+  </div>
+
+</div>
+</body>
+</html>

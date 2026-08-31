@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.4c Bubble Sort — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(251,191,36,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #fde68a; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #fbbf24; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.4c Standard Methods: Bubble Sort</div>
+  <div class="topic-subtitle">Repeatedly comparing neighbours and swapping them — the simplest sorting algorithm you'll meet.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Bubble sort</div><div class="key-term-def">A sorting algorithm that repeatedly steps through a list, swapping adjacent items that are in the wrong order.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Swapped flag</div><div class="key-term-def">A boolean recording whether any swap happened during a pass — used to detect the list is already sorted.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>How bubble sort works</h4>
+    <ul>
+      <li>Compare each PAIR of adjacent items in the list, working from the start to the end.</li>
+      <li>If a pair is in the wrong order (the first is bigger than the second, for an ascending sort), SWAP them.</li>
+      <li>After one full pass through the list, the largest unsorted value has "bubbled" to the end — hence the name.</li>
+      <li>Repeat the whole pass again, and again, until an ENTIRE pass completes with NO swaps made — at that point the list is fully sorted.</li>
+      <li>A flag variable (e.g. Swapped) records whether any swap happened during the current pass, so the algorithm knows when to stop repeating.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="600" height="180" viewBox="0 0 600 180">
+      <text x="10" y="18" fill="#9ca3af" font-size="11" font-family="system-ui">One pass over [5, 2, 8, 1] — comparing and swapping adjacent pairs</text>
+      <g font-family="ui-monospace, monospace" font-size="12">
+        <text x="10" y="45" fill="#9ca3af" font-size="10" font-family="system-ui">Start:</text>
+        <rect x="60" y="30" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="78" y="49" fill="#e2e8f0" text-anchor="middle">5</text>
+        <rect x="100" y="30" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="118" y="49" fill="#e2e8f0" text-anchor="middle">2</text>
+        <rect x="140" y="30" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="158" y="49" fill="#e2e8f0" text-anchor="middle">8</text>
+        <rect x="180" y="30" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="198" y="49" fill="#e2e8f0" text-anchor="middle">1</text>
+
+        <text x="10" y="88" fill="#9ca3af" font-size="10" font-family="system-ui">5&gt;2 swap:</text>
+        <rect x="60" y="73" width="36" height="28" fill="rgba(251,191,36,.15)" stroke="#fbbf24" rx="4"/><text x="78" y="92" fill="#fbbf24" text-anchor="middle">2</text>
+        <rect x="100" y="73" width="36" height="28" fill="rgba(251,191,36,.15)" stroke="#fbbf24" rx="4"/><text x="118" y="92" fill="#fbbf24" text-anchor="middle">5</text>
+        <rect x="140" y="73" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="158" y="92" fill="#e2e8f0" text-anchor="middle">8</text>
+        <rect x="180" y="73" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="198" y="92" fill="#e2e8f0" text-anchor="middle">1</text>
+
+        <text x="10" y="131" fill="#9ca3af" font-size="10" font-family="system-ui">5&lt;8 no swap:</text>
+        <rect x="60" y="116" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.1)" rx="4"/><text x="78" y="135" fill="#9ca3af" text-anchor="middle">2</text>
+        <rect x="100" y="116" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="118" y="135" fill="#e2e8f0" text-anchor="middle">5</text>
+        <rect x="140" y="116" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="158" y="135" fill="#e2e8f0" text-anchor="middle">8</text>
+        <rect x="180" y="116" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.15)" rx="4"/><text x="198" y="135" fill="#e2e8f0" text-anchor="middle">1</text>
+
+        <text x="10" y="174" fill="#4ade80" font-size="10" font-family="system-ui">8&gt;1 swap:</text>
+        <rect x="60" y="159" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.1)" rx="4"/><text x="78" y="178" fill="#9ca3af" text-anchor="middle">2</text>
+        <rect x="100" y="159" width="36" height="28" fill="#111320" stroke="rgba(255,255,255,.1)" rx="4"/><text x="118" y="178" fill="#9ca3af" text-anchor="middle">5</text>
+        <rect x="140" y="159" width="36" height="28" fill="rgba(74,222,128,.15)" stroke="#4ade80" rx="4"/><text x="158" y="178" fill="#4ade80" text-anchor="middle">1</text>
+        <rect x="180" y="159" width="36" height="28" fill="rgba(74,222,128,.15)" stroke="#4ade80" rx="4"/><text x="198" y="178" fill="#4ade80" text-anchor="middle">8</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Bubble sort — sorting Temperature[] into ascending order</span>REPEAT
+  Swapped ← FALSE
+  FOR Counter ← 1 TO (ArraySize - 1)
+    IF Temperature[Counter] > Temperature[Counter + 1]
+    THEN
+      Last ← Temperature[Counter]
+      Temperature[Counter] ← Temperature[Counter + 1]
+      Temperature[Counter + 1] ← Last
+      Swapped ← TRUE
+    ENDIF
+  NEXT Counter
+UNTIL Swapped = FALSE</div>
+
+  <div class="theory-block">
+    <h4>Reading the algorithm</h4>
+    <ul>
+      <li>The swap itself needs a temporary variable (<code>Last</code>) — without it, assigning <code>Temperature[Counter] ← Temperature[Counter+1]</code> directly would overwrite and lose the original value before it could be placed into <code>Temperature[Counter+1]</code>.</li>
+      <li>The outer <code>REPEAT ... UNTIL Swapped = FALSE</code> loop is what makes this a genuine sort — a SINGLE pass (the inner FOR loop) is not enough to guarantee a fully sorted list, since large values only move one position per pass unless swapped repeatedly across several passes.</li>
+      <li>Swapped is reset to FALSE at the START of every new pass — if it stayed TRUE from a previous pass, the algorithm could never detect that the list has become fully sorted.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the bubble sort algorithm.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why is a temporary variable (like Last) needed to swap two array elements?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because directly assigning one element to the other would overwrite it and permanently lose its original value before it can be moved into the other position — the temporary variable holds onto that value during the swap.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">How does the algorithm know the list is fully sorted and stop repeating passes?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Once an entire pass through the list completes with NO swaps made, the Swapped flag stays FALSE, and the outer <code>UNTIL Swapped = FALSE</code> loop condition ends the sort.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the reset that must happen at the start of every pass: <code>Swapped ← ____</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>Swapped ← FALSE</code> — it must be reset every pass so a genuinely sorted pass can be detected.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's bubble sort never resets Swapped to FALSE at the start of a new pass. What goes wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Once Swapped is set to TRUE on any pass, it stays TRUE forever, so <code>UNTIL Swapped = FALSE</code> is never satisfied — the algorithm runs forever in an infinite loop, even after the list is already sorted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A list [5, 2, 8, 1] undergoes ONE pass of bubble sort. Trace through it (as shown in the diagram) and write the resulting list after that single pass.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>[2, 5, 1, 8] — 5&amp;2 swap → [2,5,8,1]; 5&amp;8 no swap; 8&amp;1 swap → [2,5,1,8]. Note it is NOT fully sorted after just one pass — a further pass is needed to move the 1 further left.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the pseudocode, why does the FOR loop run to <code>ArraySize - 1</code> rather than <code>ArraySize</code>?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because each comparison looks at <code>Temperature[Counter]</code> AND <code>Temperature[Counter + 1]</code> — if Counter reached ArraySize, <code>Counter + 1</code> would go past the end of the array, which doesn't exist.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.4c Bubble Sort (completes Section 7.4)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.4
+  </div>
+
+</div>
+</body>
+</html>
