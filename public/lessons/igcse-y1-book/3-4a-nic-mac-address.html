@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.4a NIC &amp; MAC Addresses — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .mac-diagram { display: flex; justify-content: center; gap: 4px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 14px; flex-wrap: wrap; }
+  .mac-byte { padding: 6px 10px; border-radius: 6px; font-weight: 700; }
+  .mac-byte.mfr { background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); }
+  .mac-byte.dev { background: rgba(184,239,74,.12); color: #b8ef4a; border: 1px solid rgba(184,239,74,.3); }
+  .mac-label { font-size: 10px; text-align: center; color: #6b7280; margin-top: 4px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.4a Network Interface Card &amp; MAC Address</div>
+  <div class="topic-subtitle">The unique hardware identity every network device carries — set at the factory, rarely changed.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">NIC</div><div class="key-term-def">Network Interface Card — hardware allowing a device to connect to a network.</div></div>
+    <div class="key-term-card"><div class="key-term-name">WNIC</div><div class="key-term-def">Wireless NIC — connects via an antenna using microwaves, instead of a physical cable.</div></div>
+    <div class="key-term-card"><div class="key-term-name">MAC address</div><div class="key-term-def">A 48-bit hardware address, in six hex groups, uniquely identifying a device on a network.</div></div>
+    <div class="key-term-card"><div class="key-term-name">UAA / LAA</div><div class="key-term-def">Universally Administered (factory-set, most common) vs. Locally Administered (user-changed) MAC address.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Network Interface Cards</h4>
+    <ul>
+      <li>A <b>NIC</b> is needed for any device to connect to a network (e.g. the internet). It's usually built into the device hardware, and contains the <b>MAC address</b> generated at manufacturing.</li>
+      <li>A <b>WNIC</b> (Wireless NIC) does the same job but connects wirelessly, using an antenna and microwaves — typically via USB or built into the device's circuitry.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>MAC address structure</h4>
+    <ul>
+      <li>A MAC address is 48 bits, shown as SIX groups of hex digits: <code>NN-NN-NN-DD-DD-DD</code>.</li>
+      <li>The FIRST three groups identify the MANUFACTURER (e.g. Apple). The LAST three groups are the device's own SERIAL NUMBER (unique to that device).</li>
+      <li>If a device's NIC is replaced, its MAC address CHANGES (since the MAC is tied to the physical card, not the device as a whole).</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — reading a MAC address</div>
+    <div class="mac-diagram">
+      <div class="mac-byte mfr">00</div><div class="mac-byte mfr">1C</div><div class="mac-byte mfr">B3</div>
+      <div class="mac-byte dev">4F</div><div class="mac-byte dev">25</div><div class="mac-byte dev">FF</div>
+    </div>
+    <p style="text-align:center; font-size:11px; color:#6b7280;">First 3 groups (blue) = manufacturer code. Last 3 groups (green) = unique device serial number.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>UAA vs. LAA</h4>
+    <ul>
+      <li><b>UAA</b> (Universally Administered Address): the FACTORY-SET MAC address — by far the most common type, rarely changed by users.</li>
+      <li><b>LAA</b> (Locally Administered Address): a user/organisation-CHANGED MAC address. Easy to do, but causes big problems if the new address isn't unique.</li>
+      <li>Real reasons to use LAA: some mainframe software requires MAC addresses to follow a strict format; bypassing a MAC address filter on a router/firewall (only certain formats allowed through); or emulating unrestricted MAC addresses to get past network restrictions.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — NICs and MAC addresses.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">How many bits make up a MAC address, and how many hex groups is it shown as?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>48 bits</strong>, shown as <strong>six</strong> groups of hexadecimal digits.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What do the FIRST three hex groups of a MAC address represent, and what do the LAST three represent?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The first three groups identify the MANUFACTURER's device code. The last three groups are the device's unique SERIAL NUMBER.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      The factory-set MAC address is called a ______; a user-changed MAC address is called a ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>UAA</strong> (Universally Administered Address). Blank 2: <strong>LAA</strong> (Locally Administered Address).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "A device's MAC address is permanently fixed for life and can never change under any circumstances." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A MAC address CAN change — either by replacing the device's NIC card (the MAC is tied to that physical card, not the device as a whole), or by deliberately changing it to an LAA address (though this must be done carefully to avoid creating a non-unique address).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      An organisation's router only allows devices with MAC addresses in a specific format to connect (a MAC filter). One of their devices has a MAC address in the wrong format. Using this lesson's content, explain a real solution to this problem.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They could change the device's MAC address to an <strong>LAA</strong> (Locally Administered Address) that matches the required format — the lesson explicitly lists bypassing a MAC filter on a router/firewall as a real reason organisations use LAA addresses.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is a WNIC, and how does it differ from a standard NIC?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A WNIC (Wireless NIC) connects a device to a network wirelessly, using an antenna and microwaves, rather than via a physical cable — otherwise it serves the same purpose as a standard NIC.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.4a Network Interface Card &amp; MAC Address<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.4
+  </div>
+
+</div>
+</body>
+</html>
