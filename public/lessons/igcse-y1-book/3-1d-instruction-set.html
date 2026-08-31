@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.1d Instruction Sets — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 3 · Hardware</span>
+  <div class="topic-title">3.1d Instruction Sets</div>
+  <div class="topic-subtitle">The limited vocabulary of operations a CPU actually understands — opcodes, operands, and why X86 CPUs from different makers still "speak" the same language.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Instruction set</div><div class="key-term-def">The limited, fixed set of opcodes (operations) a particular CPU design understands.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Opcode</div><div class="key-term-def">The part of an instruction telling the CPU WHAT operation to perform (e.g. ADD, JMP).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Operand</div><div class="key-term-def">The part of an instruction giving the data to act on, or a register/memory reference.</div></div>
+    <div class="key-term-card"><div class="key-term-name">X86</div><div class="key-term-def">A common CPU instruction-set standard, shared by very differently-designed CPUs like Intel Pentium and AMD Athlon.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Opcodes and operands</h4>
+    <ul>
+      <li>Instructions are operations decoded in sequence, each instructing the ALU and CU.</li>
+      <li>Every operation is made of an <b>opcode</b> and an <b>operand</b>.</li>
+      <li>The <b>opcode</b> tells the CPU WHAT operation to carry out.</li>
+      <li>The <b>operand</b> is the DATA to act on — or it may refer to a register or memory location.</li>
+      <li>Since the CPU must understand each operation, there's a genuinely LIMITED number of opcodes available — this fixed list is called the <b>instruction set</b>.</li>
+      <li>All software eventually gets converted into these binary instructions, processed one at a time via the Fetch-Decode-Execute cycle.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="300" height="70" viewBox="0 0 300 70" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="15" width="120" height="40" rx="6" fill="rgba(96,165,250,.1)" stroke="#60a5fa"/>
+      <text x="70" y="33" text-anchor="middle" fill="#60a5fa" font-size="11" font-family="ui-monospace, monospace">ADD</text>
+      <text x="70" y="47" text-anchor="middle" fill="#6b7280" font-size="8" font-family="system-ui">opcode</text>
+      <rect x="140" y="15" width="150" height="40" rx="6" fill="rgba(184,239,74,.08)" stroke="#b8ef4a"/>
+      <text x="215" y="33" text-anchor="middle" fill="#b8ef4a" font-size="11" font-family="ui-monospace, monospace">R1, #5</text>
+      <text x="215" y="47" text-anchor="middle" fill="#6b7280" font-size="8" font-family="system-ui">operand(s)</text>
+    </svg>
+    <div class="diagram-caption">An example instruction: the opcode names the operation, the operand supplies the data/register(s) it acts on.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>X86 — a shared instruction set across different CPUs</h4>
+    <ul>
+      <li>Different manufacturers design their own internal electronics, but if a CPU is based on the <b>X86</b> standard, its instruction set is almost IDENTICAL to other X86 CPUs.</li>
+      <li>Example: Intel Pentium and AMD Athlon CPUs use nearly identical X86 instruction sets, despite being based on very different electronic designs internally.</li>
+      <li><b>Important distinction</b>: instruction sets are NOT the same as programming code. Instruction sets are low-level instructions the CPU directly understands. Program code (written by a human) needs an interpreter or compiler to convert it into the CPU's instruction set. Example instruction-set operations: <code>ADD</code>, <code>JMP</code>, <code>LDA</code>.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — instruction sets, opcodes, and operands.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What are the two parts of every CPU operation, and what does each one do?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The <strong>opcode</strong> (tells the CPU WHAT operation to do) and the <strong>operand</strong> (the data to act on, or a register/memory reference).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is a CPU's instruction set described as "limited"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the CPU can only understand a fixed, finite set of opcodes — there is genuinely a limited number of distinct operations any given CPU design can carry out.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Program code written by a human needs an ______ or ______ to convert it into the CPU's instruction set.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>interpreter</strong>. Blank 2: <strong>compiler</strong> (either order).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Instruction sets and programming code are the same thing, just described differently." What real distinction does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Instruction sets are the LOW-LEVEL instructions the CPU directly understands (e.g. ADD, JMP, LDA). Programming code is written at a higher level by humans, and must be CONVERTED (via an interpreter or compiler) into the instruction set before the CPU can run it — they are genuinely different things at different levels.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A software company wants their application to run correctly on both an Intel Pentium CPU and an AMD Athlon CPU without major changes. Using this lesson's content, explain why this is realistically achievable.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Both CPUs are based on the X86 standard, and the lesson states that X86 CPUs share almost IDENTICAL instruction sets, even though their internal electronic designs are very different. Since the software's low-level instructions ultimately target the same shared instruction set, it can realistically run on both without needing separate low-level versions.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Give two examples of actual instruction-set operations mentioned in this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any two of: <strong>ADD</strong>, <strong>JMP</strong>, <strong>LDA</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 3: Hardware — 3.1d Instruction Sets<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 3.1
+  </div>
+
+</div>
+</body>
+</html>
