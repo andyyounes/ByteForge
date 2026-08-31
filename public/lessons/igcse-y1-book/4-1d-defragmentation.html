@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.1d Defragmentation Software — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .sector-row { display: flex; gap: 2px; margin: 8px 0; font-family: ui-monospace, monospace; font-size: 10px; }
+  .sector-cell { flex: 1; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-weight: 700; }
+  .sector-cell.f1 { background: rgba(96,165,250,.2); color: #60a5fa; border: 1px solid rgba(96,165,250,.4); }
+  .sector-cell.f2 { background: rgba(232,121,249,.15); color: #e879f9; border: 1px solid rgba(232,121,249,.35); }
+  .sector-cell.f3 { background: rgba(184,239,74,.15); color: #b8ef4a; border: 1px solid rgba(184,239,74,.35); }
+  .sector-cell.empty { background: rgba(255,255,255,.03); color: #4b5563; border: 1px solid rgba(255,255,255,.08); }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 4 · Software</span>
+  <div class="topic-title">4.1d Defragmentation Software</div>
+  <div class="topic-subtitle">Watching a hard disk gradually scatter itself, sector by sector — and how a defragmenter tidies it back up.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Contiguous</div><div class="key-term-def">Meaning "next to each other" — sectors storing a file with no gaps or scattering.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Defragmenter</div><div class="key-term-def">Software that rearranges disk blocks to store files in contiguous sectors wherever possible.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why fragmentation happens</h4>
+    <ul>
+      <li>As an HDD fills up, blocks used for files become scattered across the disk (different sectors, tracks, even surfaces) — this happens naturally as files are deleted, partially deleted, and extended over time.</li>
+      <li>Result: SLOWER data access, since the read-write head needs several movements to find and retrieve all of a file's scattered pieces.</li>
+      <li>Storing files in <b>contiguous</b> sectors (next to each other) would considerably reduce head movements — this is exactly what defragmentation aims to achieve.</li>
+      <li>Note: this is NOT a problem for SSDs, due to their fundamentally different (no moving parts) way of accessing data.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — watching fragmentation happen, sector by sector</div>
+    <p>Track 8 of a disk has 12 sectors (0-11). Three files start out neatly stored:</p>
+    <div class="sector-row">
+      <div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div>
+      <div class="sector-cell f2">F2</div><div class="sector-cell f2">F2</div><div class="sector-cell f2">F2</div><div class="sector-cell f2">F2</div>
+      <div class="sector-cell f3">F3</div><div class="sector-cell f3">F3</div><div class="sector-cell f3">F3</div><div class="sector-cell f3">F3</div>
+    </div>
+    <p>File 2 is deleted. File 1 grows, but the freed sectors (4-7) aren't immediately reused (too much effort for the HDD). File 1's new data instead goes to sectors 10-11:</p>
+    <div class="sector-row">
+      <div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div>
+      <div class="sector-cell empty">-</div><div class="sector-cell empty">-</div><div class="sector-cell empty">-</div><div class="sector-cell empty">-</div>
+      <div class="sector-cell f3">F3</div><div class="sector-cell f3">F3</div><div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div>
+    </div>
+    <p>File 3 then extends, filling sector 9 first, then jumping to another track entirely (e.g. track 11) for the rest of its new data — the fragmentation keeps compounding as this repeats.</p>
+    <p>A <b>defragmenter</b> rearranges the blocks to restore contiguous storage wherever possible — File 1 and File 3 end up neatly grouped again:</p>
+    <div class="sector-row">
+      <div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div>
+      <div class="sector-cell f1">F1</div><div class="sector-cell f1">F1</div><div class="sector-cell f3">F3</div><div class="sector-cell f3">F3</div>
+      <div class="sector-cell f3">F3</div><div class="sector-cell f3">F3</div><div class="sector-cell f3">F3</div><div class="sector-cell empty">-</div>
+    </div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — defragmentation software.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does "contiguous" mean in the context of disk sectors?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Contiguous" means "next to each other" — a file's sectors are stored adjacently, with no gaps or scattering.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does an HDD's data access get slower as fragmentation increases?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>When a file's data is scattered across many non-adjacent sectors (and even different tracks/surfaces), the read-write head needs SEVERAL movements to find and retrieve all the pieces of the file, instead of one smooth continuous read.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Defragmentation is NOT a problem for ______ (unlike HDDs), because of their fundamentally different way of accessing data.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>SSDs</strong> (Solid State Drives).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "When a file is deleted, its freed-up sectors are always immediately reused by other growing files right away." What does the worked example in this lesson contradict?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The worked example explicitly shows that freed-up sectors (from a deleted file) are NOT immediately reused, since doing so would require "too much effort" for the HDD resources at that moment — a growing file's new data can instead be written to entirely different sectors, contributing to fragmentation.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user has been using their HDD-based laptop heavily for a year — installing, deleting, and updating many programs — and it's become noticeably slower opening files. Using this lesson's content, explain the likely cause and the appropriate fix.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The likely cause is FRAGMENTATION — a year of installs/deletes/updates has scattered file data across many non-contiguous sectors, forcing the read-write head to make many movements to retrieve each file. The fix: run defragmentation software, which rearranges the disk's blocks to restore contiguous storage wherever possible, speeding access back up.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does a defragmenter actually do to fix a fragmented disk?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It rearranges the blocks of data on the disk to store files in contiguous sectors wherever possible, undoing the scattering that built up over time.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 4: Software — 4.1d Defragmentation Software<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 4.1
+  </div>
+
+</div>
+</body>
+</html>
