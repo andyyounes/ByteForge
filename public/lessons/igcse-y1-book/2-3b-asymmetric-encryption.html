@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.3b Asymmetric Encryption — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .example-block ol { margin: 6px 0; padding-left: 20px; font-size: 12.5px; color: #d1d5db; line-height: 1.9; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 2 · Data Transmission</span>
+  <div class="topic-title">2.3b Asymmetric Encryption</div>
+  <div class="topic-subtitle">Two keys instead of one — how public/private key pairs solve symmetric encryption's biggest weakness.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Asymmetric encryption</div><div class="key-term-def">Encryption using TWO mathematically-linked keys — a public key and a private key — instead of one shared key.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Public key</div><div class="key-term-def">A key made available to EVERYONE, used by others to encrypt messages sent to its owner.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Private key</div><div class="key-term-def">A key known ONLY to its owner, used to decrypt messages that were encrypted with their matching public key.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why asymmetric encryption was developed</h4>
+    <ul>
+      <li>Asymmetric encryption was created to solve symmetric encryption's core problem — the difficulty of safely sharing a single secret key between sender and receiver.</li>
+      <li>It uses TWO keys: a <b>public key</b> (available to everybody) and a <b>private key</b> (known only to that one user). BOTH keys are needed across the full encrypt/decrypt process.</li>
+      <li>The two keys in a pair are mathematically linked, but — critically — CANNOT be derived from each other.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — Tom sends Jane a confidential document</div>
+    <ol>
+      <li>Jane generates a MATCHING PAIR of keys (public + private) using an algorithm, and stores both on her computer.</li>
+      <li>Jane sends her PUBLIC key to Tom (this is safe — the public key is meant to be shared).</li>
+      <li>Tom uses Jane's public key to ENCRYPT the document, producing ciphertext, and sends it to Jane.</li>
+      <li>Jane uses her own PRIVATE key (which she never shared with anyone) to DECRYPT Tom's document. This works only because her public key and private key are a matching pair generated together — Jane's public key CANNOT be used to decrypt the message; only her private key can.</li>
+    </ol>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="420" height="130" viewBox="0 0 420 130" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="15" width="80" height="35" rx="6" fill="#111320" stroke="#60a5fa"/><text x="50" y="37" text-anchor="middle" fill="#60a5fa" font-size="10" font-family="system-ui">Tom</text>
+      <rect x="330" y="15" width="80" height="35" rx="6" fill="#111320" stroke="#e879f9"/><text x="370" y="37" text-anchor="middle" fill="#e879f9" font-size="10" font-family="system-ui">Jane</text>
+
+      <path d="M 330 35 L 92 35" stroke="#4ade80" stroke-width="1.5" marker-end="url(#g1)"/>
+      <defs><marker id="g1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#4ade80"/></marker></defs>
+      <text x="210" y="27" text-anchor="middle" fill="#4ade80" font-size="8">1. Jane's public key</text>
+
+      <path d="M 92 65 L 328 65" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#g2)"/>
+      <defs><marker id="g2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#fbbf24"/></marker></defs>
+      <text x="210" y="60" text-anchor="middle" fill="#fbbf24" font-size="8">2. document encrypted with Jane's public key</text>
+
+      <text x="370" y="95" text-anchor="middle" fill="#f87171" font-size="8">3. Jane decrypts using</text>
+      <text x="370" y="107" text-anchor="middle" fill="#f87171" font-size="8">her PRIVATE key (secret)</text>
+    </svg>
+    <div class="diagram-caption">Only Jane's private key can decrypt something encrypted with her public key — that's what makes this secure even though the public key is freely shared.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Sharing one public key with many people</h4>
+    <ul>
+      <li>Jane can share her SAME public key with any number of colleagues (Tom, Susan, Mike, Megan) — they can all encrypt messages TO her using it, and only Jane's private key can decrypt any of them.</li>
+      <li>But this only allows ONE-WAY communication (everyone → Jane). For genuine TWO-WAY communication between ALL parties, each person must generate their OWN public/private key pair, and everyone must exchange public keys with everyone else.</li>
+      <li>Each person then uses their OWN private key to decrypt anything sent to them, using their own public key.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why this is more secure than symmetric encryption</h4>
+    <ul>
+      <li>The private key NEVER needs to be transmitted anywhere — it stays on its owner's computer the whole time, so it can never be intercepted in transit.</li>
+      <li>Only the public key travels across the network — and since the public key can't be used to decrypt anything (only to encrypt), intercepting it gives an eavesdropper nothing useful.</li>
+      <li>This directly solves symmetric encryption's core weakness: there's no shared secret that ever needs to be exchanged over a potentially insecure channel.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — asymmetric encryption (public/private key pairs).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which of the two keys — public or private — is ever shared with other people?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Only the <strong>public key</strong> is shared. The private key is kept secret and never leaves its owner's computer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the Tom-and-Jane example, which key does Tom use to ENCRYPT the document, and which key does Jane use to DECRYPT it?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Tom encrypts using Jane's <strong>public</strong> key. Jane decrypts using her own <strong>private</strong> key.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A public key and its matching private key are mathematically ______, but one cannot be ______ from the other.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>linked</strong>. Blank 2: <strong>derived</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Jane can use her own public key to decrypt Tom's message, since it's the same key pair." What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is explicitly false — Jane CANNOT use her public key to decrypt the message. Only her matching PRIVATE key can decrypt something that was encrypted with her public key. This asymmetry (different keys for encrypting vs. decrypting) is exactly what gives the method its name and its security.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Five colleagues (Tom, Jane, Susan, Mike, Megan) all want to be able to send EACH OTHER encrypted messages (fully two-way, not just to Jane). Using this lesson's content, describe what each person needs to do to set this up.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Each of the five people must generate their OWN public/private key pair (not just rely on Jane's). Then everyone must exchange their public keys with everyone else, so each person holds the public key of every other colleague. Each person then decrypts incoming messages using their own private key, while encrypting outgoing messages using the recipient's public key.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Explain why asymmetric encryption avoids symmetric encryption's key-sharing security risk.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The private key — the one that actually matters for decryption — never has to be transmitted anywhere, so it can never be intercepted in transit. Only the public key travels across the network, and since it can't be used to decrypt anything, an eavesdropper intercepting it gains nothing useful.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 2: Data Transmission — 2.3b Asymmetric Encryption<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 2.3
+  </div>
+
+</div>
+</body>
+</html>
