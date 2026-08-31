@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.2a Parity Checks — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: #0a0c18; border: 1px solid rgba(184,239,74,.15); border-left: 3px solid #b8ef4a; border-radius: 0 10px 10px 0; padding: 16px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #b8ef4a; margin-bottom: 10px; }
+  .example-block p { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 0 0 8px; }
+  .bits-row { display: flex; gap: 4px; justify-content: center; margin: 10px 0; font-family: ui-monospace, monospace; }
+  .bit-cell { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 13px; font-weight: 700; }
+  .bit-cell.one { background: rgba(184,239,74,.15); color: #b8ef4a; border: 1px solid rgba(184,239,74,.35); }
+  .bit-cell.zero { background: rgba(255,255,255,.05); color: #9ca3af; border: 1px solid rgba(255,255,255,.1); }
+  .bit-cell.parity { border: 2px solid #e879f9; color: #e879f9; }
+  .example-block table { border-collapse: collapse; margin: 8px auto; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block td, .example-block th { border: 1px solid rgba(255,255,255,.15); padding: 4px 8px; text-align: center; }
+  .example-block th { color: #b8ef4a; font-family: system-ui, sans-serif; font-size: 10px; }
+  .example-block td.flag { background: rgba(248,113,113,.15); color: #f87171; font-weight: 700; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 2 · Data Transmission</span>
+  <div class="topic-title">2.2a Why Check for Errors, and Parity Checks</div>
+  <div class="topic-subtitle">Why transmitted data can never be assumed correct — and how a single extra bit can catch (some) corruption.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Data corruption</div><div class="key-term-def">Data being changed, lost, or even gained during transmission — due to interference, packet-switching problems, or skewing.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Parity</div><div class="key-term-def">Whether a byte has an EVEN or ODD number of 1-bits. Agreed in advance between sender and receiver.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Parity bit</div><div class="key-term-def">An extra bit (usually the leftmost) added to a byte to force it to have the agreed parity.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Parity block</div><div class="key-term-def">Checking parity both horizontally (per byte) AND vertically (per bit position) across a block of bytes — this can locate exactly which bit is wrong.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why errors need to be checked for</h4>
+    <ul>
+      <li>Whenever data is transmitted, there's always a risk it becomes corrupted, lost, or even gained.</li>
+      <li>Errors can occur due to: <b>interference</b> (any cable can suffer electrical interference, corrupting or losing data), problems during <b>packet switching</b> (can lose OR gain data), and <b>skewing</b> (bits arriving out of sync during parallel transmission).</li>
+      <li>Checking matters because a computer, unlike a human, cannot make sense of scrambled text at all — even text a human can still read despite scrambled middle letters would be complete nonsense to a computer.</li>
+      <li>The three main methods covered: <b>parity checks</b>, <b>checksum</b>, and <b>echo check</b>.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How a basic parity check works</h4>
+    <ul>
+      <li>Parity checking is based on counting the 1-bits in a byte. Parity is either <b>EVEN</b> (an even number of 1-bits) or <b>ODD</b> (an odd number).</li>
+      <li>One bit in the byte (usually the leftmost/most significant bit) is reserved as the <b>parity bit</b>, set to whatever value makes the byte match the agreed parity.</li>
+      <li>Sender and receiver AGREE in advance which parity (even or odd) is being used — this makes parity checking a form of transmission protocol.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — setting the parity bit</div>
+    <p>Data bits: <code>1101100</code> (four 1-bits already).</p>
+    <p><b>Using EVEN parity</b> — already an even count, so the parity bit is set to <code>0</code>:</p>
+    <div class="bits-row">
+      <div class="bit-cell parity">0</div><div class="bit-cell one">1</div><div class="bit-cell one">1</div><div class="bit-cell zero">0</div><div class="bit-cell one">1</div><div class="bit-cell one">1</div><div class="bit-cell zero">0</div><div class="bit-cell zero">0</div>
+    </div>
+    <p><b>Using ODD parity</b> — needs an odd count, so the parity bit is set to <code>1</code>:</p>
+    <div class="bits-row">
+      <div class="bit-cell parity">1</div><div class="bit-cell one">1</div><div class="bit-cell one">1</div><div class="bit-cell zero">0</div><div class="bit-cell one">1</div><div class="bit-cell one">1</div><div class="bit-cell zero">0</div><div class="bit-cell zero">0</div>
+    </div>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Detecting an error with parity</div>
+    <p>Assume even parity is agreed. Byte sent: <code>01011100</code> (four 1-bits — correct even parity).</p>
+    <p>Byte received: <code>01001100</code> (only three 1-bits — now ODD).</p>
+    <p>Since the received byte's parity no longer matches the agreed EVEN parity, the receiver's computer flags a transmission error and can request a re-send.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>The limitation of basic parity — and the fix</h4>
+    <ul>
+      <li>If exactly ONE bit changes, parity checking reliably catches it. But if TWO bits change, the byte can still end up with the CORRECT parity by coincidence — meaning the error goes completely undetected.</li>
+      <li>Even when an error IS detected, a basic parity check can't tell you WHICH bit is wrong — only that something changed.</li>
+      <li>The fix: <b>parity blocks</b>. A block of bytes is sent together with an extra "parity byte" — parity is checked both HORIZONTALLY (across each byte's own bits) and VERTICALLY (down each bit position across all the bytes).</li>
+      <li>Wherever a row AND a column both show incorrect parity, their INTERSECTION is exactly the corrupted bit — meaning the error can be located, and even automatically corrected by flipping that one bit.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — locating an error with a parity block</div>
+    <p>Even parity agreed. After checking every row and column, byte 8 (row) has incorrect parity, and bit 5 (column) also has incorrect parity.</p>
+    <table>
+      <tr><th></th><th>Parity</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
+      <tr><td>Byte 8</td><td>0</td><td>0</td><td>0</td><td>1</td><td class="flag">1</td><td>0</td><td>1</td><td>0</td></tr>
+    </table>
+    <p>The bit at the intersection of row 8 and column 5 is the corrupted one — it should be <code>0</code>, not <code>1</code>. Flipping just that bit fixes BOTH the row's parity and the column's parity at once — this is exactly how the error is located and corrected.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — why errors are checked for, and parity checks (including parity blocks).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What must sender and receiver agree on BEFORE using parity checking, and why does this make it a kind of "protocol"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They must agree whether EVEN or ODD parity is being used. This is a protocol because both sides must follow the same rule for the check to mean anything — the receiver can only detect an error by comparing against the SAME parity rule the sender used.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">
+      For the 7-bit data <code>1110000</code> (three 1-bits) using EVEN parity, the parity bit should be set to ______, making the full byte have ______ 1-bits in total.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>1</strong> (to make the count even). Blank 2: <strong>four</strong> 1-bits total.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A parity block checks parity both ______ (across each byte) and ______ (down each bit position), which allows it to actually locate WHICH bit is wrong.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Blank 1: <strong>horizontally</strong>. Blank 2: <strong>vertically</strong>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Parity checking always detects every transmission error, no matter how many bits change." What real limitation does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>If exactly TWO bits change, the byte can coincidentally end up with the SAME (correct) parity it started with — meaning the error goes completely undetected by a basic parity check. Basic parity only reliably catches an ODD number of bit changes (most commonly, a single bit change).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A system sends 9 bytes as a block using even parity, plus a parity byte. After transmission, row 3 (byte 3) shows incorrect parity, and column 6 (bit 6) also shows incorrect parity, with no other row or column affected. Explain what this tells you, and what the system can do about it.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The corrupted bit is exactly at the intersection of row 3 and column 6 — that single bit's value flipped during transmission. The system can locate it precisely using the parity block method, and can automatically correct it by flipping that one bit back — restoring both row 3's and column 6's correct even parity — without needing to request a full re-transmission.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name three real causes of data corruption during transmission mentioned in this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Interference</strong> (electrical interference on cables), problems during <strong>packet switching</strong> (can lose or even gain data), and <strong>skewing</strong> (bits arriving out of sync during parallel transmission).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 2: Data Transmission — 2.2a Why Check for Errors, and Parity Checks<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 2.2
+  </div>
+
+</div>
+</body>
+</html>

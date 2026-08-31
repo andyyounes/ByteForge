@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.2b Checksum &amp; Echo Check — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; text-align: center; }
+  .diagram-caption { font-size: 11px; color: #6b7280; margin-top: 8px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.8; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 1 · Unit 2 · Data Transmission</span>
+  <div class="topic-title">2.2b Checksum &amp; Echo Check</div>
+  <div class="topic-subtitle">Two more ways to catch transmission errors — one that checks a whole block at once, and one that's simple but genuinely unreliable.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Checksum</div><div class="key-term-def">A value calculated from a block of data using an agreed algorithm, sent alongside the data, and recalculated by the receiver to check for errors.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Echo check</div><div class="key-term-def">Sending received data back to the original sender, who compares it to the original to check for transmission errors.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Checksum</h4>
+    <ul>
+      <li>A checksum is a value used to check whether a block of data has been changed or corrupted during transmission.</li>
+      <li>The process: before sending, the sender calculates a checksum from the block of data using an algorithm AGREED in advance between sender and receiver.</li>
+      <li>The checksum is transmitted along with the data block.</li>
+      <li>At the receiving end, the same algorithm is used to recalculate the checksum from the data actually received.</li>
+      <li>The recalculated checksum is compared to the one sent — if they MATCH, no transmission error occurred; if they DIFFER, the block must be re-sent.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="420" height="130" viewBox="0 0 420 130" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="15" width="150" height="35" rx="6" fill="#111320" stroke="#60a5fa"/>
+      <text x="85" y="37" text-anchor="middle" fill="#60a5fa" font-size="10" font-family="system-ui">Data block + checksum A</text>
+      <path d="M 165 32 L 250 32" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a1)"/>
+      <defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6b7280"/></marker></defs>
+      <rect x="255" y="15" width="150" height="35" rx="6" fill="#0a0c18" stroke="#e879f9"/>
+      <text x="330" y="37" text-anchor="middle" fill="#e879f9" font-size="10" font-family="system-ui">Recalculate → checksum B</text>
+      <path d="M 330 55 L 330 75" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a2)"/>
+      <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="4" refY="6" orient="auto"><path d="M0,0 L8,0 L4,8 Z" fill="#6b7280"/></marker></defs>
+      <rect x="230" y="85" width="180" height="35" rx="6" fill="#111320" stroke="#4ade80"/>
+      <text x="320" y="107" text-anchor="middle" fill="#4ade80" font-size="10" font-family="system-ui">A = B? → no error</text>
+    </svg>
+    <div class="diagram-caption">Checksum flow: a value is computed before sending, recomputed after receiving, and compared.</div>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Pseudocode — checksum verification</span>DECLARE sentChecksum, calculatedChecksum : INTEGER
+DECLARE dataBlock : ARRAY OF BYTE
+
+RECEIVE dataBlock, sentChecksum
+
+calculatedChecksum ← CALCULATE_CHECKSUM(dataBlock)
+
+IF calculatedChecksum = sentChecksum THEN
+  OUTPUT "No error - data accepted"
+ELSE
+  OUTPUT "Error detected - request re-transmission"
+ENDIF</div>
+
+  <div class="theory-block">
+    <h4>Echo check</h4>
+    <ul>
+      <li>With echo check: data sent to another device is sent straight BACK to the original sender.</li>
+      <li>The sender's computer compares the returned copy against the original data.</li>
+      <li>If there's NO difference, the data was transmitted without error.</li>
+      <li>If the two copies DIFFER, an error occurred SOMEWHERE during transmission.</li>
+      <li>The genuine reliability problem: if a difference is found, it's impossible to tell whether the error happened on the WAY THERE (sender → receiver) or on the WAY BACK (receiver → sender) — the check can't distinguish between the two.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="360" height="90" viewBox="0 0 360 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="30" width="70" height="30" rx="6" fill="#111320" stroke="#60a5fa"/><text x="55" y="49" text-anchor="middle" fill="#60a5fa" font-size="10" font-family="system-ui">Sender</text>
+      <rect x="270" y="30" width="70" height="30" rx="6" fill="#111320" stroke="#e879f9"/><text x="305" y="49" text-anchor="middle" fill="#e879f9" font-size="10" font-family="system-ui">Receiver</text>
+      <path d="M 92 38 L 268 38" stroke="#4ade80" stroke-width="1.5" marker-end="url(#e1)"/>
+      <defs><marker id="e1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#4ade80"/></marker></defs>
+      <text x="180" y="30" text-anchor="middle" fill="#6b7280" font-size="8">data sent</text>
+      <path d="M 268 55 L 92 55" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#e2)"/>
+      <defs><marker id="e2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#fbbf24"/></marker></defs>
+      <text x="180" y="72" text-anchor="middle" fill="#6b7280" font-size="8">data echoed back for comparison</text>
+    </svg>
+    <div class="diagram-caption">Echo check: data travels both ways, and the sender does the final comparison.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — checksum and echo check.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What must be agreed between sender and receiver before checksum can be used?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The ALGORITHM used to calculate the checksum from the data block — both sides must use the identical method for the comparison to be meaningful.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In an echo check, why can the sender not tell WHERE an error occurred, even when one is detected?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Data travels in both directions — sender to receiver, then receiver back to sender — so a mismatch could genuinely have been introduced on EITHER leg of that round trip. The check alone cannot distinguish which leg caused it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete this checksum pseudocode condition:<br>
+      <code>IF calculatedChecksum ______ sentChecksum THEN OUTPUT "Error detected"</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>IF calculatedChecksum <> sentChecksum THEN</code> (i.e. "not equal to") — an error is flagged only when the two values genuinely differ.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims: "Echo check is just as reliable as checksum, since both compare two values to detect errors." What real difference in reliability does this ignore?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Echo check is explicitly described as unreliable, because when a mismatch is found, it's genuinely impossible to tell whether the error happened on the outward trip or the return trip. Checksum doesn't have this ambiguity — the checksum is calculated directly from the data actually received, so a mismatch clearly indicates the received block itself is corrupted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A system transfers a large data file in blocks and needs a reliable, single-trip way to confirm each block arrived correctly, without waiting for data to be sent back to the sender. Which method — checksum or echo check — is more suitable here, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><strong>Checksum</strong> — it only requires a single trip (data + checksum sent once), with the receiver doing its own recalculation and comparison locally. Echo check requires a full round trip (data sent back to the sender) and carries genuine ambiguity about where an error occurred, making it less suitable here.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Describe, in your own words, the full echo check process from start to finish.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Data is sent from the sender to the receiver. The receiver sends that same data straight back to the sender. The sender compares the returned data against its original copy — if they match, no error occurred; if they differ, an error occurred somewhere during the round trip.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 1 — Unit 2: Data Transmission — 2.2b Checksum &amp; Echo Check<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 2.2
+  </div>
+
+</div>
+</body>
+</html>
