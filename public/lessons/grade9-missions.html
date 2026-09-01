@@ -154,6 +154,20 @@
   .cards-status .total.ok { color:#4ade80; }
   #cards-check-btn { width:100%; }
 
+  /* ── Quiz — MCQ / image-matching, no code editor ── */
+  .quiz-q { background:#161927; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px; margin-bottom:16px; }
+  .quiz-q.correct { border-color:rgba(74,222,128,.5); background:rgba(74,222,128,.06); }
+  .quiz-img { display:block; max-width:220px; max-height:150px; margin:0 auto 12px; border-radius:8px; border:1px solid rgba(255,255,255,.1); }
+  .quiz-prompt { font-size:14px; color:#e2e8f0; font-weight:700; margin-bottom:12px; text-align:center; }
+  .quiz-opts { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .quiz-opt { padding:9px 16px; border-radius:8px; border:2px solid rgba(255,255,255,.15); background:#0d0f1a;
+              color:#c7d2e0; font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
+  .quiz-opt:hover { border-color:#67e8f9; }
+  .quiz-opt.right { background:rgba(74,222,128,.18); border-color:#4ade80; color:#4ade80; }
+  .quiz-opt.wrong { background:rgba(248,113,113,.18); border-color:#f87171; color:#f87171; }
+  .quiz-opt.locked { pointer-events:none; opacity:.7; }
+  #quiz-check-btn { width:100%; }
+
   /* ── Flowchart Builder — real drag-and-drop shapes + click-to-connect ── */
   .fc-palette { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
   .fc-palette-btn { padding:8px 14px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;
@@ -340,6 +354,25 @@
         <div class="learn-theory" id="learn-theory"></div>
       </div>
       <button class="btn btn-run" id="learn-continue-btn" onclick="completeLearnBubble()">✓ I've got it — Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quiz — short MCQ / image-matching stages ("which component is which").
+     No code editor at all: click the right option per question, no answer()
+     required. Added directly in response to feedback that identification
+     questions (RAM vs Storage, which storage device, etc.) didn't need a
+     Python/pseudocode IDE at all — a quiz is a much better fit. -->
+<div class="learn-wrap" id="quiz-wrap">
+  <div class="learn-card">
+    <div class="learn-hdr">
+      <span id="quiz-title"></span>
+      <button class="mbar-back" onclick="mbarBack()">☰ Missions</button>
+    </div>
+    <div class="learn-body">
+      <p class="cards-intro" id="quiz-intro"></p>
+      <div id="quiz-questions"></div>
+      <div class="cards-status" id="quiz-status"></div>
     </div>
   </div>
 </div>
@@ -618,60 +651,83 @@ const MISSIONS = [
     },
   },
   {
-    id: 'comp-p1', type: 'data', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '💾', title: 'RAM or Storage?', xp: 20,
-    brief: 'You closed your laptop lid without saving, and the essay you were writing disappeared completely. Which kind of memory was it sitting in? answer() "RAM" or "Storage".',
-    api: ['answer(value)'],
-    dataTitle: 'Scenario', dataFields: [],
-    data: [],
-    starter: {
-      py: '# TODO: answer() "RAM" or "Storage" — which one loses its data when power is lost?\n',
-      ps: '// TODO: answer() "RAM" or "Storage" — which one loses its data when power is lost?\n',
+    // Converted from a Python/pseudocode answer() mission to a quiz — these
+    // are identification questions (which component is which), not real
+    // code, so a short click-to-answer quiz is a much better fit than an IDE.
+    id: 'comp-p1', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '💾', title: 'RAM or Storage?', xp: 20,
+    brief: 'Two real components, one job each — click the right answer for each scenario below.',
+    api: [],
+    quiz: {
+      intro: 'For each scenario, decide whether it describes RAM or Storage.',
+      questions: [
+        { image: '/images/hardware/ram.jpg', imageAlt: 'A RAM memory stick',
+          prompt: 'You closed your laptop lid without saving, and the essay you were writing disappeared completely. Which kind of memory was it sitting in?',
+          options: ['RAM', 'Storage'], answer: 'RAM' },
+        { image: '/images/hardware/ssd.jpg', imageAlt: 'A solid-state drive',
+          prompt: 'A photo taken a year ago is still there when you turn your phone back on. Which kind of memory kept it safe?',
+          options: ['RAM', 'Storage'], answer: 'Storage' },
+        { prompt: 'Which one loses everything the instant the power is switched off?',
+          options: ['RAM', 'Storage'], answer: 'RAM' },
+      ],
     },
-    answer: 'RAM',
     stars: { metric: 'pass' },
   },
   {
-    id: 'comp-p2', type: 'data', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '🖨️', title: 'Input, Process, or Output?', xp: 20,
-    brief: 'A printer produces a paper copy of your document. Which stage of the IPOS cycle is THIS actually? answer() "Input", "Process", or "Output".',
-    api: ['answer(value)'],
-    dataTitle: 'Scenario', dataFields: [],
-    data: [],
-    starter: {
-      py: '# TODO: answer() "Input", "Process", or "Output" — a printer producing paper is which stage?\n',
-      ps: '// TODO: answer() "Input", "Process", or "Output" — a printer producing paper is which stage?\n',
+    id: 'comp-p2', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '🖨️', title: 'Input, Process, or Output?', xp: 20,
+    brief: 'Every computer follows the IPOS cycle — click which stage each example belongs to.',
+    api: [],
+    quiz: {
+      intro: 'For each example, decide which stage of the IPOS cycle it belongs to.',
+      questions: [
+        { prompt: 'A printer produces a paper copy of your document. Which stage of the IPOS cycle is THIS?',
+          options: ['Input', 'Process', 'Output'], answer: 'Output' },
+        { prompt: 'You type on a keyboard to enter your name. Which stage is THIS?',
+          options: ['Input', 'Process', 'Output'], answer: 'Input' },
+        { prompt: 'The CPU calculates the total of your shopping basket. Which stage is THIS?',
+          options: ['Input', 'Process', 'Output'], answer: 'Process' },
+      ],
     },
-    answer: 'Output',
     stars: { metric: 'pass' },
   },
   {
     // Harder than comp-p1/comp-p2 on purpose: a real calculation using the
     // 1024-multiplier chain just taught in the theory (bytes -> KB -> MB ->
-    // GB), not a single-fact lookup.
-    id: 'comp-p3', type: 'data', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '📐', title: 'Storage Unit Conversion', xp: 30,
-    brief: 'A phone photo is 6 MB. Your cloud backup only shows storage used in KB. Remember: 1 MB = 1024 KB. answer() how many KB that photo actually is.',
-    api: ['answer(value)'],
-    dataTitle: 'Photo Size', dataFields: ['sizeMB'],
-    data: [{ sizeMB: 6 }],
-    starter: {
-      py: 'size_mb = 6\n# TODO: answer() size_mb converted to KB (1 MB = 1024 KB)\n',
-      ps: 'sizeMB ← 6\n// TODO: answer() sizeMB converted to KB (1 MB = 1024 KB)\n',
+    // GB), not a single-fact lookup — now multiple-choice rather than typed.
+    id: 'comp-p3', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '📐', title: 'Storage Unit Conversion', xp: 30,
+    brief: 'Remember: 1 MB = 1024 KB. Work out each conversion, then click the right answer.',
+    api: [],
+    quiz: {
+      intro: 'Remember the 1024 chain: 1 MB = 1024 KB, 1 GB = 1024 MB.',
+      questions: [
+        { prompt: 'A phone photo is 6 MB. Your cloud backup only shows storage used in KB. How many KB is that photo?',
+          options: ['600', '6144', '6000', '60'], answer: '6144' },
+        { prompt: 'A song file is 3 MB. How many KB is that?',
+          options: ['3000', '3072', '300', '30'], answer: '3072' },
+        { prompt: 'A video is 2 GB. How many MB is that?',
+          options: ['2000', '2048', '200', '20480'], answer: '2048' },
+      ],
     },
-    answer: 6144,
     stars: { metric: 'pass' },
   },
   {
     // Also harder: a real trade-off comparison across the three storage
     // device types just taught (HDD/SSD/Cloud), not a single definition.
-    id: 'comp-p4', type: 'data', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '⚡', title: 'Pick the Right Storage', xp: 30,
-    brief: 'A laptop is being shipped overseas and needs storage that will not get damaged if it is dropped or shaken in transit — no spinning parts allowed. answer() "HDD", "SSD", or "Cloud".',
-    api: ['answer(value)'],
-    dataTitle: 'Scenario', dataFields: [],
-    data: [],
-    starter: {
-      py: '# TODO: answer() "HDD", "SSD", or "Cloud" — which has NO moving parts to damage in transit?\n',
-      ps: '// TODO: answer() "HDD", "SSD", or "Cloud" — which has NO moving parts to damage in transit?\n',
+    id: 'comp-p4', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '⚡', title: 'Pick the Right Storage', xp: 30,
+    brief: 'HDD, SSD, or Cloud — click the storage type that best fits each real scenario.',
+    api: [],
+    quiz: {
+      intro: 'Pick HDD, SSD, or Cloud for each scenario.',
+      questions: [
+        { image: '/images/hardware/ssd.jpg', imageAlt: 'A solid-state drive',
+          prompt: 'A laptop is being shipped overseas and needs storage that will not get damaged if it is dropped or shaken in transit — no spinning parts allowed.',
+          options: ['HDD', 'SSD', 'Cloud'], answer: 'SSD' },
+        { image: '/images/hardware/hdd.jpg', imageAlt: 'A hard disk drive',
+          prompt: 'A school wants the cheapest possible storage per GB to archive old files, and does not care much about speed.',
+          options: ['HDD', 'SSD', 'Cloud'], answer: 'HDD' },
+        { prompt: 'A student wants to access their homework from any device, anywhere, without carrying a physical drive.',
+          options: ['HDD', 'SSD', 'Cloud'], answer: 'Cloud' },
+      ],
     },
-    answer: 'SSD',
     stars: { metric: 'pass' },
   },
   // ── Phase -1 · Your First Code — absolute zero. Nothing here assumes ANY
@@ -3247,9 +3303,11 @@ function openMission(id) {
   if (!activeMission) return
   missionStartedAt = Date.now()
   if (activeMission.type === 'learn') { renderLearnBubble(); return }
+  if (activeMission.type === 'quiz') { renderQuizBubble(); return }
   if (activeMission.type === 'cards') { renderCardsBubble(); return }
   if (activeMission.type === 'flowchart') { renderFlowchartBubble(); return }
   document.getElementById('learn-wrap').classList.remove('open')
+  document.getElementById('quiz-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.remove('open')
   document.getElementById('flowchart-wrap').classList.remove('open')
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
@@ -3294,6 +3352,7 @@ let _lmSelected = null   // currently-selected term index, or null
 let _lmMatched  = new Set()
 function renderLearnBubble() {
   const m = activeMission
+  document.getElementById('quiz-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.remove('open')
   document.getElementById('flowchart-wrap').classList.remove('open')
   document.getElementById('learn-wrap').classList.add('open')
@@ -3374,11 +3433,73 @@ function completeLearnBubble() {
   mbarBack()
 }
 
+// ── Quiz — short MCQ / image-matching stages, no code editor ───────────────
+// Each question is answered by clicking an option button — right away shows
+// correct (green, locked) or wrong (red flash, try again). Once every
+// question in the mission has been answered correctly, the whole mission
+// completes and awards full stars — there is no answer() or IDE involved.
+let _quizSolved = new Set()
+function renderQuizBubble() {
+  const m = activeMission
+  document.getElementById('learn-wrap').classList.remove('open')
+  document.getElementById('cards-wrap').classList.remove('open')
+  document.getElementById('flowchart-wrap').classList.remove('open')
+  document.getElementById('quiz-wrap').classList.add('open')
+  document.getElementById('quiz-title').textContent = m.emoji + ' ' + m.title
+  document.getElementById('quiz-intro').textContent = m.quiz.intro || ''
+  _quizSolved = new Set()
+  const wrap = document.getElementById('quiz-questions')
+  wrap.innerHTML = ''
+  m.quiz.questions.forEach((q, qi) => {
+    const card = document.createElement('div')
+    card.className = 'quiz-q'
+    card.id = 'quiz-q-' + qi
+    let html = ''
+    if (q.image) html += '<img class="quiz-img" src="' + q.image + '" alt="' + (q.imageAlt || '') + '">'
+    html += '<div class="quiz-prompt">' + q.prompt + '</div>'
+    html += '<div class="quiz-opts">' + q.options.map(opt =>
+      '<button class="quiz-opt" onclick="pickQuizOption(' + qi + ', this, \'' + opt.replace(/'/g, "\\'") + '\')">' + opt + '</button>'
+    ).join('') + '</div>'
+    card.innerHTML = html
+    wrap.appendChild(card)
+  })
+  updateQuizStatus()
+}
+function pickQuizOption(qi, el, value) {
+  if (_quizSolved.has(qi)) return
+  const q = activeMission.quiz.questions[qi]
+  const card = document.getElementById('quiz-q-' + qi)
+  if (value === q.answer) {
+    _quizSolved.add(qi)
+    el.classList.add('right')
+    card.classList.add('correct')
+    card.querySelectorAll('.quiz-opt').forEach(b => b.classList.add('locked'))
+    updateQuizStatus()
+    if (_quizSolved.size === activeMission.quiz.questions.length) completeQuizBubble()
+  } else {
+    el.classList.add('wrong')
+    setTimeout(() => el.classList.remove('wrong'), 500)
+  }
+}
+function updateQuizStatus() {
+  const total = activeMission.quiz.questions.length
+  document.getElementById('quiz-status').textContent = _quizSolved.size + ' / ' + total + ' correct'
+}
+function completeQuizBubble() {
+  const p = getProg()
+  p[activeMission.id] = { stars: 3, xp: (p[activeMission.id] || {}).xp || activeMission.xp, lang, code: '' }
+  saveProg(p)
+  try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
+  document.getElementById('quiz-status').textContent = '✅ All correct!'
+  setTimeout(mbarBack, 1200)
+}
+
 // ── Binary Cards — flip place-value cards until the total matches target ───
 let _cardsFlipped = new Set()
 function renderCardsBubble() {
   const m = activeMission
   document.getElementById('learn-wrap').classList.remove('open')
+  document.getElementById('quiz-wrap').classList.remove('open')
   document.getElementById('flowchart-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.add('open')
   document.getElementById('cards-title').textContent = m.emoji + ' ' + m.title
@@ -3441,6 +3562,7 @@ let _fcNextId = 1
 function renderFlowchartBubble() {
   const m = activeMission
   document.getElementById('learn-wrap').classList.remove('open')
+  document.getElementById('quiz-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.remove('open')
   document.getElementById('flowchart-wrap').classList.add('open')
   document.getElementById('fc-title').textContent = m.emoji + ' ' + m.title
