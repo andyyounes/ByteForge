@@ -426,7 +426,7 @@
   </div>
 </div>
 
-<div class="main">
+<div class="main" id="mission-main">
   <div class="left">
     <div class="scene-wrap">
       <canvas id="scene" width="640" height="480"></canvas>
@@ -3298,6 +3298,14 @@ function logAppend(msg, cls) {
 // Mission lifecycle
 // ══════════════════════════════════════════════════════════════════════════════
 let missionStartedAt = Date.now()
+// The bubble panels (learn/quiz/cards/flowchart) are separate elements
+// BEFORE .main in the DOM, not inside its grid — toggling their own
+// display never hides the code editor sitting underneath, so it stayed
+// visible (and clickable) behind every non-code mission type. Explicitly
+// hiding/showing #mission-main alongside each bubble's open/close fixes it.
+function showMissionMain(show) {
+  document.getElementById('mission-main').style.display = show ? '' : 'none'
+}
 function openMission(id) {
   activeMission = MISSIONS.find(m => m.id === id)
   if (!activeMission) return
@@ -3353,6 +3361,7 @@ let _lmSelected = null   // currently-selected term index, or null
 let _lmMatched  = new Set()
 function renderLearnBubble() {
   const m = activeMission
+  showMissionMain(false)
   document.getElementById('quiz-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.remove('open')
   document.getElementById('flowchart-wrap').classList.remove('open')
@@ -3442,6 +3451,7 @@ function completeLearnBubble() {
 let _quizSolved = new Set()
 function renderQuizBubble() {
   const m = activeMission
+  showMissionMain(false)
   document.getElementById('learn-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.remove('open')
   document.getElementById('flowchart-wrap').classList.remove('open')
@@ -3499,6 +3509,7 @@ function completeQuizBubble() {
 let _cardsFlipped = new Set()
 function renderCardsBubble() {
   const m = activeMission
+  showMissionMain(false)
   document.getElementById('learn-wrap').classList.remove('open')
   document.getElementById('quiz-wrap').classList.remove('open')
   document.getElementById('flowchart-wrap').classList.remove('open')
@@ -3562,6 +3573,7 @@ let _fcNextId = 1
 
 function renderFlowchartBubble() {
   const m = activeMission
+  showMissionMain(false)
   document.getElementById('learn-wrap').classList.remove('open')
   document.getElementById('quiz-wrap').classList.remove('open')
   document.getElementById('cards-wrap').classList.remove('open')
