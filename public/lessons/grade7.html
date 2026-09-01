@@ -122,6 +122,7 @@
     .cl-block code { background:rgba(184,239,74,.1); color:#b8ef4a; padding:1px 5px; border-radius:3px; font-size:11.5px; }
     .cl-img { display:block; max-width:260px; max-height:170px; width:auto; object-fit:cover; border-radius:6px; margin:8px 0 4px; border:1px solid rgba(255,255,255,.1); }
     .cl-caption { font-size:10.5px; color:#8b93a8; margin:0 0 8px; font-style:italic; }
+    .q-img { display:block; max-width:100%; max-height:130px; width:auto; margin:0 auto 8px; border-radius:6px; border:1px solid rgba(255,255,255,.1); }
     .ch-pill   { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700;
                  border:1px solid var(--border); color:var(--fg-dim); cursor:pointer; transition:.15s; }
     .ch-pill:hover  { border-color:var(--border-hi); color:var(--fg); }
@@ -1474,9 +1475,9 @@ const WORLDS = [
       hints:['The CPU carries out instructions — it\'s the "brain".', 'RAM is memory that clears when the power turns off.', 'Storage keeps files saved even with the power off.'],
       passCount:5,
       questions:[
-        { type:'match', prompt:'This part carries out instructions — the "brain" of the computer.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'CPU' },
-        { type:'match', prompt:'This is temporary memory — cleared when the power turns off.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'RAM' },
-        { type:'match', prompt:'This keeps your files saved even when the power is off.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Storage' },
+        { type:'match', image:'/images/hardware/cpu.jpg', imageAlt:'A real CPU chip', prompt:'This part carries out instructions — the "brain" of the computer.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'CPU' },
+        { type:'match', image:'/images/hardware/ram.jpg', imageAlt:'A real RAM memory stick', prompt:'This is temporary memory — cleared when the power turns off.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'RAM' },
+        { type:'match', image:'/images/hardware/hdd.jpg', imageAlt:'A real hard disk drive', prompt:'This keeps your files saved even when the power is off.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Storage' },
         { type:'match', prompt:'You type on this to send information IN.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Keyboard' },
         { type:'match', prompt:'This shows pictures and text OUT to you.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Monitor' },
         { type:'match', prompt:'You click and point with this to send information IN.', options:['CPU','RAM','Storage','Keyboard','Monitor','Mouse'], answer:'Mouse' },
@@ -1510,7 +1511,7 @@ const WORLDS = [
       hints:['Nothing new here — same facts as Challenges 1–3, just mixed together.'],
       passCount:4,
       questions:[
-        { type:'match', prompt:'This part carries out instructions.', options:['CPU','RAM','Storage'], answer:'CPU' },
+        { type:'match', image:'/images/hardware/cpu.jpg', imageAlt:'A real CPU chip', prompt:'This part carries out instructions.', options:['CPU','RAM','Storage'], answer:'CPU' },
         { type:'fill', prompt:'___ is memory that clears when the power turns off.', answer:'RAM' },
         { type:'fill', prompt:'Your files stay saved in ___ even with the power off.', answer:'storage' },
         { type:'match', prompt:'A keyboard is this kind of device.', options:['input','output'], answer:'input' },
@@ -3546,7 +3547,9 @@ function renderQuiz(ch) {
       </div>`
     }
     if (q.type === 'match') {
-      return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${q.prompt}</div>
+      return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span>
+        ${q.image ? `<img class="q-img" src="${q.image}" alt="${q.imageAlt || ''}">` : ''}
+        <div class="q-label">${q.prompt}</div>
         <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option>${q.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`
     }
     if (q.type === 'prompt' || q.type === 'any') {
