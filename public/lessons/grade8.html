@@ -639,6 +639,19 @@ async function runWebCode() {
     headingColor: doc.querySelector('h1,h2,h3') ? getComputedStyle(doc.querySelector('h1,h2,h3')).color : '',
     headingText: [...doc.querySelectorAll('h1,h2,h3')].map(e => e.textContent.trim()),
     paragraphText: [...doc.querySelectorAll('p')].map(e => e.textContent.trim()),
+    // ── Web1-4 expansion: per-level heading counts, and colouring links/
+    // buttons/backgrounds beyond just the body+heading pair originally
+    // tracked above. Kept separate from h1s/headingColor (used by every
+    // existing check) rather than changing their meaning.
+    h1Count: doc.querySelectorAll('h1').length,
+    h2Count: doc.querySelectorAll('h2').length,
+    h3Count: doc.querySelectorAll('h3').length,
+    h4Count: doc.querySelectorAll('h4').length,
+    h2Color: doc.querySelector('h2') ? getComputedStyle(doc.querySelector('h2')).color : '',
+    h3Color: doc.querySelector('h3') ? getComputedStyle(doc.querySelector('h3')).color : '',
+    linkColor: doc.querySelector('a') ? getComputedStyle(doc.querySelector('a')).color : '',
+    buttonColor: doc.querySelector('button') ? getComputedStyle(doc.querySelector('button')).color : '',
+    buttonBg: doc.querySelector('button') ? getComputedStyle(doc.querySelector('button')).backgroundColor : '',
     // JS state — Week 1 (objects/arrays for story state). Read straight off
     // the iframe's global scope, since `let`/`const` at top level of a
     // classic (non-module) <script> attach to that window's globals.
@@ -954,7 +967,7 @@ const MODULES = [
   // ── Semester 1, Week 2: Your First Tags — new for the 3-semester rebuild.
   // Real typed HTML via the existing lang:'web' editor (Web Story's own
   // mechanism), checked via webLog's real element counts.
-  { id:'web1', name:'🏷️ Your First Tags', sub:'A heading and a paragraph — real HTML, typed', live:true, stages:[
+  { id:'web1', name:'🏷️ Your First Tags', sub:'Headings h1-h4, paragraphs — real HTML, typed', live:true, stages:[
     { id:'web1s1', name:'Heading + Paragraph', xp:25, lang:'web',
       text:`<strong>Challenge 1</strong> — Type a real <code>&lt;h1&gt;</code> heading and a real <code>&lt;p&gt;</code> paragraph. Both need real, non-empty text — not left blank.`,
       hints:[
@@ -964,6 +977,36 @@ const MODULES = [
       webStarter: { html: `<!-- TODO: add one <h1> heading and one <p> paragraph, both with real text -->\n`, css: ``, js: `` },
       check:(log) => log.h1s >= 1 && log.paragraphs >= 1
                   && log.headingText.some(t => t.length > 0) && log.paragraphText.some(t => t.length > 0),
+    },
+    { id:'web1s2', name:'Subheadings — h2', xp:25, lang:'web',
+      text:`<strong>Challenge 2</strong> — Keep your <code>&lt;h1&gt;</code>, and add ONE <code>&lt;h2&gt;</code> subheading plus its own <code>&lt;p&gt;</code> paragraph underneath it. A subheading introduces a smaller SECTION inside the page — the h1 is still the one overall title.`,
+      hints:[
+        '&lt;h2&gt;About Me&lt;/h2&gt; is a real subheading — a section title, smaller than the page title.',
+        'A page can have several h2s (one per section), but usually only ONE h1.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<!-- TODO: add one <h2> subheading and a <p> paragraph under it -->\n`, css: ``, js: `` },
+      check:(log) => log.h1Count >= 1 && log.h2Count >= 1 && log.paragraphs >= 2,
+    },
+    { id:'web1s3', name:'Even More Structure — h3 & h4', xp:30, lang:'web',
+      text:`<strong>Challenge 3</strong> — Headings nest, smallest to largest: h1 is the page title, h2 is a section, h3 is a sub-section INSIDE that section, h4 smaller still. Build a real 4-level outline: one h1, one h2, one h3, and one h4, each with a paragraph.`,
+      hints:[
+        'Think of a book: h1 = book title, h2 = chapter, h3 = section within the chapter, h4 = a small point within that section.',
+        'They must be in this ORDER on the page — h1, then h2, then h3, then h4 — not scrambled.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<!-- TODO: add <h2>, <h3>, and <h4> headings in order, each with its own <p> -->\n`,
+        css: ``, js: ``,
+      },
+      check:(log) => log.h1Count >= 1 && log.h2Count >= 1 && log.h3Count >= 1 && log.h4Count >= 1 && log.paragraphs >= 4,
+    },
+    { id:'web1boss', name:'BOSS — A Real Document Outline', xp:50, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Nothing new: one full page using EVERY heading level together — h1, TWO h2 sections, and inside one of those sections a real h3 and h4 — each with its own paragraph. A real outline, not a flat list of headings.`,
+      hints:[
+        'This is genuinely just Challenges 1-3 combined, with an extra h2 section.',
+        'Count carefully: 1 h1, 2 h2s, 1 h3, 1 h4 — six headings total, six paragraphs.',
+      ],
+      webStarter: { html: `<!-- TODO: h1, then h2 (with p), then another h2 (with p), and inside it an h3 and h4 (each with p) -->\n`, css: ``, js: `` },
+      check:(log) => log.h1Count >= 1 && log.h2Count >= 2 && log.h3Count >= 1 && log.h4Count >= 1 && log.paragraphs >= 6,
     },
   ]},
   // ── Semester 1, Week 3: More Tags — links vs. buttons.
@@ -976,6 +1019,33 @@ const MODULES = [
       ],
       webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<!-- TODO: add a real <a> link and a real <button> -->\n`, css: ``, js: `` },
       check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1,
+    },
+    { id:'web2s2', name:'Several Links & Buttons', xp:30, lang:'web',
+      text:`<strong>Challenge 2</strong> — Real pages rarely have just ONE link or button. Add a SECOND link (a different destination) and a SECOND button, so there are 2 of each on the page.`,
+      hints:[
+        'Two &lt;a&gt; tags, two different href values — a navbar with "Home" and "About" is a real example.',
+        'Two &lt;button&gt; tags — e.g. "Like" and "Share".',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<a href="#">Link 1</a>\n<button>Button 1</button>\n<!-- TODO: add a SECOND link and a SECOND button -->\n`, css: ``, js: `` },
+      check:(log) => log.links >= 2 && log.buttons >= 2,
+    },
+    { id:'web2s3', name:'A Real List', xp:30, lang:'web',
+      text:`<strong>Challenge 3</strong> — Lists group related items together — a <code>&lt;ul&gt;</code> (unordered list) holding at least THREE <code>&lt;li&gt;</code> items. Add one under your heading, e.g. your three favourite games, foods, or hobbies.`,
+      hints:[
+        '&lt;ul&gt;&lt;li&gt;Item one&lt;/li&gt;&lt;li&gt;Item two&lt;/li&gt;&lt;li&gt;Item three&lt;/li&gt;&lt;/ul&gt;',
+        'Every &lt;li&gt; must be INSIDE a &lt;ul&gt; — it doesn\'t work on its own.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<!-- TODO: add a <ul> with at least 3 <li> items -->\n`, css: ``, js: `` },
+      check:(log) => log.listItems >= 3,
+    },
+    { id:'web2boss', name:'BOSS — A Real Page of Tags', xp:60, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Nothing new: heading + paragraph, TWO links, TWO buttons, and a list of at least THREE items, all on one page.`,
+      hints:[
+        'This is genuinely just Challenges 1-3 combined.',
+        'Count before you check: 2 links, 2 buttons, 3+ list items.',
+      ],
+      webStarter: { html: `<!-- TODO: heading + paragraph, 2 links, 2 buttons, and a <ul> with 3+ <li> items -->\n`, css: ``, js: `` },
+      check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 2 && log.buttons >= 2 && log.listItems >= 3,
     },
   ]},
   // ── Semester 1, Week 4: Colors & Shading — exact hex values, checked via
@@ -995,23 +1065,89 @@ const MODULES = [
       },
       check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)',
     },
+    { id:'web3s2', name:'Color the Tags — Links', xp:30, lang:'web',
+      text:`<strong>Challenge 2</strong> — CSS can target ANY tag, not just headings. Keep last week's colors, and set every <code>&lt;a&gt;</code> link's color to EXACTLY <code>#1D4ED8</code>.`,
+      hints:[
+        'CSS: a { color: #1D4ED8; }',
+        'The selector "a" targets EVERY link on the page at once.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<a href="#">Click here</a>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: set every <a> link's color to #1D4ED8 */\n`,
+        js: ``,
+      },
+      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)' && log.linkColor === 'rgb(29, 78, 216)',
+    },
+    { id:'web3s3', name:'Color the Buttons — Fill & Text', xp:35, lang:'web',
+      text:`<strong>Challenge 3</strong> — A button has TWO colors: its fill (the <code>background-color</code> behind it) and its text (<code>color</code>). Set the button's fill to EXACTLY <code>#E63946</code> and its text to EXACTLY <code>#FFFFFF</code>.`,
+      hints:[
+        'CSS: button { background-color: #E63946; color: #FFFFFF; }',
+        '"Fill" here just means the background-color of the button itself, same property as the page background.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<button>Click me</button>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: set the button's fill (background-color) to #E63946 and its text color to #FFFFFF */\n`,
+        js: ``,
+      },
+      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)'
+                  && log.buttonBg === 'rgb(230, 57, 70)' && log.buttonColor === 'rgb(255, 255, 255)',
+    },
+    { id:'web3s4', name:'Every Heading Level, Its Own Color', xp:35, lang:'web',
+      text:`<strong>Challenge 4</strong> — Keep your h1's color, and give an <code>&lt;h2&gt;</code> the exact color <code>#7C3AED</code> and an <code>&lt;h3&gt;</code> the exact color <code>#059669</code> — three different heading levels, three different colors.`,
+      hints:[
+        'CSS: h2 { color: #7C3AED; } and h3 { color: #059669; } — separate rules for each tag.',
+        'h1, h2, and h3 can each have their OWN color rule — nothing stops you styling every level differently.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<h2>A Section</h2>\n<p>More text.</p>\n<h3>A Sub-Section</h3>\n<p>Even more text.</p>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: h2 color #7C3AED, h3 color #059669 */\n`,
+        js: ``,
+      },
+      check:(log) => log.headingColor === 'rgb(47, 59, 82)' && log.h2Color === 'rgb(124, 58, 237)' && log.h3Color === 'rgb(5, 150, 105)',
+    },
+    { id:'web3boss', name:'BOSS — A Fully Colored Page', xp:65, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Nothing new: page background, h1 color, link color, button fill + text color, AND h2/h3 colors — every rule from this month's Colors & Shading challenges, on one page.`,
+      hints:[
+        'This is genuinely just Challenges 1-4 combined — six separate CSS rules total.',
+        'Go rule by rule: body, h1, a, button (two properties), h2, h3.',
+      ],
+      webStarter: {
+        html: `<!-- TODO: h1, p, a link, button, h2 (with p), h3 (with p) -->\n`,
+        css: `/* TODO: body #FFF7E6, h1 #2F3B52, a #1D4ED8, button fill #E63946 + text #FFFFFF, h2 #7C3AED, h3 #059669 */\n`,
+        js: ``,
+      },
+      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)'
+                  && log.linkColor === 'rgb(29, 78, 216)' && log.buttonBg === 'rgb(230, 57, 70)' && log.buttonColor === 'rgb(255, 255, 255)'
+                  && log.h2Color === 'rgb(124, 58, 237)' && log.h3Color === 'rgb(5, 150, 105)',
+    },
   ]},
   // ── Semester 1, Week 5: Structure + Style, Together — checkpoint boss
   // requiring ALL of Weeks 2-4 together, not a subset.
   { id:'web4', name:'🧩 Structure + Style, Together', sub:'Checkpoint — everything from Weeks 2-4, combined', live:true, stages:[
-    { id:'web4boss', name:'BOSS — The Warm-Up Page', xp:60, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — One page requiring EVERYTHING so far: a heading, a paragraph, a link, a button, background EXACTLY <code>#FFF7E6</code>, heading color EXACTLY <code>#2F3B52</code>. No subset accepted.`,
+    { id:'web4s1', name:'Rebuild It From Scratch', xp:40, lang:'web',
+      text:`<strong>Checkpoint</strong> — Before the real boss: one page with a heading, a paragraph, a link, a button, AND a 3-item list. No colors required yet — this stage is purely structure, so slow down and get it right before style gets added back in.`,
       hints:[
-        'This is genuinely just Weeks 2-4 combined into one page — nothing new to learn.',
-        'HTML = structure (heading/paragraph/link/button). CSS = style (the two colors). Order doesn\'t matter — CSS applies no matter when it\'s set.',
+        'Every tag from web1 + web2, nothing from web3 yet.',
+        'h1, p, a, button, and a ul with 3+ li — five different tag types on one page.',
+      ],
+      webStarter: { html: `<!-- TODO: heading + paragraph + link + button + a <ul> with 3+ <li> items -->\n`, css: ``, js: `` },
+      check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1 && log.listItems >= 3,
+    },
+    { id:'web4boss', name:'BOSS — The Complete Warm-Up Page', xp:90, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — The real final page requiring EVERYTHING from this whole month: h1, h2, h3, a paragraph under each, a link, a button, a 3-item list, background EXACTLY <code>#FFF7E6</code>, h1 color EXACTLY <code>#2F3B52</code>, h2 color EXACTLY <code>#7C3AED</code>, h3 color EXACTLY <code>#059669</code>, link color EXACTLY <code>#1D4ED8</code>, button fill EXACTLY <code>#E63946</code> with text EXACTLY <code>#FFFFFF</code>. No subset accepted — this is the whole month, together.`,
+      hints:[
+        'This is genuinely just web1 + web2 + web3 combined into one page — nothing new to learn, just a LOT of pieces at once.',
+        'Build it in order: structure first (all the tags), THEN add every CSS color rule one at a time, checking each as you go.',
       ],
       webStarter: {
-        html: `<!-- TODO: heading + paragraph + link + button -->\n`,
-        css: `/* TODO: body background #FFF7E6, h1 color #2F3B52 */\n`,
+        html: `<!-- TODO: h1, h2, h3 (each with a paragraph), a link, a button, and a <ul> with 3+ <li> items -->\n`,
+        css: `/* TODO: body #FFF7E6, h1 #2F3B52, h2 #7C3AED, h3 #059669, a #1D4ED8, button fill #E63946 + text #FFFFFF */\n`,
         js: ``,
       },
-      check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1
-                  && log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)',
+      check:(log) => log.h1s >= 1 && log.paragraphs >= 3 && log.links >= 1 && log.buttons >= 1 && log.listItems >= 3
+                  && log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)'
+                  && log.h2Color === 'rgb(124, 58, 237)' && log.h3Color === 'rgb(5, 150, 105)'
+                  && log.linkColor === 'rgb(29, 78, 216)' && log.buttonBg === 'rgb(230, 57, 70)' && log.buttonColor === 'rgb(255, 255, 255)',
     },
   ]},
   // ── Semester 1, Weeks 7-11: Build Your Portfolio (project) — new for the
@@ -3565,17 +3701,56 @@ const CHALLENGE_LESSON = {
       <p>&lt;h1&gt;My Page&lt;/h1&gt; — the opening tag, the content, then the closing tag with a slash. A page usually has exactly ONE heading — it's the title, the single biggest thing on the page.</p></div>
     <div class="cl-block"><h4>Heading vs. paragraph</h4>
       <p>The heading is the title. The paragraph is the body — what you actually want to say. Almost every real page is built from exactly this pair, repeated.</p></div>` },
+  web1s2: { title: 'h2 — a subheading for a section', html: `
+    <div class="cl-block"><h4>Headings come in levels</h4>
+      <p>&lt;h1&gt; is the one page title. &lt;h2&gt; introduces a smaller SECTION inside that page — a page can have several h2s (one per section), but usually only one h1.</p></div>
+    <div class="cl-block"><h4>A real example</h4>
+      <p>A portfolio page might have one h1 ("Alex's Portfolio") and several h2s underneath it — "About Me", "My Projects", "Contact" — each starting a new section with its own paragraph.</p></div>` },
+  web1s3: { title: 'h3 and h4 — nesting sections inside sections', html: `
+    <div class="cl-block"><h4>Headings nest, largest to smallest</h4>
+      <p>h1 = page title, h2 = a section, h3 = a sub-section INSIDE that section, h4 = smaller still. Like a book: title, chapter, section within the chapter, a small point within that section.</p></div>
+    <div class="cl-block"><h4>Order matters</h4>
+      <p>These need to appear on the page in order — h1, then h2, then h3, then h4 — a real document outline reads top to bottom, biggest idea to smallest.</p></div>` },
+  web1boss: { title: 'BOSS — a real 4-level outline', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>One h1, TWO h2 sections, and inside one of them a real h3 and h4 — six headings, six paragraphs, all from Challenges 1-3 combined.</p></div>` },
   web2s1: { title: 'A link goes elsewhere; a button acts here', html: `
     <div class="cl-block"><h4>Two different jobs</h4>
       <p>&lt;a href="..."&gt; takes the reader to a different page or address. &lt;button&gt; does something on THIS page, right where you are — but only once JavaScript tells it what to do, which is next semester's job.</p></div>` },
+  web2s2: { title: 'Real pages have MULTIPLE links and buttons', html: `
+    <div class="cl-block"><h4>One of something is rarely enough</h4>
+      <p>A real navbar has several links (Home, About, Contact). A real page often has several buttons (Like, Share, Subscribe). Adding a second of each is exactly the same tag, just written twice with different text/destinations.</p></div>` },
+  web2s3: { title: 'ul and li — a real list', html: `
+    <div class="cl-block"><h4>Lists group related items</h4>
+      <p>&lt;ul&gt; (unordered list) holds one or more &lt;li&gt; (list item) tags — every li MUST be inside a ul, it doesn't work standing alone. Use a list any time you have several related items: favourites, steps, ingredients.</p></div>` },
+  web2boss: { title: 'BOSS — heading, paragraph, links, buttons, and a list', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Heading + paragraph, TWO links, TWO buttons, and a 3+ item list — every tag from Challenges 1-3, together on one page.</p></div>` },
   web3s1: { title: 'CSS decides how it looks, not what\'s there', html: `
     <div class="cl-block"><h4>Content vs. style, the Week 1 split, now concrete</h4>
       <p>HTML said WHAT is on the page. CSS says how it LOOKS — background-color, color, and more. Same page, two completely separate jobs.</p></div>
     <div class="cl-block"><h4>Exact hex values, exactly</h4>
       <p>#FFF7E6 and #2F3B52 aren't "a warm cream" and "a dark blue" — they're specific, exact colors. A close-but-not-exact hex value won't pass, the same way a typo in a word wouldn't count as correct spelling.</p></div>` },
-  web4boss: { title: 'BOSS — structure and style, no subset accepted', html: `
+  web3s2: { title: 'CSS reaches every tag, not just headings', html: `
+    <div class="cl-block"><h4>The "a" selector targets every link at once</h4>
+      <p>Just like h1 { color: ...; } colors every h1, a { color: ...; } colors every &lt;a&gt; link on the page in one rule — you never need to colour each link individually.</p></div>` },
+  web3s3: { title: 'A button has TWO colors — fill and text', html: `
+    <div class="cl-block"><h4>Fill vs. text — two separate properties</h4>
+      <p>background-color sets the button's FILL (the coloured box itself). color sets its TEXT colour. They're independent — a dark fill usually needs a light text colour on top of it to stay readable, exactly like this challenge's red fill + white text.</p></div>` },
+  web3s4: { title: 'Every heading level can have its own color', html: `
+    <div class="cl-block"><h4>Separate rules, separate tags</h4>
+      <p>h1 { color: ...; }, h2 { color: ...; }, and h3 { color: ...; } are three completely independent rules — styling h2 never touches h1's colour, and vice versa. A real page often gives each heading level a slightly different shade on purpose, to help the eye tell them apart.</p></div>` },
+  web3boss: { title: 'BOSS — six CSS rules, one page', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>Heading, paragraph, link, button (Weeks 2-3) plus the two exact colors (Week 4) — every piece from this month, assembled into one real page.</p></div>` },
+      <p>body background, h1 colour, link colour, button fill + text colour, h2 colour, h3 colour — six separate rules, every one from Challenges 1-4, combined onto one page.</p></div>` },
+  web4s1: { title: 'Structure first, style later', html: `
+    <div class="cl-block"><h4>Why this checkpoint has no colors yet</h4>
+      <p>The real boss asks for a LOT at once — structure AND six colour rules together. This checkpoint isolates just the structure half first (heading, paragraph, link, button, list) so you can get that solid before style gets layered back on top.</p></div>` },
+  web4boss: { title: 'BOSS — the whole month, structure and style together', html: `
+    <div class="cl-block"><h4>Nothing new, just a lot of it at once</h4>
+      <p>h1/h2/h3 with paragraphs, a link, a button, a list (web1 + web2), PLUS every colour rule from web3 — background, three heading colours, link colour, and the button's fill + text colour. Every single piece from this month, on one real page.</p></div>
+    <div class="cl-block"><h4>Build it in order</h4>
+      <p>Get the structure right first (all the tags), THEN add the CSS colour rules one at a time — checking each one as you go is much easier than writing everything at once and debugging six rules simultaneously.</p></div>` },
   web5s1: { title: 'Multiple real sections, not one long page', html: `
     <div class="cl-block"><h4>Each section is its own heading + paragraph</h4>
       <p>A real portfolio has multiple parts — About Me, hobbies, projects, whatever's real to you. Each one gets its own heading and its own paragraph, same pair repeated.</p></div>` },
