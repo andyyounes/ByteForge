@@ -126,7 +126,27 @@
   <div class="nav-links"><a href="#" onclick="showQuestMap();return false" style="color:#a78bfa;font-weight:800;">🗺 Expedition Map</a> &nbsp; <a href="/student/dashboard">← Dashboard</a></div>
 </nav>
 
-<div class="layout">
+<!-- Self-check book-lesson bubbles (type:'lesson') have no code to run at
+     all — this overlay replaces the whole editor+output layout with the
+     real, teacher-editable static lesson page (same file the Browse
+     Textbook index and the teacher editor both use) plus a manual
+     "mark complete" button, instead of trying to retrofit the pseudocode
+     IDE for a stage with nothing to check. -->
+<div class="lesson-wrap" id="lesson-wrap" style="display:none;">
+  <div style="max-width:900px;margin:0 auto;padding:20px 16px 60px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+      <h2 id="lesson-wrap-title" style="font-size:16px;font-weight:800;color:#e2e8f0;margin:0;"></h2>
+      <button class="btn btn-ghost" onclick="showQuestMap()">☰ Map</button>
+    </div>
+    <iframe id="lesson-wrap-iframe" style="width:100%;height:62vh;min-height:420px;border:0;border-radius:10px;background:#0d0f1a;" title="Lesson"></iframe>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-brand" onclick="markLessonComplete()">✓ Mark lesson complete</button>
+      <span id="lesson-wrap-feedback" style="font-size:13px;font-weight:700;"></span>
+    </div>
+  </div>
+</div>
+
+<div class="layout" id="mission-main">
 
   <!-- Left: pseudocode editor -->
   <div class="ed-panel">
@@ -894,6 +914,7 @@ BF.seed()
 const me=(() => {try{return BF.session()||null}catch(_){return null}})()
 const completed=new Set();let activeIdx=0;let hintIdx=0
 let challengeStartedAt = Date.now()
+let currentClassId = null   // set by applyClassOverrides() — used for book-lesson iframe src
 
 // ── Bridge to the real Supabase-backed progress system (mirrors grade7/8/9) ──
 const IGCSE_Y2_MODULE_CONCEPT = { M1:'pseudocode-arrays', M2:'igcse-params', M3:'igcse-files', M4:'data-structures-intro', M6:'oop-concepts' }
@@ -1197,6 +1218,104 @@ CALL Animal_Speak()
 CALL Dog_Info()`,
     check:(code,res)=>res.output.some(o=>o.includes('Rex')&&o.includes('Woof'))&&res.output.some(o=>o.includes('Rex')&&o.includes('Labrador')),
   },
+  // ── BOOK-LESSONS-START (scripts/inject-y2-book-lessons-into-map.mjs) ──
+  { mod:'M7', name:'7.1a The Program Development Life Cycle', xp:15, type:'lesson', bookFile:'7-1a-program-development-life-cycle.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.2a Computer Systems & Decomposition', xp:15, type:'lesson', bookFile:'7-2a-computer-systems-decomposition.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.2b Structure Diagrams', xp:15, type:'lesson', bookFile:'7-2b-structure-diagrams.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.2c Flowcharts', xp:15, type:'lesson', bookFile:'7-2c-flowcharts.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.2d Pseudocode: Assignment Statements', xp:15, type:'lesson', bookFile:'7-2d-pseudocode-assignment.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.2e Pseudocode: Conditional Statements', xp:15, type:'lesson', bookFile:'7-2e-pseudocode-conditionals.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.2f Pseudocode: Iteration (Loops)', xp:15, type:'lesson', bookFile:'7-2f-pseudocode-iteration.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.2g Pseudocode: Input & Output Statements', xp:15, type:'lesson', bookFile:'7-2g-pseudocode-input-output.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.3a Explaining the Purpose of an Algorithm', xp:15, type:'lesson', bookFile:'7-3a-purpose-of-an-algorithm.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.4a Totalling, Counting, Maximum/Minimum & Average', xp:15, type:'lesson', bookFile:'7-4a-totalling-counting-average.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.4b Linear Search', xp:15, type:'lesson', bookFile:'7-4b-linear-search.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.4c Bubble Sort', xp:15, type:'lesson', bookFile:'7-4c-bubble-sort.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.5a Validation', xp:15, type:'lesson', bookFile:'7-5a-validation.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.5b Verification', xp:15, type:'lesson', bookFile:'7-5b-verification.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.6a Test Data', xp:15, type:'lesson', bookFile:'7-6a-test-data.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.7a Trace Tables', xp:15, type:'lesson', bookFile:'7-7a-trace-tables.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.8a Identifying Errors in Algorithms', xp:15, type:'lesson', bookFile:'7-8a-identifying-errors.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.9a Writing and Amending Algorithms', xp:15, type:'lesson', bookFile:'7-9a-writing-algorithms.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.9b A Real Nested-Loop Algorithm', xp:15, type:'lesson', bookFile:'7-9b-nested-loops-worked-example.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M7', name:'7.9c Stacks and Queues (Extension)', xp:15, type:'lesson', bookFile:'7-9c-stacks-and-queues.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1a Variables, Constants & Data Types', xp:15, type:'lesson', bookFile:'8-1a-variables-constants-data-types.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1b Input and Output in Real Code', xp:15, type:'lesson', bookFile:'8-1b-input-output.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1c Sequence — Getting the Order Right', xp:15, type:'lesson', bookFile:'8-1c-sequence.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1d Selection in Real Code', xp:15, type:'lesson', bookFile:'8-1d-selection-case.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1e Iteration in Real Code', xp:15, type:'lesson', bookFile:'8-1e-iteration.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1f String Handling', xp:15, type:'lesson', bookFile:'8-1f-string-handling.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1g Arithmetic, Logical & Boolean Operators', xp:15, type:'lesson', bookFile:'8-1g-operators.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1h Nested Statements', xp:15, type:'lesson', bookFile:'8-1h-nested-statements.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1i Procedures and Functions', xp:15, type:'lesson', bookFile:'8-1i-procedures-functions.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1j Local and Global Variables', xp:15, type:'lesson', bookFile:'8-1j-scope.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1k Library Routines', xp:15, type:'lesson', bookFile:'8-1k-library-routines.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.1l Writing Maintainable Programs', xp:15, type:'lesson', bookFile:'8-1l-maintainable-programs.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.2a One-Dimensional Arrays', xp:15, type:'lesson', bookFile:'8-2a-one-dimensional-arrays.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.2b Two-Dimensional Arrays', xp:15, type:'lesson', bookFile:'8-2b-two-dimensional-arrays.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M8', name:'8.3a File Handling', xp:15, type:'lesson', bookFile:'8-3a-file-handling.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M9', name:'9.1a Database Structure — Tables, Records & Fields', xp:15, type:'lesson', bookFile:'9-1a-database-structure.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M9', name:'9.1b Data Types & Primary Keys', xp:15, type:'lesson', bookFile:'9-1b-data-types-primary-keys.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M9', name:'9.1c SQL Basics — SELECT, FROM, WHERE', xp:15, type:'lesson', bookFile:'9-1c-sql-basics.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M9', name:'9.1d SQL — ORDER BY, SUM, COUNT', xp:15, type:'lesson', bookFile:'9-1d-sql-order-sum-count.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M9', name:'9.1e SQL DDL (Extension)', xp:15, type:'lesson', bookFile:'9-1e-sql-ddl-extension.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M10', name:'10.1a Logic Gates & Truth Tables', xp:15, type:'lesson', bookFile:'10-1a-logic-gates-intro.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M10', name:'10.1b The Six Logic Gates', xp:15, type:'lesson', bookFile:'10-1b-six-gate-functions.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M10', name:'10.2a Tracing a Circuit into a Truth Table', xp:15, type:'lesson', bookFile:'10-2a-circuit-to-truth-table.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M10', name:'10.2b Writing a Logic Expression from a Circuit', xp:15, type:'lesson', bookFile:'10-2b-circuit-to-expression.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M10', name:'10.2c Building a Circuit from an Expression', xp:15, type:'lesson', bookFile:'10-2c-expression-to-circuit.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M10', name:'10.2d Writing an Expression from a Truth Table', xp:15, type:'lesson', bookFile:'10-2d-truth-table-to-expression.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M10', name:'10.2e Real-World Problems into Logic Circuits', xp:15, type:'lesson', bookFile:'10-2e-problem-to-logic.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M10', name:'10.3a Half & Full Adders (Extension)', xp:15, type:'lesson', bookFile:'10-3a-adders-extension.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  // ── BOOK-LESSONS-END ──
 ]
 
 // mod+name is the stable identity used for saves (no dedicated `id` field on
@@ -1311,13 +1430,45 @@ function toggleChallengeList() {
   const expanded = row.classList.toggle('expanded')
   if (tog) tog.textContent = expanded ? '✕ Hide list' : '☰ All challenges'
 }
+// Self-check book lessons (type:'lesson') have no starter/output/trace at
+// all — this swaps the whole editor+output layout for the lesson-wrap
+// overlay (real static lesson page + a manual mark-complete button)
+// instead of a graded pseudocode challenge.
+function showMissionMain(show) {
+  document.getElementById('mission-main').style.display = show ? '' : 'none'
+  document.getElementById('lesson-wrap').style.display = show ? 'none' : ''
+}
 function selectChallenge(i){
   activeIdx=i;hintIdx=0;challengeStartedAt=Date.now();const ch=CHALLENGES[i]
+  if (ch.type === 'lesson') {
+    showMissionMain(false)
+    document.getElementById('lesson-wrap-title').textContent = ch.mod + ' ' + ch.name
+    const qs = currentClassId ? ('?classId=' + encodeURIComponent(currentClassId)) : ''
+    document.getElementById('lesson-wrap-iframe').src = '/lessons/igcse-y2-book/' + ch.bookFile + qs
+    document.getElementById('lesson-wrap-feedback').textContent = completed.has(i) ? '✓ Already complete' : ''
+    document.getElementById('lesson-wrap-feedback').style.color = '#4ade80'
+    renderPills()
+    return
+  }
+  showMissionMain(true)
   document.getElementById('ch-text').innerHTML=ch.text
   document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
   editor.setValue(ch.starter||'')
   document.getElementById('output').innerHTML='';clearTraceTable();renderPills()
   renderChallengeLesson(ch)
+}
+function markLessonComplete() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch || ch.type !== 'lesson') return
+  const fb = document.getElementById('lesson-wrap-feedback')
+  if (completed.has(activeIdx)) { fb.textContent = '✓ Already marked complete.'; return }
+  completed.add(activeIdx)
+  renderPills()
+  showToast('Lesson complete! +' + ch.xp + ' XP')
+  if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'gy2-c' + activeIdx, { passed: true, score: 100 }) }
+  LessonSaves.save('igcse-y2', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code: 'self-check' })
+  try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
+  fb.textContent = '✓ Marked complete!'
 }
 
 // 📘 Full per-challenge lesson — CHALLENGE_LESSON defined after CHALLENGES,
@@ -1374,14 +1525,14 @@ function isTeacherPreview() { return new URLSearchParams(window.location.search)
 
 // ── Quest Map — 🧭 Code Expedition ───────────────────────────
 function showQuestMap() {
-  const EMO = {M1:'🗃',M2:'⚖',M3:'📂',M4:'📚',M5:'🔀',M6:'🧱'}
+  const EMO = {M1:'🗃',M2:'⚖',M3:'📂',M4:'📚',M5:'🔀',M6:'🧱',M7:'🧩',M8:'🐍',M9:'🗄️',M10:'⚡'}
   const stagesFor = mod => CHALLENGES
     .map((c, i) => ({ c, i }))
     .filter(x => x.c.mod === mod)
     .map(x => ({ id: String(x.i), emoji: EMO[mod] || '🐍', label: x.c.name, done: completed.has(x.i) }))
   QuestMap.show({
     title: '🧭 Code Expedition — IGCSE Year 2',
-    subtitle: 'Six programming camps on the road to Paper 2. Pseudocode is your gear.',
+    subtitle: 'Ten camps on the road to Paper 2 — pseudocode challenges, plus the full textbook as self-check reading. Pseudocode is your gear.',
     accent: '#a78bfa',
     layout: 'path', softLock: true, hardLock: !isTeacherPreview(),
     avatarSvg: '<span style="font-size:22px;">🧭</span>',
@@ -1392,6 +1543,10 @@ function showQuestMap() {
       { name: '📚 Camp 4 — Stacks & Queues', sub: 'PUSH, POP and pointers', live: true, stages: stagesFor('M4') },
       { name: '🔀 Camp 5 — Sorting & Searching', sub: 'Bubble sort and binary search', live: true, stages: stagesFor('M5') },
       { name: '🧱 Camp 6 — OOP Basics', sub: 'Classes, NEW and inheritance', live: true, stages: stagesFor('M6') },
+      { name: '🧩 Camp 7 — Algorithm Design & Problem Solving', sub: 'Textbook: structure diagrams, validation, trace tables', live: true, stages: stagesFor('M7') },
+      { name: '🐍 Camp 8 — Programming', sub: 'Textbook: real pseudocode-to-Python, scope, arrays, file handling', live: true, stages: stagesFor('M8') },
+      { name: '🗄️ Camp 9 — Databases', sub: 'Textbook: tables, primary keys, SQL', live: true, stages: stagesFor('M9') },
+      { name: '⚡ Camp 10 — Logic Gates', sub: 'Textbook: the six gates, circuits, truth tables', live: true, stages: stagesFor('M10') },
     ],
     onOpen: id => { selectChallenge(parseInt(id)) },
   })
@@ -1413,6 +1568,7 @@ async function fetchClassIdIgcse() {
 }
 async function applyClassOverrides() {
   const classId = await fetchClassIdIgcse()
+  currentClassId = classId   // used to build the book-lesson iframe src so teacher edits show up
   if (!classId) return
   try {
     const res = await fetch(`/api/class-lesson-overrides?classId=${encodeURIComponent(classId)}&lessonKey=igcse-y2`)
