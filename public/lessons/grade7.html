@@ -2063,6 +2063,12 @@ const WORLDS = [
         return corners.every(([cx,cy]) => log.positions.some(([x,y]) => Math.abs(x-cx) < 60 && Math.abs(y-cy) < 60))
       },
     },
+    { id:'sc1s3', name:'Mix Your Shapes', xp:25,
+      text:`<strong>Challenge 3</strong> — Sprites aren't always the same shape. Draw at least one CIRCLE and at least one RECTANGLE, both on the stage at once.`,
+      hints:['Draw → "draw circle" for one sprite, "draw rectangle" for the other.', 'Give them different X positions so they don\'t overlap.'],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => log.circles >= 1 && log.rects >= 1,
+    },
     { id:'sc1boss', name:'BOSS — Place Your Cast', xp:45, boss:true,
       text:`<strong>BOSS</strong> — Draw THREE sprites at three different corners of the stage: top-left, top-right, and bottom-left.`,
       hints:['Corners: (20,20), (440,20), (20,220).', 'Three separate draw blocks, three different positions.'],
@@ -2089,6 +2095,15 @@ const WORLDS = [
         return log.hasVar && targets.every(tx => log.positions.some(([x]) => Math.abs(x-tx) < 25))
       },
     },
+    { id:'sc2s3', name:'Vertical Column', xp:30,
+      text:`<strong>Challenge 3</strong> — Same idea as the marching line, but UP-DOWN instead of side-to-side: draw 4 sprites in an evenly-spaced VERTICAL column (same X, y = 30, 90, 150, 210).`,
+      hints:['Variables → create "y", set it to 30 before the loop.', 'Inside the repeat: draw a circle at (240, y), then change y by 60.'],
+      needsVar:true, needsIf:false, needsFrames:false,
+      check:(log) => {
+        const targets = [30,90,150,210]
+        return log.hasVar && targets.every(ty => log.positions.some(([,y]) => Math.abs(y-ty) < 25))
+      },
+    },
     { id:'sc2boss', name:'BOSS — Bouncing Sprite', xp:55, boss:true,
       text:`<strong>BOSS</strong> — Make a sprite move sideways every frame, using "On every frame" + a variable for its X position that changes each frame.`,
       hints:['Events → "On every frame".', 'Variables → create x, then each frame: "change x by 2", then draw the sprite at (x, 130).'],
@@ -2106,6 +2121,12 @@ const WORLDS = [
     { id:'sc3s2', name:'Jump on Space', xp:30,
       text:`<strong>Challenge 2</strong> — Make a sprite move UP whenever the Space key is held down, every frame.`,
       hints:['Keyboard → "key Space is pressed?" — inside an if, change y by -3 (up is negative in canvas coordinates).'],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.circles >= 1 || log.rects >= 1),
+    },
+    { id:'sc3s3', name:'Move Diagonally', xp:30,
+      text:`<strong>Challenge 3</strong> — Combine TWO keys at once: while ↑ is held, move up; while → is held, move right — so holding both together moves the sprite diagonally.`,
+      hints:['Two separate ifs inside "On every frame" — one for ↑ (change y), one for → (change x). Both can be true on the same frame.'],
       needsVar:true, needsIf:true, needsFrames:true,
       check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.circles >= 1 || log.rects >= 1),
     },
@@ -2129,6 +2150,12 @@ const WORLDS = [
       needsVar:true, needsIf:false, needsFrames:true,
       check:(log) => log.frames >= 5 && log.hasVar && log.texts >= 1,
     },
+    { id:'sc4s3', name:'Countdown Timer', xp:30,
+      text:`<strong>Challenge 3</strong> — Create a variable called time, set it to 10, and make it COUNT DOWN by 1 each frame instead of up — showing the current value on screen.`,
+      hints:['Variables → create time, set to 10 before the frame loop.', 'Inside the frame loop: "change time by -1" (a negative number), then draw text showing time.'],
+      needsVar:true, needsIf:false, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasVar && log.texts >= 1,
+    },
     { id:'sc4boss', name:'BOSS — Score & Lives HUD', xp:55, boss:true,
       text:`<strong>BOSS</strong> — Track TWO variables at once — score and lives — and show BOTH on screen every frame (two separate text labels).`,
       hints:['Two variables, two "draw text" blocks inside the same frame loop — one per variable.'],
@@ -2146,6 +2173,12 @@ const WORLDS = [
     { id:'sc5s2', name:'Win Message', xp:35,
       text:`<strong>Challenge 2</strong> — Track a score variable that increases each frame. When it reaches 5 or more, show "You Win!" instead of the score.`,
       hints:['Control → if score >= 5 — draw text "You Win!"; else — draw text showing the score.'],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && log.texts >= 1,
+    },
+    { id:'sc5s3', name:'Two Rules at Once', xp:35,
+      text:`<strong>Challenge 3</strong> — Use TWO separate ifs together: a score variable that increases each frame, an edge-touch rule that changes colour past X=400, AND a win message once score reaches 5 — all checked every frame.`,
+      hints:['This is sc5s1\'s edge-colour if PLUS sc5s2\'s win-message if, both inside the same "On every frame".', 'Two ifs can both live in the same frame loop — they don\'t interfere with each other.'],
       needsVar:true, needsIf:true, needsFrames:true,
       check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && log.texts >= 1,
     },
@@ -2991,6 +3024,9 @@ const CHALLENGE_LESSON = {
   sc1s2: { title: 'Naming positions makes them easier to reason about', html: `
     <div class="cl-block"><h4>Corners as landmarks</h4>
       <p>"Top-left" and "bottom-right" are easier to picture than raw numbers — but they're really just shorthand for specific (x,y) values. Learning to translate a description into coordinates is a skill you'll use constantly.</p></div>` },
+  sc1s3: { title: 'A sprite is really just any shape at a position', html: `
+    <div class="cl-block"><h4>Circle or rectangle — same idea underneath</h4>
+      <p>"Sprite" doesn't mean one specific shape — it's just whatever you draw at an (x,y). A circle and a rectangle are both real, valid sprites; real games mix shapes constantly (a round coin, a square platform).</p></div>` },
   sc1boss: { title: 'BOSS — three sprites, three positions', html: `
     <div class="cl-block"><h4>Nothing new, more of it</h4>
       <p>Three corners instead of two — the same skill, just repeated. Real Scratch projects often start with exactly this: placing a handful of sprites before anything moves or reacts.</p></div>` },
@@ -3001,6 +3037,9 @@ const CHALLENGE_LESSON = {
   sc2s2: { title: 'A variable changing INSIDE a loop', html: `
     <div class="cl-block"><h4>The loop variable does the real work</h4>
       <p>Changing x by 80 each pass through the loop is what actually spaces the sprites out — the repeat block alone would draw 5 sprites in the exact same spot without a variable tracking where the next one goes.</p></div>` },
+  sc2s3: { title: 'The same loop pattern works on ANY axis', html: `
+    <div class="cl-block"><h4>x and y are interchangeable in a loop</h4>
+      <p>Nothing about "repeat + change a variable" is specific to X — the exact same pattern spaces sprites out vertically just by changing y instead, with a fixed x. Once you know one axis, you know both.</p></div>` },
   sc2boss: { title: 'BOSS — movement is just a variable changing every frame', html: `
     <div class="cl-block"><h4>From "loop 5 times" to "loop forever"</h4>
       <p>"On every frame" is a repeat block that never stops — 60 times a second while your game runs. Changing x by a little each frame is genuinely what ALL motion in ALL games (Scratch, this platform, anything) actually is.</p></div>` },
@@ -3011,6 +3050,9 @@ const CHALLENGE_LESSON = {
   sc3s2: { title: 'Any key can trigger any action', html: `
     <div class="cl-block"><h4>Space isn't special — it's just another key</h4>
       <p>The exact same "key ... is pressed?" block works for Space, W, or any other key. What makes an action feel like a "jump" is purely what you put inside the if — here, decreasing y.</p></div>` },
+  sc3s3: { title: 'Two ifs in the same frame don\'t conflict', html: `
+    <div class="cl-block"><h4>Diagonal movement is free once you have two axes</h4>
+      <p>An if for ↑ (changing y) and a SEPARATE if for → (changing x), both inside the same "on every frame", can both be true on the same frame — that's genuinely all diagonal movement is: two independent single-direction checks, at once.</p></div>` },
   sc3boss: { title: 'BOSS — four keys, four directions', html: `
     <div class="cl-block"><h4>Independent checks, not one big rule</h4>
       <p>Each arrow key gets its OWN separate if — they don't interfere with each other, so pressing two at once (e.g. → and ↑) genuinely moves the sprite diagonally, for free.</p></div>` },
@@ -3021,6 +3063,9 @@ const CHALLENGE_LESSON = {
   sc4s2: { title: 'Redrawing every frame keeps the display current', html: `
     <div class="cl-block"><h4>You never "update" the label manually</h4>
       <p>Because "draw text" re-reads score fresh every single frame, the display always shows whatever score currently IS — there's no separate step where you tell the display "the score changed, please update".</p></div>` },
+  sc4s3: { title: 'Changing by a negative number counts DOWN', html: `
+    <div class="cl-block"><h4>"Change by" works both directions</h4>
+      <p>"Change time by -1" is the exact same block as "change score by 1", just with a negative number — there's no separate "countdown" block. A timer, a shrinking health bar, and a rising score are all built from this one idea.</p></div>` },
   sc4boss: { title: 'BOSS — a real two-stat HUD', html: `
     <div class="cl-block"><h4>Most real games track more than one number</h4>
       <p>Score AND lives, shown together, is genuinely what almost every simple arcade game's on-screen display actually is — two independent variables, each displayed the same way.</p></div>` },
@@ -3031,6 +3076,9 @@ const CHALLENGE_LESSON = {
   sc5s2: { title: 'IF can replace what\'s shown, not just add to it', html: `
     <div class="cl-block"><h4>Either the score, or the win message — never both</h4>
       <p>Because "You Win!" and the running score are in DIFFERENT branches of the same if/else, only one is ever drawn on a given frame — exactly the "pick exactly one path" behaviour if/else was built for.</p></div>` },
+  sc5s3: { title: 'A real game is usually SEVERAL rules, not one', html: `
+    <div class="cl-block"><h4>Rules stack — they don't replace each other</h4>
+      <p>An edge-colour rule and a win-message rule can both live in the same frame loop at once, each checking its own condition independently — real games are almost always built from several small rules like this stacked together, not one giant rule.</p></div>` },
   sc5boss: { title: 'BOSS — every Block Arcade idea, one sprite', html: `
     <div class="cl-block"><h4>Five weeks, one small real game</h4>
       <p>Coordinates, loops/motion, key events, variables, and if/else — every idea from Block Arcade combines here into something genuinely close to a tiny real game, right before Game Maker revisits all five ideas with more depth and real rigor.</p></div>` },
