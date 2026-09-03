@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1f String Handling — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: left; }
+  .dtype-table th { background: rgba(232,121,249,.1); color: #e879f9; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-family: ui-monospace, monospace; font-size: 11.5px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1f String Handling</div>
+  <div class="topic-subtitle">Length, substrings, upper/lower case — and the one indexing trap that catches almost everyone once.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Length</div><div class="key-term-def">The number of characters in a string — spaces count too.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Substring</div><div class="key-term-def">Extracting part of a string, starting at a given position for a given length.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Position/index</div><div class="key-term-def">A character's location within a string — pseudocode starts counting at 1, Python starts counting at 0.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Four string-handling methods you need to use</h4>
+    <ul>
+      <li><b>Length</b> — the number of characters, e.g. "Computer Science" has length 16 (the space counts as a character too).</li>
+      <li><b>Substring</b> — extracting part of a string, e.g. extracting "Science" out of "Computer Science".</li>
+      <li><b>Upper</b> — converting every letter to uppercase, e.g. "Computer Science" → "COMPUTER SCIENCE".</li>
+      <li><b>Lower</b> — converting every letter to lowercase, e.g. "Computer Science" → "computer science".</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Task</th><th>Pseudocode</th><th>Python</th></tr>
+    <tr><td>Length</td><td>LENGTH(MyString)</td><td>len(MyString)</td></tr>
+    <tr><td>Upper case</td><td>UCASE(MyString)</td><td>MyString.upper()</td></tr>
+    <tr><td>Lower case</td><td>LCASE(MyString)</td><td>MyString.lower()</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Substring — the ONE genuine trap: where counting starts</h4>
+    <ul>
+      <li>Pseudocode strings start counting positions at <b>1</b>. Python strings start counting positions at <b>0</b>.</li>
+      <li>Pseudocode's <code>SUBSTRING(string, start, length)</code> takes THREE arguments: the string, the START position, and HOW MANY characters to extract.</li>
+      <li>Python instead uses SLICING with square brackets: <code>string[start:end]</code> — where <code>start</code> is the first position INCLUDED, and <code>end</code> is the position AFTER the last one included (exclusive), not a length.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="560" height="90" viewBox="0 0 560 90">
+      <g font-family="ui-monospace, monospace" font-size="13">
+        <text x="10" y="20" fill="#9ca3af" font-size="11" font-family="system-ui">Extracting "Science" from "Computer Science"</text>
+        <text x="10" y="55" fill="#e2e8f0">C o m p u t e r _ S c i e n c e</text>
+        <text x="10" y="75" fill="#e879f9" font-size="10" font-family="system-ui">pseudocode pos:  1 2 3 4 5 6 7 8 9 10 11...        (Science starts at 10)</text>
+      </g>
+    </svg>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Method</th><th>Extracting "Science"</th><th>Notes</th></tr>
+    <tr><td>Pseudocode (1-indexed)</td><td>SUBSTRING("Computer Science", 10, 7)</td><td>Start position 10, length 7 characters.</td></tr>
+    <tr><td>Python (0-indexed)</td><td>"Computer Science"[9:16]</td><td>Start position 9 (one less, since Python starts at 0), end position 16 (exclusive — the slice runs up to but not including index 16).</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Why the Python numbers look "off by one" — but aren't actually wrong</h4>
+    <ul>
+      <li>"Science" starts at pseudocode position 10 — but at Python position 9, because Python starts counting from 0 instead of 1.</li>
+      <li>The pseudocode version's THIRD argument is a LENGTH (7 characters). The Python version's second number is an END POSITION (16) — 9 + 7 = 16, so they describe the exact same 7 characters, just via a different counting convention.</li>
+      <li>Always converting carefully between "pseudocode position" and "Python index" (subtract 1) is the single most common source of off-by-one string bugs.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the four string-handling methods and 1-indexed vs. 0-indexed positions.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the length of the string "Computer Science", and why does the space count?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>16 characters — spaces are stored as real characters within a string, exactly like letters, so they're included in the length count.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What position does the FIRST character of a string occupy in pseudocode, versus in Python?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Pseudocode: position 1. Python: position (index) 0.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the Python call to convert MyString to uppercase: <code>MyString.______()</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>MyString.upper()</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student converts pseudocode's <code>SUBSTRING(MyString, 1, 5)</code> (the first 5 characters) directly into Python as <code>MyString[1:5]</code>. What's the actual mistake?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Pseudocode position 1 is Python index 0, not 1 — using [1:5] in Python actually skips the FIRST character and only grabs characters 2-5. The correct Python slice is <code>MyString[0:5]</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write the pseudocode SUBSTRING call, and the equivalent Python slice, to extract "Computer" (the first 8 characters) from "Computer Science".
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Pseudocode: <code>SUBSTRING("Computer Science", 1, 8)</code>. Python: <code>"Computer Science"[0:8]</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is an "empty string", and is it a valid string?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A string with no characters stored in it at all — length 0. It's a perfectly valid string, just the shortest possible one.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1f String Handling<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1
+  </div>
+
+</div>
+</body>
+</html>

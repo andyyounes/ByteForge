@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1h Nested Statements — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 11.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.6; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1h Nested Statements — Three Loops Deep</div>
+  <div class="topic-subtitle">Selection and iteration can be nested inside each other — a genuinely realistic triple-nested-loop worked example.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Nesting</div><div class="key-term-def">Placing one construct (loop or selection) entirely inside another.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Outer / middle / inner loop</div><div class="key-term-def">In a triple-nested structure, the outermost loop runs least often; the innermost runs most often — once for every combination of the loops around it.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why nest constructs at all</h4>
+    <ul>
+      <li>Selection and iteration can be nested one inside the other — this reduces how much code needs to be written, and makes a program simpler to test.</li>
+      <li>One construct can nest within another type — selection inside a loop, or a loop inside another loop (used here).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The task — three levels of statistics, one algorithm</h4>
+    <ul>
+      <li>Calculate and output the highest, lowest, and average mark for a CLASS of 20 students.</li>
+      <li>Calculate and output the highest, lowest, and average mark for EACH student (across all their subjects).</li>
+      <li>Calculate and output the highest, lowest, and average mark for EACH subject a student takes — 6 subjects, each with 5 tests.</li>
+      <li>All marks are whole numbers between 0 and 100.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="500" height="140" viewBox="0 0 500 140">
+      <g font-family="system-ui" font-size="12" text-anchor="middle">
+        <rect x="10" y="10" width="480" height="120" rx="10" fill="none" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="120" y="28" fill="#60a5fa" font-size="10" text-anchor="start">OUTER — FOR Student ← 1 TO 20</text>
+        <rect x="30" y="35" width="440" height="85" rx="10" fill="none" stroke="#e879f9" stroke-width="1.5"/>
+        <text x="140" y="52" fill="#e879f9" font-size="10" text-anchor="start">MIDDLE — FOR Subject ← 1 TO 6</text>
+        <rect x="50" y="58" width="400" height="50" rx="10" fill="none" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="150" y="75" fill="#4ade80" font-size="10" text-anchor="start">INNER — FOR Test ← 1 TO 5</text>
+        <text x="250" y="95" fill="#e2e8f0" font-size="10">INPUT one Mark, update Subject stats</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Pseudocode — the full triple-nested algorithm</span>DECLARE ClassAverage, StudentAverage, SubjectAverage : REAL
+DECLARE Student, Subject, Test, Mark : INTEGER
+DECLARE ClassHigh, ClassLow, ClassTotal : INTEGER
+DECLARE StudentHigh, StudentLow, StudentTotal : INTEGER
+DECLARE SubjectHigh, SubjectLow, SubjectTotal : INTEGER
+ClassHigh ← 0
+ClassLow ← 100
+ClassTotal ← 0
+CONSTANT NumberOfTests ← 5
+CONSTANT NumberOfSubjects ← 6
+CONSTANT ClassSize ← 20
+
+FOR Student ← 1 TO ClassSize                    // OUTER loop
+  StudentHigh ← 0
+  StudentLow ← 100
+  StudentTotal ← 0
+  FOR Subject ← 1 TO NumberOfSubjects            // MIDDLE loop
+    SubjectHigh ← 0
+    SubjectLow ← 100
+    SubjectTotal ← 0
+    FOR Test ← 1 TO NumberOfTests                // INNER loop
+      OUTPUT "Please enter mark "
+      INPUT Mark
+      IF Mark > SubjectHigh THEN SubjectHigh ← Mark ENDIF
+      IF Mark < SubjectLow THEN SubjectLow ← Mark ENDIF
+      SubjectTotal ← SubjectTotal + Mark
+    NEXT Test
+    SubjectAverage ← SubjectTotal / NumberOfTests
+    OUTPUT "Average mark for Subject ", Subject, " is ", SubjectAverage
+    OUTPUT "Highest mark for Subject ", Subject, " is ", SubjectHigh
+    OUTPUT "Lowest mark for Subject ", Subject, " is ", SubjectLow
+    IF SubjectHigh > StudentHigh THEN StudentHigh ← SubjectHigh ENDIF
+    IF SubjectLow < StudentLow THEN StudentLow ← SubjectLow ENDIF
+    StudentTotal ← StudentTotal + SubjectTotal
+  NEXT Subject
+  StudentAverage ← StudentTotal / (NumberOfTests * NumberOfSubjects)
+  OUTPUT "Average mark for Student ", Student, " is ", StudentAverage
+  OUTPUT "Highest mark for Student ", Student, " is ", StudentHigh
+  OUTPUT "Lowest mark for Student ", Student, " is ", StudentLow
+  IF StudentHigh > ClassHigh THEN ClassHigh ← StudentHigh ENDIF
+  IF StudentLow < ClassLow THEN ClassLow ← StudentLow ENDIF
+  ClassTotal ← ClassTotal + StudentTotal
+NEXT Student
+ClassAverage ← ClassTotal / (NumberOfTests * NumberOfSubjects * ClassSize)
+OUTPUT "Average mark for Class is ", ClassAverage
+OUTPUT "Highest mark for Class is ", ClassHigh
+OUTPUT "Lowest mark for Class is ", ClassLow</div>
+
+  <div class="theory-block">
+    <h4>Reading the structure — three "levels", each resetting its own counters</h4>
+    <ul>
+      <li>SubjectHigh/SubjectLow/SubjectTotal reset at the START of every MIDDLE loop pass — they only ever track ONE subject at a time.</li>
+      <li>StudentHigh/StudentLow/StudentTotal reset at the START of every OUTER loop pass — they only ever track ONE student's overall performance (across all 6 subjects) at a time.</li>
+      <li>ClassHigh/ClassLow/ClassTotal are initialised ONCE, before the outer loop even starts — they must accumulate across the ENTIRE class, all 20 students.</li>
+      <li>Each level's statistics feed UP into the level above it: SubjectHigh feeds into StudentHigh's check; StudentHigh feeds into ClassHigh's check — the same "compare and keep the best" pattern, applied three times at three different scales.</li>
+      <li>Constants (NumberOfTests, NumberOfSubjects, ClassSize) mean the whole algorithm's scale can be changed by editing just THREE values, rather than hunting through the code for every place a number like 5, 6, or 20 appears.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How many times does the innermost loop actually run?</h4>
+    <ul>
+      <li>20 students × 6 subjects × 5 tests = 600 total INPUT Mark calls — the innermost loop body runs 600 times in total, even though it's written just once.</li>
+      <li>This is exactly why nesting reduces code: writing out 600 separate INPUT statements by hand would be absurd; three nested FOR loops express the same task in a handful of lines.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the triple-nested class/student/subject statistics algorithm.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">How many times does the innermost loop's body execute in total across the whole algorithm?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>600 times — 20 students × 6 subjects × 5 tests each.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why are SubjectTotal and StudentTotal reset at different points in the algorithm?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>SubjectTotal resets at the start of every MIDDLE loop pass (once per subject) because it only tracks ONE subject at a time. StudentTotal resets at the start of every OUTER loop pass (once per student) because it needs to accumulate across all 6 subjects for that ONE student.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the class average calculation: <code>ClassAverage ← ClassTotal / (NumberOfTests * ______ * ClassSize)</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>ClassAverage ← ClassTotal / (NumberOfTests * NumberOfSubjects * ClassSize)</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student accidentally moves <code>ClassHigh ← 0</code> and <code>ClassLow ← 100</code> to INSIDE the outer FOR loop (so they reset for every student), instead of before it. What breaks?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>ClassHigh/ClassLow would only ever reflect the MOST RECENT student, since they'd reset every time a new student starts — the final "Class" statistics would just be the last student's own statistics, not a genuine reflection of the whole class of 20.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using CONSTANTs the way this algorithm does, what would you need to change to test this algorithm with a class of only 3 students, 2 subjects, and 2 tests each?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Just the three CONSTANT lines: <code>CONSTANT NumberOfTests ← 2</code>, <code>CONSTANT NumberOfSubjects ← 2</code>, <code>CONSTANT ClassSize ← 3</code> — nothing else in the algorithm needs to change, since every loop and calculation refers to these constants rather than hardcoded numbers.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What real advantage does nesting loops give here, beyond just "less typing"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It makes the program genuinely easier to test — each level's logic (subject stats, student stats, class stats) can be reasoned about and checked on its own, and a bug found at one level (e.g. subject stats) doesn't require re-checking unrelated logic at another level.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1h Nested Statements (completes the core of Section 8.1)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1
+  </div>
+
+</div>
+</body>
+</html>

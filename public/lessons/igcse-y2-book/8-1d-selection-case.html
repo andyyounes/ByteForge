@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1d Selection in Real Code — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1d Selection in Real Code</div>
+  <div class="topic-subtitle">IF and CASE, exactly as taught in Chapter 7 — now written the way Python actually expects them.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">elif</div><div class="key-term-def">Python's keyword for "else if" — chaining another condition onto an if statement.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>IF statements — the same logic, different punctuation</h4>
+    <ul>
+      <li>Pseudocode's <code>THEN</code> and <code>ENDIF</code> don't exist in Python — Python uses a colon <code>:</code> and INDENTATION instead to show what belongs inside the IF.</li>
+      <li>Getting the indentation right in Python isn't just neat formatting — it's how Python knows which lines are actually part of the IF block at all.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">IF with ELSE — pseudocode vs. Python</span>// Pseudocode
+IF Age > 17
+THEN
+  OUTPUT "You are an adult"
+ELSE
+  OUTPUT "You are a child"
+ENDIF
+
+# Python
+if Age > 17:
+    print("You are an adult")
+else:
+    print("You are a child")</div>
+
+  <div class="theory-block">
+    <h4>CASE OF becomes a chain of elif</h4>
+    <ul>
+      <li>Python has no direct equivalent of pseudocode's <code>CASE OF ... ENDCASE</code> — instead, multiple choices are written as <code>if</code>, then a chain of <code>elif</code> ("else if"), ending in an optional <code>else</code> for anything not matched (the same job as pseudocode's <code>OTHERWISE</code>).</li>
+      <li>Each <code>elif</code> is checked in order, top to bottom, until one matches — exactly like CASE OF checks each option in order.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">CASE OF a calculator operator — pseudocode vs. Python</span>// Pseudocode
+CASE OF OpValue
+  "+" : Answer ← Number1 + Number2
+  "-" : Answer ← Number1 - Number2
+  "*" : Answer ← Number1 * Number2
+  "/" : Answer ← Number1 / Number2
+  OTHERWISE OUTPUT "Please enter a valid choice"
+ENDCASE
+
+# Python
+if OpValue == "+":
+    Answer = Number1 + Number2
+elif OpValue == "-":
+    Answer = Number1 - Number2
+elif OpValue == "*":
+    Answer = Number1 * Number2
+elif OpValue == "/":
+    Answer = Number1 / Number2
+else:
+    print("Please enter a valid choice")</div>
+
+  <div class="theory-block">
+    <h4>What stays exactly the same</h4>
+    <ul>
+      <li>The COMPARISON <code>OpValue == "+"</code> uses two equals signs in Python (one equals sign, <code>=</code>, is only ever assignment, never comparison) — pseudocode uses a single <code>=</code> for comparison, which is a genuine difference to watch for.</li>
+      <li>The order of checks, and the idea of a final "catch-all" branch for anything unmatched, is identical in both.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — writing IF and CASE OF as real Python code.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What replaces pseudocode's THEN and ENDIF in Python?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A colon <code>:</code> after the condition, and INDENTATION to show which lines belong inside the IF block — there are no THEN or ENDIF keywords at all.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What Python keyword replaces pseudocode's CASE OF / multiple choices?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A chain of <code>if</code> / <code>elif</code> / <code>elif</code> ... / <code>else</code> — Python has no direct CASE OF equivalent.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the Python comparison for checking if Score equals 100: <code>if Score ______ 100:</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>if Score == 100:</code> — two equals signs, since a single <code>=</code> is only ever assignment in Python.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes <code>if Score = 100:</code> in Python, expecting it to check whether Score equals 100. What's actually wrong with this line?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A single <code>=</code> in Python means ASSIGNMENT, not comparison — this line would actually be trying to assign 100 to Score inside the if condition, which is invalid syntax in Python and would cause an error, not perform a comparison. It must be <code>==</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Convert this pseudocode into Python: <code>IF Grade = "A"<br>THEN<br>&nbsp;&nbsp;OUTPUT "Excellent"<br>ELSE<br>&nbsp;&nbsp;OUTPUT "Keep trying"<br>ENDIF</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>if Grade == "A":<br>&nbsp;&nbsp;&nbsp;&nbsp;print("Excellent")<br>else:<br>&nbsp;&nbsp;&nbsp;&nbsp;print("Keep trying")</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the CASE OF / elif chain example, what does pseudocode's OTHERWISE become in Python?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A final <code>else</code> — the catch-all branch that runs if none of the earlier if/elif conditions matched.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1d Selection in Real Code<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1
+  </div>
+
+</div>
+</body>
+</html>
