@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.01 Cable Transmission Media — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: center; }
+  .dtype-table th { background: rgba(96,165,250,.1); color: #60a5fa; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 2 · Communication &amp; Internet Technologies</span>
+  <div class="topic-title">2.01 Cable Transmission Media</div>
+  <div class="topic-subtitle">Twisted pair, coaxial, fibre-optic — the same job, three genuinely different trade-offs.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Bandwidth</div><div class="key-term-def">The data transmission rate a medium can achieve.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Attenuation</div><div class="key-term-def">Deterioration of a signal, worse at higher frequencies.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Repeater</div><div class="key-term-def">A device that boosts a weakening signal along a transmission line.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Four factors that decide which cable to use</h4>
+    <ul>
+      <li><b>Cost</b> — of the cable itself and its connecting devices.</li>
+      <li><b>Bandwidth</b> — governs the maximum possible data rate.</li>
+      <li><b>Interference</b> — how easily transmitted signals are corrupted by external sources.</li>
+      <li><b>Attenuation</b> — signal deterioration at high frequencies, which increases the need for repeaters/amplifiers.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th></th><th>Twisted pair</th><th>Coaxial</th><th>Fibre-optic</th></tr>
+    <tr><td>Cost</td><td>Lowest</td><td>Higher</td><td>Highest</td></tr>
+    <tr><td>Bandwidth</td><td>Lowest</td><td>Higher</td><td>Much higher</td></tr>
+    <tr><td>Attenuation</td><td>Most affected</td><td>Less affected</td><td>Least affected</td></tr>
+    <tr><td>Interference</td><td>Worst affected</td><td>Less affected</td><td>Least affected</td></tr>
+    <tr><td>Repeaters needed</td><td>More often</td><td>More often</td><td>Less often</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Reading the table — fibre-optic wins on performance, but not on cost</h4>
+    <ul>
+      <li>Fibre-optic performs BEST on every technical measure — but costs the most.</li>
+      <li>For a genuinely NEW installation, fibre-optic's performance advantage usually wins out.</li>
+      <li>Where copper cable is ALREADY installed, the cost of ripping it out and replacing it with fibre may not be justified — a real, practical trade-off, not just "always pick the best spec".</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Where each cable type is actually used today</h4>
+    <ul>
+      <li><b>Twisted pair</b>: still near-universal for connecting a telephone handset to the line, and the technology of choice for high-speed LANs.</li>
+      <li><b>Coaxial</b>: mostly replaced for long-distance telephone cabling, but still extensively used by cable TV companies and often in metropolitan area networks (MANs).</li>
+      <li><b>Fibre-optic</b>: the technology of choice for long-distance cabling. A fibre-optic cable bundles many individual fibres together; coaxial cable is NOT bundled this way.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — twisted pair, coaxial, and fibre-optic cable.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Name the four factors used to compare cable types.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Cost, bandwidth (data rate), interference, and attenuation (which affects how often repeaters are needed).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Which cable type performs best on bandwidth, attenuation, AND interference, all at once?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Fibre-optic — highest bandwidth, least attenuation, least interference.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A fibre-optic cable bundles many individual ______, whereas coaxial cable is ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Fibres; not bundled.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student concludes that every organisation should always replace its existing copper cabling with fibre-optic immediately, since fibre performs best on every metric. Why is this an oversimplification?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Fibre-optic also costs the MOST — where copper cable is already installed and working, the cost of replacing it may not be justified by the performance gain. The best choice for a NEW installation isn't automatically the best choice for an existing one.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A company is laying brand-new cabling for a long-distance link between two cities. Which cable type would generally be chosen, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Fibre-optic — it's the technology of choice for long-distance cabling, with the best bandwidth and least attenuation/interference, and for a new installation the extra cost is usually justified by this performance.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which cable type is still near-universal for connecting a telephone handset to its line?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Twisted pair.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 2: Communication &amp; Internet Technologies — 2.01 Cable Transmission Media<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 2.01
+  </div>
+
+</div>
+</body>
+</html>

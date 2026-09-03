@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.02 Satellite Communication — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: center; }
+  .dtype-table th { background: rgba(251,191,36,.1); color: #fbbf24; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 2 · Communication &amp; Internet Technologies</span>
+  <div class="topic-title">2.02 Satellite Communication</div>
+  <div class="topic-subtitle">GEO, MEO, LEO — three altitudes, three genuinely different jobs. Completes Section 2.02.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">GEO</div><div class="key-term-def">Geostationary Earth Orbit — highest altitude, appears fixed over one point on the equator.</div></div>
+    <div class="key-term-card"><div class="key-term-name">MEO</div><div class="key-term-def">Medium Earth Orbit — includes GPS satellites.</div></div>
+    <div class="key-term-card"><div class="key-term-name">LEO</div><div class="key-term-def">Low Earth Orbit — works in large "constellations", supplements mobile networks.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <table class="dtype-table">
+    <tr><th>Type</th><th>Altitude</th><th>Number needed for global coverage</th><th>Typical use</th></tr>
+    <tr><td>GEO</td><td>35,786 km</td><td>3</td><td>Long-distance telephone/network communication</td></tr>
+    <tr><td>MEO</td><td>~15,000 km</td><td>10</td><td>GPS (Global Positioning System)</td></tr>
+    <tr><td>LEO</td><td>~5,000 km</td><td>50 (hundreds actually in use)</td><td>Supplementing mobile phone networks</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Why so few GEO satellites can cover the whole planet</h4>
+    <ul>
+      <li>A GEO satellite orbits at exactly the right altitude/speed to stay FIXED relative to a point on the equator — this is why just THREE of them, positioned correctly, can achieve full global coverage.</li>
+      <li>MEO satellites (used for GPS) need ten for global coverage; LEO satellites need around fifty, working together in "constellations" — though in practice, several HUNDRED LEO satellites are currently in use.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The Van Allen belts — genuine no-go zones</h4>
+    <ul>
+      <li>The Van Allen belts (regions full of charged particles) are areas satellites must avoid — they sit between certain altitude bands, constraining where satellites can safely orbit.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The fundamental trade-off of using a satellite at all</h4>
+    <ul>
+      <li><b>Advantage</b>: height above the ground lets a satellite connect components separated by much GREATER distances than purely ground-based infrastructure could manage.</li>
+      <li><b>Disadvantage</b>: the greater transmission DISTANCE causes transmission delays, which can cause real problems for the underlying technology supporting network operation.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — GEO/MEO/LEO satellites (completes Section 2.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why can just 3 GEO satellites achieve full global coverage?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A GEO satellite orbits at the specific altitude/speed that keeps it fixed relative to a point on the equator — positioned correctly, just three can jointly cover the whole planet.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Which type of satellite is used for GPS?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>MEO (Medium Earth Orbit) satellites.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      LEO satellites work in large groups called ______, and are used to supplement ______ networks.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Constellations; mobile (cell) phone networks.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says using satellites has NO real downside compared to ground-based infrastructure, since they can cover such huge distances. What's the genuine trade-off being ignored?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The much greater transmission distance to and from a satellite causes real transmission DELAYS — this can cause genuine problems for the technology relying on that network connection, even though the satellite's height enables connecting far-apart locations.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A telecom company wants to provide long-distance telephone communication with the fewest possible satellites. Which type would they choose, and how many would they need at minimum?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>GEO satellites — just 3 are needed for full global coverage, the fewest of the three types.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What are the Van Allen belts, and why do they matter for satellite orbits?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Regions full of charged particles — genuine "no-go" zones that satellites must be positioned to avoid when choosing their orbital altitude.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 2: Communication &amp; Internet Technologies — 2.02 Satellite Communication (completes Section 2.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 2.02
+  </div>
+
+</div>
+</body>
+</html>
