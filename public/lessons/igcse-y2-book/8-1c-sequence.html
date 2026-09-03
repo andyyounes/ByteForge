@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1c Sequence — Getting the Order Right — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #f87171; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(248,113,113,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #fca5a5; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block.good { border-color: rgba(74,222,128,.25); color: #86efac; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #f87171; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .pseudo-block.good .pseudo-block-title { color: #4ade80; }
+  .trace-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11.5px; margin-bottom: 16px; }
+  .trace-table th, .trace-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 8px; text-align: center; }
+  .trace-table th { background: rgba(248,113,113,.1); color: #f87171; font-family: system-ui, sans-serif; font-size: 10.5px; text-transform: uppercase; }
+  .trace-table.good th { background: rgba(74,222,128,.1); color: #4ade80; }
+  .trace-table td { color: #e2e8f0; }
+  .trace-table td.bug { color: #fbbf24; font-weight: 700; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1c Sequence — Getting the Order Right</div>
+  <div class="topic-subtitle">The exact same steps, in a different order, produce a completely broken program.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Sequence</div><div class="key-term-def">The order in which the steps of an algorithm happen — getting it wrong can cause incorrect results or unnecessary extra steps.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why sequence is its own genuine skill</h4>
+    <ul>
+      <li>An incorrect ORDER of otherwise-correct steps can lead to wrong results, or steps that shouldn't even be needed.</li>
+      <li>The algorithm below is meant to input marks (finishing when 999 is entered), then output the total, average, and how many real marks were entered.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">⚠ Version 1 — looks reasonable, but the SEQUENCE is wrong</span>DECLARE Total, Average : REAL
+DECLARE Mark, Counter : INTEGER
+Total ← 0
+Mark ← 0
+Counter ← 0
+OUTPUT "Enter marks, 999 to finish "
+REPEAT
+  INPUT Mark
+  Total ← Total + Mark
+  IF Mark = 999
+  THEN
+    Average ← Total / Counter
+  ENDIF
+  Counter ← Counter + 1
+UNTIL Mark = 999
+OUTPUT "The total mark is ", Total
+OUTPUT "The average mark is ", Average
+OUTPUT "The number of marks is ", Counter</div>
+
+  <table class="trace-table">
+    <tr><th>Total</th><th>Average</th><th>Counter</th><th>Mark</th><th>OUTPUT</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td></td><td>Enter marks, 999 to finish</td></tr>
+    <tr><td>25</td><td></td><td>1</td><td>25</td><td></td></tr>
+    <tr><td>52</td><td></td><td>2</td><td>27</td><td></td></tr>
+    <tr><td>75</td><td></td><td>3</td><td>23</td><td></td></tr>
+    <tr><td class="bug">1074</td><td class="bug">358</td><td>4</td><td>999</td><td></td></tr>
+    <tr><td colspan="5" class="bug">OUTPUT: The total mark is 1074 / The average mark is 358 / The number of marks is 4</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Every single output is wrong — here's exactly why</h4>
+    <ul>
+      <li>Test data: 25, 27, 23, 999 (three real marks, then the "finish" signal).</li>
+      <li>The 999 itself gets ADDED into Total (75 + 999 = 1074) — the algorithm never checks to exclude it, because <code>Total ← Total + Mark</code> runs BEFORE the check for whether Mark equals 999.</li>
+      <li>Counter reaches 4 (counting the 999 as if it were a real mark), not 3 — so the "number of marks" output is wrong too.</li>
+      <li>Average is calculated using the WRONG Total (1074, which includes 999) divided by the WRONG Counter (4) — every downstream value inherits the earlier mistake.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block good">
+<span class="pseudo-block-title">✓ Version 2 — same task, correct sequence</span>DECLARE Total, Average : REAL
+DECLARE Mark, Counter : INTEGER
+Total ← 0
+Mark ← 0
+Counter ← -1
+OUTPUT "Enter marks, 999 to finish "
+REPEAT
+  Total ← Total + Mark
+  INPUT Mark
+  Counter ← Counter + 1
+UNTIL Mark = 999
+OUTPUT "The total mark is ", Total
+Average ← Total / Counter
+OUTPUT "The average mark is ", Average
+OUTPUT "The number of marks is ", Counter</div>
+
+  <table class="trace-table good">
+    <tr><th>Total</th><th>Average</th><th>Counter</th><th>Mark</th><th>OUTPUT</th></tr>
+    <tr><td>0</td><td>0</td><td>-1</td><td></td><td>Enter marks, 999 to finish</td></tr>
+    <tr><td>0</td><td></td><td>0</td><td>25</td><td></td></tr>
+    <tr><td>25</td><td></td><td>1</td><td>27</td><td></td></tr>
+    <tr><td>52</td><td></td><td>2</td><td>23</td><td></td></tr>
+    <tr><td>75</td><td></td><td>3</td><td>999</td><td></td></tr>
+    <tr><td colspan="5">OUTPUT: The total mark is 75 / The average mark is 25 / The number of marks is 3</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>What actually changed, and why each change fixes the bug</h4>
+    <ul>
+      <li><b>Counter starts at -1 instead of 0</b> — this allows for the extra "999" input that triggers the end of the loop WITHOUT it being counted as a real mark. By the time the loop ends, Counter has correctly counted only the 3 real marks.</li>
+      <li><b>Total ← Total + Mark now runs BEFORE the new INPUT Mark</b> — so on each pass, the OLD mark (from the PREVIOUS input) gets added to Total, one step behind. This means when 999 is finally input, it triggers the loop to end on the NEXT check, but it is never itself added to Total (the addition for that pass already happened using the previous real mark).</li>
+      <li><b>The IF check inside the loop is removed entirely</b> — Average is now calculated ONCE, after the loop ends, using the final correct Total and Counter — there's no need to test "is this the last input?" inside the loop at all.</li>
+      <li>All three outputs are now correct: total = 75 (25+27+23), average = 25, number of marks = 3.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — how sequence errors happen and how this specific one was fixed.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">In Version 1, why does 999 end up being added into Total?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because <code>Total ← Total + Mark</code> runs immediately after every INPUT, before there's any check for whether Mark equals 999 — by the time the algorithm checks for 999, it has already been added to the total.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does Counter start at -1 in the corrected version, instead of 0?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>So that the extra "999" input (which does still get counted once, to trigger the loop's exit) doesn't throw off the final count of REAL marks — starting one lower cancels out that one extra increment.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In the corrected version, which line comes FIRST inside the loop: <code>Total ← Total + Mark</code> or <code>INPUT Mark</code>?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>Total ← Total + Mark</code> comes first — it adds the PREVIOUS mark to the total before a new one is input, which is exactly what keeps 999 from ever being added.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student "fixes" Version 1 by just removing the IF check but leaving everything else (including Counter starting at 0, and the original line order) unchanged. Would this genuinely fix the algorithm? Why or why not?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — removing only the IF check doesn't fix the core sequence problem: <code>Total ← Total + Mark</code> would still run immediately after every input, so 999 would still get added to Total, and Counter would still count it as a 4th mark. The REAL fix requires changing the ORDER of the lines (Total updates using the previous mark, before the new input), not just deleting one check.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the corrected Version 2 algorithm, trace through the test data 10, 20, 30, 40, 999. What would the three final outputs be?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Total mark = 100 (10+20+30+40), average mark = 25 (100 ÷ 4), number of marks = 4.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What's the general lesson this worked example teaches about writing algorithms?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The exact same set of steps, in a different ORDER, can produce a completely different (and wrong) result — sequence is a genuine, separate skill from just knowing which individual steps are needed; getting the order right is just as important as choosing the right operations.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1c Sequence — Getting the Order Right<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1
+  </div>
+
+</div>
+</body>
+</html>

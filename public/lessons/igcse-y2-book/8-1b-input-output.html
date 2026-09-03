@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1b Input and Output in Real Code — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1b Input and Output in Real Code</div>
+  <div class="topic-subtitle">Prompts, casting, and separators — a complete real Python program, built from ideas you already know.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Prompt</div><div class="key-term-def">A message telling the user exactly what they're expected to input.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Casting</div><div class="key-term-def">Converting a value from one data type to another, e.g. text input into a real number.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Separator</div><div class="key-term-def">A character (like a comma) that separates the different parts of an output statement.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Every input needs a prompt</h4>
+    <ul>
+      <li>For a program to be useful, the user needs to know what they're expected to type — every input should be accompanied by a prompt explaining what's required.</li>
+      <li>ALL input defaults to a string, in every language — so if the input should actually be an integer or a real number, it must be explicitly CONVERTED (cast) afterwards.</li>
+      <li>In Python, <code>int()</code> converts a string to an integer, and <code>float()</code> converts a string to a real number.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Input with a prompt — pseudocode vs. Python</span>// Pseudocode
+OUTPUT "Please enter the radius of the cylinder "
+INPUT Radius
+
+# Python — the prompt and the cast happen together, in one line
+radius = float(input("Please enter the radius of the cylinder "))</div>
+
+  <div class="theory-block">
+    <h4>Output needs a message too, and a separator between parts</h4>
+    <ul>
+      <li>Every output should be accompanied by a message explaining what the result actually IS — a lone number with no label isn't useful to a user.</li>
+      <li>If an output statement has several parts, each part needs a separator character between them.</li>
+      <li>In pseudocode, OUTPUT parts are separated by commas. Python's <code>print()</code> also uses commas between its parts.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Output with a message — pseudocode vs. Python</span>// Pseudocode
+OUTPUT "Volume of the cylinder is ", Volume
+
+# Python
+print("Volume of the cylinder is ", volume)</div>
+
+  <div class="theory-block">
+    <h4>A complete worked program — volume of a cylinder</h4>
+    <ul>
+      <li>This combines everything from 8.1a and 8.1b: a constant, two variables, two prompted+cast inputs, a calculation, and a labelled output.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Pseudocode — volume of a cylinder</span>CONSTANT Pi ← 3.142
+DECLARE Radius, Length, Volume : REAL
+OUTPUT "Please enter the radius of the cylinder "
+INPUT Radius
+OUTPUT "Please enter the length of the cylinder "
+INPUT Length
+Volume ← Radius * Radius * Length * Pi
+OUTPUT "Volume of the cylinder is ", Volume</div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Python — the exact same program</span>CONSTPI = 3.142
+Radius = float(input("Please enter the radius of the cylinder "))
+Length = float(input("Please enter the length of the cylinder "))
+Volume = Radius * Radius * Length * CONSTPI
+print("Volume of the cylinder is ", Volume)</div>
+
+  <div class="theory-block">
+    <h4>Reading the correspondence, line by line</h4>
+    <ul>
+      <li>Pseudocode's separate <code>DECLARE</code> lines simply don't exist in Python — Python decides each variable's type automatically the moment a value is first assigned to it.</li>
+      <li>Pseudocode's <code>OUTPUT "..."</code> then <code>INPUT Radius</code> (two lines) become Python's single line combining the prompt AND the cast: <code>float(input("..."))</code>.</li>
+      <li>The actual calculation line is IDENTICAL in both — <code>*</code> means multiply in both pseudocode and Python.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — input/output statements and casting.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does every single input, in every language, default to a string?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because raw keyboard input is just characters typed by the user — the program has no way to know in advance what "kind" of value was intended, so it treats it as text (a string) by default until explicitly told otherwise via casting.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does "casting" mean in this context?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Converting a value from one data type to another — e.g. converting a string like "3.5" typed by the user into an actual real number 3.5 that can be used in a calculation.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the Python line that prompts for and casts an integer age: <code>age = ______(input("Please enter your age "))</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>age = int(input("Please enter your age "))</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes <code>radius = input("Please enter the radius ")</code> and then tries to use <code>radius</code> directly in a multiplication. What goes wrong, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Without casting, <code>radius</code> is still a STRING (input always defaults to string), not a real number — multiplying strings doesn't work the way multiplying numbers does, so the calculation would fail or behave unexpectedly. The fix is wrapping it: <code>radius = float(input(...))</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write pseudocode AND Python for prompting the user for their name (a string — no casting needed) and outputting "Hello, " followed by their name.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><b>Pseudocode:</b> <code>OUTPUT "Please enter your name "<br>INPUT Name<br>OUTPUT "Hello, ", Name</code></p>
+      <p><b>Python:</b> <code>name = input("Please enter your name ")<br>print("Hello, ", name)</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why doesn't the "Hello, [name]" example in Question 5 need any casting?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because a name is already a STRING — and input already defaults to a string — so no conversion is needed. Casting is only needed when the required type is something OTHER than a string, like an integer or real number.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1b Input and Output in Real Code<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1
+  </div>
+
+</div>
+</body>
+</html>

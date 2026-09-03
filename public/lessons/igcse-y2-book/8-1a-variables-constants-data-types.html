@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1a Variables, Constants &amp; Data Types — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; background: #0a0c18; border: 1px solid rgba(255,255,255,.08); }
+  .compare-card b { display: block; margin-bottom: 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: #60a5fa; }
+  .compare-card code { display: block; background: rgba(255,255,255,.05); color: #93c5fd; padding: 6px 8px; border-radius: 6px; font-family: ui-monospace, monospace; white-space: pre-wrap; margin-top: 4px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: left; }
+  .dtype-table th { background: rgba(96,165,250,.1); color: #60a5fa; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-family: ui-monospace, monospace; font-size: 11.5px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1a Variables, Constants &amp; Data Types</div>
+  <div class="topic-subtitle">From pseudocode to real code — the same ideas Chapter 7 taught, now with genuine Python syntax alongside.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Variable</div><div class="key-term-def">A named data store whose value MAY change while the program runs.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Constant</div><div class="key-term-def">A named data store whose value does NOT change while the program runs.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Explicit declaration</div><div class="key-term-def">Stating the exact data type of a variable/constant up front (pseudocode requires this for variables).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Implicit declaration</div><div class="key-term-def">The data type is decided automatically from the value assigned (Python works this way).</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Five basic constructs of any program</h4>
+    <ul>
+      <li><b>Data use</b> — variables, constants, and arrays.</li>
+      <li><b>Sequence</b> — the order steps happen in.</li>
+      <li><b>Selection</b> — choosing a path through the program (IF, CASE).</li>
+      <li><b>Iteration</b> — repeating a sequence of steps (loops).</li>
+      <li><b>Operator use</b> — arithmetic for calculations, logical/Boolean for decisions.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Variables vs. constants — same idea, different rule</h4>
+    <ul>
+      <li>A variable holds a value that MAY change while the program runs. A constant holds a value that must NOT change once set.</li>
+      <li>Both should always be given MEANINGFUL names, so the program stays understandable to someone else (or to you, later).</li>
+      <li>Not every language enforces the difference in code — Python doesn't technically stop you reassigning a "constant" — but a good programmer stays clear about which data stores are meant to change and which aren't, regardless of what the language enforces. A common convention: write constant names in ALL CAPS as a signal, even in a language that doesn't require it.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card"><b>Pseudocode — explicit</b>Variables are explicitly typed; constants are written directly.<code>DECLARE FirstVar : INTEGER
+DECLARE SecondVar : INTEGER
+CONSTANT FirstConst ← 500
+CONSTANT SecondConst ← 100</code></div>
+    <div class="compare-card"><b>Python — implicit</b>No separate declaration at all — the type is decided by whatever value is assigned. No built-in distinction between variables and constants.<code>FirstVar = 20
+SecondVar = 30
+FIRSTCONST = 500
+SECONDCONST = 100</code></div>
+  </div>
+
+  <div class="theory-block">
+    <h4>The five basic data types</h4>
+    <ul>
+      <li><b>Integer</b> — a positive or negative WHOLE number, usable with mathematical operators.</li>
+      <li><b>Real</b> — a positive or negative number with a fractional (decimal) part, also usable with mathematical operators.</li>
+      <li><b>Char</b> — a single character.</li>
+      <li><b>String</b> — several characters in length; can even be empty (an "empty string"). A number STORED as a string cannot be used directly in a calculation.</li>
+      <li><b>Boolean</b> — only ever TRUE or FALSE.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Type</th><th>Pseudocode</th><th>Python</th></tr>
+    <tr><td>INTEGER</td><td>FirstInteger = 25</td><td>FirstInteger = 25</td></tr>
+    <tr><td>REAL</td><td>FirstReal = 25.0</td><td>FirstReal = 25.0</td></tr>
+    <tr><td>CHAR</td><td>Female = 'F'</td><td>Female = 'F'</td></tr>
+    <tr><td>STRING</td><td>FirstName = 'Emma'</td><td>FirstName = 'Emma'</td></tr>
+    <tr><td>BOOLEAN</td><td>Flag = TRUE</td><td>Flag = True</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Why this matters beyond just "labelling" data</h4>
+    <ul>
+      <li>Correct data types let data be stored appropriately (numbers as numbers, characters as characters).</li>
+      <li>They let data be manipulated correctly — numbers with mathematical operators, strings with concatenation (joining text together).</li>
+      <li>They also enable automatic validation in some cases — e.g. a program can refuse to store text where an integer is expected.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — variables, constants, and the five basic data types.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between a variable and a constant?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A variable's value MAY change while the program runs; a constant's value must NOT change once it's set.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the difference between explicit and implicit declaration?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Explicit declaration states the exact data type up front (pseudocode's <code>DECLARE ... : INTEGER</code>). Implicit declaration decides the type automatically from whatever value is assigned (how Python works — no separate declaration at all).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Which of the five data types would each of these use? "F" for female → ______. -3.5 → ______. "Hello World" → ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"F" → CHAR (a single character). -3.5 → REAL (a number with a fractional part). "Hello World" → STRING (several characters).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student stores a phone number like "0712345678" as an INTEGER instead of a STRING. What real problem does this cause?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A leading zero is meaningless in an integer — 0712345678 stored as an integer would silently become 712345678, dropping the leading zero and corrupting the phone number. Data that is never actually used in a calculation (like a phone number) should usually be stored as a string.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write the pseudocode DECLARE statements for two variables needed to calculate the volume of a cylinder: Radius and Length (both REAL), plus a constant Pi.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>DECLARE Radius : REAL<br>DECLARE Length : REAL<br>CONSTANT Pi ← 3.142</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Even though Python doesn't enforce a difference between variables and constants, why might a programmer still write a constant's name in ALL CAPS?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To signal to anyone reading the code (including themselves later) that this value is intended to never change, even though Python itself won't stop it from being reassigned — a readability convention, not an enforced rule.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1a Variables, Constants &amp; Data Types<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1
+  </div>
+
+</div>
+</body>
+</html>
