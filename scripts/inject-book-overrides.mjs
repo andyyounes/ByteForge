@@ -1,7 +1,7 @@
 // One-off (idempotent) script: appends a small override-merge snippet before
-// </body> in every IGCSE Y1 book lesson under public/lessons/igcse-y1-book/
-// (skipping index.html, which is just a directory listing). When a teacher
-// publishes an edit for their class, this snippet is what actually makes the
+// </body> in every IGCSE book lesson under public/lessons/<book>/ (skipping
+// index.html, which is just a directory listing). When a teacher publishes
+// an edit for their class, this snippet is what actually makes the
 // student's browser show it — the static file itself is never touched by
 // the teacher editor.
 //
@@ -9,14 +9,17 @@
 // by the START/END markers) before appending a fresh copy, so re-running
 // after editing the template below just updates every file in place.
 //
-// Run with: node scripts/inject-book-overrides.mjs
+// Run with: node scripts/inject-book-overrides.mjs <book>
+//   <book> is the directory name under public/lessons/, e.g. igcse-y1-book
+//   or igcse-y2-book. Also used as the lessonKey. Defaults to igcse-y1-book.
 
 import { readdirSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const DIR = path.join(__dirname, '..', 'public', 'lessons', 'igcse-y1-book')
+const BOOK = process.argv[2] || 'igcse-y1-book'
+const DIR = path.join(__dirname, '..', 'public', 'lessons', BOOK)
 
 const START = '<!-- OVERRIDE-MERGE-SCRIPT-START -->'
 const END = '<!-- OVERRIDE-MERGE-SCRIPT-END -->'
@@ -28,7 +31,7 @@ const SNIPPET = `${START}
   var classId = params.get('classId');
   if (!classId) return;
   var file = location.pathname.split('/').pop();
-  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=igcse-y1-book')
+  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=${BOOK}')
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
       if (!data || !Array.isArray(data.overrides)) return;
@@ -67,4 +70,4 @@ for (const file of files) {
   changed++
 }
 
-console.log(`Injected/refreshed override-merge script in ${changed} of ${files.length} lesson files.`)
+console.log(`[${BOOK}] Injected/refreshed override-merge script in ${changed} of ${files.length} lesson files.`)
