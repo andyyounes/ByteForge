@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.3a File Handling — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(74,222,128,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #86efac; white-space: pre-wrap; line-height: 1.6; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4ade80; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; background: #0a0c18; border: 1px solid rgba(255,255,255,.08); }
+  .compare-card b { display: block; margin-bottom: 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: #4ade80; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.3a File Handling</div>
+  <div class="topic-subtitle">Making data outlive the program that created it — completes Unit 8 (Programming).</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">File</div><div class="key-term-def">A named, permanent store of data on a storage device, identified by its filename.</div></div>
+    <div class="key-term-card"><div class="key-term-name">OPEN / CLOSE</div><div class="key-term-def">Statements that begin and end a program's access to a file.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why files exist — RAM alone isn't enough</h4>
+    <ul>
+      <li>Any data held in RAM is lost the instant the computer is switched off. Data saved to a FILE is stored permanently instead.</li>
+      <li>A file can be read again by the SAME program later, by a DIFFERENT program entirely, or even sent to be used on another computer.</li>
+      <li>Storing data in files is one of the most-used features of real programming.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The basic pattern — open, use, close</h4>
+    <ul>
+      <li>Every file is identified by its FILENAME.</li>
+      <li>Writing: OPEN the file for writing, WRITE the data to it, then CLOSE it.</li>
+      <li>Reading: OPEN the file for reading, READ the data from it, then CLOSE it.</li>
+      <li>Always CLOSING a file after use is important — it ensures the data is actually saved properly and the file isn't left "locked" for other programs to use.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Pseudocode — writing a line, then reading it back</span>DECLARE TextLine : STRING
+DECLARE MyFile : STRING
+MyFile ← "MyText.txt"
+
+// writing the line of text to the file
+OPEN MyFile FOR WRITE
+OUTPUT "Please enter a line of text"
+INPUT TextLine
+WRITEFILE MyFile, TextLine
+CLOSEFILE(MyFile)
+
+// reading the line of text from the file
+OUTPUT "The file contains this line of text:"
+OPEN MyFile FOR READ
+READFILE MyFile, TextLine
+OUTPUT TextLine
+CLOSEFILE(MyFile)</div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Python — the exact same task</span>MyFile = open("MyText.txt", "w")
+TextLine = input("Please enter a line of text ")
+MyFile.write(TextLine)
+MyFile.close()
+
+print("The file contains this line of text")
+MyFile = open("MyText.txt", "r")
+TextLine = MyFile.read()
+print(TextLine)
+MyFile.close()</div>
+
+  <div class="compare-grid">
+    <div class="compare-card"><b>Opening for writing</b>Pseudocode: <code>OPEN MyFile FOR WRITE</code><br>Python: <code>open("MyText.txt", "w")</code> — "w" means write mode.</div>
+    <div class="compare-card"><b>Opening for reading</b>Pseudocode: <code>OPEN MyFile FOR READ</code><br>Python: <code>open("MyText.txt", "r")</code> — "r" means read mode.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Reading the correspondence line by line</h4>
+    <ul>
+      <li>Python's <code>open(filename, mode)</code> combines opening AND specifying read/write mode into one call — pseudocode splits this into <code>OPEN ... FOR WRITE</code> or <code>OPEN ... FOR READ</code>.</li>
+      <li><code>MyFile.write(TextLine)</code> and <code>MyFile.read()</code> correspond directly to pseudocode's <code>WRITEFILE</code> and <code>READFILE</code>.</li>
+      <li><code>MyFile.close()</code> is exactly pseudocode's <code>CLOSEFILE(MyFile)</code> — always called once reading or writing is finished.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — file handling (completes Unit 8: Programming).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What happens to data held in RAM when the computer is switched off, and how does storing it in a file change this?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Data in RAM is lost the instant the power is switched off. Data saved to a FILE is stored permanently, surviving being switched off, and can be read again later.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the basic three-step pattern for using a file, whether reading or writing?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>OPEN the file (specifying read or write), READ or WRITE the actual data, then CLOSE the file.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the Python call to open "Scores.txt" for writing: <code>MyFile = open("Scores.txt", "______")</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>MyFile = open("Scores.txt", "w")</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes data to a file but never calls CLOSEFILE / .close() afterwards. What real problem can this cause?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The data may not actually be properly saved to the file at all (some systems buffer writes and only guarantee they're saved on close), and the file could remain "locked", preventing other programs from accessing it until it's properly closed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write pseudocode to open a file called "Log.txt" for writing, write the string "Program started", and close it.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>OPEN "Log.txt" FOR WRITE<br>WRITEFILE "Log.txt", "Program started"<br>CLOSEFILE("Log.txt")</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Give one real reason a program might read data from a file that was written by a COMPLETELY DIFFERENT program.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any genuine reason where two separate programs need to share the same data — e.g. one program exports a list of scores to a file, and a completely separate reporting program reads that same file later to produce a summary, without the two programs ever running at the same time or communicating directly.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.3a File Handling (completes Unit 8)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.3
+  </div>
+
+</div>
+</body>
+</html>

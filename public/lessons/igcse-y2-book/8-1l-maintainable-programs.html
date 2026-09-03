@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1l Writing Maintainable Programs — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: left; }
+  .dtype-table th { background: rgba(96,165,250,.1); color: #60a5fa; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-family: ui-monospace, monospace; font-size: 11.5px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1l Writing Maintainable Programs</div>
+  <div class="topic-subtitle">Code that YOU understand today isn't enough — it needs to make sense to someone else too. Completes Section 8.1.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Maintainable code</div><div class="key-term-def">Code written so that another programmer (not just its original author) can understand, fix, and extend it.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Comment</div><div class="key-term-def">Text in a program ignored by the computer, written purely to explain the code to a human reader.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>A real program should be understandable to ANOTHER programmer</h4>
+    <ul>
+      <li>A program written for a genuine real-world task needs to be maintainable — someone OTHER than its original author should be able to read, understand, and safely modify it.</li>
+      <li>(Note: exam questions sometimes deliberately DON'T follow these rules, to test your ability to trace through unclear code or spot errors — real production code should always follow them.)</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Three concrete habits that make code maintainable</h4>
+    <ul>
+      <li>Use MEANINGFUL names for every variable, constant, array, procedure, and function — a name like <code>StudentTotal</code> tells a reader what it's for; a name like <code>x</code> or <code>temp2</code> doesn't.</li>
+      <li>Divide the program into MODULES for each distinct task, using procedures and functions — a program that's just one giant block of code is far harder to understand and fix than one broken into clearly-named pieces.</li>
+      <li>Fully COMMENT the code, using the programming language's own commenting feature.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Language</th><th>How comments are written</th></tr>
+    <tr><td>Python</td><td># starts a comment for that whole line</td></tr>
+    <tr><td>Pseudocode</td><td>// starts a comment for that whole line (used throughout this course)</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>What comments are actually for</h4>
+    <ul>
+      <li>A comment is completely ignored by the computer when the program runs — it exists purely to explain something to a human reader.</li>
+      <li>Good comments explain WHY something is done a certain way (or what a tricky piece of logic is FOR), not just restate exactly what the code obviously already says.</li>
+      <li>Every worked example throughout this course (Chapters 7 and 8) has used exactly this kind of comment — e.g. explaining why a Counter starts at -1, or what a nested loop level is tracking.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the habits and features that make a program maintainable.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does it mean for a program to be "maintainable"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It means the code can be understood, fixed, and extended by someone OTHER than the person who originally wrote it — not just by its original author.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Name the three concrete habits this subsection identifies for writing maintainable code.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Meaningful names for every data store; dividing the program into modules using procedures/functions; and fully commenting the code.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In Python, a comment starts with the symbol ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A hash symbol, <code>#</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes a program using only single-letter variable names (a, b, c, x, y) throughout, arguing it's faster to type. Why does this go against writing maintainable code?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Single-letter names give no clue what a variable is actually FOR — another programmer (or the same student, returning to the code weeks later) would have to trace through the whole program just to work out what each one represents, exactly the opposite of the goal of meaningful naming.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write a Python comment explaining why a Counter variable starts at -1 (referring back to the sequence-error worked example from 8.1c).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code># Counter starts at -1 so the extra "999" input (used only to end the loop) is not counted as a real mark</code> — a good comment explains the REASON for a non-obvious choice, not just what the line does.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Does a comment have any effect on how the program actually runs?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — a comment is completely ignored by the computer when the program executes. It exists purely to communicate with a human reader of the code.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1l Writing Maintainable Programs (completes Section 8.1)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1
+  </div>
+
+</div>
+</body>
+</html>

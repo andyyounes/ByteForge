@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.2a One-Dimensional Arrays — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(232,121,249,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #f0abfc; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #e879f9; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.2a One-Dimensional Arrays</div>
+  <div class="topic-subtitle">One name, many values — accessed by index, not by a separate variable for each one.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Array</div><div class="key-term-def">A data structure holding several elements of the SAME data type, all under one identifier name.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Index</div><div class="key-term-def">The position number used to access one specific element in an array.</div></div>
+    <div class="key-term-card"><div class="key-term-name">List (Python)</div><div class="key-term-def">Python's equivalent structure — but unlike an array, a Python list CAN mix different data types.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why arrays exist at all</h4>
+    <ul>
+      <li>An array stores multiple data items UNIFORMLY — all under the same identifier, each accessed separately via its index.</li>
+      <li>This lets a list of items be stored, searched, and ordered — e.g. names sorted alphabetically, or temperatures searched for a particular value — without needing a completely separate variable name for every single item.</li>
+      <li>The first element's index is usually 0 (most languages, including pseudocode and Python, index from 0 by default here).</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="480" height="90" viewBox="0 0 480 90">
+      <g font-family="ui-monospace, monospace" font-size="12" text-anchor="middle">
+        <text x="10" y="15" fill="#9ca3af" font-size="10" font-family="system-ui" text-anchor="start">MyList — a one-dimensional array of 10 integers</text>
+        <g>
+          <rect x="10" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="32" y="45" fill="#e2e8f0">27</text>
+          <rect x="54" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="76" y="45" fill="#e2e8f0">19</text>
+          <rect x="98" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="120" y="45" fill="#e2e8f0">36</text>
+          <rect x="142" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="164" y="45" fill="#e2e8f0">42</text>
+          <rect x="186" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="208" y="45" fill="#e2e8f0">16</text>
+          <rect x="230" y="25" width="44" height="30" fill="rgba(232,121,249,.15)" stroke="#e879f9" stroke-width="2"/><text x="252" y="45" fill="#f0abfc">89</text>
+          <rect x="274" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="296" y="45" fill="#e2e8f0">21</text>
+          <rect x="318" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="340" y="45" fill="#e2e8f0">16</text>
+          <rect x="362" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="384" y="45" fill="#e2e8f0">55</text>
+          <rect x="406" y="25" width="44" height="30" fill="#111320" stroke="#e879f9"/><text x="428" y="45" fill="#e2e8f0">72</text>
+        </g>
+        <text x="32" y="70" fill="#6b7280" font-size="9">0</text><text x="252" y="70" fill="#e879f9" font-size="9" font-weight="700">5</text><text x="428" y="70" fill="#6b7280" font-size="9">9</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Declaring a one-dimensional array in pseudocode</h4>
+    <ul>
+      <li>A declaration needs: the array's NAME, its first index, its last index, and its data TYPE.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Declaring MyList — 10 integers, index 0 to 9</span>DECLARE MyList : ARRAY[0:9] OF INTEGER</div>
+
+  <div class="theory-block">
+    <h4>Populating one element at a time, by index</h4>
+    <ul>
+      <li>Setting a single element uses square brackets with its index: <code>MyList[4] ← 27</code> puts 27 into the 5th position (index 4, since counting starts at 0).</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Populating an entire array using a loop</span>OUTPUT "Enter these 10 values in order 27, 19, 36, 42, 16, 89, 21, 16, 55, 72"
+FOR Counter ← 0 TO 9
+  OUTPUT "Enter next value "
+  INPUT MyList[Counter]
+NEXT Counter
+
+OUTPUT MyList[1]     // this would display 19</div>
+
+  <div class="theory-block">
+    <h4>Reading the loop — Counter IS the array index</h4>
+    <ul>
+      <li>The loop variable Counter is used directly as the array index — each pass through the loop reads one value into the NEXT position, without needing 10 separate INPUT statements written by hand.</li>
+      <li><code>MyList[1]</code> displays 19 — the SECOND item (index 1), not the first, because indexing starts at 0.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Python — populating an array (list) directly, all at once</span>myList = [27, 19, 36, 42, 16, 89, 21, 16, 55, 72]</div>
+
+  <div class="theory-block">
+    <h4>Python's "list" — similar, but not identical to a real array</h4>
+    <ul>
+      <li>Python doesn't have a strict array type — it uses a LIST instead, which is more flexible.</li>
+      <li>A Python list CAN hold mixed data types (a string, an integer, and a boolean all in the same list) — a true array must hold only ONE data type throughout.</li>
+      <li>For IGCSE purposes, a Python list used to hold a single data type behaves exactly like the arrays this course describes.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — one-dimensional arrays.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What four things does a pseudocode array declaration need to specify?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The array's name, its first index value, its last index value, and its data type.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the one key difference between a true array and a Python list?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A Python list can hold MIXED data types in the same list; a true array must hold only ONE data type throughout.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the declaration for an array called Scores holding 5 REAL numbers, indexed 0 to 4: <code>DECLARE Scores : ______[0:4] OF ______</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>DECLARE Scores : ARRAY[0:4] OF REAL</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student wants to display the FIRST item in MyList and writes <code>OUTPUT MyList[1]</code>. What's actually wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Index 1 is the SECOND item (19), not the first — since indexing starts at 0, the first item is <code>MyList[0]</code> (27).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write pseudocode to populate a 5-element array called Ages (indexed 0 to 4) using a FOR loop and INPUT.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>FOR Counter ← 0 TO 4<br>&nbsp;&nbsp;OUTPUT "Enter next age "<br>&nbsp;&nbsp;INPUT Ages[Counter]<br>NEXT Counter</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why does using an array (with a loop and index) genuinely save code, compared to using 10 separate named variables?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A loop can populate or process EVERY element using just a few lines, regardless of how many elements there are — 10 separate variables would need 10 separate lines repeated for every operation, and the number of lines would grow every time more data needed storing.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.2a One-Dimensional Arrays<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.2
+  </div>
+
+</div>
+</body>
+</html>
