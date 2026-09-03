@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.9b A Real Nested-Loop Algorithm — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #93c5fd; white-space: pre-wrap; line-height: 1.6; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .example-block { background: rgba(74,222,128,.05); border: 1px solid rgba(74,222,128,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4ade80; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #d1fae5; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.9b A Real Nested-Loop Algorithm</div>
+  <div class="topic-subtitle">Combining totalling, max/min/average, validation, and CASE OF into one genuinely realistic algorithm.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Outer loop</div><div class="key-term-def">A loop that controls how many times an ENTIRE inner loop repeats.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Inner loop</div><div class="key-term-def">A loop nested inside another loop, running to completion every single time the outer loop takes one step.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example 2 — school test results</div>
+    <p>A school with 600 students wants to produce information from the results of four standard tests: Maths, Science, English, and IT — each out of 100 marks. The output should be the highest, lowest, and average mark for EACH test, and the highest, lowest, and average mark OVERALL. All the marks need to be input.</p>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Pseudocode — nested loops, CASE OF, per-subject AND overall statistics</span>// initialisation of overall counters
+OverallHighest ← 0
+OverallLowest ← 100
+OverallTotal ← 0
+FOR Test ← 1 TO 4              // outer loop for the tests
+  // initialisation of subject counters
+  SubjectHighest ← 0
+  SubjectLowest ← 100
+  SubjectTotal ← 0
+  CASE OF Test
+    1 : SubjectName ← "Maths"
+    2 : SubjectName ← "Science"
+    3 : SubjectName ← "English"
+    4 : SubjectName ← "IT"
+  ENDCASE
+  FOR StudentNumber ← 1 TO 600   // inner loop for the students
+    REPEAT
+      OUTPUT "Enter Student ", StudentNumber, "'s mark for ", SubjectName
+      INPUT Mark
+    UNTIL Mark < 101 AND Mark > -1
+    IF Mark < OverallLowest THEN OverallLowest ← Mark
+    IF Mark < SubjectLowest THEN SubjectLowest ← Mark
+    IF Mark > OverallHighest THEN OverallHighest ← Mark
+    IF Mark > SubjectHighest THEN SubjectHighest ← Mark
+    OverallTotal ← OverallTotal + Mark
+    SubjectTotal ← SubjectTotal + Mark
+  NEXT StudentNumber
+  SubjectAverage ← SubjectTotal / 600
+  OUTPUT SubjectName
+  OUTPUT "Average mark is ", SubjectAverage
+  OUTPUT "Highest Mark is ", SubjectHighest
+  OUTPUT "Lowest Mark is ", SubjectLowest
+NEXT Test
+OverallAverage ← OverallTotal / 2400
+OUTPUT "Overall Average is ", OverallAverage
+OUTPUT "Overall Highest Mark is ", OverallHighest
+OUTPUT "Overall Lowest Mark is ", OverallLowest</div>
+
+  <div class="theory-block">
+    <h4>Reading the structure: two loops, two "levels" of statistics</h4>
+    <ul>
+      <li>The OUTER loop (<code>FOR Test ← 1 TO 4</code>) runs once per subject — Maths, Science, English, IT — using <code>CASE OF</code> to set the subject's name from the Test number.</li>
+      <li>The INNER loop (<code>FOR StudentNumber ← 1 TO 600</code>) runs once per student, EVERY single time the outer loop takes a step — so the inner loop's body genuinely executes 4 × 600 = 2400 times in total.</li>
+      <li>SubjectHighest/SubjectLowest/SubjectTotal are RESET back to their starting values at the start of every outer loop pass — they only need to track ONE subject at a time. OverallHighest/OverallLowest/OverallTotal are initialised ONCE, outside both loops, because they must track across ALL 2400 marks.</li>
+      <li>A validation REPEAT...UNTIL loop (<code>Mark &lt; 101 AND Mark &gt; -1</code>) sits inside the inner loop, re-asking for the SAME student's mark until it's a valid 0-100 value, before moving on.</li>
+      <li>Comments (the // lines) are used throughout purely to make the algorithm more understandable to a human reader — they have no effect on what the algorithm actually does.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Testing an algorithm this large — reduce the scale first</h4>
+    <ul>
+      <li>Dry-running this algorithm exactly as written would mean tracing 2400 individual inputs by hand — completely impractical.</li>
+      <li>The sensible approach: reduce the numbers for TESTING purposes only — e.g. 5 students and 2 subjects instead of 600 and 4 — trace THAT smaller version thoroughly, then trust the same logic scales up once it's proven correct on the small version.</li>
+      <li>This is a genuinely common real technique: test the same LOGIC at a manageable scale before ever running it at full, real-world scale.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the nested-loop school-results algorithm.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">How many times does the inner loop's body actually execute in total, across the whole algorithm?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>2400 times — the inner loop runs 600 times (once per student) for EACH of the 4 outer loop passes (once per subject): 4 × 600 = 2400.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is SubjectTotal reset to 0 at the start of every outer loop pass, but OverallTotal is only initialised once?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>SubjectTotal only ever needs to track ONE subject at a time, so it must start fresh for each new subject. OverallTotal needs to accumulate across ALL subjects and all students, so it's only initialised once, before the outer loop even begins.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the CASE OF statement: <code>CASE OF Test<br>&nbsp;&nbsp;1 : SubjectName ← "Maths"<br>&nbsp;&nbsp;2 : SubjectName ← ______<br>&nbsp;&nbsp;...</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>SubjectName ← "Science"</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student moves the line <code>SubjectTotal ← 0</code> to OUTSIDE the outer FOR loop (before it starts), instead of inside it. What goes wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>SubjectTotal would never reset between subjects — Science's total would start from wherever Maths's total finished, English's from Science's, and so on, making every subject average AFTER the first one completely wrong (too high, accumulating marks from previous subjects).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does the validation loop use <code>UNTIL Mark &lt; 101 AND Mark &gt; -1</code> rather than <code>UNTIL Mark &lt;= 100 AND Mark &gt;= 0</code>, even though both describe the same 0-100 range?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They're mathematically equivalent ways of expressing the exact same valid range (0 to 100 inclusive) — either is correct; this is just a stylistic choice some algorithms make, and recognising that both forms describe the same condition is the actual skill being tested.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why would a real dry run of this algorithm reduce the number of students and subjects first, rather than tracing all 2400 inputs?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Tracing 2400 individual inputs by hand is completely impractical. Reducing to a small number (e.g. 5 students, 2 subjects) still fully tests the same LOGIC, just at a manageable scale — the algorithm's structure doesn't change, only how many times it repeats.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.9b A Real Nested-Loop Algorithm (completes Section 7.9)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.9
+  </div>
+
+</div>
+</body>
+</html>

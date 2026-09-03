@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.9c Stacks and Queues (Extension) — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+  .stack-col { display: flex; flex-direction: column-reverse; gap: 2px; }
+  .stack-cell { width: 60px; height: 30px; background: #111320; border: 1px solid #e879f9; color: #f0abfc; display: flex; align-items: center; justify-content: center; font-family: ui-monospace, monospace; font-size: 13px; }
+  .stack-label { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 6px; font-family: system-ui, sans-serif; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving · Extension</span>
+  <div class="topic-title">7.9c Stacks and Queues</div>
+  <div class="topic-subtitle">Extension: an early look at Abstract Data Types, for anyone considering A Level Computer Science.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Abstract Data Type (ADT)</div><div class="key-term-def">A collection of data PLUS a set of operations that work on that data.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Stack (LIFO)</div><div class="key-term-def">Last In, First Out — the most recently added item is always the first one removed.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Queue (FIFO)</div><div class="key-term-def">First In, First Out — the earliest added item is always the first one removed.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Push / Pop</div><div class="key-term-def">Push adds an item to a stack; pop removes the most recently added item from it.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Enqueue / Dequeue</div><div class="key-term-def">Enqueue adds an item to a queue; dequeue removes the earliest-added item from it.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What an ADT actually is</h4>
+    <ul>
+      <li>An Abstract Data Type is a collection of data AND a defined set of operations that work on it — the operations are just as much part of the ADT as the data itself.</li>
+      <li>Stacks and queues are two of the simplest, most common ADTs — both store a LIST of items, but they remove items in completely different ORDERS.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <div>
+      <div class="stack-col">
+        <div class="stack-cell">79</div>
+        <div class="stack-cell">34</div>
+        <div class="stack-cell">82</div>
+        <div class="stack-cell">27</div>
+      </div>
+      <div class="stack-label">Stack — 27 pushed first,<br>79 pushed last (Top)</div>
+    </div>
+    <div>
+      <div class="stack-col">
+        <div class="stack-cell">34</div>
+        <div class="stack-cell">82</div>
+        <div class="stack-cell">27</div>
+      </div>
+      <div class="stack-label">Stack after POP<br>(79 removed — always<br>the TOP item)</div>
+    </div>
+    <div>
+      <div class="stack-col">
+        <div class="stack-cell">31</div>
+        <div class="stack-cell">34</div>
+        <div class="stack-cell">82</div>
+        <div class="stack-cell">27</div>
+      </div>
+      <div class="stack-label">Stack after PUSH<br>(31 added — always<br>goes on TOP)</div>
+    </div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Stack — Last In, First Out</h4>
+    <ul>
+      <li>Items are added to a stack with <b>push</b>, and removed with <b>pop</b>.</li>
+      <li>In the example above, 27 was pushed first, then 82, then 34, then 79 — a Top Pointer always tracks whichever item was added most recently.</li>
+      <li>A pop always removes whatever is currently on TOP — so popping removes 79 first, even though it's the most recent addition, not the oldest.</li>
+      <li>A push always adds the new item to the top — after popping 79 off, pushing 31 places it on top of 34 (the new top), NOT at the bottom.</li>
+      <li>The Base Pointer (the bottom of the stack) never changes during stack operations — only the Top Pointer moves.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Queue — First In, First Out</h4>
+    <ul>
+      <li>Items are added to a queue with <b>enqueue</b>, and removed with <b>dequeue</b>.</li>
+      <li>A Front Pointer tracks the item that will be removed NEXT; an End Pointer tracks where the next new item will be added.</li>
+      <li>Dequeue always removes whichever item is at the FRONT — the item that has been waiting longest, exactly like a real queue of people.</li>
+      <li>Enqueue always adds the new item at the END — behind everyone already waiting.</li>
+      <li>Unlike a stack (where only the Top Pointer moves), BOTH the Front Pointer and the End Pointer change during queue operations — dequeue moves the front pointer forward, enqueue moves the end pointer forward.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>A real-world way to remember the difference</h4>
+    <ul>
+      <li>A stack is like a pile of plates — you can only take the top one off, and any new plate goes on top. The plate at the very bottom could sit there for a very long time if plates keep getting added and removed from the top.</li>
+      <li>A queue is like a real queue of people waiting in line — the person who arrived FIRST is served first, and new arrivals join at the back.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — stacks, queues, and their operations.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does an Abstract Data Type consist of?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A collection of data, PLUS a defined set of operations that work on that data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What do the abbreviations LIFO and FIFO stand for, and which structure does each describe?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>LIFO = Last In, First Out — describes a stack. FIFO = First In, First Out — describes a queue.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Adding an item to a stack is called ______; removing an item from a stack is called ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Adding = push; removing = pop.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "In both a stack and a queue, adding a new item always changes both pointers." Explain what's wrong with this statement.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This is only true for a queue (enqueue changes the End Pointer; dequeue changes the Front Pointer — both pointers move over time). For a STACK, the Base Pointer never changes during push or pop — only the Top Pointer ever moves.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Items are pushed onto an empty stack in this order: A, B, C, D. What order would they be popped off in?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>D, C, B, A — the reverse of the order they were pushed, since a stack is Last In, First Out.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">
+      The same items — A, B, C, D — are enqueued in that order onto an empty queue instead. What order would they be dequeued in?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A, B, C, D — the SAME order they were added, since a queue is First In, First Out.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.9c Stacks and Queues (Extension) — completes Unit 7<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.9 Extension
+  </div>
+
+</div>
+</body>
+</html>

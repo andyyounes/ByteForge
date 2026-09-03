@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.9a Writing and Amending Algorithms — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul, .theory-block ol { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .example-block { background: rgba(74,222,128,.05); border: 1px solid rgba(74,222,128,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4ade80; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #d1fae5; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.9a Writing and Amending Algorithms</div>
+  <div class="topic-subtitle">A real process for going from a problem statement to a working, tested algorithm.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Sub-problem</div><div class="key-term-def">A smaller, more manageable piece a complex problem is broken down into.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Structure diagram</div><div class="key-term-def">A diagram showing how a problem is broken into sub-tasks, top-down.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The eight stages of producing an algorithm</h4>
+    <ol>
+      <li>Make sure the problem is CLEARLY SPECIFIED — the purpose of the algorithm and the tasks it must complete.</li>
+      <li>Break the problem down into sub-problems — most problems, even simple ones, can be divided into: set-up processes, input, processing of data, permanent storage of data (if required), output of results.</li>
+      <li>Decide how data is obtained and stored, what happens to it, and how results are displayed.</li>
+      <li>Design the structure of the algorithm using a structure diagram.</li>
+      <li>Decide how to construct the algorithm — flowchart or pseudocode (or follow whatever you're told to use).</li>
+      <li>Construct the algorithm so it can be easily read and understood by someone else — set it out clearly, use MEANINGFUL names for data stores, and take particular care with loop/selection conditions (e.g. <code>Counter &gt;= 10</code> rather than "Counter ten or over").</li>
+      <li>Use several sets of test data (Normal, Abnormal, and Boundary) to dry run the algorithm and record results in trace tables, to find any errors.</li>
+      <li>If errors are found, correct them and repeat the process until the algorithm works perfectly.</li>
+    </ol>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="500" height="180" viewBox="0 0 500 180">
+      <g font-family="system-ui" font-size="12" text-anchor="middle">
+        <rect x="180" y="10" width="140" height="34" rx="6" fill="#111320" stroke="#60a5fa"/><text x="250" y="31" fill="#e2e8f0">Max and Min</text>
+        <line x1="250" y1="44" x2="250" y2="60" stroke="rgba(255,255,255,.3)"/>
+        <line x1="60" y1="60" x2="440" y2="60" stroke="rgba(255,255,255,.3)"/>
+        <line x1="60" y1="60" x2="60" y2="75" stroke="rgba(255,255,255,.3)"/>
+        <line x1="180" y1="60" x2="180" y2="75" stroke="rgba(255,255,255,.3)"/>
+        <line x1="320" y1="60" x2="320" y2="75" stroke="rgba(255,255,255,.3)"/>
+        <line x1="440" y1="60" x2="440" y2="75" stroke="rgba(255,255,255,.3)"/>
+        <rect x="10" y="75" width="100" height="34" rx="6" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="60" y="96" fill="#e2e8f0">Enter values</text>
+        <rect x="120" y="75" width="120" height="34" rx="6" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="180" y="96" fill="#e2e8f0">Check all values</text>
+        <rect x="255" y="75" width="130" height="34" rx="6" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="320" y="96" fill="#e2e8f0">Check for Max/Min</text>
+        <rect x="380" y="75" width="120" height="34" rx="6" fill="#111320" stroke="rgba(255,255,255,.2)"/><text x="440" y="96" fill="#e2e8f0">Output Max, Min</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Structure diagrams vs. flowcharts — different jobs</h4>
+    <ul>
+      <li>A structure diagram (or "structure chart") shows WHAT sub-tasks make up a solution, top-down — it says nothing about loops, conditions, or exact sequencing.</li>
+      <li>A flowchart or pseudocode then shows HOW each of those sub-tasks is actually built, step by step, including every loop and decision.</li>
+      <li>Precision matters when writing an algorithm exactly as much as when writing real program code — meaningful names and clearly stated conditions make an algorithm something another person (or you, months later) can actually follow.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — concert ticket pricing</div>
+    <p>Tickets are sold for a concert at $20 each. Buying 10 tickets gives a 10% discount; buying 20 tickets gives a 20% discount. No more than 25 tickets can be bought in a single transaction.</p>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">a) Pseudocode for the ticket-pricing algorithm</span>REPEAT
+  OUTPUT "How many tickets would you like to buy? "
+  INPUT NumberOfTickets
+UNTIL NumberOfTickets > 0 AND NumberOfTickets < 26
+IF NumberOfTickets < 10
+THEN
+  Discount ← 0
+ELSE
+  IF NumberOfTickets < 20
+  THEN
+    Discount ← 0.1
+  ELSE
+    Discount ← 0.2
+  ENDIF
+ENDIF
+Cost ← NumberOfTickets * 20 * (1 – Discount)
+PRINT "Your tickets cost ", Cost</div>
+
+  <div class="theory-block">
+    <h4>b) How this algorithm would be tested</h4>
+    <ul>
+      <li>Test data would use values of: <b>0, 26</b> — expected result: both REJECTED (outside the valid 1-25 range).</li>
+      <li><b>1, 25</b> — expected results: 20, 400 (1 ticket at full price = $20; 25 tickets at 20% off = 25 × 20 × 0.8 = $400).</li>
+      <li><b>9, 10</b> — expected results: 180, 180 (9 tickets at full price = $180; 10 tickets at 10% off = 10 × 20 × 0.9 = $180 — genuinely the same cost, right at the discount boundary).</li>
+      <li><b>19, 20</b> — expected results: 342, 320 (19 tickets at 10% off = 19 × 20 × 0.9 = $342; 20 tickets at 20% off = 20 × 20 × 0.8 = $320).</li>
+      <li>Notice this test data is exactly boundary data — pairs straddling each discount threshold (0/1, 9/10, 19/20, 25/26).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the algorithm-writing process and the ticket-pricing worked example.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the very FIRST stage in producing an algorithm, before any design work begins?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Making sure the problem is clearly specified — understanding the purpose of the algorithm and exactly what tasks it must complete.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the difference in job between a structure diagram and a flowchart/pseudocode?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A structure diagram shows WHAT sub-tasks a solution breaks into (top-down), with no detail on loops or conditions. A flowchart or pseudocode shows HOW each sub-task is actually built, step by step, including every loop and decision.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the ticket cost formula: <code>Cost ← NumberOfTickets * 20 * (1 – ______)</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>Cost ← NumberOfTickets * 20 * (1 – Discount)</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student names their loop condition variable <code>Counter</code> and writes the exit condition as "keep going until Counter reaches ten or so". Why does stage 6 of the process explicitly warn against this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Ten or so" is vague and not a precise, checkable condition — a real algorithm needs an EXACT comparison like <code>Counter &gt;= 10</code>, otherwise it's ambiguous exactly when the loop should stop, and different people (or a computer) could interpret it differently.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the ticket-pricing algorithm, what would the output be for 10 tickets, and why is this a genuinely useful boundary test?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>10 tickets triggers the 10% discount (since it's NOT less than 10): 10 × 20 × 0.9 = $180. It's a useful boundary test because 9 tickets (just below) costs 9 × 20 = $180 too — proving the discount threshold behaves exactly as intended right at the edge, not one ticket too early or late.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why does the test data for this algorithm specifically include the pairs 0/1, 9/10, 19/20, and 25/26?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because each pair straddles a real boundary in the algorithm's logic (the minimum valid order, and each discount threshold) — boundary data always comes in pairs like this, one value accepted and one rejected (or one at each discount rate), to prove the exact cut-off point behaves correctly.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.9a Writing and Amending Algorithms<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.9
+  </div>
+
+</div>
+</body>
+</html>
