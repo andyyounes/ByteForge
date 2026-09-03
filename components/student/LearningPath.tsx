@@ -51,22 +51,29 @@ const GRADE_SECTIONS: Record<number, PathSection[]> = {
       ],
     },
   ],
-  // ── Grade 8 ───────────────────────────────────────────────────────────────
+  // ── Grade 8 — kept in sync with grade8.html's own G8_MODULE_CONCEPT map and
+  // its real module order (web0-web5, py1-adv/cc1, m1-m10). The previous list
+  // here (functions-params/lists-data, then pseudocode-*, then compression/
+  // cpu-pipeline/hex-intro/ascii-unicode) was a leftover from before Grade 8's
+  // 3-semester rebuild — those pseudocode/hardware concepts are gradeMin 9-10
+  // and link to entirely different standalone pages, not grade8.html at all,
+  // so this widget sent Grade 8 students somewhere unrelated to their actual
+  // Builder City Map. ────────────────────────────────────────────────────────
   8: [
     {
-      label: 'Systems Builder Track',
+      label: 'Building a Website',
       color: SECTION_DOT,
-      conceptIds: ['functions-params', 'lists-data'],
+      conceptIds: ['g8-what-is-a-website', 'g8-web-story'],
     },
     {
-      label: 'Algorithms & Pseudocode',
+      label: 'Python Fundamentals',
       color: SECTION_DOT,
-      conceptIds: ['pseudocode-intro', 'pseudocode-loops', 'pseudocode-arrays'],
+      conceptIds: ['g8-text', 'g8-loops', 'functions-params', 'lists-data', 'g8-strings'],
     },
     {
-      label: 'Hardware & Data',
+      label: 'Real Projects',
       color: SECTION_DOT,
-      conceptIds: ['compression', 'cpu-pipeline', 'binary-addition', 'hex-intro', 'ascii-unicode'],
+      conceptIds: ['g8-files', 'g8-hardware', 'g8-web', 'g8-cyber', 'g8-apps', 'g8-capstone'],
     },
   ],
   // ── Grade 9 — "The Deep Diver" ───────────────────────────────────────────

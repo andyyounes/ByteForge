@@ -250,7 +250,7 @@ export const PATHWAYS: Pathway[] = [
     name: 'Systems Builder',
     icon: '⊞',
     color: '#3b82f6',
-    conceptIds: ['g8-text','g8-loops','functions-params','lists-data','g8-strings','g8-files','g8-hardware','g8-web','g8-apps','g8-capstone'],
+    conceptIds: ['g8-what-is-a-website','g8-web-story','g8-text','g8-loops','functions-params','lists-data','g8-strings','g8-files','g8-hardware','g8-web','g8-cyber','g8-apps','g8-capstone'],
     tier: 'Grade 8',
   },
   // ── General pathways (Grade 9+) ───────────────────────────────────────────
