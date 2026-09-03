@@ -34,6 +34,9 @@ const QuestMap = (() => {
       .qm-stat { background:#111320; border:1px solid rgba(255,255,255,.08); border-radius:99px; padding:5px 15px;
                  font-size:12px; font-weight:800; color:#c4b5fd; }
       .qm-stat b { color:#fbbf24; }
+      .qm-complete-banner { max-width:560px; margin:16px auto 0; padding:12px 20px; text-align:center;
+        background:linear-gradient(135deg, rgba(251,191,36,.12), rgba(232,121,249,.12));
+        border:1px solid rgba(251,191,36,.35); border-radius:14px; font-size:13px; color:#fde68a; line-height:1.5; }
       .qm-map { max-width:680px; margin:16px auto 80px; padding:0 16px; }
       .qm-world { border-radius:18px; border:1px solid rgba(255,255,255,.08); margin-bottom:16px; padding:15px 17px 19px;
                   background:linear-gradient(160deg, rgba(255,255,255,.03), rgba(255,255,255,0)); }
@@ -123,6 +126,15 @@ const QuestMap = (() => {
       + '<button class="qm-close" onclick="QuestMap.hide()">✕</button>'
       + '<div class="qm-stats"><span class="qm-stat">✅ <b>' + done + '</b>/' + total + ' stages</span></div>'
       + '</div>'
+
+    // Every live stage done, and there's at least one — nothing else to show
+    // up next (no unbuilt "coming soon" world queued after the last live
+    // one, on any of these pages right now), so say so explicitly instead
+    // of the map just quietly ending with no acknowledgement.
+    if (total > 0 && done === total) {
+      html += '<div class="qm-complete-banner">🎉 <b>You\'ve completed every stage!</b> '
+        + 'Keep revisiting any of them for extra practice, or check with your teacher about what\'s next.</div>'
+    }
 
     if (cfg.layout === 'path') {
       overlay.innerHTML = html + renderPath()
