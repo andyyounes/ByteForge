@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.02 Coding Signed Integers: Two's Complement — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: rgba(74,222,128,.05); border: 1px solid rgba(74,222,128,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4ade80; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #d1fae5; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 9px; text-align: center; }
+  .dtype-table th { background: rgba(232,121,249,.1); color: #e879f9; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-family: ui-monospace, monospace; font-size: 11.5px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 1 · Information Representation</span>
+  <div class="topic-title">1.02 Coding Signed Integers: Two's Complement</div>
+  <div class="topic-subtitle">How a computer represents negative numbers — and why this specific scheme was chosen.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Sign and magnitude</div><div class="key-term-def">Using one bit purely for +/- sign, the rest for the value — simple, but has real drawbacks.</div></div>
+    <div class="key-term-card"><div class="key-term-name">One's complement</div><div class="key-term-def">Every bit individually flipped (0↔1).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Two's complement</div><div class="key-term-def">The one's complement PLUS 1 — the scheme real computers actually use for signed integers.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Unsigned vs. signed — the basic choice</h4>
+    <ul>
+      <li>An UNSIGNED integer is stored simply as a plain binary number — the only real decision is how many bytes to use. Two bytes (16 bits) gives a range of 0 to 2¹⁶−1 = 65535.</li>
+      <li>A SIGNED integer needs a way to represent both positive AND negative — the obvious idea (sign-and-magnitude: one bit for sign, the rest for value) has real problems, most notably TWO representations of zero (+0 and −0).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Two's complement — the scheme actually used</h4>
+    <ul>
+      <li><b>One's complement</b>: flip every bit (each 0 becomes 1, each 1 becomes 0).</li>
+      <li><b>Two's complement</b>: take the one's complement, then add 1.</li>
+      <li><b>Shortcut</b>: starting from the LEAST significant bit, copy every bit unchanged up to and including the first 1 you hit; flip every bit AFTER that.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — two's complement of 10100100</div>
+    <p>From the right: the trailing "100" is copied unchanged (up to and including the first 1). The remaining bits "10100" get flipped to "01011".</p>
+    <p>Result: <b>01011100</b>.</p>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Denary</th><th>Sign &amp; magnitude</th><th>Two's complement</th></tr>
+    <tr><td>+7</td><td>0111</td><td>0111</td></tr>
+    <tr><td>+1</td><td>0001</td><td>0001</td></tr>
+    <tr><td>+0</td><td>0000</td><td>0000</td></tr>
+    <tr><td>−0</td><td>1000</td><td>not represented</td></tr>
+    <tr><td>−1</td><td>1001</td><td>1111</td></tr>
+    <tr><td>−7</td><td>1111</td><td>1001</td></tr>
+    <tr><td>−8</td><td>not represented</td><td>1000</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Reading the comparison table — three real observations</h4>
+    <ul>
+      <li>Sign-and-magnitude has BOTH +0 and −0 — a genuine problem, since two different bit patterns are meant to mean the same value, complicating comparisons.</li>
+      <li>Two's complement has NO separate −0 — but gains an EXTRA negative value instead (−8 in this 4-bit example) that sign-and-magnitude can't represent at all.</li>
+      <li>Positive values are IDENTICAL in both schemes — only the negative encodings differ.</li>
+      <li>In two's complement, counting UP from the most negative value (adding 1 repeatedly) naturally rolls over from all-1s straight to all-0s — exactly like a real digital counter reaching its maximum and wrapping around.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The key property: two's complement is self-complementary</h4>
+    <ul>
+      <li>Taking the two's complement of a NEGATIVE number's code gives you the code for the corresponding POSITIVE number — and vice versa. Apply the exact same operation twice and you're back where you started.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — converting 10110001 (two's complement) to denary</div>
+    <p><b>Method 1 — flip to positive first:</b> take the two's complement of 10110001: the trailing "1" stays, the rest "0110001" → wait, more precisely: copy the "1" (first 1 from the right) unchanged, flip everything before it: 10110001 → 01001111. That's binary for 79 (using double-and-add: 1→2→4→9→18→38→78→79... following the book's working). So the ORIGINAL number is <b>−79</b>.</p>
+    <p><b>Method 2 — treat the top bit as negative directly:</b> −2⁷ + 2⁵ + 2⁴ + 2⁰ = −128 + 32 + 16 + 1 = <b>−79</b>. Same answer, without converting to positive first.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why two's complement specifically — the real payoff</h4>
+    <ul>
+      <li>The whole point of choosing two's complement is that it makes SUBTRACTION trivial: subtracting one signed integer from another is done by converting the number being subtracted into its two's complement form, then simply ADDING.</li>
+      <li>This means a computer's hardware only needs to know how to ADD — subtraction is "free" once two's complement and addition both exist.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — sign-and-magnitude vs. two's complement.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key problem with sign-and-magnitude representation that two's complement avoids?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Sign-and-magnitude has TWO representations of zero (+0 and −0), which complicates comparing values. Two's complement has only one representation of zero.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the real, practical reason two's complement is used, beyond just representing negatives?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It makes subtraction reduce to addition: to subtract B from A, convert B to its two's complement form and ADD it to A — hardware only needs to implement addition, not a separate subtraction circuit.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the shortcut method: copy bits unchanged from the right up to and including the first ______; flip every bit ______ that point.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Copy unchanged up to and including the first 1; flip every bit AFTER (to the left of) that point.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims 4-bit two's complement can represent the same RANGE of values as 4-bit sign-and-magnitude, just shifted. Using the table above, show this is false.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Sign-and-magnitude (4 bits) represents −7 to +7 (15 distinct values, with two codes for zero). Two's complement (4 bits) represents −8 to +7 (16 distinct values, one code per value) — two's complement has an EXTRA representable value (−8) that sign-and-magnitude cannot represent at all, so the ranges are not simply "shifted" versions of each other.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Take the two's complement of the 4-bit binary code for −5 (1011) and confirm you get the code for +5.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1011 → one's complement (flip all): 0100 → add 1: 0101, which is +5. Confirmed — two's complement is self-complementary.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">
+      Using one byte per value, subtract denary 35 from denary 67 using two's complement binary arithmetic (convert 35 to two's complement, then add it to 67's binary form).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>67 = 01000011. 35 = 00100011 → two's complement of 35 = 11011101. Adding: 01000011 + 11011101 = (1)00100000 — discard the overflow carry bit, leaving 00100000 = 32 in denary. 67 − 35 = 32. ✓</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 1: Information Representation — 1.02 Coding Signed Integers: Two's Complement<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 1.02
+  </div>
+
+</div>
+</body>
+</html>

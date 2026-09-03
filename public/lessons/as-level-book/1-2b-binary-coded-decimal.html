@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.02 Binary Coded Decimal (BCD) — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: rgba(74,222,128,.05); border: 1px solid rgba(74,222,128,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4ade80; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #d1fae5; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: center; }
+  .dtype-table th { background: rgba(251,191,36,.1); color: #fbbf24; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-family: ui-monospace, monospace; font-size: 11.5px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 1 · Information Representation</span>
+  <div class="topic-title">1.02 Binary Coded Decimal (BCD)</div>
+  <div class="topic-subtitle">When storing denary digits directly beats storing a "real" binary number — completes Section 1.02.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">BCD</div><div class="key-term-def">Binary Coded Decimal — each individual denary DIGIT (0-9) stored as its own 4-bit binary code.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Nibble</div><div class="key-term-def">4 bits — half a byte. Exactly enough to encode one denary digit (0-9) in BCD.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Packed BCD</div><div class="key-term-def">Storing TWO BCD digits per byte (one per nibble), instead of one digit per byte.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>BCD is genuinely different from normal binary integer coding</h4>
+    <ul>
+      <li>A normal binary integer treats the WHOLE number as one value (e.g. denary 246 → binary 11110110, one continuous number).</li>
+      <li>BCD instead encodes EACH denary digit SEPARATELY as its own 4-bit code — denary 246 in BCD is three separate nibbles: 0010 (2), 0100 (4), 0110 (6), simply placed next to each other.</li>
+      <li>A 4-bit nibble can represent 16 different values, but BCD only ever uses 10 of them (0000-1001, for digits 0-9) — the remaining 6 combinations (1010-1111) are simply never used.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Scheme</th><th>Denary 8503, byte-by-byte</th></tr>
+    <tr><td>One BCD digit per byte</td><td>00001000 · 00000101 · 00000000 · 00000011</td></tr>
+    <tr><td>Packed BCD (2 digits/byte)</td><td>10000101 · 00000011</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>One digit per byte vs. packed BCD</h4>
+    <ul>
+      <li>ONE BCD digit per byte wastes 4 bits per byte (half the byte's capacity), but is simpler to work with.</li>
+      <li>PACKED BCD stores TWO digits per byte (one per nibble), using space far more efficiently — at the cost of slightly more complex logic to extract each digit.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why BCD is actually used, despite wasting space compared to plain binary</h4>
+    <ul>
+      <li>Obvious use: displaying denary digits directly — e.g. a calculator's screen or a digital clock, where each digit needs to be shown individually anyway.</li>
+      <li>Less obvious use: representing CURRENCY values precisely. A value like $300.25 is a fixed-point decimal number — storing it as a "real" (floating-point) number can introduce small rounding errors (covered further in Chapter 16), which is completely unacceptable for money.</li>
+      <li>Storing each denary digit as its own BCD code avoids this rounding problem entirely, since no conversion between binary and decimal fractions ever needs to happen.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Why BCD arithmetic needs special handling</div>
+    <p>Adding two BCD-encoded values isn't as simple as adding the raw binary bytes — a normal binary ADD can produce a result like 1010 (denary 10) inside a single nibble, which is NOT a valid single BCD digit (valid BCD digits only go up to 1001/9). When this happens, a correction step is needed to "carry" into the next digit, similar to how carrying works in ordinary denary addition by hand.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — Binary Coded Decimal (completes Section 1.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">How is BCD fundamentally different from encoding a number as one continuous binary value?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>BCD encodes EACH denary digit separately as its own 4-bit (nibble) code, rather than treating the whole number as one continuous binary value.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Out of the 16 possible 4-bit combinations, how many does BCD actually use, and why?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Only 10 (0000 through 1001) — because there are only 10 denary digits (0-9) to represent. The remaining 6 combinations (1010-1111) are never used in BCD.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete: packed BCD stores ______ digit(s) per byte; one-digit-per-byte BCD stores ______ digit(s) per byte.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Packed BCD stores TWO digits per byte; one-digit-per-byte BCD stores ONE digit per byte.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student encodes denary digit 12 as a single BCD nibble, "1100". What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>12 is not a single denary DIGIT (it's two digits, "1" and "2") — a single BCD nibble can only ever represent one digit, 0-9. "1100" is also outside the valid BCD range (it equals denary 12 in plain binary, but 1010-1111 are never valid BCD codes) — 12 would need TWO separate nibbles: 0001 (1) and 0010 (2).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write the packed BCD representation of the denary number 47 (one byte, two nibbles).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>4 → 0100, 7 → 0111. Packed into one byte: <b>01000111</b>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why is BCD preferred over floating-point (real number) representation for storing currency values?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Floating-point representation can introduce small rounding errors when representing decimal fractions — completely unacceptable for money. BCD stores each denary digit exactly, with no binary-fraction rounding involved at all.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 1: Information Representation — 1.02 Binary Coded Decimal (completes Section 1.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 1.02
+  </div>
+
+</div>
+</body>
+</html>
