@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>1.07 Compression Techniques — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; }
+  .compare-card.good { background: rgba(74,222,128,.06); border: 1px solid rgba(74,222,128,.25); color: #d1fae5; }
+  .compare-card.bad { background: rgba(248,113,113,.06); border: 1px solid rgba(248,113,113,.25); color: #fecaca; }
+  .compare-card b { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: center; }
+  .dtype-table th { background: rgba(74,222,128,.1); color: #4ade80; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 1 · Information Representation</span>
+  <div class="topic-title">1.07 Compression Techniques &amp; Multimedia Packaging</div>
+  <div class="topic-subtitle">Huffman coding, run-length encoding, and why video needs an entirely different approach — completes Chapter 1.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Lossless compression</div><div class="key-term-def">Reduces file size with NO information lost — decoding recreates the exact original file.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Lossy compression</div><div class="key-term-def">Reduces file size by discarding some information permanently — the exact original can never be recovered.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Prefix property</div><div class="key-term-def">No Huffman code is the starting sequence of any other code — guarantees unambiguous decoding.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Multimedia container format</div><div class="key-term-def">A single file format holding several independent but synchronised streams (video, audio, subtitles, etc.).</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Lossless vs. lossy — the fundamental choice</h4>
+    <ul>
+      <li>Text files MUST use lossless compression — losing even one character's information would corrupt the meaning, so it's never acceptable.</li>
+      <li>Sound and image files can often tolerate LOSSY compression, since the human ear/eye may not notice some detail being removed or altered.</li>
+      <li>Many real applications combine BOTH lossless and lossy methods together.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Huffman coding — shorter codes for more frequent characters</h4>
+    <ul>
+      <li>Instead of giving every character a fixed one-byte code, Huffman coding analyses which characters occur MOST often, and gives THOSE shorter codes — genuinely variable-length codes, not one fixed size.</li>
+      <li>The original byte stream becomes a genuine BIT stream (codes no longer align to byte boundaries).</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Code</th><th>Character</th></tr>
+    <tr><td>10</td><td>e</td></tr>
+    <tr><td>01</td><td>t</td></tr>
+    <tr><td>111</td><td>o</td></tr>
+    <tr><td>0001</td><td>h</td></tr>
+    <tr><td>0000</td><td>i</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>The prefix property — why decoding is never ambiguous</h4>
+    <ul>
+      <li>Critically, NONE of the codes begins with the exact bit sequence of any OTHER (shorter) code — this is the "prefix property".</li>
+      <li>Because of this, a decoder reading the bit stream left to right can ALWAYS tell exactly where one code ends and the next begins, with zero ambiguity — even though codes have different lengths.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Run-length encoding (RLE) — a different lossless approach</h4>
+    <ul>
+      <li>RLE converts a SEQUENCE of the same repeated bit pattern into a code recording just the pattern AND how many times it repeats.</li>
+      <li>This is particularly effective for bitmap files, which often contain large runs of identical or near-identical pixel colours (e.g. a plain background).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>A simple example of lossy compression</h4>
+    <ul>
+      <li>Reducing the COLOUR DEPTH of a bitmap (fewer bits per pixel) is a straightforward lossy technique — detail is genuinely discarded, but the human eye may barely notice on typical images.</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card good"><b>Spatial redundancy</b>Redundant information WITHIN a single frame/image (e.g. large areas of the same colour). Image-compression techniques (like RLE) target this.</div>
+    <div class="compare-card bad"><b>Temporal redundancy</b>Redundant information BETWEEN successive video frames — one frame is often very similar to the one before it.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why video needs a genuinely different compression strategy</h4>
+    <ul>
+      <li>Only tackling spatial redundancy (treating each frame as an independent image) is INEFFICIENT for video — it ignores the fact that consecutive frames are usually very similar to each other.</li>
+      <li>A much more effective approach targets TEMPORAL redundancy instead: rather than storing every frame in full, mainly record the DIFFERENCES between adjacent frames.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Multimedia container formats — packaging audio and video together</h4>
+    <ul>
+      <li>A video contains BOTH images and sound — but these two streams don't go to the same part of a receiving/display system, so they must be handled independently, while still staying SYNCHRONISED.</li>
+      <li>The solution is a multimedia CONTAINER format — one file holding multiple independent streams (video, audio, and potentially others like subtitles or chapter headings) all packaged together.</li>
+      <li>A container isn't limited to exactly one video stream and one audio stream — it can hold several of each.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — Huffman coding, RLE, lossy compression, and video/multimedia packaging (completes Chapter 1).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why must text files always use LOSSLESS compression?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Losing even a small amount of information could corrupt or change the actual meaning of the text — unlike sound/images, there's no "acceptable" amount of information to lose.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the "prefix property" in Huffman coding, and why does it matter?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No code is the starting sequence of any other (longer) code. It matters because it guarantees a decoder can always tell exactly where one variable-length code ends and the next begins, with zero ambiguity.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Run-length encoding is especially effective for compressing files with large runs of the ______ repeated bit pattern.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The SAME repeated bit pattern.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student compresses video by applying an image-compression technique (targeting spatial redundancy) to each frame independently, calling this "efficient". Why is this criticised in the theory above?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It's unlikely to be efficient, because it ignores TEMPORAL redundancy — the fact that one video frame is usually very similar to the one immediately before it. A much more effective approach records mainly the DIFFERENCES between adjacent frames instead.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Given the Huffman code table above, decode the bit stream <code>011010</code>.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Reading left to right, matching the shortest valid code at each step (the prefix property guarantees this is always unambiguous): <code>01</code> = t, <code>10</code> = e, <code>10</code> = e. The decoded text is <b>"tee"</b>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why does a video file need a "multimedia container format" rather than just concatenating a video file and an audio file together?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the audio and visual streams must stay SYNCHRONISED while being handled independently (they go to different parts of the playback system) — a container format is specifically designed to hold multiple streams together while preserving that synchronisation, rather than treating them as two entirely separate files.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 1: Information Representation — 1.07 Compression Techniques &amp; Multimedia Packaging (completes Chapter 1)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 1.07
+  </div>
+
+</div>
+</body>
+</html>
