@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.3a Half &amp; Full Adders (Extension) — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11.5px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 10px; text-align: center; }
+  .db-table th { background: rgba(232,121,249,.1); color: #e879f9; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 10 · Logic Gates · Extension</span>
+  <div class="topic-title">10.3a Half &amp; Full Adders</div>
+  <div class="topic-subtitle">Extension: the actual logic circuits that add binary numbers — completes the entire IGCSE Year 2 book.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Half adder</div><div class="key-term-def">A circuit adding 2 bits, producing a sum bit and a carry bit — but can't accept a carry IN.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Full adder</div><div class="key-term-def">A circuit adding 2 bits PLUS a carry-in, built from two half adders and an OR gate.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Half adder — the simplest binary addition circuit</h4>
+    <ul>
+      <li>Binary addition is one of the most basic operations any computer performs.</li>
+      <li>A half adder adds 2 bits (A and B), producing TWO outputs: the sum bit (S) and the carry bit (C).</li>
+      <li>Example: 1 + 1 = 10 in binary (denary 2) — the '1' is the carry, the '0' is the sum.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>S (sum)</th><th>C (carry)</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Recognising the gates hidden in this table</h4>
+    <ul>
+      <li>The SUM column is EXACTLY the XOR truth table — <code>S = A XOR B</code>.</li>
+      <li>The CARRY column is EXACTLY the AND truth table — <code>C = A AND B</code>.</li>
+      <li>So a half adder is really just an XOR gate and an AND gate, both fed the same two inputs A and B, each producing one of the two outputs.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="260" height="120" viewBox="0 0 260 120">
+      <g font-family="system-ui" font-size="11">
+        <text x="10" y="30" fill="#e2e8f0">A</text><text x="10" y="80" fill="#e2e8f0">B</text>
+        <rect x="50" y="15" width="70" height="30" rx="4" fill="#111320" stroke="#fbbf24"/><text x="85" y="35" fill="#fde68a" text-anchor="middle" font-size="10">XOR</text>
+        <rect x="50" y="65" width="70" height="30" rx="4" fill="#111320" stroke="#60a5fa"/><text x="85" y="85" fill="#93c5fd" text-anchor="middle" font-size="10">AND</text>
+        <text x="200" y="35" fill="#e2e8f0">S (sum)</text>
+        <text x="200" y="85" fill="#e2e8f0">C (carry)</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why a half adder isn't enough for real numbers</h4>
+    <ul>
+      <li>A half adder can't accept a CARRY-IN from a previous column — it only handles exactly 2 bits with no incoming carry.</li>
+      <li>Adding real multi-bit numbers (e.g. a full 8-bit byte) means every column (except the very first) needs to handle THREE inputs: the two bits being added, PLUS whatever carry came from the column before it.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Full adder — two half adders, joined by an OR gate</h4>
+    <ul>
+      <li>A full adder has THREE inputs: A, B, and Cin (carry in) — and two outputs: S (sum) and Cout (carry out).</li>
+      <li>It's built from TWO half adders plus one OR gate: the first half adder combines A and B; its sum output then goes into a SECOND half adder along with Cin.</li>
+      <li>The final sum (S) comes from the second half adder's sum output. The final carry-out (Cout) comes from ORing together the carry outputs of BOTH half adders — a carry could genuinely come from either step.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="360" height="110" viewBox="0 0 360 110">
+      <g font-family="system-ui" font-size="10">
+        <text x="10" y="20" fill="#e2e8f0" font-size="11">A</text><text x="10" y="45" fill="#e2e8f0" font-size="11">B</text><text x="10" y="90" fill="#e2e8f0" font-size="11">Cin</text>
+        <rect x="50" y="10" width="80" height="30" rx="4" fill="#111320" stroke="#60a5fa"/><text x="90" y="30" fill="#93c5fd" text-anchor="middle">Half adder 1</text>
+        <rect x="170" y="30" width="80" height="30" rx="4" fill="#111320" stroke="#4ade80"/><text x="210" y="50" fill="#86efac" text-anchor="middle">Half adder 2</text>
+        <rect x="170" y="75" width="80" height="25" rx="4" fill="#111320" stroke="#fbbf24"/><text x="210" y="92" fill="#fde68a" text-anchor="middle">OR gate</text>
+        <text x="300" y="45" fill="#e2e8f0" font-size="11">S (sum)</text>
+        <text x="300" y="88" fill="#e2e8f0" font-size="11">Cout</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Reading the full adder — a real 3-bit column addition</h4>
+    <ul>
+      <li>Consider adding two 5-bit numbers where a column has A=1, B=0, and a carry-in of 1 from the previous column: the sum for THIS column is 0, and a NEW carry of 1 is passed to the NEXT column.</li>
+      <li>This is exactly why chaining full adders together (one per bit position) lets a computer add numbers of ANY length — each column's full adder passes its Cout into the NEXT column's Cin.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — half and full adders (completes this entire book).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What are the two outputs of a half adder, and which single gate produces each one?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Sum (S) comes from an XOR gate; Carry (C) comes from an AND gate — both fed the same two inputs A and B.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the key limitation of a half adder that a full adder solves?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A half adder cannot accept a carry-IN from a previous column — it only handles exactly 2 bits. A full adder adds a third input (Cin), needed for every column except the very first when adding multi-bit numbers.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A full adder is built from ______ half adders and one ______ gate.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>TWO half adders and one OR gate.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student tries to add an 8-bit byte using only half adders (no full adders) chained together. Why does this fail from the second bit position onward?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Every column after the first needs to handle a carry-IN from the previous column — a half adder has no way to accept that third input at all, so any carry generated would simply be lost or ignored, producing a wrong total.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the half adder truth table, what are S and C when A=1 and B=1?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>S = 0, C = 1 — matching 1 + 1 = 10 in binary (the carry is the '1', the sum is the '0').</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why is Cout produced by ORing the two half adders' carry outputs together, rather than picking just one of them?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A carry could genuinely be generated by EITHER half adder (the first one combining A and B, or the second one combining that sum with Cin) — ORing them together correctly captures a carry-out happening from either source.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 10: Logic Gates — 10.3a Half &amp; Full Adders (Extension) — completes this book<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 10.3, Extension Topic 2
+  </div>
+
+</div>
+</body>
+</html>
