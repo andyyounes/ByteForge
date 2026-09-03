@@ -3,16 +3,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
 /**
- * Teacher visual editor for the IGCSE Year 1 "book" lessons — 89 static,
- * self-contained lesson pages rewritten from the Cambridge coursebook
- * (public/lessons/igcse-y1-book/*.html), listed via lib/igcse-book-manifest.ts.
+ * Teacher visual editor for the IGCSE "book" lessons — static, self-contained
+ * lesson pages rewritten from the Cambridge coursebook
+ * (public/lessons/<book>/*.html), listed via lib/igcse-book-manifest.ts.
+ * Shared by both Year 1 (book='igcse-y1-book', 89 lessons) and Year 2
+ * (book='igcse-y2-book', 48 lessons) — book is also the lessonKey and the
+ * directory name under public/lessons/.
  *
  * Different shape again from IgcseLessonEditor (which edits the CHALLENGES
  * app's stage objects + separate lesson explainer): there is no data
  * structure here at all, just a title + a body of static HTML per lesson.
  * Editing replaces the WHOLE lesson body for this class. Publishing writes
  * one row to the same class_lesson_overrides table
- * (lesson_key='igcse-y1-book', scope='stage', target_id=<filename>,
+ * (lesson_key=<book>, scope='stage', target_id=<filename>,
  * override_data={ title, html }) — the lesson page itself picks this up via
  * a small merge script injected at build time (scripts/inject-book-overrides.mjs),
  * which only runs when a classId is present in the URL.
@@ -21,7 +24,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 interface ManifestLesson { file: string; code: string; title: string; overridden: boolean }
 interface ManifestUnit { unit: string; title: string; lessons: ManifestLesson[] }
 
-export function IgcseBookLessonEditor({ classId }: { classId: string }) {
+export function IgcseBookLessonEditor({ classId, book = 'igcse-y1-book', bookLabel = 'IGCSE Year 1 textbook' }: { classId: string; book?: string; bookLabel?: string }) {
   const [units, setUnits] = useState<ManifestUnit[] | null>(null)
   const [error, setError] = useState('')
   const [activeFile, setActiveFile] = useState<string | null>(null)
@@ -39,14 +42,14 @@ export function IgcseBookLessonEditor({ classId }: { classId: string }) {
 
   const loadManifest = useCallback(async () => {
     try {
-      const res = await fetch(`/api/teacher/igcse-book-content?classId=${classId}`)
+      const res = await fetch(`/api/teacher/igcse-book-content?classId=${classId}&book=${book}`)
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Failed to load')
       setUnits(data.units ?? [])
     } catch (e: unknown) {
       setError((e as Error).message ?? 'Failed to load')
     }
-  }, [classId])
+  }, [classId, book])
 
   useEffect(() => { loadManifest() }, [loadManifest])
 
@@ -56,7 +59,7 @@ export function IgcseBookLessonEditor({ classId }: { classId: string }) {
     setLoadingLesson(true)
     setError('')
     try {
-      const res = await fetch(`/api/teacher/igcse-book-content?classId=${classId}&file=${file}`)
+      const res = await fetch(`/api/teacher/igcse-book-content?classId=${classId}&book=${book}&file=${file}`)
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Failed to load lesson')
       setLoadedTitle(data.title ?? '')
@@ -100,7 +103,7 @@ export function IgcseBookLessonEditor({ classId }: { classId: string }) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          classId, lessonKey: 'igcse-y1-book', scope: 'stage', targetId: activeFile,
+          classId, lessonKey: book, scope: 'stage', targetId: activeFile,
           overrideData: { title: titleRef.current?.value ?? '', html: htmlRef.current?.value ?? '' },
         }),
       })
@@ -121,7 +124,7 @@ export function IgcseBookLessonEditor({ classId }: { classId: string }) {
     if (!activeFile) return
     if (!confirm('Revert this lesson back to the original, unedited content?')) return
     try {
-      const res = await fetch(`/api/class-lesson-overrides?classId=${classId}&lessonKey=igcse-y1-book&scope=stage&targetId=${activeFile}`, { method: 'DELETE' })
+      const res = await fetch(`/api/class-lesson-overrides?classId=${classId}&lessonKey=${book}&scope=stage&targetId=${activeFile}`, { method: 'DELETE' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Failed to revert')
       setEditing(false)
@@ -134,7 +137,7 @@ export function IgcseBookLessonEditor({ classId }: { classId: string }) {
   }
 
   if (error && !units) return <p className="text-xs text-rose p-4">{error}</p>
-  if (!units) return <p className="text-xs text-fg-dim p-4">Loading IGCSE Year 1 textbook…</p>
+  if (!units) return <p className="text-xs text-fg-dim p-4">Loading {bookLabel}…</p>
 
   const activeLesson = activeFile
     ? units.flatMap(u => u.lessons).find(l => l.file === activeFile)
@@ -150,7 +153,7 @@ export function IgcseBookLessonEditor({ classId }: { classId: string }) {
         {activeFile ? (
           <iframe
             key={iframeKey}
-            src={`/lessons/igcse-y1-book/${activeFile}?classId=${classId}`}
+            src={`/lessons/${book}/${activeFile}?classId=${classId}`}
             className="w-full h-[60vh] min-h-[420px] lg:h-[620px] lg:min-h-0"
             style={{ border: 0 }}
             title="Lesson preview"

@@ -141,3 +141,93 @@ export const ALL_BOOK_LESSONS: BookLesson[] = IGCSE_BOOK_UNITS.flatMap(u => u.le
 export function findBookLesson(file: string): BookLesson | undefined {
   return ALL_BOOK_LESSONS.find(l => l.file === file)
 }
+
+// ── IGCSE Year 2 "book" lessons — 48 self-contained static HTML pages under
+// public/lessons/igcse-y2-book/, rewriting Chapters 7-10 of the same
+// coursebook (Algorithm Design & Problem Solving, Programming, Databases,
+// Logic Gates). Same shape and rules as the Y1 manifest above.
+export const IGCSE_Y2_BOOK_UNITS: BookUnit[] = [
+  {
+    unit: 'Chapter 7', title: 'Algorithm Design & Problem Solving', lessons: [
+      { file: '7-1a-program-development-life-cycle.html', code: '7.1a', title: 'The Program Development Life Cycle' },
+      { file: '7-2a-computer-systems-decomposition.html', code: '7.2a', title: 'Computer Systems & Decomposition' },
+      { file: '7-2b-structure-diagrams.html', code: '7.2b', title: 'Structure Diagrams' },
+      { file: '7-2c-flowcharts.html', code: '7.2c', title: 'Flowcharts' },
+      { file: '7-2d-pseudocode-assignment.html', code: '7.2d', title: 'Pseudocode: Assignment Statements' },
+      { file: '7-2e-pseudocode-conditionals.html', code: '7.2e', title: 'Pseudocode: Conditional Statements' },
+      { file: '7-2f-pseudocode-iteration.html', code: '7.2f', title: 'Pseudocode: Iteration (Loops)' },
+      { file: '7-2g-pseudocode-input-output.html', code: '7.2g', title: 'Pseudocode: Input & Output Statements' },
+      { file: '7-3a-purpose-of-an-algorithm.html', code: '7.3a', title: 'Explaining the Purpose of an Algorithm' },
+      { file: '7-4a-totalling-counting-average.html', code: '7.4a', title: 'Totalling, Counting, Maximum/Minimum & Average' },
+      { file: '7-4b-linear-search.html', code: '7.4b', title: 'Linear Search' },
+      { file: '7-4c-bubble-sort.html', code: '7.4c', title: 'Bubble Sort' },
+      { file: '7-5a-validation.html', code: '7.5a', title: 'Validation' },
+      { file: '7-5b-verification.html', code: '7.5b', title: 'Verification' },
+      { file: '7-6a-test-data.html', code: '7.6a', title: 'Test Data' },
+      { file: '7-7a-trace-tables.html', code: '7.7a', title: 'Trace Tables' },
+      { file: '7-8a-identifying-errors.html', code: '7.8a', title: 'Identifying Errors in Algorithms' },
+      { file: '7-9a-writing-algorithms.html', code: '7.9a', title: 'Writing and Amending Algorithms' },
+      { file: '7-9b-nested-loops-worked-example.html', code: '7.9b', title: 'A Real Nested-Loop Algorithm' },
+      { file: '7-9c-stacks-and-queues.html', code: '7.9c', title: 'Stacks and Queues (Extension)' },
+    ],
+  },
+  {
+    unit: 'Chapter 8', title: 'Programming', lessons: [
+      { file: '8-1a-variables-constants-data-types.html', code: '8.1a', title: 'Variables, Constants & Data Types' },
+      { file: '8-1b-input-output.html', code: '8.1b', title: 'Input and Output in Real Code' },
+      { file: '8-1c-sequence.html', code: '8.1c', title: 'Sequence — Getting the Order Right' },
+      { file: '8-1d-selection-case.html', code: '8.1d', title: 'Selection in Real Code' },
+      { file: '8-1e-iteration.html', code: '8.1e', title: 'Iteration in Real Code' },
+      { file: '8-1f-string-handling.html', code: '8.1f', title: 'String Handling' },
+      { file: '8-1g-operators.html', code: '8.1g', title: 'Arithmetic, Logical & Boolean Operators' },
+      { file: '8-1h-nested-statements.html', code: '8.1h', title: 'Nested Statements' },
+      { file: '8-1i-procedures-functions.html', code: '8.1i', title: 'Procedures and Functions' },
+      { file: '8-1j-scope.html', code: '8.1j', title: 'Local and Global Variables' },
+      { file: '8-1k-library-routines.html', code: '8.1k', title: 'Library Routines' },
+      { file: '8-1l-maintainable-programs.html', code: '8.1l', title: 'Writing Maintainable Programs' },
+      { file: '8-2a-one-dimensional-arrays.html', code: '8.2a', title: 'One-Dimensional Arrays' },
+      { file: '8-2b-two-dimensional-arrays.html', code: '8.2b', title: 'Two-Dimensional Arrays' },
+      { file: '8-3a-file-handling.html', code: '8.3a', title: 'File Handling' },
+    ],
+  },
+  {
+    unit: 'Chapter 9', title: 'Databases', lessons: [
+      { file: '9-1a-database-structure.html', code: '9.1a', title: 'Database Structure — Tables, Records & Fields' },
+      { file: '9-1b-data-types-primary-keys.html', code: '9.1b', title: 'Data Types & Primary Keys' },
+      { file: '9-1c-sql-basics.html', code: '9.1c', title: 'SQL Basics — SELECT, FROM, WHERE' },
+      { file: '9-1d-sql-order-sum-count.html', code: '9.1d', title: 'SQL — ORDER BY, SUM, COUNT' },
+      { file: '9-1e-sql-ddl-extension.html', code: '9.1e', title: 'SQL DDL (Extension) — Building a Database with SQL' },
+    ],
+  },
+  {
+    unit: 'Chapter 10', title: 'Logic Gates', lessons: [
+      { file: '10-1a-logic-gates-intro.html', code: '10.1a', title: 'Logic Gates & Truth Tables' },
+      { file: '10-1b-six-gate-functions.html', code: '10.1b', title: 'The Six Logic Gates' },
+      { file: '10-2a-circuit-to-truth-table.html', code: '10.2a', title: 'Tracing a Circuit into a Truth Table' },
+      { file: '10-2b-circuit-to-expression.html', code: '10.2b', title: 'Writing a Logic Expression from a Circuit' },
+      { file: '10-2c-expression-to-circuit.html', code: '10.2c', title: 'Building a Circuit from an Expression' },
+      { file: '10-2d-truth-table-to-expression.html', code: '10.2d', title: 'Writing an Expression from a Truth Table' },
+      { file: '10-2e-problem-to-logic.html', code: '10.2e', title: 'Real-World Problems into Logic Circuits' },
+      { file: '10-3a-adders-extension.html', code: '10.3a', title: 'Half & Full Adders (Extension)' },
+    ],
+  },
+]
+
+export const ALL_Y2_BOOK_LESSONS: BookLesson[] = IGCSE_Y2_BOOK_UNITS.flatMap(u => u.lessons)
+
+export function findY2BookLesson(file: string): BookLesson | undefined {
+  return ALL_Y2_BOOK_LESSONS.find(l => l.file === file)
+}
+
+// ── Generic lookup by book id — lets the API route/editor/content lib work
+// with either book without a chain of if/else. 'igcse-y1-book' and
+// 'igcse-y2-book' are both the directory name under public/lessons/ AND the
+// lessonKey used in class_lesson_overrides.
+export const BOOK_MANIFESTS: Record<string, { units: BookUnit[]; all: BookLesson[] }> = {
+  'igcse-y1-book': { units: IGCSE_BOOK_UNITS, all: ALL_BOOK_LESSONS },
+  'igcse-y2-book': { units: IGCSE_Y2_BOOK_UNITS, all: ALL_Y2_BOOK_LESSONS },
+}
+
+export function findBookLessonInBook(book: string, file: string): BookLesson | undefined {
+  return BOOK_MANIFESTS[book]?.all.find(l => l.file === file)
+}

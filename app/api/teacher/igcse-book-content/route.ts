@@ -1,16 +1,18 @@
-// Teacher-only read endpoint for the IGCSE Y1 "book" lesson editor.
+// Teacher-only read endpoint for the IGCSE "book" lesson editors (Y1 and Y2
+// share this one route — pass ?book=igcse-y1-book or ?book=igcse-y2-book;
+// defaults to igcse-y1-book for back-compat with existing callers).
 //
-// GET ?classId=&file=<filename>  → { title, html, overridden }
+// GET ?classId=&book=&file=<filename>  → { title, html, overridden }
 //   Returns that one lesson's content (base file merged with the class's
 //   override, if one exists) plus whether an override currently exists.
 //
-// GET ?classId=                  → { units: [...] } (no file param)
+// GET ?classId=&book=                  → { units: [...] } (no file param)
 //   Returns the manifest grouped by unit, each lesson flagged with
 //   `overridden` — used to render the sidebar list and its "edited" badges.
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getBookLessonContent, applyBookOverride, type BookOverrideRow } from '@/lib/igcse-book-content'
-import { IGCSE_BOOK_UNITS, findBookLesson } from '@/lib/igcse-book-manifest'
+import { BOOK_MANIFESTS, findBookLessonInBook } from '@/lib/igcse-book-manifest'
 
 export const runtime = 'nodejs'
 
@@ -26,7 +28,10 @@ export async function GET(req: NextRequest) {
 
   const classId = req.nextUrl.searchParams.get('classId')
   const file = req.nextUrl.searchParams.get('file')
+  const book = req.nextUrl.searchParams.get('book') || 'igcse-y1-book'
   if (!classId) return NextResponse.json({ error: 'classId required' }, { status: 400 })
+  const manifest = BOOK_MANIFESTS[book]
+  if (!manifest) return NextResponse.json({ error: 'Unknown book' }, { status: 400 })
 
   if (!(await ownsClass(supabase, classId, user.id))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -36,16 +41,16 @@ export async function GET(req: NextRequest) {
     .from('class_lesson_overrides')
     .select('scope, target_id, override_data')
     .eq('class_id', classId)
-    .eq('lesson_key', 'igcse-y1-book')
+    .eq('lesson_key', book)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   const overrides = (overrideRows ?? []) as BookOverrideRow[]
   const overriddenFiles = new Set(overrides.filter(o => o.scope === 'stage').map(o => o.target_id))
 
   if (file) {
-    if (!findBookLesson(file)) return NextResponse.json({ error: 'Unknown lesson file' }, { status: 404 })
+    if (!findBookLessonInBook(book, file)) return NextResponse.json({ error: 'Unknown lesson file' }, { status: 404 })
     try {
-      const base = getBookLessonContent(file)
+      const base = getBookLessonContent(book, file)
       const merged = applyBookOverride(base, overrides, file)
       return NextResponse.json({ title: merged.title, html: merged.html, overridden: overriddenFiles.has(file) })
     } catch (e: unknown) {
@@ -53,7 +58,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const units = IGCSE_BOOK_UNITS.map(u => ({
+  const units = manifest.units.map(u => ({
     unit: u.unit,
     title: u.title,
     lessons: u.lessons.map(l => ({ ...l, overridden: overriddenFiles.has(l.file) })),

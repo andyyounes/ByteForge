@@ -13,7 +13,7 @@
 // Never import this from a client component — it uses `fs`.
 import { readFileSync } from 'fs'
 import path from 'path'
-import { findBookLesson } from './igcse-book-manifest'
+import { findBookLessonInBook } from './igcse-book-manifest'
 
 export interface BookLessonContent {
   title: string
@@ -24,9 +24,11 @@ export interface BookLessonContent {
 // at the end of every lesson file (see scripts/inject-book-overrides.mjs).
 const OVERRIDE_SCRIPT_START = '<!-- OVERRIDE-MERGE-SCRIPT-START -->'
 
-export function getBookLessonContent(file: string): BookLessonContent {
-  if (!findBookLesson(file)) throw new Error(`Unknown book lesson file: ${file}`)
-  const html = readFileSync(path.join(process.cwd(), 'public', 'lessons', 'igcse-y1-book', file), 'utf8')
+// `book` is the directory name under public/lessons/ — 'igcse-y1-book' or
+// 'igcse-y2-book' — and also the lessonKey used in class_lesson_overrides.
+export function getBookLessonContent(book: string, file: string): BookLessonContent {
+  if (!findBookLessonInBook(book, file)) throw new Error(`Unknown book lesson file: ${book}/${file}`)
+  const html = readFileSync(path.join(process.cwd(), 'public', 'lessons', book, file), 'utf8')
 
   const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i)
   const title = titleMatch ? titleMatch[1].trim() : file

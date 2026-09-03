@@ -308,6 +308,32 @@ export default async function StudentDashboardPage() {
             </Card>
           )}
 
+          {/* ── IGCSE Year 2: textbook lesson library ────────────────── */}
+          {effectiveGrade === 11 && (
+            <Card className="border-b2 bg-s1/30">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-accent/10 text-accent shrink-0">
+                    <BookIcon size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-fg-faint uppercase tracking-wider">
+                      IGCSE Year 2 — Textbook
+                    </p>
+                    <h3 className="text-lg font-bold text-fg">48 lessons, rewritten from the coursebook</h3>
+                    <p className="text-xs text-fg-faint mt-0.5">Algorithm design, programming, databases &amp; logic gates — key terms, worked examples, and practice questions for every subsection</p>
+                  </div>
+                </div>
+                <Link
+                  href="/lessons/igcse-y2-book/index.html"
+                  className="btn-secondary py-2 px-4 text-sm flex items-center gap-2 shrink-0"
+                >
+                  Browse <ChevronRightIcon size={16} />
+                </Link>
+              </div>
+            </Card>
+          )}
+
           {/* ── Class: next-exercise callout ─────────────────────────── */}
           {showCurriculumCallout && nextExercise && classObj && (
             <Card className="border-accent/30 bg-accent/5">
