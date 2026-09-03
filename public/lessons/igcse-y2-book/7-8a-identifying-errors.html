@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.8a Identifying Errors in Algorithms — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #f87171; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(248,113,113,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #fca5a5; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #f87171; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .trace-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 12px; margin-bottom: 16px; }
+  .trace-table th, .trace-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 10px; text-align: center; }
+  .trace-table th { background: rgba(248,113,113,.1); color: #f87171; font-family: system-ui, sans-serif; font-size: 11px; text-transform: uppercase; }
+  .trace-table td { color: #e2e8f0; }
+  .trace-table td.bug { color: #fbbf24; font-weight: 700; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 7 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">7.8a Identifying Errors in Algorithms</div>
+  <div class="topic-subtitle">Using a trace table to catch a bug — then fixing the algorithm so it genuinely works for ANY data.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Logic error</div><div class="key-term-def">An algorithm that runs without crashing, but produces the WRONG result for some (or all) inputs.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Provisional value</div><div class="key-term-def">A starting value assigned to a variable before the real data is known, used as a placeholder until real values are compared against it.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Trace tables reveal bugs, not just confirm correctness</h4>
+    <ul>
+      <li>Trace tables and test data can be used to identify AND correct errors — not just to prove an algorithm works.</li>
+      <li>The algorithm below is meant to find the highest and lowest of ten numbers (the same shape as Section 7.7's algorithm), tested with: 400, 800, 190, 170, 300, 110, 600, 150, 130, 900.</li>
+    </ul>
+  </div>
+
+  <table class="trace-table">
+    <tr><th>A</th><th>B</th><th>C</th><th>X</th><th>OUTPUT</th></tr>
+    <tr><td>0</td><td>0</td><td>100</td><td></td><td></td></tr>
+    <tr><td>1</td><td>400</td><td></td><td>400</td><td></td></tr>
+    <tr><td>2</td><td>800</td><td></td><td>800</td><td></td></tr>
+    <tr><td>3</td><td></td><td></td><td>190</td><td></td></tr>
+    <tr><td>4</td><td></td><td></td><td>170</td><td></td></tr>
+    <tr><td>5</td><td></td><td></td><td>300</td><td></td></tr>
+    <tr><td>6</td><td></td><td></td><td>110</td><td></td></tr>
+    <tr><td>7</td><td></td><td></td><td>600</td><td></td></tr>
+    <tr><td>8</td><td></td><td></td><td>150</td><td></td></tr>
+    <tr><td>9</td><td></td><td></td><td>130</td><td></td></tr>
+    <tr><td>10</td><td class="bug">900</td><td></td><td>900</td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td class="bug">900, 100</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Reading the completed trace: the bug is real and specific</h4>
+    <ul>
+      <li>The output is 900, 100 — but the SMALLEST number in the list is actually 110, which never got picked up. <b>There is an error: the smallest number, 110, has not been identified.</b></li>
+      <li>Notice C (the running minimum) never changes from its starting value of 100 anywhere in the trace — every single input value (400, 800, 190, 170, 300, 110, 600, 150, 130, 900) is LARGER than 100, so the condition <code>X &lt; C</code> is never true, not even once.</li>
+      <li>This is a genuine logic error, not a crash — the algorithm runs to completion and produces AN answer, just the wrong one.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why this happens: the algorithm only works for 0-100</h4>
+    <ul>
+      <li>The original algorithm initialises B ← 0 and C ← 100 — provisional values that only make sense for percentage marks in the range 0 to 100.</li>
+      <li>Tested with numbers like 400 and 900, which are already bigger than the provisional C = 100, the minimum-tracking logic breaks immediately.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Attempt 2 — bigger provisional bounds (still not a real fix)</span>A ← 0
+B ← -1000000
+C ← 1000000
+REPEAT
+  INPUT X
+  IF X > B
+  THEN
+    B ← X
+  ENDIF
+  IF X < C
+  THEN
+    C ← X
+  ENDIF
+  A ← A + 1
+UNTIL A = 10
+OUTPUT B, C</div>
+
+  <div class="theory-block">
+    <h4>A much larger range — but still not a genuine fix</h4>
+    <ul>
+      <li>This version works for a much larger range of numbers than the original — but it STILL does not work for every possible set of numbers. Any number bigger than 1,000,000 or smaller than -1,000,000 would break it exactly the same way.</li>
+      <li>Choosing "big enough" provisional bounds is really just guessing — there is always some data that breaks a fixed bound, no matter how large.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Attempt 3 — a genuine fix: start from the first real value</span>Counter ← 1
+INPUT Number
+Highest ← Number
+Lowest ← Number
+REPEAT
+  INPUT Number
+  IF Number > Highest
+  THEN
+    Highest ← Number
+  ENDIF
+  IF Number < Lowest
+  THEN
+    Lowest ← Number
+  ENDIF
+  Counter ← Counter + 1
+UNTIL Counter = 9
+OUTPUT Highest, Lowest</div>
+
+  <div class="theory-block">
+    <h4>Why THIS version genuinely works for any set of numbers</h4>
+    <ul>
+      <li>Highest and Lowest are set to the value of the FIRST item input — not a guessed provisional bound — so they always start from a value that's actually PART of the real data.</li>
+      <li>The remaining values are then compared against this real starting point, one at a time.</li>
+      <li>The counter now needs to reach only 9 (not 10) — because the first value was already used to set the initial Highest/Lowest, so only the remaining 9 values need to be looped over and compared.</li>
+      <li>This is a standard, reusable technique: whenever the range of valid data isn't known in advance, initialise using the FIRST real value rather than a guessed bound.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — using trace tables to find bugs, and fixing an algorithm to work for genuinely any data.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">In the completed trace table, what specific error was identified?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The smallest number in the list, 110, was never identified — C (the running minimum) stayed at its starting value of 100 the whole way through, since every real input value was larger than 100.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why did increasing the provisional bounds to -1,000,000 / 1,000,000 not count as a genuine fix?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It only works for a LARGER range of numbers, not every possible set of numbers — any input still bigger or smaller than those bounds would break it in exactly the same way. Guessed bounds can always be exceeded by some data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the genuine fix's initialisation: <code>INPUT Number<br>Highest ← ______<br>Lowest ← ______</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>Highest ← Number</code> and <code>Lowest ← Number</code> — both set to the first real value input, not a guessed bound.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      In Attempt 3, why does the loop now run <code>UNTIL Counter = 9</code> instead of 10, even though there are still 10 numbers in total?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the FIRST number was already consumed before the loop began (to set the initial Highest/Lowest) — only the remaining 9 numbers are read and compared inside the loop, so the counter only needs to reach 9.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using Attempt 3's algorithm and the test data -97, 12390, 0, 77, 359, -2, -89, 5000, 21, 67 — what would the final OUTPUT be?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>12390, -97 — Highest ends at 12390 (the largest value in the list), Lowest ends at -97 (the smallest — note it's also the FIRST value input, so it was never actually beaten by a smaller one, but the algorithm still correctly identifies it since it started from a real value).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What general lesson does this trace-table exercise teach about testing an algorithm?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An algorithm that runs without crashing and produces SOME output is not automatically correct — it must be tested against real, varied data (not just data that happens to suit its assumptions) using a trace table, to reveal logic errors that would otherwise go unnoticed.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 7: Algorithm Design &amp; Problem Solving — 7.8a Identifying Errors in Algorithms<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 7.8
+  </div>
+
+</div>
+</body>
+</html>
