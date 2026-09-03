@@ -529,6 +529,18 @@
 <script>
 'use strict'
 
+// ── Current user + per-user localStorage scoping ────────────────────────────
+// Every progress/draft/bot key below used to be a single global localStorage
+// key shared by whoever used this browser — on a shared/school computer, a
+// second student would inherit (and could overwrite) the first student's
+// stars, code drafts, and tournament bot. userKey() namespaces every one of
+// them by the logged-in user's id, so a brand new account genuinely starts
+// with nothing, and switching accounts on the same machine never leaks
+// progress between students. Falls back to the bare key when logged out
+// (no real user to separate anyway — e.g. local dev without auth).
+const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
+function userKey(base) { return me && me.id ? base + '-u' + me.id : base }
+
 // Editor highlighting for the pseudocode side of the bridge
 CodeMirror.defineSimpleMode('pseudog9', {
   start: [
@@ -543,7 +555,7 @@ CodeMirror.defineSimpleMode('pseudog9', {
 
 // ── Language bridge: the same mission, written in Python or pseudocode ────────
 let lang = (() => { try { return localStorage.getItem('bf-g9-lang') || 'py' } catch (e) { return 'py' } })()
-function draftKey(id, l) { return 'bf-g9-draft-' + id + '-' + l }
+function draftKey(id, l) { return userKey('bf-g9-draft-' + id + '-' + l) }
 function loadDraft(id, l) { try { return localStorage.getItem(draftKey(id, l)) } catch (e) { return null } }
 function saveDraft() {
   if (activeMission && editor) try { localStorage.setItem(draftKey(activeMission.id, lang), editor.getValue()) } catch (e) {}
@@ -2761,8 +2773,8 @@ function dataEnvFor(mission) {
 // ══════════════════════════════════════════════════════════════════════════════
 // Progress (same pattern as Grade 6)
 // ══════════════════════════════════════════════════════════════════════════════
-function getProg() { try { return JSON.parse(localStorage.getItem('bf-g9-missions')) || {} } catch (e) { return {} } }
-function saveProg(p) { try { localStorage.setItem('bf-g9-missions', JSON.stringify(p)) } catch (e) {} }
+function getProg() { try { return JSON.parse(localStorage.getItem(userKey('bf-g9-missions'))) || {} } catch (e) { return {} } }
+function saveProg(p) { try { localStorage.setItem(userKey('bf-g9-missions'), JSON.stringify(p)) } catch (e) {} }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Python execution — Pyodide (pluggable: a pseudocode executor lands in the
@@ -3013,10 +3025,10 @@ const PRACTICE_BOTS = [
 // real classmate submissions exist (a server-backed extension), they'd slot
 // into the bracket entrant list the exact same shape as a PRACTICE_BOTS entry
 // ({ name, code, lang }) — nothing else in this engine would need to change.
-function tyBotCode(l) { try { return localStorage.getItem('bf-g9-bot-code-' + l) } catch (e) { return null } }
-function tySaveBotCode(l, code) { try { localStorage.setItem('bf-g9-bot-code-' + l, code) } catch (e) {} }
-function tyBotLang() { try { return localStorage.getItem('bf-g9-bot-lang') || 'py' } catch (e) { return 'py' } }
-function tyBotLocked() { try { return localStorage.getItem('bf-g9-bot-locked') === '1' } catch (e) { return false } }
+function tyBotCode(l) { try { return localStorage.getItem(userKey('bf-g9-bot-code-' + l)) } catch (e) { return null } }
+function tySaveBotCode(l, code) { try { localStorage.setItem(userKey('bf-g9-bot-code-' + l), code) } catch (e) {} }
+function tyBotLang() { try { return localStorage.getItem(userKey('bf-g9-bot-lang')) || 'py' } catch (e) { return 'py' } }
+function tyBotLocked() { try { return localStorage.getItem(userKey('bf-g9-bot-locked')) === '1' } catch (e) { return false } }
 const TY_STARTER = {
   py: '# Your tournament bot. 1v1 duel — state[\'enemies\'][0] is always your opponent.\n'
     + "# This code runs fresh every turn, just like a Phase 2 boss fight.\n"
@@ -3046,7 +3058,7 @@ function tySyncPush() {
         saveData: {
           botCodePy: tyBotCode('py'), botCodePs: tyBotCode('ps'),
           botLang: tyBotLang(), botLocked: tyBotLocked(),
-          lastBracket: (() => { try { return JSON.parse(localStorage.getItem('bf-g9-last-bracket')) } catch (e) { return null } })(),
+          lastBracket: (() => { try { return JSON.parse(localStorage.getItem(userKey('bf-g9-last-bracket'))) } catch (e) { return null } })(),
         },
       })
     } catch (e) {}
@@ -3060,14 +3072,14 @@ function tySyncPull() {
   if (!ws) return
   if (ws.botCodePy && !tyBotCode('py')) tySaveBotCode('py', ws.botCodePy)
   if (ws.botCodePs && !tyBotCode('ps')) tySaveBotCode('ps', ws.botCodePs)
-  if (ws.botLang && !localStorage.getItem('bf-g9-bot-lang')) { try { localStorage.setItem('bf-g9-bot-lang', ws.botLang) } catch (e) {} }
-  if (ws.botLocked && !tyBotLocked()) { try { localStorage.setItem('bf-g9-bot-locked', '1') } catch (e) {} }
-  if (ws.lastBracket && !localStorage.getItem('bf-g9-last-bracket')) {
-    try { localStorage.setItem('bf-g9-last-bracket', JSON.stringify(ws.lastBracket)) } catch (e) {}
+  if (ws.botLang && !localStorage.getItem(userKey('bf-g9-bot-lang'))) { try { localStorage.setItem(userKey('bf-g9-bot-lang'), ws.botLang) } catch (e) {} }
+  if (ws.botLocked && !tyBotLocked()) { try { localStorage.setItem(userKey('bf-g9-bot-locked'), '1') } catch (e) {} }
+  if (ws.lastBracket && !localStorage.getItem(userKey('bf-g9-last-bracket'))) {
+    try { localStorage.setItem(userKey('bf-g9-last-bracket'), JSON.stringify(ws.lastBracket)) } catch (e) {}
   }
 }
 function tyAwardOnce(idx, xp) {
-  const key = 'bf-g9-award-' + idx
+  const key = userKey('bf-g9-award-' + idx)
   try { if (localStorage.getItem(key) === '1') return false } catch (e) { return false }
   try { localStorage.setItem(key, '1') } catch (e) {}
   try { LessonSaves.save('grade9-missions', idx, { passed: true, xpEarned: xp }) } catch (e) {}
@@ -4227,7 +4239,7 @@ function closeTourney() {
 }
 
 function tySwitchLang(l) {
-  try { localStorage.setItem('bf-g9-bot-lang', l) } catch (e) {}
+  try { localStorage.setItem(userKey('bf-g9-bot-lang'), l) } catch (e) {}
   tyApplyLang()
   tySyncPush()
 }
@@ -4256,14 +4268,14 @@ function tyResetBot() {
 }
 function tyLockBot() {
   tySaveBotCode(tyBotLang(), tyEditor.getValue())
-  try { localStorage.setItem('bf-g9-bot-locked', '1') } catch (e) {}
+  try { localStorage.setItem(userKey('bf-g9-bot-locked'), '1') } catch (e) {}
   tyEditor.setOption('readOnly', true)
   tyRenderStatus()
   tyAwardOnce(BOT_LOCK_IDX, 25)
   tySyncPush()
 }
 function tyUnlockBot() {
-  try { localStorage.removeItem('bf-g9-bot-locked') } catch (e) {}
+  try { localStorage.removeItem(userKey('bf-g9-bot-locked')) } catch (e) {}
   tyEditor.setOption('readOnly', false)
   tyRenderStatus()
   tySyncPush()
@@ -4293,7 +4305,7 @@ async function tyRunBracket() {
   renderBracketView(bracket)
   const isChampion = bracket.champion && bracket.champion.name === 'My Bot'
   try {
-    localStorage.setItem('bf-g9-last-bracket', JSON.stringify({
+    localStorage.setItem(userKey('bf-g9-last-bracket'), JSON.stringify({
       champion: bracket.champion.name, isChampion, rounds: bracket.rounds.length, at: Date.now(),
     }))
   } catch (e) {}
@@ -4471,7 +4483,6 @@ async function applyClassOverrides() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 BF.seed()
-const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
 ;(async () => {
   await applyClassOverrides()
   if (me) { try { await LessonSaves.load('grade9-missions') } catch (e) {} }
