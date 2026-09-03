@@ -4186,6 +4186,12 @@ function switchToolkitTab(tab) {
   document.getElementById('toolkit-body').innerHTML = TOOLKIT_CONTENT[tab]
 }
 
+// A teacher previewing this page (embedded via Grade9LessonEditor.tsx's
+// iframe, ?classId=&teacher=1 — the same convention every lesson editor
+// uses) must be able to open ANY mission regardless of student progress,
+// since there IS no student progress in that context.
+function isTeacherPreview() { return new URLSearchParams(window.location.search).get('teacher') === '1' }
+
 function showJourney() {
   const p = getProg()
   const worlds = TIERS.map(tier => ({
@@ -4204,7 +4210,7 @@ function showJourney() {
     title: '🌊 Deep Diver — Mission IDE',
     subtitle: 'Your code is the pilot. Write it, run it, watch it fly.',
     accent: '#67e8f9',
-    layout: 'path', softLock: true,
+    layout: 'path', softLock: true, hardLock: !isTeacherPreview(),
     worlds,
     onOpen: (id) => { if (id === 'tourney') openTourney(); else openMission(id) },
   })

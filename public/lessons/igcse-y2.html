@@ -1366,6 +1366,12 @@ function showToast(msg){
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)
 }
 
+// A teacher previewing this page (embedded via IgcseLessonEditor.tsx's
+// iframe, ?classId=&teacher=1 — the same convention every lesson editor
+// uses) must be able to open ANY stage regardless of student progress, since
+// there IS no student progress in that context.
+function isTeacherPreview() { return new URLSearchParams(window.location.search).get('teacher') === '1' }
+
 // ── Quest Map — 🧭 Code Expedition ───────────────────────────
 function showQuestMap() {
   const EMO = {M1:'🗃',M2:'⚖',M3:'📂',M4:'📚',M5:'🔀',M6:'🧱'}
@@ -1377,7 +1383,7 @@ function showQuestMap() {
     title: '🧭 Code Expedition — IGCSE Year 2',
     subtitle: 'Six programming camps on the road to Paper 2. Pseudocode is your gear.',
     accent: '#a78bfa',
-    layout: 'path', softLock: true,
+    layout: 'path', softLock: true, hardLock: !isTeacherPreview(),
     avatarSvg: '<span style="font-size:22px;">🧭</span>',
     worlds: [
       { name: '🗃 Camp 1 — Arrays & Records', sub: '2D arrays and record types', live: true, stages: stagesFor('M1') },

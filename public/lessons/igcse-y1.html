@@ -982,6 +982,12 @@ function showToast(msg) {
   t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3200)
 }
 
+// A teacher previewing this page (embedded via IgcseLessonEditor.tsx's
+// iframe, ?classId=&teacher=1 — the same convention every lesson editor
+// uses) must be able to open ANY stage regardless of student progress, since
+// there IS no student progress in that context.
+function isTeacherPreview() { return new URLSearchParams(window.location.search).get('teacher') === '1' }
+
 // ── Quest Map — 🏔 Theory Peaks ──────────────────────────────
 function showQuestMap() {
   const EMO = {M1:'💾',M2:'🖥',M3:'🌐',M4:'🔐',M5:'🧮',M6:'🌍',M7:'🤖'}
@@ -993,7 +999,7 @@ function showQuestMap() {
     title: '🏔 Theory Peaks — IGCSE Year 1',
     subtitle: 'Climb seven peaks of Cambridge 0478 theory. Every summit counts.',
     accent: '#2dd4bf',
-    layout: 'path', softLock: true,
+    layout: 'path', softLock: true, hardLock: !isTeacherPreview(),
     avatarSvg: '<span style="font-size:22px;">🏔</span>',
     worlds: [
       { name: '💾 Peak 1 — Data Representation', sub: 'Binary, hex, file sizes, sound', live: true, stages: stagesFor('M1') },

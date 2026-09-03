@@ -1412,9 +1412,16 @@ function totalStats() {
   return { stars, xp, bosses }
 }
 
+// A teacher previewing this page (embedded via Grade6LessonEditor.tsx's
+// iframe, ?classId=&teacher=1 — the same convention every lesson editor
+// uses) must be able to open ANY stage regardless of student progress, since
+// there IS no student progress in that context.
+function isTeacherPreview() { return new URLSearchParams(window.location.search).get('teacher') === '1' }
+
 // ── Map rendering — shared QuestMap engine, same winding-path shape every
-// other grade/IGCSE/AS-A page uses now. Soft lock: already-beaten stages never
-// re-lock even if a new one appears mid-world; nothing is ever hard-blocked.
+// other grade/IGCSE/AS-A page uses now. Hard lock for real students (see
+// isTeacherPreview): already-beaten stages never re-lock even if a new one
+// appears mid-world.
 function showJourney() {
   const worlds = WORLDS.map(w => {
     if (!w.live) return { name: w.name, sub: w.sub, live: false, count: w.count }
@@ -1428,7 +1435,7 @@ function showJourney() {
     title: '🏝 The Creator Quest',
     subtitle: 'Walk the path. Beat the bosses. Become the Year 6 Creator.',
     accent: '#e879f9',
-    layout: 'path', softLock: true,
+    layout: 'path', softLock: true, hardLock: !isTeacherPreview(),
     avatarSvg: BOT_SVG,
     worlds,
     onOpen: (id) => openStage(id),

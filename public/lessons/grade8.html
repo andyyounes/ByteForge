@@ -4218,6 +4218,13 @@ const CHALLENGE_LESSON = {
 const STAGE_INDEX = {}
 CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.id] = i })
 
+// A teacher previewing this page (embedded via Grade8LessonEditor.tsx's
+// iframe, ?classId=&teacher=1 — the same convention every lesson editor
+// uses) must be able to open ANY stage regardless of student progress, since
+// there IS no student progress in that context. Checked fresh at map-render
+// time rather than cached, since it never changes mid-session anyway.
+function isTeacherPreview() { return new URLSearchParams(window.location.search).get('teacher') === '1' }
+
 // ── Builder City map — sequential unlock, same intent as the pill list below
 // (any pill is currently clickable regardless of order; the map itself is the
 // paced/sequential front door, matching Grade 6/7's landing-map convention).
@@ -4241,7 +4248,7 @@ function showJourney() {
     title: '🏙 Builder City',
     subtitle: 'Real Python, a real editor, real data. From your first print() to a shipped app.',
     accent: '#60a5fa',
-    layout: 'path', softLock: true, hardLock: true,
+    layout: 'path', softLock: true, hardLock: !isTeacherPreview(),
     avatarSvg: '<span style="font-size:22px;">🐍</span>',
     worlds,
     onOpen: (id) => id.startsWith('lesson-') ? openModuleLesson(id.slice(7)) : selectChallenge(STAGE_INDEX[id]),

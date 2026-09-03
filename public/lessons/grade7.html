@@ -3342,6 +3342,12 @@ const CHALLENGE_LESSON = {
 const STAGE_INDEX = {}
 CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.id] = i })
 
+// A teacher previewing this page (embedded via Grade7LessonEditor.tsx's
+// iframe, ?classId=&teacher=1 — the same convention every lesson editor
+// uses) must be able to open ANY stage regardless of student progress, since
+// there IS no student progress in that context.
+function isTeacherPreview() { return new URLSearchParams(window.location.search).get('teacher') === '1' }
+
 // ── Galaxy Map — sequential unlock (matches the existing pill-lock intent);
 // clicking a stage hides the map and opens it in the existing workspace player.
 function showJourney() {
@@ -3366,13 +3372,16 @@ function showJourney() {
   // grade9/AS/A-Level/IGCSE. Grade 7 used to default to the grid layout,
   // which renders every not-yet-current stage as a literal 🔒 padlock tile —
   // exactly the "wall of locked challenges" complaint. The path view instead
-  // dims future stages (still clickable) and highlights achievements (⭐/🏆)
-  // on completed ones, with the current stage glowing and carrying the avatar.
+  // dims future stages, with the current stage glowing and carrying the
+  // avatar. hardLock now genuinely enforces that order for real students
+  // (see isTeacherPreview) — a deliberate reversal of the above, requested
+  // directly after the softLock-only behaviour above turned out to let
+  // students open any stage regardless of progress.
   QuestMap.show({
     title: '🌌 Game Maker Galaxy',
     subtitle: 'One world, one boss build. Ship real games — block by block.',
     accent: '#818cf8',
-    layout: 'path', softLock: true,
+    layout: 'path', softLock: true, hardLock: !isTeacherPreview(),
     avatarSvg: '<span style="font-size:22px;">🚀</span>',
     worlds,
     onOpen: (id) => id.startsWith('lesson-') ? openWorldLesson(id.slice(7)) : selectChallenge(STAGE_INDEX[id]),
