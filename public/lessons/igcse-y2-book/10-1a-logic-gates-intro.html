@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.1a Logic Gates &amp; Truth Tables — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11.5px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 10px; text-align: center; }
+  .db-table th { background: rgba(251,191,36,.1); color: #fbbf24; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 10 · Logic Gates</span>
+  <div class="topic-title">10.1a Logic Gates &amp; Truth Tables</div>
+  <div class="topic-subtitle">Six gates, binary in and binary out — and why the number of rows in a truth table always doubles per input.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Logic gate</div><div class="key-term-def">A component that takes binary input(s) and produces a binary output, based on a fixed rule.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Logic circuit</div><div class="key-term-def">Several logic gates combined together to carry out a specific function.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Truth table</div><div class="key-term-def">A table listing the output for every possible combination of inputs to a gate or circuit.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Where logic gates actually live</h4>
+    <ul>
+      <li>Real electronic circuits in computers, solid-state drives, and controlling devices are built from THOUSANDS of logic gates.</li>
+      <li>Six logic gates are covered here: <b>NOT, AND, OR, NAND, NOR, XOR</b>. NOT has ONE input; all five others have TWO inputs.</li>
+      <li>A logic CIRCUIT can have more than 2 inputs overall, even though each individual GATE only ever has 1 or 2.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why the number of rows in a truth table doubles per input</h4>
+    <ul>
+      <li>2 inputs → 2² = 4 possible combinations. 3 inputs → 2³ = 8 combinations. 4 inputs → 2⁴ = 16 combinations.</li>
+      <li>Every input is either 0 or 1 — the number of possible combinations is always a power of 2, since each extra input DOUBLES the number of ways the existing combinations can occur (once with the new input at 0, once at 1).</li>
+      <li>A truth table lists the OUTPUT for every single one of these combinations, not just a few examples.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>C</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>0</td><td>1</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>The standard way to list combinations, so none are missed</h4>
+    <ul>
+      <li>The table above shows all 8 combinations for 3 inputs (A, B, C) — notice the rightmost column alternates every row, the middle column every 2 rows, and the leftmost every 4 rows. Following this pattern guarantees every combination is listed exactly once, with none missed or repeated.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Boolean algebra — an alternative notation you'll see online</h4>
+    <ul>
+      <li>Boolean algebra uses symbols instead of words: <code>.</code> means AND, <code>+</code> means OR, and a bar OVER a letter means NOT (e.g. <code>A̅</code> means "NOT A").</li>
+      <li>This is optional for IGCSE — logic notation (AND, OR, NOT written out) is used throughout this course — but Boolean algebra appears constantly on real logic-gate websites, so recognising it is worth knowing.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — logic gates, circuits, and truth table combinatorics.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which of the six logic gates has only ONE input, unlike all the others?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The NOT gate.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">How many rows would a truth table need for 4 inputs?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>2⁴ = 16 rows.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In Boolean algebra, the symbol <code>.</code> means ______, and <code>+</code> means ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>.</code> means AND; <code>+</code> means OR.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student builds a truth table for 3 inputs but only lists 6 rows. What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>3 inputs require 2³ = 8 rows to cover every possible combination — 6 rows means at least 2 real combinations were missed entirely.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      How many rows would a truth table need for a logic circuit with 5 inputs?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>2⁵ = 32 rows.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Can a single logic GATE (not a whole circuit) have more than 2 inputs, per this course?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — each individual gate has at most 2 inputs (or 1, for NOT). More than 2 overall inputs only happens when several gates are combined together into a full logic CIRCUIT.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 10: Logic Gates — 10.1a Logic Gates &amp; Truth Tables<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 10.1
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.2a Tracing a Circuit into a Truth Table — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: center; }
+  .db-table th { background: rgba(96,165,250,.1); color: #60a5fa; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .db-table td.hi { color: #fbbf24; font-weight: 700; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 10 · Logic Gates</span>
+  <div class="topic-title">10.2a Tracing a Circuit into a Truth Table</div>
+  <div class="topic-subtitle">Split the circuit into stages, solve each stage's own mini truth table, then combine them.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Intermediate value</div><div class="key-term-def">The output of an internal gate partway through a circuit — not a final input or the final output.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The strategy — split the circuit into parts</h4>
+    <ul>
+      <li>A 3-input circuit needs 8 rows in its truth table. Rather than tracing the WHOLE circuit at once, split it into parts (following each gate's wiring), giving each part its own intermediate output label (e.g. P, Q, R).</li>
+      <li>Solve each part's mini truth table one at a time, then combine them into the final table.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="420" height="130" viewBox="0 0 420 130">
+      <g font-family="system-ui" font-size="11">
+        <text x="10" y="20" fill="#e2e8f0">A</text><text x="10" y="55" fill="#e2e8f0">B</text><text x="10" y="90" fill="#e2e8f0">C</text>
+        <rect x="60" y="10" width="60" height="34" rx="4" fill="#111320" stroke="#60a5fa"/><text x="90" y="31" fill="#93c5fd" text-anchor="middle" font-size="10">AND → P</text>
+        <rect x="60" y="55" width="60" height="34" rx="4" fill="#111320" stroke="#e879f9"/><text x="90" y="76" fill="#f0abfc" text-anchor="middle" font-size="10">NOR → Q</text>
+        <rect x="160" y="35" width="60" height="34" rx="4" fill="#111320" stroke="#4ade80"/><text x="190" y="56" fill="#86efac" text-anchor="middle" font-size="10">OR → R</text>
+        <rect x="260" y="55" width="60" height="34" rx="4" fill="#111320" stroke="#fbbf24"/><text x="290" y="76" fill="#fde68a" text-anchor="middle" font-size="10">AND → X</text>
+        <text x="340" y="76" fill="#e2e8f0">X (output)</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Part 1 — the first two gates, using the original inputs A, B, C</h4>
+    <ul>
+      <li>P comes from an AND gate with inputs A and B.</li>
+      <li>Q comes from a NOR gate with inputs B and C.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>C</th><th>P (A AND B)</th><th>Q (B NOR C)</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+    <tr><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Part 2 — combining P and Q with an OR gate</h4>
+    <ul>
+      <li>All 8 rows of P/Q from Part 1 are used here — even though this gate only has 2 inputs, it must still be evaluated for every one of the 8 combinations already generated.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>P</th><th>Q</th><th>R (P OR Q)</th></tr>
+    <tr><td>0</td><td>1</td><td class="hi">1</td></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td class="hi">1</td></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td class="hi">1</td></tr>
+    <tr><td>1</td><td>0</td><td class="hi">1</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Part 3 — the final gate, R AND C, producing X</h4>
+    <ul>
+      <li>Putting all three intermediate tables together — keeping P, Q, R visible — gives the complete working. It's good practice to leave the intermediate columns IN until you're confident, then remove them for a clean final A/B/C/X table.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>C</th><th>P</th><th>Q</th><th>R</th><th>X (final)</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td class="hi">1</td></tr>
+    <tr><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+  </table>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — tracing a multi-gate circuit into a truth table.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why is it useful to split a complex circuit into parts, using intermediate labels like P, Q, R?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It breaks one hard problem into several small, manageable ones — each part only needs its OWN simple 2-input truth table solved, rather than trying to work out the whole complex circuit's behaviour all at once.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In Part 2 (combining P and Q), why does the table still need all 8 rows even though the OR gate only has 2 inputs?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because P and Q's VALUES already differ across all 8 of the original A/B/C combinations from Part 1 — the OR gate must be evaluated separately for every one of those 8 rows, even though it only ever looks at 2 values (P and Q) at a time.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      When A=1, B=1, C=0: P = A AND B = ______, Q = B NOR C = ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>P = 1 (both A and B are 1). Q = 0 (B is 1, so NOR — which needs BOTH inputs to be 0 — gives 0).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student computes the final X column directly from A, B, C, skipping P, Q, R entirely — and gets one row wrong. Why does keeping the intermediate columns help avoid this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Working through P, Q, and R one gate at a time means each step is a simple, checkable 1-2 input gate — skipping straight to X requires holding the ENTIRE circuit's logic in your head at once, which is far more error-prone, especially before you're confident with the method.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the final table above, what is X when A=0, B=1, C=1?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>X = 1 (row 4 in the final table).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Is it acceptable to remove the intermediate P/Q/R columns from the final answer?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Yes — once the working is done, it's optional to leave a clean final table showing only A, B, C, and X. Keeping the intermediates is good practice while learning, but not required in the final answer.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 10: Logic Gates — 10.2a Tracing a Circuit into a Truth Table<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 10.3, Example 1
+  </div>
+
+</div>
+</body>
+</html>
