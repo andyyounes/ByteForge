@@ -2688,6 +2688,16 @@ const WORLDS = [
       needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
       check:(log) => log.frames >= 5 && log.hasIf && log.texts >= 2,
     },
+    { id:'g10s3', name:'Bring the Title Screen Into the Game', xp:65,
+      text:`<strong>Challenge 3 — Connect Your Pieces</strong> — Call your Challenge 1 title function from INSIDE the game loop itself, using an if: show the title screen while the game hasn't started yet, and the live score/win display from Challenge 2 once it has.`,
+      hints:[
+        'A simple "started" variable (true/false) checked with an if is enough — this is your first real state check.',
+        'if (!started) { drawTitle() } else { show the score/win display } — one function call, decided by a condition, every frame.',
+        'This is genuinely the seed of the full menu → playing → gameover state machine the final boss asks for.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:true, needsFunction:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasFunction && log.texts >= 1,
+    },
     { id:'g10boss', name:'Ship Your Own Game', xp:100, boss:true,
       text:`<strong>🏆 FINAL BOSS — Ship Your Own Game</strong> — Bring the whole year together: a state machine (menu → playing → gameover, from Game States), player input (keyboard or mouse, from Player Control), collision or a win condition (from Collision & Physics), and at least one function you define (from My Blocks). This is YOUR game, in the class arcade.`,
       hints:[
@@ -3318,6 +3328,11 @@ const CHALLENGE_LESSON = {
       <p><code>text("Score: " + score, 20, 20)</code> called every frame automatically shows the CURRENT score, because it re-reads the variable fresh each time — you never have to manually "update" the display, it just always reflects whatever the variable currently holds.</p></div>
     <div class="cl-block"><h4>From "code that runs" to "a game a player understands"</h4>
       <p>Code that works perfectly but never shows the player anything isn't really a game yet — a visible score/win screen is what turns your logic into something a player can actually follow and enjoy.</p></div>` },
+  g10s3: { title: 'A function called BY a condition is a real state check', html: `
+    <div class="cl-block"><h4>The seed of a state machine</h4>
+      <p>A single true/false variable, checked with an if, deciding WHICH thing gets drawn each frame — title screen or gameplay — is genuinely the same core idea as G7's full menu → playing → gameover state machine, just with only two states instead of three.</p></div>
+    <div class="cl-block"><h4>Why connect them now, not just at the boss</h4>
+      <p>Calling your Challenge 1 function from inside a live, running game loop — rather than testing it in isolation — is exactly where real bugs tend to surface: does it draw in the right place once other things are also being drawn every frame? Better to find out here than for the first time at the final boss.</p></div>` },
   g10boss: { title: 'FINAL BOSS — Everything from the whole year', html: `
     <div class="cl-block"><h4>Four ideas, one finished game</h4>
       <p>A state machine (G7), player input (G5), collision or a win condition (G6), and at least one function you define (G4) — every single major idea from this entire course, combined into one thing YOU designed, not a pre-set challenge.</p></div>
