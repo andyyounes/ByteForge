@@ -1541,6 +1541,30 @@ const WORLDS = [
       ],
       check:(log) => log.quizCorrect >= 4,
     },
+    { id:'cb2s2', name:'Folders & File Paths', xp:25, type:'quiz',
+      text:`<strong>Challenge 2</strong> — Folders keep files organised. Match each description to the right term.`,
+      hints:['A folder can hold OTHER folders — that\'s a subfolder.', 'A file path is like an address — it lists every folder you\'d open to reach the file.'],
+      passCount:4,
+      questions:[
+        { type:'match', prompt:'This groups files together, but isn\'t a file type itself.', options:['Folder','Extension','File path','Icon'], answer:'Folder' },
+        { type:'match', prompt:'A folder placed INSIDE another folder is called this.', options:['Subfolder','Root folder','Shortcut','Extension'], answer:'Subfolder' },
+        { type:'match', prompt:'Documents / Homework / essay.docx — this whole thing is an example of a real ___.', options:['file path','file extension','folder icon','file size'], answer:'file path' },
+        { type:'fill', prompt:'A messy Desktop with 200 loose files makes it ___ to find anything (opposite of "easy").', answer:'hard' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
+    { id:'cb2s3', name:'Storage Units in Practice', xp:30, type:'quiz',
+      text:`<strong>Challenge 3</strong> — KB, MB, and GB in real, worked examples — not just "which is bigger".`,
+      hints:['1024 KB = 1 MB. 1024 MB = 1 GB (roughly 1000x, as taught).', 'A bigger file takes up more storage AND takes longer to download.'],
+      passCount:4,
+      questions:[
+        { type:'fill', prompt:'A photo is 4 MB and a song is 4000 KB. Which is bigger — "photo" or "song"?', answer:'photo' },
+        { type:'match', prompt:'A two-hour HD movie is roughly this size.', options:['4 GB','4 MB','4 KB','4 bytes'], answer:'4 GB' },
+        { type:'match', prompt:'A short text message is roughly this size.', options:['1 KB','1 MB','1 GB','1 TB'], answer:'1 KB' },
+        { type:'fill', prompt:'A 64 GB phone is nearly full of 4 MB photos. Roughly how many thousand photos is that (64,000 ÷ 4)? Answer as a number.', answer:'16000' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
     { id:'cb2boss', name:'BOSS — File Types & Storage', xp:55, type:'quiz', boss:true,
       text:`<strong>BOSS</strong> — A harder mixed set: file types plus storage size order.`,
       hints:['game.exe is a program you run, not a document.', '1 GB is bigger than 1 MB, which is bigger than 1 KB.'],
@@ -2696,6 +2720,20 @@ const CHALLENGE_LESSON = {
       <p>A single text message: under 1 KB. A one-page Word document: 20-50 KB. A phone photo: 2-5 MB. A 3-minute MP3 song: about 3-5 MB. A 10-minute HD video: 200-500 MB. A modern video game install: often 20-100+ GB.</p></div>
     <div class="cl-block"><h4>The hands-on task (teacher-reviewed, not auto-checked)</h4>
       <p>Create a folder called "Grade 7 ICT" with 3 sub-folders inside — Games, Pictures, Homework. Save one real file into each — an image into Pictures, a document into Homework, anything relevant into Games. Look at each file's extension before you place it, so you're sorting by ACTUAL type, not just guessing from the name. Then show your teacher.</p></div>` },
+  cb2s2: { title: 'Folders keep files findable', html: `
+    <div class="cl-block"><h4>A folder isn't a file type — it's a container</h4>
+      <p>A folder groups files (and other folders) together, but it has no file type of its own — it doesn't open in a viewer or player, it just holds things. A folder placed INSIDE another folder is called a <b>subfolder</b> — e.g. a "Homework" subfolder inside a "Grade 7 ICT" folder.</p></div>
+    <div class="cl-block"><h4>A file path is a real address</h4>
+      <p>A file path lists every folder you'd open, in order, to reach a file — e.g. <code>Grade 7 ICT / Homework / essay.docx</code> means: open "Grade 7 ICT", then open "Homework" inside it, and there's essay.docx. Windows/Mac both show this as a clickable trail at the top of a file browser window.</p></div>
+    <div class="cl-block"><h4>Why organising into folders actually matters</h4>
+      <p>200 files loose on a Desktop with no folders makes finding ANY one of them slow and frustrating — you'd have to scroll and read every single name. The same 200 files sorted into a handful of clearly-named folders (Photos, Homework, Games) means you only ever look inside ONE folder to find what you need.</p></div>` },
+  cb2s3: { title: 'Storage units, worked with real numbers', html: `
+    <div class="cl-block"><h4>The 1024 chain, and why "about 1000×" is a simplification</h4>
+      <p>Technically 1 KB = 1024 bytes, 1 MB = 1024 KB, 1 GB = 1024 MB — but "about 1000×" (as taught) is close enough for comparing sizes at a glance, and is what most people actually say day to day.</p></div>
+    <div class="cl-block"><h4>Comparing real files by their units, not just their names</h4>
+      <p>A 4 MB photo and a 4000 KB song — since 1 MB ≈ 1000 KB, 4 MB ≈ 4000 KB, so they're actually about the SAME size, even though one's measured in MB and the other in KB. Always convert to the SAME unit before comparing.</p></div>
+    <div class="cl-block"><h4>Working out how many files fit</h4>
+      <p>If a phone has 64 GB of storage and photos are 4 MB each: 64 GB ≈ 64,000 MB, so 64,000 ÷ 4 = 16,000 photos could theoretically fit (ignoring apps, videos, and other files that would also take up space in reality).</p></div>` },
   cb2boss: { title: 'BOSS — file types and storage size order', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Same facts as Challenge 1, plus: KB is smaller than MB, which is smaller than GB. A folder is a container that groups files together — it doesn't have its own file type; it holds OTHER files and folders.</p></div>
