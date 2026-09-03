@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.2c Building a Circuit from an Expression — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: center; }
+  .db-table th { background: rgba(74,222,128,.1); color: #4ade80; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 10 · Logic Gates</span>
+  <div class="topic-title">10.2c Building a Circuit from an Expression</div>
+  <div class="topic-subtitle">Split the expression at its OUTERMOST connector first, then build each half separately.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The strategy — the reverse of 10.2b</h4>
+    <ul>
+      <li>Given <code>(A XOR C) OR (NOT C NAND B)</code>: identify the OUTERMOST connecting gate first — here, OR.</li>
+      <li>Build EACH half of the expression as its own separate sub-circuit: one half for <code>(A XOR C)</code>, one half for <code>(NOT C NAND B)</code>.</li>
+      <li>Finally, join the two halves together using the OR gate identified at the start.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Producing the truth table two ways — and why using BOTH is useful</h4>
+    <ul>
+      <li><b>Method 1:</b> trace through the circuit you just built, stage by stage (as in 10.2a).</li>
+      <li><b>Method 2:</b> produce the truth table directly from the ORIGINAL expression instead.</li>
+      <li>Using Method 2 as well as Method 1 gives you a genuine CHECK — if both methods agree, your circuit is very likely correct; if they disagree, you've found a mistake somewhere.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>C</th><th>P (A XOR C)</th><th>Q (NOT C)</th><th>R (Q NAND B)</th><th>X (P OR R)</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Reading the working — three intermediate stages, then combine</h4>
+    <ul>
+      <li>P is worked out first (A XOR C) — the LEFT half of the OR.</li>
+      <li>Q (NOT C) is an intermediate step needed for the RIGHT half; R (Q NAND B) is the actual right half's real value.</li>
+      <li>X, the final output, is P OR R — combining both halves exactly as the original expression describes.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — building a circuit (and its truth table) from a given logic expression.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">When building a circuit from an expression like (A XOR C) OR (NOT C NAND B), which gate should you identify FIRST?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The OUTERMOST connecting gate — here, the OR gate joining the two bracketed halves together.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is it useful to produce the truth table BOTH by tracing the circuit AND directly from the original expression?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>If both methods give the same result, it's a genuine check that the circuit you built correctly matches the expression it was supposed to represent — a mismatch would reveal a mistake in either the circuit or the working.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      For the expression (NOT C NAND B), when C=1 and B=0: NOT C = ______, and (NOT C) NAND B = ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>NOT C = 0 (since C=1). (NOT C) NAND B = 0 NAND 0 = 1 (NAND is 1 unless BOTH inputs are 1).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student builds a circuit for (A XOR C) OR (NOT C NAND B) but accidentally uses an AND gate instead of OR to join the two halves. How would this be caught?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Tracing the (wrongly built) circuit's truth table and comparing it against the truth table produced directly from the ORIGINAL expression would reveal a mismatch on at least one row — exactly the check this two-method approach is designed to catch.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      For the expression (A XOR C) OR (NOT C NAND B), using the table above, what is X when A=0, B=1, C=0?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>X = 0 (row 3 in the table).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How does building a circuit from an expression relate to writing an expression from a circuit (10.2b)?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They're the reverse of each other — 10.2b starts from a circuit and works OUTWARD to an expression; this lesson starts from an expression and works from the OUTERMOST gate inward to build the circuit.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 10: Logic Gates — 10.2c Building a Circuit from an Expression<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 10.3, Example 3
+  </div>
+
+</div>
+</body>
+</html>

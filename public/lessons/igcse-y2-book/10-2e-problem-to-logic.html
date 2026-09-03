@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.2e Real-World Problems into Logic Circuits — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: rgba(248,113,113,.05); border: 1px solid rgba(248,113,113,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #f87171; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #fecaca; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: center; }
+  .db-table th { background: rgba(248,113,113,.1); color: #f87171; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 10 · Logic Gates</span>
+  <div class="topic-title">10.2e Real-World Problems into Logic Circuits</div>
+  <div class="topic-subtitle">Safety systems, alarms, sensors — turning a written scenario into a genuine logic expression.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The strategy — hunt for AND, OR, NOT hiding in the words</h4>
+    <ul>
+      <li>ON = 1, OFF = 0 — and remember 0 is usually treated as "NOT 1".</li>
+      <li>Look for the key words connecting conditions: "and" → AND, "or" → OR, "not"/negative phrasing → NOT.</li>
+      <li>Build the expression piece by piece, one condition at a time, before combining them.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked example — a safety alarm</div>
+    <p>"An alarm, X, sounds if input A represents ON and input B represents OFF; OR if input B represents ON and input C represents OFF."</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Turning the words into an expression</h4>
+    <ul>
+      <li>"A is ON and B is OFF" → <code>(A AND NOT B)</code>.</li>
+      <li>"B is ON and C is OFF" → <code>(B AND NOT C)</code>.</li>
+      <li>These two parts are joined by "OR" in the original sentence: <code>(A AND NOT B) OR (B AND NOT C)</code>.</li>
+      <li>The circuit is built the same way as any expression (10.2c): build each half separately, then join with the OR gate mentioned.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>C</th><th>(A AND NOT B)</th><th>(B AND NOT C)</th><th>X</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+  </table>
+
+  <div class="example-block">
+    <div class="example-block-title">A harder real-world example — a wind turbine safety system</div>
+    <p>Three sensors: turbine speed (S: 1 if &gt;1000 rpm), bearing temperature (T: 1 if &gt;80°C), wind velocity (W: 1 if &gt;120 kph). Shutdown (X=1) happens if: (speed ≤1000 AND temp &gt;80°C) OR (speed &gt;1000 AND wind &gt;120kph) OR (temp ≤80°C AND wind &gt;120kph).</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Converting a table of conditions, one clause at a time</h4>
+    <ul>
+      <li>"speed ≤1000 rpm and bearing temp &gt;80°C" → <code>(NOT S AND T)</code>.</li>
+      <li>"speed &gt;1000 rpm and wind &gt;120kph" → <code>(S AND W)</code>.</li>
+      <li>"bearing temp ≤80°C and wind &gt;120kph" → <code>(NOT T AND W)</code>.</li>
+      <li>All three original clauses were joined by "OR" — so the three intermediate circuits are joined using TWO OR gates (since OR only takes 2 inputs at a time): first join (i) and (ii), then join that result with (iii).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>A genuinely useful check for complex, real problems</h4>
+    <ul>
+      <li>For a problem this complex, it's advisable to produce the logic circuit AND the truth table SEPARATELY (each straight from the original conditions), then compare them against each other.</li>
+      <li>Any disagreement between the two reveals a mistake — either in the circuit's wiring, or in how a condition was translated into logic.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — converting a real-world problem statement into a logic expression.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">In a problem statement, what English word usually signals an AND, and what usually signals an OR?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"and" signals AND; "or" signals OR. Negative phrasing (e.g. "is OFF", "is NOT") signals NOT.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the safety alarm example, what expression represents "input A represents ON and input B represents OFF"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>(A AND NOT B)</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the wind turbine clause "bearing temp ≤80°C and wind &gt;120kph": <code>(______ T AND W)</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>(NOT T AND W)</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student translates "bearing temperature &gt; 80°C" directly as just T (forgetting this IS what T=1 already means), then separately treats "temperature ≤ 80°C" as also just T. What's the mistake?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Temperature &gt; 80°C" corresponds to T=1 (written simply as T), but "temperature ≤ 80°C" is the OPPOSITE condition and must be written as NOT T — treating both phrasings as plain T would make two genuinely different conditions indistinguishable.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the safety alarm's truth table, what is X when A=1, B=1, C=0?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>X = 1 (row 7 in the table) — B is ON and C is OFF, satisfying the second half of the alarm condition.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why is it good practice to build the circuit AND the truth table separately for a complex real-world problem, then compare them?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any disagreement between the two independently-produced results reveals a genuine mistake somewhere — either in translating a condition into logic, or in how the circuit was wired — a check that's especially valuable the more complex the problem gets.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 10: Logic Gates — 10.2e Real-World Problems into Logic Circuits<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 10.3, Examples 6-7
+  </div>
+
+</div>
+</body>
+</html>

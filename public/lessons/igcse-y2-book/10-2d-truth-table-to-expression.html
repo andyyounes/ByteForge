@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.2d Writing an Expression from a Truth Table — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: center; }
+  .db-table th { background: rgba(251,191,36,.1); color: #fbbf24; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .db-table td.hi { background: rgba(251,191,36,.12); color: #fde68a; font-weight: 700; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 10 · Logic Gates</span>
+  <div class="topic-title">10.2d Writing an Expression from a Truth Table</div>
+  <div class="topic-subtitle">Only the rows where the output is 1 matter — OR them together and you're done.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Sum of products</div><div class="key-term-def">Writing an expression as several AND terms (one per output-1 row) joined by OR — the standard method used here.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The method — only the 1-rows matter</h4>
+    <ul>
+      <li>To find the expression a truth table represents, only look at the rows where the OUTPUT is 1 — completely ignore every row where it's 0.</li>
+      <li>For EACH such row, write an AND expression describing exactly that combination of inputs (using NOT for any input that's 0 in that row).</li>
+      <li>Join ALL these AND expressions together with OR — this final combined expression represents the whole truth table.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>X</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td class="hi">1</td><td class="hi">0</td><td class="hi">1</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>A simple 2-input example — only ONE row has output 1</h4>
+    <ul>
+      <li>Only the row A=1, B=0 gives an output of 1.</li>
+      <li>The expression: <code>A AND NOT B</code> (Boolean: A.B̅) — A is 1 so it's written directly; B is 0 so it needs NOT.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>X</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td class="hi">0</td><td class="hi">1</td><td class="hi">1</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td class="hi">1</td><td class="hi">1</td><td class="hi">1</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Two rows give output 1 — OR them together</h4>
+    <ul>
+      <li>Row A=0, B=1 gives: <code>(NOT A AND B)</code>. Row A=1, B=1 gives: <code>(A AND B)</code>.</li>
+      <li>Joined with OR: <code>(NOT A AND B) OR (A AND B)</code>.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Verifying two DIFFERENT-looking expressions actually match</h4>
+    <ul>
+      <li>Sometimes two expressions LOOK different but produce the exact SAME output for every input — e.g. <code>(NOT A AND B) OR (A AND B)</code> might be claimed to equal something simpler.</li>
+      <li>To PROVE this, build a truth table for the alternative expression too, and compare its output column, row by row, against the original — if every row matches, the two expressions are genuinely equivalent.</li>
+      <li>This "build a truth table and compare" method is the standard, reliable way to verify any claimed equivalence between two logic expressions.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>A 3-input example — three 1-rows, ORed into one expression</h4>
+    <ul>
+      <li>If rows (0,0,0), (1,0,0), and (1,1,0) each give output 1, the three individual expressions are: <code>(NOT A AND NOT B AND NOT C)</code>, <code>(A AND NOT B AND NOT C)</code>, <code>(A AND B AND NOT C)</code>.</li>
+      <li>Joined together: <code>(NOT A AND NOT B AND NOT C) OR (A AND NOT B AND NOT C) OR (A AND B AND NOT C)</code>.</li>
+      <li>The METHOD is identical regardless of how many inputs or how many 1-rows exist — just more terms get ORed together.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — deriving a logic expression from a truth table.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which rows of a truth table actually matter when deriving its logic expression?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Only the rows where the OUTPUT is 1 — rows with output 0 are ignored entirely.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">If a truth table has THREE rows where the output is 1, how many AND terms will the final expression have, and how are they joined?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Three AND terms (one per output-1 row), joined together with OR.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      For a row where A=0, B=1, C=1 gives output 1, complete the AND term: <code>(______ A AND B AND C)</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>(NOT A AND B AND C)</code> — A is 0, so it needs NOT; B and C are both 1, so they're written directly.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes an AND term for a row where the output is 0. What's wrong with including this term?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Only rows with output 1 should contribute a term — including a 0-output row's term would make the final expression output 1 for an input combination that should genuinely give 0, making the expression wrong.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A truth table for inputs A, B has output 1 only when A=0, B=0, and also when A=1, B=1. Write the full logic expression.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>(NOT A AND NOT B) OR (A AND B)</code> — this is, incidentally, exactly the XNOR function.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How would you PROVE that two differently-written expressions actually represent the same logic?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Build a truth table for each expression and compare their output columns row by row — if every row matches exactly, the two expressions are genuinely equivalent.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 10: Logic Gates — 10.2d Writing an Expression from a Truth Table<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 10.3, Examples 4-5
+  </div>
+
+</div>
+</body>
+</html>
