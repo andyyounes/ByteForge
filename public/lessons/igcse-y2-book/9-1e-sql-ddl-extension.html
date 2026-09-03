@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>9.1e SQL DDL (Extension) — Building a Database with SQL — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(232,121,249,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #f0abfc; white-space: pre-wrap; line-height: 1.6; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #e879f9; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11.5px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 10px; text-align: left; }
+  .db-table th { background: rgba(232,121,249,.1); color: #e879f9; font-family: system-ui, sans-serif; font-size: 10.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; background: #0a0c18; border: 1px solid rgba(255,255,255,.08); }
+  .compare-card b { display: block; margin-bottom: 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: #e879f9; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 9 · Databases · Extension</span>
+  <div class="topic-title">9.1e Building a Database with SQL (DDL)</div>
+  <div class="topic-subtitle">Extension: using SQL to CREATE the database structure itself, not just query it. Completes Unit 9.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">DDL</div><div class="key-term-def">Data Definition Language — creates, modifies, and removes a database's STRUCTURE.</div></div>
+    <div class="key-term-card"><div class="key-term-name">DML</div><div class="key-term-def">Data Manipulation Language — adds, modifies, deletes, and retrieves the DATA stored in a database.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="compare-grid">
+    <div class="compare-card"><b>DML — working with the data</b>SELECT, WHERE, ORDER BY, SUM, COUNT — everything covered so far in this unit. Reads and reports on data ALREADY in the database.</div>
+    <div class="compare-card"><b>DDL — working with the structure</b>CREATE DATABASE, CREATE TABLE, ALTER TABLE, PRIMARY KEY — builds and changes the database's actual STRUCTURE (tables, fields, keys) before any data is even entered.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>SQL does both jobs</h4>
+    <ul>
+      <li>Most Database Management Systems use SQL for BOTH DDL and DML — SQL was developed in the 1970s and has since become the industry standard.</li>
+      <li>AS/A Level extends this further into relational databases (multiple linked tables) — this section is an early preview for anyone considering that path.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>DDL Command</th><th>Description</th></tr>
+    <tr><td>CREATE DATABASE</td><td>Creates a new, empty database.</td></tr>
+    <tr><td>CREATE TABLE</td><td>Creates a table definition — its name and fields.</td></tr>
+    <tr><td>ALTER TABLE</td><td>Alters an existing table's definition.</td></tr>
+    <tr><td>PRIMARY KEY</td><td>Adds a primary key to a table.</td></tr>
+  </table>
+
+  <table class="db-table">
+    <tr><th>Data Type</th><th>Description</th></tr>
+    <tr><td>CHAR(n)</td><td>Fixed-length text, exactly n characters.</td></tr>
+    <tr><td>VARCHAR(n)</td><td>Variable-length text, up to a MAXIMUM of n characters.</td></tr>
+    <tr><td>BOOLEAN</td><td>True or False — SQL stores these as the integers 1 and 0.</td></tr>
+    <tr><td>INTEGER</td><td>Whole number.</td></tr>
+    <tr><td>REAL</td><td>Number with decimal places.</td></tr>
+    <tr><td>DATE</td><td>A date, usually formatted YYYY-MM-DD.</td></tr>
+    <tr><td>TIME</td><td>A time, usually formatted HH:MM:SS.</td></tr>
+  </table>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Creating the CubScout database and CUB table</span>CREATE DATABASE CubScout
+
+CREATE TABLE CUB (
+  CubName VARCHAR(30),
+  DateOfBirth DATE,
+  Address VARCHAR(40),
+  Gender CHAR(1),
+  School VARCHAR(30),
+  TelephoneNumber CHAR(14),
+  DateJoined DATE
+);
+
+ALTER TABLE CUB ADD PRIMARY KEY (CubNumber);</div>
+
+  <div class="theory-block">
+    <h4>Reading this script, line by line</h4>
+    <ul>
+      <li><code>CREATE DATABASE CubScout</code> — makes a brand new, empty database called CubScout.</li>
+      <li><code>CREATE TABLE CUB (...)</code> — defines the CUB table's structure: every field's name AND data type, listed together.</li>
+      <li><code>CubName VARCHAR(30)</code> — a variable-length text field, up to 30 characters. <code>Gender CHAR(1)</code> — a FIXED single character (e.g. 'M' or 'F').</li>
+      <li><code>ALTER TABLE CUB ADD PRIMARY KEY (CubNumber)</code> — a SEPARATE statement, adding a primary key AFTER the table already exists — note CubNumber itself wasn't listed in the original CREATE TABLE, so this also implies it needs adding as a genuine field first in a real script.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — DDL commands and SQL data types for building a database (completes Unit 9).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between DDL and DML?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>DDL creates/modifies/removes the database's STRUCTURE (tables, fields, keys). DML adds/modifies/deletes/retrieves the actual DATA stored inside that structure.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the difference between CHAR(n) and VARCHAR(n)?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>CHAR(n) is a FIXED length of exactly n characters. VARCHAR(n) is a VARIABLE length, up to a maximum of n characters.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the DDL command that adds a primary key to an existing table: <code>______ TABLE CUB ADD PRIMARY KEY (CubNumber);</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>ALTER TABLE CUB ADD PRIMARY KEY (CubNumber);</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student defines <code>Gender CHAR(1)</code> but then tries to store "Male" in it. What goes wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>CHAR(1) is a FIXED length of exactly 1 character — "Male" (4 characters) doesn't fit. Gender fields using CHAR(1) are meant for a single-letter code like 'M' or 'F', not a full word.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write a DDL CREATE TABLE statement for a table called STUDENT with fields: FamilyName (VARCHAR, up to 30 characters) and DateOfBirth (DATE).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>CREATE TABLE STUDENT (<br>&nbsp;&nbsp;FamilyName VARCHAR(30),<br>&nbsp;&nbsp;DateOfBirth DATE<br>);</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How does SQL represent Boolean (True/False) values internally?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>As the integers 1 and 0.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 9: Databases — 9.1e Building a Database with SQL (DDL), Extension — completes Unit 9<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 9.1, Extension
+  </div>
+
+</div>
+</body>
+</html>
