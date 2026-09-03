@@ -196,13 +196,19 @@ const QuestMap = (() => {
         const isCurrent = !s.done && !foundCurrent
         if (isCurrent) foundCurrent = true
         const soon = cfg.softLock && !s.done && !isCurrent
+        // hardLock: unlike softLock (dimmed but still clickable — meant for
+        // exam revision pages where jumping around is fine), a hard-locked
+        // "soon" node genuinely cannot be opened until every stage before it
+        // is done — no onclick attached at all, shown with a 🔒 instead of
+        // its real emoji, exactly like the grid layout already enforces.
+        const hardLocked = cfg.hardLock && soon
         const cls = 'qm-node' + (s.boss ? ' boss' : '') + (s.cp ? ' cp' : '') + (s.done ? ' done' : '')
-          + (isCurrent ? ' current' : '') + (soon ? ' soon' : '') + (s.rusty ? ' rusty' : '')
+          + (isCurrent ? ' current' : '') + (soon ? ' soon' : '') + (hardLocked ? ' locked' : '') + (s.rusty ? ' rusty' : '')
         html += '<div class="qm-pwrap" style="transform:translateX(' + OFF[k % OFF.length] + 'px)">'
-          + '<div class="' + cls + '" onclick="QuestMap._open(\'' + esc(s.id) + '\')" title="' + esc(s.label) + '">'
+          + '<div class="' + cls + '"' + (hardLocked ? '' : ' onclick="QuestMap._open(\'' + esc(s.id) + '\')"') + ' title="' + esc(hardLocked ? 'Complete earlier stages first' : s.label) + '">'
           + (isCurrent && cfg.avatarSvg ? '<span class="qm-avatar">' + cfg.avatarSvg + '</span>' : '')
           + (s.rusty ? '<span class="qm-rusty-tag">🩹</span>' : '')
-          + '<span class="qm-emoji">' + (s.emoji || '📘') + '</span>'
+          + '<span class="qm-emoji">' + (hardLocked ? '🔒' : (s.emoji || '📘')) + '</span>'
           + (s.done ? '<span class="qm-done-mark">' + (s.stars ? '⭐'.repeat(s.stars) : (s.boss ? '🏆' : '⭐')) + '</span>' : '')
           + '</div>'
           + '<div class="qm-plabel">' + esc(s.label)
