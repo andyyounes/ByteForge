@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1k Library Routines — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: left; }
+  .dtype-table th { background: rgba(74,222,128,.1); color: #4ade80; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-family: ui-monospace, monospace; font-size: 11.5px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1k Library Routines — MOD, DIV, ROUND, RANDOM</div>
+  <div class="topic-subtitle">Ready-made, fully-tested routines every IDE provides — completes Section 8.1.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Library routine</div><div class="key-term-def">A ready-made, pre-tested procedure or function included with a programming language, ready to use without writing it yourself.</div></div>
+    <div class="key-term-card"><div class="key-term-name">MOD</div><div class="key-term-def">Returns the REMAINDER of a division.</div></div>
+    <div class="key-term-card"><div class="key-term-name">DIV</div><div class="key-term-def">Returns the QUOTIENT (whole-number part) of a division.</div></div>
+    <div class="key-term-card"><div class="key-term-name">ROUND</div><div class="key-term-def">Returns a value rounded to a given number of decimal places.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why library routines exist</h4>
+    <ul>
+      <li>Every IDE includes a standard library of ready-made, fully-tested routines for common tasks — including the string handling from Section 8.1f.</li>
+      <li>Some languages need a specific IMPORT statement to access certain library routines — e.g. Python's <code>from random import random</code> before RANDOM can be used.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Routine</th><th>Pseudocode example</th><th>Result</th></tr>
+    <tr><td>MOD</td><td>Value1 ← MOD(10, 3)</td><td>1 (the remainder of 10 ÷ 3)</td></tr>
+    <tr><td>DIV</td><td>Value2 ← DIV(10, 3)</td><td>3 (the whole-number quotient of 10 ÷ 3)</td></tr>
+    <tr><td>ROUND</td><td>Value3 ← ROUND(6.97354, 2)</td><td>6.97 (rounded to 2 decimal places)</td></tr>
+    <tr><td>RANDOM</td><td>Value4 ← RANDOM()</td><td>A random number between 0 and 1 inclusive</td></tr>
+  </table>
+
+  <table class="dtype-table">
+    <tr><th>Routine</th><th>Python equivalent</th><th>Notes</th></tr>
+    <tr><td>MOD</td><td>Value1 = 10 % 3</td><td>Python uses the % operator, not a named function.</td></tr>
+    <tr><td>DIV</td><td>Value2 = 10 // 3</td><td>Python uses //. divmod(10, 3) returns BOTH the quotient and remainder together, as a pair.</td></tr>
+    <tr><td>ROUND</td><td>Value3 = round(6.97354, 2)</td><td>A direct function call, same shape as pseudocode.</td></tr>
+    <tr><td>RANDOM</td><td>from random import random<br>Value4 = random()</td><td>Must import the random library first — RANDOM needs an import that MOD/DIV/ROUND don't.</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Working through the pseudocode examples by hand</h4>
+    <ul>
+      <li><code>MOD(10, 3)</code> — 10 divided by 3 is 3 remainder 1, so MOD returns <b>1</b>.</li>
+      <li><code>DIV(10, 3)</code> — 10 divided by 3 goes 3 whole times (with 1 left over), so DIV returns <b>3</b>.</li>
+      <li><code>ROUND(6.97354, 2)</code> — rounding 6.97354 to 2 decimal places gives <b>6.97</b> (the third decimal digit, 3, rounds down).</li>
+      <li>MOD and DIV are a genuine pair: for any division A ÷ B, <code>DIV(A,B) * B + MOD(A,B)</code> always equals A exactly — e.g. 3 × 3 + 1 = 10.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — MOD, DIV, ROUND, and RANDOM (completing Section 8.1).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference between what MOD and DIV each return?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>MOD returns the REMAINDER of a division; DIV returns the QUOTIENT (the whole-number part) of a division.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does RANDOM() return?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A random number between 0 and 1 inclusive.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the Python equivalent of pseudocode's <code>Value ← MOD(10, 3)</code>: <code>Value = 10 ______ 3</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>Value = 10 % 3</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student wants a random number and simply writes <code>Value4 = random()</code> at the top of their Python program with no other setup. What real problem might this cause?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Without <code>from random import random</code> first, Python has no idea what <code>random()</code> refers to — RANDOM specifically needs its library imported before use, unlike MOD/DIV/ROUND which work immediately with no setup.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Work out MOD(17, 5) and DIV(17, 5) by hand.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>17 ÷ 5 = 3 remainder 2. So DIV(17, 5) = 3, and MOD(17, 5) = 2. Check: 3 × 5 + 2 = 17. ✓</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What genuine relationship always holds true between DIV(A,B), MOD(A,B), B, and A?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>DIV(A,B) * B + MOD(A,B) = A</code> — the quotient times the divisor, plus the remainder, always reconstructs the original number exactly.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1k Library Routines (completes Section 8.1)<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1.7
+  </div>
+
+</div>
+</body>
+</html>

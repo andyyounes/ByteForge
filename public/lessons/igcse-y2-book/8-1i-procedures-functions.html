@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1i Procedures and Functions — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12.5px; color: #93c5fd; white-space: pre-wrap; line-height: 1.7; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; background: #0a0c18; border: 1px solid rgba(255,255,255,.08); }
+  .compare-card b { display: block; margin-bottom: 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: #60a5fa; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1i Procedures and Functions</div>
+  <div class="topic-subtitle">Naming a group of statements once, so it can be called from anywhere — with or without a returned value.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Procedure</div><div class="key-term-def">A named group of statements that performs a task — does NOT return a value.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Function</div><div class="key-term-def">A named group of statements that performs a task AND returns a value to the main program.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Parameter</div><div class="key-term-def">A variable that stores the value of an argument passed INTO a procedure or function.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Header</div><div class="key-term-def">The first line of a procedure/function definition — its name, parameters (with types), and (for a function) its return type.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why define something once, instead of repeating code</h4>
+    <ul>
+      <li>Programs often need to perform the SAME task in several places — subroutines (procedures/functions) are defined ONCE and can be CALLED many times, instead of retyping the same statements repeatedly.</li>
+      <li>A procedure performs a task — it does not return a value. A function performs a task AND returns a value back to whatever called it.</li>
+      <li>Different languages use different terminology: procedures are called "void functions" in Python; functions are called "fruitful functions" in Python.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">A procedure without parameters — pseudocode vs. Python</span>// Pseudocode
+PROCEDURE Stars
+  OUTPUT "************"
+ENDPROCEDURE
+
+CALL Stars
+
+# Python
+def Stars():
+    print("************")
+
+Stars()</div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">A procedure WITH a parameter — pseudocode vs. Python</span>// Pseudocode — prints Number stars
+PROCEDURE Stars (Number : INTEGER)
+  DECLARE Counter : INTEGER
+  FOR Counter ← 1 TO Number
+    OUTPUT "*"
+  NEXT Counter
+ENDPROCEDURE
+
+CALL Stars(7)
+
+# Python
+def Stars(Number):
+    for Counter in range(Number):
+        print("*", end="")
+
+Stars(7)</div>
+
+  <div class="theory-block">
+    <h4>A procedure call must match its definition</h4>
+    <ul>
+      <li>When a procedure is defined WITH parameters, the arguments in the CALL must match the parameters in the DEFINITION — same number, in the same order.</li>
+      <li>For IGCSE Computer Science, the number of parameters used is limited to two.</li>
+      <li>A procedure call is a standalone statement on its own line — <code>CALL Stars(7)</code>.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">A function — Fahrenheit to Celsius, pseudocode vs. Python</span>// Pseudocode
+FUNCTION Celsius (Temperature : REAL) RETURNS REAL
+  RETURN (Temperature - 32) / 1.8
+ENDFUNCTION
+
+MyTemp ← Celsius(MyTemp)
+
+# Python — no need to declare the data type at all
+def Celsius(Temperature):
+    return (Temperature - 32) / 1.8
+
+MyTemp = Celsius(MyTemp)</div>
+
+  <div class="compare-grid">
+    <div class="compare-card"><b>Procedure calls</b>Standalone statements on their own line — <code>CALL Stars(7)</code> — nothing is returned to be used elsewhere.</div>
+    <div class="compare-card"><b>Function calls</b>Made as PART of an expression, usually on the right-hand side of an assignment — <code>MyTemp ← Celsius(MyTemp)</code> — because a value comes back that needs somewhere to go.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>What a header always contains</h4>
+    <ul>
+      <li>The NAME of the procedure or function.</li>
+      <li>Any PARAMETERS passed in, and their data type.</li>
+      <li>For a function specifically: the data type of the value it RETURNS.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — procedures, functions, and parameters.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between a procedure and a function?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A function returns a value back to the main program; a procedure does not return anything.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why must a procedure/function call match its definition exactly in terms of arguments?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the arguments passed in the call are assigned to the parameters in the definition, in order — a mismatched number or order of arguments would mean the wrong values end up in the wrong parameters, or the call would be invalid entirely.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank pseudocode</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Complete the function header for one that takes a REAL parameter Value and returns a REAL: <code>FUNCTION Square (Value : REAL) ______ REAL</code>
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>FUNCTION Square (Value : REAL) RETURNS REAL</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes <code>CALL Celsius(MyTemp)</code> as a standalone line, expecting the converted temperature to be used afterwards. What's wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Celsius is a FUNCTION, not a procedure — its return value needs somewhere to go. Calling it as a standalone statement (like a procedure) throws the returned value away; it should be assigned instead: <code>MyTemp ← Celsius(MyTemp)</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write a pseudocode FUNCTION called Double that takes a parameter Value (INTEGER) and returns Value multiplied by 2.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>FUNCTION Double (Value : INTEGER) RETURNS INTEGER<br>&nbsp;&nbsp;RETURN Value * 2<br>ENDFUNCTION</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why doesn't Python's function definition need to state a data type for its parameter or return value, unlike pseudocode?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because Python uses implicit typing throughout — the type of any value is decided automatically by what's actually assigned or passed in, so there's no separate step where a type must be explicitly declared.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1i Procedures and Functions<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1.6
+  </div>
+
+</div>
+</body>
+</html>

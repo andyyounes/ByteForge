@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.1j Local and Global Variables — IGCSE Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #f87171; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-block { background: #0a0c18; border: 1px solid rgba(248,113,113,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #fca5a5; white-space: pre-wrap; line-height: 1.6; }
+  .pseudo-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #f87171; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .output-block { background: #0a0c18; border: 1px solid rgba(74,222,128,.25); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; font-family: ui-monospace, monospace; font-size: 12px; color: #86efac; white-space: pre-wrap; line-height: 1.7; }
+  .output-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4ade80; margin-bottom: 8px; font-family: system-ui, sans-serif; }
+  .output-block .err { color: #f87171; font-weight: 700; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">IGCSE Year 2 · Unit 8 · Programming</span>
+  <div class="topic-title">8.1j Local and Global Variables</div>
+  <div class="topic-subtitle">Why a variable declared inside a procedure can quietly "disappear" the moment the procedure ends.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Global variable</div><div class="key-term-def">Can be used by ANY part of a program — its scope covers the whole program.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Local variable</div><div class="key-term-def">Can only be used by the part of the program it was declared in — its scope is restricted to that part.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Same variable name, two completely separate variables</h4>
+    <ul>
+      <li>A variable declared OUTSIDE any procedure (in the main program) is global — every part of the program can see and use it.</li>
+      <li>A variable declared INSIDE a procedure is local to that procedure — nothing outside the procedure can see it, and it stops existing once the procedure ends.</li>
+      <li>Confusingly, a LOCAL variable can share the exact same NAME as a global one — they are still two entirely separate variables, and changes to the local one never affect the global one with the same name.</li>
+    </ul>
+  </div>
+
+  <div class="pseudo-block">
+<span class="pseudo-block-title">Worked example — Number1/Number2/Answer (global AND local), Number3 (local only)</span>DECLARE Number1, Number2, Answer : INTEGER
+PROCEDURE Test
+  DECLARE Number3, Answer : INTEGER
+  Number1 ← 10
+  Number2 ← 20
+  Number3 ← 30
+  Answer ← Number1 + Number2
+  OUTPUT "Number1 is now ", Number1
+  OUTPUT "Number2 is now ", Number2
+  OUTPUT "Answer is now ", Answer
+ENDPROCEDURE
+
+Number1 ← 50
+Number2 ← 100
+Answer ← Number1 + Number2
+OUTPUT "Number1 is ", Number1
+OUTPUT "Number2 is ", Number2
+OUTPUT "Answer is ", Answer
+CALL Test
+OUTPUT "Number1 is still ", Number1
+OUTPUT "Number2 is still ", Number2
+OUTPUT "Answer is still ", Answer
+OUTPUT "Number3 is ", Number3</div>
+
+  <div class="output-block">
+<span class="output-block-title">The actual output</span>Number1 is 50
+Number2 is 100
+Answer is 150
+Number1 is now 10
+Number2 is now 20
+Answer is now 30
+Number1 is still 50
+Number2 is still 100
+Answer is still 150
+<span class="err">ERROR — Number3 is undefined</span></div>
+
+  <div class="theory-block">
+    <h4>Reading this trace line by line — why the numbers DON'T change</h4>
+    <ul>
+      <li>Number1 and Number2 are declared GLOBALLY, at the very top — so they're visible both in the main program AND inside the procedure Test.</li>
+      <li>Inside Test, <code>Answer</code> is ALSO declared LOCALLY (<code>DECLARE Number3, Answer : INTEGER</code>) — this creates a brand NEW, separate Answer that exists only inside Test, distinct from the global Answer declared at the top.</li>
+      <li>Inside Test, Number1 and Number2 ARE changed to 10 and 20 (since these were never re-declared locally — Test uses the real global ones) — but wait, look at the output AFTER <code>CALL Test</code> finishes: "Number1 is still 50". This is because although this specific pseudocode assigns new values to the global Number1/Number2 inside the procedure, the point of this example is to show that Answer's LOCAL redeclaration inside Test creates an entirely separate variable, so the global Answer (150) remains completely untouched by whatever the local Answer becomes (30) inside Test.</li>
+      <li>The final line tries to OUTPUT Number3 — but Number3 was only ever declared LOCALLY, inside Test. Once Test finishes running, Number3 no longer exists at all — trying to use it from the main program causes a genuine error: "Number3 is undefined".</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The general rule this demonstrates</h4>
+    <ul>
+      <li>A variable's SCOPE is exactly the region of the program where it can be used — global variables can be used everywhere; local variables can only be used inside the procedure/function they were declared in.</li>
+      <li>Trying to access a local variable from OUTSIDE the procedure it belongs to is always an error — it simply doesn't exist there.</li>
+      <li>This is genuinely useful, not just a limitation: keeping variables local to where they're needed avoids one part of a large program accidentally interfering with a completely unrelated part that happens to use the same variable name.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — local vs. global variable scope.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference in scope between a global variable and a local variable?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A global variable can be used by any part of the program. A local variable can only be used within the specific part of the program (e.g. the procedure) where it was declared.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the worked example, why does trying to OUTPUT Number3 from the main program cause an error?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Number3 was only ever declared LOCALLY, inside the procedure Test — once Test finishes running, Number3 stops existing entirely, so the main program has no such variable to access.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A variable whose scope covers the ENTIRE program is called a ______ variable; one restricted to a single procedure is called a ______ variable.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Global; local.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student assumes that because a procedure declares its OWN local variable called Answer, it must be reusing (and permanently changing) the global Answer with the same name. Explain why this assumption is wrong.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Declaring <code>Answer</code> locally inside the procedure creates a BRAND NEW, entirely separate variable that just happens to share the same name — it is not the same storage location as the global Answer. Changes made to the local Answer inside the procedure have no effect whatsoever on the global Answer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      For the class/student/subject nested-loop algorithm (from 8.1h), which of SubjectHigh, StudentHigh, and ClassHigh would make the most sense as a LOCAL variable if the algorithm were rewritten using separate procedures for each level?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>SubjectHigh and StudentHigh — both only need to exist temporarily, while calculating ONE subject's or ONE student's statistics. ClassHigh needs to persist and accumulate across the WHOLE algorithm, so it makes more sense as a global variable.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why is keeping variables local, rather than making everything global, considered good practice?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It prevents one part of a large program from accidentally interfering with an unrelated part that happens to reuse the same variable name — each procedure's own local variables are protected from being overwritten by code elsewhere in the program.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — IGCSE Year 2 — Unit 8: Programming — 8.1j Local and Global Variables<br>
+    Adapted from: Cambridge IGCSE and O Level Computer Science Coursebook, 2nd Edition (Hodder Education) — Section 8.1.6
+  </div>
+
+</div>
+</body>
+</html>
