@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.04 Logic Circuits and Logic Gates — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: center; }
+  .db-table th { background: rgba(34,211,238,.1); color: #22d3ee; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .example-block { background: rgba(34,211,238,.05); border: 1px solid rgba(34,211,238,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #22d3ee; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #a5f3fc; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.6; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 4 · Logic Gates &amp; Logic Circuits</span>
+  <div class="topic-title">4.04 Logic Circuits and Logic Gates</div>
+  <div class="topic-subtitle">Building a real circuit from a problem statement, then tracing it into a truth table systematically.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Logic gate</div><div class="key-term-def">A component of a logic circuit whose operation matches that of a Boolean operator.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Digital circuits are built from transistors, viewed as logic gates</h4>
+    <ul>
+      <li>Every part of a digital circuit is, at any moment, either "on" (1) or "off" (0).</li>
+      <li>Physically, this is built from integrated circuits made of transistors — potentially BILLIONS of them in one chip.</li>
+      <li>At the level this course works at, we view a circuit as made of LOGIC GATES — each one matching a specific Boolean operator.</li>
+      <li>Symbol convention: the GATE'S SHAPE defines its type; inputs are on the LEFT, output on the RIGHT. This course only considers gates with at most two inputs (though real circuits can have more).</li>
+      <li>The NOT gate is a special case with only ONE input. NAND and NOR are each an AND/OR gate combined with a NOT gate — producing the complementary output to AND/OR respectively.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked Example — building a circuit from a problem statement</div>
+    <p>A bank offers a special lending rate if: the customer has held an account for 2 years (A), AND at least TWO of the following also apply: married (B), aged 25+ (C), parents are customers (D).</p>
+    <p>Logic expression: <code>Special_rate IF A AND (((B AND C) OR (B AND D)) OR (C AND D))</code></p>
+    <p>Note the EXTRA brackets — not strictly required by operator precedence, but included deliberately to guide building the circuit where each gate only accepts two inputs.</p>
+    <p>This expression needs FOUR AND gates and TWO OR gates to build.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>The general method — from problem statement to circuit</h4>
+    <ul>
+      <li>Step 1: convert the problem statement into a formal logic expression.</li>
+      <li>Step 2: identify each individual Boolean operation inside that expression.</li>
+      <li>Step 3: represent each condition with a single letter/symbol (A, B, C, …) — just like in ordinary algebra.</li>
+      <li>Step 4: build the circuit gate by gate, using brackets in the expression as a guide for how gates should be grouped and connected (especially important when gates are limited to two inputs each).</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked Example — tracing a 3-input circuit into a truth table</div>
+    <p>With 3 inputs (A, B, C), the truth table needs 2³ = 8 rows, listed in increasing binary order: 000, 001, 010, 011, 100, 101, 110, 111.</p>
+    <p>Key method: don't try to work out the final output directly from the inputs. Instead, identify INTERMEDIATE points in the circuit (e.g. label them M, N, P, Q — one after each gate) and fill in a "workspace" column for each, working through the circuit systematically.</p>
+  </div>
+
+  <table class="db-table">
+    <tr><th>A</th><th>B</th><th>C</th><th>M</th><th>N</th><th>P</th><th>Q</th><th>X (output)</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Reading the finished table, and a genuinely useful sanity check</h4>
+    <ul>
+      <li>This particular circuit has exactly TWO input combinations that produce a TRUE (1) output.</li>
+      <li>Once you're confident in the workspace columns, they can be DELETED — only the inputs and final output need to remain in the presented answer.</li>
+      <li>Useful check: trace just PART of the circuit. If, say, the path from input C to the output passes through two AND gates, then EVERY row where C = 0 must give output 0 — letting you sanity-check roughly half the table at a glance before checking the rest in detail.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — building circuits from problem statements, and tracing circuits into truth tables (completes Section 4.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does this course only consider gates with at most TWO inputs, even though real logic gates can have more?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It keeps circuit construction and analysis manageable and consistent for the course — real integrated circuits genuinely can and do use gates with more inputs.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does the worked bank-rate example include "extra" brackets that aren't strictly needed by normal operator precedence?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To guide the construction of the circuit itself — since each gate can only accept two inputs, the brackets show exactly how to group conditions pairwise into individual gates.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      When tracing a circuit into a truth table, instead of guessing the final output directly, you should identify ______ points in the circuit and fill in a workspace column for each.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Intermediate.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student lists the rows of an 8-row truth table in this order: 000, 001, 011, 010, 100... What's wrong, and why does it matter?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Rows must be listed in INCREASING binary order (000, 001, 010, 011, 100...) — the student swapped 011 and 010. This matters because it's easy to accidentally omit or duplicate a combination if you don't follow a systematic order.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In the worked 3-input example, the path from input C to the final output X passes through two AND gates in series. Without recalculating every row, what can you immediately conclude about every row where C = 0?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Every row where C = 0 must produce output X = 0 — since C feeds into a chain of AND gates on its way to the output, and AND requires ALL its inputs to be TRUE.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why are NAND and NOR gates described as combinations of another gate plus a NOT gate?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>NAND produces exactly the complementary (opposite) output to AND for every input combination; NOR produces exactly the complementary output to OR — as if a NOT gate had been placed straight after an AND or OR gate.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 4: Logic Gates &amp; Logic Circuits — 4.04 Logic Circuits and Logic Gates (completes Section 4.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 4.04
+  </div>
+
+</div>
+</body>
+</html>
