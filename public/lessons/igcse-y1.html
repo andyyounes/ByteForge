@@ -241,6 +241,12 @@ const CHALLENGES = [
     hints:['Work right to left: position values are 128, 64, 32, 16, 8, 4, 2, 1.', '1×128 + 1×64 + 0×32 + 1×16 + 0×8 + 1×4 + 1×2 + 0×1', 'Answer: 214'],
     check: ans => parseInt(ans.trim()) === 214,
   },
+  {
+    mod:'M1', name:'Binary Place Values', xp:20, type:'complete',
+    text:`<strong>Complete it — 1.1a Binary Numbers</strong><br>The binary place values, right to left, are: <code>128, 64, 32, 16, 8, 4, 2, ___</code>.<br>What's the missing value?`,
+    hints:['Each place value is exactly half of the one to its left.', '2 ÷ 2 = ?'],
+    check: ans => ans.trim() === '1',
+  },
   { mod:'M1', name:'1.1b Hexadecimal', xp:15, type:'lesson', bookFile:'1-1b-hexadecimal.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
@@ -248,6 +254,12 @@ const CHALLENGES = [
     text:`<strong>Challenge 2 — Data Representation</strong><br>Convert decimal <code>175</code> to hexadecimal.<br>Type your answer in uppercase (e.g. A3).`,
     hints:['Divide 175 by 16. 175 ÷ 16 = 10 remainder 15.', '10 = A, 15 = F in hex.', 'Answer: AF'],
     check: ans => ans.trim().toUpperCase() === 'AF',
+  },
+  {
+    mod:'M1', name:'Hex Digit Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 1.1b Hexadecimal</strong><br>The hex digit <code>B</code> represents the decimal value ___.`,
+    hints:['Hex digits A-F stand in for decimal 10-15, in order: A=10, B=11, C=12…'],
+    check: ans => ans.trim() === '11',
   },
   { mod:'M1', name:'1.1c Binary Addition & Overflow', xp:15, type:'lesson', bookFile:'1-1c-binary-addition.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
@@ -257,8 +269,20 @@ const CHALLENGES = [
     hints:['Add from the rightmost bit, carrying 1s left: 0+0=0, 1+1=0 carry 1, 1+1+1=1 carry 1 …', 'Work column by column exactly like decimal addition, but base 2.', 'Answer: 01110011'],
     check: ans => ans.trim().replace(/\s/g,'') === '01110011',
   },
+  {
+    mod:'M1', name:'Overflow Spotter', xp:20, type:'identify',
+    text:`<strong>Identify it — 1.1c Binary Addition & Overflow</strong><br>An 8-bit register holds <code>11111111</code>. You add <code>00000001</code> to it.<br>Does this cause overflow? Type <code>yes</code> or <code>no</code>.`,
+    hints:['The true result needs 9 bits — but an 8-bit register can only hold 8.'],
+    check: ans => /^y/i.test(ans.trim()),
+  },
   { mod:'M1', name:'1.1d Logical Shifts', xp:15, type:'lesson', bookFile:'1-1d-logical-shifts.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M1', name:'Shift Effect', xp:20, type:'complete',
+    text:`<strong>Complete it — 1.1d Logical Shifts</strong><br>Shifting a binary number one place to the LEFT ______ its value by 2 (assuming no overflow).`,
+    hints:['Think about what happens to decimal 6 (00000110) after a left shift → 00001100.'],
+    check: ans => /multipl/i.test(ans.trim()),
+  },
   { mod:'M1', name:'1.1e Two\'s Complement', xp:15, type:'lesson', bookFile:'1-1e-twos-complement.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
@@ -267,8 +291,20 @@ const CHALLENGES = [
     hints:["Find the two's complement of 00010110: invert all bits (11101001), then add 1 → 11101010.", 'Add that to 01011010 using binary addition, discarding any overflow carry off the top.', 'Answer: 01000100'],
     check: ans => ans.trim().replace(/\s/g,'') === '01000100',
   },
+  {
+    mod:'M1', name:"Two's Complement Method", xp:20, type:'complete',
+    text:`<strong>Complete it — 1.1e Two's Complement</strong><br>To find the two's complement of a binary number: invert all the bits, then ______.`,
+    hints:['This is the step that turns "ones complement" into "twos complement".'],
+    check: ans => /add\s*1|\+\s*1/i.test(ans.trim()),
+  },
   { mod:'M1', name:'1.2a ASCII & Unicode', xp:15, type:'lesson', bookFile:'1-2a-ascii-unicode.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M1', name:'ASCII or Unicode?', xp:20, type:'identify',
+    text:`<strong>Identify it — 1.2a ASCII &amp; Unicode</strong><br>Which character set can represent emoji (😀) and every writing system in the world: <code>ASCII</code> or <code>Unicode</code>?`,
+    hints:['ASCII only has 128 (or 256 extended) codes — nowhere near enough for emoji plus every alphabet.'],
+    check: ans => /unicode/i.test(ans.trim()),
+  },
   { mod:'M1', name:'1.2b Representation of Sound', xp:15, type:'lesson', bookFile:'1-2b-sound-representation.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
@@ -282,8 +318,31 @@ const CHALLENGES = [
              a.includes('sample')
     },
   },
+  {
+    mod:'M1', name:'Sample Rate Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 1.2b Representation of Sound</strong><br>The number of samples taken per second during sound digitisation is called the sample ______.`,
+    hints:['Measured in Hz — e.g. CD-quality audio samples 44,100 times a second.'],
+    check: ans => /rate/i.test(ans.trim()),
+  },
   { mod:'M1', name:'1.2c Representation of Images', xp:15, type:'lesson', bookFile:'1-2c-image-representation.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M1', name:'Pixel Grid File Size', xp:20, type:'identify',
+    text:`<strong>Identify it — 1.2c Representation of Images</strong><br>
+      <div style="display:flex;justify-content:center;margin:10px 0;">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <g stroke="#333">
+            <rect x="0" y="0" width="35" height="35" fill="#111"/><rect x="35" y="0" width="35" height="35" fill="#eee"/><rect x="70" y="0" width="35" height="35" fill="#666"/><rect x="105" y="0" width="35" height="35" fill="#fff"/>
+            <rect x="0" y="35" width="35" height="35" fill="#eee"/><rect x="35" y="35" width="35" height="35" fill="#111"/><rect x="70" y="35" width="35" height="35" fill="#fff"/><rect x="105" y="35" width="35" height="35" fill="#666"/>
+            <rect x="0" y="70" width="35" height="35" fill="#666"/><rect x="35" y="70" width="35" height="35" fill="#fff"/><rect x="70" y="70" width="35" height="35" fill="#111"/><rect x="105" y="70" width="35" height="35" fill="#eee"/>
+            <rect x="0" y="105" width="35" height="35" fill="#fff"/><rect x="35" y="105" width="35" height="35" fill="#666"/><rect x="70" y="105" width="35" height="35" fill="#eee"/><rect x="105" y="105" width="35" height="35" fill="#111"/>
+          </g>
+        </svg>
+      </div>
+      This is a 4×4 pixel bitmap using <strong>2 bits per pixel</strong> (4 shades of grey). What is the total file size, in <strong>bits</strong> (ignore any header)?`,
+    hints:['Total bits = width × height × bits-per-pixel.', '4 × 4 × 2 = ?'],
+    check: ans => parseInt(ans.trim()) === 32,
+  },
   { mod:'M1', name:'1.3a Units & File Size', xp:15, type:'lesson', bookFile:'1-3a-units-file-size.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
@@ -292,10 +351,29 @@ const CHALLENGES = [
     hints:['Total bits = 800 × 600 × 24', 'Total bytes = total bits ÷ 8', 'MB = bytes ÷ 1,048,576. Answer ≈ 1.37'],
     check: ans => { const v = parseFloat(ans.trim()); return Math.abs(v - 1.37) < 0.05 },
   },
+  {
+    mod:'M1', name:'Kibibyte Power', xp:20, type:'complete',
+    text:`<strong>Complete it — 1.3a Units &amp; File Size</strong><br>1 kibibyte (KiB) = 2<sup>__</sup> bytes.`,
+    hints:['1 KiB = 1024 bytes, and 1024 = 2 to the power of…'],
+    check: ans => ans.trim() === '10',
+  },
   { mod:'M1', name:'1.3b Data Compression (Lossy)', xp:15, type:'lesson', bookFile:'1-3b-data-compression.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M1', name:'Lossy or Lossless?', xp:20, type:'identify',
+    text:`<strong>Identify it — 1.3b Data Compression (Lossy)</strong><br>A photo is saved as a JPEG, permanently discarding some detail the eye barely notices to shrink the file. Is this <code>lossy</code> or <code>lossless</code> compression?`,
+    hints:['Lossy = detail is permanently thrown away. Lossless = every bit of the original can be perfectly restored.'],
+    check: ans => /lossy/i.test(ans.trim()),
+  },
   { mod:'M1', name:'1.3c Lossless Compression & RLE', xp:15, type:'lesson', bookFile:'1-3c-lossless-rle.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+
+  {
+    mod:'M1', name:'RLE Completion', xp:20, type:'complete',
+    text:`<strong>Complete it — 1.3c Lossless Compression &amp; RLE</strong><br>Run-length encode the string <code>aaaabbbccd</code>.<br>The first three runs are <code>4a,3b,2c</code> — what's the final run?`,
+    hints:['Count how many times the last character repeats in a row.', 'The last character is "d", appearing once.'],
+    check: ans => ans.trim().replace(/\s/g,'').toLowerCase() === '1d',
+  },
 
   // ── Module 2: Hardware & Software ─────────────────────────────────────────
   { mod:'M2', name:'3.1a CPU & Von Neumann Architecture', xp:15, type:'lesson', bookFile:'3-1a-von-neumann-architecture.html', hints:[],
