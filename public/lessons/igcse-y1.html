@@ -235,56 +235,42 @@ const CHALLENGES = [
   // ── Module 1: Data Representation ─────────────────────────────────────────
   { mod:'M1', name:'1.1a Binary Numbers', xp:15, type:'lesson', bookFile:'1-1a-binary-numbers.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.1b Hexadecimal', xp:15, type:'lesson', bookFile:'1-1b-hexadecimal.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.1c Binary Addition & Overflow', xp:15, type:'lesson', bookFile:'1-1c-binary-addition.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.1d Logical Shifts', xp:15, type:'lesson', bookFile:'1-1d-logical-shifts.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.1e Two\'s Complement', xp:15, type:'lesson', bookFile:'1-1e-twos-complement.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.2a ASCII & Unicode', xp:15, type:'lesson', bookFile:'1-2a-ascii-unicode.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.2b Representation of Sound', xp:15, type:'lesson', bookFile:'1-2b-sound-representation.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.2c Representation of Images', xp:15, type:'lesson', bookFile:'1-2c-image-representation.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.3a Units & File Size', xp:15, type:'lesson', bookFile:'1-3a-units-file-size.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.3b Data Compression (Lossy)', xp:15, type:'lesson', bookFile:'1-3b-data-compression.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M1', name:'1.3c Lossless Compression & RLE', xp:15, type:'lesson', bookFile:'1-3c-lossless-rle.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
     mod:'M1', name:'Binary→Decimal', xp:30, type:'convert',
     text:`<strong>Challenge 1 — Data Representation</strong><br>Convert the binary number <code>11010110</code> to decimal.<br>Type only the decimal number as your answer.`,
     hints:['Work right to left: position values are 128, 64, 32, 16, 8, 4, 2, 1.', '1×128 + 1×64 + 0×32 + 1×16 + 0×8 + 1×4 + 1×2 + 0×1', 'Answer: 214'],
     check: ans => parseInt(ans.trim()) === 214,
   },
+  { mod:'M1', name:'1.1b Hexadecimal', xp:15, type:'lesson', bookFile:'1-1b-hexadecimal.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
     mod:'M1', name:'Decimal→Hex', xp:30, type:'convert',
     text:`<strong>Challenge 2 — Data Representation</strong><br>Convert decimal <code>175</code> to hexadecimal.<br>Type your answer in uppercase (e.g. A3).`,
     hints:['Divide 175 by 16. 175 ÷ 16 = 10 remainder 15.', '10 = A, 15 = F in hex.', 'Answer: AF'],
     check: ans => ans.trim().toUpperCase() === 'AF',
   },
-  {
-    mod:'M1', name:'File Size', xp:40, type:'convert',
-    text:`<strong>Challenge 3 — File Size Calculation</strong><br>An image is <strong>800 × 600</strong> pixels with a colour depth of <strong>24 bits</strong>.<br>Calculate the file size in <strong>megabytes</strong> (1 MB = 1,048,576 bytes).<br>Give your answer to 2 decimal places (e.g. 1.37).`,
-    hints:['Total bits = 800 × 600 × 24', 'Total bytes = total bits ÷ 8', 'MB = bytes ÷ 1,048,576. Answer ≈ 1.37'],
-    check: ans => { const v = parseFloat(ans.trim()); return Math.abs(v - 1.37) < 0.05 },
-  },
+  { mod:'M1', name:'1.1c Binary Addition & Overflow', xp:15, type:'lesson', bookFile:'1-1c-binary-addition.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
     mod:'M1', name:'Binary Addition', xp:40, type:'convert',
     text:`<strong>Challenge 3b — Binary Addition</strong><br>Add the two 8-bit binary numbers <code>01001101</code> and <code>00100110</code>.<br>Type only the 8-bit binary result as your answer (no spaces).`,
     hints:['Add from the rightmost bit, carrying 1s left: 0+0=0, 1+1=0 carry 1, 1+1+1=1 carry 1 …', 'Work column by column exactly like decimal addition, but base 2.', 'Answer: 01110011'],
     check: ans => ans.trim().replace(/\s/g,'') === '01110011',
   },
+  { mod:'M1', name:'1.1d Logical Shifts', xp:15, type:'lesson', bookFile:'1-1d-logical-shifts.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M1', name:'1.1e Two\'s Complement', xp:15, type:'lesson', bookFile:'1-1e-twos-complement.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
     mod:'M1', name:'Binary Subtraction', xp:40, type:'convert',
     text:`<strong>Challenge 3c — Binary Subtraction</strong><br>Using <strong>two's complement</strong>, calculate <code>01011010</code> − <code>00010110</code> as 8-bit binary numbers.<br>Type only the 8-bit binary result as your answer (no spaces).`,
     hints:["Find the two's complement of 00010110: invert all bits (11101001), then add 1 → 11101010.", 'Add that to 01011010 using binary addition, discarding any overflow carry off the top.', 'Answer: 01000100'],
     check: ans => ans.trim().replace(/\s/g,'') === '01000100',
   },
+  { mod:'M1', name:'1.2a ASCII & Unicode', xp:15, type:'lesson', bookFile:'1-2a-ascii-unicode.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M1', name:'1.2b Representation of Sound', xp:15, type:'lesson', bookFile:'1-2b-sound-representation.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   {
     mod:'M1', name:'Sound Digitisation', xp:40, type:'theory',
     text:`<strong>Challenge 4 — Sound Digitisation</strong><br>Explain how sound is digitised. Your answer must mention: <em>analogue</em>, <em>sample</em>, <em>sample rate</em> (or frequency), and <em>bit depth</em> (or sample depth / resolution).`,
@@ -296,12 +282,49 @@ const CHALLENGES = [
              a.includes('sample')
     },
   },
+  { mod:'M1', name:'1.2c Representation of Images', xp:15, type:'lesson', bookFile:'1-2c-image-representation.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M1', name:'1.3a Units & File Size', xp:15, type:'lesson', bookFile:'1-3a-units-file-size.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M1', name:'File Size', xp:40, type:'convert',
+    text:`<strong>Challenge 3 — File Size Calculation</strong><br>An image is <strong>800 × 600</strong> pixels with a colour depth of <strong>24 bits</strong>.<br>Calculate the file size in <strong>megabytes</strong> (1 MB = 1,048,576 bytes).<br>Give your answer to 2 decimal places (e.g. 1.37).`,
+    hints:['Total bits = 800 × 600 × 24', 'Total bytes = total bits ÷ 8', 'MB = bytes ÷ 1,048,576. Answer ≈ 1.37'],
+    check: ans => { const v = parseFloat(ans.trim()); return Math.abs(v - 1.37) < 0.05 },
+  },
+  { mod:'M1', name:'1.3b Data Compression (Lossy)', xp:15, type:'lesson', bookFile:'1-3b-data-compression.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  { mod:'M1', name:'1.3c Lossless Compression & RLE', xp:15, type:'lesson', bookFile:'1-3c-lossless-rle.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
 
   // ── Module 2: Hardware & Software ─────────────────────────────────────────
   { mod:'M2', name:'3.1a CPU & Von Neumann Architecture', xp:15, type:'lesson', bookFile:'3-1a-von-neumann-architecture.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M2', name:'CPU Components', xp:30, type:'theory',
+    text:`<strong>Challenge 5 — Hardware</strong><br>Name the <strong>three main components of a CPU</strong> and state one function of each.<br>Include: ALU, CU, and registers (or cache).`,
+    hints:['ALU = Arithmetic Logic Unit — performs calculations and logical comparisons.', 'CU = Control Unit — fetches, decodes, and coordinates execution of instructions.', 'Registers are tiny, ultra-fast storage locations inside the CPU (e.g. PC, MAR, MDR, ACC).'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      // Word-boundary: 'alu' used to match "v(alu)e" and 'cu' "ac(cu)rate",
+      // so "Aluminium is accurate in the register." passed.
+      return anyWord(a, 'alu', 'arithmetic') &&
+             (anyWord(a, 'cu') || /control\s+unit/i.test(a)) &&
+             anyWord(a, 'register', 'registers', 'cache')
+    },
+  },
   { mod:'M2', name:'3.1b Buses & Fetch-Decode-Execute', xp:15, type:'lesson', bookFile:'3-1b-buses-fetch-decode-execute.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M2', name:'FDE Cycle', xp:40, type:'theory',
+    text:`<strong>Challenge 7 — Fetch-Decode-Execute</strong><br>Describe the three stages of the FDE cycle. Your answer must include the words: <em>fetch</em>, <em>decode</em>, <em>execute</em>, and one register name (PC, MAR, MDR, or CIR).`,
+    hints:['Fetch: The PC holds the address of the next instruction. The address is copied to the MAR, and the instruction is copied from memory to the MDR, then to the CIR.', 'Decode: The CU decodes the instruction in the CIR.', 'Execute: The ALU or other components carry out the decoded instruction.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('fetch') && a.includes('decode') && a.includes('execute') &&
+             (a.includes('pc') || a.includes('mar') || a.includes('mdr') || a.includes('cir'))
+    },
+  },
   { mod:'M2', name:'3.1c Cores, Cache & Clock', xp:15, type:'lesson', bookFile:'3-1c-cpu-performance.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   { mod:'M2', name:'3.1d Instruction Sets', xp:15, type:'lesson', bookFile:'3-1d-instruction-set.html', hints:[],
@@ -338,8 +361,47 @@ const CHALLENGES = [
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   { mod:'M2', name:'3.2o Types of Sensor', xp:15, type:'lesson', bookFile:'3-2o-sensor-types.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M2', name:'Device Types', xp:30, type:'theory',
+    text:`<strong>Challenge 8 — Devices</strong><br>Give <strong>one example</strong> of each: an input device, an output device, and a storage device. Explain the purpose of each.`,
+    hints:['Input: keyboard, mouse, scanner, microphone, webcam.', 'Output: monitor, printer, speaker, projector.', 'Storage: hard disk, SSD, USB drive, optical disc.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      const inputs   = ['keyboard','mouse','scanner','microphone','webcam','touchscreen']
+      const outputs  = ['monitor','printer','speaker','projector','screen']
+      const storages = ['hard disk','ssd','usb','optical','flash','memory card']
+      return inputs.some(x=>a.includes(x)) && outputs.some(x=>a.includes(x)) && storages.some(x=>a.includes(x))
+    },
+  },
   { mod:'M2', name:'3.3a Primary Memory: RAM & ROM', xp:15, type:'lesson', bookFile:'3-3a-primary-memory.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M2', name:'RAM vs ROM', xp:30, type:'theory',
+    text:`<strong>Challenge 6 — Memory</strong><br>State <strong>two differences</strong> between RAM and ROM.<br>Your answer should mention volatility and write access.`,
+    hints:['RAM is volatile — it loses data when power is removed. ROM is non-volatile.', 'RAM can be read and written. ROM can only be read (Read-Only Memory).', 'RAM stores running programs; ROM stores firmware/BIOS.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      // Previously never even required the word ROM, and accepted
+      // "I read a book about power." plus the fully inverted answer
+      // "ROM is volatile … RAM is non-volatile and read-only."
+      // Now both terms are required, and each must carry its OWN correct
+      // property: RAM volatile (and not described as non-volatile), ROM the
+      // opposite.
+      if (!word(a, 'ram') || !word(a, 'rom')) return false
+      const ramVolatile = about(a, 'ram', ['volatile', 'loses', 'lost', 'temporary'], ['non-volatile', 'nonvolatile', 'permanent'])
+                          || /ram[^.;]*\blos(e|es|t)\b[^.;]*power/i.test(a)
+      // Careful: '-' is not a word character, so \bvolatile\b matches INSIDE
+      // "non-volatile". Strip that phrase before testing for a bare "volatile",
+      // or a correct ROM answer trips its own negative guard.
+      const romPermanent = clauses(a).some(c => {
+        if (!word(c, 'rom')) return false
+        const saysPermanent = /\bnon-?volatile\b/i.test(c) || anyWord(c, 'permanent', 'keeps', 'retains', 'read-only')
+        const saysVolatile  = word(c.replace(/\bnon-?volatile\b/ig, ''), 'volatile')
+        return saysPermanent && !saysVolatile
+      })
+      return ramVolatile && romPermanent
+    },
+  },
   { mod:'M2', name:'3.3b Hard Disk Drives', xp:15, type:'lesson', bookFile:'3-3b-hard-disk-drives.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   { mod:'M2', name:'3.3c SSD & Flash Memory', xp:15, type:'lesson', bookFile:'3-3c-ssd-flash-memory.html', hints:[],
@@ -392,68 +454,6 @@ const CHALLENGES = [
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   { mod:'M2', name:'4.2e IDEs', xp:15, type:'lesson', bookFile:'4-2e-integrated-development-environments.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  {
-    mod:'M2', name:'CPU Components', xp:30, type:'theory',
-    text:`<strong>Challenge 5 — Hardware</strong><br>Name the <strong>three main components of a CPU</strong> and state one function of each.<br>Include: ALU, CU, and registers (or cache).`,
-    hints:['ALU = Arithmetic Logic Unit — performs calculations and logical comparisons.', 'CU = Control Unit — fetches, decodes, and coordinates execution of instructions.', 'Registers are tiny, ultra-fast storage locations inside the CPU (e.g. PC, MAR, MDR, ACC).'],
-    check: ans => {
-      const a = ans.toLowerCase()
-      // Word-boundary: 'alu' used to match "v(alu)e" and 'cu' "ac(cu)rate",
-      // so "Aluminium is accurate in the register." passed.
-      return anyWord(a, 'alu', 'arithmetic') &&
-             (anyWord(a, 'cu') || /control\s+unit/i.test(a)) &&
-             anyWord(a, 'register', 'registers', 'cache')
-    },
-  },
-  {
-    mod:'M2', name:'RAM vs ROM', xp:30, type:'theory',
-    text:`<strong>Challenge 6 — Memory</strong><br>State <strong>two differences</strong> between RAM and ROM.<br>Your answer should mention volatility and write access.`,
-    hints:['RAM is volatile — it loses data when power is removed. ROM is non-volatile.', 'RAM can be read and written. ROM can only be read (Read-Only Memory).', 'RAM stores running programs; ROM stores firmware/BIOS.'],
-    check: ans => {
-      const a = ans.toLowerCase()
-      // Previously never even required the word ROM, and accepted
-      // "I read a book about power." plus the fully inverted answer
-      // "ROM is volatile … RAM is non-volatile and read-only."
-      // Now both terms are required, and each must carry its OWN correct
-      // property: RAM volatile (and not described as non-volatile), ROM the
-      // opposite.
-      if (!word(a, 'ram') || !word(a, 'rom')) return false
-      const ramVolatile = about(a, 'ram', ['volatile', 'loses', 'lost', 'temporary'], ['non-volatile', 'nonvolatile', 'permanent'])
-                          || /ram[^.;]*\blos(e|es|t)\b[^.;]*power/i.test(a)
-      // Careful: '-' is not a word character, so \bvolatile\b matches INSIDE
-      // "non-volatile". Strip that phrase before testing for a bare "volatile",
-      // or a correct ROM answer trips its own negative guard.
-      const romPermanent = clauses(a).some(c => {
-        if (!word(c, 'rom')) return false
-        const saysPermanent = /\bnon-?volatile\b/i.test(c) || anyWord(c, 'permanent', 'keeps', 'retains', 'read-only')
-        const saysVolatile  = word(c.replace(/\bnon-?volatile\b/ig, ''), 'volatile')
-        return saysPermanent && !saysVolatile
-      })
-      return ramVolatile && romPermanent
-    },
-  },
-  {
-    mod:'M2', name:'FDE Cycle', xp:40, type:'theory',
-    text:`<strong>Challenge 7 — Fetch-Decode-Execute</strong><br>Describe the three stages of the FDE cycle. Your answer must include the words: <em>fetch</em>, <em>decode</em>, <em>execute</em>, and one register name (PC, MAR, MDR, or CIR).`,
-    hints:['Fetch: The PC holds the address of the next instruction. The address is copied to the MAR, and the instruction is copied from memory to the MDR, then to the CIR.', 'Decode: The CU decodes the instruction in the CIR.', 'Execute: The ALU or other components carry out the decoded instruction.'],
-    check: ans => {
-      const a = ans.toLowerCase()
-      return a.includes('fetch') && a.includes('decode') && a.includes('execute') &&
-             (a.includes('pc') || a.includes('mar') || a.includes('mdr') || a.includes('cir'))
-    },
-  },
-  {
-    mod:'M2', name:'Device Types', xp:30, type:'theory',
-    text:`<strong>Challenge 8 — Devices</strong><br>Give <strong>one example</strong> of each: an input device, an output device, and a storage device. Explain the purpose of each.`,
-    hints:['Input: keyboard, mouse, scanner, microphone, webcam.', 'Output: monitor, printer, speaker, projector.', 'Storage: hard disk, SSD, USB drive, optical disc.'],
-    check: ans => {
-      const a = ans.toLowerCase()
-      const inputs   = ['keyboard','mouse','scanner','microphone','webcam','touchscreen']
-      const outputs  = ['monitor','printer','speaker','projector','screen']
-      const storages = ['hard disk','ssd','usb','optical','flash','memory card']
-      return inputs.some(x=>a.includes(x)) && outputs.some(x=>a.includes(x)) && storages.some(x=>a.includes(x))
-    },
-  },
 
   // ── Module 3: Networking ───────────────────────────────────────────────────
   { mod:'M3', name:'2.1a Data Packets & Packet Switching', xp:15, type:'lesson', bookFile:'2-1a-data-packets.html', hints:[],
@@ -474,6 +474,24 @@ const CHALLENGES = [
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
   { mod:'M3', name:'2.3b Asymmetric Encryption', xp:15, type:'lesson', bookFile:'2-3b-asymmetric-encryption.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M3', name:'Encryption', xp:40, type:'theory',
+    text:`<strong>Challenge 13 — Encryption</strong><br>Define <em>encryption</em>. Then explain the difference between <strong>symmetric</strong> and <strong>asymmetric</strong> encryption.`,
+    hints:['Encryption converts plaintext into ciphertext using an algorithm and a key.', 'Symmetric: the same key is used for encryption and decryption. Fast but key distribution is a problem.', 'Asymmetric: uses a public key to encrypt and a private key to decrypt. Slower but more secure for key exchange.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      // 'symmetric' is a SUBSTRING of 'asymmetric', so the single word
+      // "asymmetric" used to satisfy both clauses — and the answer
+      // "Asymmetric encryption uses one key for both …" (the definition of
+      // SYMMETRIC) passed. \b fixes this: \bsymmetric\b does not match inside
+      // "asymmetric". Each term must also carry its correct key count.
+      if (!anyWord(a, 'encrypt', 'encryption', 'cipher', 'key', 'keys')) return false
+      if (!word(a, 'symmetric') || !word(a, 'asymmetric')) return false
+      const symOneKey  = about(a, 'symmetric',  ['one', 'same', 'single', 'shared', '1'])
+      const asymTwoKey = about(a, 'asymmetric', ['two', 'public', 'private', 'pair', '2'])
+      return symOneKey && asymTwoKey
+    },
+  },
   {
     mod:'M3', name:'LAN vs WAN', xp:30, type:'theory',
     text:`<strong>Challenge 9 — Networking</strong><br>State <strong>two differences</strong> between a LAN and a WAN.<br>Your answer should mention <em>geographic area</em> and <em>ownership</em> (or speed/cost).`,
@@ -524,24 +542,6 @@ const CHALLENGES = [
   },
 
   // ── Module 4: Security & Privacy ──────────────────────────────────────────
-  {
-    mod:'M4', name:'Encryption', xp:40, type:'theory',
-    text:`<strong>Challenge 13 — Encryption</strong><br>Define <em>encryption</em>. Then explain the difference between <strong>symmetric</strong> and <strong>asymmetric</strong> encryption.`,
-    hints:['Encryption converts plaintext into ciphertext using an algorithm and a key.', 'Symmetric: the same key is used for encryption and decryption. Fast but key distribution is a problem.', 'Asymmetric: uses a public key to encrypt and a private key to decrypt. Slower but more secure for key exchange.'],
-    check: ans => {
-      const a = ans.toLowerCase()
-      // 'symmetric' is a SUBSTRING of 'asymmetric', so the single word
-      // "asymmetric" used to satisfy both clauses — and the answer
-      // "Asymmetric encryption uses one key for both …" (the definition of
-      // SYMMETRIC) passed. \b fixes this: \bsymmetric\b does not match inside
-      // "asymmetric". Each term must also carry its correct key count.
-      if (!anyWord(a, 'encrypt', 'encryption', 'cipher', 'key', 'keys')) return false
-      if (!word(a, 'symmetric') || !word(a, 'asymmetric')) return false
-      const symOneKey  = about(a, 'symmetric',  ['one', 'same', 'single', 'shared', '1'])
-      const asymTwoKey = about(a, 'asymmetric', ['two', 'public', 'private', 'pair', '2'])
-      return symOneKey && asymTwoKey
-    },
-  },
   {
     mod:'M4', name:'Malware Types', xp:30, type:'theory',
     text:`<strong>Challenge 14 — Malware</strong><br>Identify the type of malware in this scenario:<br><em>"A program secretly records every keystroke the user types, including passwords, and sends them to a remote attacker."</em><br>Then name two other types of malware and describe each in one sentence.`,
