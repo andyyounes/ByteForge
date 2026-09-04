@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.05 Register Transfer Notation — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 13px; color: #7dd3fc; line-height: 1.8; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 5 · Processor Fundamentals</span>
+  <div class="topic-title">5.05 Register Transfer Notation</div>
+  <div class="topic-subtitle">A precise shorthand for describing exactly what moves where, inside the CPU.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The fetch stage, written in register transfer notation</h4>
+    <ul>
+      <li>Register transfer notation (RTN) describes operations involving registers.</li>
+    </ul>
+    <div class="pseudo-box">MAR ← [PC]
+PC ← [PC] + 1  ;  MDR ← [[MAR]]
+CIR ← [MDR]</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Reading the notation, piece by piece</h4>
+    <ul>
+      <li>The format resembles ordinary variable assignment: the item on the LEFT of the arrow is the DESTINATION of the data (identified by its register abbreviation).</li>
+      <li>To the RIGHT of the arrow is the DEFINITION of that data.</li>
+      <li>SQUARE BRACKETS around a register abbreviation, like <code>[PC]</code>, mean "the CONTENTS of that register" (possibly with an arithmetic operation applied) — not the register itself.</li>
+      <li>Two operations on the SAME line, separated by a SEMICOLON, means those two transfers happen SIMULTANEOUSLY.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The trickiest part — double brackets, <code>[[MAR]]</code></h4>
+    <ul>
+      <li>The CONTENT of the MAR is itself an ADDRESS.</li>
+      <li>So <code>[[MAR]]</code> means: take the content of MAR (an address), then go to THAT address in memory, and take the content stored THERE — that's the value being transferred to the MDR.</li>
+      <li>Single brackets <code>[MAR]</code> would just mean "the address stored in MAR" — DOUBLE brackets are needed to say "the value found AT that address".</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Line-by-line walkthrough of the fetch stage in RTN</h4>
+    <ul>
+      <li><code>MAR ← [PC]</code>: the CONTENT of the PC (an address) is copied into the MAR.</li>
+      <li><code>PC ← [PC] + 1 ; MDR ← [[MAR]]</code>: SIMULTANEOUSLY, the PC's content is incremented by 1, AND the value stored at the address held in the MAR is copied into the MDR.</li>
+      <li><code>CIR ← [MDR]</code>: the content of the MDR (the fetched instruction) is copied into the CIR.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — register transfer notation (completes Section 5.05).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">In register transfer notation, what does putting a register abbreviation inside square brackets, like <code>[PC]</code>, mean?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It means "the CONTENT of that register" — not the register itself.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does a semicolon between two register transfer statements on the same line indicate?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>That both transfers happen SIMULTANEOUSLY, not one after the other.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      <code>[[MAR]]</code> means: take the ______ of MAR (an address), then take the ______ stored at that address.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Content; value (content).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes <code>MDR ← [MAR]</code> (single brackets) to mean "copy the value from the address held in MAR into the MDR". What's actually wrong with this?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Single brackets <code>[MAR]</code> just means "the address stored in MAR" — it would copy an ADDRESS into the MDR, not the value stored at that address. To get the value AT that address, DOUBLE brackets are required: <code>MDR ← [[MAR]]</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write, in register transfer notation, the statement that copies the CONTENT of the MDR into the CIR.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>CIR ← [MDR]</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the fetch-stage RTN, which two operations are written on the same line separated by a semicolon, and why does that make sense?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>PC ← [PC] + 1</code> and <code>MDR ← [[MAR]]</code> — this matches exactly what was described in Section 5.04: the PC increments AND the instruction is fetched into the MDR during the same clock cycle.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 5: Processor Fundamentals — 5.05 Register Transfer Notation (completes Section 5.05)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 5.05
+  </div>
+
+</div>
+</body>
+</html>

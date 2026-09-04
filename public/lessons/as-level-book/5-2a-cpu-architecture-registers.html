@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.02 CPU Architecture &amp; Registers — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(96,165,250,.1); color: #60a5fa; font-size: 10.5px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-size: 12px; }
+  .dtype-table code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 11px; }
+  .example-block { background: rgba(96,165,250,.05); border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #bfdbfe; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.6; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 5 · Processor Fundamentals</span>
+  <div class="topic-title">5.02 CPU Architecture &amp; Registers</div>
+  <div class="topic-subtitle">The ALU, the control unit, seven named registers, and how the status register catches an impossible sum.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Accumulator</div><div class="key-term-def">A general-purpose register that stores a value before and after the execution of an instruction by the ALU.</div></div>
+    <div class="key-term-card"><div class="key-term-name">ALU</div><div class="key-term-def">Arithmetic and Logic Unit — handles arithmetic or logic processing.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Control unit</div><div class="key-term-def">Controls data flow throughout the processor/system, and ensures instructions are handled correctly.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Clock speed</div><div class="key-term-def">The CPU's clock frequency — defines the minimum time period between successive activities.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The two major CPU components</h4>
+    <ul>
+      <li>The ALU (Arithmetic and Logic Unit) — responsible for any arithmetic or logic processing needed while a program runs.</li>
+      <li>The control unit — controls data flow throughout the processor (and the whole system), and ensures program instructions are handled correctly.</li>
+      <li>A vital part of the control unit is a CLOCK, used to synchronise processes. Strictly there are TWO clocks: an internal clock (controls activity WITHIN the processor) and the system clock (controls activity OUTSIDE the processor).</li>
+      <li>Clock speed = clock frequency — it defines the MINIMUM time period separating successive activities in the system.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Registers — fast storage right next to the ALU</h4>
+    <ul>
+      <li>Registers are storage components; their PROXIMITY to the ALU is what allows very short access times.</li>
+      <li>Each register has limited capacity, typically 16, 32 or 64 bits.</li>
+      <li>A register is either general-purpose or special-purpose. If there's only ONE general-purpose register, it's called the ACCUMULATOR — the assumption used throughout this course.</li>
+      <li>The Accumulator stores a single value at a time — a value used by the ALU during instruction execution, which the ALU can then overwrite with a new value afterwards.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Register</th><th>Abbreviation</th><th>Function</th></tr>
+    <tr><td>Current Instruction Register</td><td><code>CIR</code></td><td>Stores the current instruction while it's decoded and executed</td></tr>
+    <tr><td>Index Register</td><td><code>IX</code></td><td>Stores a value; used only for indexed addressing</td></tr>
+    <tr><td>Memory Address Register</td><td><code>MAR</code></td><td>Stores the address of a memory location about to be read from/written to</td></tr>
+    <tr><td>Memory Data Register (Memory Buffer Register)</td><td><code>MDR</code> (<code>MBR</code>)</td><td>Stores data just read from memory, or about to be written to memory</td></tr>
+    <tr><td>Program Counter</td><td><code>PC</code></td><td>Stores the address of where the NEXT instruction is to be read from</td></tr>
+    <tr><td>Status Register</td><td><code>SR</code></td><td>Contains individual bits ("flags"), each set or cleared</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Naming pitfalls worth knowing</h4>
+    <ul>
+      <li>MDR's alternative name, "memory BUFFER register", emphasises that this register must act as a buffer — internal CPU transfers happen much faster than transfers outside the processor.</li>
+      <li>This chapter (and Chapter 6) deliberately IGNORES cache memory — all references are simply to "memory" as in the table above.</li>
+      <li>IX (index register) is sometimes abbreviated "IR" elsewhere — but some sources ALSO abbreviate CIR as "IR", causing confusion. This book always uses IX and CIR to avoid that clash. Similarly, "PC" is reserved for register transfer notation only — everywhere else, PC means "personal computer".</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The status register — three flags to know</h4>
+    <ul>
+      <li>The SR is used when an instruction needs arithmetic or logic processing. Each bit acts as a FLAG, set to 1 if a specific condition is detected.</li>
+      <li>Carry flag (C): set to 1 if there is a carry.</li>
+      <li>Negative flag (N): set to 1 if a result is negative.</li>
+      <li>Overflow flag (V): set to 1 if overflow is detected.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked Example — catching an impossible sum with flags</div>
+    <p><strong>Adding two positive 8-bit numbers that overflow:</strong> denary 66 (<code>01000010</code>) + denary 68 (<code>01000100</code>) = <code>10000110</code>, read as denary −122 if treated as signed. Two positives producing a NEGATIVE result is impossible — and it's caught because BOTH the negative flag (N) AND the overflow flag (V) get set to 1.</p>
+    <p><strong>Adding two negative 8-bit numbers:</strong> −66 (<code>10111110</code>) + −68 (<code>10111100</code>) = <code>01111010</code> with a carry out, read as +122 if treated as signed. Two negatives producing a POSITIVE result is impossible — caught because the negative flag is NOT set, while BOTH the overflow flag AND the carry flag ARE set to 1.</p>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why this matters — the processor can detect its own impossible results</h4>
+    <ul>
+      <li>In BOTH worked cases, the specific COMBINATION of flags set reveals that something has gone wrong mathematically — the processor can then act on this (e.g. raise an error) rather than silently returning a wrong answer.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — CPU architecture and registers (completes Section 5.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the name given to the ONE general-purpose register assumed throughout this course?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The Accumulator.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is stored in the Program Counter (PC)?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The address of where the NEXT instruction is to be read from.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Registers allow very short access times because of their ______ to the ALU.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Proximity (closeness).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes "IR" to mean the index register in their exam answer. Why is this risky, according to this lesson?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"IR" is ambiguous — some sources use it for the index register, others for the current instruction register (CIR), causing genuine confusion. This book always uses IX for the index register and CIR for the current instruction register specifically to avoid this clash.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Two POSITIVE 8-bit numbers are added and the result comes out NEGATIVE. Which combination of status flags reveals this impossible result?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Both the negative flag (N) AND the overflow flag (V) are set to 1 — exactly as shown in the worked example (66 + 68 in 8 bits).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why does this chapter deliberately ignore the existence of cache memory when discussing registers and memory?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To keep the discussion of the simple CPU model manageable — all references are simplified to just "memory", even though a real system's MDR transfer could sometimes actually be to/from fast cache memory rather than main memory.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 5: Processor Fundamentals — 5.02 CPU Architecture &amp; Registers (completes Section 5.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 5.02
+  </div>
+
+</div>
+</body>
+</html>

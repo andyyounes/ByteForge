@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>5.03 The System Bus — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: left; }
+  .dtype-table th { background: rgba(232,121,249,.1); color: #e879f9; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 5 · Processor Fundamentals</span>
+  <div class="topic-title">5.03 The System Bus</div>
+  <div class="topic-subtitle">Three separate buses, one crucial rule: a bus never stores data, it only carries it.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Address bus</div><div class="key-term-def">Carries an address to the memory controller to identify a location to be read from or written to.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Data bus</div><div class="key-term-def">Carries data to and from the processor.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Word</div><div class="key-term-def">A small number of bytes handled as a unit by the computer system.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Bus width</div><div class="key-term-def">The number of separate wires in a bus — defines how many bits it can carry at once.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What a bus actually is — and isn't</h4>
+    <ul>
+      <li>A bus is a parallel transmission component — each separate wire carries a single bit.</li>
+      <li>Crucial point: a bus is NOT a storage device. It does not hold data — it's purely a mechanism for TRANSFERRING data between components.</li>
+      <li>The system bus comprises THREE distinct components: the address bus, the data bus, and the control bus.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Bus</th><th>Connects to</th><th>Direction</th><th>Carries</th></tr>
+    <tr><td>Address bus</td><td>MAR</td><td>One-way (CPU → memory controller only)</td><td>A memory address</td></tr>
+    <tr><td>Data bus</td><td>MDR</td><td>Bidirectional</td><td>An instruction, an address, or a value</td></tr>
+    <tr><td>Control bus</td><td>Control unit</td><td>Bidirectional</td><td>Timing/control signals</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>The address bus — genuinely one-way</h4>
+    <ul>
+      <li>The address bus's SOLE function is to carry an address, loaded from the MAR onto the bus when directed by the control unit.</li>
+      <li>It is a "one-way street" — it can send an address TO the memory controller, but CANNOT carry an address back from the memory controller to the CPU.</li>
+      <li>Its bus width defines how many memory locations can be directly addressed. In this simple system: 16-bit width → 65,536 addressable locations. Even 32 bits would only reach a little over 4 billion — inadequate for a modern system, hence special addressing techniques are needed for larger memories.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The data bus — and what a "word" is</h4>
+    <ul>
+      <li>The data bus carries data — which might be an instruction, an address, or a value — travelling CPU↔memory or CPU↔I/O device.</li>
+      <li>A WORD is a defined number of bytes that the system handles as ONE unit — typical word lengths are 16, 32 or 64 bits (2, 4 or 8 bytes).</li>
+      <li>Ideally, bus width MATCHES word length. If it can't, the bus width can be HALF the word length, transmitting a full word over two consecutive transfers instead.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The control bus — narrower, but essential for timing</h4>
+    <ul>
+      <li>Bidirectional; typically just 8 wires (no need for greater width).</li>
+      <li>Major use: carrying TIMING signals, driven by the system clock — ensuring one component transmits data at exactly the time another component is ready to read it.</li>
+      <li>Clock speed is the MOST important factor for processing speed — but NOT the only one. Insufficient bus width, or inefficient memory access, both limit real-world performance too.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Ports — the missing detail behind the simplified diagram</h4>
+    <ul>
+      <li>A simple schematic can misleadingly suggest CPU, memory, and I/O devices all have EQUAL, direct access to the buses — the reality is different.</li>
+      <li>Each I/O device connects via an interface called a PORT, which connects to an I/O/device controller managing the CPU↔device interaction.</li>
+      <li>An "internal" port connects a device that's an integral part of the system; an "external" port lets the user connect a peripheral.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>USB — the plug-and-play standard</h4>
+    <ul>
+      <li>Before USB, connecting a peripheral was time-consuming and needed technical expertise — the "plug-and-play" concept aimed to remove that need entirely.</li>
+      <li>USB fully realised plug-and-play. Key facts: supports a HIERARCHY of connections; the computer sits at the root and can handle up to 127 attached devices; devices can be attached while powered on and are auto-configured; the standard has evolved (USB 3.0 being the latest version discussed here).</li>
+      <li>FireWire is an alternative technology, but far less commonly used.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the system bus and USB (completes Section 5.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why is it wrong to describe a bus as a storage device?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A bus does not hold data at all — it's purely a mechanism for transferring data from one component to another.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why can't the address bus carry an address back from the memory controller to the CPU?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It is a one-way bus by design — it can only send an address from the CPU (via the MAR) TO the memory controller.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      With a 16-bit address bus, the number of directly addressable memory locations is ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>65,536 (2¹⁶).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "The CPU, memory, and I/O devices all have identical, direct access to the address and data buses." What does this lesson say is missing?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>I/O devices don't connect directly — each connects via a PORT, which connects to an I/O/device controller that manages the interaction between the CPU and that device. The simple schematic diagram slightly misrepresents this reality.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A system has a 32-bit word length but only a 16-bit data bus. How can a full word still be transferred, according to this lesson?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Since the bus width is HALF the word length, the full word can be transmitted using two consecutive data transfers instead of one.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Besides clock speed, name TWO other factors that can limit a system's real-world processing performance.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Insufficient bus width (can't transfer a full data value in one clock cycle), and inefficient memory access.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 5: Processor Fundamentals — 5.03 The System Bus (completes Section 5.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 5.03
+  </div>
+
+</div>
+</body>
+</html>
