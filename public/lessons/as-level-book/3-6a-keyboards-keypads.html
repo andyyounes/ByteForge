@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.06 Keyboards and Keypads — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(167,139,250,.12); color: #a78bfa; border: 1px solid rgba(167,139,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #a78bfa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.25); color: #a78bfa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 3 · Hardware</span>
+  <div class="topic-title">3.06 Keyboards and Keypads</div>
+  <div class="topic-subtitle">Pressing a key feels instant — but there's a surprising amount of hardware working behind that illusion.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Key matrix</div><div class="key-term-def">A grid of row wires and column wires beneath the keys — a key press connects one row wire to one column wire.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Character code</div><div class="key-term-def">The code sent to the processor representing which key was pressed.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>QWERTY, numeric keypads, and phone keypads — same underlying technology</h4>
+    <ul>
+      <li>The standard method for inputting significant text has always been the QWERTY keyboard (named after the top-left row of letters).</li>
+      <li>When only numbers are needed, a numeric keypad is used instead. A traditional mobile phone keypad is a different layout again, but can still input text data.</li>
+      <li>The TECHNOLOGY underpinning all of these is the SAME, provided there are actual physical keys involved.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Pressing a key and seeing it on screen is an illusion</h4>
+    <ul>
+      <li>It APPEARS as though a key press immediately puts the character on screen — but this is genuinely an illusion.</li>
+      <li>The key press must first be converted to a CHARACTER CODE, which is transmitted to the processor. The processor, under OS control, then ensures the character is displayed.</li>
+      <li>The same underlying process happens for a shortcut key combination too — except the processor responds by taking the requested ACTION, rather than displaying a character.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="260" height="160" viewBox="0 0 260 160">
+      <g stroke="#a78bfa" stroke-width="1.5">
+        <line x1="20" y1="30" x2="240" y2="30"/><line x1="20" y1="70" x2="240" y2="70"/><line x1="20" y1="110" x2="240" y2="110"/>
+        <line x1="50" y1="10" x2="50" y2="130"/><line x1="110" y1="10" x2="110" y2="130"/><line x1="170" y1="10" x2="170" y2="130"/><line x1="230" y1="10" x2="230" y2="130"/>
+      </g>
+      <circle cx="110" cy="70" r="6" fill="#fbbf24"/>
+      <text x="110" y="150" text-anchor="middle" fill="#9ca3af" font-family="system-ui" font-size="10">Row × column intersection = one key</text>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>The key matrix — how a key press actually gets detected</h4>
+    <ul>
+      <li>The keyboard has its own electrical circuitry, a microprocessor, and a ROM chip.</li>
+      <li>Keys sit above a KEY MATRIX — a set of ROW wires crossing a set of COLUMN wires. Pressing a key causes contact at one specific intersection.</li>
+      <li>The microprocessor continuously TESTS whether any row-column circuit has closed. When it detects one, it identifies WHICH intersection caused it.</li>
+      <li>It then uses data stored in the ROM to generate the correct character code for that intersection, and sends this code to the processor.</li>
+      <li>The same principle applies even when TWO keys are pressed simultaneously (e.g. Shift + a letter).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — keyboards and keypads (completes Section 3.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why is seeing a character appear on screen "immediately" after a key press described as an illusion?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The key press has to first be converted into a character code, transmitted to the processor, and then displayed under OS control — several real steps happen, even though it feels instantaneous to the user.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What THREE hardware components does a keyboard itself contain, beyond the physical keys?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Electrical circuitry, its own microprocessor, and a ROM chip.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A key matrix consists of a set of ______ wires and a set of ______ wires; pressing a key makes contact at one specific intersection.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Row; column.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "A QWERTY keyboard, a numeric keypad, and a mobile phone keypad all use fundamentally DIFFERENT underlying technologies since they look so different." Correct this.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The underlying TECHNOLOGY is the same across all of them, provided there are actual physical keys — only the layout and arrangement of keys differs between them.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user presses Ctrl+S as a shortcut to save a file, rather than typing a visible character. How does the processor's response differ from a normal letter key press?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The same underlying detection process happens (key matrix intersection → character code → sent to processor) — but instead of displaying a character on screen, the processor responds by carrying out the requested ACTION (saving the file).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does the keyboard's microprocessor continuously do while waiting for input?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It continuously tests whether any row-and-column circuit in the key matrix has become closed (i.e. whether any key has been pressed).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 3: Hardware — 3.06 Keyboards and Keypads (completes Section 3.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 3.06
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.08 Input and Output of Sound — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fb923c; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 3 · Hardware</span>
+  <div class="topic-title">3.08 Input and Output of Sound</div>
+  <div class="topic-subtitle">A microphone and a speaker are almost exact mirror images of each other. Completes Chapter 3.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Diaphragm</div><div class="key-term-def">A flexible material that vibrates in response to sound (microphone) or creates sound by vibrating (speaker).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Condenser microphone</div><div class="key-term-def">Uses a capacitance change to convert sound vibration into an electrical signal.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Sound input — the microphone</h4>
+    <ul>
+      <li>IP telephony and video conferencing are the two obvious use cases needing voice input; voice recognition is an alternative technique for data input generally.</li>
+      <li>A microphone has a DIAPHRAGM — a flexible material caused to vibrate by incoming sound. Connected to suitable circuitry, this vibration causes a change in an electrical signal.</li>
+      <li>A condenser microphone uses a CAPACITANCE change as its mechanism; an alternative uses a piezoelectric crystal.</li>
+      <li>The resulting electrical signal must be converted to a DIGITAL signal by an analogue-to-digital converter, before a sound (audio) card inside the computer can process it.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="380" height="110" viewBox="0 0 380 110">
+      <g font-family="system-ui" font-size="10" fill="#e2e8f0">
+        <text x="70" y="20" text-anchor="middle" fill="#fb923c">Sound in</text>
+        <path d="M10,55 Q30,35 50,55 T90,55" fill="none" stroke="#fb923c" stroke-width="1.5"/>
+        <rect x="100" y="40" width="14" height="30" fill="#111320" stroke="#fb923c"/>
+        <text x="107" y="90" text-anchor="middle" fill="#9ca3af" font-size="8">diaphragm</text>
+        <line x1="120" y1="55" x2="160" y2="55" stroke="#fb923c" marker-end="url(#a2)"/>
+        <rect x="160" y="40" width="60" height="30" rx="4" fill="#111320" stroke="#60a5fa"/><text x="190" y="59" text-anchor="middle" fill="#93c5fd" font-size="8">ADC</text>
+        <line x1="220" y1="55" x2="260" y2="55" stroke="#60a5fa" marker-end="url(#a2)"/>
+        <rect x="260" y="40" width="100" height="30" rx="4" fill="#111320" stroke="#4ade80"/><text x="310" y="59" text-anchor="middle" fill="#86efac" font-size="8">Sound card (digital)</text>
+        <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#9ca3af"/></marker></defs>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Sound output — the speaker (effectively the reverse process)</h4>
+    <ul>
+      <li>The sound card produces a DIGITAL signal, converted to analogue by a digital-to-analogue converter, then fed to the speaker.</li>
+      <li>Traditional technology: current flows through a COIL suspended within the magnetic field of a permanent magnet inside the speaker.</li>
+      <li>As the current's direction keeps reversing, the coil moves BACKWARDS and FORWARDS — this movement drives a diaphragm, which creates the actual sound.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Input and output are near-exact mirror images</h4>
+    <ul>
+      <li>Microphone (input): sound vibration → diaphragm moves → electrical signal → ADC → digital signal.</li>
+      <li>Speaker (output): digital signal → DAC → analogue signal → coil/diaphragm moves → sound.</li>
+      <li>Both rely on a diaphragm; both need a converter between the analogue and digital worlds — just running in opposite directions.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — sound input and output (completes Section 3.08 and Chapter 3).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What physical component do BOTH a microphone and a speaker rely on?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A diaphragm — a flexible material that vibrates (microphone: vibrates because of incoming sound; speaker: vibrates to create outgoing sound).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What mechanism does a condenser microphone use to turn sound vibration into an electrical signal?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A capacitance change.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Sound input needs an ______-to-digital converter; sound output needs a digital-to-______ converter.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Analogue; analogue.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "A traditional speaker creates sound directly from the digital signal produced by the sound card." What's the missing step?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The digital signal must first be converted to an ANALOGUE signal by a digital-to-analogue converter before it's fed to the speaker — the speaker itself works on the analogue signal, not the raw digital one.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In a traditional speaker, explain step by step how a changing electrical current ultimately produces sound.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Current flows through a coil suspended in a permanent magnet's magnetic field. As the current's direction keeps reversing, the coil is pushed backwards and forwards. This coil movement drives a diaphragm, whose movement creates the sound.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name two obvious real-world applications that need voice INPUT to a computer system.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>IP telephony and video conferencing (voice recognition is also mentioned as an alternative data-input technique).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 3: Hardware — 3.08 Input and Output of Sound (completes Section 3.08 and Chapter 3)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 3.08
+  </div>
+
+</div>
+</body>
+</html>

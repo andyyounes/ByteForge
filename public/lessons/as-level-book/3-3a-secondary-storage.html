@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3.03 Secondary Storage Devices — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #e879f9; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 3 · Hardware</span>
+  <div class="topic-title">3.03 Secondary Storage Devices</div>
+  <div class="topic-subtitle">Magnetic, optical, and solid-state — three completely different physical mechanisms for the same job.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Device driver</div><div class="key-term-def">Software that lets the OS operate a hardware device — not to be confused with "drive".</div></div>
+    <div class="key-term-card"><div class="key-term-name">Direct-access device</div><div class="key-term-def">Any sector can be chosen for reading/writing directly — but data within a sector is read sequentially.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Sector</div><div class="key-term-def">The smallest unit of storage on a disk — a defined number of bytes within a track.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Flash memory</div><div class="key-term-def">Semiconductor storage with no moving parts — blocks are erased "in a flash" before being rewritten.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Terminology worth untangling first</h4>
+    <ul>
+      <li>"Device driver" is the SOFTWARE needed to operate any hardware device.</li>
+      <li>"Drive" was originally the HARDWARE that houses a storage medium and physically transfers data to/from it — but in practice, "hard disk", "hard disk drive" and "hard drive" are now all used to mean the same thing.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Magnetic media — the hard disk</h4>
+    <ul>
+      <li>Magnetic tape (for sound recording) pre-dates computing — it was the FIRST storage technology adapted for computer use. The hard disk was invented specifically FOR computer storage, arriving later.</li>
+      <li>A read head detects a state of magnetisation as an electrical property; a write head does the reverse — the two are usually combined into one read-write head. The two states of magnetisation are interpreted as 1 or 0.</li>
+      <li>Physical construction: MULTIPLE platters, each with a read-write head per SIDE, all spinning in unison, with actuator arms moving the heads in sync. A cushion of air keeps the head from touching the platter.</li>
+      <li>Logical construction: data is stored in concentric TRACKS, each formatted into SECTORS (a defined number of bytes) — the sector is the smallest unit of storage.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="320" height="160" viewBox="0 0 320 160">
+      <g font-family="system-ui" font-size="10">
+        <circle cx="120" cy="80" r="70" fill="none" stroke="#e879f9" stroke-width="1.5"/>
+        <circle cx="120" cy="80" r="45" fill="none" stroke="#e879f9" stroke-width="1" stroke-dasharray="2 2"/>
+        <circle cx="120" cy="80" r="8" fill="#e879f9"/>
+        <line x1="120" y1="10" x2="270" y2="10" stroke="#c084fc"/>
+        <rect x="180" y="20" width="80" height="12" rx="3" fill="#111320" stroke="#c084fc"/><text x="220" y="29" fill="#e9d5ff" text-anchor="middle" font-size="8">Arm</text>
+        <text x="120" y="150" fill="#9ca3af" text-anchor="middle" font-size="9">Concentric tracks, formatted into sectors</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Direct access — but sequential WITHIN a sector</h4>
+    <ul>
+      <li>A hard drive is a DIRECT-access read-write device — any sector can be chosen directly for reading or writing.</li>
+      <li>However, the data WITHIN a chosen sector still has to be read SEQUENTIALLY.</li>
+      <li>As files are created, deleted and edited, sector use becomes increasingly FRAGMENTED, degrading performance — a defragmentation program reorganises sector allocation to restore it.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Optical media — CD, DVD, and Blu-ray</h4>
+    <ul>
+      <li>Like magnetic tape, optical storage was adapted from existing non-computing technology (audio CDs).</li>
+      <li>CD-ROM (read-only) came first; CD-RW added write capability; the CD was superseded by the DVD, and then by the more powerful Blu-ray disc.</li>
+      <li>The disc spins; a laser reflects off a surface between a substrate and protective coating. For CD-ROM, indentations ("pits") separated by "lands" cause a PHASE DIFFERENCE in the reflected light, detected by a photodiode and interpreted as 1 or 0.</li>
+      <li>For CD-RW/DVD-RW, the reflective surface is a special alloy — writing ("burning") uses laser heat to change the material to liquid, which then cools into either a crystalline or amorphous solid, giving the 1/0 distinction on later reads.</li>
+      <li>The optical head follows a SINGLE SPIRAL path from centre to edge — but formatting the data into sectors still allows direct access, just like a magnetic disk.</li>
+      <li>Storage capacity depends on how close together individual bit-representations can be placed — governed by spin-speed compensation and, crucially, the LASER'S WAVELENGTH (shorter wavelength = better focus = higher density). This is why infrared (CD) → red (DVD) → blue (Blu-ray) laser light corresponds to increasing storage capacity.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Solid-state media — flash memory</h4>
+    <ul>
+      <li>Flash memory is a form of EEPROM where the programmable aspect is part of NORMAL use, with no moving parts at all.</li>
+      <li>Built from arrays of transistors ("NAND" technology, named after its resemblance to a NAND logic gate) with memory cells connected in series.</li>
+      <li>Special feature: blocks of memory cells can have their contents erased all at once ("in a flash"). Before writing, a block must first be ERASED; reading also happens a whole block at a time.</li>
+      <li>Used for solid-state drives (replacing hard disks), memory cards, and USB flash drives — currently the technology of choice for removable storage, though alternatives (e.g. PRAM) are under development.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — magnetic, optical and solid-state secondary storage (completes Section 3.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the smallest unit of storage on a magnetic hard disk, and what does it contain?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A sector — a defined number of bytes within a track.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is a hard drive described as "direct-access" but data within a sector is still read "sequentially"? Are these contradictory?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Not contradictory — ANY sector can be chosen directly (that's the direct-access part), but once you're reading that chosen sector, its bytes are read in sequence, one after another.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      For a CD-ROM, indentations called ______ (separated by ______) cause a phase difference in the reflected laser light, interpreted as 1 or 0.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Pits; lands.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "Blue-ray discs hold more data than DVDs mainly because the disc itself is a different physical size." What's the ACTUAL reason given in this lesson?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The key factor is the laser's WAVELENGTH — a shorter wavelength (blue laser vs red vs infrared) allows better focus, letting bit-representations be placed closer together, increasing storage density and capacity. The physical disc size is the same across CD/DVD/Blu-ray.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A manufacturer wants a small, rugged storage device with NO moving parts for a portable USB drive. Which of the three technologies in this lesson fits best, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Solid-state (flash) memory — it's a semiconductor technology with no moving parts at all, unlike the spinning platters/heads of magnetic disks or the spinning disc/laser mechanism of optical media.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Before data can be WRITTEN to a block of flash memory cells, what must happen first?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The data already in that block must first be erased.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 3: Hardware — 3.03 Secondary Storage Devices (completes Section 3.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 3.03
+  </div>
+
+</div>
+</body>
+</html>
