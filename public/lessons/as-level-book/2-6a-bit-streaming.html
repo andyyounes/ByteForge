@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.06 Bit Streaming — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fb923c; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .example-block { background: rgba(251,146,60,.05); border: 1px solid rgba(251,146,60,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #fb923c; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #fed7aa; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 2 · Communication &amp; Internet Technologies</span>
+  <div class="topic-title">2.06 Bit Streaming</div>
+  <div class="topic-subtitle">Why streamed media needs bit streams, not byte streams — and how buffering keeps playback smooth. Completes Chapter 2.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Byte stream</div><div class="key-term-def">Transmitting stored data as whole bytes — the normal way data is transmitted before compression is involved.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Bit stream</div><div class="key-term-def">Transmitting data as individual bits rather than whole bytes — required once compression changes each byte's bit-length.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Buffer</div><div class="key-term-def">Temporary storage on the user's computer that receives incoming media data before it's played.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Bit rate</div><div class="key-term-def">The speed at which media content is delivered/played, e.g. 128 kbps for decent-quality audio.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why compression forces a bit stream, not a byte stream</h4>
+    <ul>
+      <li>Data is normally stored in bytes, and it's possible to transmit this as a "byte stream".</li>
+      <li>Streamed media is always compressed using techniques from Chapter 1 (Section 1.07) — and some compression techniques convert each byte into a representation with FEWER bits.</li>
+      <li>Because the number of bits per unit no longer lines up neatly into whole bytes, the data must be transferred as a BIT stream for the decoder at the receiving end to reconstruct it correctly.</li>
+      <li>So: any mention of streaming media normally implies bit streaming is being used underneath.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Download vs. streaming — two different processes</h4>
+    <ul>
+      <li>For media already stored on a website, one option is to DOWNLOAD the file and play it later — a fully separate step from playback.</li>
+      <li>The streaming option ("on demand") instead makes delivery and playback two processes that happen CONCURRENTLY, not sequentially.</li>
+      <li>Incoming data is received into a buffer on the user's computer; media player software then takes the data from the buffer and plays it — the buffer is what decouples the (possibly uneven) network delivery from smooth playback.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="440" height="140" viewBox="0 0 440 140">
+      <g font-family="system-ui" font-size="11">
+        <rect x="10" y="50" width="70" height="40" rx="6" fill="#111320" stroke="#fb923c"/><text x="45" y="74" fill="#fed7aa" text-anchor="middle" font-size="10">Media server</text>
+        <line x1="80" y1="70" x2="150" y2="70" stroke="#fb923c" stroke-width="2" marker-end="url(#arrow)"/>
+        <rect x="150" y="40" width="120" height="60" rx="6" fill="#111320" stroke="#fbbf24"/>
+        <text x="210" y="56" fill="#fde68a" text-anchor="middle" font-size="10">Buffer</text>
+        <line x1="160" y1="66" x2="260" y2="66" stroke="#4ade80" stroke-dasharray="3 3"/><text x="210" y="63" fill="#4ade80" text-anchor="middle" font-size="8">high-water mark</text>
+        <line x1="160" y1="82" x2="260" y2="82" stroke="#f87171" stroke-dasharray="3 3"/><text x="210" y="94" fill="#f87171" text-anchor="middle" font-size="8">low-water mark</text>
+        <line x1="270" y1="70" x2="340" y2="70" stroke="#fb923c" stroke-width="2" marker-end="url(#arrow)"/>
+        <rect x="340" y="50" width="80" height="40" rx="6" fill="#111320" stroke="#60a5fa"/><text x="380" y="74" fill="#93c5fd" text-anchor="middle" font-size="10">Media player</text>
+        <text x="210" y="120" fill="#9ca3af" text-anchor="middle" font-size="9">User's computer</text>
+        <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#fb923c"/></marker></defs>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>The high-water / low-water marks — keeping the buffer from running dry OR overflowing</h4>
+    <ul>
+      <li>The bit rate for delivery FROM the buffer TO the user must match the exact rate defined for that specific media.</li>
+      <li>The planned transmission rate INTO the buffer should be set HIGHER than the playback rate — this builds a safety margin against network slowdowns.</li>
+      <li>The high-water and low-water marks are the buffer thresholds that manage this margin, preventing the buffer running empty (causing playback to stall) or overflowing.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Stored media vs. real-time/live streaming</h4>
+    <ul>
+      <li>For stored media, the source website already has the media saved and simply streams it out on request.</li>
+      <li>For REAL-TIME/live transmission (e.g. a live sporting event), the content is generated AT THE SAME TIME it's being delivered.</li>
+      <li>The receiver-end technology is the same either way — but live streaming has an extra problem: potentially huge numbers of simultaneous viewers. The solution is to transmit the media first to many content-provider servers, which then each transmit onward to individual users.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Why the exact bit rate genuinely matters</div>
+    <p>Media must be delivered at PRECISELY the same speed it was created at — a song recorded at 4 minutes would sound "very peculiar" if delivered at a rate that stretched it to 6 minutes.</p>
+    <p>Typical bit rates: a relatively poor-quality video might use around 300 kbps; a reasonably good-quality audio file might only need around 128 kbps — video needs a substantially higher bit rate than audio for acceptable quality.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — bit streaming (completes Section 2.06 and Chapter 2).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does compressed streamed media need to be transmitted as a bit stream rather than a byte stream?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Some compression techniques convert each byte into a representation with fewer bits, so the data no longer lines up into whole bytes — it must be transferred bit-by-bit for the decoder at the receiver to reconstruct it correctly.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the role of the buffer on the user's computer during streaming?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It temporarily holds incoming media data; the media player software takes data from the buffer to play it — decoupling delivery timing from playback timing.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      The planned transmission rate INTO the buffer should be set ______ than the defined playback rate, to guard against network slowdowns.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Higher.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "Downloading a file and streaming it are basically the same thing, just with different names." What's the genuine difference?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Downloading fully separates delivery and playback into two sequential steps (get the whole file, then play it later). Streaming makes delivery and playback happen CONCURRENTLY — the buffer receives data while the media player simultaneously plays already-buffered data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A streaming service expects millions of simultaneous viewers for a live sports broadcast. What architectural approach does the theory describe for handling this scale, rather than one server streaming to every viewer directly?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Transmit the media first to a large number of content provider servers, which then each transmit onward to individual users — spreading the delivery load rather than one server handling every viewer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">A video streams at roughly 300 kbps while an audio-only stream needs only about 128 kbps. Why the difference?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Video content carries substantially more information per second (image frames plus audio) than audio alone, so it needs a correspondingly higher bit rate to be delivered at acceptable quality.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 2: Communication &amp; Internet Technologies — 2.06 Bit Streaming (completes Section 2.06 and Chapter 2)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 2.06
+  </div>
+
+</div>
+</body>
+</html>

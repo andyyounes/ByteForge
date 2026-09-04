@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2.05 Client-Server Architecture — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: rgba(34,211,238,.05); border: 1px solid rgba(34,211,238,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #22d3ee; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #a5f3fc; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 2 · Communication &amp; Internet Technologies</span>
+  <div class="topic-title">2.05 Client-Server Architecture</div>
+  <div class="topic-subtitle">Middleware, static vs dynamic pages, and why payroll still runs as a batch job.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Client-server architecture</div><div class="key-term-def">A distributed system where a client does part of the processing and a server does another part.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Middleware</div><div class="key-term-def">Software needed for a client and server to cooperate — now handles data transmission plus scripting support.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Static web page</div><div class="key-term-def">A page whose content doesn't change based on the request — the original style of web browsing.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Dynamic web page</div><div class="key-term-def">A page whose displayed content is determined by the specific request the client makes.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Where client-server architecture came from</h4>
+    <ul>
+      <li>After the PC arrived in the 1980s, it became clear that stand-alone PCs weren't viable in a large organisation — a PC needed a network connection to get enough resource.</li>
+      <li>Servers were first used just to provide extra shared facilities (filestore, software applications, printing).</li>
+      <li>The further development into "client-server" architecture was seen as a competitor to the traditional mainframe-with-terminals model: networked PCs (clients) accessing one or more powerful minicomputers acting as servers.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The essence of client-server, and middleware's role</h4>
+    <ul>
+      <li>The core idea: a distributed computer system where the CLIENT carries out part of the processing and the SERVER carries out another part.</li>
+      <li>For client and server to cooperate at all, software called "middleware" must be present — this basic concept still holds today, even though the vocabulary describing it has changed.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The modern vocabulary — web server, browser, middleware</h4>
+    <ul>
+      <li>The server is now a "web server" — a suite of software installable on virtually any computer system, providing access to a web application.</li>
+      <li>The client is the web browser software.</li>
+      <li>Middleware is now the software supporting the transmission of data across the network, together with the provision for scripting.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Static pages (the original web) vs dynamic pages (client-server applications)</h4>
+    <ul>
+      <li>The ORIGINAL use of the web involved a browser displaying static web pages containing information — downloading was possible, but the pages themselves were essentially fixed.</li>
+      <li>In a genuine client-server APPLICATION, the web page is "dynamic" — what's displayed is determined by the specific request the client makes.</li>
+      <li>The only requirement for this style of application is that it involves USER INTERACTION — beyond that, there's almost no limit to the variety of applications supported.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">What counts as a client-server application — and what doesn't</div>
+    <p>The most obvious category is "ecommerce" (a customer buying products online from a company). Others include: e-business, email, searching library catalogues, online banking, and travel timetable information. Most require a "web-enabled" database installed on, or accessible from, the server.</p>
+    <p>By contrast: the monthly payroll run typifies an application that is UNSUITABLE for implementation as a dynamic web application, and will continue to be handled by batch processing instead — not every task benefits from this architecture.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — client-server architecture (completes Section 2.05).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">In the original client-server model, what genuinely different role did the "client" and the "server" each play?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The client (networked PC) carried out part of the processing; the server (a powerful minicomputer) carried out another part — a genuinely distributed system, not just a PC talking to a shared disk.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is middleware, in the modern client-server picture?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The software supporting the transmission of data across the network, together with the provision for scripting — required for the client (browser) and server (web server) to cooperate.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ web page's content never changes with the request; a ______ web page's content is determined by the specific request the client makes.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Static; dynamic.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "Every business application should be rebuilt as a dynamic web application — it's always the better architecture." Give a genuine counter-example from the theory.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The monthly payroll run — it typifies an application UNSUITABLE for a dynamic web application, and continues to be handled by batch processing instead. Dynamic web applications specifically require user interaction; payroll doesn't fit that requirement.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A library wants customers to search its catalogue online, get personalised results, and interact with the system. Should this be built as a static or dynamic web page, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Dynamic — searching a catalogue involves user interaction and the displayed results depend on the specific request/search terms made, which is exactly what a dynamic page (and the client-server model behind it) is designed for.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is the ONE requirement that any client-server application must involve, regardless of how varied the applications are?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>User interaction.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 2: Communication &amp; Internet Technologies — 2.05 Client-Server Architecture (completes Section 2.05)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 2.05
+  </div>
+
+</div>
+</body>
+</html>
