@@ -1112,39 +1112,6 @@ OUTPUT Pop()  // should print 15`,
   // Module 5: Sorting & Searching
   { mod:'M5', name:'7.4b Linear Search', xp:15, type:'lesson', bookFile:'7-4b-linear-search.html', hints:[],
     text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  { mod:'M5', name:'7.4c Bubble Sort', xp:15, type:'lesson', bookFile:'7-4c-bubble-sort.html', hints:[],
-    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
-  {
-    mod:'M5',name:'Bubble Sort',xp:70,
-    text:`<strong>Challenge 9 — Bubble Sort</strong><br>Declare an array of 5 integers: [64, 25, 12, 22, 11]. Write a bubble sort to sort them in ascending order. OUTPUT all 5 elements after sorting. Expected: 11, 12, 22, 25, 64.`,
-    hints:['Use nested FOR loops: outer i from 1 to 4, inner j from 1 to 5-i.', 'Compare arr[j] and arr[j+1]. If arr[j] > arr[j+1], swap using a temp variable.', 'DECLARE temp : INTEGER / temp ← arr[j] / arr[j] ← arr[j+1] / arr[j+1] ← temp'],
-    starter:`// Challenge 9: Bubble Sort
-DECLARE arr  : ARRAY[1:5] OF INTEGER
-DECLARE i    : INTEGER
-DECLARE j    : INTEGER
-DECLARE temp : INTEGER
-
-// Fill array: 64, 25, 12, 22, 11
-arr[1] ← 64; arr[2] ← 25; arr[3] ← 12; arr[4] ← 22; arr[5] ← 11
-
-// Bubble sort:
-FOR i ← 1 TO 4
-   FOR j ← 1 TO 5 - i
-      IF arr[j] > arr[j + 1] THEN
-         // TODO: swap arr[j] and arr[j+1] using temp
-      ENDIF
-   NEXT j
-NEXT i
-
-// OUTPUT sorted array:
-FOR i ← 1 TO 5
-   OUTPUT arr[i]
-NEXT i`,
-    check:(code,res)=>{
-      const nums=res.output.map(s=>parseInt(s.trim()))
-      return JSON.stringify(nums)===JSON.stringify([11,12,22,25,64])
-    },
-  },
   {
     mod:'M5',name:'Binary Search',xp:70,
     text:`<strong>Challenge 10 — Binary Search</strong><br>Declare a sorted array [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]. Write a binary search FUNCTION <code>BinSearch(target : INTEGER) RETURNS INTEGER</code> that returns the 1-based index of the target, or -1 if not found.<br>Search for 23. Expected output: <strong>6</strong>.`,
@@ -1180,6 +1147,39 @@ ENDFUNCTION
 
 OUTPUT BinSearch(23)   // expected: 6`,
     check:(code,res)=>res.output.some(o=>o.trim()==='6'),
+  },
+  { mod:'M5', name:'7.4c Bubble Sort', xp:15, type:'lesson', bookFile:'7-4c-bubble-sort.html', hints:[],
+    text:'Read the full lesson (theory, key terms, worked examples) and try its 6 practice questions, then mark it complete.' },
+  {
+    mod:'M5',name:'Bubble Sort',xp:70,
+    text:`<strong>Challenge 9 — Bubble Sort</strong><br>Declare an array of 5 integers: [64, 25, 12, 22, 11]. Write a bubble sort to sort them in ascending order. OUTPUT all 5 elements after sorting. Expected: 11, 12, 22, 25, 64.`,
+    hints:['Use nested FOR loops: outer i from 1 to 4, inner j from 1 to 5-i.', 'Compare arr[j] and arr[j+1]. If arr[j] > arr[j+1], swap using a temp variable.', 'DECLARE temp : INTEGER / temp ← arr[j] / arr[j] ← arr[j+1] / arr[j+1] ← temp'],
+    starter:`// Challenge 9: Bubble Sort
+DECLARE arr  : ARRAY[1:5] OF INTEGER
+DECLARE i    : INTEGER
+DECLARE j    : INTEGER
+DECLARE temp : INTEGER
+
+// Fill array: 64, 25, 12, 22, 11
+arr[1] ← 64; arr[2] ← 25; arr[3] ← 12; arr[4] ← 22; arr[5] ← 11
+
+// Bubble sort:
+FOR i ← 1 TO 4
+   FOR j ← 1 TO 5 - i
+      IF arr[j] > arr[j + 1] THEN
+         // TODO: swap arr[j] and arr[j+1] using temp
+      ENDIF
+   NEXT j
+NEXT i
+
+// OUTPUT sorted array:
+FOR i ← 1 TO 5
+   OUTPUT arr[i]
+NEXT i`,
+    check:(code,res)=>{
+      const nums=res.output.map(s=>parseInt(s.trim()))
+      return JSON.stringify(nums)===JSON.stringify([11,12,22,25,64])
+    },
   },
 
   // Module 6: OOP Basics
