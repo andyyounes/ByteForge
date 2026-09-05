@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.02 Protecting Computer Systems — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(167,139,250,.12); color: #a78bfa; border: 1px solid rgba(167,139,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #a78bfa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.25); color: #a78bfa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 8 · Data Security, Privacy &amp; Integrity</span>
+  <div class="topic-title">8.02 Security Measures for Protecting Computer Systems</div>
+  <div class="topic-subtitle">Hot sites, authentication, firewalls, and why "just install antivirus" was never the whole story.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Authentication</div><div class="key-term-def">Verification of a user's identity.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Hot site</div><div class="key-term-def">A full, ready-to-go replacement system kept remote from the original, so it survives natural disasters affecting the original site.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Two primary aims of system security — not just protecting data</h4>
+    <ul>
+      <li>Ensure SYSTEM FUNCTIONALITY.</li>
+      <li>Ensure only AUTHORISED users have access.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Four categories of threat</h4>
+    <ul>
+      <li>Internal mismanagement.</li>
+      <li>Natural disasters.</li>
+      <li>Unauthorised intrusion by an individual.</li>
+      <li>Malicious software entering the system.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Disaster recovery — contingency planning and hot sites</h4>
+    <ul>
+      <li>For large installations, continuity of operation is VITAL — measures must keep the system functional, or at least guarantee resumption within a very short time.</li>
+      <li>This falls under disaster recovery CONTINGENCY PLANNING, based on a RISK ASSESSMENT, with provision for an alternative system.</li>
+      <li>A "hot site" — a full always-ready replacement system — must be REMOTE from the original, specifically so it can survive natural disasters (earthquake, flood) that might destroy the original site.</li>
+      <li>For a major hardware/software update: traditionally done over a weekend when no service was needed. In the modern era of globally-available, never-closed systems, organisations may need the ORIGINAL and REPLACEMENT running IN PARALLEL for a period, to ensure continuity.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>User accounts and authentication</h4>
+    <ul>
+      <li>Even a single-user PC should have a user account — essential for any multi-user (timesharing) system.</li>
+      <li>The main security feature of a user account is AUTHENTICATION, normally via a password. For effectiveness, a password needs many characters, ideally drawing from a wide variety of ASCII characters.</li>
+      <li>Alternative/additional authentication methods: BIOMETRIC (fingerprint, face, eye) and SECURITY TOKENS (hardware, or a software equivalent requiring further input after the password). Normal practice COMBINES one of these with the password system.</li>
+      <li>General good practice: don't leave a computer switched on unattended; don't let others observe you accessing it; don't write down your access details.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Beyond login — portable devices and the Internet</h4>
+    <ul>
+      <li>Portable storage devices attached by users can carry viruses — the safest policy is BANNING their use, though this isn't always practical if business processes require data portability.</li>
+      <li>Internet connection is a "virtually unavoidable" threat — incoming transmissions may carry malicious software, AND sensitive data could be exported OUT to another system.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Firewalls — the primary defence</h4>
+    <ul>
+      <li>Ideally a HARDWARE firewall — like an airport security gate, nothing passes without inspection.</li>
+      <li>Alternatively, SOFTWARE-based — the transmission must enter the system first, but is inspected immediately.</li>
+      <li>A firewall might focus purely on ADDRESSES in a transmission, or additionally examine the DATA itself for anything inappropriate.</li>
+      <li>For email specifically, sender authentication is addressed by requiring a DIGITAL CERTIFICATE attached to the email.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Access restriction isn't the whole solution — ongoing monitoring is needed too</h4>
+    <ul>
+      <li>A virus checker — regular system scans to detect and remove/deactivate viruses.</li>
+      <li>An intrusion detection system — takes an audit record of system use as input, and looks for ANOMALOUS use.</li>
+      <li>Attackers' methods keep becoming more sophisticated — defences must be continually improved to keep up.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — protecting computer systems (completes Section 8.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why must a "hot site" be located remotely from the original system?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>So it can survive natural disasters (like earthquake or flood) that might destroy or disable the original site — a hot site next door wouldn't help with that specific threat.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why might a modern organisation need its old and new systems running in PARALLEL during a major update, unlike in the past?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Modern globally-available systems mean a company is never "closed" — there's no safe weekend window to take the system offline for testing, so continuity of service requires both systems running together during the transition.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      The two primary aims of system security are ensuring system ______, and ensuring only ______ users have access.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Functionality; authorised.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "A firewall guarantees that no malicious software can ever enter a system." What does this lesson imply is wrong with that claim?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Security measures restricting access do NOT guarantee removal of all threats — this is exactly why the lesson also requires ONGOING monitoring (virus checkers, intrusion detection systems) running alongside the firewall, and notes that attacker methods keep evolving to be more sophisticated.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A company wants extra confidence in the identity of email senders before trusting an incoming email. What solution does this lesson describe?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Insisting the sender attaches a digital certificate to the email.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What input does an intrusion detection system use, and what is it looking for?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It takes an audit record of system use as input, and looks for anomalous (unusual/suspicious) use.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 8: Data Security, Privacy &amp; Integrity — 8.02 Security Measures for Protecting Computer Systems (completes Section 8.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 8.02
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.01 Data Integrity, Privacy and Security — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #f87171; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 8 · Data Security, Privacy &amp; Integrity</span>
+  <div class="topic-title">8.01 Definitions of Data Integrity, Privacy and Security</div>
+  <div class="topic-subtitle">Three closely related words that mean three genuinely different things — and one is a prerequisite for the other two.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Data integrity</div><div class="key-term-def">A requirement for data to be accurate and up to date.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Data privacy</div><div class="key-term-def">A requirement for data to be available only to authorised users.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Data security</div><div class="key-term-def">A requirement for data to be recoverable if lost or corrupted.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Data protection law</div><div class="key-term-def">A law that relates to data privacy.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Data integrity — easy to define, hard to ensure</h4>
+    <ul>
+      <li>Only ACCURATE and UP-TO-DATE data has integrity.</li>
+      <li>Any person or organisation storing data needs it to have integrity — but achieving this reliably is genuinely difficult.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Data privacy — about control, not secrecy for its own sake</h4>
+    <ul>
+      <li>Data privacy is about keeping data PRIVATE rather than letting it enter the public domain — it applies to both individuals and organisations.</li>
+      <li>Assuming an individual isn't engaged in criminal/subversive activity, they should be in CONTROL of which data about themselves is public vs. private.</li>
+      <li>For an individual, privacy has little chance of being upheld WITHOUT a legal framework penalising breaches — these are DATA PROTECTION LAWS.</li>
+      <li>Such laws mainly cover PERSONAL data supplied to an organisation for a specific, AGREED purpose — obliging the organisation to protect its privacy and integrity.</li>
+      <li>Laws don't guarantee compliance, but they act as a DETERRENT because wrongdoers can face legal proceedings.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Data security — availability and unchanged-ness</h4>
+    <ul>
+      <li>Data is "secure" if it's AVAILABLE for use when needed, AND the data made available is exactly what was originally stored.</li>
+      <li>Security is BREACHED if data has been lost or corrupted.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The crucial relationship between the three</h4>
+    <ul>
+      <li>Data SECURITY is a PREREQUISITE for both integrity and privacy — you can't have accurate, appropriately-controlled data if it isn't reliably available and unchanged in the first place.</li>
+      <li>BUT security alone CANNOT guarantee either integrity or privacy — data can be perfectly secure (available, unchanged) while still being inaccurate, or while still being accessible to the wrong people.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the definitions of integrity, privacy and security (completes Section 8.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Give the precise definitions of data integrity, data privacy, and data security.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Integrity: data is accurate and up to date. Privacy: data is available only to authorised users. Security: data is recoverable if lost or corrupted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why do data protection laws matter for data privacy, given that they can't force perfect compliance?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They act as a DETERRENT — wrongdoers who breach privacy can be subject to legal proceedings, even though the existence of a law can't by itself guarantee everyone follows it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Data security is a ______ for data integrity and privacy — but by itself cannot ______ either.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Prerequisite; guarantee.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "If data is secure (available, uncorrupted), it must also be accurate and appropriately private, since security covers everything." What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Security alone cannot guarantee integrity or privacy. Data can be perfectly secure (available exactly as originally stored) while still being factually WRONG (failing integrity), or while still being visible to unauthorised people (failing privacy).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A company's customer database is perfectly backed up and always available (secure), but a data-entry error means half the customer addresses are wrong. Which of the three properties (integrity/privacy/security) has been violated, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Integrity — the data is available and unchanged from what was stored (security is fine), but it isn't ACCURATE, which is exactly what integrity requires.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What do most data protection laws mainly relate to, in terms of WHOSE data and WHY it was supplied?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Personal (private) data that an individual supplies to an organisation, for a purpose understood and agreed by that individual — the law obliges the organisation to protect its privacy and integrity.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 8: Data Security, Privacy &amp; Integrity — 8.01 Definitions of Data Integrity, Privacy and Security (completes Section 8.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 8.01
+  </div>
+
+</div>
+</body>
+</html>

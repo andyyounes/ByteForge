@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>8.04 Data Validation and Verification — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fb923c; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block ol { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .example-block { background: rgba(251,146,60,.05); border: 1px solid rgba(251,146,60,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #fb923c; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #fed7aa; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 13px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 10px; text-align: center; }
+  .db-table th { background: rgba(251,146,60,.1); color: #fb923c; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .db-table td.parity { color: #4ade80; font-weight: 700; }
+  .db-table td.flag { color: #f87171; font-weight: 700; background: rgba(248,113,113,.1); }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 8 · Data Security, Privacy &amp; Integrity</span>
+  <div class="topic-title">8.04 Data Validation and Verification</div>
+  <div class="topic-subtitle">Validation checks the SHAPE of data, not its truth — then three transmission-checking methods, ending with one that can actually locate and fix an error. Completes Chapter 8.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Validation</div><div class="key-term-def">A check that data entered is of the correct type and format; does NOT guarantee accuracy.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Verification</div><div class="key-term-def">Confirmation of data received by a system.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>"Validation" is a misleading name — it doesn't mean "correct"</h4>
+    <ul>
+      <li>If a name is expected but the WRONG name is entered, it's still recognised AS a name — so it passes validation despite being factually wrong.</li>
+      <li>Validation can only catch data that is the wrong TYPE, wrong FORMAT, or OUT OF RANGE — never data that's simply untrue but plausible.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Five types of validation check</h4>
+    <ul>
+      <li>Presence check — an entry field isn't left blank.</li>
+      <li>Format check — e.g. a date must be dd/mm/yyyy.</li>
+      <li>Length check — e.g. a telephone number has the right number of digits.</li>
+      <li>Range check — e.g. a month value must not exceed 12.</li>
+      <li>Type check — e.g. only a numeric value accepted for a month.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Verification — confirming, not correcting</h4>
+    <ul>
+      <li>Most common example: re-entering a new password to confirm it.</li>
+      <li>Verification is USUALLY effective — but does NOT guarantee accuracy either, because the SAME wrong data could be entered both times.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Verification during data transfer — checking for flipped bits</h4>
+    <ul>
+      <li>Data corruption during transmission typically happens at bit level — an individual bit flips from 1 to 0 or vice versa.</li>
+      <li>Verification techniques check some property of the bit pattern to catch this.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Method 1 — simple one-bit parity check (using even parity)</h4>
+    <ol>
+      <li>At the transmitter: count the 1s in the 7-bit code.</li>
+      <li>If the count is even, set the parity bit to 0.</li>
+      <li>If the count is odd, set the parity bit to 1.</li>
+      <li>Repeat for every byte.</li>
+      <li>At the receiver: count the 1s in the full 8-bit code.</li>
+      <li>If the count is even, accept the byte.</li>
+      <li>Repeat for every byte.</li>
+    </ol>
+    <ul>
+      <li>Limitation: it can only DETECT the presence of an error — it cannot identify WHICH bit is wrong. Also, if exactly TWO bits flip in one byte, the error goes undetected (though this is unlikely enough to be a reasonable risk to accept). If an error is found, re-transmission must be requested.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Method 2 — the checksum method</h4>
+    <ul>
+      <li>A block of bytes is defined at the transmitter. The bits across the whole block are interpreted as one binary number, summed, and the SUM is sent as a checksum value.</li>
+      <li>The receiver does the same calculation and compares it against the transmitted checksum.</li>
+      <li>Same limitation as simple parity: an error can be DETECTED, but its exact POSITION cannot be determined.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Method 3 — the parity block check (can locate AND correct an error)</h4>
+    <ul>
+      <li>A longitudinal parity check on a serial sequence of bits across several bytes, arranged as a MATRIX.</li>
+      <li>Each byte (row) gets its OWN parity bit, exactly as in Method 1.</li>
+      <li>An EXTRA byte (the parity byte) is then created — each of ITS bits is the parity for that BIT POSITION down the whole column (including the row-parity column itself).</li>
+      <li>If exactly ONE bit is wrong anywhere in the block, the ROW check and the COLUMN check will each flag exactly one line — and their INTERSECTION identifies precisely which bit is wrong, so it can be corrected without needing a re-transmission.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked Example — locating a flipped bit with a parity block check</div>
+    <p>Three 4-bit data bytes are sent using even parity, row-by-row AND column-by-column:</p>
+  </div>
+
+  <table class="db-table">
+    <tr><th></th><th>bit4</th><th>bit3</th><th>bit2</th><th>bit1</th><th>row parity</th></tr>
+    <tr><td>Byte A</td><td>1</td><td>0</td><td>1</td><td>1</td><td class="parity">1</td></tr>
+    <tr><td>Byte B</td><td>0</td><td>1</td><td>1</td><td>0</td><td class="parity">0</td></tr>
+    <tr><td>Byte C</td><td>1</td><td>1</td><td>0</td><td>0</td><td class="parity">0</td></tr>
+    <tr><td>Parity byte</td><td class="parity">0</td><td class="parity">0</td><td class="parity">0</td><td class="parity">1</td><td class="parity">1</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <ul>
+      <li>Check: Byte A = 1011 (three 1s, odd) → row parity 1 ✓. Byte B = 0110 (two 1s, even) → row parity 0 ✓. Byte C = 1100 (two 1s, even) → row parity 0 ✓.</li>
+      <li>Column bit1 across A,B,C = 1,0,0 (one 1, odd) → column parity 1 ✓ — every row and column checks out before transmission.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Now suppose bit2 of Byte B is flipped in transit (1 → 0)</div>
+    <p>Byte B is received as <code>0100</code> instead of <code>0110</code>.</p>
+  </div>
+
+  <table class="db-table">
+    <tr><th></th><th>bit4</th><th>bit3</th><th>bit2</th><th>bit1</th><th>row parity</th></tr>
+    <tr><td>Byte A</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1 ✓</td></tr>
+    <tr><td>Byte B (received)</td><td>0</td><td>1</td><td class="flag">0</td><td>0</td><td class="flag">0 ✗</td></tr>
+    <tr><td>Byte C</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0 ✓</td></tr>
+    <tr><td>Parity byte</td><td>0 ✓</td><td>0 ✓</td><td class="flag">0 ✗</td><td>1 ✓</td><td>1</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <ul>
+      <li>Row check: Byte B's data now has one 1 (odd), but its transmitted parity bit says 0 (expects even) — ROW B is flagged.</li>
+      <li>Column check: bit2 down the column is now 1, 0, 0 (one 1, odd), but the parity byte says 0 (expects even) — COLUMN bit2 is flagged.</li>
+      <li>The INTERSECTION of the flagged row and flagged column is exactly Byte B's bit2 — that is the bit that was flipped. It can be corrected back to 1 without needing to ask for a re-transmission.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — validation, verification, and the three transmission-checking methods (completes Section 8.04 and Chapter 8).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why can validation never guarantee that entered data is actually TRUE?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Validation only checks type, format, and range — a wrong-but-plausible value (like the wrong name, still recognised as a valid-looking name) will still pass every validation check.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the shared limitation of BOTH the simple one-bit parity check and the checksum method?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Both can only DETECT that an error occurred somewhere — neither can identify the exact position of the error.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In a parity block check, the intersection of the flagged ______ and the flagged ______ identifies the exact bit that is wrong.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Row; column.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "Verification guarantees data accuracy, since the user has to enter the data twice and it's checked both times." What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Verification only confirms the SAME value was entered twice — it cannot catch a case where the user makes the SAME mistake both times. It does not guarantee accuracy, only consistency between the two entries.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In the worked example, if the ROW check flags Byte B but the COLUMN check flags NO column at all, what would that suggest happened instead of a single flipped data bit?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It would suggest the error is in Byte B's OWN parity bit itself (not in its data), since the row parity fails but no data column's overall parity is disturbed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which validation check would catch someone entering "13" for a month field, and which would catch entering "May" instead of a number?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A range check would catch "13" (out of the valid 1-12 range); a type check would catch "May" (not numeric, when a number is expected).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 8: Data Security, Privacy &amp; Integrity — 8.04 Data Validation and Verification (completes Section 8.04 and Chapter 8)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 8.04
+  </div>
+
+</div>
+</body>
+</html>
