@@ -647,8 +647,10 @@ async function runWebCode() {
     h2Count: doc.querySelectorAll('h2').length,
     h3Count: doc.querySelectorAll('h3').length,
     h4Count: doc.querySelectorAll('h4').length,
+    h5Count: doc.querySelectorAll('h5').length,
     h2Color: doc.querySelector('h2') ? getComputedStyle(doc.querySelector('h2')).color : '',
     h3Color: doc.querySelector('h3') ? getComputedStyle(doc.querySelector('h3')).color : '',
+    pColor: doc.querySelector('p') ? getComputedStyle(doc.querySelector('p')).color : '',
     linkColor: doc.querySelector('a') ? getComputedStyle(doc.querySelector('a')).color : '',
     buttonColor: doc.querySelector('button') ? getComputedStyle(doc.querySelector('button')).color : '',
     buttonBg: doc.querySelector('button') ? getComputedStyle(doc.querySelector('button')).backgroundColor : '',
@@ -1000,14 +1002,26 @@ const MODULES = [
       },
       check:(log) => log.h1Count >= 1 && log.h2Count >= 1 && log.h3Count >= 1 && log.h4Count >= 1 && log.paragraphs >= 4,
     },
-    { id:'web1boss', name:'BOSS — A Real Document Outline', xp:50, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — Nothing new: one full page using EVERY heading level together — h1, TWO h2 sections, and inside one of those sections a real h3 and h4 — each with its own paragraph. A real outline, not a flat list of headings.`,
+    { id:'web1s4', name:'One Level Deeper — h5', xp:30, lang:'web',
+      text:`<strong>Challenge 4</strong> — Headings can nest one level further still: add an <code>&lt;h5&gt;</code> INSIDE your h4's section, with its own paragraph — five heading levels in total, h1 through h5, in order.`,
       hints:[
-        'This is genuinely just Challenges 1-3 combined, with an extra h2 section.',
-        'Count carefully: 1 h1, 2 h2s, 1 h3, 1 h4 — six headings total, six paragraphs.',
+        'Same book analogy, one level deeper: h5 = a small point within the h4 point.',
+        'Keep the order strict: h1, h2, h3, h4, then h5 — each with its own paragraph underneath.',
       ],
-      webStarter: { html: `<!-- TODO: h1, then h2 (with p), then another h2 (with p), and inside it an h3 and h4 (each with p) -->\n`, css: ``, js: `` },
-      check:(log) => log.h1Count >= 1 && log.h2Count >= 2 && log.h3Count >= 1 && log.h4Count >= 1 && log.paragraphs >= 6,
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<h2>A Section</h2>\n<p>More text.</p>\n<h3>A Sub-Section</h3>\n<p>Even more text.</p>\n<h4>A Small Point</h4>\n<p>Detail here.</p>\n<!-- TODO: add an <h5> with its own <p> -->\n`,
+        css: ``, js: ``,
+      },
+      check:(log) => log.h1Count >= 1 && log.h2Count >= 1 && log.h3Count >= 1 && log.h4Count >= 1 && log.h5Count >= 1 && log.paragraphs >= 5,
+    },
+    { id:'web1boss', name:'BOSS — A Real Document Outline', xp:50, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Nothing new: one full page using EVERY heading level together — h1, TWO h2 sections, and inside one of those sections a real h3, h4, AND h5 — each with its own paragraph. A real outline, not a flat list of headings.`,
+      hints:[
+        'This is genuinely just Challenges 1-4 combined, with an extra h2 section.',
+        'Count carefully: 1 h1, 2 h2s, 1 h3, 1 h4, 1 h5 — seven headings total, seven paragraphs.',
+      ],
+      webStarter: { html: `<!-- TODO: h1, then h2 (with p), then another h2 (with p), and inside it h3, h4, and h5 (each with p) -->\n`, css: ``, js: `` },
+      check:(log) => log.h1Count >= 1 && log.h2Count >= 2 && log.h3Count >= 1 && log.h4Count >= 1 && log.h5Count >= 1 && log.paragraphs >= 7,
     },
   ]},
   // ── Semester 1, Week 3: More Tags — links vs. buttons.
@@ -1106,18 +1120,31 @@ const MODULES = [
       },
       check:(log) => log.headingColor === 'rgb(47, 59, 82)' && log.h2Color === 'rgb(124, 58, 237)' && log.h3Color === 'rgb(5, 150, 105)',
     },
-    { id:'web3boss', name:'BOSS — A Fully Colored Page', xp:65, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — Nothing new: page background, h1 color, link color, button fill + text color, AND h2/h3 colors — every rule from this month's Colors & Shading challenges, on one page.`,
+    { id:'web3s5', name:'Color the Paragraph Text', xp:30, lang:'web',
+      text:`<strong>Challenge 5</strong> — CSS targets paragraphs too. Keep every color so far, and set every <code>&lt;p&gt;</code> paragraph's text color to EXACTLY <code>#4B5563</code> — a softer grey, easier to read than pure black for body text.`,
       hints:[
-        'This is genuinely just Challenges 1-4 combined — six separate CSS rules total.',
-        'Go rule by rule: body, h1, a, button (two properties), h2, h3.',
+        'CSS: p { color: #4B5563; }',
+        'This is the same pattern as coloring "a" or "h2" — just a different selector, targeting paragraphs instead.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: set every <p> paragraph's color to #4B5563 */\n`,
+        js: ``,
+      },
+      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)' && log.pColor === 'rgb(75, 85, 99)',
+    },
+    { id:'web3boss', name:'BOSS — A Fully Colored Page', xp:65, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Nothing new: page background, h1 color, paragraph color, link color, button fill + text color, AND h2/h3 colors — every rule from this month's Colors & Shading challenges, on one page.`,
+      hints:[
+        'This is genuinely just Challenges 1-5 combined — seven separate CSS rules total.',
+        'Go rule by rule: body, h1, p, a, button (two properties), h2, h3.',
       ],
       webStarter: {
         html: `<!-- TODO: h1, p, a link, button, h2 (with p), h3 (with p) -->\n`,
-        css: `/* TODO: body #FFF7E6, h1 #2F3B52, a #1D4ED8, button fill #E63946 + text #FFFFFF, h2 #7C3AED, h3 #059669 */\n`,
+        css: `/* TODO: body #FFF7E6, h1 #2F3B52, p #4B5563, a #1D4ED8, button fill #E63946 + text #FFFFFF, h2 #7C3AED, h3 #059669 */\n`,
         js: ``,
       },
-      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)'
+      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)' && log.pColor === 'rgb(75, 85, 99)'
                   && log.linkColor === 'rgb(29, 78, 216)' && log.buttonBg === 'rgb(230, 57, 70)' && log.buttonColor === 'rgb(255, 255, 255)'
                   && log.h2Color === 'rgb(124, 58, 237)' && log.h3Color === 'rgb(5, 150, 105)',
     },
@@ -3771,9 +3798,12 @@ const CHALLENGE_LESSON = {
       <p>h1 = page title, h2 = a section, h3 = a sub-section INSIDE that section, h4 = smaller still. Like a book: title, chapter, section within the chapter, a small point within that section.</p></div>
     <div class="cl-block"><h4>Order matters</h4>
       <p>These need to appear on the page in order — h1, then h2, then h3, then h4 — a real document outline reads top to bottom, biggest idea to smallest.</p></div>` },
-  web1boss: { title: 'BOSS — a real 4-level outline', html: `
+  web1s4: { title: 'h5 — one nesting level deeper still', html: `
+    <div class="cl-block"><h4>The pattern keeps going</h4>
+      <p>h5 works exactly like h4 did one challenge ago — a smaller point nested inside the level above it. HTML actually goes all the way to h6, but h5 is already a genuinely deep, realistic level of nesting for a real document.</p></div>` },
+  web1boss: { title: 'BOSS — a real 5-level outline', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>One h1, TWO h2 sections, and inside one of them a real h3 and h4 — six headings, six paragraphs, all from Challenges 1-3 combined.</p></div>` },
+      <p>One h1, TWO h2 sections, and inside one of them a real h3, h4, and h5 — seven headings, seven paragraphs, all from Challenges 1-4 combined.</p></div>` },
   web2s1: { title: 'A link goes elsewhere; a button acts here', html: `
     <div class="cl-block"><h4>Two different jobs</h4>
       <p>&lt;a href="..."&gt; takes the reader to a different page or address. &lt;button&gt; does something on THIS page, right where you are — but only once JavaScript tells it what to do, which is next semester's job.</p></div>` },
@@ -3800,9 +3830,12 @@ const CHALLENGE_LESSON = {
   web3s4: { title: 'Every heading level can have its own color', html: `
     <div class="cl-block"><h4>Separate rules, separate tags</h4>
       <p>h1 { color: ...; }, h2 { color: ...; }, and h3 { color: ...; } are three completely independent rules — styling h2 never touches h1's colour, and vice versa. A real page often gives each heading level a slightly different shade on purpose, to help the eye tell them apart.</p></div>` },
-  web3boss: { title: 'BOSS — six CSS rules, one page', html: `
+  web3s5: { title: 'Paragraphs get their own color too', html: `
+    <div class="cl-block"><h4>Body text deserves its own rule</h4>
+      <p>p { color: ...; } works exactly like every other tag selector so far — but it matters in practice because pure black paragraph text on a coloured background can feel harsh; a softer grey is often easier on the eye for large blocks of reading text.</p></div>` },
+  web3boss: { title: 'BOSS — seven CSS rules, one page', html: `
     <div class="cl-block"><h4>Nothing new</h4>
-      <p>body background, h1 colour, link colour, button fill + text colour, h2 colour, h3 colour — six separate rules, every one from Challenges 1-4, combined onto one page.</p></div>` },
+      <p>body background, h1 colour, paragraph colour, link colour, button fill + text colour, h2 colour, h3 colour — seven separate rules, every one from Challenges 1-5, combined onto one page.</p></div>` },
   web4s1: { title: 'Structure first, style later', html: `
     <div class="cl-block"><h4>Why this checkpoint has no colors yet</h4>
       <p>The real boss asks for a LOT at once — structure AND six colour rules together. This checkpoint isolates just the structure half first (heading, paragraph, link, button, list) so you can get that solid before style gets layered back on top.</p></div>` },
