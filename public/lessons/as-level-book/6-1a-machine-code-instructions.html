@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.01 Machine Code Instructions — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 6 · Assembly Language Programming</span>
+  <div class="topic-title">6.01 Machine Code Instructions</div>
+  <div class="topic-subtitle">Every instruction the CPU actually runs splits neatly into an opcode and an operand.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Machine code instruction</div><div class="key-term-def">A binary code with a defined number of bits, comprising an opcode and (most often) one operand.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Machine code is the ONLY language the CPU truly understands</h4>
+    <ul>
+      <li>When an instruction is fetched from memory, it must already be in the exact binary format matching that specific CPU's machine code.</li>
+      <li>Different processors have DIFFERENT instruction sets. Even where two processors share an instruction NAME, the actual machine code binary will differ — though the overall STRUCTURE of the code tends to be similar across processors.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Four things defined for every machine code instruction on a given processor</h4>
+    <ul>
+      <li>The total number of bits/bytes for the whole instruction.</li>
+      <li>The number of bits that define the opcode.</li>
+      <li>The number of operands defined in the remaining bits.</li>
+      <li>Whether the opcode occupies the MOST significant or LEAST significant bits.</li>
+      <li>In general, up to THREE operands are possible — but this course's simple system uses only ONE or ZERO operands.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="380" height="90" viewBox="0 0 380 90">
+      <g font-family="system-ui" font-size="10" fill="#e2e8f0">
+        <rect x="10" y="10" width="140" height="40" fill="none" stroke="#60a5fa"/><text x="80" y="5" text-anchor="middle" fill="#93c5fd" font-size="9">Opcode (8 bits)</text>
+        <rect x="10" y="10" width="70" height="40" fill="#111320" stroke="#60a5fa"/><text x="45" y="25" text-anchor="middle" fill="#bfdbfe" font-size="8">Operation</text><text x="45" y="38" text-anchor="middle" fill="#9ca3af" font-size="8">4 bits</text>
+        <rect x="80" y="10" width="35" height="40" fill="#111320" stroke="#60a5fa"/><text x="97" y="25" text-anchor="middle" fill="#bfdbfe" font-size="7">Addr mode</text><text x="97" y="38" text-anchor="middle" fill="#9ca3af" font-size="8">2 bits</text>
+        <rect x="115" y="10" width="35" height="40" fill="#111320" stroke="#60a5fa"/><text x="132" y="25" text-anchor="middle" fill="#bfdbfe" font-size="7">Register</text><text x="132" y="38" text-anchor="middle" fill="#9ca3af" font-size="8">2 bits</text>
+        <rect x="150" y="10" width="220" height="40" fill="#111320" stroke="#4ade80"/><text x="260" y="5" text-anchor="middle" fill="#86efac" font-size="9">Operand (16 bits)</text><text x="260" y="34" text-anchor="middle" fill="#bbf7d0" font-size="9">address / value</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>A concrete simple instruction format — 8-bit opcode, 16-bit operand</h4>
+    <ul>
+      <li>Opcode: 4 bits for the OPERATION, 2 bits for the ADDRESS MODE (Section 6.03), 2 bits for REGISTER addressing.</li>
+      <li>This allows 16 different operations, each with one of 4 addressing modes.</li>
+      <li>The opcode occupies the MOST significant bits of the instruction.</li>
+      <li>The operand gets 16 bits — matching the 16-bit address bus, since the operand is often a memory address.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Register transfer notation needs a small extension for this</h4>
+    <ul>
+      <li>Because an instruction now has TWO components (opcode + operand), RTN needs to be able to refer to just PART of a register's contents.</li>
+      <li>Example: <code>CU ← [CIR(23:16)]</code> means only bits 16 to 23 of the CIR's content are transferred to the control unit — bits 0 to 15 aren't needed for this particular step.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — machine code instruction structure (completes Section 6.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What are the two main parts a machine code instruction is split into?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An opcode and an operand.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the example 8-bit opcode format, how many bits are used for the operation, and how many operations does this allow?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>4 bits for the operation, allowing 16 (2⁴) different operations.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      <code>CU ← [CIR(23:16)]</code> means only bits ______ to ______ of the CIR's content are transferred to the control unit.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>16; 23.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "Since two different processors both have an ADD instruction, the actual binary machine code for ADD must be identical on both." What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Even where the instruction NAME/concept matches, the actual binary machine code will genuinely differ between different processors — only the overall STRUCTURE tends to be similar, not the exact bit patterns.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is the operand given a full 16 bits in this simple instruction format, matching the address bus width from Chapter 5?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the operand will often BE a memory address, so it needs to be wide enough to specify any of the addressable memory locations — matching the 16-bit address bus keeps this consistent.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How many operands does a machine code instruction have in the simplified system used throughout this course?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Either one or zero (even though real processors can allow up to three).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 6: Assembly Language Programming — 6.01 Machine Code Instructions (completes Section 6.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 6.01
+  </div>
+
+</div>
+</body>
+</html>

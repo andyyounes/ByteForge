@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.04 Assembly Language Instructions — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(34,211,238,.1); color: #22d3ee; font-size: 10.5px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-size: 12px; }
+  .dtype-table code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 11px; }
+  .example-block { background: rgba(34,211,238,.05); border: 1px solid rgba(34,211,238,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #22d3ee; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #a5f3fc; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11.5px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: center; }
+  .db-table th { background: rgba(34,211,238,.1); color: #22d3ee; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 6 · Assembly Language Programming</span>
+  <div class="topic-title">6.04 Assembly Language Instructions</div>
+  <div class="topic-subtitle">Data movement, arithmetic, compare/jump, and I/O — then a full worked trace through a real program. Completes Chapter 6.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>A note on these examples</h4>
+    <ul>
+      <li>These instructions don't correspond exactly to any one real processor's assembly language — but they ARE representative of the most common instruction categories found in real instruction sets.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Category 1 — Data movement</h4>
+  </div>
+  <table class="dtype-table">
+    <tr><th>Opcode</th><th>Operand</th><th>Explanation</th></tr>
+    <tr><td><code>LDM</code></td><td><code>#n</code></td><td>Immediate addressing — load n directly into ACC</td></tr>
+    <tr><td><code>LDR</code></td><td><code>#n</code></td><td>Immediate addressing — load n directly into IX</td></tr>
+    <tr><td><code>LDD</code></td><td><code>&lt;address&gt;</code></td><td>Direct addressing — load into ACC</td></tr>
+    <tr><td><code>LDI</code></td><td><code>&lt;address&gt;</code></td><td>Indirect addressing — load into ACC</td></tr>
+    <tr><td><code>LDX</code></td><td><code>&lt;address&gt;</code></td><td>Indexed addressing — load into ACC</td></tr>
+    <tr><td><code>STO</code></td><td><code>&lt;address&gt;</code></td><td>Store the contents of ACC at the address</td></tr>
+  </table>
+  <div class="theory-block">
+    <ul>
+      <li>The mnemonic itself defines the instruction TYPE, WHICH register is involved, and (where relevant) the addressing mode — reading it carefully matters.</li>
+      <li>In RTN, the LDD instruction is: <code>ACC ← [[CIR(15:0)]]</code> — the CIR holds the instruction; only the 16-bit address portion is examined, and the CONTENTS of that memory location are transferred into the accumulator.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Category 2 — Arithmetic operations</h4>
+  </div>
+  <table class="dtype-table">
+    <tr><th>Opcode</th><th>Operand</th><th>Explanation</th></tr>
+    <tr><td><code>ADD</code></td><td><code>&lt;address&gt;</code></td><td>Add the address's content to the content in the ACC</td></tr>
+    <tr><td><code>INC</code></td><td><code>&lt;register&gt;</code></td><td>Add 1 to the value stored in the specified register</td></tr>
+    <tr><td><code>DEC</code></td><td><code>&lt;register&gt;</code></td><td>Subtract 1 from the value stored in the specified register</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Category 3 — Comparisons and jumps</h4>
+  </div>
+  <table class="dtype-table">
+    <tr><th>Opcode</th><th>Operand</th><th>Explanation</th></tr>
+    <tr><td><code>JMP</code></td><td><code>&lt;address&gt;</code></td><td>Jump to the address specified (unconditional)</td></tr>
+    <tr><td><code>CMP</code></td><td><code>&lt;address&gt;</code></td><td>Compare the ACC content with the address's content</td></tr>
+    <tr><td><code>CMP</code></td><td><code>#n</code></td><td>Compare the ACC content with n (immediate — note the <code>#</code>)</td></tr>
+    <tr><td><code>JPE</code></td><td><code>&lt;address&gt;</code></td><td>Jump to the address IF the previous comparison was TRUE</td></tr>
+    <tr><td><code>JPN</code></td><td><code>&lt;address&gt;</code></td><td>Jump to the address IF the previous comparison was FALSE</td></tr>
+  </table>
+  <div class="theory-block">
+    <ul>
+      <li>The TWO forms of CMP share the same opcode — the <code>#</code> symbol is what distinguishes immediate addressing from a plain address. No <code>#</code> means the operand is interpreted as an address.</li>
+      <li>Comparison here is restricted to asking whether two values are EQUAL.</li>
+      <li>A jump instruction doesn't cause an "instant" jump as such — it supplies a NEW value to the program counter, so the NEXT fetch happens from that new address instead. This OVERWRITES the automatic increment that already happened when the jump instruction itself was fetched.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Category 4 — Input and output</h4>
+    <ul>
+      <li><code>IN</code> (no operand): stores the ASCII value of a keyboard-typed character into the ACC.</li>
+      <li><code>OUT</code> (no operand): displays on screen the character whose ASCII code is currently stored in the ACC.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked Example — tracing a full assembly program</div>
+    <p>Instructions live from address 100; 8-bit data values live from address 200 onward.</p>
+  </div>
+
+  <table class="db-table">
+    <tr><th>Address</th><th>Contents</th><th>Address</th><th>Contents</th></tr>
+    <tr><td>100</td><td>LDM #0</td><td>200</td><td>0000 0000</td></tr>
+    <tr><td>101</td><td>LDD 201</td><td>201</td><td>0000 0001</td></tr>
+    <tr><td>102</td><td>INC ACC</td><td>202</td><td>0000 0010</td></tr>
+    <tr><td>103</td><td>ADD 203</td><td>203</td><td>0000 0011</td></tr>
+    <tr><td>104</td><td>CMP 205</td><td>204</td><td>0000 0100</td></tr>
+    <tr><td>105</td><td>JPE 106</td><td>205</td><td>0000 0101</td></tr>
+    <tr><td>106</td><td>DEC ACC</td><td>206</td><td>0000 0111</td></tr>
+    <tr><td>107</td><td>INC ACC / STO 206</td><td>207</td><td>0000 0000</td></tr>
+  </table>
+
+  <table class="db-table">
+    <tr><th>After instruction at</th><th>Program Counter</th><th>Accumulator</th></tr>
+    <tr><td>Start</td><td>100</td><td>0000 0000</td></tr>
+    <tr><td>100</td><td>101</td><td>0000 0000</td></tr>
+    <tr><td>101</td><td>102</td><td>0000 0001</td></tr>
+    <tr><td>102</td><td>103</td><td>0000 0010</td></tr>
+    <tr><td>103</td><td>104</td><td>0000 0101</td></tr>
+    <tr><td>104</td><td>105</td><td>0000 0101</td></tr>
+    <tr><td>106</td><td>106</td><td>0000 0101</td></tr>
+    <tr><td>107</td><td>108</td><td>0000 0110</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Reading the trace — why the PC jumps straight from 105 to 106 to 107</h4>
+    <ul>
+      <li>At address 104, ACC (0000 0101 = 5) is compared with the content of address 205 (0000 0101 = 5) — they're EQUAL, so the comparison is TRUE.</li>
+      <li>At address 105, <code>JPE 106</code> fires because the comparison WAS true — the PC is set to 106, skipping straight there.</li>
+      <li>At 106, <code>DEC ACC</code> would normally decrement — but since this row shows ACC unchanged at 0000 0101, then 107 increments it back to 0000 0110 — the net effect across 106 and 107 here is a genuine trace exercise worth stepping through by hand.</li>
+      <li>Note that memory locations 100–107 and 200–207 themselves do NOT change during execution here — only the PC and ACC registers change; STO 206 would be the one instruction capable of changing memory, at address 107 in this layout.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — assembly language instructions and program tracing (completes Section 6.04 and Chapter 6).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference between <code>CMP 205</code> and <code>CMP #205</code>?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>CMP 205</code> compares the ACC against the CONTENT of memory address 205 (direct addressing). <code>CMP #205</code> compares the ACC directly against the literal value 205 (immediate addressing) — the <code>#</code> makes the difference.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does a jump instruction actually DO to make the "jump" happen?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It supplies a new value to the program counter, overwriting the automatic increment that happened when the jump instruction was fetched — so the NEXT fetch reads from the new address instead of the next sequential one.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      The <code>IN</code> instruction stores the ______ value of a typed character into the ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>ASCII; accumulator (ACC).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "JPE and JPN both jump unconditionally, they're just given different names for style." What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Both are CONDITIONAL jumps, not unconditional. JPE jumps only if the PREVIOUS comparison was TRUE; JPN jumps only if it was FALSE. JMP is the genuinely unconditional jump.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In the worked trace, why does execution jump from address 104 straight through the comparison logic to reach address 106?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The CMP at 104 found the ACC equal to the value at address 205, making the comparison TRUE — so the JPE at 105 fires and redirects the program counter to 106, exactly as JPE's definition requires.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Do memory locations 100–107 and 200–207 change while the traced program executes?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — throughout this trace only the PC and ACC registers change; the instructions and data values in memory stay as originally set (until an instruction like STO is actually reached and executed).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 6: Assembly Language Programming — 6.04 Assembly Language Instructions (completes Section 6.04 and Chapter 6)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 6.04
+  </div>
+
+</div>
+</body>
+</html>
