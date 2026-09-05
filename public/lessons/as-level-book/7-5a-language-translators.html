@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.05 Language Translators — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block ol { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 10px; text-align: left; }
+  .dtype-table th { background: rgba(34,211,238,.1); color: #22d3ee; font-size: 11px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 7 · System Software</span>
+  <div class="topic-title">7.05 Language Translators</div>
+  <div class="topic-subtitle">Two-pass assemblers, the real step-by-step difference between a compiler and an interpreter, and why Java does something different again. Completes Chapter 7.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Two-pass assembler</div><div class="key-term-def">An assembler that processes the source twice: pass 1 builds symbol/literal tables, pass 2 generates object code.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Java Byte Code</div><div class="key-term-def">The intermediate code produced by compiling Java, run by interpretation inside a Java Virtual Machine.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The two-pass assembler</h4>
+    <ul>
+      <li>A two-pass structure isn't essential, but it clearly separates the two stages needed for translation.</li>
+      <li>PASS 1: every assembly-language "helper" feature (from 6.02) is removed or acted on — remove comments; build a SYMBOL TABLE (binary codes for symbolic names/labels); build a LITERAL TABLE for any constants used; EXPAND macros; identify system calls and subroutines used.</li>
+      <li>PASS 2 (only if no errors found): generate the OBJECT CODE — this involves replacing symbolic addresses with ABSOLUTE addresses.</li>
+      <li>Object code is NOT executable on its own — a LINKER makes the program's object code and any associated procedures' object code mutually consistent in memory; a LOADER (or the loader part of a link-loader) then actually transfers the result into memory, making any final address adjustments.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Interpreter — step by step</h4>
+    <ol>
+      <li>Interpreter, source code file, AND the program's data are all made available.</li>
+      <li>Interpreter begins execution.</li>
+      <li>First line of source code is read.</li>
+      <li>The line is analysed.</li>
+      <li>If an error is found: reported, and execution HALTS immediately.</li>
+      <li>If no error: the line is converted to intermediate code.</li>
+      <li>The interpreter uses this intermediate code to EXECUTE the action right away.</li>
+      <li>Next line is read; steps 4-8 repeat.</li>
+    </ol>
+  </div>
+
+  <div class="theory-block">
+    <h4>Compiler — step by step</h4>
+    <ol>
+      <li>Compiler and source code file are made available — NO data is needed yet.</li>
+      <li>Compiler begins execution.</li>
+      <li>First line of source code is read.</li>
+      <li>The line is analysed.</li>
+      <li>If an error is found: it's RECORDED (not halted).</li>
+      <li>If no error: converted to intermediate code.</li>
+      <li>Next line read; steps 4-7 repeat.</li>
+      <li>Once the WHOLE source has been processed: if no errors anywhere, the full intermediate code becomes OBJECT code; if any errors were found, a list is output and NO object code is produced.</li>
+    </ol>
+    <ul>
+      <li>Execution can only begin once compilation shows NO errors — either automatically (if data is ready) or later, with the object code stored and run with no further involvement from the compiler.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The crucial difference in HOW errors are handled</h4>
+    <ul>
+      <li>An interpreter stops IMMEDIATELY the moment it hits an error — line by line, live.</li>
+      <li>A compiler keeps going, RECORDING each error, and only reports the full list at the very END, after processing the entire source.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th></th><th>Interpreter</th><th>Compiler</th></tr>
+    <tr><td>Advantage (development)</td><td>Errors caught and fixed immediately, without waiting for the whole file</td><td>Executable can be distributed — users never see source code</td></tr>
+    <tr><td>Disadvantage</td><td>Unreached code with errors may go undetected until later; source code must be sent to every user</td><td>Object code is less secure — it could contain a virus</td></tr>
+    <tr><td>Every run needs</td><td>Both the interpreter AND the source code, every time</td><td>Only the object code, every time</td></tr>
+    <tr><td>Execution speed</td><td>Slower</td><td>Faster</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>A constraint that applies to BOTH</h4>
+    <ul>
+      <li>Whichever is used, a program can only run on a computer whose PROCESSOR the interpreter/compiler was specifically written for.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Java — a genuinely different philosophy</h4>
+    <ul>
+      <li>Every different type of computer needs its OWN Java Virtual Machine (JVM) created for it.</li>
+      <li>A Java program is first COMPILED into "Java Byte Code" — an intermediate form, not final machine code.</li>
+      <li>When run, this Byte Code is INTERPRETED by the JVM.</li>
+      <li>Because the Byte Code itself is the same everywhere, it can be transferred to ANY computer with a JVM installed — combining a compile step with the portability of interpretation.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — language translators, assemblers, compilers/interpreters, and Java (completes Section 7.05 and Chapter 7).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What happens in PASS 1 of a two-pass assembler?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Comments are removed, a symbol table and literal table are built, macros are expanded, and system calls/subroutines are identified — everything except generating the final object code.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">If an interpreter finds an error on line 5 of a source file, what happens immediately?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The error is reported and the interpreter HALTS execution right there — it doesn't continue to later lines.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A compiler only produces object code if ______ errors are found across the whole source file.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No (zero).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "An interpreter is always strictly better for a programmer because it finds ALL errors in a program before it finishes running." What's the flaw in this claim?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An interpreter only analyses lines it actually EXECUTES during a given run — parts of the code containing syntax errors that are never REACHED during that particular execution won't be discovered until later (or never), unlike a compiler which analyses the entire source regardless of execution path.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A software company wants to distribute a finished, error-free program to thousands of customers WITHOUT exposing its source code. Should they distribute it compiled or interpreted, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Compiled — a compiler produces an executable object code file that can be distributed without the source code ever being shared. An interpreted program would require sending the source code to every user.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How does Java's approach let the SAME compiled program run on genuinely different types of computer?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Java compiles to Java Byte Code (an intermediate form, the same regardless of the target machine), which is then interpreted by a Java Virtual Machine written specifically for each type of computer — the Byte Code itself doesn't need to change.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 7: System Software — 7.05 Language Translators (completes Section 7.05 and Chapter 7)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 7.05
+  </div>
+
+</div>
+</body>
+</html>

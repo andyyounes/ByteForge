@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.04 Library Programs — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 7 · System Software</span>
+  <div class="topic-title">7.04 Library Programs</div>
+  <div class="topic-subtitle">Why "reinventing the wheel" is a genuinely bad idea in programming — and how object code actually gets linked together.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Object code</div><div class="key-term-def">Machine code produced by a compiler — cannot be executed by itself until linked.</div></div>
+    <div class="key-term-card"><div class="key-term-name">DLL</div><div class="key-term-def">Dynamic Link Library — routines loaded into memory that can be shared by multiple processes at once.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>"Library program" is a slightly misleading term</h4>
+    <ul>
+      <li>A library program is defined as a program contained in a program library — but both terms are misleading.</li>
+      <li>More often, what's in a "library" are SUBROUTINES that programmers can use in their own programs, rather than complete standalone programs.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why using existing library routines is almost always the right choice</h4>
+    <ul>
+      <li>There's no advantage to a programmer "reinventing the wheel" — if a routine already exists in a library, writing your own version instead would be UNWISE.</li>
+      <li>Existing library routines have been EXTENSIVELY tested before release.</li>
+      <li>Even if residual bugs remained after testing, the routine's REGULAR, widespread use makes eventual detection of those bugs almost inevitable.</li>
+      <li>Example: the NAG (Numerical Algorithms Group) library — over 1,600 procedures for maths/statistics, developed since 1971, and universally accepted as being about as reliable as software ever gets.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>From source code to a runnable program — the linking step</h4>
+    <ul>
+      <li>If a compiler translates source code with no errors, it produces OBJECT CODE (machine code) — but this object code CANNOT be executed by itself.</li>
+      <li>It must be LINKED with the object code of any subroutines it uses. Linking can happen BEFORE the combined code is loaded into memory and run.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Dynamic linking — a genuinely different approach</h4>
+    <ul>
+      <li>By contrast, DYNAMIC linking has the routines from a Dynamic Link Library (DLL) already sitting IN memory.</li>
+      <li>WHILE the program is running, it links to whichever DLL routine it needs, at the moment it needs it.</li>
+      <li>A DLL exists specifically so its routines can be SHARED — MORE THAN ONE process can dynamically link to the same DLL file at the same time.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — library programs and linking (completes Section 7.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why are both "library program" and "program library" described as slightly misleading terms?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>What's stored is more often SUBROUTINES that programmers incorporate into their own programs, rather than complete standalone programs.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Give two reasons why using an existing library routine is better than writing your own version.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Existing routines have been extensively tested before release; and even residual bugs are almost inevitably caught eventually because of the routine's regular, widespread use.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Object code produced by a compiler cannot be executed by itself — it must first be ______ with the object code of any subroutines it uses.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Linked.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "Static linking and dynamic linking are the same thing — both combine object code with routine code before the program starts running." What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Static linking happens BEFORE loading and running. Dynamic linking is different — the DLL routines are already sitting in memory, and the program links to the specific routine it needs WHILE it's actually running, not beforehand.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Two different applications are running at the same time and both need a shared graphics routine. How does a DLL make this efficient, according to this lesson?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A DLL is specifically designed to be SHARED — more than one process can dynamically link to the same DLL file at the same time, so the routine doesn't need to be duplicated separately for each application.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Give one real example of a library mentioned in this lesson, and roughly how many routines it contains.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The NAG (Numerical Algorithms Group) library — over 1,600 procedures for mathematical and statistics processing.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 7: System Software — 7.04 Library Programs (completes Section 7.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 7.04
+  </div>
+
+</div>
+</body>
+</html>

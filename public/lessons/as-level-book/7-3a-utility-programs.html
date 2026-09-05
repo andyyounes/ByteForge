@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.03 Utility Programs Used by a PC — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 7 · System Software</span>
+  <div class="topic-title">7.03 Utility Programs Used by a PC</div>
+  <div class="topic-subtitle">Disk formatters, defragmenters, backup software, compression, and virus checkers — run when needed, not as part of routine OS operation.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What makes something a "utility program"</h4>
+    <ul>
+      <li>A utility program MIGHT be provided by the OS, or installed as a separate program.</li>
+      <li>Key distinguishing feature: it is NOT executed as part of the normal routine of OS operation. It's run when the USER decides to (or sometimes the OS decides to, in certain circumstances).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Hard disk formatter and checker</h4>
+    <ul>
+      <li>A disk FORMATTER typically: removes existing data from a previously-used disk; sets up the file system (a table of contents linking recognised files to physical disk locations); and partitions the disk into logical drives if needed.</li>
+      <li>A disk CHECKER/repair utility (sometimes bundled with the formatter) analyses disk contents and repairs where possible. It first checks for errors: "bad sectors" (a physical defect, often from manufacture or mishandling — e.g. moving a computer without securing the disk heads).</li>
+      <li>Other errors come from abnormal events (power loss, sudden shutdown) leaving some files in an unidentifiable state. A repair utility marks bad sectors so the file system stops using them, and tries to RECOVER affected files — otherwise it has to delete them.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Hard disk defragmenter</h4>
+    <ul>
+      <li>Unlike the disk checker, a defragmenter is NOT primarily about errors — a perfectly FUNCTIONING disk still gradually becomes less EFFICIENT as constant file creation/editing/deletion leaves files fragmented across sectors.</li>
+      <li>The root cause: the logical sector-based arrangement of data (Chapter 3) doesn't allow a file to always be stored as one contiguous block.</li>
+      <li>Example: File A occupies sectors 0-3 fully plus part of sector 4. File B (small) occupies the rest of sector 4. File C occupies sectors 5-7 plus part of 8. If File B is deleted, its space is left UNFILLED (rearranging the whole file system on every change would be too costly). If File A is then extended, it fills sectors 0-4 completely and spills into sectors 8-9 — leaving File A split into two non-contiguous pieces.</li>
+      <li>A defragmenter reorganises storage so all files return to being CONTIGUOUS. This takes time on a large disk, and is IMPOSSIBLE if the disk is too full (no working space to rearrange into).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Backup software, file compression, and virus checkers</h4>
+    <ul>
+      <li>BACKUP software (vs. a manual backup to a flash drive) can: establish a SCHEDULE for backups, and only create a NEW backup file when something has actually CHANGED.</li>
+      <li>FILE COMPRESSION can be a routine OS feature to save disk space, or a user-chosen program — most important when TRANSMITTING data (e.g. compressing/"zipping" a file before emailing it).</li>
+      <li>A VIRUS CHECKER should be installed PERMANENTLY. Ideally it would only need to scan a file once, on entry to the system — but this ideal is never fully achievable: there's always a delay before a NEW virus is recognised, and a FURTHER delay before the checker is updated to detect it. So regular updates AND routine full-system scans are both necessary.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — utility programs (completes Section 7.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the defining feature that makes a program a "utility program", according to this lesson?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It is NOT executed as part of the normal routine of OS operation — it's run when the user (or sometimes the OS, in certain circumstances) decides to.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is a hard disk defragmenter NOT primarily concerned with errors, unlike a disk checker?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Fragmentation happens to a perfectly FUNCTIONING disk simply through normal use (creating, editing, deleting files) — it's an efficiency problem, not a fault/error problem.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Defragmentation is impossible if the disk is too ______, because there's no working space to rearrange files into.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Full.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "Once a virus checker is installed and fully updated, it never needs scanning or updating again — the job is permanently done." Why is this wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>New viruses keep appearing — there's always a delay before a new virus is recognised, and a further delay before the checker is updated to detect it. Regular updates and routine scans are genuinely necessary on an ongoing basis, this ideal "done once" state is never actually achievable.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A user deletes a small file, then later extends a large file that was stored right next to it. According to the fragmentation example in this lesson, what typically happens to the large file's storage?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The extended file fills the space left by the deleted file plus more, but likely ends up split across NON-CONTIGUOUS sectors elsewhere on the disk too — because rearranging the whole file system on every single change would be too costly for the system to do automatically.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name the two things backup software can do that a purely manual backup to a flash drive cannot.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Establish a schedule for backups automatically, and only create a new backup file when there has actually been a change.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 7: System Software — 7.03 Utility Programs Used by a PC (completes Section 7.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 7.03
+  </div>
+
+</div>
+</body>
+</html>
