@@ -676,6 +676,7 @@ async function runWebCode() {
     // and really do persist, this is just how "did they use it" is checked.
     hasLSSet:         /localStorage\s*\.\s*setItem\s*\(/.test(js),
     hasLSGet:         /localStorage\s*\.\s*getItem\s*\(/.test(js),
+    hasLSRemove:      /localStorage\s*\.\s*removeItem\s*\(/.test(js),
     hasJSONStringify: /JSON\s*\.\s*stringify\s*\(/.test(js),
     hasJSONParse:     /JSON\s*\.\s*parse\s*\(/.test(js),
     // Week 4 — loops generating repeated UI. listItems (li count) already
@@ -1356,6 +1357,21 @@ const MODULES = [
       needsFunction2:true,
       check:(log) => log.functionCount >= 2,
     },
+    { id:'ws2s4', name:'A Function Deciding, Live', xp:35, lang:'web',
+      text:`<strong>Challenge 4</strong> — Write <code>canAfford(gold, price)</code> again, but this time call it DIRECTLY inside an <code>if</code> — <code>if (canAfford(gold, price)) { ... }</code> — not stored in a variable first.`,
+      hints:[
+        'if (canAfford(gold, price)) { ... } else { ... } — the function call itself goes straight inside the condition.',
+        'This is different from ws2s3: there, canAfford()\'s result was saved in a variable first. Here it feeds the if directly.',
+        'Either way works in real code — this challenge is just making sure you can read/write BOTH styles.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `let gold = 20;\nlet price = 15;\n\n// TODO: function canAfford(gold, price) — RETURNS true/false\n\n// TODO: if (canAfford(gold, price)) { ... } else { ... } — show a message in #story either way\n`,
+      },
+      needsFunction:true, needsReturn:true, needsIf:true,
+      check:(log) => log.hasFunction && log.hasReturn && log.hasIf,
+    },
     { id:'ws2boss', name:'BOSS — A Story Told By Functions', xp:75, lang:'web', boss:true,
       text:`<strong>BOSS</strong> — Organize a whole small page around functions: at least THREE separate functions — one building/returning a description, one managing inventory or a flag, and one that ties the others together and actually writes to <code>#story</code>.`,
       hints:[
@@ -1417,6 +1433,20 @@ const MODULES = [
       needsLSGet:true, needsIf:true,
       check:(log) => log.hasLSGet && log.hasIf,
     },
+    { id:'ws3s4', name:'Starting Over', xp:35, lang:'web',
+      text:`<strong>Challenge 4</strong> — Add a "Reset" scenario: use <code>localStorage.removeItem("name")</code> to delete the saved name, then check with an IF whether it still exists (it shouldn't).`,
+      hints:[
+        'localStorage.removeItem("name"); — deletes just that one key, everything else saved stays untouched.',
+        'After removing it, localStorage.getItem("name") will be null — the same IF pattern from Challenge 3 now correctly shows "New reader" again.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `localStorage.setItem("name", "Alex");\n\n// TODO: localStorage.removeItem("name")\n\n// TODO: check with IF whether "name" still exists — show a message in #story either way\n`,
+      },
+      needsLSRemove:true, needsIf:true,
+      check:(log) => log.hasLSRemove && log.hasIf,
+    },
     { id:'ws3boss', name:'BOSS — A Story That Remembers You', xp:80, lang:'web', boss:true,
       text:`<strong>BOSS</strong> — Save BOTH an inventory array (via JSON) and a flags object (via JSON) to localStorage, then load both back and display them — with an IF checking whether anything was saved before.`,
       hints:[
@@ -1476,6 +1506,21 @@ const MODULES = [
       },
       needsLoop:true, needsFunction:true,
       check:(log) => log.hasLoop && log.hasFunction && log.listItems >= 3,
+    },
+    { id:'ws4s4', name:'A Loop That Skips', xp:35, lang:'web',
+      text:`<strong>Challenge 4</strong> — Loop over an array of items, but only add an &lt;li&gt; for items LONGER than 4 letters (use an IF inside the loop to skip the short ones).`,
+      hints:[
+        'for (let i = 0; i < items.length; i++) { if (items[i].length > 4) { ...build and append the <li>... } }',
+        'items[i].length checks how many characters that ONE item has — the IF only lets long-enough ones through.',
+        'This should end up with FEWER <li>s than the array has items — some get skipped on purpose.',
+      ],
+      webStarter: {
+        html: `<ul id="choices"></ul>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `let items = ["key", "lantern", "map", "sword"];\n// TODO: loop over items, but only add an <li> for ones with MORE than 4 letters\n`,
+      },
+      needsLoop:true, needsIf:true,
+      check:(log) => log.hasLoop && log.hasIf && log.listItems >= 1 && log.listItems < 4,
     },
     { id:'ws4boss', name:'BOSS — Full Inventory Display', xp:70, lang:'web', boss:true,
       text:`<strong>BOSS</strong> — Build an inventory array (push a 3rd item onto it), write a function that LOOPS over it to display each item as an &lt;li&gt;, AND show the total count (e.g. "3 items") separately.`,
@@ -1538,6 +1583,21 @@ const MODULES = [
       },
       needsLoop:true, needsFunction:true, needsClick:true, needsLSSet:true, needsJSON:true,
       check:(log) => log.hasLoop && log.hasFunction && log.hasClick && log.hasLSSet && log.hasJSONStringify && log.listItemsGrewOnClick,
+    },
+    { id:'ws5s4', name:'Pick Up Where You Left Off', xp:40, lang:'web',
+      text:`<strong>Challenge 4</strong> — Instead of always starting from a hardcoded array, LOAD the inventory from localStorage when the page first runs (using JSON.parse), and render THAT — falling back to a starting array only if nothing was saved yet.`,
+      hints:[
+        'const saved = localStorage.getItem("inventory"); let inventory = saved ? JSON.parse(saved) : ["sword", "shield"];',
+        'This is the real payoff of Week 3\'s saving: the page genuinely remembers your progress the next time it loads, not just within one click session.',
+        'Still keep the click handler pushing + saving + re-rendering, exactly like ws5s3 — this challenge is about how the page STARTS, not how it updates.',
+      ],
+      webStarter: {
+        html: `<ul id="choices"></ul>\n<button id="addBtn">Find an item</button>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `// TODO: load inventory from localStorage (JSON.parse) — fall back to ["sword","shield"] if nothing was saved\nlet inventory = ["sword", "shield"];\n\nfunction renderInventory(items) {\n  // TODO: clear #choices, loop over items adding one <li> per item\n}\nrenderInventory(inventory);\n\n// TODO: addBtn click — push an item, SAVE inventory to localStorage (JSON.stringify), then re-render\n`,
+      },
+      needsLoop:true, needsFunction:true, needsLSGet:true, needsJSON:true,
+      check:(log) => log.hasLoop && log.hasFunction && log.hasLSGet && log.hasJSONParse && log.hasClick,
     },
     { id:'ws5boss', name:'BOSS — Your Story Engine', xp:120, lang:'web', boss:true,
       text:`<strong>BOSS</strong> — The full Semester 1 finale. Build a page with an inventory array AND a flags object, a function that loops to render the list, a button whose click pushes a new item, flips a flag, re-renders, AND saves everything to localStorage.`,
@@ -3822,6 +3882,9 @@ const CHALLENGE_LESSON = {
   ws2s3: { title: 'One function\'s result, another function\'s input', html: `
     <div class="cl-block"><h4>Functions can call each other</h4>
       <p>canAfford() returns true/false; showResult() takes THAT value and decides what to display. Chaining functions this way — one\'s output becomes another\'s input — is how real programs build complex behaviour out of small, simple, individually-understandable pieces.</p></div>` },
+  ws2s4: { title: 'A function call can go straight inside an if', html: `
+    <div class="cl-block"><h4>Two equally valid styles</h4>
+      <p><code>if (canAfford(gold, price))</code> calls the function AND checks its result in one line — no separate variable needed. Storing it in a variable first (like ws2s3) is sometimes clearer when you need the result more than once; calling it directly is shorter when you only need it that one time.</p></div>` },
   ws2boss: { title: 'BOSS — a page organized entirely around functions', html: `
     <div class="cl-block"><h4>Structure comes from HOW you split the work</h4>
       <p>A working page could technically be one giant block of code — but splitting it into functions, each with ONE clear job, is what makes a real project readable, testable, and changeable later without breaking everything else.</p></div>` },
@@ -3837,6 +3900,9 @@ const CHALLENGE_LESSON = {
   ws3s3: { title: 'null means "nothing was ever saved"', html: `
     <div class="cl-block"><h4>A real, common first-run problem</h4>
       <p>The very first time anyone visits a page, localStorage.getItem() returns null for everything — there\'s genuinely nothing saved yet. Any real save system has to handle this "first visit" case explicitly, exactly like this challenge does.</p></div>` },
+  ws3s4: { title: 'removeItem deletes just one key', html: `
+    <div class="cl-block"><h4>Undoing a save, cleanly</h4>
+      <p>localStorage.removeItem("name") deletes ONLY that specific key — every other saved value stays completely untouched. After removing it, getItem("name") goes back to null, exactly like a brand-new visitor who never saved anything.</p></div>` },
   ws3boss: { title: 'BOSS — real persistent story state', html: `
     <div class="cl-block"><h4>Every idea from this week, working together</h4>
       <p>Saving structured data (arrays/objects via JSON), loading it back, and checking whether it existed first — this is genuinely the same shape as how real websites remember your shopping cart, your game progress, or your preferences between visits.</p></div>` },
@@ -3852,6 +3918,9 @@ const CHALLENGE_LESSON = {
   ws4s3: { title: 'A loop wrapped in a function becomes reusable', html: `
     <div class="cl-block"><h4>Not tied to one specific array</h4>
       <p>renderList(items) doesn\'t care what\'s inside items — call it with a shopping list, a list of enemies, a list of chapter titles, and the exact same loop logic handles all of them.</p></div>` },
+  ws4s4: { title: 'An if INSIDE a loop filters what gets built', html: `
+    <div class="cl-block"><h4>Not every item has to be shown</h4>
+      <p>Putting an if inside the loop body means some passes build an &lt;li&gt; and others skip it entirely — the loop still visits every item, but the if decides which ones actually reach the page. This combination (loop + condition) is behind almost every real search filter or "show only..." feature on the web.</p></div>` },
   ws4boss: { title: 'BOSS — array, function, and loop, together', html: `
     <div class="cl-block"><h4>Four weeks, one real pattern</h4>
       <p>An array holding real data (Week 1), a function organizing the logic (Week 2), and a loop turning that data into visible page elements (this week) is genuinely the core pattern behind almost every real list, menu, or gallery on the web.</p></div>` },
@@ -3867,6 +3936,11 @@ const CHALLENGE_LESSON = {
   ws5s3: { title: 'Saving on every meaningful change', html: `
     <div class="cl-block"><h4>Not just once at the start</h4>
       <p>Week 3 saved once, when the page loaded. Real progress-saving usually happens repeatedly, every time something changes — exactly like this: every click that changes inventory also saves it, so nothing is ever lost.</p></div>` },
+  ws5s4: { title: 'Loading saved state when the page starts', html: `
+    <div class="cl-block"><h4>The real payoff of Week 3\'s saving</h4>
+      <p>Saving progress is only half the story — a real app also LOADS that saved progress back in in when it first opens, so the page picks up exactly where the last visit left off, instead of resetting to the same starting array every single time.</p></div>
+    <div class="cl-block"><h4>The fallback matters just as much</h4>
+      <p>The very FIRST time anyone visits, there's nothing saved yet — the <code>saved ? JSON.parse(saved) : [...]</code> pattern handles both cases in one line: use the real saved data if it exists, otherwise fall back to a sensible starting point.</p></div>` },
   ws5boss: { title: 'BOSS — a real, small, working story engine', html: `
     <div class="cl-block"><h4>Five weeks, one finished thing</h4>
       <p>State (arrays/objects), functions organizing logic, loops building UI, real click events, and localStorage persistence — this is genuinely the same shape as a real, if small, interactive web application, built entirely from ideas introduced one at a time.</p></div>
