@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>22.01 Sensors, Actuators and Feedback — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(45,212,191,.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(45,212,191,.06); border: 1px solid rgba(45,212,191,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #2dd4bf; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 16px; margin: 10px 0; text-align: center; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(45,212,191,.12); border: 1px solid rgba(45,212,191,.25); color: #2dd4bf; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 22 · Monitoring and Control Systems</span>
+  <div class="topic-title">22.01 Sensors, Actuators and Feedback</div>
+  <div class="topic-subtitle">The two hardware devices at the heart of every monitoring and control system, and why feedback makes control possible.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Monitoring vs. control</h4>
+    <ul>
+      <li>MONITORING measures some physical property (temperature, pressure, light intensity, flow rate, movement) using a SENSOR — a hardware device that measures a property and transmits a value to a computer.</li>
+      <li>Two reasons to monitor: (1) SAFETY — check a value stays within acceptable limits, taking immediate action if a dangerous level is reached; (2) ROUTINE control — continuously ensure a property stays as required, correcting deviations.</li>
+      <li>CONTROL additionally needs an ACTUATOR — a hardware device that receives a signal from a computer and adjusts a controlling device's setting.</li>
+    </ul>
+    <div class="key-term-box"><strong>Sensor:</strong> a hardware device that measures a property and transmits a value to a controlling computer.<br><strong>Actuator:</strong> a hardware device that receives a signal from a computer and adjusts the setting of a controlling device.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>ADC and DAC</h4>
+    <ul>
+      <li>An Analogue-to-Digital Converter (ADC) converts a sensor's real-world analogue signal into digital data the computer can process.</li>
+      <li>A Digital-to-Analogue Converter (DAC) converts the computer's digital output back into an analogue control signal for the actuator.</li>
+      <li>These are usually INTEGRAL to the sensor/actuator device itself, rather than separate standalone components.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Feedback — measure, act, measure again</h4>
+    <ul>
+      <li>A monitoring-and-control system is a CONTINUOUS process: measure → (if needed) act → measure AGAIN. This repeated measure-act cycle is what creates FEEDBACK.</li>
+      <li>A CLOSED-LOOP FEEDBACK CONTROL SYSTEM is the special case where feedback DIRECTLY controls the operation: a controller compares the ACTUAL output (from the sensor) with the DESIRED output, and sends a signal to the actuator based on the DIFFERENCE.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="420" height="90" viewBox="0 0 420 90" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="30" width="90" height="30" rx="4" fill="#111320" stroke="#2dd4bf"/>
+      <text x="55" y="50" fill="#e2e8f0" font-size="10" text-anchor="middle">Controller</text>
+      <rect x="130" y="30" width="80" height="30" rx="4" fill="#111320" stroke="#2dd4bf"/>
+      <text x="170" y="50" fill="#e2e8f0" font-size="10" text-anchor="middle">Actuator</text>
+      <rect x="240" y="30" width="80" height="30" rx="4" fill="#111320" stroke="#2dd4bf"/>
+      <text x="280" y="50" fill="#e2e8f0" font-size="10" text-anchor="middle">Process</text>
+      <line x1="100" y1="45" x2="130" y2="45" stroke="#7dd3fc" stroke-width="2"/>
+      <line x1="210" y1="45" x2="240" y2="45" stroke="#7dd3fc" stroke-width="2"/>
+      <line x1="320" y1="45" x2="380" y2="45" stroke="#7dd3fc" stroke-width="2"/>
+      <path d="M380 45 L380 75 L55 75 L55 60" fill="none" stroke="#facc15" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="215" y="85" fill="#facc15" font-size="9" text-anchor="middle">feedback (via sensor)</text>
+    </svg>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — sensors, actuators, and closed-loop feedback (completes Section 22.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between a pure monitoring system and a monitoring AND control system?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A pure monitoring system only needs a sensor to measure and report a property. A monitoring and control system additionally needs an actuator, to actually adjust the controlled environment based on what's measured.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In a closed-loop feedback control system, what does the controller compare?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The actual output (as read by the sensor) with the desired output — the difference determines what signal to send to the actuator.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      An ______ converts a sensor's analogue signal into digital data; a ______ converts the computer's digital output into an analogue control signal.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>ADC (analogue-to-digital converter); DAC (digital-to-analogue converter).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says feedback in a control system just means "the system reports what it did afterwards". What's missing from this description?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Feedback isn't just a report — it's the mechanism that DIRECTLY drives further control action: after an actuator acts, the sensor measures again, and that new measurement feeds back into deciding the NEXT control action, forming a continuous loop.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A safety system monitors a nuclear reactor's temperature but takes NO automatic action — it just alerts a human operator if a dangerous level is reached. Is this a monitoring system, or a monitoring-and-control system?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A monitoring system — it uses a sensor and checks limits, but has no actuator taking automatic control action; the actual response is left to a human.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What physical device is an actuator often built around, according to the coursebook's simplification note?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An electric motor that drives a controlling device.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 22: Monitoring and Control Systems — 22.01 Sensors, Actuators and Feedback (completes Section 22.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 22.01
+  </div>
+
+</div>
+</body>
+</html>

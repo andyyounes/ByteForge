@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>22.02 Real-Time Programming — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 22 · Monitoring and Control Systems</span>
+  <div class="topic-title">22.02 Real-Time Programming</div>
+  <div class="topic-subtitle">Two worked pseudocode examples: a monitoring loop, and a full monitoring-and-control loop.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The core requirement: repetitive, timed sensor reading</h4>
+    <ul>
+      <li>A monitoring/control program needs an INFINITE (or very long-running) loop that reads sensors REPEATEDLY, for as long as the system is switched on.</li>
+      <li>Reading sensors every single clock cycle is unnecessarily frequent — the program must control the TIMING, either via a timed sequence or a deliberate DELAY inside the loop.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — a pure monitoring program</h4>
+    <div class="pseudo-box">EndReadingSensor ← FALSE
+ReadingOutOfRange ← FALSE
+REPEAT
+  CALL SensorRead(SensorValue)
+  IF SensorValue > MaximumAllowed
+    THEN ReadingOutOfRange ← TRUE
+         Reading ← 'H'
+    ELSE
+      IF SensorValue < MinimumAllowed
+        THEN ReadingOutOfRange ← TRUE
+             Reading ← 'L'
+      ENDIF
+  ENDIF
+  IF ReadingOutOfRange
+    THEN CALL WarningDisplay(Reading)
+  ENDIF
+  ReadingOutOfRange ← FALSE          // reset — crucial!
+  FOR TimeFiller ← 1 TO 999999       // deliberate delay loop
+  ENDFOR
+UNTIL EndReadingSensor</div>
+    <ul>
+      <li>Key features: an effectively INFINITE loop; a "do-nothing" inner loop purely to create a DELAY; a warning procedure called only when needed; and — critically — <code>ReadingOutOfRange</code> is RESET to FALSE after each check, otherwise the warning would fire repeatedly forever once triggered once.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — a monitoring AND control program</h4>
+    <div class="pseudo-box">EndReadingSensor ← FALSE
+READ DesiredOutputLevel
+REPEAT
+  CALL SensorRead(SensorValue)
+  SensorDifference ← DesiredOutputLevel - SensorValue
+  IF ABS(SensorDifference) < DesiredOutputLevel/100
+    THEN SensorDifference ← 0        // treat tiny differences as "close enough"
+  ENDIF
+  IF SensorDifference > 0
+    THEN ActuatorAdjustmentFactor ← SensorDifference/DesiredOutputLevel
+         AdjustmentDirection ← 'up'
+         CALL ActivateActuator(AdjustmentDirection, ActuatorAdjustmentFactor)
+  ENDIF
+  IF SensorDifference < 0
+    THEN ActuatorAdjustmentFactor ← ABS(SensorDifference)/DesiredOutputLevel
+         AdjustmentDirection ← 'down'
+         CALL ActivateActuator(AdjustmentDirection, ActuatorAdjustmentFactor)
+  ENDIF
+  FOR TimeFiller ← 1 TO 999999
+  ENDFOR
+UNTIL EndReadingSensor</div>
+    <ul>
+      <li>The actuator is only activated when the sensor reading shows a SIGNIFICANT change (beyond the small tolerance band) — avoiding constant, unnecessary micro-adjustments.</li>
+      <li>CRITICAL assumption: the code only works correctly if the actuator's effect on the property is GUARANTEED to happen before the NEXT loop iteration reads the sensor again — otherwise the feedback loop would be acting on stale or incomplete information.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — real-time monitoring/control loops (completes Section 22.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why is a "do-nothing" FOR loop included at the end of the monitoring loop?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To create a deliberate delay before the sensor is read again — reading it every single clock cycle would be unnecessarily (and wastefully) frequent.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why must ReadingOutOfRange be reset to FALSE after the warning is displayed?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the loop continues running indefinitely — without resetting it, the warning procedure would be called repeatedly on every subsequent iteration, even after the original problem might have been resolved.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In the monitoring-and-control example, if the sensor difference is within ______% of the desired output level, it is treated as effectively zero.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1 (one) — the tolerance check is DesiredOutputLevel/100.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student removes the ABS(SensorDifference) < DesiredOutputLevel/100 tolerance check, arguing the actuator should react to ANY difference no matter how tiny. What problem could this cause?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The actuator would be triggered constantly by insignificant fluctuations (sensor noise, tiny natural variation) — causing unnecessary wear, instability, or "hunting" behaviour, instead of settling once close enough to the target.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is it essential that the actuator's effect completes BEFORE the next sensor reading, in the monitoring-and-control loop?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>If the next reading happens before the actuator's adjustment has actually taken effect, the controller would be reacting to OUTDATED information — potentially over-correcting or issuing contradictory adjustments based on a measurement that doesn't yet reflect the previous action.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What determines whether the AdjustmentDirection is set to 'up' or 'down'?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The sign of SensorDifference — positive (actual reading below desired) sets 'up'; negative (actual reading above desired) sets 'down'.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 22: Monitoring and Control Systems — 22.02 Real-Time Programming (completes Section 22.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 22.02
+  </div>
+
+</div>
+</body>
+</html>
