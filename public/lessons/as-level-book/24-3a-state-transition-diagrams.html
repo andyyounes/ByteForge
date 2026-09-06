@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>24.03 State-Transition Diagrams — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(251,146,60,.06); border: 1px solid rgba(251,146,60,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #fb923c; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 8px; text-align: left; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(251,146,60,.1); color: #fb923c; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 16px; margin: 10px 0; text-align: center; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 24 · Algorithm Design Methods</span>
+  <div class="topic-title">24.03 State-Transition Diagrams</div>
+  <div class="topic-subtitle">Modelling a system as a finite state machine — states, inputs, transitions, and outputs. Completes Chapter 24.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Finite state machines (FSMs)</h4>
+    <ul>
+      <li>An FSM has a fixed set of possible STATES, a START STATE, a set of INPUTS that trigger transitions between states, and (optionally) a set of possible OUTPUTS.</li>
+      <li>An input to the FSM produces a TRANSFORMATION from one state to another (or possibly back to the same state).</li>
+    </ul>
+    <div class="key-term-box"><strong>Finite state machine (FSM):</strong> a machine that consists of a fixed set of possible states with a set of inputs that change the state and a set of possible outputs.<br><strong>State-transition table:</strong> a table that gives information about the states of an FSM.<br><strong>State-transition diagram:</strong> a diagram that describes the behaviour of an FSM.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Reading a state-transition table</h4>
+    <table class="dtype-table">
+      <tr><th></th><th>Current state S1</th><th>Current state S2</th></tr>
+      <tr><td>Input a</td><td>S1</td><td>S1</td></tr>
+      <tr><td>Input b</td><td>S2</td><td>S2</td></tr>
+    </table>
+    <ul>
+      <li>Reading this: in S1, input 'a' causes NO change; input 'b' moves to S2. In S2, input 'b' causes NO change; input 'a' moves back to S1.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Diagram conventions</h4>
+    <ul>
+      <li>The START state is marked with an incoming arrow from nowhere (often written as "→ S1").</li>
+      <li>A FINAL (halting) state is shown as a DOUBLE-CIRCLED state.</li>
+      <li>If an input PRODUCES AN OUTPUT, this is shown with a VERTICAL BAR notation on the transition — e.g. "input b / output c" means: on input b, output c is produced, and the state changes accordingly.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — an intruder detection system</h4>
+    <ul>
+      <li>Description: pressing START activates the system; pressing START again while active does nothing; entering a PIN de-activates it; a triggered SENSOR moves the active system into ALERT MODE; after 2 minutes without de-activation, an ALARM BELL rings.</li>
+    </ul>
+    <table class="dtype-table">
+      <tr><th>Current state</th><th>Event</th><th>Next state</th></tr>
+      <tr><td>System inactive</td><td>Press start button</td><td>System active</td></tr>
+      <tr><td>System active</td><td>Enter PIN</td><td>System inactive</td></tr>
+      <tr><td>System active</td><td>Activate sensor</td><td>Alert mode</td></tr>
+      <tr><td>System active</td><td>Press start button</td><td>System active (no change)</td></tr>
+      <tr><td>Alert mode</td><td>Enter PIN</td><td>System inactive</td></tr>
+      <tr><td>Alert mode</td><td>2 minutes pass</td><td>Alarm bell ringing</td></tr>
+      <tr><td>Alarm bell ringing</td><td>Enter PIN</td><td>System inactive</td></tr>
+    </table>
+    <ul>
+      <li>The START state is "System inactive". This table maps DIRECTLY onto a state-transition diagram: 4 states (inactive, active, alert, alarm), with labelled arrows for each event.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — an FSM WITH outputs (two's complement conversion)</h4>
+    <ul>
+      <li>An FSM processing bits one at a time (least significant first) can convert a positive binary number to its two's complement negative equivalent: OUTPUT the bits up to and including the first 1 UNCHANGED; after that, output the INVERSE of each remaining input bit.</li>
+      <li>This needs TWO states: "before the first 1" and "after the first 1" — with the OUTPUT rule differing between the two states, shown via the vertical-bar notation on each transition.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 24 summary</h4>
+    <ul>
+      <li>A decision table models every possible combination of conditions and its resulting action, and can often be SIMPLIFIED by spotting redundant conditions.</li>
+      <li>JSP designs program structure to mirror data structure, using sequence, selection, and iteration components.</li>
+      <li>A finite state machine has a start state, a fixed set of states, and inputs that transform one state into another (possibly producing outputs) — represented via a state-transition table or diagram.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover state-transition diagrams and draw together the whole of Chapter 24 (completes Section 24.03 and Chapter 24).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">How is a final (halting) state shown on a state-transition diagram?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>As a double-circled state.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the intruder detection system, what event moves the system from "System active" to "Alert mode"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Activating a sensor.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      When an input to an FSM produces an output, this is shown on the diagram using a ______ notation.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Vertical bar (e.g. "input / output").</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's state-transition table for the intruder system has "Alert mode" with input "Press start button" transitioning to "System active". Based on the system description, is this correct?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — pressing start while already active/alert has NO effect per the description; in Alert mode, pressing the start button should leave the system in Alert mode (no change), not transition it back to System active.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In the intruder system's Alarm bell ringing state, what event returns the system to System inactive?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Entering the PIN.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What three things define a finite state machine?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A fixed set of possible states, a set of inputs that change the state, and a set of possible outputs.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 24: Algorithm Design Methods — 24.03 State-Transition Diagrams (completes Section 24.03 and Chapter 24)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 24.03
+  </div>
+
+</div>
+</body>
+</html>
