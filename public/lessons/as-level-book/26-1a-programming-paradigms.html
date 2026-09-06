@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>26.01 Programming Paradigms — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(129,140,248,.12); color: #818cf8; border: 1px solid rgba(129,140,248,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(129,140,248,.1); color: #818cf8; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(129,140,248,.12); border: 1px solid rgba(129,140,248,.25); color: #818cf8; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 26 · Further Programming</span>
+  <div class="topic-title">26.01 Programming Paradigms</div>
+  <div class="topic-subtitle">Four fundamentally different styles of programming — low-level, imperative, object-oriented, and declarative.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What a paradigm is</h4>
+    <ul>
+      <li>A PROGRAMMING PARADIGM is a fundamental STYLE of programming — each supports a different way of thinking about and solving problems.</li>
+      <li>Paradigms are NOT mutually exclusive — many languages support MORE than one paradigm.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Paradigm</th><th>Core idea</th><th>Example languages</th></tr>
+    <tr><td>Low-level</td><td>Direct manipulation of memory addresses/registers, exploiting a specific processor's architecture</td><td>Assembly language (x86, ARM, etc.)</td></tr>
+    <tr><td>Imperative</td><td>A sequence of explicit steps telling the computer HOW to get a result</td><td>Pascal, C, BASIC</td></tr>
+    <tr><td>Object-oriented</td><td>Objects (data + methods) interacting with one another</td><td>Python, Java, Delphi/Object Pascal, VB.NET</td></tr>
+    <tr><td>Declarative</td><td>Formal logic statements; computation is deduction from those statements, describing WHAT is wanted</td><td>SQL, Prolog</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Low-level programming</h4>
+    <ul>
+      <li>Gives direct control over memory addresses and registers, exploiting a specific PROCESSOR's architecture.</li>
+      <li>Each type of processor has its OWN language — though "families" of similarly-designed processors (e.g. the Intel x86 family) share similar instruction sets.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Imperative programming</h4>
+    <ul>
+      <li>A sequence of EXPLICIT steps executed by the processor — tells the computer HOW to reach a result, in contrast to declarative programming, which describes WHAT the result should be.</li>
+      <li>PROCEDURAL programming (Chapter 14) is a SUBSET of the imperative paradigm.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Object-oriented programming (OOP)</h4>
+    <ul>
+      <li>Based on OBJECTS interacting — objects are data structures WITH associated methods (Chapter 27).</li>
+      <li>Some languages were originally imperative and later EXTENDED to support OOP (Pascal → Delphi/Object Pascal; VB → VB.NET). Others (Python, Java) were designed to be object-oriented from the start.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Declarative programming</h4>
+    <ul>
+      <li>Programs are expressed as FORMAL LOGIC; computations are DEDUCTIONS from those logic statements, rather than a sequence of instructions.</li>
+      <li>SQL (Chapter 10) and Prolog (Chapter 29) are declarative languages.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the four programming paradigms (completes Section 26.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between imperative and declarative programming?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Imperative programming tells the computer HOW to get a result, via a sequence of explicit steps. Declarative programming describes WHAT the desired result should be, expressed as formal logic.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Which paradigm is procedural programming a subset of?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Imperative programming.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Object-oriented programming is based on ______ interacting with one another — data structures combined with their associated ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Objects; methods.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says "a language can only ever support ONE programming paradigm". What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Paradigms are not mutually exclusive — many real languages support MORE than one. Python, for instance, supports imperative, procedural, AND object-oriented styles all at once.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A SQL query says "SELECT Name FROM Customers WHERE Balance &gt; 1000" without specifying HOW to search the table. Which paradigm does this reflect?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Declarative — the query states WHAT result is wanted, leaving the database engine to determine HOW to actually retrieve it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why does each type of processor typically require its own distinct low-level programming language?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Low-level languages directly exploit a specific processor's architecture (its registers, memory layout, instruction set) — different processor designs need different low-level instructions, though processors within the same "family" (like x86) can share a similar language.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 26: Further Programming — 26.01 Programming Paradigms (completes Section 26.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 26.01
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>26.03 Random-Access File Processing — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(244,114,182,.12); color: #f472b6; border: 1px solid rgba(244,114,182,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(244,114,182,.12); border: 1px solid rgba(244,114,182,.25); color: #f472b6; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 26 · Further Programming</span>
+  <div class="topic-title">26.03 Random-Access File Processing</div>
+  <div class="topic-subtitle">Storing records directly at a hashed address, so they can be updated in place. Completes Section 26.03.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why use random access?</h4>
+    <ul>
+      <li>Instead of storing records in an ARRAY and periodically saving the whole thing, each record can be written STRAIGHT to a binary file as it's created.</li>
+      <li>This allows UPDATING a record IN SITU — read it, change it, save it back to the SAME location — without rewriting the whole file.</li>
+      <li>IMPORTANT restriction: this only works for FIXED-LENGTH records (so every record occupies a predictable, identical amount of space).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Using a hashing function to calculate the address</h4>
+    <ul>
+      <li>Exactly like a hash table (Chapter 23): a HASHING FUNCTION calculates an address from the record's KEY, and the record is stored there.</li>
+      <li>COLLISIONS can occur just as with a hash table — a colliding record is stored in the NEXT FREE record space.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — saving and retrieving a random-access record</h4>
+    <div class="pseudo-box">// Saving a record
+OPENFILE "CarFile" FOR RANDOM
+Address ← Hash(ThisCar.VehicleID)
+SEEK "CarFile", Address
+PUTRECORD "CarFile", ThisCar
+CLOSEFILE "CarFile"
+
+// Retrieving a record
+OPENFILE "CarFile" FOR RANDOM
+Address ← Hash(ThisCar.VehicleID)
+SEEK "CarFile", Address
+GETRECORD "CarFile", ThisCar
+CLOSEFILE "CarFile"</div>
+    <ul>
+      <li>SEEK moves a pointer to the given record ADDRESS. PUTRECORD/GETRECORD then act at THAT address. After the command runs, the pointer automatically advances to the NEXT record in the file.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>A practical detail — addressing by BYTE position</h4>
+    <ul>
+      <li>In Python and VB.NET, the hashing function must account for the record's SIZE IN BYTES. If a record is 58 bytes, the SECOND record slot starts at byte position 59; the n-th slot starts at <code>(n-1) × 58 + 1</code>.</li>
+      <li>In Pascal, this is handled automatically: the file is declared to hold a SPECIFIC record type, and addresses are simply SLOT numbers (Pascal computes the actual byte offset internally).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — random-access file processing (completes Section 26.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does random-access record storage only work for fixed-length records?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The address calculation relies on every record occupying a predictable, identical amount of space — variable-length records would make it impossible to reliably calculate where the n-th record's byte position actually starts.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does the SEEK command do?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Moves a pointer to a given record address within the file, so the next PUTRECORD/GETRECORD acts at that specific location.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      For a record size of 58 bytes, the n-th record slot starts at byte position ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>(n - 1) × 58 + 1.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes records of VARYING lengths (some names are longer than others) to a random-access file, then wonders why records become corrupted when read back. What's the root cause?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Random-access file storage assumes FIXED-LENGTH records so addresses can be reliably calculated — varying record lengths break the assumption that record n starts at a predictable byte offset, causing reads to land in the wrong place or overlap with neighbouring records.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why can Pascal's programmer simply use a "slot number" as the address, while Python/VB.NET programmers must calculate an exact byte offset?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Pascal's file declaration (<code>file of CarRecord</code>) tells the language the exact record type and size in advance, so it can automatically translate a slot number into the correct byte offset internally — Python and VB.NET don't have this built-in typed-file mechanism, so the programmer must do the byte-position arithmetic manually.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What happens to a hash collision in a random-access file, similar to a hash table?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The colliding record is stored in the next free record space, just like open hashing in a hash table.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 26: Further Programming — 26.03 Random-Access File Processing (completes Section 26.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 26.03
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>26.04-26.05 Exception Handling &amp; Programming Environments — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(45,212,191,.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(45,212,191,.06); border: 1px solid rgba(45,212,191,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #2dd4bf; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(45,212,191,.12); border: 1px solid rgba(45,212,191,.25); color: #2dd4bf; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 26 · Further Programming</span>
+  <div class="topic-title">26.04–26.05 Exception Handling &amp; Programming Environments</div>
+  <div class="topic-subtitle">Catching run-time errors gracefully, and choosing between a compiler and an interpreter. Completes Chapter 26.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What an exception is</h4>
+    <ul>
+      <li>Run-time errors (division by zero, invalid array index, opening a non-existent file) are called EXCEPTIONS.</li>
+      <li>Rather than letting the program CRASH, an EXCEPTION HANDLER can catch and resolve them.</li>
+    </ul>
+    <div class="pseudo-box">TRY
+  &lt;statementsA&gt;
+EXCEPT
+  &lt;statementsB&gt;
+ENDTRY</div>
+    <ul>
+      <li>Any run-time error during &lt;statementsA&gt; is caught, and &lt;statementsB&gt; runs instead of crashing.</li>
+      <li>There can be MULTIPLE EXCEPT blocks, each handling a DIFFERENT exception type.</li>
+      <li>An optional FINALLY block runs REGARDLESS of whether an exception occurred or not.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Two philosophies of exception handling</h4>
+    <ul>
+      <li>VB.NET and Delphi treat exceptions as ABNORMAL, unpredictable error situations.</li>
+      <li>Python is DESIGNED to use exception handling as a genuine FLOW-CONTROL structure — e.g. reading records from a file until an end-of-file EXCEPTION naturally signals "stop".</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Python's specific exception types</h4>
+    <ul>
+      <li>IOError (file can't be opened), ImportError (module not found), ValueError (inappropriate argument value), KeyboardInterrupt (user presses Ctrl+C), EOFError (end-of-file reached), ZeroDivisionError.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — handling bad input</h4>
+    <div class="pseudo-box"># Python
+NumberString = input("enter an integer: ")
+try:
+    n = int(NumberString)
+    print(n)
+except:
+    print("This was not an integer")</div>
+    <ul>
+      <li>Without this TRY/EXCEPT, a non-numeric input would crash the program with an unhandled ValueError.</li>
+      <li>Note: in VB.NET/Delphi IDEs, the INTEGRATED DEBUGGER must be switched OFF for exception handling to actually work as intended.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Programming environments — compilers vs. interpreters, revisited</h4>
+    <ul>
+      <li>In THEORY, an interpreter is ideal DURING development (test partial programs instantly, no compile wait); compiled code is better for FINAL DISTRIBUTION (source code stays hidden, runs faster, and guarantees no remaining syntax errors).</li>
+      <li>In PRACTICE, this choice rarely truly exists: Pascal and VB.NET MUST be compiled before execution. Python ALWAYS runs under an interpreter.</li>
+      <li>Internally, Python source is translated into BYTECODE, which is then executed by the Python VIRTUAL MACHINE — a hybrid approach, neither pure interpretation nor pure compilation to native machine code.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 26 summary</h4>
+    <ul>
+      <li>Programming paradigms: low-level, imperative, object-oriented, declarative.</li>
+      <li>Records are user-defined types, implemented as classes in Python, Structures in VB.NET, records in Pascal.</li>
+      <li>Records can be stored serially, sequentially, or via random (direct) access using a hashing function.</li>
+      <li>Exception handling (TRY/EXCEPT/FINALLY) avoids program crashes from run-time errors.</li>
+      <li>Pascal and VB.NET require compilation; Python runs via an interpreter/virtual machine using bytecode.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover exception handling and programming environments, and draw together the whole of Chapter 26 (completes Sections 26.04–26.05 and Chapter 26).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is an exception?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A run-time error, such as division by zero, an invalid array index, or trying to open a non-existent file.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the difference in philosophy between how VB.NET/Delphi and Python treat exceptions?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>VB.NET/Delphi treat exceptions as abnormal, unpredictable error situations. Python is designed to use exception handling as a genuine flow-control mechanism (e.g. using an end-of-file exception to naturally end a reading loop).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ block, if present, runs regardless of whether an exception occurred or not.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>FINALLY.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says "Python programs are compiled, just like Pascal, since they're translated into bytecode first". What's the nuance being missed?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Python's bytecode is executed by the Python VIRTUAL MACHINE at run time — it's not compiled to native machine code the way Pascal/VB.NET are. Python still runs under an interpreter (via this bytecode layer), it's a hybrid, not a true ahead-of-time compiled language.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A VB.NET student adds a TRY/CATCH block but the exception still isn't caught properly during testing. What IDE setting should they check?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Whether the integrated debugger is switched on — it must be switched OFF (via Debugger Options) for exception handling to behave correctly during testing.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name one advantage of compiled code over interpreted code, and one advantage of interpreted code during development.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Compiled code: runs faster and is guaranteed free of syntax errors, and hides the source code from distribution. Interpreted: lets partial programs be tested instantly without waiting for a full compilation.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 26: Further Programming — 26.04–26.05 Exception Handling &amp; Programming Environments (completes Sections 26.04–26.05 and Chapter 26)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Sections 26.04–26.05
+  </div>
+
+</div>
+</body>
+</html>
