@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>25.05 Benefits and Drawbacks of Recursion — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(163,230,53,.12); color: #a3e635; border: 1px solid rgba(163,230,53,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(163,230,53,.1); color: #a3e635; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(163,230,53,.12); border: 1px solid rgba(163,230,53,.25); color: #a3e635; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 25 · Recursion</span>
+  <div class="topic-title">25.05 Benefits and Drawbacks of Recursion</div>
+  <div class="topic-subtitle">When recursion is the right tool — and when its overhead outweighs its elegance. Completes Chapter 25.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The case for recursion</h4>
+    <ul>
+      <li>Recursion is an important technique across different PROGRAMMING PARADIGMS (Chapter 29 covers declarative languages, where recursion is central).</li>
+      <li>For a problem that is INHERENTLY recursive by its mathematical definition, the EASIEST way to write a solution is often to directly implement the recursive definition.</li>
+      <li>Recursive solutions are often MORE ELEGANT and use LESS program code than the equivalent iterative solution — the code can closely mirror the problem's own natural structure.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The case against recursion</h4>
+    <ul>
+      <li>Repeated recursive calls carry a real OVERHEAD in MEMORY USAGE (one stack frame per call) and PROCESSOR TIME (managing all that pushing/popping).</li>
+      <li>Deep recursion can use significantly MORE resources than an equivalent iterative loop, which typically needs only a FIXED, small amount of memory regardless of how many iterations it runs.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Aspect</th><th>Recursive</th><th>Iterative</th></tr>
+    <tr><td>Code length/clarity</td><td>Often shorter, closer to mathematical definition</td><td>Can be longer, more explicit</td></tr>
+    <tr><td>Memory usage</td><td>One stack frame per call — scales with recursion depth</td><td>Typically fixed, regardless of loop count</td></tr>
+    <tr><td>Best suited to</td><td>Problems defined recursively by nature (factorial, tree traversal, etc.)</td><td>Simple repeated counting/accumulation</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Chapter 25 summary</h4>
+    <ul>
+      <li>A recursive routine is defined in terms of itself, with a base case and a general case.</li>
+      <li>It must reach the base case after a finite number of calls, or it never terminates.</li>
+      <li>Tracing recursion requires care with statements AFTER the recursive call — they execute during unwinding, in reverse order of the original calls.</li>
+      <li>Each recursive call pushes a stack frame (return address + local variables); each return pops one off.</li>
+      <li>Recursion can be more elegant and concise, but carries real memory and processing overhead compared to iteration.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover the trade-offs of recursion, and draw together the whole of Chapter 25 (completes Section 25.05 and Chapter 25).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Name one advantage and one disadvantage of using recursion instead of iteration.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Advantage: recursive solutions are often more elegant and use less code, especially for inherently recursive problems. Disadvantage: repeated calls carry memory and processing overhead from all the stack frames.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is recursion often the natural choice for a mathematically-defined problem?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The recursive code can directly mirror the problem's own mathematical definition, since many mathematical definitions are themselves stated recursively (like the factorial function).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Repeated recursive calls carry overheads in terms of ______ usage and ______ time.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Memory; processor.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says "recursion is always better than iteration because it's shorter and more elegant". What's the oversight?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Elegance and brevity come at the cost of memory and processing overhead — for very deep recursion (e.g. CountDownFrom(100) needing 100 stack frames), an iterative loop would typically use far less memory, making iteration the more PRACTICAL choice despite being less "elegant".</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A programmer needs to sum the numbers from 1 to 1,000,000. Would recursion or iteration be the more sensible practical choice, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Iteration — a recursive solution would require 1,000,000 stack frames, an enormous and likely impractical amount of memory, whereas an iterative loop uses a small, fixed amount of memory regardless of how many times it repeats.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In which broader category of programming languages is recursion described as a particularly important technique?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Declarative programming languages (covered in Chapter 29).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 25: Recursion — 25.05 Benefits and Drawbacks of Recursion (completes Section 25.05 and Chapter 25)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 25.05
+  </div>
+
+</div>
+</body>
+</html>

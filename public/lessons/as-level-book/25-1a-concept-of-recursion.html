@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>25.01-25.02 The Concept of Recursion — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(96,165,250,.06); border: 1px solid rgba(96,165,250,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #60a5fa; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 25 · Recursion</span>
+  <div class="topic-title">25.01–25.02 The Concept of Recursion</div>
+  <div class="topic-subtitle">A routine defined in terms of itself — base case, general case, and coding it in pseudocode.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What recursion is</h4>
+    <ul>
+      <li>A RECURSIVE routine is a function or procedure defined IN TERMS OF ITSELF.</li>
+      <li>Classic example: the factorial function. <code>0! = 1</code> (the BASE CASE — explicit, no recursion needed). <code>n! = n × (n-1)!</code> (the GENERAL CASE — defined using the SAME function, on a SMALLER value).</li>
+    </ul>
+    <div class="key-term-box"><strong>Recursive routine:</strong> a function or procedure defined in terms of itself.<br><strong>Base case:</strong> an explicit solution to a recursive function.<br><strong>General case:</strong> a definition of a recursive function in terms of itself.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>The three rules every recursive routine must follow</h4>
+    <ul>
+      <li>1. Must have a BASE CASE.</li>
+      <li>2. Must have a GENERAL CASE.</li>
+      <li>3. Must reach the base case after a FINITE number of calls to itself — each recursive step must move CLOSER to the base case, for any valid starting value.</li>
+    </ul>
+    <ul>
+      <li>Break rule 3, and the recursion never terminates — e.g. calling <code>Factorial(-2)</code> on the pseudocode below would keep subtracting 1 forever, NEVER reaching n=0.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Coding the factorial function — iterative vs. recursive</h4>
+    <div class="pseudo-box">// Iterative version
+FUNCTION Factorial(n : INTEGER) RETURNS INTEGER
+  Result ← 1
+  FOR i ← 1 TO n
+    Result ← Result * i
+  ENDFOR
+  RETURN Result
+ENDFUNCTION
+
+// Recursive version — closely mirrors the mathematical definition
+FUNCTION Factorial(n : INTEGER) RETURNS INTEGER
+  IF n = 0
+    THEN Result ← 1                        // base case
+    ELSE Result ← n * Factorial(n - 1)     // general case — recursive call
+  ENDIF
+  RETURN Result
+ENDFUNCTION</div>
+    <ul>
+      <li>The recursive version's structure directly mirrors the ORIGINAL mathematical definition — this is a common reason recursion feels natural for mathematically-defined problems.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>A recursive procedure — counting down</h4>
+    <div class="pseudo-box">PROCEDURE CountDownFrom(n : INTEGER)
+  OUTPUT n
+  IF n > 0
+    THEN CALL CountDownFrom(n - 1)
+  ENDIF
+END PROCEDURE</div>
+    <ul>
+      <li>The base case is n=0 (outputs 0, but makes NO further call). The general case outputs n, then recurses on a SMALLER value (n-1) — each call moves one step closer to the base case.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the concept of recursion and writing recursive routines (completes Sections 25.01–25.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What are the three rules a recursive subroutine must satisfy?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It must have a base case, have a general case, and reach the base case after a finite number of calls to itself.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the base case of the factorial function?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>0! = 1 — an explicit result requiring no further recursive call.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A recursive routine's general case must move ______ to the base case with every call, for the recursion to terminate.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Closer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      Calling the recursive Factorial function with n = -2. Which of the three rules is broken, and what actually happens?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Rule 3 (reaching the base case in a finite number of calls) is broken — since n decreases by 1 each call starting from -2, it goes -2, -3, -4... and NEVER equals 0. The recursion never terminates (in practice, it would eventually crash from exhausting available memory/stack space).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In the CountDownFrom procedure, what happens if it's called with n = 0 directly?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It outputs 0, then checks n &gt; 0 (FALSE), so it makes NO further recursive call — the base case is reached and handled immediately.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why does the recursive version of Factorial closely resemble its original mathematical definition, unlike the iterative version?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the mathematical definition itself IS recursive (n! = n × (n-1)!) — the recursive pseudocode directly translates that same structure, while the iterative version has to express the same idea using a completely different mechanism (a loop with an accumulator).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 25: Recursion — 25.01–25.02 The Concept of Recursion (completes Sections 25.01–25.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Sections 25.01–25.02
+  </div>
+
+</div>
+</body>
+</html>
