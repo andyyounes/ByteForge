@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>17.06 The Ethernet Protocol — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(250,204,21,.12); color: #facc15; border: 1px solid rgba(250,204,21,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(250,204,21,.06); border: 1px solid rgba(250,204,21,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #facc15; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(250,204,21,.12); border: 1px solid rgba(250,204,21,.25); color: #facc15; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 17 · Communication &amp; Internet Technologies</span>
+  <div class="topic-title">17.06 The Ethernet Protocol</div>
+  <div class="topic-subtitle">MAC addresses, CSMA/CD, and why switched Ethernet made collision detection obsolete.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What Ethernet is</h4>
+    <ul>
+      <li>The dominant LAN protocol, standardised by the IEEE as 802.3. Has evolved through generations: standard, fast, gigabit, 10 gigabit, 100 gigabit — the naming reflects transfer speed.</li>
+      <li>Ethernet transmits data in FRAMES, each containing a SOURCE and DESTINATION address — the physical/MAC address that uniquely identifies one NIC (48 bits, guaranteeing uniqueness), usually written in hexadecimal, e.g. <code>4A:30:12:24:1A:10</code>.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Standard Ethernet and CSMA/CD</h4>
+    <ul>
+      <li>Originally implemented on a bus or a hub-based star — either way, transmission was BROADCAST as a connectionless service.</li>
+      <li>Because everyone shared the medium, collisions were possible if two devices transmitted simultaneously. The solution: CSMA/CD (Carrier Sense Multiple Access with Collision Detection).</li>
+      <li>CSMA: an end-system checks the cable's voltage level to detect if a frame is ALREADY being transmitted, and if so, waits a defined time before trying again.</li>
+      <li>CD: even with this waiting rule, two end-systems could still occasionally start at the same moment — CD lets a device DETECT a collision as it happens and DISCONTINUE transmission immediately.</li>
+    </ul>
+    <div class="key-term-box"><strong>CSMA/CD:</strong> Carrier Sense Multiple Access with Collision Detection — a method for controlling shared-medium access by sensing existing transmissions and detecting/stopping on collision.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Modern switched Ethernet — collisions eliminated</h4>
+    <ul>
+      <li>Modern Ethernet uses a SWITCH as the star's central device, rather than a hub.</li>
+      <li>Each end-system connects to the switch via a FULL-DUPLEX link — no collision is possible along that dedicated link.</li>
+      <li>Since collisions can no longer happen at all, CSMA/CD is simply NO LONGER NEEDED in a fully switched network.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Ethernet within the TCP/IP stack</h4>
+    <ul>
+      <li>Ethernet is the most likely protocol operating at the DATA-LINK layer beneath IP.</li>
+      <li>Ethernet's data-link layer has TWO sub-layers: the LOGICAL LINK CONTROL (LLC) sub-layer (flow control, error control, part of framing), and the MEDIA ACCESS CONTROL (MAC) sub-layer (completes framing, defines the access method, transmits frames containing the physical addresses).</li>
+      <li>This is exactly why physical addresses are called "MAC addresses" — they're handled at the MAC sub-layer.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — Ethernet, CSMA/CD, and switched Ethernet (completes Section 17.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What do the "CS", "MA", and "CD" parts of CSMA/CD each refer to?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Carrier Sense (checking if the medium is already in use), Multiple Access (many devices share the medium), Collision Detection (detecting and stopping when a collision occurs).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is CSMA/CD no longer needed in a modern switched Ethernet network?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Each end-system connects to the switch via its own full-duplex link, meaning no collision is possible along that link at all — so collision detection has nothing left to do.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A MAC address is 48 bits long and is usually written in ______ notation.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Hexadecimal.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims collisions are still possible on a modern switched Ethernet network, just less often than on the original bus/hub design. What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>On a switched network with full-duplex links to each end-system, collisions are not merely reduced — they become IMPOSSIBLE on those links, because each end-system has its own dedicated, two-way channel rather than sharing a single medium with others.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Which Ethernet sub-layer is responsible for actually transmitting frames containing the physical sender/receiver addresses?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The Media Access Control (MAC) sub-layer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What organisation standardised Ethernet, and under what standard number?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The IEEE (Institute of Electrical and Electronics Engineers), under standard 802.3.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 17: Communication and Internet Technologies — 17.06 The Ethernet Protocol (completes Section 17.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 17.06
+  </div>
+
+</div>
+</body>
+</html>

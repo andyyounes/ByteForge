@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>17.04 The TCP/IP Protocol Suite — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 16px; margin: 10px 0; text-align: center; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(251,146,60,.1); color: #fb923c; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 17 · Communication &amp; Internet Technologies</span>
+  <div class="topic-title">17.04 The TCP/IP Protocol Suite</div>
+  <div class="topic-subtitle">A stack of layered protocols — how TCP and IP work together to deliver a message across the Internet.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Protocols and protocol suites</h4>
+    <ul>
+      <li>A PROTOCOL is a set of rules for data transmission, agreed by sender and receiver — from the simplest (a voltage level = bit 1) to the complex (the exact byte format of a packet header).</li>
+      <li>A PROTOCOL SUITE is a collection of related protocols. TCP/IP is the dominant suite for the Internet.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The layered stack model</h4>
+    <ul>
+      <li>Each layer (except the physical layer) is SOFTWARE running on an end-system or router.</li>
+      <li>Each layer's software can send and receive data in FULL-DUPLEX mode to/from the ADJACENT layer.</li>
+      <li>An upper-layer protocol is SERVICED by the layers below it — this lets an application behave as though it has a DIRECT connection to an application on a different end-system, even though the actual data passes through many layers and devices.</li>
+      <li>TCP/IP itself only operates at the TOP THREE layers (application, transport, network); the lower layers use a DIFFERENT suite, such as Ethernet. A router has NO awareness of the top two layers.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="420" height="200" viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="10" width="140" height="30" rx="4" fill="#111320" stroke="#fb923c"/>
+      <text x="90" y="30" fill="#e2e8f0" font-size="11" text-anchor="middle">Application</text>
+      <rect x="20" y="50" width="140" height="30" rx="4" fill="#111320" stroke="#fb923c"/>
+      <text x="90" y="70" fill="#e2e8f0" font-size="11" text-anchor="middle">Transport (TCP)</text>
+      <rect x="20" y="90" width="140" height="30" rx="4" fill="#111320" stroke="#fb923c"/>
+      <text x="90" y="110" fill="#e2e8f0" font-size="11" text-anchor="middle">Network (IP)</text>
+      <rect x="20" y="130" width="140" height="30" rx="4" fill="#111320" stroke="#fb923c"/>
+      <text x="90" y="150" fill="#e2e8f0" font-size="11" text-anchor="middle">Data-link</text>
+      <rect x="20" y="170" width="140" height="20" rx="4" fill="#111320" stroke="#fb923c"/>
+      <text x="90" y="184" fill="#e2e8f0" font-size="10" text-anchor="middle">Physical</text>
+      <text x="260" y="105" fill="#9ca3af" font-size="11" text-anchor="middle">Router only sees</text>
+      <text x="260" y="120" fill="#9ca3af" font-size="11" text-anchor="middle">Network and below</text>
+      <text x="90" y="0" fill="#e2e8f0" font-size="11" text-anchor="middle" dy="8">One end-system's protocol stack</text>
+    </svg>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Layer</th><th>Example protocols</th></tr>
+    <tr><td>Application</td><td>HTTP, SMTP, DNS, FTP, POP3</td></tr>
+    <tr><td>Transport</td><td>TCP, UDP, SCTP</td></tr>
+    <tr><td>Network</td><td>IP, IGMP, ICMP, ARP</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>TCP (Transmission Control Protocol)</h4>
+    <ul>
+      <li>Receives the "message" from the application layer and takes responsibility for its SAFE DELIVERY — splitting it into enough packets, each with a header plus the user data.</li>
+      <li>Includes a PORT NUMBER in the header identifying which application-layer protocol should receive the response (e.g. port 80 for HTTP). TCP itself is NOT concerned with the receiving end-system's address — that's IP's job.</li>
+      <li>Includes a SEQUENCE NUMBER for multi-packet transmissions, so the data can be correctly reassembled.</li>
+      <li>TCP is CONNECTION-ORIENTED: only the first packet is initially sent; once the connection is established (acknowledged), the rest follow, with missing packets identified and re-sent as needed.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>IP (Internet Protocol)</h4>
+    <ul>
+      <li>Ensures correct ROUTING across the Internet — takes the packet from the transport layer and adds its OWN header containing sender and receiver IP addresses.</li>
+      <li>Uses DNS to resolve a URL into an IP address when needed (Chapter 2).</li>
+      <li>The resulting IP packet ("datagram") is passed to the data-link layer, which assembles it into a "frame". Once handed off, IP has NO further duty for that packet.</li>
+      <li>IP is CONNECTIONLESS — it simply passes packets along without tracking acknowledgements itself; that's TCP's responsibility.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The router's role in this stack</h4>
+    <ul>
+      <li>A frame arriving at a router has its datagram content handed back to IP, which uses the router's ROUTING TABLE to choose the NEXT target host.</li>
+      <li>No router can hold a GLOBAL routing table — the Internet is far too large — so routing decisions are made incrementally, hop by hop.</li>
+      <li>A SWITCH, by contrast, forwards a frame WITHOUT making any routing decision — it operates only at the data-link layer, not the network layer.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the TCP/IP layered stack, TCP, IP, and the router's role (completes Section 17.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the division of responsibility between TCP and IP?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>TCP is responsible for the SAFE DELIVERY of the message — splitting it into packets, tracking sequence, and re-sending missing packets. IP is responsible for ROUTING each packet across the Internet using sender/receiver IP addresses.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why can no router hold a complete, global routing table?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The Internet is far too large and complex — routing decisions are instead made incrementally, one hop at a time, using a partial routing table appropriate to that router.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A router has no awareness of the ______ and ______ layers — it only sees the network layer and below.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Application; transport.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says a switch makes routing decisions just like a router, only "smaller-scale". What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A switch operates at the DATA-LINK layer and forwards frames WITHOUT making any routing decision — it has no concept of IP addressing or routing tables at all. Only a router (operating at the network layer) makes genuine routing decisions.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does TCP include a port number in its header, given that IP already handles addressing?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>IP's address only gets a packet to the correct END-SYSTEM — the port number is needed additionally to identify which specific APPLICATION-layer protocol on that end-system (e.g. a web server vs. a mail server) should receive the data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Is IP connection-oriented or connectionless?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Connectionless — it simply forwards packets without tracking whether they were acknowledged; that responsibility belongs to TCP.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 17: Communication and Internet Technologies — 17.04 The TCP/IP Protocol Suite (completes Section 17.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 17.04
+  </div>
+
+</div>
+</body>
+</html>

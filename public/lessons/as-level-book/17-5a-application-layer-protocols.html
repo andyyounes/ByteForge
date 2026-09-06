@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>17.05 Application-Layer Protocols — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(244,114,182,.12); color: #f472b6; border: 1px solid rgba(244,114,182,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(244,114,182,.12); border: 1px solid rgba(244,114,182,.25); color: #f472b6; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 17 · Communication &amp; Internet Technologies</span>
+  <div class="topic-title">17.05 Application-Layer Protocols: HTTP, Email, and FTP</div>
+  <div class="topic-subtitle">The protocols that actually carry web pages, emails, and files.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>HTTP (HyperText Transfer Protocol)</h4>
+    <ul>
+      <li>Underpins the World Wide Web — used every time a browser accesses a website, though hidden from the user.</li>
+      <li>TRANSACTION-oriented, client-server protocol: the client sends a REQUEST message, the server sends back a RESPONSE.</li>
+      <li>The request line format is <code>&lt;Method&gt; &lt;URL&gt; &lt;Version&gt;CRLF</code>, using ASCII coding. GET is the usual method, but several alternatives exist, making HTTP more broadly useful than just fetching web pages.</li>
+    </ul>
+    <div class="pseudo-box">1. HTTP transmits a request message to TCP.
+2. TCP creates packet(s), sends the first to IP (destination port 80, temporary sending port).
+3. IP resolves the URL to an address using DNS, sends a datagram.
+4. At the server, IP forwards the datagram to TCP.
+5. Server TCP sends an acknowledgement.
+6. Connection established — TCP sends remaining packets via IP to server TCP.
+7. HTTP transmits a response message back via TCP/IP to the client browser.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Email protocols: SMTP, POP3, IMAP</h4>
+    <ul>
+      <li>Traditional email involves THREE separate client-server interactions: sender client → sender's mail server → receiver's mail server → receiver client.</li>
+      <li>SMTP (Simple Mail Transfer Protocol) is a "PUSH" protocol — it sends mail onward.</li>
+      <li>POP3 (Post Office Protocol v3) is a "PULL" protocol — the receiving client requests mail FROM the server.</li>
+      <li>IMAP (Internet Message Access Protocol) offers the same facilities as POP3, but MORE (e.g. leaving mail synced on the server across multiple devices).</li>
+      <li>Web-based mail has largely SUPERSEDED this traditional flow — a browser uses HTTP to access the mail application, though SMTP still handles server-to-server transfer.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>FTP (File Transfer Protocol)</h4>
+    <ul>
+      <li>Handles any file transfer between two end-systems — a more capable alternative to emailing a file as an attachment.</li>
+      <li>Copes with end-systems running DIFFERENT operating systems / file systems by separating the CONTROL process from the DATA-TRANSFER process.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — HTTP, email protocols, and FTP (completes Section 17.05).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference between SMTP and POP3?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>SMTP is a "push" protocol used to send mail onward. POP3 is a "pull" protocol used by the receiving client to request/retrieve mail from the server.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What kind of protocol is HTTP, in terms of the client-server relationship?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A transaction-oriented, client-server protocol — the client sends a request, the server sends back a response.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      FTP handles differing operating systems by separating the ______ process from the ______ process.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Control; data-transfer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says HTTP can only be used for fetching web pages, since GET is "the" HTTP method. What's the oversight?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>GET is the USUAL method, but HTTP defines several ALTERNATIVES — this range of methods makes HTTP a genuinely general-purpose protocol, not one limited only to retrieving web pages.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does traditional email delivery involve THREE separate client-server interactions rather than just one direct connection from sender to receiver?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The sender's client only connects to their OWN mail server; that server then acts as a CLIENT itself when forwarding (via SMTP) to the receiver's mail server; finally the receiver's client retrieves (via POP3/IMAP) from their own server — three separate hops rather than a single direct link.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which protocol offers the same facilities as POP3, but more (such as staying synced across devices)?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>IMAP (Internet Message Access Protocol).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 17: Communication and Internet Technologies — 17.05 Application-Layer Protocols (completes Section 17.05)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 17.05
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>17.02 Communication &amp; Transmission Concepts — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(129,140,248,.12); color: #818cf8; border: 1px solid rgba(129,140,248,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(129,140,248,.06); border: 1px solid rgba(129,140,248,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #818cf8; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(129,140,248,.1); color: #818cf8; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(129,140,248,.12); border: 1px solid rgba(129,140,248,.25); color: #818cf8; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 17 · Communication &amp; Internet Technologies</span>
+  <div class="topic-title">17.02 Communication and Transmission Concepts</div>
+  <div class="topic-subtitle">Data flow modes, message types, and the two big approaches: circuit switching vs. packet switching.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Data flow modes</h4>
+    <ul>
+      <li>SIMPLEX: data flows in ONE direction only.</li>
+      <li>HALF DUPLEX: data flows both ways, but NOT at the same time.</li>
+      <li>FULL DUPLEX: data flows both ways SIMULTANEOUSLY.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Message types</h4>
+    <ul>
+      <li>BROADCAST: one-to-all (e.g. traditional radio/TV).</li>
+      <li>MULTICAST: one source to MANY specific destinations.</li>
+      <li>UNICAST: one-to-one.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Circuit switching</h4>
+    <ul>
+      <li>The method used in the traditional telephone system (PSTN) — now often provided digitally, e.g. via a leased line, for data as well as voice.</li>
+      <li>Steps: (1) sender identifies the intended receiver, (2) the system checks the receiver is ready, (3) if available, a SEQUENCE OF LINKS is established across the network, (4) data is transferred, (5) the links are removed.</li>
+      <li>The dedicated links GUARANTEE unimpeded transmission for the duration of the call/session — but the circuit must be fully established BEFORE any data moves.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Packet switching</h4>
+    <ul>
+      <li>Allows data transmission WITHOUT establishing a circuit first. Data can't be sent as a continuous stream — instead it's split into PACKETS, each with a HEADER (delivery instructions) plus the data body.</li>
+      <li>The links used are NOT pre-defined at the moment a packet is sent, unlike circuit switching.</li>
+    </ul>
+    <div class="key-term-box"><strong>Protocol:</strong> a set of rules for data transmission which are agreed by sender and receiver.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Connectionless vs. connection-oriented packet-switching services</h4>
+    <ul>
+      <li>CONNECTIONLESS: a packet is sent with NO knowledge of whether the receiver is ready to accept it.</li>
+      <li>CONNECTION-ORIENTED: the first packet includes a request for ACKNOWLEDGEMENT. If received, the sender continues transmitting further packets; if not, it retries the first packet.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Approach</th><th>Circuit switching</th><th>Packet switching</th></tr>
+    <tr><td>Setup required before data flows?</td><td>Yes — a full circuit of links</td><td>No</td></tr>
+    <tr><td>Data unit</td><td>Continuous stream</td><td>Discrete packets (header + body)</td></tr>
+    <tr><td>Typical use</td><td>Traditional telephone (PSTN), leased lines</td><td>The modern Internet</td></tr>
+  </table>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — data flow modes, message types, and circuit/packet switching (completes Section 17.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference between half duplex and full duplex?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Half duplex allows data to flow both ways, but only one direction at a time. Full duplex allows both directions SIMULTANEOUSLY.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What must happen before data can be transferred in circuit switching, that is NOT required in packet switching?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A sequence of dedicated links must be established across the network first, forming a complete circuit — packet switching requires no such pre-established circuit.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In a ______ service, the first packet requests an acknowledgement before further packets are sent; in a ______ service, packets are sent with no such check.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Connection-oriented; connectionless.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says a broadcast message is sent to "a few chosen destinations". What message type are they actually describing?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>That's a MULTICAST, not a broadcast — broadcast is one-to-ALL, while multicast targets a specific, limited SET of destinations.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is packet switching better suited than circuit switching to the unpredictable, bursty traffic patterns of Internet usage?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Packet switching doesn't require a dedicated circuit to be reserved for the full duration of a session — packets from many different communications can share the same links as needed, making better use of available capacity than a fixed, pre-established circuit would.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What are the two parts that make up a packet?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A header (containing delivery instructions) and the data body.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 17: Communication and Internet Technologies — 17.02 Communication and Transmission Concepts (completes Section 17.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 17.02
+  </div>
+
+</div>
+</body>
+</html>
