@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>19.02 Pipelining — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 7px; text-align: center; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(52,211,153,.1); color: #34d399; font-family: system-ui, sans-serif; font-size: 9px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 19 · Processor and Computer Architecture</span>
+  <div class="topic-title">19.02 Pipelining</div>
+  <div class="topic-subtitle">Overlapping instructions to make a processor much faster — and the interrupt-handling problem it creates.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The idea: split the fetch-decode-execute cycle into stages</h4>
+    <ul>
+      <li>Pipelining is INSTRUCTION-LEVEL parallelism — a form of parallel processing applied specifically to instruction execution.</li>
+      <li>A common breakdown uses FIVE stages: Instruction Fetch (IF), Instruction Decode (ID), Operand Fetch (OF), Instruction Execute (IE), result Write Back (WB).</li>
+      <li>For pipelining to work, the processor needs FIVE INDEPENDENT units, each handling one stage — and crucially, each unit needs access to its OWN set of registers. This is exactly why RISC processors need multiple register sets.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How the pipeline fills up</h4>
+    <table class="dtype-table">
+      <tr><th>Stage</th><th>Cycle 1</th><th>Cycle 2</th><th>Cycle 3</th><th>Cycle 4</th><th>Cycle 5</th></tr>
+      <tr><td>IF</td><td>1.1</td><td>2.1</td><td>3.1</td><td>4.1</td><td>5.1</td></tr>
+      <tr><td>ID</td><td></td><td>1.2</td><td>2.2</td><td>3.2</td><td>4.2</td></tr>
+      <tr><td>OF</td><td></td><td></td><td>1.3</td><td>2.3</td><td>3.3</td></tr>
+      <tr><td>IE</td><td></td><td></td><td></td><td>1.4</td><td>2.4</td></tr>
+      <tr><td>WB</td><td></td><td></td><td></td><td></td><td>1.5</td></tr>
+    </table>
+    <ul>
+      <li>"1.1" means instruction 1, stage 1 (IF), etc. Initially only the FIRST stage of instruction 1 is active.</li>
+      <li>By cycle 6, instruction 1 has fully LEFT the pipeline, and instruction 6 has just ENTERED — from then on, the pipeline is handling FIVE stages of FIVE DIFFERENT instructions simultaneously.</li>
+      <li>Once fully underway, ONE complete instruction finishes at EVERY clock cycle — without the pipeline, processing would take FIVE TIMES longer.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The interrupt-handling problem</h4>
+    <ul>
+      <li>In a non-pipelined processor (Chapter 5), instructions are handled sequentially — an interrupt has a clean, single point to intervene.</li>
+      <li>In a pipelined processor, up to FIVE instructions may be mid-execution at once when an interrupt occurs.</li>
+      <li>OPTION 1: erase the pipeline contents for the four LATEST instructions to have entered, then handle the interrupt normally for the one remaining (oldest) instruction.</li>
+      <li>OPTION 2: give each processing unit its OWN program counter register, so the CURRENT data for every in-flight instruction can be preserved while the interrupt is handled.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>A related hazard — data dependency</h4>
+    <ul>
+      <li>Consider: <code>ADD R1,R2,R3</code> then <code>ADD R5,R1,R4</code> — the second instruction needs R1's NEW value, but in a pipeline, the second instruction may try to READ R1 before the first instruction has finished WRITING to it.</li>
+      <li>This is a genuine hazard that pipelined processor designs must specifically guard against (e.g. via forwarding/stalling techniques) — the coursebook raises it as a discussion point rather than fully solving it here.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — pipelining and its interrupt-handling challenge (part of Section 19.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does pipelining require multiple independent register sets?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because each of the five pipeline stages is handled by its own independent processing unit, and each unit needs access to its own set of registers to work on its instruction without conflicting with the others.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Once a 5-stage pipeline is fully underway, how many instructions complete per clock cycle?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>One — even though five different instructions are being processed simultaneously (each at a different stage), exactly one instruction fully completes at every clock cycle.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Without pipelining, processing the same instructions would take ______ times longer, for a 5-stage pipeline.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Five.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says pipelining means five instructions are each fully finished at the same instant, every fifth cycle. What's actually happening?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Once the pipeline is full, ONE instruction completes EVERY single cycle (not five at once every fifth cycle) — the five instructions in flight at any moment are each at a DIFFERENT stage, staggered so completions happen continuously, one per cycle.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Describe the two options a pipelined processor has for handling an interrupt correctly.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Option 1: erase the pipeline contents of the four most-recently-entered instructions and handle the interrupt for the one remaining. Option 2: give each processing unit its own program counter register, preserving current data for ALL in-flight instructions during the interrupt.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the ADD R1,R2,R3 / ADD R5,R1,R4 example, what specifically could go wrong in a pipelined processor?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The second instruction might read R1's OLD value before the first instruction has finished writing R1's NEW value — because the two instructions overlap in the pipeline rather than running one fully after the other.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 19: Processor and Computer Architecture — 19.02 Pipelining (part of Section 19.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 19.02
+  </div>
+
+</div>
+</body>
+</html>

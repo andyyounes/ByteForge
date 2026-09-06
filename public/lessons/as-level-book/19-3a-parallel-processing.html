@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>19.03 Parallel Processing — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(251,146,60,.1); color: #fb923c; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 19 · Processor and Computer Architecture</span>
+  <div class="topic-title">19.03 Parallel Processing</div>
+  <div class="topic-subtitle">SISD, SIMD, MISD, MIMD — and scaling parallelism up to whole networks of computers. Completes Chapter 19.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The four categories of parallel system</h4>
+    <table class="dtype-table">
+      <tr><th>Category</th><th>Meaning</th><th>Example</th></tr>
+      <tr><td>SISD</td><td>Single Instruction, Single Data stream</td><td>Early personal computers — one processor, one memory, no parallelism</td></tr>
+      <tr><td>SIMD</td><td>Single Instruction, Multiple Data stream</td><td>Array/vector processors — one instruction runs on many processors, each with its own memory and data</td></tr>
+      <tr><td>MISD</td><td>Multiple Instruction, Single Data stream</td><td>Not implemented in commercial products</td></tr>
+      <tr><td>MIMD</td><td>Multiple Instruction, Multiple Data stream</td><td>Modern symmetric multiprocessor PCs — identical processors, each executing a different instruction</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-block">
+    <h4>SIMD in more detail</h4>
+    <ul>
+      <li>ONE instruction is broadcast to MULTIPLE processors, each of which has its OWN dedicated memory — every processor executes the SAME instruction, but on its OWN local data.</li>
+      <li>Ideal for problems that apply an identical operation across a large dataset (e.g. graphics/vector processing).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>MIMD in more detail</h4>
+    <ul>
+      <li>Multiple IDENTICAL processors, each running a DIFFERENT instruction at any given moment (symmetric multiprocessing).</li>
+      <li>The "multiple data" stream doesn't need multiple physical memories — a SINGLE memory, suitably PARTITIONED, can supply each processor. Each processor might also have its own dedicated CACHE memory.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Scaling up: multicomputer systems</h4>
+    <ul>
+      <li>MASSIVELY PARALLEL COMPUTERS ("supercomputers") are used by large organisations for highly complex mathematical processing.</li>
+      <li>The key architectural difference from a multiprocessor system: instead of a BUS structure connecting multiple processors, there is a NETWORK infrastructure connecting multiple whole COMPUTER units — these communicate by passing MESSAGES over the network.</li>
+      <li>CLUSTER COMPUTING is an alternative multicomputer approach: a very large number of ordinary PCs networked together.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 19 summary</h4>
+    <ul>
+      <li>A control unit can be hard-wired or microprogrammed.</li>
+      <li>RISC processors offer several advantages over CISC — chiefly, simpler hard-wired control and easier pipelining.</li>
+      <li>Pipelining is instruction-level parallelism, splitting fetch-decode-execute into overlapping stages for major speedup, at the cost of trickier interrupt handling.</li>
+      <li>Parallelism can operate at the instruction level (pipelining), the processor level (SIMD/MIMD), or the whole-computer level (massively parallel/cluster computing).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover parallel processing categories and draw together the whole of Chapter 19 (completes Section 19.03 and Chapter 19).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between SIMD and MIMD?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>SIMD: ONE instruction runs on MULTIPLE processors, each working on its own data. MIMD: MULTIPLE processors each execute a DIFFERENT instruction, potentially on different data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What replaces a bus structure in a massively parallel computer system, compared to a single multiprocessor computer?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A network infrastructure, connecting multiple separate computer units that communicate by passing messages, rather than a bus connecting multiple processors within one machine.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Parallelism can be based at the ______ level, the ______ level, or the ______ level.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Instruction (pipelining); processor (SIMD/MIMD); computer (massively parallel/cluster computing).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says a modern multi-core PC running several different applications simultaneously is an example of SIMD. What's the correct classification?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>MIMD — each processor core is running a DIFFERENT instruction (from a different application), which is exactly the "multiple instruction" part of MIMD, not the single-instruction pattern of SIMD.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In an MIMD system, how can multiple processors share data without each needing a physically separate memory?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A single memory can be suitably PARTITIONED so different processors access different sections — combined with individual dedicated cache memory per processor for faster local access.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is cluster computing?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A type of multicomputer system where a very large number of ordinary PCs are networked together to work as a combined parallel system.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 19: Processor and Computer Architecture — 19.03 Parallel Processing (completes Section 19.03 and Chapter 19)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 19.03
+  </div>
+
+</div>
+</body>
+</html>
