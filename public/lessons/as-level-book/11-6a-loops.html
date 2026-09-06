@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>11.06 Loops — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(167,139,250,.12); color: #a78bfa; border: 1px solid rgba(167,139,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #a78bfa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.7; overflow-x: auto; white-space: pre; }
+  .example-block { background: rgba(167,139,250,.05); border: 1px solid rgba(167,139,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #a78bfa; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #ddd6fe; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.25); color: #a78bfa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 11 · Algorithm Design &amp; Problem Solving</span>
+  <div class="topic-title">11.06 Loops</div>
+  <div class="topic-subtitle">REPEAT, FOR, rogue values, WHILE, and nested loops — five ways to avoid writing the same lines ten times.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Rogue value</div><div class="key-term-def">A value used to terminate a sequence — same data type, but outside the range of normal expected values.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Nested loop</div><div class="key-term-def">A loop containing another loop.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>REPEAT … UNTIL — a post-condition loop, counting manually</h4>
+    <ul>
+      <li>Problem: take 10 numbers, output the largest.</li>
+    </ul>
+    <div class="pseudo-box">INPUT BiggestSoFar
+Counter ← 1
+REPEAT
+  INPUT NextNumber
+  Counter ← Counter + 1
+  IF NextNumber > BiggestSoFar
+    THEN
+      BiggestSoFar ← NextNumber
+  ENDIF
+UNTIL Counter = 10
+OUTPUT BiggestSoFar</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>FOR … ENDFOR — the loop that counts for you</h4>
+    <div class="pseudo-box">INPUT BiggestSoFar
+FOR Counter ← 2 TO 10
+  INPUT NextNumber
+  IF NextNumber > BiggestSoFar
+    THEN
+      BiggestSoFar ← NextNumber
+  ENDIF
+ENDFOR
+OUTPUT BiggestSoFar</div>
+    <ul>
+      <li>Counter starts at 2 (since the first number was already input BEFORE the loop) and automatically increases each pass, up to and including 10.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Rogue values — ending a loop without knowing the count in advance</h4>
+    <ul>
+      <li>A rogue value must be the SAME data type as normal input, but OUTSIDE the normal expected range (e.g. 0 terminating a sequence of non-zero numbers, or -1 if 0 is itself a valid input).</li>
+    </ul>
+    <div class="pseudo-box">INPUT BiggestSoFar
+REPEAT
+  INPUT NextNumber
+  IF NextNumber > BiggestSoFar
+    THEN
+      BiggestSoFar ← NextNumber
+  ENDIF
+UNTIL NextNumber = 0
+OUTPUT BiggestSoFar</div>
+    <ul>
+      <li>Limitation: this REPEAT version still runs its body at LEAST once — so it fails if the very FIRST input is already the rogue value 0.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>WHILE … ENDWHILE — a pre-condition loop, can run ZERO times</h4>
+    <div class="pseudo-box">INPUT NextNumber
+BiggestSoFar ← NextNumber
+WHILE NextNumber &lt;&gt; 0
+  INPUT NextNumber
+  IF NextNumber > BiggestSoFar
+    THEN
+      BiggestSoFar ← NextNumber
+  ENDIF
+ENDWHILE
+OUTPUT BiggestSoFar</div>
+    <ul>
+      <li>The condition is checked BEFORE the loop body runs — if the very first number is already 0, the loop body never executes at all, correctly handling that edge case.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Running totals and averages — a real accumulator pattern</h4>
+    <div class="pseudo-box">RunningTotal ← 0
+FOR Counter ← 1 TO 10
+  INPUT NextNumber
+  RunningTotal ← RunningTotal + NextNumber
+ENDFOR
+OUTPUT RunningTotal
+Average ← RunningTotal / 10
+OUTPUT Average</div>
+    <ul>
+      <li>CRUCIAL: RunningTotal must be INITIALISED to zero before the loop begins — starting from an unknown/leftover value would corrupt the whole sum.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Nested loops — a loop within a loop, producing a grid</h4>
+    <div class="pseudo-box">INPUT NumberOfRows
+INPUT NumberOfColumns
+INPUT Symbol
+FOR RowCounter ← 1 TO NumberOfRows
+  FOR ColumnCounter ← 1 TO NumberOfColumns
+    OUTPUT Symbol // without moving to next line
+  ENDFOR
+  OUTPUT Newline // move to the next line
+ENDFOR</div>
+    <ul>
+      <li>Each pass of the OUTER loop (one row) completes the ENTIRE inner loop (one full row's worth of symbols) before moving to the next row.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — REPEAT/FOR/rogue values/WHILE loops and nested loops (completes Section 11.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the defining difference between a REPEAT…UNTIL loop and a WHILE…ENDWHILE loop?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>REPEAT…UNTIL checks its condition AFTER the loop body runs (post-condition), so it always runs at least once. WHILE…ENDWHILE checks BEFORE (pre-condition), so it can run zero times if the condition is already false.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What property must a rogue value have?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It must be the SAME data type as the normal input, but OUTSIDE the range of normally expected values.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Before a running total loop begins, RunningTotal must be ______ to zero.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Initialised.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A sequence of non-zero numbers might have ONLY 0 as its first and only input. A student uses REPEAT…UNTIL with a rogue value of 0 to solve this. What genuinely goes wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>REPEAT…UNTIL always runs its body AT LEAST once — so it will try to process the value 0 as if it were real data (treating 0 as a "number input") before even checking the termination condition, which is wrong. WHILE…ENDWHILE avoids this by checking first.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In the nested-loop grid example, if NumberOfRows = 3 and NumberOfColumns = 7, how many times does the INNER loop's body execute in total across the whole algorithm?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>21 times (3 rows × 7 columns) — the inner loop runs fully (7 times) for EACH of the 3 passes of the outer loop.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the FOR-loop biggest-number example, why does Counter start at 2 rather than 1?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the FIRST number was already input (into BiggestSoFar) BEFORE the loop started — the loop only needs to handle numbers 2 through 10, the remaining 9 numbers.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 11: Algorithm Design &amp; Problem Solving — 11.06 Loops (completes Section 11.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 11.06
+  </div>
+
+</div>
+</body>
+</html>
