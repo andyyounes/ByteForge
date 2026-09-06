@@ -1507,6 +1507,17 @@ const WORLDS = [
       ],
       check:(log) => log.quizCorrect >= 3,
     },
+    { id:'cb1s4', name:'HDD or SSD?', xp:25, type:'quiz',
+      text:`<strong>Challenge 4</strong> — Two kinds of storage, one job. Match each fact to the right type.`,
+      hints:['SSD (solid state drive) has no moving parts — faster, more expensive.', 'HDD (hard disk drive) spins a physical disk — slower, cheaper per GB.'],
+      passCount:3,
+      questions:[
+        { type:'match', prompt:'This storage type has NO moving parts inside it.', options:['HDD','SSD'], answer:'SSD' },
+        { type:'match', prompt:'This storage type is usually cheaper per GB, but slower.', options:['HDD','SSD'], answer:'HDD' },
+        { type:'fill', prompt:'A gaming laptop advertised as having super-fast load times most likely uses ___ storage.', answer:'SSD' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
     { id:'cb1boss', name:'BOSS — Mixed Test', xp:60, type:'quiz', boss:true,
       text:`<strong>BOSS</strong> — A mixed test drawing on everything from this week. Score at least 4 out of 5 to pass.`,
       hints:['Nothing new here — same facts as Challenges 1–3, just mixed together.'],
@@ -1565,6 +1576,17 @@ const WORLDS = [
         { type:'fill', prompt:'A 64 GB phone is nearly full of 4 MB photos. Roughly how many thousand photos is that (64,000 ÷ 4)? Answer as a number.', answer:'16000' },
       ],
       check:(log) => log.quizCorrect >= 4,
+    },
+    { id:'cb2s4', name:'Choosing the Right Format', xp:30, type:'quiz',
+      text:`<strong>Challenge 4</strong> — Not every file type suits every job. Pick the best format for each real situation.`,
+      hints:['A photo for a website should be small in file size — that\'s the whole point of compression.', 'A document you want people to be able to EDIT should be a .docx, not a locked format.'],
+      passCount:3,
+      questions:[
+        { type:'match', prompt:'You want a small website photo that loads fast. Best format?', options:['.jpg','.docx','.mp3'], answer:'.jpg' },
+        { type:'match', prompt:'You want to send a document that a friend can freely EDIT in a word processor. Best format?', options:['.docx','.mp4','.jpg'], answer:'.docx' },
+        { type:'match', prompt:'You just recorded your voice for a school podcast. Best format?', options:['.mp3','.docx','.jpg'], answer:'.mp3' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
     },
     { id:'cb2boss', name:'BOSS — File Types & Storage', xp:55, type:'quiz', boss:true,
       text:`<strong>BOSS</strong> — A harder mixed set: file types plus storage size order.`,
@@ -1698,6 +1720,15 @@ const WORLDS = [
         options:['a subject','a constraint','a format','all of the above'], answer:'all of the above' }],
       check:(log) => log.quizCorrect >= 1,
     },
+    { id:'cb5s4', name:'Spot the Better Prompt', xp:30, type:'quiz',
+      text:`<strong>Challenge 4</strong> — Two prompts, same task: "get help planning a birthday party." Which one is more specific — and why?`,
+      hints:['One of these has a subject, a constraint, AND a format. The other is missing at least one.', 'Look for: WHAT exactly, some limit (length/audience/tone), and WHAT SHAPE the answer should take.'],
+      passCount:1,
+      questions:[{ type:'match',
+        prompt:'Prompt A: "Help me plan a party." Prompt B: "Give me a 5-step checklist for planning a superhero-themed birthday party for a 10-year-old." Which is more specific?',
+        options:['Prompt A','Prompt B'], answer:'Prompt B' }],
+      check:(log) => log.quizCorrect >= 1,
+    },
     { id:'cb5boss', name:'BOSS — Write One From Scratch', xp:65, type:'quiz', boss:true,
       text:`<strong>BOSS</strong> — Write one prompt from scratch for this task: "get help writing a birthday message for a friend." It must include a subject, a constraint, and a format — same 3-part checklist as Challenge 2.`,
       hints:['Same rule as Challenge 2: subject + constraint + format, all in one prompt.'],
@@ -1731,11 +1762,17 @@ const WORLDS = [
       hints:['A vague prompt like "write about me" gets a generic result — give it real details to work with.'],
       check:(log) => log.chatGenCount >= 2,
     },
+    { id:'cb6s4', name:'Explain: Staying Safe on Social Media', xp:50, type:'chat',
+      chatTask: 'Write a prompt asking a chatbot for real, specific tips on staying safe on social media (not scams this time — think privacy settings, who can see your posts, accepting friend requests). Revise and regenerate at least once.',
+      text:`<strong>Piece 4</strong> — Get a chatbot to explain how to stay safe on social media, using a prompt YOU write.`,
+      hints:['A genuinely different topic from Piece 2 — this is about privacy/settings, not spotting a scam message.', 'Add a constraint like "for someone starting their first social media account" to get a more useful answer.'],
+      check:(log) => log.chatGenCount >= 2,
+    },
     { id:'cb6boss', name:'BOSS — Combine Into One Guide', xp:80, type:'page', boss:true,
-      text:`<strong>BOSS</strong> — Build the final guide page: a heading ("Stay Smart Online"), and all THREE of your refined chatbot pieces from this project as separate paragraphs.`,
-      hints:['Copy your BEST (most recently revised) response from each of the 3 chat pieces into its own paragraph.', 'This is assembly, not new content — everything already exists from Pieces 1-3.'],
-      needsHeadings:1, needsParagraphs:3,
-      check:(log) => log.headings >= 1 && log.paragraphs >= 3,
+      text:`<strong>BOSS</strong> — Build the final guide page: a heading ("Stay Smart Online"), and all FOUR of your refined chatbot pieces from this project as separate paragraphs.`,
+      hints:['Copy your BEST (most recently revised) response from each of the 4 chat pieces into its own paragraph.', 'This is assembly, not new content — everything already exists from Pieces 1-4.'],
+      needsHeadings:1, needsParagraphs:4,
+      check:(log) => log.headings >= 1 && log.paragraphs >= 4,
     },
   ]},
   // ── Story Studio — Semester 1, Week 1: HTML structure & tags ──────────────
@@ -2862,6 +2899,9 @@ const CHALLENGE_LESSON = {
       <p>Monitor/screen, speakers, headphones, printer (paper is a real, physical output), a game controller's rumble/vibration. Every one of these sends information FROM the computer, for a human to see, hear, or feel.</p></div>
     <div class="cl-block"><h4>A quick way to remember it</h4>
       <p>If it sends data TO the computer, it's input. If it sends data FROM the computer to you, it's output. A touchscreen is actually both at once — input when you tap it, output when it lights up. Two real storage types worth knowing: HDD (hard disk drive, older, spinning disk, cheaper) and SSD (solid state drive, newer, no moving parts, much faster).</p></div>` },
+  cb1s4: { title: 'SSD vs HDD — a real, current trade-off', html: `
+    <div class="cl-block"><h4>Same job, different mechanics</h4>
+      <p>Both store your files even with the power off — but an SSD has no moving parts (all electronic), while an HDD physically spins a disk and moves a read/write head. That's exactly why SSDs are faster and more reliable, but historically cost more per gigabyte.</p></div>` },
   cb1boss: { title: 'BOSS — same five facts, mixed', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Every question here reuses a fact from Challenges 1–3. Score 4 out of 5 to pass.</p></div>
@@ -2894,6 +2934,9 @@ const CHALLENGE_LESSON = {
       <p>A 4 MB photo and a 4000 KB song — since 1 MB ≈ 1000 KB, 4 MB ≈ 4000 KB, so they're actually about the SAME size, even though one's measured in MB and the other in KB. Always convert to the SAME unit before comparing.</p></div>
     <div class="cl-block"><h4>Working out how many files fit</h4>
       <p>If a phone has 64 GB of storage and photos are 4 MB each: 64 GB ≈ 64,000 MB, so 64,000 ÷ 4 = 16,000 photos could theoretically fit (ignoring apps, videos, and other files that would also take up space in reality).</p></div>` },
+  cb2s4: { title: 'The right format depends on the JOB, not just the content', html: `
+    <div class="cl-block"><h4>Same content, different needs</h4>
+      <p>A photo can be a .jpg (small, fast-loading, some quality loss) — great for a website. That same photo saved as a giant uncompressed file would be needlessly slow to load. Choosing a format is about matching the file's PURPOSE to its trade-offs, not just "what type of content is this".</p></div>` },
   cb2boss: { title: 'BOSS — file types and storage size order', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Same facts as Challenge 1, plus: KB is smaller than MB, which is smaller than GB. A folder is a container that groups files together — it doesn't have its own file type; it holds OTHER files and folders.</p></div>
@@ -2992,6 +3035,9 @@ const CHALLENGE_LESSON = {
       <p>"Write a 5-sentence adventure story about a lost dog finding its way home, for a 10-year-old" fixes all three at once — subject (a lost dog finding its way home), length (5 sentences), tone/audience (for a 10-year-old).</p></div>
     <div class="cl-block"><h4>Why this exercise uses multiple choice, not free text</h4>
       <p>Before writing a good prompt yourself, being able to correctly spot WHAT'S missing from a bad one is the underlying skill — the Boss challenge is where you write one completely from scratch.</p></div>` },
+  cb5s4: { title: 'Recognising specificity, not just producing it', html: `
+    <div class="cl-block"><h4>Reading a prompt critically</h4>
+      <p>Being able to WRITE a specific prompt (Challenge 2) and being able to RECOGNISE which of two prompts is more specific are related but different skills — this one asks you to judge, not just produce, which is exactly what you'll need to do when revising your own prompts later.</p></div>` },
   cb5boss: { title: 'BOSS — same 3-part checklist, your own prompt', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Subject, constraint, format — the same rule as Challenge 2, now for a task nobody gave you an example for.</p></div>
@@ -3018,6 +3064,9 @@ const CHALLENGE_LESSON = {
       <p>"Write a short, friendly paragraph about a 12-year-old who loves football and drawing, for a class introduction" gives the chatbot something real to work with — "write about me" doesn't.</p></div>
     <div class="cl-block"><h4>A privacy note worth remembering here</h4>
       <p>Share hobbies, interests, and things you're proud of — the kind of thing you'd say introducing yourself to a new class. Skip your address, school name, or full name, the same rule from Weeks 3-4, applied to something you're writing yourself now.</p></div>` },
+  cb6s4: { title: 'A genuinely different topic needs a genuinely different prompt', html: `
+    <div class="cl-block"><h4>Not every safety topic is a "spot the scam" question</h4>
+      <p>Privacy settings and who can see your posts is real online safety too, but it's a completely different kind of advice from spotting a fake message — reusing your Piece 2 prompt almost word-for-word here would get an answer about the wrong thing.</p></div>` },
   cb6boss: { title: 'BOSS — assemble the guide', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Your 3 best revised answers, each as their own paragraph, under one heading. Assembly, not new writing.</p></div>
