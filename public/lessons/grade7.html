@@ -2529,6 +2529,16 @@ const WORLDS = [
       needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
       check:(log) => log.frames >= 5 && log.hasIf && log.circles >= 2,
     },
+    { id:'g6s4', name:'Wall Bounce — Rectangle Collision', xp:45,
+      text:`<strong>Challenge 4</strong> — Circles use the distance formula, but a RECTANGLE wall needs a different check. Draw a rectangle "wall" and a moving circle ball. Each frame, check if the ball's x/y falls WITHIN the wall's x-range AND y-range — if so, that's a hit, so reverse its direction.`,
+      hints:[
+        'A rectangle collision compares RANGES, not distance: if (ballX > wallX && ballX < wallX + wallW && ballY > wallY && ballY < wallY + wallH) { ...hit... }',
+        'This is genuinely different from Challenge 1\'s circle-circle check — rectangles need FOUR comparisons combined, not one distance formula.',
+        'On a hit, reverse the ball\'s velocity (or just its x-direction) so it visibly bounces off the wall instead of passing through.',
+      ],
+      needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.hasIf && log.circles >= 1 && log.rects >= 1,
+    },
     { id:'g6boss', name:'Breakout Clone', xp:75, boss:true,
       text:`<strong>💥 BOSS — Breakout Clone</strong> — Make a list (array) of 3 bricks, each with an x and y. Every frame, check the ball against the bricks ONE AT A TIME, in order, stopping as soon as you find one it's touching — that's a <strong>linear search</strong>. Draw the paddle following the mouse, the ball bouncing, and all the bricks.<br><br>
       <span style="opacity:.8;font-size:12px;">💡 A linear search checks every item until it finds a match (or runs out) — perfectly fine for 3 bricks. If your game had 10,000 bricks sorted in a line, checking one by one every single frame would start to feel slow — that's the kind of problem <strong>binary search</strong> solves, coming up in Grade 8.</span>`,
@@ -2571,6 +2581,16 @@ const WORLDS = [
       ],
       needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
       check:(log) => log.frames >= 5 && log.hasIf && log.texts >= 1 && log.rects >= 1,
+    },
+    { id:'g7s4', name:'Countdown Before Start', xp:45,
+      text:`<strong>Challenge 4</strong> — Add a "ready" state that counts down before play begins. Create a <em>timer</em> variable starting at 3. Every frame (roughly once per second — or every frame for simplicity here), decrease it and show it as text: "3", "2", "1" — then switch state to "playing" once it reaches 0.`,
+      hints:[
+        'state = "ready", timer = 3. While state is "ready": show text(timer, ...) and count timer down.',
+        'if (timer <= 0) { state = "playing" } — the SAME pattern as g7s2\'s score-based switch, just triggered by a timer instead.',
+        'This is genuinely how almost every real game\'s "3... 2... 1... GO!" countdown works underneath.',
+      ],
+      needsVar:true, needsIf:true, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && log.texts >= 1,
     },
     { id:'g7boss', name:'Full Game Loop w/ Screens', xp:80, boss:true,
       text:`<strong>🎬 BOSS — Full Game Loop</strong> — Build a real state machine with at least THREE states: "menu", "playing", and "gameover" (bonus: add "paused" too). Draw something different for each, and switch between them based on a condition (like a timer or score).<br><br>
@@ -2620,6 +2640,16 @@ const WORLDS = [
       needsVar:false, needsIf:true, needsFrames:false, needsFunction:false,
       check:(log) => log.hasIf && log.texts >= 2,
     },
+    { id:'g8s4', name:'Two Enemies, Two Personalities', xp:45,
+      text:`<strong>Challenge 4</strong> — Run TWO enemies at once, each with its OWN rule: one chases the mouse (Challenge 1's rule), the other patrols back and forth (Challenge 2's rule) — completely independently, in the same frame loop.`,
+      hints:[
+        'Give each enemy its own separate x/y variables — e.g. chaserX/chaserY and patrolX/patrolY — so they don\'t interfere with each other.',
+        'Two separate blocks of if-logic in the same "on every frame": one moving the chaser toward the mouse, one flipping the patroller\'s direction at its two edges.',
+        'Draw both enemies every frame — you should see one following your mouse while the other paces back and forth on its own.',
+      ],
+      needsVar:true, needsIf:true, needsFrames:true, needsFunction:false,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.circles >= 2 || log.rects >= 2 || (log.circles >= 1 && log.rects >= 1)),
+    },
     { id:'g8boss', name:'Enemy with 3 Behaviours', xp:80, boss:true,
       text:`<strong>🤖 BOSS — Enemy with 3 Behaviours</strong> — One enemy, three rules: PATROL back and forth normally. If the player (mouse) gets within 100 pixels, switch to CHASE. If the player gets within 30 pixels, switch to FLEE (run away instead). Measure distance the same way you did back in Collision & Physics.<br><br>
       <span style="opacity:.8;font-size:12px;">💡 Is this enemy "intelligent"? No — every behaviour is a rule YOU wrote (if distance < 100, chase). Real <strong>machine learning</strong> is different: instead of a human writing the rules, the system is shown lots of examples and works out its own rules from the data — then keeps improving as it sees more. Your enemy will do the exact same thing forever; a trained ML model changes based on what it learns. That distinction is exactly what AI World digs into next year.</span>`,
@@ -2662,6 +2692,16 @@ const WORLDS = [
       ],
       needsVar:true, needsIf:true, needsFrames:false, needsFunction:false,
       check:(log) => log.hasVar && log.hasIf && log.texts >= 1,
+    },
+    { id:'g9s4', name:'Long or Short Name?', xp:40,
+      text:`<strong>Challenge 4</strong> — Create <em>playerName</em> as text. Use <code>.length</code> to check how many characters it has: if it's longer than 6 characters, draw a SHORT greeting (e.g. just "Hi!"); otherwise draw the FULL greeting from Challenge 1.`,
+      hints:[
+        'playerName.length gives you how many characters are in the string — a number, not text.',
+        'if (playerName.length > 6) { short greeting } else { full greeting } — same if/else shape as g9s2, checking a length instead of an exact word.',
+        'Try a short name and a long name, re-running each time, to see both branches.',
+      ],
+      needsVar:true, needsIf:true, needsFrames:false, needsFunction:false,
+      check:(log) => log.hasIf && log.hasVar && log.texts >= 1,
     },
     { id:'g9boss', name:'RPG Dialogue Scene', xp:80, boss:true,
       text:`<strong>💬 BOSS — RPG Dialogue Scene</strong> — Combine everything: greet the player by name (with their ASCII code shown once), branch a short dialogue tree on their choice, then draw a high-score table — a list of {name, score} pairs, drawn as several lines of text, one per entry.`,
@@ -3293,6 +3333,9 @@ const CHALLENGE_LESSON = {
       <p>Knockback needs BOTH ideas from this world at once: the distance-formula collision check from Challenge 1, AND the frame-by-frame movement from Challenge 2. Detecting the hit is only half the job — reacting to it (reversing velocity) is the other half.</p></div>
     <div class="cl-block"><h4>Cause and effect</h4>
       <p>This is a clean example of "detect, then react" — a pattern that shows up constantly in real games: check for a condition (collision), then DO something as a direct result (bounce away).</p></div>` },
+  g6s4: { title: 'Rectangles need a range check, not a distance formula', html: `
+    <div class="cl-block"><h4>Two genuinely different collision checks</h4>
+      <p>Circle-vs-circle collision is one formula (distance between centres). Rectangle collision is completely different — it's four separate range comparisons combined with AND, checking whether a point falls between the wall's left/right AND top/bottom edges. Real games use whichever shape check actually matches their hitbox.</p></div>` },
   g6boss: { title: 'BOSS — Linear search through an array', html: `
     <div class="cl-block"><h4>An array is a list with a shared name</h4>
       <p>Instead of three separate brick variables, an <strong>array</strong> stores a whole LIST of bricks under one name — brick[0], brick[1], brick[2] — and you check them ONE AT A TIME, in order, stopping the moment you find a match. That's called a <strong>linear search</strong>.</p></div>
@@ -3315,6 +3358,9 @@ const CHALLENGE_LESSON = {
       <p><code>paused</code> is a simple true/false variable, but when true, it draws an overlay ON TOP of the normal game — the normal game code doesn't need to know or care that it's paused; the overlay just gets drawn last, covering everything beneath it.</p></div>
     <div class="cl-block"><h4>Drawing order = stacking order</h4>
       <p>Whatever you draw LAST appears on top of everything drawn before it in the same frame — that's why the pause overlay has to be one of the final things drawn each frame, not the first.</p></div>` },
+  g7s4: { title: 'A timer can trigger a state switch, not just a score', html: `
+    <div class="cl-block"><h4>Any condition can drive a state machine</h4>
+      <p>g7s2 switched states based on SCORE reaching a value; this switches based on a TIMER reaching zero — the actual mechanism (a variable, checked every frame, flips the state) is identical. Real games trigger state changes from all sorts of conditions: a timer, a score, a health value, or a player action.</p></div>` },
   g7boss: { title: 'BOSS — A real, multi-state machine', html: `
     <div class="cl-block"><h4>Three+ states, all driven by conditions</h4>
       <p>menu → playing → gameover, each with its own drawing, each transition triggered by a real condition (a timer, a score, a health value hitting zero) — this is a genuine, complete state machine, the exact pattern behind every real video game's screen flow.</p></div>
@@ -3337,6 +3383,9 @@ const CHALLENGE_LESSON = {
       <p>Comparing <code>message === "hello"</code> works exactly like comparing numbers — checking if two pieces of text are EXACTLY identical. A rule-based chatbot is just a chain of these text comparisons, each with its own canned reply.</p></div>
     <div class="cl-block"><h4>What real chatbots looked like before machine learning</h4>
       <p>This is genuinely what early chatbots were — long lists of "if the message matches THIS, reply with THAT" written entirely by hand. Modern AI chatbots replaced this with something that learns patterns from huge amounts of text instead of matching exact phrases.</p></div>` },
+  g8s4: { title: 'Independent entities never share state by accident', html: `
+    <div class="cl-block"><h4>Two enemies, two SEPARATE sets of variables</h4>
+      <p>Giving each enemy its own x/y variables (rather than reusing one pair for both) is what lets them behave completely independently in the same frame loop — mix up their variables and one enemy's movement would accidentally affect the other's position.</p></div>` },
   g8boss: { title: 'BOSS — Three behaviours, one distance check', html: `
     <div class="cl-block"><h4>Distance decides which behaviour runs</h4>
       <p>The SAME distance formula from Collision & Physics now decides between three behaviours: patrol (far away), chase (medium distance), flee (very close) — an if/else-if/else chain where only ONE branch runs each frame, chosen by how close the distance is.</p></div>
@@ -3359,6 +3408,9 @@ const CHALLENGE_LESSON = {
       <p><code>line.toUpperCase()</code> returns a NEW, shouty version of the text — it doesn't modify the original <code>line</code> variable at all. This matters: string methods almost always hand back a new result rather than changing what you started with.</p></div>
     <div class="cl-block"><h4>A boolean deciding which version to show</h4>
       <p><code>shout</code> is just another true/false variable (like <code>isBig</code> back in G4) — deciding between two versions of the same underlying text, exactly the same "one flag, one IF, two outcomes" pattern you've used all year.</p></div>` },
+  g9s4: { title: '.length works on strings too, not just arrays', html: `
+    <div class="cl-block"><h4>Counting characters, not items</h4>
+      <p>An array's .length counts how many ITEMS are inside it; a string's .length counts how many CHARACTERS it has — same property name, same idea (a count), just applied to a different kind of value.</p></div>` },
   g9boss: { title: 'BOSS — Text, arrays, and a loop, together', html: `
     <div class="cl-block"><h4>An array of objects — structured data</h4>
       <p><code>{name:"Alex", score:120}</code> groups TWO related pieces of data (a name and a number) into one structured item — an array of these is a real, proper data table, just like a simple version of a spreadsheet or database.</p></div>
