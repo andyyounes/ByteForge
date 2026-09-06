@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.01 Limitations of a File-Based Approach — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11px; margin-bottom: 16px; overflow-x:auto; display:block; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: left; white-space:nowrap; }
+  .db-table th { background: rgba(96,165,250,.1); color: #60a5fa; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .db-table td.bad { color: #f87171; }
+  .example-block { background: rgba(96,165,250,.05); border: 1px solid rgba(96,165,250,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #60a5fa; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #bfdbfe; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 10 · Database &amp; Data Modelling</span>
+  <div class="topic-title">10.01 Limitations of a File-Based Approach</div>
+  <div class="topic-subtitle">A theatrical agency's messy text file — every database concept in this chapter exists to fix one of its problems.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Data redundancy</div><div class="key-term-def">The same data stored more than once.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Data dependency</div><div class="key-term-def">A program's structure being tied to the exact way its data files are organised.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The running scenario for this whole chapter</h4>
+    <ul>
+      <li>A theatrical agency books bands for gigs. It stores band-member data in a text file: one line per member, containing name, contact details, banking details, band name, agent name, agent contact details.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>Given Name</th><th>Family Name</th><th>Band Name</th></tr>
+    <tr><td>Xiangfei</td><td>Jha</td><td>ComputerKidz</td></tr>
+    <tr><td>Mahesh</td><td>Ravuru</td><td>ITWizz</td></tr>
+    <tr><td class="bad">Dylan</td><td class="bad">Stoddart</td><td class="bad">(missing)</td></tr>
+    <tr><td class="bad">Graham</td><td class="bad">Vandana</td><td>ITWizz</td></tr>
+    <tr><td>Vandana</td><td>Graham</td><td>ITWizz</td></tr>
+    <tr><td>Mahesh</td><td>Ravuru</td><td>ITWizz</td></tr>
+    <tr><td>Precious</td><td>Olsen</td><td class="bad">ComputerKidz</td></tr>
+    <tr><td>Precious</td><td>Olsen</td><td class="bad">ITWizz</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>What's actually wrong with this data — three genuinely different problems</h4>
+    <ul>
+      <li>"Graham Vandana" — the given/family names were entered in the WRONG ORDER originally, and a later correct entry was added WITHOUT deleting the wrong one. No validation technique could have caught this — it's a genuinely correct-LOOKING but wrong entry.</li>
+      <li>Dylan Stoddart's missing band name — THIS one validation genuinely could and should have caught (a simple presence check).</li>
+      <li>Precious Olsen appearing with TWO different bands — an example of duplication AND inconsistent data.</li>
+      <li>There's also an error not visible just from looking at the file: a band name could be entered here that doesn't actually correspond to any real, existing band.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Data privacy — a genuinely separate problem from data integrity</h4>
+    <ul>
+      <li>The SAME file was meant to serve two departments: finance (needs banking details) and recruitment (needs contact details).</li>
+      <li>The problem: a file has no way to control access to just PART of itself — so recruitment staff can also see banking details they have no need to see.</li>
+      <li>A database system properly handles this kind of access control; a plain file cannot.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Splitting into department files — solves privacy, creates data redundancy</h4>
+    <ul>
+      <li>To fix the privacy problem, the agency splits data into separate files per department — but department files inevitably OVERLAP in what they store (e.g. member names and band name needed by multiple departments).</li>
+      <li>This duplication across files is DATA REDUNDANCY — once data is stored, there's no NEED to store it again, yet here it's stored multiple times.</li>
+      <li>Redundancy causes DATA INCONSISTENCY when one copy is edited/corrected but another copy isn't — a different root cause of lost integrity than the original single-file errors.</li>
+      <li>One of the PRIMARY aims of the database approach: eliminating data redundancy.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Data dependency — the OTHER category of file-based problem</h4>
+    <ul>
+      <li>Traditionally, a programmer writes a program AND defines the data files it needs — the programmer must know exact file structure (e.g. "the fourth item on a line is a band name"). This tight coupling is DATA DEPENDENCY.</li>
+      <li>Consequence 1 — changing needs: if the agency wants to start storing data about session musicians, the EXISTING files must be rewritten, which then forces the EXISTING programs to also be rewritten. In a database, existing programs could keep running even as new data is added — only new programs handling the new data would be needed.</li>
+      <li>Consequence 2 — new applications: file structures designed for one specific program don't suit NEW applications. Building a new report analysing gig success over the years, from this file-based system, would be complex and slow.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — limitations of file-based systems (completes Section 10.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why couldn't validation have caught the "Graham Vandana" name-order error?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Graham" and "Vandana" are both perfectly valid-LOOKING names — the error is about which field they went into, not whether the data itself is a valid type/format. Validation can't detect a factually wrong but well-formed entry.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is data redundancy, and why is it a problem?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The same data stored more than once. It's a problem because it can lead to data INCONSISTENCY — if one copy is corrected/edited but another copy isn't, the data no longer agrees with itself.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A programmer needing to know the EXACT structure of a data file (e.g. "the fourth item is a band name") is an example of data ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Dependency.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "Splitting the file by department completely SOLVES the agency's data problems." What genuine NEW problem does this lesson say it creates?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Data redundancy — the department files inevitably duplicate some of the same data (e.g. member names, band name) across multiple files, creating a new risk of inconsistency between the copies.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      The agency wants to start tracking session musicians. In the file-based system, what TWO things does this force to happen, in order?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>First, the existing data files must be rewritten to hold the new data. Second, this forces the existing PROGRAMS that read those files to also be rewritten, since they depend on the exact old file structure.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why is extracting data for a brand-new report (e.g. gig success analysis) hard in a file-based system?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The existing file structures were designed to suit the SPECIFIC programs that already use them — they aren't suited to supporting new applications, making extraction for a new purpose a complex, time-consuming task.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 10: Database &amp; Data Modelling — 10.01 Limitations of a File-Based Approach (completes Section 10.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 10.01
+  </div>
+
+</div>
+</body>
+</html>

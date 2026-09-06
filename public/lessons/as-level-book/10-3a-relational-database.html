@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.03 The Relational Database — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,191,36,.12); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fbbf24; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11.5px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 9px; text-align: left; }
+  .db-table th { background: rgba(251,191,36,.1); color: #fbbf24; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .db-table td.pk { text-decoration: underline; color: #4ade80; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 10 · Database &amp; Data Modelling</span>
+  <div class="topic-title">10.03 The Relational Database</div>
+  <div class="topic-subtitle">Primary keys enforce entity integrity; foreign keys enforce referential integrity.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Relation</div><div class="key-term-def">The special type of table used in a relational database.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Attribute</div><div class="key-term-def">A column in a relation that contains values.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Primary key</div><div class="key-term-def">An attribute (or combination) with a unique value in every tuple.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Foreign key</div><div class="key-term-def">An attribute in one table that refers to the primary key in another table.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Naming and structure — where table definitions come from</h4>
+    <ul>
+      <li>A relational database is a collection of RELATIONS (a special type of table) — the odd name comes from mathematical theory.</li>
+      <li>When designing, a table gets a name with its attribute names listed in brackets, e.g. <code>Member(MemberID, MemberGivenName, MemberFamilyName, BandName, …)</code>.</li>
+      <li>Each attribute maps to one column; a row is technically a TUPLE (though often loosely called a "record", with attribute values called "fields").</li>
+      <li>A tuple must be a set of ATOMIC values — each attribute holds exactly one value, or no value.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>MemberID</th><th>MemberGivenName</th><th>MemberFamilyName</th><th>BandName</th></tr>
+    <tr><td class="pk">0005</td><td>Xiangfei</td><td>Jha</td><td>ComputerKidz</td></tr>
+    <tr><td class="pk">0009</td><td>Mahesh</td><td>Ravuru</td><td>ITWizz</td></tr>
+    <tr><td class="pk">0001</td><td>Dylan</td><td>Stoddart</td><td>ComputerKidz</td></tr>
+    <tr><td class="pk">0025</td><td>Vandana</td><td>Graham</td><td>ITWizz</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Primary keys — the most important relational feature</h4>
+    <ul>
+      <li>Every table MUST have a primary key; every tuple MUST have a unique value for it.</li>
+      <li>If an attribute's values are naturally guaranteed unique, it's a CANDIDATE key. If there's no natural candidate key, one must be CREATED (e.g. MemberID above — no natural attribute guarantees uniqueness for people, so an artificial ID is introduced).</li>
+      <li>The DBMS will REJECT any attempt to insert a duplicate primary key value — this is ENTITY INTEGRITY, one way the relational model directly enforces data integrity.</li>
+      <li>The primary key also gives a unique reference for whatever a query is selecting.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>BandName</th><th>AgentID</th></tr>
+    <tr><td class="pk">ComputerKidz</td><td>01</td></tr>
+    <tr><td class="pk">ITWizz</td><td>07</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Foreign keys — linking tables, enforcing referential integrity</h4>
+    <ul>
+      <li>Most databases have MULTIPLE related tables — foreign keys implement these relationships.</li>
+      <li>Example: Band table is created first, with BandName as its primary key (guaranteed unique). Member table is created with MemberID as ITS primary key, and BandName as a FOREIGN KEY referencing Band's primary key.</li>
+      <li>Once this link exists, the DBMS will PREVENT any BandName value in Member that doesn't already exist in Band — this is REFERENTIAL INTEGRITY, another way the relational model enforces data integrity.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — relations, primary keys, and foreign keys (completes Section 10.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference between a "candidate key" and a "primary key"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A candidate key is ANY attribute whose values are guaranteed unique. The primary key is the ONE candidate key actually CHOSEN to serve that role for the table (if multiple candidates exist).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does "entity integrity" mean, and which key enforces it?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Every tuple is genuinely unique, because the DBMS refuses to allow a duplicate primary key value. The PRIMARY key enforces this.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A tuple must be a set of ______ values — each attribute has one value or no value.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Atomic.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "MemberGivenName and MemberFamilyName together would make a fine primary key for the Member table, since together they identify a person." Why doesn't this hold up in general?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Two DIFFERENT real people can share the same given name AND family name — the combination isn't GUARANTEED unique, which is exactly why the table introduces an artificial MemberID as the primary key instead.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Someone tries to insert a new Member row with BandName = "RockStars", but no "RockStars" row exists in the Band table. What happens, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The DBMS prevents the insertion — BandName is a foreign key referencing Band's primary key, and referential integrity means a foreign key value must already exist as a primary key value in the referenced table.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is the correct technical term for a "row" in a relation, even though "record" is often used loosely instead?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A tuple.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 10: Database &amp; Data Modelling — 10.03 The Relational Database (completes Section 10.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 10.03
+  </div>
+
+</div>
+</body>
+</html>

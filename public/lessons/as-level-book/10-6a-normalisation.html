@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.06 Normalisation — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.8; overflow-x: auto; white-space: pre; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11px; margin-bottom: 16px; overflow-x:auto; display:block; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: left; white-space:nowrap; }
+  .db-table th { background: rgba(34,211,238,.1); color: #22d3ee; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .example-block { background: rgba(34,211,238,.05); border: 1px solid rgba(34,211,238,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #22d3ee; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #a5f3fc; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 10 · Database &amp; Data Modelling</span>
+  <div class="topic-title">10.06 Normalisation</div>
+  <div class="topic-subtitle">"The key, the whole key, and nothing but the key" — one booking data sheet, taken all the way to 3NF.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Repeating group</div><div class="key-term-def">A set of attributes with more than one set of values when the other attributes each have a single value.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The starting point — a real booking data sheet</h4>
+    <ul>
+      <li>Attribute list: <code>(BookingID, VenueName, VenueAddress1, VenueAddress2, Date, (BandName, NumberOfMembers, Headlining))</code></li>
+      <li>The INNER brackets around BandName/NumberOfMembers/Headlining mark a REPEATING GROUP — one booking can have several bands, each with their own member count and headlining status.</li>
+      <li>A table needs single rows and atomic values, so a repeating group CAN'T sensibly go straight into one table — the only naive option is a row per band-within-a-booking, which duplicates the booking/venue/date data for every band.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>BookingID</th><th>VenueName</th><th>VenueAddress1</th><th>VenueAddress2</th><th>Date</th><th>BandName</th><th>NumberOfMembers</th><th>Headlining</th></tr>
+    <tr><td>2016/023</td><td>Cambridge Int'l Theatre</td><td>Camside</td><td>CA1</td><td>23.06.2016</td><td>ComputerKidz</td><td>5</td><td>Y</td></tr>
+    <tr><td>2016/023</td><td>Cambridge Int'l Theatre</td><td>Camside</td><td>CA1</td><td>23.06.2016</td><td>ITWizz</td><td>3</td><td>N</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Step 1 — First Normal Form (1NF): eliminate the repeating group</h4>
+    <ul>
+      <li>Split into two tables — one for the non-repeating attributes, one for the repeating group.</li>
+    </ul>
+    <div class="pseudo-box">Booking(BookingID, VenueName, VenueAddress1, VenueAddress2, Date)
+Band-Booking(BandName, BookingID(fk), NumberOfMembers, Headlining)</div>
+    <ul>
+      <li>The repeating-group table needs a COMPOUND primary key AND a foreign key back to the first table.</li>
+      <li>Result: no data redundancy in EITHER table, and every attribute is dependent on ITS table's primary key — that's the essence of 1NF.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Step 2 — Second Normal Form (2NF): remove partial dependencies</h4>
+    <ul>
+      <li>Only tables with a COMPOUND primary key need checking — Booking is automatically already in 2NF.</li>
+      <li>For each non-key attribute, ask: is it dependent on BOTH parts of the compound key, or just one?</li>
+      <li>NumberOfMembers is dependent ONLY on BandName (not on BookingID too) — so it must move to a NEW table.</li>
+    </ul>
+    <div class="pseudo-box">Booking(BookingID, VenueName, VenueAddress1, VenueAddress2, Date)
+Band-Booking(BandName(fk), BookingID(fk), Headlining)
+Band(BandName, NumberOfMembers)</div>
+    <ul>
+      <li>A table is in 2NF if it either has a single-attribute primary key, or a compound key where every non-key attribute depends on BOTH parts.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Step 3 — Third Normal Form (3NF): remove non-key dependencies</h4>
+    <ul>
+      <li>Check every table for a NON-KEY attribute that depends on ANOTHER non-key attribute (not on the primary key itself).</li>
+      <li>VenueAddress1 and VenueAddress2 are dependent on VenueName — not directly needed by BookingID itself — so they move to a new Venue table.</li>
+    </ul>
+    <div class="pseudo-box">Band(BandName, NumberOfMembers)
+Band-Booking(BandName(fk), BookingID(fk), Headlining)
+Booking(BookingID, Date, VenueName(fk))
+Venue(VenueName, VenueAddress1, VenueAddress2)</div>
+    <ul>
+      <li>These four 3NF table definitions match four of the entities already identified in the logical ER model — though this alignment WON'T always happen automatically.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">The one-sentence summary of 3NF</div>
+    <p>Each non-key attribute is dependent on the key, the WHOLE key, and NOTHING BUT the key.</p>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — normalisation to 1NF, 2NF, and 3NF (completes Section 10.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What problem does converting to 1NF specifically solve?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It eliminates the repeating group — splitting the data so no table needs multiple values for one attribute within a single row.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the 2NF step, why did NumberOfMembers move out of Band-Booking into its own Band table?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>NumberOfMembers is dependent ONLY on BandName, not on the whole compound key (BandName + BookingID) — a partial dependency, which 2NF requires moving into a separate table.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In a 3NF table, every non-key attribute is dependent on the key, the ______ key, and ______ but the key.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Whole; nothing.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says: "VenueAddress1 and VenueAddress2 should stay in the Booking table, since a booking has to happen somewhere." Why does 3NF move them out instead?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The addresses are dependent on VenueName — a NON-KEY attribute of Booking — not on BookingID itself. That's exactly the non-key dependency 3NF removes: the addresses belong with Venue, referenced from Booking via a foreign key.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does the un-normalised single table (BookingID, Venue data, Date, BandName, NumberOfMembers, Headlining all together) cause data redundancy?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because one booking can have MULTIPLE bands, the BookingID, venue data, and date all get repeated once PER band in that booking — exactly the redundancy visible in the two-row example (Cambridge International Theatre's address repeated for both ComputerKidz and ITWizz).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Does a logical ER diagram always automatically produce a 3NF set of tables?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — a logical ER diagram will describe a 2NF set of entities, but not necessarily a 3NF set. Normalisation must still be checked/applied separately.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 10: Database &amp; Data Modelling — 10.06 Normalisation (completes Section 10.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 10.06
+  </div>
+
+</div>
+</body>
+</html>

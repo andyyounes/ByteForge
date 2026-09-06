@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10.05 A Logical Entity-Relationship Model — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(167,139,250,.12); color: #a78bfa; border: 1px solid rgba(167,139,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .db-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 11.5px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 9px; text-align: left; }
+  .db-table th { background: rgba(167,139,250,.1); color: #a78bfa; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.25); color: #a78bfa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 10 · Database &amp; Data Modelling</span>
+  <div class="topic-title">10.05 A Logical Entity-Relationship Model</div>
+  <div class="topic-subtitle">A foreign key can't hold many values — so a many-to-many relationship needs a link entity.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>From conceptual to logical — why the conversion is needed</h4>
+    <ul>
+      <li>A fully-annotated ER diagram is a CONCEPTUAL model — it doesn't relate to any specific implementation.</li>
+      <li>To implement as a relational database, it must be converted to a LOGICAL model. Start from a simplified ER diagram showing just cardinalities.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How each cardinality converts</h4>
+    <ul>
+      <li><strong>1:M</strong> — needs NO further refinement. The entity at the MANY end simply gets a foreign key referencing the primary key of the entity at the ONE end.</li>
+      <li><strong>1:1</strong> — has implementation options, but is extremely rare in practice (not discussed further).</li>
+      <li><strong>M:M</strong> — the genuinely PROBLEM case. A foreign key can only hold a SINGLE value, so it cannot represent "many" references at once.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The solution — a link entity</h4>
+    <ul>
+      <li>For an M:M relationship (like Band↔Booking), create a LINK ENTITY in between — here, "Band-Booking".</li>
+      <li>The link entity holds TWO foreign keys: one referencing Band's primary key, one referencing Booking's primary key.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="440" height="90" viewBox="0 0 440 90">
+      <g font-family="system-ui" font-size="11">
+        <rect x="10" y="30" width="90" height="35" rx="4" fill="#111320" stroke="#f87171"/><text x="55" y="52" text-anchor="middle" fill="#fecaca">Band</text>
+        <line x1="100" y1="47" x2="150" y2="47" stroke="#9ca3af"/>
+        <rect x="150" y="25" width="140" height="45" rx="4" fill="#111320" stroke="#a78bfa"/><text x="220" y="44" text-anchor="middle" fill="#ddd6fe" font-size="10">Band-Booking</text><text x="220" y="58" text-anchor="middle" fill="#c4b5fd" font-size="8">(link entity)</text>
+        <line x1="290" y1="47" x2="340" y2="47" stroke="#9ca3af"/>
+        <rect x="340" y="30" width="90" height="35" rx="4" fill="#111320" stroke="#60a5fa"/><text x="385" y="52" text-anchor="middle" fill="#bfdbfe">Booking</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Choosing primary keys once every entity is a table</h4>
+    <ul>
+      <li>Every entity in the logical ER diagram becomes a table — primary and foreign keys can now be chosen for each, summarised in a KEY TABLE.</li>
+      <li>The link entity CANNOT use just BandName or just BookingID alone as primary key (neither is unique enough on its own) — but the COMBINATION of the two works as a compound primary key.</li>
+    </ul>
+  </div>
+
+  <table class="db-table">
+    <tr><th>Table</th><th>Primary key</th><th>Foreign key</th></tr>
+    <tr><td>Member</td><td>MemberID</td><td>BandName</td></tr>
+    <tr><td>Band</td><td>BandName</td><td>—</td></tr>
+    <tr><td>Band-Booking</td><td>BandName + BookingID (compound)</td><td>BandName, BookingID</td></tr>
+    <tr><td>Booking</td><td>BookingID</td><td>VenueName</td></tr>
+    <tr><td>Venue</td><td>VenueName</td><td>—</td></tr>
+  </table>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — converting a conceptual ER model into a logical one (completes Section 10.05).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why can't a plain foreign key be used to implement a many-to-many relationship?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A foreign key attribute can only hold a SINGLE value — it cannot represent the "many" references that an M:M relationship requires on either side.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">How many foreign keys does a link entity resolving an M:M relationship typically have, and what do they reference?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Two — one referencing the primary key of each of the two original entities in the M:M relationship.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A 1:M relationship needs no link entity — the entity at the ______ end simply receives a foreign key referencing the entity at the ______ end.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Many; one.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student proposes using just BandName alone as the Band-Booking link table's primary key. Why won't this work?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A single band can appear in MULTIPLE bookings, so BandName alone repeats across many rows in the link table — it isn't unique on its own. Only the COMBINATION of BandName and BookingID together is guaranteed unique.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does a logical ER diagram not necessarily produce a set of tables already in 3NF (as mentioned at the end of this section)?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A logical ER diagram only guarantees a set of entities consistent with the relationships and their cardinalities (roughly 2NF-level structure) — it doesn't automatically check for non-key dependencies between attributes, which is what normalisation to 3NF specifically addresses.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is a "key table" used for?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Summarising the chosen primary key and foreign key(s) for every table in the database design, once every entity has become a table.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 10: Database &amp; Data Modelling — 10.05 A Logical Entity-Relationship Model (completes Section 10.05)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 10.05
+  </div>
+
+</div>
+</body>
+</html>
