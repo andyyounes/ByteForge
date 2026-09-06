@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>18.04 Karnaugh Maps — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 8px 12px; text-align: center; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(251,146,60,.1); color: #fb923c; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .kmap-cell { background: rgba(251,146,60,.18) !important; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 18 · Boolean Algebra and Logic Circuits</span>
+  <div class="topic-title">18.04 Karnaugh Maps (K-maps)</div>
+  <div class="topic-subtitle">A grid-based shortcut for simplifying Boolean expressions, without doing any algebra. Completes Chapter 18.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What a K-map is for</h4>
+    <ul>
+      <li>Reaches the SAME simplified expression that Boolean algebra would eventually reach, but through visual grouping instead of algebraic manipulation.</li>
+      <li>Each cell in the grid shows the truth table's output value for one specific combination of inputs.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The rules for reading a K-map</h4>
+    <ul>
+      <li>Only cells containing a 1 are considered.</li>
+      <li>Group 1s together where possible — a group can be a row, a column, or a rectangle.</li>
+      <li>Groups must contain a power-of-2 number of cells: 2, 4, 8, and so on.</li>
+      <li>Each group should be made as LARGE as possible.</li>
+      <li>Groups CAN overlap.</li>
+      <li>A cell that can't join any group is treated as its own group of one.</li>
+      <li>Within a group, only the input values that stay CONSTANT throughout the group are kept in the final expression.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — the OR gate</h4>
+    <table class="dtype-table">
+      <tr><th></th><th>B=0</th><th>B=1</th></tr>
+      <tr><td>A=0</td><td>0</td><td class="kmap-cell">1</td></tr>
+      <tr><td>A=1</td><td class="kmap-cell">1</td><td class="kmap-cell">1</td></tr>
+    </table>
+    <ul>
+      <li>Sum-of-products would give <code>X = A.B̄ + Ā.B + A.B</code> — correct, but not obviously equal to A+B.</li>
+      <li>Using the K-map: the COLUMN group (B=1) has B constant while A changes — keep B. The ROW group (A=1) has A constant while B changes — keep A.</li>
+      <li>Sum the retained values from each group: <code>X = A + B</code> — found with no algebra at all.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — a three-input problem, with wraparound</h4>
+    <ul>
+      <li>K-map columns for a 2-variable pair (B, C) are labelled using GRAY CODE order (00, 01, 11, 10) — NOT plain binary order — so that only ONE bit changes between adjacent columns.</li>
+      <li>K-maps WRAP AROUND: the leftmost and rightmost columns are also considered "adjacent" for grouping purposes (since Gray coding makes them differ by only one bit too).</li>
+      <li>For a truth table where output=1 whenever B=1 (regardless of A or C), plus one extra 1 at A=0,B=0,C=0: the four-cell "B=1" group gives the term <code>B</code>; a wraparound row group (using the extra cell plus its Gray-code neighbour) gives <code>A.C̄</code>.</li>
+      <li>Final simplified expression: <code>X = A.C̄ + B</code> — far simpler than the five-minterm sum-of-products expression derived directly from the truth table.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 18 summary</h4>
+    <ul>
+      <li>Boolean algebra laws let you simplify logic expressions — De Morgan's laws convert between AND/OR forms of an inverse.</li>
+      <li>A half adder (AND + XOR, or NAND-only) adds two bits; a full adder (two half adders + OR) adds two bits plus a carry-in.</li>
+      <li>SR and JK flip-flops are sequential circuits used to store a bit — JK avoids the SR flip-flop's invalid state via toggling.</li>
+      <li>Sum-of-products builds an expression directly from a truth table's 1-output rows.</li>
+      <li>A Karnaugh map visually groups 1s to reach a simplified expression without algebra.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover Karnaugh maps and draw together the whole of Chapter 18 (completes Section 18.04 and Chapter 18).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why must K-map groups contain a power-of-2 number of cells (2, 4, 8...) rather than any number?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Each cell added to a group must correspond to exactly one input variable changing while the others stay fixed — this only works out cleanly for group sizes that are powers of 2, matching how binary/Gray-code combinations pair up.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why are K-map columns labelled using Gray code rather than plain binary order?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>So that only ONE bit changes between any two ADJACENT columns — this is essential for correctly identifying which input values stay constant across a group of adjacent cells.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Within a K-map group, only the input values that remain ______ throughout the group are kept in the final expression.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Constant.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student groups together the top-left cell and the bottom-left cell of a 4-column K-map, believing they can't be adjacent because they're in different rows and not next to each other visually. What's the misconception?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Actually, it's the leftmost and RIGHTMOST columns (within the same row) that wrap around and count as adjacent under Gray coding — not top and bottom of the SAME column, unless the map also wraps vertically for a 4-input problem. The student needs to check which wraparound rule actually applies to their specific map's dimensions.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A K-map group spans all four cells where B=1 (across both values of A and C). What term does this group contribute to the final expression?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Just B — since A and C both change across the group but B stays constant (at 1), only B is retained.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What should you do with a single 1-cell that cannot be paired with any adjacent 1-cell?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Treat it as its own group of one — its full minterm (every input, inverted where needed) is kept as a separate term in the final expression.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 18: Boolean Algebra and Logic Circuits — 18.04 Karnaugh Maps (completes Section 18.04 and Chapter 18)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 18.04
+  </div>
+
+</div>
+</body>
+</html>
