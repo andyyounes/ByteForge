@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>23.06 Linked Lists: Array Implementation — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(250,204,21,.12); color: #facc15; border: 1px solid rgba(250,204,21,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(250,204,21,.06); border: 1px solid rgba(250,204,21,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #facc15; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(250,204,21,.12); border: 1px solid rgba(250,204,21,.25); color: #facc15; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 23 · Computational Thinking and Problem-Solving</span>
+  <div class="topic-title">23.06 Linked Lists: Array Implementation</div>
+  <div class="topic-subtitle">Building a linked list from an array of records, with a "free list" tracking unused nodes. Completes Section 23.06.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Storing a linked list in an array of records</h4>
+    <ul>
+      <li>Recall the RECORD type from Chapter 16. One record represents ONE node: its data, plus a pointer field.</li>
+      <li>A pointer's VALUE is simply the ARRAY INDEX of the node it points to — no real memory addresses needed.</li>
+      <li>When a node is inserted or deleted, only POINTER FIELDS change — nothing else in the array moves.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The free list — tracking unused slots</h4>
+    <ul>
+      <li>Unused array slots are linked together into a SEPARATE linked list: the FREE LIST. A FreeListPtr points to the first available slot.</li>
+      <li>To INSERT a node: take a slot from the FRONT of the free list, fill it with data, and update FreeListPtr to the NEXT free slot.</li>
+      <li>To DELETE a node: add its slot back onto the FRONT of the free list, ready to be reused.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Setting up the structure</h4>
+    <div class="pseudo-box">CONSTANT NullPointer = 0
+
+TYPE ListNode
+  DECLARE Data : STRING
+  DECLARE Pointer : INTEGER
+ENDTYPE
+
+DECLARE StartPointer : INTEGER
+DECLARE FreeListPtr : INTEGER
+DECLARE List[1:7] OF ListNode
+
+PROCEDURE InitialiseList
+  StartPointer ← NullPointer     // list starts empty
+  FreeListPtr ← 1                // free list starts at slot 1
+  FOR Index ← 1 TO 6
+    List[Index].Pointer ← Index + 1   // link each slot to the next
+  ENDFOR
+  List[7].Pointer ← NullPointer  // last free slot ends the free list
+END PROCEDURE</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Inserting into an ordered linked list</h4>
+    <div class="pseudo-box">PROCEDURE InsertNode(NewItem)
+  IF FreeListPtr &lt;&gt; NullPointer
+    THEN
+      NewNodePtr ← FreeListPtr
+      List[NewNodePtr].Data ← NewItem
+      FreeListPtr ← List[FreeListPtr].Pointer   // take next free slot
+
+      ThisNodePtr ← StartPointer
+      WHILE ThisNodePtr &lt;&gt; NullPointer AND List[ThisNodePtr].Data &lt; NewItem
+        PreviousNodePtr ← ThisNodePtr
+        ThisNodePtr ← List[ThisNodePtr].Pointer
+      ENDWHILE
+
+      IF PreviousNodePtr = StartPointer
+        THEN List[NewNodePtr].Pointer ← StartPointer
+             StartPointer ← NewNodePtr
+        ELSE List[NewNodePtr].Pointer ← List[PreviousNodePtr].Pointer
+             List[PreviousNodePtr].Pointer ← NewNodePtr
+      ENDIF
+  ENDIF
+END PROCEDURE</div>
+    <ul>
+      <li>The WHILE loop walks the list looking for the correct INSERTION POINT (keeping data in order) — very similar in structure to the traversal used for finding or deleting.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Finding, deleting, and outputting</h4>
+    <ul>
+      <li>FIND: walk from StartPointer, following pointers, until either the item is found OR the null pointer is reached (not found).</li>
+      <li>DELETE: walk to find the target node (remembering the PREVIOUS node along the way), then re-link the previous node's pointer to skip over it — and add the freed slot back onto the FREE LIST.</li>
+      <li>OUTPUT ALL: walk from StartPointer to the null pointer, outputting each node's data in turn — this naturally visits nodes in their LINKED order.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Stacks and queues as special-case linked lists</h4>
+    <ul>
+      <li>A linked-list STACK only ever adds/removes nodes at the FRONT — much simpler than the general ordered-insert case.</li>
+      <li>A linked-list QUEUE adds nodes at the END and removes from the FRONT — this typically needs an EXTRA pointer that always tracks the end of the queue, updated whenever a new node is added.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — array-based linked list implementation and the free list (completes Section 23.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is a pointer's actual VALUE when a linked list is implemented using an array?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The array index of the node it points to.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the purpose of the free list?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To keep track of which array slots are currently UNUSED, so a new node insertion knows exactly which slot to reuse, and a deleted node's slot can be added back for future reuse.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A linked-list stack only ever adds and removes nodes at the ______ of the list; a linked-list queue adds at the ______ and removes from the ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Front; end; front.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's DeleteNode procedure removes a node from the main list but never links its slot back into the free list. What problem does this cause over time?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The array slowly "leaks" usable slots — deleted nodes' memory is never reclaimed, so eventually FreeListPtr runs out even though there are technically free slots sitting unused and unreachable.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does inserting into an ORDERED linked list need a WHILE loop, while inserting into a linked-list STACK does not?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An ordered list must find the CORRECT position to preserve order, requiring traversal to compare data values. A stack always inserts at a FIXED position (the front), so no search/traversal is needed at all.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why would a linked-list queue implementation typically add an extra pointer beyond StartPointer?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To track the END of the queue directly — without it, adding a new node at the end would require traversing the ENTIRE list every time just to find the last node, which is inefficient.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 23: Computational Thinking and Problem-Solving — 23.06 Linked Lists: Array Implementation (completes Section 23.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 23.06
+  </div>
+
+</div>
+</body>
+</html>

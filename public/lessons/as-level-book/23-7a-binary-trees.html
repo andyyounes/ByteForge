@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>23.07 Binary Trees — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(45,212,191,.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 16px; margin: 10px 0; text-align: center; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(45,212,191,.12); border: 1px solid rgba(45,212,191,.25); color: #2dd4bf; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 23 · Computational Thinking and Problem-Solving</span>
+  <div class="topic-title">23.07 Binary Trees</div>
+  <div class="topic-subtitle">A search structure where inserting a node never means moving any other node.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What makes a binary tree "binary"</h4>
+    <ul>
+      <li>Each node can have AT MOST TWO children — unlike a general family tree, which can have any number.</li>
+      <li>Terminology: the ROOT node is the top; a LEAF node has no children; each node's descendants split into a LEFT SUBTREE and a RIGHT SUBTREE.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Rule for adding a node to an ORDERED binary tree</h4>
+    <div class="pseudo-box">Start at the root node as the current node.
+REPEAT
+  IF new value > current node's value THEN follow the RIGHT branch
+  IF new value < current node's value THEN follow the LEFT branch
+UNTIL the current node has no branch to follow in that direction.
+Add the new node in this position.</div>
+    <ul>
+      <li>Worked example: adding value D to a tree rooted at F — D &lt; F (turn left), D &gt; C (turn right), D &lt; E (turn left) — since E has no left child yet, D becomes E's new left child.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="300" height="180" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="150" cy="30" r="18" fill="#111320" stroke="#2dd4bf"/><text x="150" y="35" fill="#e2e8f0" font-size="12" text-anchor="middle">F</text>
+      <circle cx="80" cy="90" r="18" fill="#111320" stroke="#2dd4bf"/><text x="80" y="95" fill="#e2e8f0" font-size="12" text-anchor="middle">C</text>
+      <circle cx="220" cy="90" r="18" fill="#111320" stroke="#2dd4bf"/><text x="220" y="95" fill="#e2e8f0" font-size="12" text-anchor="middle">H</text>
+      <circle cx="120" cy="150" r="18" fill="#111320" stroke="#facc15"/><text x="120" y="155" fill="#e2e8f0" font-size="12" text-anchor="middle">E</text>
+      <circle cx="80" cy="150" r="0" fill="none"/>
+      <line x1="150" y1="48" x2="80" y2="72" stroke="#7dd3fc" stroke-width="1.5"/>
+      <line x1="150" y1="48" x2="220" y2="72" stroke="#7dd3fc" stroke-width="1.5"/>
+      <line x1="80" y1="108" x2="120" y2="132" stroke="#7dd3fc" stroke-width="1.5"/>
+      <text x="150" y="15" fill="#9ca3af" font-size="10" text-anchor="middle">Root</text>
+      <text x="120" y="175" fill="#facc15" font-size="9" text-anchor="middle">D inserted here (left of E)</text>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why binary trees are useful as search trees</h4>
+    <ul>
+      <li>Just like binary search on a sorted array, a binary SEARCH TREE gives a FASTER search than a linear search or searching through a linked list.</li>
+      <li>Bonus advantage over a plain linked list: inserting a new node NEVER requires moving other nodes — only ONE pointer (left or right) needs setting to link the new node in.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Array-based implementation</h4>
+    <ul>
+      <li>Same idea as the linked list: an array of RECORDS, where each record represents a node holding its data PLUS a LeftPointer and a RightPointer.</li>
+      <li>Unused nodes are again tracked via a FREE LIST.</li>
+    </ul>
+    <div class="pseudo-box">TYPE TreeNode
+  DECLARE Data : STRING
+  DECLARE LeftPointer : INTEGER
+  DECLARE RightPointer : INTEGER
+ENDTYPE
+
+DECLARE RootPointer : INTEGER
+DECLARE FreePtr : INTEGER
+DECLARE Tree[1:7] OF TreeNode</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Inserting and finding — following the same left/right rule</h4>
+    <ul>
+      <li>INSERT: take a node from the free list, set both its pointers to NULL, then walk down from the root following left/right comparisons exactly as before, remembering the LAST node visited and whether the final move was left or right — that determines which pointer field gets updated to link in the new node.</li>
+      <li>FIND: walk down from the root, comparing at each node and following LEFT or RIGHT accordingly, until either the item is found or a NULL pointer is reached (item not present).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — binary tree structure, insertion, and searching (completes Section 23.07).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the maximum number of children a node in a binary tree can have?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Two.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">When adding a new value to an ordered binary tree, which direction do you go if the new value is SMALLER than the current node's value?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Left.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A node in a binary tree with no children is called a ______ node.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Leaf.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says inserting into a binary search tree is exactly as costly as inserting into an array-based linear list. What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Inserting into a binary tree only needs ONE pointer updated to link in the new node — no other nodes move. Inserting into a linear (array-based) list may require shifting many existing items to make room, which is far more costly.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Starting at a root node with value M, trace the path to insert a new value G, given: G &lt; M (go left) leads to node C; G &gt; C (go right) leads to node K; G &lt; K (go left) and K has no left child. Where is G inserted?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>G becomes the new LEFT child of node K.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the array implementation, what does each TreeNode record store, besides its own data?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A LeftPointer and a RightPointer, linking to its left and right child nodes (or the null pointer if there is no child in that direction).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 23: Computational Thinking and Problem-Solving — 23.07 Binary Trees (completes Section 23.07)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 23.07
+  </div>
+
+</div>
+</body>
+</html>

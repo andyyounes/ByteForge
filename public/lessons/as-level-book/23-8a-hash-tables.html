@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>23.08 Hash Tables — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(251,146,60,.06); border: 1px solid rgba(251,146,60,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #fb923c; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 23 · Computational Thinking and Problem-Solving</span>
+  <div class="topic-title">23.08 Hash Tables</div>
+  <div class="topic-subtitle">Calculating an array address directly from a record's key, and handling collisions with open hashing.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The core idea</h4>
+    <ul>
+      <li>Calculate an ADDRESS (array index) directly from a record's KEY value, and store the record there. To find it again, recalculate the SAME address from the key.</li>
+      <li>Calculating an address from a key is called HASHING.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Collisions</h4>
+    <ul>
+      <li>Finding a hash function that gives every possible key a UNIQUE address is very hard in general. When two DIFFERENT keys hash to the SAME address, that's a COLLISION.</li>
+      <li>Three main ways to resolve collisions: CHAINING (a linked list starting at the hashed address for every colliding record), CLOSED HASHING (all collisions stored in a separate OVERFLOW area), OPEN HASHING (linear search from the hashed address to the next EMPTY slot).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — a simple hashing function</h4>
+    <div class="pseudo-box">FUNCTION Hash(Key) RETURNS INTEGER
+  Address ← Key MOD (n + 1)
+  RETURN Address
+ENDFUNCTION
+
+// n = 9, so Index ← CustomerID MOD 10
+// Customer IDs to store: 45876, 32390, 95312, 64636, 23467
+// 45876 MOD 10 = 6 → slot 6
+// 32390 MOD 10 = 0 → slot 0
+// 95312 MOD 10 = 2 → slot 2
+// 64636 MOD 10 = 6 → COLLISION with 45876! → next available slot (7)
+// 23467 MOD 10 = 7 → COLLISION with 64636's new slot! → next available slot (8)</div>
+    <ul>
+      <li>This resolves collisions using OPEN HASHING — each colliding record moves to the next empty slot found by a linear search.</li>
+      <li>When SEARCHING later, an unoccupied slot encountered along that same linear path tells you the record does NOT exist in the table.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Inserting into a hash table (open hashing, pseudocode)</h4>
+    <div class="pseudo-box">PROCEDURE Insert(NewRecord)
+  Index ← Hash(NewRecord.Key)
+  WHILE HashTable[Index] NOT empty
+    Index ← Index + 1
+    IF Index > Max
+      THEN Index ← 1        // wrap around to the beginning
+    ENDIF
+  ENDWHILE
+  HashTable[Index] ← NewRecord
+END PROCEDURE</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Finding a record (open hashing, pseudocode)</h4>
+    <div class="pseudo-box">FUNCTION FindRecord(SearchKey) RETURNS Record
+  Index ← Hash(SearchKey)
+  WHILE (HashTable[Index].Key &lt;&gt; SearchKey) AND (HashTable[Index] NOT empty)
+    Index ← Index + 1
+    IF Index > Max
+      THEN Index ← 0
+    ENDIF
+  ENDWHILE
+  IF HashTable[Index] NOT empty
+    THEN RETURN HashTable[Index]
+  ENDIF
+END FUNCTION</div>
+    <ul>
+      <li>Both procedures follow the SAME linear path from the hashed address — this is essential: insertion and lookup must use identical logic, or records could never be found again.</li>
+    </ul>
+    <div class="key-term-box"><strong>Hashing:</strong> calculating an address from a key value.<br><strong>Collision:</strong> when two different key values hash to the same address.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — hash tables, hashing, and collision resolution (completes Section 23.08).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is a collision in the context of a hash table?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>When two different key values hash to the same calculated address.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Describe how open hashing resolves a collision.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It performs a linear search forward from the hashed address until it finds an empty slot, and stores the colliding record there.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      When searching for a record with open hashing, encountering an ______ slot along the linear search path means the record does not exist in the table.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Empty (unoccupied).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's Insert procedure uses open hashing but their FindRecord function instead jumps straight to a DIFFERENT overflow area to search for collided records. What will go wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Insert and Find must use the EXACT SAME collision-resolution logic — if records are inserted via open hashing (linear search from the hashed address) but searched for using a different scheme (overflow area), records placed via collision resolution will never be found again.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Using the hash function Index ← CustomerID MOD 10, what slot does a customer with ID 78901 hash to?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>78901 MOD 10 = 1, so slot 1.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why does the Insert/FindRecord pseudocode wrap the index back to the start of the table once it goes past Max?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>So the linear search for an empty slot (or a matching record) can continue searching the WHOLE table, including slots near the beginning, rather than stopping artificially at the end of the array.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 23: Computational Thinking and Problem-Solving — 23.08 Hash Tables (completes Section 23.08)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 23.08
+  </div>
+
+</div>
+</body>
+</html>

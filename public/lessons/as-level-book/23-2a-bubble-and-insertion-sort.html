@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>23.02 Bubble Sort and Insertion Sort — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #34d399; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 23 · Computational Thinking and Problem-Solving</span>
+  <div class="topic-title">23.02 Bubble Sort and Insertion Sort</div>
+  <div class="topic-subtitle">Two standard sorting algorithms — comparing adjacent items vs. building up a sorted section one item at a time.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Bubble sort — a quick recap</h4>
+    <ul>
+      <li>Repeatedly steps through the list, comparing ADJACENT items and swapping them if they're in the wrong order — larger values gradually "bubble up" toward the end.</li>
+      <li>An efficient version stops early once a full pass makes NO swaps (the list is already sorted), and can also shrink the range checked each pass, since the largest remaining items settle into place at the end first.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Insertion sort — the card-sorting analogy</h4>
+    <ul>
+      <li>Imagine sorting a hand of cards: you hold a SORTED section in your hand, and take cards ONE AT A TIME from an unsorted pile, inserting each into its correct position among the cards you're already holding.</li>
+      <li>Compare the card to be inserted against the CURRENT card (starting from the end of the sorted section, working backward): if the new card is bigger, insert it below; otherwise, move to the next card up and repeat.</li>
+      <li>If you reach the top of the sorted section without finding a smaller card, the new card goes right at the TOP.</li>
+    </ul>
+    <div class="key-term-box"><strong>Insertion sort:</strong> a sorting algorithm that builds a sorted section of the list one item at a time, inserting each new item into its correct position.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Insertion sort in pseudocode</h4>
+    <div class="pseudo-box">FOR Pointer ← 2 TO NumberOfItems
+  ItemToBeInserted ← List[Pointer]
+  CurrentItem ← Pointer - 1        // last item in the sorted part
+  WHILE (List[CurrentItem] > ItemToBeInserted) AND (CurrentItem > 0)
+    List[CurrentItem + 1] ← List[CurrentItem]   // shift item down
+    CurrentItem ← CurrentItem - 1               // look at the item above
+  ENDWHILE
+  List[CurrentItem + 1] ← ItemToBeInserted      // insert item
+ENDFOR</div>
+    <ul>
+      <li>The FOR loop starts at Pointer=2 (position 1 is trivially already "sorted" on its own).</li>
+      <li>The WHILE loop shifts sorted items UP one position at a time, making room, until it finds the correct spot for the new item — or runs out of items to compare against (CurrentItem reaches 0).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — bubble sort and insertion sort (part of Section 23.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the fundamental difference in approach between bubble sort and insertion sort?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Bubble sort repeatedly compares and swaps ADJACENT pairs across the whole list. Insertion sort maintains a growing SORTED section and inserts each new item directly into its correct position within that section.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the insertion sort pseudocode, why does the FOR loop start at Pointer = 2, not Pointer = 1?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A single item (position 1) is trivially already "sorted" on its own — there's nothing to compare it against yet, so sorting genuinely begins from the second item.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In insertion sort, the WHILE loop stops shifting items when it finds an item that is ______ than or equal to the item being inserted, or when it runs out of items to compare (CurrentItem reaches 0).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Smaller.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student implements insertion sort but forgets to store <code>ItemToBeInserted</code> in a separate variable before the WHILE loop starts shifting items. What goes wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The shifting step (<code>List[CurrentItem+1] ← List[CurrentItem]</code>) would overwrite the original value at <code>List[Pointer]</code> before it's been saved, permanently losing the item that was supposed to be inserted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Dry-run insertion sort on the list [5, 2, 4] by hand. What does the list look like after processing Pointer=2 (inserting the value 2)?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>[2, 5, 4] — the 2 is compared against 5, found smaller, shifts 5 down one place, then 2 is inserted at position 1 (CurrentItem reaches 0, the loop condition fails).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What real-world sorting activity does insertion sort closely resemble?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Sorting a hand of playing cards one card at a time, inserting each new card into its correct position among cards already held in order.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 23: Computational Thinking and Problem-Solving — 23.02 Bubble Sort and Insertion Sort (part of Section 23.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 23.02
+  </div>
+
+</div>
+</body>
+</html>
