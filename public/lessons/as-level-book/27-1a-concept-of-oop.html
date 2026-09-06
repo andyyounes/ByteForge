@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>27.01 Concept of OOP — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(96,165,250,.06); border: 1px solid rgba(96,165,250,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #60a5fa; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 27 · Object-Oriented Programming (OOP)</span>
+  <div class="topic-title">27.01 Concept of OOP</div>
+  <div class="topic-subtitle">Grouping data AND the code that operates on it into one unit: encapsulation, classes, and objects.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>From records to objects</h4>
+    <ul>
+      <li>Procedural programming groups related STATEMENTS into subroutines, and groups related DATA into record structures — but keeps the two SEPARATE.</li>
+      <li>OOP goes one step further: it groups the DATA structure TOGETHER WITH the subroutines that operate on it. This combined group is called an OBJECT.</li>
+      <li>This combining of data with the subroutines that act on it is called ENCAPSULATION.</li>
+    </ul>
+    <div class="key-term-box"><strong>Encapsulation:</strong> combining data and subroutines into a class.<br><strong>Class:</strong> a type that combines a record with the methods that operate on the properties in the record.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>The problem with plain records</h4>
+    <ul>
+      <li>With a plain record, you CAN write a procedure to update a field properly (e.g. <code>UpdateRegistration</code>) — but nothing STOPS you from bypassing it and changing the field DIRECTLY: <code>ThisCar.EngineSize ← 2500</code>, with no validation at all.</li>
+      <li>OOP's classes fix this: attributes can ONLY be accessed through methods defined as part of the class — there is NO direct path to the data.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Private attributes, public methods</h4>
+    <ul>
+      <li>ATTRIBUTES (the data items of a class) are PRIVATE — inaccessible from outside the class.</li>
+      <li>METHODS (the subroutines of a class) are PUBLIC — made available for other code to call.</li>
+      <li>A CLASS is a TEMPLATE — once defined, it can be used to create one or more OBJECTS of that class type.</li>
+    </ul>
+    <div class="key-term-box"><strong>Attributes:</strong> the data items of a class.<br><strong>Methods:</strong> the subroutines of a class.<br><strong>Object:</strong> an instance of a class.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why OOP produces more robust code</h4>
+    <ul>
+      <li>Because attributes can ONLY be changed via methods, they're PROTECTED from accidental/careless changes — validation logic can live in one place (the setter method) and is guaranteed to run every time.</li>
+      <li>Classes provided in tested MODULE LIBRARIES are already thoroughly verified — reusing them means you're building on TESTED foundations rather than writing everything from scratch, reducing the chance of introducing new bugs.</li>
+      <li>The syllabus-prescribed OOP languages are Python 3, VB.NET, and Delphi/Object Pascal.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — encapsulation, classes, objects, attributes, and methods (completes Section 27.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is encapsulation?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Combining data (attributes) and the subroutines (methods) that operate on it into a single class.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the relationship between a class and an object?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A class is the template/blueprint; an object is one specific INSTANCE created from that template.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In OOP, attributes are declared ______, and methods are declared ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Private; public.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes a class but allows other code to directly write <code>ThisCar.EngineSize = 2500</code>, bypassing any method. What OOP principle has been broken?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Encapsulation — attributes should be PRIVATE, accessible only through the class's own methods, so validation and controlled access can be enforced. Allowing direct field access defeats the whole purpose of encapsulation.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does reusing classes from a tested module library tend to reduce bugs, compared to writing equivalent code from scratch?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Library classes have already been thoroughly tested by others — building on these verified foundations is less likely to introduce new bugs than writing and testing equivalent functionality yourself from the beginning.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name the three programming languages the syllabus prescribes for OOP.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Python 3, VB.NET, and Delphi/Object Pascal.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 27: Object-Oriented Programming (OOP) — 27.01 Concept of OOP (completes Section 27.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 27.01
+  </div>
+
+</div>
+</body>
+</html>

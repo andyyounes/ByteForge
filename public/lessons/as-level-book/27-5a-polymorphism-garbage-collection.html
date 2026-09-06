@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>27.05-27.06 Polymorphism &amp; Garbage Collection — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(56,189,248,.12); color: #38bdf8; border: 1px solid rgba(56,189,248,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(56,189,248,.06); border: 1px solid rgba(56,189,248,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #38bdf8; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(56,189,248,.12); border: 1px solid rgba(56,189,248,.25); color: #38bdf8; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 27 · Object-Oriented Programming (OOP)</span>
+  <div class="topic-title">27.05–27.06 Polymorphism &amp; Garbage Collection</div>
+  <div class="topic-subtitle">Same method name, different behaviour per class — and how memory gets reclaimed automatically.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The problem polymorphism solves</h4>
+    <ul>
+      <li>A method like <code>PrintDetails</code>, defined only in the BASE class, can only print the base class's OWN attributes — it has no way to know about a SUBCLASS's extra attributes (like Book's IsRequested).</li>
+      <li>The fix: REDEFINE the method in the subclass, using the SAME identifier — but giving it DIFFERENT behaviour appropriate to that subclass.</li>
+    </ul>
+    <div class="key-term-box"><strong>Polymorphism:</strong> the method behaves differently for different classes in the hierarchy.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Redefining a method — calling the base version first</h4>
+    <div class="pseudo-box"># Python — Book's version of PrintDetails
+def PrintDetails(self):
+    print("Book Details")
+    LibraryItem.PrintDetails(self)   # calls the BASE CLASS method of the same name
+    print(self._IsRequested)</div>
+    <ul>
+      <li>Rather than reimplementing everything, the subclass's method typically CALLS the base class's version first (to handle the shared attributes), then adds its OWN extra output.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Language-specific syntax for polymorphism</h4>
+    <ul>
+      <li><strong>VB.NET:</strong> the base class method needs the keyword <code>Overridable</code>; the subclass version uses <code>Overrides</code>, and calls the base version via <code>MyBase.PrintDetails()</code>.</li>
+      <li><strong>Pascal:</strong> the base class method header needs <code>virtual</code>; the subclass's header needs <code>override</code>, and calls the base version via <code>inherited;</code>.</li>
+      <li>Python needs NO special keyword — simply redefining a method with the same name in the subclass is enough; calling the base version is done explicitly (<code>LibraryItem.PrintDetails(self)</code>).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Garbage collection</h4>
+    <ul>
+      <li>When an object is created, it occupies MEMORY. If objects never release that memory when no longer needed, eventually there's NO free memory left — this is called MEMORY LEAKAGE.</li>
+      <li><strong>Python and VB.NET:</strong> a GARBAGE COLLECTOR automatically reclaims memory from objects no longer referenced by the running program — the programmer does NO manual housekeeping.</li>
+      <li><strong>Pascal:</strong> the programmer must EXPLICITLY release memory using <code>.Free</code> (e.g. <code>ThisBook.Free;</code>) — NOT automatic.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — polymorphism and garbage collection (completes Sections 27.05–27.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is polymorphism?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A method with the same identifier behaves differently depending on which class in the hierarchy it's called on.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What keyword must Pascal add to a base class method's header to allow it to be overridden?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>virtual.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In Pascal, memory must be manually released using the ______ method, whereas Python and VB.NET use an automatic ______ ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>.Free; garbage collector.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes a VB.NET subclass method with <code>Overrides</code>, but the base class method was never marked <code>Overridable</code>. What happens?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This will cause a compile error — VB.NET requires the base class method to be explicitly marked Overridable before any subclass can legally use Overrides to redefine it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does a Pascal program need to explicitly call ThisBook.Free before the program ends, but a Python program doesn't need an equivalent call?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Pascal does not have automatic garbage collection — memory occupied by objects must be explicitly released by the programmer. Python's garbage collector automatically detects when an object is no longer referenced and reclaims its memory without any programmer action.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What term describes the situation where a program eventually runs out of free memory because objects never release it?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Memory leakage.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 27: Object-Oriented Programming (OOP) — 27.05–27.06 Polymorphism &amp; Garbage Collection (completes Sections 27.05–27.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Sections 27.05–27.06
+  </div>
+
+</div>
+</body>
+</html>

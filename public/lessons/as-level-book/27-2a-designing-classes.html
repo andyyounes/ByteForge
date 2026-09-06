@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>27.02 Designing Classes and Objects — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #34d399; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 8px; text-align: left; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(52,211,153,.1); color: #34d399; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 27 · Object-Oriented Programming (OOP)</span>
+  <div class="topic-title">27.02 Designing Classes and Objects</div>
+  <div class="topic-subtitle">Constructors, getters, and setters — the anatomy of a well-designed class.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Instantiation and the constructor</h4>
+    <ul>
+      <li>Creating a new object from a class is called INSTANTIATION.</li>
+      <li>A CONSTRUCTOR is a special method called to CREATE a new object and INITIALISE its attributes.</li>
+      <li>Attributes ALREADY KNOWN at creation time (e.g. a car's VehicleID and EngineSize, fixed at manufacture) are set BY the constructor.</li>
+    </ul>
+    <div class="key-term-box"><strong>Constructor:</strong> a special type of method that is called to create a new object and initialise its attributes.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Getters and setters</h4>
+    <ul>
+      <li>GETTERS retrieve (get) an attribute's current value — since attributes are PRIVATE, a getter is the only way outside code can read them.</li>
+      <li>SETTERS update an attribute's value AFTER instantiation — needed for any property that might change later (e.g. Registration is set only once the car is SOLD, not at manufacture).</li>
+      <li>Properties that get set ONLY at instantiation and never change afterward don't NEED a setter — deliberately omitting one makes the object MORE robust, since it becomes literally impossible to change something that was never meant to change.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — the Car class identifier table</h4>
+    <table class="dtype-table">
+      <tr><th>Identifier</th><th>Description</th></tr>
+      <tr><td>VehicleID</td><td>Unique ID assigned at time of manufacture</td></tr>
+      <tr><td>Registration</td><td>Assigned after time of purchase</td></tr>
+      <tr><td>DateOfRegistration</td><td>Date of registration</td></tr>
+      <tr><td>EngineSize</td><td>Assigned at time of manufacture</td></tr>
+      <tr><td>PurchasePrice</td><td>Assigned at time of purchase</td></tr>
+      <tr><td>Constructor()</td><td>Creates a Car object; sets VehicleID and EngineSize</td></tr>
+      <tr><td>SetPurchasePrice(), SetRegistration(), SetDateOfRegistration()</td><td>Setters — for values known only after purchase/registration</td></tr>
+      <tr><td>GetVehicleID(), GetRegistration(), GetDateOfRegistration(), GetEngineSize(), GetPurchasePrice()</td><td>Getters — for reading each attribute</td></tr>
+    </table>
+    <ul>
+      <li>Notice: VehicleID and EngineSize have NO setters at all — they're fixed forever once the car is manufactured, matching real-world behaviour exactly.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The class diagram convention</h4>
+    <ul>
+      <li>A class diagram lists ATTRIBUTES (top section, with data types) and METHODS (bottom section) — by convention, ATTRIBUTES must be shown as PRIVATE and METHODS as PUBLIC.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — constructors, getters, and setters (completes Section 27.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is instantiation?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The process of creating a new object from a class.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why might a property have no setter at all?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because it's only ever meant to be set once, at instantiation (by the constructor) — deliberately omitting a setter prevents it from ever being changed afterward, making the object more robust.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ retrieves an attribute's value; a ______ updates an attribute's value after instantiation.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Getter; setter.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's Car class adds a SetVehicleID() method, even though VehicleID is meant to be permanently fixed at manufacture. What design flaw does this introduce?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Adding a setter for something that should never change removes the protection the design was supposed to provide — it becomes possible to (accidentally or otherwise) change a value that real-world logic says is permanent, weakening the class's robustness.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In a class diagram, how are attributes and methods conventionally marked for visibility?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Attributes are shown as private; methods are shown as public.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which two attributes of the Car class are set by the constructor, since they're known at manufacture time?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>VehicleID and EngineSize.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 27: Object-Oriented Programming (OOP) — 27.02 Designing Classes and Objects (completes Section 27.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 27.02
+  </div>
+
+</div>
+</body>
+</html>

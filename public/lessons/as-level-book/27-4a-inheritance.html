@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>27.04 Inheritance — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(232,121,249,.06); border: 1px solid rgba(232,121,249,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #e879f9; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 16px; margin: 10px 0; text-align: center; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 27 · Object-Oriented Programming (OOP)</span>
+  <div class="topic-title">27.04 Inheritance</div>
+  <div class="topic-subtitle">Writing shared code once in a base class, and specialising it in subclasses.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The core idea</h4>
+    <ul>
+      <li>Design a BASE CLASS (or SUPERCLASS), then DERIVE further classes (SUBCLASSES) from it.</li>
+      <li>The base class's code is written ONCE; subclasses automatically get its attributes and methods, PLUS their own additional ones.</li>
+    </ul>
+    <div class="key-term-box"><strong>Inheritance:</strong> all attributes and methods of the base class are copied to the subclass.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — a library system</h4>
+    <ul>
+      <li>A library lends BOOKS and CDs. Both share MANY attributes: Title, Author/Artist, unique ID, whether on loan, due date. But books ALSO need "IsRequested" (can be requested by another borrower); CDs ALSO need "Genre".</li>
+      <li>Design: a base class <code>LibraryItem</code> holding the SHARED attributes/methods, with <code>Book</code> and <code>CD</code> as SUBCLASSES adding their own specific attribute.</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="360" height="160" viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="120" y="10" width="120" height="40" rx="6" fill="#111320" stroke="#e879f9"/>
+      <text x="180" y="34" fill="#e2e8f0" font-size="11" text-anchor="middle">LibraryItem</text>
+      <line x1="180" y1="50" x2="180" y2="80" stroke="#7dd3fc" stroke-width="1.5"/>
+      <line x1="80" y1="80" x2="280" y2="80" stroke="#7dd3fc" stroke-width="1.5"/>
+      <line x1="80" y1="80" x2="80" y2="100" stroke="#7dd3fc" stroke-width="1.5"/>
+      <line x1="280" y1="80" x2="280" y2="100" stroke="#7dd3fc" stroke-width="1.5"/>
+      <rect x="20" y="100" width="120" height="40" rx="6" fill="#111320" stroke="#e879f9"/>
+      <text x="80" y="124" fill="#e2e8f0" font-size="11" text-anchor="middle">Book</text>
+      <rect x="220" y="100" width="120" height="40" rx="6" fill="#111320" stroke="#e879f9"/>
+      <text x="280" y="124" fill="#e2e8f0" font-size="11" text-anchor="middle">CD</text>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Abstract classes</h4>
+    <ul>
+      <li>A base class NEVER used to create objects DIRECTLY is an ABSTRACT class. <code>LibraryItem</code> is abstract — real objects are always specifically Books or CDs, never a plain "LibraryItem".</li>
+    </ul>
+    <div class="key-term-box"><strong>Abstract class:</strong> a base class that is never used to create objects directly.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Declaring inheritance in Python</h4>
+    <div class="pseudo-box">import datetime
+
+class LibraryItem:
+    def __init__(self, t, a, i):
+        self.Title = t
+        self.AuthorArtist = a
+        self.ItemID = i
+        self.OnLoan = False
+        self.DueDate = datetime.date.today()
+
+    def GetTitle(self):
+        return self.Title
+    # other Get methods go here
+
+class Book(LibraryItem):          # Book INHERITS from LibraryItem
+    def __init__(self, t, a, i):
+        LibraryItem.__init__(self, t, a, i)   # call the base class constructor
+        self.IsRequested = False              # Book's OWN extra attribute</div>
+    <ul>
+      <li>In Python, <code>class Book(LibraryItem):</code> establishes the inheritance relationship — putting the base class name in parentheses.</li>
+      <li>The subclass constructor typically CALLS the base class's constructor first (to set up the shared attributes), then adds its OWN extra initialisation.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — inheritance, base classes, subclasses, and abstract classes (completes Section 27.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does a subclass automatically get from its base class?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>All the base class's attributes and methods — plus it can define its own additional attributes and methods on top.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is an abstract class?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A base class that is never used to create objects directly — only its subclasses are actually instantiated.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In the library example, LibraryItem is the ______ class; Book and CD are its ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Base (super); subclasses.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's Book subclass constructor sets up Title, ItemID, and IsRequested manually, duplicating the LibraryItem constructor's code, instead of calling it. What's the drawback?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This duplicates code that already exists in the base class — defeating the purpose of inheritance (write shared logic once). If the base class initialisation logic ever needs to change, the duplicated code in every subclass would ALSO need updating separately, risking inconsistency.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does IsRequested belong specifically to the Book subclass, rather than the shared LibraryItem base class?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Only books, not CDs, can be requested by another borrower in this system's design — it's an attribute specific to ONE subclass's behaviour, not something shared by every library item.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In Python, how is the inheritance relationship between a subclass and its base class declared?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>By putting the base class name in parentheses after the subclass name: <code>class Book(LibraryItem):</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 27: Object-Oriented Programming (OOP) — 27.04 Inheritance (completes Section 27.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 27.04
+  </div>
+
+</div>
+</body>
+</html>
