@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>29.06 Rules in Prolog — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 29 · Declarative Programming</span>
+  <div class="topic-title">29.06 Rules in Prolog</div>
+  <div class="topic-subtitle">Deriving new facts from existing ones — IF this AND this, THEN that.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The rule structure</h4>
+    <ul>
+      <li>Recall: <code>Head :- Body.</code> — a rule's BODY consists of calls to predicates, called the rule's GOALS.</li>
+      <li>If the BODY is true, the HEAD is true too.</li>
+      <li>In Prolog notation: <code>:-</code> means IF; a comma <code>,</code> means AND.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — grandparent and sibling rules</h4>
+    <div class="pseudo-box">parent(fred, jack).
+parent(fred, alia).
+parent(fred, paul).
+parent(dave, fred).
+
+% "G is a grandparent of S if G is a parent of P, and P is a parent of S"
+grandparent(G, S) :- parent(G, P), parent(P, S).
+
+% "A and B are siblings if they share a parent"
+sibling(A, B) :-
+    parent(P, A),
+    parent(P, B).</div>
+    <ul>
+      <li>Note a subtlety: with the sibling rule as written, querying <code>sibling(jack, X)</code> ALSO returns Jack as his OWN sibling (since Jack IS his own parent's child).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Fixing the sibling rule — excluding a person from being their own sibling</h4>
+    <div class="pseudo-box">sibling(A, B) :-
+    parent(P, A),
+    parent(P, B),
+    not(A = B).</div>
+    <ul>
+      <li>Adding <code>not(A = B)</code> as an EXTRA goal excludes the case where A and B are actually the SAME person.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — a rule that ignores an argument</h4>
+    <div class="pseudo-box">ingredient(tagine, aubergine, 250).
+ingredient(stew, beef, 400).
+meat(chicken).
+meat(beef).
+meat(lamb).
+
+containsMeat(X) :-
+    ingredient(X, Meat, _),
+    meat(Meat).
+
+?- containsMeat(X).
+X = stew.</div>
+    <ul>
+      <li>This rule COMBINES two facts: "X uses SOME ingredient" (whose amount we don't care about — hence the anonymous variable) AND "that ingredient IS a meat".</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — Prolog rules (completes Section 29.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does the comma mean inside a Prolog rule's body?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>AND — all the goals separated by commas must be true for the rule's head to be true.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does the sibling rule need an extra "not(A = B)" clause?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Without it, the rule would incorrectly report that a person is their OWN sibling, since they share a parent with themselves — the extra clause excludes A and B being the same person.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In Prolog, ______ replaces the word IF, and a ______ replaces the word AND.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>:- ; comma.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes <code>grandparent(G, S) :- parent(G, S), parent(S, P).</code> intending the original grandparent rule. What's wrong with the variable usage?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The variables are mismatched — this actually checks that G is a parent of S, AND S is a parent of P (an unrelated third person), which does NOT express "G is a grandparent of S". The correct rule is <code>parent(G, P), parent(P, S)</code>, chaining through the SAME intermediate person P.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Given <code>containsMeat(X) :- ingredient(X, Meat, _), meat(Meat).</code>, why is the anonymous variable used for the amount argument?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The rule only cares WHETHER a dish contains some meat ingredient — the specific amount is irrelevant to this rule's logic, so the anonymous variable signals that clearly.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is a rule's body made up of?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Calls to predicates, referred to as the rule's goals.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 29: Declarative Programming — 29.06 Rules in Prolog (completes Section 29.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 29.06
+  </div>
+
+</div>
+</body>
+</html>

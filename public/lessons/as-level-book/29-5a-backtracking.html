@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>29.07 Instantiation and Backtracking — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(232,121,249,.1); color: #e879f9; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 29 · Declarative Programming</span>
+  <div class="topic-title">29.07 Instantiation and Backtracking</div>
+  <div class="topic-subtitle">Watching how Prolog actually searches the knowledge base to find (or fail to find) an answer.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Instantiation, not assignment</h4>
+    <ul>
+      <li>When Prolog answers a query with something like <code>X = stew</code>, the <code>=</code> is NOT assignment (as in imperative programming) — it shows INSTANTIATION: X has been matched to the value stew for this particular solution.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Watching Prolog work: the trace facility</h4>
+    <ul>
+      <li>Typing <code>trace.</code> before a query shows EVERY step Prolog takes while trying to satisfy it — invaluable for understanding exactly HOW an answer was reached (or why a query failed).</li>
+    </ul>
+    <table class="dtype-table">
+      <tr><th>Trace term</th><th>Meaning</th></tr>
+      <tr><td>Call</td><td>The initial entry to a predicate</td></tr>
+      <tr><td>Creep</td><td>Prolog is moving to the next predicate</td></tr>
+      <tr><td>Exit</td><td>A successful return</td></tr>
+      <tr><td>Redo</td><td>Backing into a predicate again for another possible answer</td></tr>
+      <tr><td>Fail</td><td>Prolog can find no more solutions along this path</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — tracing containsMeat(X)</h4>
+    <div class="pseudo-box">containsMeat(X) :- ingredient(X, Meat, _), meat(Meat).
+
+Trace summary:
+  Call: containsMeat(X)
+  Call: ingredient(X, Meat, _)
+  Exit: ingredient(tagine, aubergine, 250)
+  Call: meat(aubergine)
+  Fail: meat(aubergine)          -- aubergine is NOT meat, so BACKTRACK
+  ...retry ingredient with the NEXT possible match...
+  Exit: ingredient(stew, beef, 400)
+  Call: meat(beef)
+  Exit: meat(beef)               -- SUCCESS
+  Exit: containsMeat(stew)
+  X = stew</div>
+    <ul>
+      <li>This shows BACKTRACKING in action: when <code>meat(aubergine)</code> FAILS, Prolog doesn't give up — it goes BACK to the previous goal (<code>ingredient</code>) and tries the NEXT possible match, continuing until it either succeeds or runs out of options entirely.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — instantiation and backtracking (completes Section 29.07).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does "X = stew" actually mean in a Prolog response?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The variable X has been instantiated (matched) to the value stew for this solution — it is not an assignment statement.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does "backtracking" mean?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>When a goal fails, Prolog goes back to a previous goal and tries the next possible match/alternative, rather than giving up entirely.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In a Prolog trace, ______ marks a successful return from a predicate, while ______ marks the point where no more solutions can be found.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Exit; Fail.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says "once meat(aubergine) fails, the whole query containsMeat(X) must fail too". Why is this wrong, based on the trace?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Prolog BACKTRACKS instead of giving up immediately — it retries the ingredient goal to find OTHER possible matches (like stew/beef), and only reports overall failure if EVERY possible path has been exhausted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is the trace facility useful for a programmer debugging a Prolog rule that isn't returning the expected results?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It shows the EXACT sequence of calls, successes, failures, and backtracking Prolog performs — letting the programmer see precisely where the logic diverges from what was expected, rather than only seeing the final answer (or lack of one).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What trace term indicates Prolog is moving forward to evaluate the next predicate?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Creep.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 29: Declarative Programming — 29.07 Instantiation and Backtracking (completes Section 29.07)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 29.07
+  </div>
+
+</div>
+</body>
+</html>

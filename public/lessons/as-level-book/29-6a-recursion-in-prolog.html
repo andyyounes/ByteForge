@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>29.08 Recursion in Prolog — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(56,189,248,.12); color: #38bdf8; border: 1px solid rgba(56,189,248,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(56,189,248,.12); border: 1px solid rgba(56,189,248,.25); color: #38bdf8; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 29 · Declarative Programming</span>
+  <div class="topic-title">29.08 Recursion in Prolog</div>
+  <div class="topic-subtitle">A rule that uses itself as a sub-goal — the same base-case/general-case discipline as imperative recursion.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What recursion means for a rule</h4>
+    <ul>
+      <li>Recursion in declarative programming: a rule is defined by ITSELF — more precisely, a rule uses ITSELF as one of its own sub-goals.</li>
+      <li>The SAME discipline from Chapter 25 still applies: a recursive rule must have a BASE CASE, a GENERAL CASE, and must reach the base case after a FINITE number of self-calls.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — the "ancestor" rule</h4>
+    <ul>
+      <li>Building on the Family knowledge base: "A is an ancestor of B" needs to cover NOT just direct parents, but parents of parents, and so on, indefinitely.</li>
+    </ul>
+    <div class="pseudo-box">% Base case: a parent IS an ancestor
+ancestor(A, B) :- parent(A, B).
+
+% General case: A is an ancestor of B if A is a parent of SOME X,
+% and X is (recursively) an ancestor of B
+ancestor(A, B) :- parent(A, X), ancestor(X, B).</div>
+    <ul>
+      <li>The GENERAL case calls <code>ancestor</code> AGAIN — but on X, which is CLOSER to B in the family tree than A was — this satisfies the "must get closer to the base case" requirement, exactly like imperative recursion.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — factorial in Prolog</h4>
+    <div class="pseudo-box">factorial(0, 1).                            % base case: 0! = 1
+
+factorial(N, Result) :-
+    M is N - 1,
+    factorial(M, PartResult),               % recursive call — closer to 0
+    Result is PartResult * N.
+
+?- factorial(5, Answer).
+Answer = 120.</div>
+    <ul>
+      <li>Compare this DIRECTLY to the imperative recursive version from Chapter 25 — the same base case / general case shape, just expressed in Prolog's clause syntax.</li>
+      <li><code>is</code> performs ARITHMETIC evaluation and instantiation (e.g. <code>M is N - 1</code>) — different from plain <code>=</code>, which just tests/performs unification without arithmetic.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — recursion in Prolog (completes Section 29.08).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does it mean for a Prolog rule to be recursive?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The rule uses itself as one of its own sub-goals within its body.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What are the three rules a recursive Prolog rule must still satisfy, just like imperative recursion?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It must have a base case, have a general case, and reach the base case after a finite number of calls to itself.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In the ancestor rule's general case, <code>ancestor(A, B) :- parent(A, X), ancestor(X, B).</code>, the recursive call uses ______ instead of A, moving closer to the base case.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>X.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes <code>factorial(N, Result) :- M is N - 1, factorial(N, PartResult), Result is PartResult * N.</code> (calling factorial(N, ...) instead of factorial(M, ...)). What goes wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The recursive call never actually gets CLOSER to the base case (N is never reduced in the recursive call itself) — this would cause infinite recursion, since N stays the same value forever instead of counting down toward 0.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      What is the base case of the factorial rule shown above?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>factorial(0, 1).</code> — 0! = 1, stated explicitly with no recursive call needed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does the "is" operator do in Prolog, that plain "=" does not?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It performs arithmetic evaluation of the expression on its right-hand side, then instantiates the result — plain "=" just tests/performs unification, without evaluating arithmetic expressions.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 29: Declarative Programming — 29.08 Recursion in Prolog (completes Section 29.08)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 29.08
+  </div>
+
+</div>
+</body>
+</html>
