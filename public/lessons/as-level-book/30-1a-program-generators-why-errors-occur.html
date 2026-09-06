@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>30.01-30.02 Program Generators &amp; Why Errors Occur — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #34d399; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 30 · Software Development</span>
+  <div class="topic-title">30.01–30.02 Program Generators &amp; Why Errors Occur</div>
+  <div class="topic-subtitle">Tools that write code for you, and the human causes behind most software bugs. Opens the final chapter of the course.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Program generators — not a new idea</h4>
+    <ul>
+      <li>Early computers were programmed directly in MACHINE CODE — extremely tedious. ASSEMBLERS were invented to generate machine code from assembly instructions; later, INTERPRETERS and COMPILERS generate low-level code from high-level programs.</li>
+      <li>Program generators have therefore existed for a very long time — the trend continues toward tools that translate ever more ABSTRACT models into working code.</li>
+      <li>Modern IDEs offer advanced generation: interactive GUI DESIGNERS, code generated from a WIZARD or TEMPLATE, and Computer-Aided Software Engineering (CASE) tools.</li>
+    </ul>
+    <div class="key-term-box"><strong>Program generator:</strong> a computer program that can be used to create other computer programs.<br><strong>Program library:</strong> a collection of pre-compiled routines or modules that a program can use.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Program libraries</h4>
+    <ul>
+      <li>Built-in functions (Chapter 13) are part of a program LIBRARY — pre-written, pre-TESTED code that saves you from writing (and re-testing) the same logic from scratch.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why software fails to perform as expected</h4>
+    <ul>
+      <li>A CODING mistake by the programmer.</li>
+      <li>The REQUIREMENT SPECIFICATION wasn't drawn up correctly in the first place.</li>
+      <li>A DESIGN error made by the software designer.</li>
+      <li>A poorly designed USER INTERFACE that leads users to make mistakes.</li>
+      <li>HARDWARE failure.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Finding errors — and why finding them EARLY matters</h4>
+    <ul>
+      <li>An END USER reporting an error damages the software developer's REPUTATION — testing BEFORE release is essential.</li>
+      <li>Research consistently shows: the EARLIER an error is found, the CHEAPER it is to fix.</li>
+      <li>Edsger Dijkstra (famous computer scientist): <em>"Program testing can be used to show the presence of bugs, but never to show their absence!"</em> — testing can never PROVE a program is bug-free, only reveal bugs that exist.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — program generators, libraries, and why errors occur (completes Sections 30.01–30.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Give two examples of program generators mentioned in this section.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Any two of: assemblers, interpreters/compilers, IDE GUI wizards/templates, CASE tools.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does Dijkstra's quote mean in practice?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No matter how much testing a program passes, this only proves the TESTED cases work — it can never guarantee there are no bugs remaining in UNTESTED cases.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      The earlier an error is found during development, the ______ it is to fix.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Cheaper.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A team assumes all their software bugs must be the programmer's fault, since "that's who writes the code". What other sources of error does this overlook?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Errors can also stem from an incorrect requirement specification, a design flaw introduced by the software designer, a poorly designed user interface causing user mistakes, or hardware failure — not just coding mistakes.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is a user reporting a bug considered worse for a software developer than the bug being caught during in-house testing?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It damages the software developer's reputation — customers experiencing bugs firsthand reflects poorly on the quality of the release, whereas catching it internally before release avoids that reputational cost entirely.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is a program library?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A collection of pre-compiled routines or modules that a program can use, rather than needing to write and test equivalent code from scratch.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 30: Software Development — 30.01–30.02 Program Generators &amp; Why Errors Occur (completes Sections 30.01–30.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Sections 30.01–30.02
+  </div>
+
+</div>
+</body>
+</html>

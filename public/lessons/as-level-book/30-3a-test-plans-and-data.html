@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>30.04 Test Plans and Test Data — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(251,146,60,.1); color: #fb923c; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 30 · Software Development</span>
+  <div class="topic-title">30.04 Test Plans and Test Data</div>
+  <div class="topic-subtitle">Normal, abnormal, and boundary data — and why one test should only ever check ONE thing.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why a test PLAN, not just ad-hoc testing</h4>
+    <ul>
+      <li>Large programs CANNOT be exhaustively tested — a systematic PLAN is needed to find as many errors as possible with limited testing effort.</li>
+      <li>An OUTLINE plan considers: does flow of control give the right choices and route to the right module? Is INPUT validated correctly? Do loops/decisions behave correctly? Is data saved to the correct files? Are RESULTS correct?</li>
+      <li>This outline then becomes a DETAILED test plan, specifying exact test DATA.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Three types of test data</h4>
+    <table class="dtype-table">
+      <tr><th>Type</th><th>Meaning</th></tr>
+      <tr><td>Normal (valid)</td><td>Typical data values that ARE valid and should be accepted</td></tr>
+      <tr><td>Abnormal (erroneous)</td><td>Data values the system should NOT accept</td></tr>
+      <tr><td>Boundary (extreme)</td><td>Values right at the edge of the valid range — both just WITHIN (valid) and just OUTSIDE (invalid) the boundary</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — testing the pyramid program's "number of symbols" input</h4>
+    <ul>
+      <li>Requirement: the number must be a POSITIVE ODD integer, greater than 1.</li>
+      <li>NORMAL: e.g. 7 — an odd positive integer, should be accepted. Test SEVERAL different valid values, not just one.</li>
+      <li>ABNORMAL: needs SEVERAL separate tests, each checking ONE specific reason for rejection: −7 (negative integer), 8 (even integer), 7.5 (real number), '*' (non-numeric).</li>
+      <li>CRITICAL principle: NEVER combine two abnormal conditions into one test (e.g. one negative EVEN number) — if it's rejected, you won't know WHICH reason actually caused the rejection.</li>
+      <li>BOUNDARY: the smallest possible pyramid is 1 symbol — so 1 is just WITHIN the boundary. This also raises genuine DESIGN questions: should 0 be accepted? Is there an UPPER boundary too (e.g. based on screen width — 79 within, 81 outside, if 80 characters fit per line)?</li>
+    </ul>
+    <ul>
+      <li>Testing WITHIN the boundary also happens to test NORMAL data, just at the extreme end of the valid range.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — test plans and the three types of test data (completes Section 30.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why can't large programs be tested exhaustively?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The number of possible input combinations and code paths is far too large to check every single one — a systematic test plan aims to find as many errors as possible within realistic effort, not to guarantee every case is covered.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What are boundary (extreme) test values?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Values at the very edge of the range of normal data — including one value just WITHIN the boundary (should be accepted) and one just OUTSIDE it (should be rejected).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A test that combines two different abnormal conditions in one input (e.g. a negative EVEN number) risks not revealing WHICH ______ actually caused the rejection.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Reason (condition).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A tester picks −8 as their ONE abnormal test value for the pyramid program's number-of-symbols input, intending to test that both negative numbers AND even numbers are rejected. What's the flaw?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>−8 is BOTH negative AND even — if it's correctly rejected, there's no way to know whether the program checks for negative numbers, even numbers, both, or neither correctly. Separate tests (e.g. −7 for negative, 8 for even) are needed to isolate each condition.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      If a screen fits 80 characters per line, what are the two boundary test values for the maximum number of pyramid symbols, and which is valid?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>79 (just within the boundary — valid) and 81 (just outside the boundary — should be rejected).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why should more than one normal (valid) test value be used, rather than just one?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A single valid value might accidentally pass even if the program has a subtle bug that only shows up with a DIFFERENT valid value — testing multiple normal values increases confidence the logic is genuinely correct, not just correct by coincidence for one case.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 30: Software Development — 30.04 Test Plans and Test Data (completes Section 30.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 30.04
+  </div>
+
+</div>
+</body>
+</html>
