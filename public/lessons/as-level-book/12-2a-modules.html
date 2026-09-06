@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>12.02 Modules — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(74,222,128,.12); color: #4ade80; border: 1px solid rgba(74,222,128,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #4ade80; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.7; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25); color: #4ade80; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 12 · Stepwise Refinement &amp; Structure Charts</span>
+  <div class="topic-title">12.02 Modules</div>
+  <div class="topic-subtitle">Procedures do a job; functions do a job AND hand back one value.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Procedure</div><div class="key-term-def">A sequence of steps given an identifier, called to perform a sub-task — no value is returned.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Function</div><div class="key-term-def">A sequence of steps given an identifier, resulting in a single value RETURNED — called as part of an expression/assignment.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Local variable</div><div class="key-term-def">A variable used only within a single module.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Global variable</div><div class="key-term-def">A variable used throughout the whole solution.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Decomposing into modules</h4>
+    <ul>
+      <li>An alternative way to develop a solution: decompose the problem into SUB-TASKS. Each sub-task is a "module", refined separately.</li>
+      <li>Modules are either PROCEDURES or FUNCTIONS.</li>
+      <li>Module identifier naming follows the SAME rules as variable identifiers (Section 11.03).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Procedures — grouping steps under one name</h4>
+    <div class="pseudo-box">CALL SetValues</div>
+    <ul>
+      <li>Calling a procedure by name runs its whole sequence of steps.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked Example — the pyramid, rebuilt as four procedures</h4>
+    <div class="pseudo-box">CALL SetValues
+REPEAT
+  CALL OutputSpaces
+  CALL OutputSymbols
+  CALL AdjustValuesForNextRow
+UNTIL NumberOfSymbols > MaxNumberOfSymbols</div>
+    <ul>
+      <li>The TOP-LEVEL solution becomes remarkably short and readable — it just calls four named procedures.</li>
+      <li>Each called procedure then needs its OWN full definition elsewhere (SetValues, InputMaxNumberOfSymbols, OutputSpaces, OutputSymbols, AdjustValuesForNextRow) — this is the exact same detailed pseudocode from Section 12.01, just now organised under names.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Functions — a procedure's cousin that hands back a value</h4>
+    <ul>
+      <li>A function performs a sequence of steps and returns a SINGLE value — it's called as part of an EXPRESSION or ASSIGNMENT, not as a standalone statement.</li>
+      <li>Example use case from a real game: a function that CHECKS whether a chosen column number is valid, returning TRUE or FALSE for use directly inside a condition.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Local vs. global variables — why the distinction matters</h4>
+    <ul>
+      <li>A LOCAL variable exists only WITHIN one module. A GLOBAL variable is usable throughout the entire solution.</li>
+      <li>Using local variables and parameters (rather than making everything global) keeps modules SELF-CONTAINED — changes to a variable inside one module then can't accidentally affect a variable's value somewhere else in the program.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — procedures, functions, and local/global variables (completes Section 12.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between a procedure and a function?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A function returns a single value and is used as part of an expression/assignment; a procedure performs a sequence of steps but does NOT return a value, and is called as a standalone statement.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why does breaking the pyramid solution into procedures make the TOP-LEVEL solution easier to read?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The top level becomes a short sequence of named CALLs (SetValues, OutputSpaces, OutputSymbols, AdjustValuesForNextRow) — the reader immediately sees the overall shape of the solution without wading through every low-level detail at once.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A variable that exists only within ONE module is called a ______ variable; one usable throughout the whole solution is called a ______ variable.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Local; global.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes a function that checks whether a chosen column is valid, then calls it as a standalone statement: <code>CALL ColumnNumberValid</code>, ignoring its result entirely. What's wrong with this usage?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A function's whole purpose is its RETURNED value — it should be used inside an expression or assignment (e.g. <code>IF ColumnNumberValid(Col) THEN …</code>), not called as a bare statement whose result is thrown away.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does using LOCAL variables (rather than making everything global) reduce bugs in a large program with many modules?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Local variables keep each module self-contained — a change made to a variable INSIDE one module can't accidentally leak out and affect a variable's value used elsewhere in the program, unlike global variables which are visible (and modifiable) everywhere.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What rule governs how a module identifier must be named?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The same rules as variable identifiers (Section 11.03) — no spaces, only letters/digits/underscore, and the name should reflect the module's purpose.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 12: Stepwise Refinement &amp; Structure Charts — 12.02 Modules (completes Section 12.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 12.02
+  </div>
+
+</div>
+</body>
+</html>

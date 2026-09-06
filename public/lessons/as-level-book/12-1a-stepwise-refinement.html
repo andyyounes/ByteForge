@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>12.01 Stepwise Refinement — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #fb923c; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.7; overflow-x: auto; white-space: pre; }
+  .example-block { background: rgba(251,146,60,.05); border: 1px solid rgba(251,146,60,.2); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; }
+  .example-block-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #fb923c; margin-bottom: 8px; }
+  .example-block p { font-size: 12.5px; color: #fed7aa; line-height: 1.7; margin: 0 0 6px; }
+  .example-block p:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 12 · Stepwise Refinement &amp; Structure Charts</span>
+  <div class="topic-title">12.01 Stepwise Refinement</div>
+  <div class="topic-subtitle">A 6-line outline of a pyramid-drawing program, refined step by numbered step into real pseudocode.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Stepwise refinement</div><div class="key-term-def">Breaking down the steps of an outline solution into smaller and smaller steps.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why bigger problems need this technique</h4>
+    <ul>
+      <li>For a solution to be PROGRAMMABLE, its steps must ultimately break down into the basic constructs: sequence, assignment, selection, repetition, input, output.</li>
+      <li>Stepwise refinement takes an outline solution and breaks it into smaller steps, repeating the process until each step is detailed enough to implement directly.</li>
+    </ul>
+  </div>
+
+  <div class="example-block">
+    <div class="example-block-title">Worked Example — drawing a pyramid, first attempt (too vague)</div>
+    <p>Input: a symbol and an odd number (the width of the final row). Output: a symmetrical pyramid of that symbol.</p>
+  </div>
+
+  <div class="pseudo-box">01 Set up initial values
+02 REPEAT
+03   Output number of spaces
+04   Output number of symbols
+05   Adjust number of spaces and number of symbols for next row
+06 UNTIL the required number of symbols have been output in one row</div>
+
+  <div class="theory-block">
+    <h4>Why this first attempt isn't enough</h4>
+    <ul>
+      <li>Steps are NUMBERED specifically so later refinements can reference them precisely (e.g. "01.2" refines part of step "01").</li>
+      <li>This level of detail is NOT enough to write real program code — exactly what values need setting? What's "the number of spaces" actually computed FROM?</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Refining step 01 — setting up initial values</h4>
+    <div class="pseudo-box">01.1 INPUT Symbol
+01.2 INPUT MaxNumberOfSymbols
+01.3 NumberOfSpaces ← (MaxNumberOfSymbols - 1) / 2
+01.4 NumberOfSymbols ← 1</div>
+    <ul>
+      <li>NumberOfSpaces is HALF of the final row's symbol count — this is exactly what makes the pyramid's slope symmetrical.</li>
+      <li>MaxNumberOfSymbols must be ODD for the pyramid to look right — so step 01.2 gets refined FURTHER, into its own REPEAT loop that keeps asking until an odd number is entered: <code>REPEAT / INPUT MaxNumberOfSymbols / UNTIL MaxNumberOfSymbols MOD 2 = 1</code>.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Refining steps 03, 04, and 05</h4>
+    <div class="pseudo-box">03.1 FOR i ← 1 TO NumberOfSpaces
+03.2   OUTPUT Space  // without moving to next line
+03.3 ENDFOR
+
+04.1 FOR i ← 1 TO NumberOfSymbols
+04.2   OUTPUT Symbol  // without moving to next line
+04.3 ENDFOR
+04.4 OUTPUT Newline   // move to the next line
+
+05.1 NumberOfSpaces ← NumberOfSpaces - 1
+05.2 NumberOfSymbols ← NumberOfSymbols + 2</div>
+    <ul>
+      <li>Step 06's termination check becomes: <code>UNTIL NumberOfSymbols &gt; MaxNumberOfSymbols</code> — checking whether the NEXT row's symbol count has already gone too far.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — stepwise refinement (completes Section 12.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Give the precise definition of stepwise refinement.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Breaking down the steps of an outline solution into smaller and smaller steps.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is NumberOfSpaces set to HALF of MaxNumberOfSymbols minus 1, divided by 2?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To make the pyramid's slope symmetrical — the leading spaces on each row need to shrink at exactly the right rate to match the growing number of symbols, centred correctly.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Steps in a stepwise refinement are ______ so that later, more detailed refinements can reference exactly which step they're expanding.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Numbered.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's algorithm accepts ANY number for MaxNumberOfSymbols, even numbers. What genuine problem would follow, and how does the refined algorithm prevent it?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An even final-row width would make the pyramid's symmetric slope calculation come out wrong. The refined step 01.2 wraps the input in its own REPEAT…UNTIL loop, checking <code>MaxNumberOfSymbols MOD 2 = 1</code>, so it keeps re-asking until an odd number is given.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is the FIRST attempt at the pyramid algorithm ("Set up initial values… REPEAT… UNTIL…") not directly programmable, even though it's logically correct?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It isn't expressed in terms of the basic constructs (assignment, specific loops, exact conditions) — phrases like "set up initial values" and "adjust values" aren't yet concrete enough to translate directly into real code.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">By how much does NumberOfSymbols increase, and NumberOfSpaces decrease, moving from one pyramid row to the next?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>NumberOfSymbols increases by 2; NumberOfSpaces decreases by 1.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 12: Stepwise Refinement &amp; Structure Charts — 12.01 Stepwise Refinement (completes Section 12.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 12.01
+  </div>
+
+</div>
+</body>
+</html>

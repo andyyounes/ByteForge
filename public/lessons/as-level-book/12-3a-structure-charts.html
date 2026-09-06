@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>12.03 Structure Charts — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .diagram-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: center; overflow-x: auto; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 12 · Stepwise Refinement &amp; Structure Charts</span>
+  <div class="topic-title">12.03 Structure Charts</div>
+  <div class="topic-subtitle">Boxes for modules, arrows for parameters, a diamond for a decision, a semicircle for repetition.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Structure chart</div><div class="key-term-def">A graphical representation of the modular structure of a solution.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Parameter</div><div class="key-term-def">A value passed between modules.</div></div>
+  </div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The basic shape — boxes and levels</h4>
+    <ul>
+      <li>Each BOX represents a module. Each LEVEL down the chart is a refinement of the level above it.</li>
+      <li>A structure chart ALSO shows the interface between modules — the parameters passed.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Parameters and arrow direction</h4>
+    <ul>
+      <li>A DOWNWARD-pointing arrow: a parameter supplying a value TO a lower-level module.</li>
+      <li>An UPWARD-pointing arrow: a parameter supplying a NEW value back UP to the higher-level module.</li>
+      <li>This passing of parameters between modules is called the "interface".</li>
+    </ul>
+  </div>
+
+  <div class="diagram-box">
+    <svg width="360" height="130" viewBox="0 0 360 130">
+      <g font-family="system-ui" font-size="10">
+        <rect x="120" y="10" width="120" height="30" rx="4" fill="#111320" stroke="#60a5fa"/><text x="180" y="30" text-anchor="middle" fill="#bfdbfe">Calculate Average</text>
+        <line x1="180" y1="40" x2="90" y2="80" stroke="#9ca3af"/>
+        <line x1="180" y1="40" x2="270" y2="80" stroke="#9ca3af"/>
+        <rect x="20" y="80" width="140" height="30" rx="4" fill="#111320" stroke="#4ade80"/><text x="90" y="100" text-anchor="middle" fill="#86efac" font-size="9">Calculate average</text>
+        <rect x="200" y="80" width="140" height="30" rx="4" fill="#111320" stroke="#fbbf24"/><text x="270" y="100" text-anchor="middle" fill="#fde68a" font-size="9">OUTPUT average</text>
+        <text x="90" y="75" text-anchor="middle" fill="#4ade80" font-size="8">↓ Number1, Number2</text>
+        <text x="270" y="75" text-anchor="middle" fill="#fbbf24" font-size="8">↑ Average</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="theory-block">
+    <h4>Reading the example — averaging two numbers</h4>
+    <ul>
+      <li>The top-level box names the module; it refines into sub-tasks at Level 1.</li>
+      <li>Number1 and Number2 are passed DOWN into "Calculate average"; the resulting Average is then passed on to "OUTPUT average".</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Showing selection — a diamond shape</h4>
+    <ul>
+      <li>A DIAMOND shape represents a condition that is either TRUE or FALSE — exactly ONE of the two branches beneath it will be followed.</li>
+      <li>Example: a number-guessing game (one guess only) branches into "output congratulation" (if correct) or "output consolation message" (if not).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Showing repetition — a semi-circular arrow</h4>
+    <ul>
+      <li>A SEMI-CIRCULAR arrow represents repetition of the modules underneath it.</li>
+      <li>A LABEL on that arrow states the exact condition governing when repetition occurs (e.g. "UNTIL NumberOfSymbols = MaxNumberOfSymbols" for the pyramid example).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — structure charts, parameters, selection and repetition (completes Section 12.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What does a DOWNWARD-pointing arrow between two module boxes represent?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A parameter supplying a value TO the lower-level module.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What shape represents a decision point (selection) in a structure chart?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A diamond — showing a condition that is either TRUE or FALSE, with exactly one of two branches followed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ arrow shows repetition of the modules beneath it, labelled with the exact condition governing when it happens.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Semi-circular.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student draws an UPWARD arrow from "Calculate Average" to the top-level module, labelling it "Number1, Number2". What's wrong with this label?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Number1 and Number2 are inputs going DOWN into the "Calculate average" module — an upward arrow should instead carry the RESULT (Average) back up to the calling module, not the original inputs.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In the pyramid program's structure chart, what does the label on the semi-circular repetition arrow tell you?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The exact condition under which the modules beneath the arrow (Output spaces, Output symbols, Adjust values for next row) keep repeating — here, "UNTIL NumberOfSymbols = MaxNumberOfSymbols".</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is the passing of parameters between modules in a structure chart called?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The interface.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 12: Stepwise Refinement &amp; Structure Charts — 12.03 Structure Charts (completes Section 12.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 12.03
+  </div>
+
+</div>
+</body>
+</html>
