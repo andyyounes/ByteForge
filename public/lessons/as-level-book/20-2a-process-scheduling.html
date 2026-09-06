@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>20.02 Process Scheduling — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #34d399; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 20 · System Software</span>
+  <div class="topic-title">20.02 Process Scheduling</div>
+  <div class="topic-subtitle">Process states, interrupts, and the algorithms that decide which process runs next.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Three levels of scheduler</h4>
+    <ul>
+      <li>LONG-TERM (high-level) scheduler: selects a program on disk to be loaded into main memory.</li>
+      <li>MEDIUM-TERM scheduler: moves a program back to disk if memory gets overcrowded.</li>
+      <li>SHORT-TERM (low-level) scheduler: controls when an in-memory program actually gets CPU access.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The five process states</h4>
+    <ul>
+      <li>NEW → READY: a process arrives in memory, a process control block (PCB) is created.</li>
+      <li>READY → RUNNING: the dispatcher gives the process CPU access.</li>
+      <li>RUNNING → READY: the process is halted by an interrupt (e.g. its time slice ran out).</li>
+      <li>RUNNING → WAITING: the process can't progress until an event completes (e.g. I/O) — also called "suspended" or "blocked".</li>
+      <li>WAITING → READY: the awaited event completes.</li>
+      <li>RUNNING → TERMINATED: the process finishes execution.</li>
+    </ul>
+    <div class="key-term-box"><strong>Process:</strong> a program in memory that has an associated process control block.<br><strong>Process control block (PCB):</strong> a complex data structure containing all data relevant to the running of a process.<br><strong>Thread:</strong> part of a process being executed.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Interrupts and register saving</h4>
+    <ul>
+      <li>An interrupt happens for one of two main reasons (besides error termination): a running process makes an I/O system call and must move to WAITING; or the scheduler decides to halt the process for its own reasons.</li>
+      <li>Whatever the cause, the OS kernel's interrupt-handling routine must run, possibly deciding on PRIORITY between multiple pending interrupts.</li>
+      <li>Crucially, the CURRENT register values must be saved into the process's PCB — this is what allows the process to resume correctly later, exactly where it left off.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Scheduling algorithms — preemptive vs. non-preemptive</h4>
+    <ul>
+      <li>PREEMPTIVE: can halt a running process before it would naturally finish/pause itself.</li>
+      <li>NON-PREEMPTIVE: cannot interrupt a running process.</li>
+      <li>FIRST COME FIRST SERVED (FCFS): non-preemptive, implemented as a FIFO queue. Simple but very INEFFICIENT if used alone — usually combined with other algorithms.</li>
+      <li>ROUND-ROBIN: gives each process a fixed TIME SLICE — preemptive, since the process is halted once the slice expires. Normally no prioritisation, unless separate round-robin queues are set up per priority level.</li>
+      <li>PRIORITY-BASED: more complex — priorities may need RE-EVALUATING every time a process enters the ready queue or gets halted. Possible criteria: estimated total execution time, estimated remaining time, time already spent waiting, or whether a process is I/O-bound vs. CPU-bound.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why I/O-bound processes deserve high priority</h4>
+    <ul>
+      <li>A process doing heavy I/O (e.g. printing wage slips) uses very LITTLE CPU time overall — giving it high priority lets that small CPU burst happen quickly, after which the process moves to WAITING while the slow I/O proceeds, freeing the CPU for other work.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — process states, interrupts, and scheduling algorithms (completes Section 20.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why must a process's register values be saved to its PCB when an interrupt occurs?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>So the process can later resume execution exactly where it left off, with all its working values intact, once it returns to the running state.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the key difference between a preemptive and a non-preemptive scheduling algorithm?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A preemptive algorithm can halt a running process before it would naturally stop itself. A non-preemptive algorithm cannot interrupt a running process.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A process moves from the running state to the ______ state when it needs to wait for an event such as I/O to complete.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Waiting (also called suspended or blocked).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims round-robin scheduling is non-preemptive because it just cycles through processes fairly. What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Round-robin IS preemptive — each process is forcibly halted once its allocated time slice expires, even if it wasn't finished or ready to yield the CPU voluntarily.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why should an I/O-bound process (like one printing wage slips) typically be given HIGH priority, even though it doesn't need much CPU time overall?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Giving it priority lets its brief CPU burst run quickly, so it can move on to the WAITING state (during the slow I/O operation) sooner — freeing the CPU for other processes rather than making them wait behind a process that barely needs the CPU anyway.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which scheduler level is responsible for deciding which program on disk gets loaded into main memory?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The long-term (high-level) scheduler.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 20: System Software — 20.02 Process Scheduling (completes Section 20.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 20.02
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>20.05 Translation Software: Compiler Front End &amp; Grammar — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(244,114,182,.12); color: #f472b6; border: 1px solid rgba(244,114,182,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(244,114,182,.06); border: 1px solid rgba(244,114,182,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #f472b6; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(244,114,182,.12); border: 1px solid rgba(244,114,182,.25); color: #f472b6; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 20 · System Software</span>
+  <div class="topic-title">20.05 Translation Software: Compiler Front End &amp; Grammar</div>
+  <div class="topic-subtitle">Lexical, syntax, and semantic analysis — and how a language's grammar is formally defined.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Front end vs. back end</h4>
+    <ul>
+      <li>FRONT END: analyses the source code, producing INTERMEDIATE code that fully captures its meaning (semantics).</li>
+      <li>BACK END: takes the intermediate code and SYNTHESISES object (machine) code from it.</li>
+      <li>An INTERPRETER shares the same front-end ANALYSIS process — but instead of synthesising object code, it EXECUTES each line immediately after converting it.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The four front-end stages</h4>
+    <ul>
+      <li>1. LEXICAL ANALYSIS: splits each line into TOKENS — a pattern-matching exercise requiring knowledge of the language's valid components.</li>
+      <li>2. SYNTAX ANALYSIS (parsing): analyses program CONSTRUCTS, recording the result as a syntax/parse TREE.</li>
+      <li>3. SEMANTIC ANALYSIS: establishes the FULL MEANING, recorded as an annotated abstract syntax tree (attributes like data type get added).</li>
+      <li>4. INTERMEDIATE CODE GENERATION: often produces THREE-ADDRESS CODE.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — tokens and the symbol table</h4>
+    <div class="pseudo-box">Var Count : integer ;      → 5 tokens: Var | Count | : | integer | ;
+PercentMark[Count] := Score * 10  → 8 tokens (note := is ONE two-character operator)</div>
+    <ul>
+      <li>The analyser must CATEGORISE each token: keywords (<code>Var</code>, <code>integer</code>), symbols (<code>[</code>, <code>*</code>), and special multi-character operators (<code>:=</code> must NOT be split into <code>:</code> and <code>=</code>).</li>
+      <li>Every IDENTIFIER gets an entry in the SYMBOL TABLE — recording attributes like data type, where it's declared, and where it's assigned.</li>
+    </ul>
+    <div class="key-term-box"><strong>Symbol table:</strong> a data structure in which each record contains the name and attributes of an identifier.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Three-address code — an intermediate form</h4>
+    <ul>
+      <li>An assignment like <code>y := a + (b * c - d) / e</code> has FIVE identifiers — too many for a single simple instruction — so it's broken into steps, each using at most THREE addresses:</li>
+    </ul>
+    <div class="pseudo-box">temp := b * c
+temp := temp - d
+temp := temp / e
+y := a + temp</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Representing a language's grammar: syntax diagrams vs. BNF</h4>
+    <ul>
+      <li>A SYNTAX DIAGRAM shows grammar rules visually — options drawn above the main flow line, repetitions below it. Useful for humans, but CANNOT be directly turned into a compiler algorithm.</li>
+      <li>BACKUS-NAUR FORM (BNF) is a text-based, general notation — usable for ANY structured data, and CAN form the basis of an algorithm (a real advantage over syntax diagrams).</li>
+    </ul>
+    <div class="pseudo-box">&lt;Identifier&gt; ::= &lt;Letter&gt; | &lt;Identifier&gt;&lt;Letter&gt; | &lt;Identifier&gt;&lt;Digit&gt;
+&lt;Digit&gt; ::= 0|1|2|3|4|5|6|7|8|9
+&lt;Letter&gt; ::= &lt;UpperCaseLetter&gt; | &lt;LowerCaseLetter&gt;</div>
+    <ul>
+      <li><code>::=</code> reads "is defined as"; <code>|</code> separates alternative options.</li>
+      <li>Note the RECURSIVE definition of &lt;Identifier&gt; — without recursion, every possible combination of letters/digits would need to be spelled out explicitly, which is impractical.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Back-end synthesis and optimisation</h4>
+    <ul>
+      <li>If front-end analysis found SYNTAX ERRORS, the back end's only job is reporting them, with an explanation and location.</li>
+      <li>Otherwise, the main back-end job is generating MACHINE CODE from the intermediate code — often including OPTIMISATION for efficiency.</li>
+      <li>Example optimisation: reusing a repeated sub-expression's computed value instead of recalculating it, or moving a loop-invariant statement OUTSIDE the loop so it only runs once.</li>
+      <li>A separate class of optimisation happens AFTER machine code is generated — e.g. more efficient use of registers or memory.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — compiler front-end stages, BNF, and back-end optimisation (part of Section 20.05).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key advantage of BNF over a syntax diagram?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>BNF is a general, text-based notation that can be used as the basis for an actual compiler algorithm — a syntax diagram, while useful for human understanding, cannot be directly incorporated into a compiler program.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is stored in a symbol table entry for an identifier?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Attributes such as its data type, where it's declared, and where it's assigned a value.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      The four front-end stages, in order, are lexical analysis, ______ analysis, ______ analysis, and intermediate code generation.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Syntax; semantic.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's lexical analyser splits <code>:=</code> into two separate tokens, <code>:</code> and <code>=</code>. Why is this wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>:=</code> is a special case — ONE operator made of two characters that must not be separated. Splitting it would misinterpret the assignment operator as two unrelated symbols.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is recursion used in the BNF definition of &lt;Identifier&gt;, rather than listing out every possible letter/digit combination?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Recursion lets the definition build an identifier of ANY length from a small, fixed set of rules — without it, every possible combination following the initial letter would need to be explicitly spelled out, which is impossible to do exhaustively.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">If front-end analysis finds a syntax error, what does the back end do instead of generating machine code?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Presents a list of the errors found, each with an explanation and its location in the source code.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 20: System Software — 20.05 Translation Software: Compiler Front End &amp; Grammar (part of Section 20.05)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 20.05
+  </div>
+
+</div>
+</body>
+</html>

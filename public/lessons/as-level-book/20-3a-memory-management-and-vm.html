@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>20.03-20.04 Memory Management &amp; Virtual Machines — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(250,204,21,.12); color: #facc15; border: 1px solid rgba(250,204,21,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(250,204,21,.06); border: 1px solid rgba(250,204,21,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #facc15; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(250,204,21,.12); border: 1px solid rgba(250,204,21,.25); color: #facc15; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 20 · System Software</span>
+  <div class="topic-title">20.03–20.04 Memory Management &amp; Virtual Machines</div>
+  <div class="topic-subtitle">Partitioning, paging, virtual memory, and the very different concept of a virtual machine.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Partitioning and paging</h4>
+    <ul>
+      <li>PARTITIONING: memory is divided into partitions, aiming to load a whole process into ONE partition. DYNAMIC partitioning matches partition size to process size.</li>
+      <li>SEGMENTATION: an extension — larger processes are split into segments, each loaded into its own dynamic partition.</li>
+      <li>PAGING: the process is divided into EQUAL-sized pages, and memory into FRAMES of the same size — with this method, ALL pages are loaded into memory at once.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Virtual memory — paging without loading everything</h4>
+    <ul>
+      <li>The most flexible approach: paging-based, but WITHOUT requiring all pages to be in memory simultaneously.</li>
+      <li>The CPU's usable address space becomes LARGER than physical main memory — a memory management unit translates CPU addresses to actual page locations.</li>
+    </ul>
+    <div class="key-term-box"><strong>Virtual memory:</strong> a paging mechanism that allows a program to use more memory addresses than are available in main memory.</div>
+    <ul>
+      <li>Pages start on DISK. As a process becomes ready, one or more of its pages load into memory. During execution, if a needed page isn't in memory, another page must first be REMOVED to make room — this needs a PAGE REPLACEMENT algorithm.</li>
+      <li>Simple option: FIRST-IN FIRST-OUT. Better option: LEAST-RECENTLY-USED — but this requires tracking usage statistics.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Virtual memory's advantages and the "disk thrashing" risk</h4>
+    <ul>
+      <li>ADVANTAGE 1: a very large program can run even without an equally large amount of physical memory available.</li>
+      <li>ADVANTAGE 2: only PART of a program needs to be resident at once — e.g. a database's index tables could stay permanently in memory while the full tables load only when actually needed.</li>
+      <li>DISADVANTAGE: system overhead. The worst case is DISK THRASHING — a page is removed, but is needed again almost immediately, causing near-constant loading/unloading cycles. Algorithms guard against this, but it can still occur (rarely).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Virtual machines — a completely different concept</h4>
+    <ul>
+      <li>IMPORTANT: virtual memory and a virtual MACHINE are unrelated concepts — don't confuse them. (The Java virtual machine, from Chapter 7, is yet another different underlying concept again.)</li>
+      <li>A process on a virtual machine interacts with a SOFTWARE interface provided by the OS — this interface presents an EXACT copy of the underlying hardware. The kernel handles all REAL interactions with the actual host hardware.</li>
+      <li>ADVANTAGE 1: multiple DIFFERENT operating systems can run on one physical computer — valuable for keeping legacy software running without keeping aged physical hardware.</li>
+      <li>ADVANTAGE 2: the SAME operating system can be made available many times over — used by mainframe companies offering SERVER CONSOLIDATION, giving different client companies their own isolated virtual server.</li>
+      <li>DRAWBACKS: significant implementation time/effort, and REDUCED performance compared to running directly on real hardware.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — memory management techniques, virtual memory, and virtual machines (completes Sections 20.03–20.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is disk thrashing?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A situation in virtual memory where a page is removed from memory but needed again almost immediately, leading to near-constant loading and unloading of pages — severely hurting performance.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why must virtual memory and a virtual machine never be confused, despite the similar name?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They are completely different concepts — virtual memory is a memory-management technique letting a program use more addresses than physical RAM provides; a virtual machine is a software interface presenting a complete simulated copy of hardware, potentially running its own separate operating system.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In paging, a process is divided into equal-sized ______, and memory is divided into equal-sized ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Pages; frames.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says virtual memory lets a program actually access more PHYSICAL RAM than the computer has installed. What's the misunderstanding?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Virtual memory gives the CPU a larger ADDRESS SPACE to work with, not more physical RAM — pages not currently needed are simply kept on disk and swapped in only when required. The actual amount of installed RAM is unchanged.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why would a mainframe company use a virtual machine setup to offer "server consolidation" to multiple client companies?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Each client can be given their own isolated virtual server (running the same OS, or even different ones) on shared physical hardware — far more cost-effective than dedicating a separate physical machine to each client.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Between first-in-first-out and least-recently-used page replacement, which is generally more effective, and what does it require?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Least-recently-used is generally more effective, but it requires tracking usage statistics for each page — extra overhead that FIFO doesn't need.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 20: System Software — 20.03–20.04 Memory Management &amp; Virtual Machines (completes Sections 20.03–20.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Sections 20.03–20.04
+  </div>
+
+</div>
+</body>
+</html>

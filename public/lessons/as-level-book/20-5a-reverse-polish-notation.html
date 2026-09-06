@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>20.05 Reverse Polish Notation — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(45,212,191,.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(45,212,191,.06); border: 1px solid rgba(45,212,191,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #2dd4bf; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 5px 8px; text-align: center; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(45,212,191,.1); color: #2dd4bf; font-family: system-ui, sans-serif; font-size: 9px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(45,212,191,.12); border: 1px solid rgba(45,212,191,.25); color: #2dd4bf; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 20 · System Software</span>
+  <div class="topic-title">20.05 Reverse Polish Notation (RPN)</div>
+  <div class="topic-subtitle">Converting expressions to postfix form, and evaluating them with a stack. Completes Chapter 20.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Why RPN?</h4>
+    <ul>
+      <li>RPN (postfix) NEVER requires brackets and has NO precedence rules — a huge simplification for a compiler evaluating expressions, especially on processors with stack-handling instructions.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Converting infix to RPN by hand</h4>
+    <div class="pseudo-box">a + b * c        (precedence: convert b*c first)
+→ a + "bc*"
+→ "abc*+"       (final RPN)
+
+(a + b) * c     (brackets force + to happen first)
+→ "ab+c*"</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>The shunting-yard algorithm — infix to RPN using a stack</h4>
+    <ul>
+      <li>Scan tokens left to right. IDENTIFIERS pass straight through to the RPN output.</li>
+      <li>OPERATORS: if the stack is empty or holds a LOWER-precedence operator, push the new operator onto the stack.</li>
+      <li>If the stack holds an EQUAL or HIGHER-precedence operator, POP it to the RPN output first, then push the new operator.</li>
+      <li>At the end, pop all remaining stack operators to the RPN output, one by one.</li>
+    </ul>
+    <table class="dtype-table">
+      <tr><th>Infix remaining</th><th>Stack</th><th>RPN output</th></tr>
+      <tr><td>a+b*c</td><td></td><td></td></tr>
+      <tr><td>+b*c</td><td>+</td><td>a</td></tr>
+      <tr><td>*c</td><td>+ *</td><td>ab</td></tr>
+      <tr><td></td><td>+</td><td>abc*</td></tr>
+      <tr><td></td><td></td><td>abc*+</td></tr>
+    </table>
+    <ul>
+      <li>Had the expression instead been <code>a * b + c</code>, the <code>*</code> would be popped BEFORE <code>+</code> could ever be pushed, since <code>+</code> is NOT higher precedence than the <code>*</code> already on the stack.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Evaluating an RPN expression with a stack</h4>
+    <ul>
+      <li>Scan left to right. Push each VALUE onto the stack. When an OPERATOR is met, POP the top TWO values, apply the operator, and PUSH the result back.</li>
+    </ul>
+    <div class="pseudo-box">RPN: x 2 * y 3 * + 6 /     (x=3, y=4)
+Push 3, push 2 → stack: [3,2]. See *: pop 3,2 → 3*2=6 → push 6. Stack: [6]
+Push 4, push 3 → stack: [6,4,3]. See *: pop 4,3 → 4*3=12 → push 12. Stack: [6,12]
+See +: pop 6,12 → 6+12=18 → push 18. Stack: [18]
+Push 6 → stack: [18,6]. See /: pop 18,6 → 18/6=3 → push 3. Stack: [3]
+Result: 3</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why this matters for real compilers</h4>
+    <ul>
+      <li>RPN would be of little practical value on the very SIMPLE processor from Chapter 6 — but modern processors include STACK-HANDLING instructions, so a compiler can convert expressions to RPN knowing the resulting machine code can exploit efficient stack processing at execution time.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 20 summary</h4>
+    <ul>
+      <li>An OS manages CPU, memory, and I/O resources, and provides a user interface, file system, and APIs.</li>
+      <li>A process moves through five states: new, ready, running, waiting, terminated — controlled by long/medium/short-term schedulers.</li>
+      <li>Memory management ranges from partitioning through paging to virtual memory; a virtual MACHINE is an entirely separate concept.</li>
+      <li>A compiler's front end analyses (lexical, syntax, semantic) and generates intermediate code; the back end synthesises and optimises machine code.</li>
+      <li>BNF is a text-based, algorithm-friendly way to define a language's grammar.</li>
+      <li>RPN removes the need for brackets/precedence rules, enabling simple stack-based expression evaluation.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover RPN conversion and evaluation, and draw together the whole of Chapter 20 (completes Section 20.05 and Chapter 20).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What two things does RPN never require, unlike infix notation?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Brackets, and rules of precedence.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">When evaluating an RPN expression with a stack and an operator token is encountered, what happens?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The top two values are popped from the stack, the operator is applied to them, and the result is pushed back onto the stack.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In the shunting-yard algorithm, an operator is pushed onto the stack immediately only if the stack is empty or holds a ______ precedence operator.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Lower.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      Converting a * b + c with the shunting-yard algorithm, a student expects both * and + to end up on the stack together at some point. Why won't that happen?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>When + is encountered, the stack already holds * (higher precedence) — the rule requires popping * to the RPN output FIRST before + can be pushed, so they're never both on the stack simultaneously in this case.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Convert the infix expression a + b to RPN, and then convert the RPN expression a b + back to infix, to confirm they match.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Both directions give the same pair: infix "a + b" ↔ RPN "a b +" — a single operator with two operands converts straightforwardly either way.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why is RPN of little practical value on the very simple processor described in Chapter 6, but valuable on modern processors?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Modern processors include dedicated stack-handling instructions in their instruction set, letting compiled RPN expressions be evaluated efficiently via the stack — a simple processor without such instructions gains no such benefit.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 20: System Software — 20.05 Reverse Polish Notation (completes Section 20.05 and Chapter 20)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 20.05
+  </div>
+
+</div>
+</body>
+</html>

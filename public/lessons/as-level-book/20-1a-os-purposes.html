@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>20.01 The Purposes of an Operating System — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(129,140,248,.12); color: #818cf8; border: 1px solid rgba(129,140,248,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(129,140,248,.1); color: #818cf8; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(129,140,248,.12); border: 1px solid rgba(129,140,248,.25); color: #818cf8; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 20 · System Software</span>
+  <div class="topic-title">20.01 The Purposes of an Operating System</div>
+  <div class="topic-subtitle">Resource management, user facilities, and how an OS is structured internally.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Getting the OS running in the first place</h4>
+    <ul>
+      <li>At power-on, there's no OS loaded — but ROM holds the BIOS (Basic Input Output System), which starts a BOOTSTRAP program.</li>
+      <li>The bootstrap program LOADS the operating system into memory and sets it running.</li>
+      <li>MULTI-PROGRAMMING: more than one program held in memory at once (only one accesses the CPU at any instant, others wait their turn) — for ONE user.</li>
+      <li>TIME-SHARING: a system designed for MANY users simultaneously logged in.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Two viewpoints on OS purpose</h4>
+    <ul>
+      <li>INTERNAL viewpoint: how the OS organises its activities to best use available resources.</li>
+      <li>EXTERNAL viewpoint: the facilities made available for actual system usage.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Resource management — the three fundamental resources</h4>
+    <ul>
+      <li>The CPU: managed via SCHEDULING for efficient usage.</li>
+      <li>Memory: managed for OPTIMUM usage of main memory.</li>
+      <li>The I/O system: covers not just direct user I/O, but also I/O to storage devices during program execution. Data can be routed via the CPU, or — for large quantities — transferred DIRECTLY between memory and an I/O device.</li>
+    </ul>
+    <table class="dtype-table">
+      <tr><th>Device</th><th>Data rate</th><th>Time for 1 byte</th></tr>
+      <tr><td>Keyboard</td><td>10 Bps</td><td>0.1 s</td></tr>
+      <tr><td>Screen</td><td>50 MBps</td><td>2 × 10⁻⁸ s</td></tr>
+      <tr><td>Disk</td><td>5 MBps</td><td>2 × 10⁻⁷ s</td></tr>
+    </table>
+    <ul>
+      <li>A GHz-speed CPU executes over a TRILLION clock cycles per second. I/O is dramatically slower than this — which is exactly why managing CPU usage during I/O waits is vital, so the CPU never sits idle unnecessarily.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>What the OS provides for users</h4>
+    <ul>
+      <li>A USER INTERFACE (command line, graphical, or voice) letting the user interact with running programs.</li>
+      <li>DEVICE DRIVERS — the user just expects a connected device to "work", without needing to understand it.</li>
+      <li>A FILE SYSTEM — the user chooses filenames and organises folders, but never has to manage the physical layout of data on disk.</li>
+      <li>A PROGRAMMING ENVIRONMENT (for programmers) — letting a program be created and run without needing to understand processor internals.</li>
+      <li>SYSTEM CALLS — the interface a running program (itself a kind of "user") uses to request OS services, e.g. reading a file.</li>
+      <li>An APPLICATION PROGRAMMING INTERFACE (API) — a higher-level layer built on one or more system calls, aimed at giving programs PORTABILITY.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>OS internal structure</h4>
+    <ul>
+      <li>USER MODE: available to ordinary users/applications. KERNEL MODE (or "privileged mode"): has sole access to certain protected memory and system functions user mode cannot reach.</li>
+      <li>The KERNEL runs at all times; the rest of the OS runs in user mode.</li>
+      <li>A LAYERED structure requires each higher layer to be fully serviced by the layer below (like a network protocol stack) — hard to achieve cleanly in practice.</li>
+      <li>A more flexible MODULAR structure lets the kernel call individual services only when needed — sometimes paired with a MICRO-KERNEL design, where the kernel itself is reduced to the absolute minimum.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — OS bootstrapping, resource management, user facilities, and structure (completes Section 20.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What role does the bootstrap program play when a computer is switched on?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It is started by the BIOS in ROM, and its job is to load the operating system into memory and set it running.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the key difference between user mode and kernel mode?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Kernel mode has sole access to certain protected memory and system functions that user mode cannot access — user mode is the restricted mode used by ordinary applications.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      The three fundamental resources managed by an operating system are the ______, the ______, and the ______ system.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>CPU; memory; I/O (input/output).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says an API is just another name for a system call. What's the distinction being missed?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An API call is a HIGHER-LEVEL, more specific function (e.g. "create a screen icon") that may internally use ONE OR MORE system calls to be fulfilled — an API sits above the raw system-call interface, aiming to give programs greater portability.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is managing CPU usage during I/O so critical, given the numbers in the data-rate table above?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>I/O devices operate orders of magnitude slower than the CPU's GHz clock — if the CPU simply waited idle for I/O to finish, it would waste enormous amounts of processing capacity; scheduling lets it do other useful work during those waits instead.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What advantage does a modular OS structure have over a strict layered structure?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A layered structure requires every higher layer to be fully serviced by the layer directly below it, which is hard to achieve cleanly in practice. A modular structure is more flexible — the kernel calls individual services only when actually needed, without a strict layering requirement.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 20: System Software — 20.01 The Purposes of an Operating System (completes Section 20.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 20.01
+  </div>
+
+</div>
+</body>
+</html>
