@@ -2252,6 +2252,16 @@ const WORLDS = [
           (log.positions||[]).some(([x,y]) => Math.hypot(x-tx, y-ty) <= NEAR))
       },
     },
+    { id:'g1s5', name:'Label It', xp:30,
+      text:`<strong>Challenge 5</strong> — Draw one shape (circle or rectangle), then use a TEXT block to write a label above it — its name, e.g. "Hero". Text on the canvas works just like a shape: it needs an X and Y too.`,
+      hints:[
+        'Drag out "draw text" from the Draw category — it needs the text itself, plus an X and Y.',
+        'Position the text a little ABOVE your shape (a smaller Y value), so it reads like a name tag.',
+        'Run it — you should see your shape with a text label sitting just above it.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:false,
+      check:(log) => log.texts >= 1 && (log.circles >= 1 || log.rects >= 1),
+    },
     { id:'g1boss', name:'Sprite Follows You', xp:45, boss:true,
       text:`<strong>🚀 BOSS — Sprite Follows You</strong> — Use <em>On every frame</em>. Inside it: clear the canvas, then draw a circle at <em>mouseX</em> / <em>mouseY</em>. Move your mouse over the canvas — your sprite follows it!`,
       hints:[
@@ -2294,6 +2304,21 @@ const WORLDS = [
       ],
       needsVar:true, needsIf:false, needsFrames:false,
       check:(log) => log.rects >= 1 && log.circles >= 1 && log.hasVar,
+    },
+    { id:'g2s4', name:'Two Sizes, Same Variable', xp:35,
+      text:`<strong>Challenge 4</strong> — Create a <em>size</em> variable set to 20. Draw a circle at X=150, Y=130 with radius <em>size</em>. Then CHANGE size to a bigger number, and draw a SECOND circle at X=350, Y=130 with the new, bigger radius.`,
+      hints:[
+        'Set size = 20 first, draw the first circle using it.',
+        'Then use "set size to..." again with a bigger number, like 60 — this REPLACES the old value.',
+        'Draw the second circle at X=350 using size again — it should come out visibly bigger than the first.',
+      ],
+      needsVar:true, needsIf:false, needsFrames:false,
+      check:(log) => {
+        if (log.circles < 2 || !log.hasVar) return false
+        const near150 = (log.positions||[]).some(([x,y]) => Math.hypot(x-150,y-130) <= 60)
+        const near350 = (log.positions||[]).some(([x,y]) => Math.hypot(x-350,y-130) <= 60)
+        return near150 && near350
+      },
     },
     { id:'g2boss', name:'Clicker Upgrade', xp:50, boss:true,
       text:`<strong>🎚 BOSS — Clicker Upgrade</strong> — Create a <em>score</em> variable starting at 0. Use <em>On every frame</em>: if the SPACE key is down, add 1 to score. Draw a circle whose radius grows with score (radius = 20 + score).`,
@@ -2343,6 +2368,16 @@ const WORLDS = [
       needsVar:true, needsIf:true, needsFrames:false,
       check:(log) => log.rects >= 1 && log.circles >= 1 && log.hasIf && log.hasVar,
     },
+    { id:'g3s4', name:'Score Meter — Three Bands', xp:45,
+      text:`<strong>Challenge 4</strong> — Create a <em>score</em> variable. Draw a rectangle "meter" whose colour depends on THREE bands: red if score is below 10, amber if score is 10-19, green if score is 20 or more. This needs a chain of if/else-if/else, not just one if/else.`,
+      hints:[
+        'if score < 10 → fill red. else if score < 20 → fill orange. else → fill green.',
+        'Use the "else if" option on the if block (click the gear ⚙ to add it) to get all three branches in one block.',
+        'Test all three: score = 5 (red), score = 15 (amber), score = 25 (green).',
+      ],
+      needsVar:true, needsIf:true, needsFrames:false,
+      check:(log) => log.rects >= 1 && log.hasIf && log.hasVar,
+    },
     { id:'g3boss', name:'Dodge at the Edges', xp:55, boss:true,
       text:`<strong>🚦 BOSS — Dodge at the Edges</strong> — Create <em>x</em> and <em>y</em> variables. Use <em>On every frame</em> + arrow key checks to move a rectangle. If ← key is pressed, x = x − 4. If → key: x = x + 4. Same for up/down.`,
       hints:[
@@ -2389,6 +2424,16 @@ const WORLDS = [
       needsVar:false, needsIf:false, needsFrames:false, needsFunction:true,
       check:(log) => log.hasFunction && log.rects >= 3,
     },
+    { id:'g4s4', name:'titleScreen()', xp:35,
+      text:`<strong>Challenge 4</strong> — Define a function called <em>titleScreen</em> with NO parameters at all. Inside it: draw a background rectangle covering the canvas, then a text block with your game's name. Call it once.`,
+      hints:[
+        'A function doesn\'t NEED parameters — click the gear ⚙ and simply add none. Every call runs the exact same way.',
+        'Inside titleScreen(): background/rectangle first, THEN the text on top of it (order matters — text drawn first would get covered).',
+        'Call "titleScreen" once, with no inputs to fill in.',
+      ],
+      needsVar:false, needsIf:false, needsFrames:false, needsFunction:true,
+      check:(log) => log.hasFunction && log.texts >= 1 && (log.rects >= 1 || log.circles >= 1),
+    },
     { id:'g4boss', name:'Platformer Vertical Slice', xp:70, boss:true,
       text:`<strong>🧰 BOSS — Platformer Vertical Slice</strong> — Before touching a single block, write two lines of pseudocode for your jump power, e.g. <em>"IF up-arrow pressed AND on ground THEN y = y − 40"</em>. Then build it: a player rectangle that falls with gravity and jumps when you press ↑. Define a function <em>jump()</em> that changes the player's y position, and call it from inside "On every frame" when the key is pressed.`,
       hints:[
@@ -2430,6 +2475,16 @@ const WORLDS = [
       ],
       needsVar:false, needsIf:true, needsFrames:true, needsFunction:false,
       check:(log) => log.frames >= 5 && log.hasIf && log.rects >= 2,
+    },
+    { id:'g5s4', name:'Speed Boost', xp:40,
+      text:`<strong>Challenge 4</strong> — Create x and y variables and move a rectangle with arrow keys, like Challenge 1 — but this time, if the SHIFT key is held down, move DOUBLE the normal amount (e.g. 8 instead of 4).`,
+      hints:[
+        'Inside each arrow-key if block, add a nested if: if Shift is down, change x/y by the bigger amount; else by the normal amount.',
+        'isKeyDown("Shift") checks the shift key exactly like any other key.',
+        'Test it: move normally, then hold Shift while moving — it should visibly speed up.',
+      ],
+      needsVar:true, needsIf:true, needsFrames:true,
+      check:(log) => log.frames >= 5 && log.hasIf && log.hasVar && (log.rects >= 1 || log.circles >= 1),
     },
     { id:'g5boss', name:'Top-Down Shooter Controls', xp:65, boss:true,
       text:`<strong>⌨️ BOSS — Top-Down Shooter Controls</strong> — Combine both input schemes: arrow keys move a player rectangle, while a reticle circle follows the mouse independently. Two input devices, one game.<br><br>
@@ -3113,6 +3168,9 @@ const CHALLENGE_LESSON = {
       <p>Three shapes "in a line" means one coordinate (Y) stays THE SAME across all three, while the other (X) changes. This is worth noticing: a huge amount of layout in real interfaces (a row of buttons, a menu bar) is exactly this — one shared coordinate, several different values for the other.</p></div>
     <div class="cl-block"><h4>Sequence = blocks run top to bottom</h4>
       <p>Your three "draw shape" blocks run in the exact order you stacked them — first block drawn first, appearing underneath if anything overlaps. Order in a sequence always matters, even when the visual result looks the same either way.</p></div>` },
+  g1s5: { title: 'Text is drawn just like any other shape', html: `
+    <div class="cl-block"><h4>Words need coordinates too</h4>
+      <p>A text block isn't special — it needs an X and Y position on the canvas exactly like a circle or rectangle does. Drawing order still matters: draw the text AFTER your shape if you want it to sit on top and stay readable.</p></div>` },
   g1boss: { title: 'BOSS — Coordinates that update every frame', html: `
     <div class="cl-block"><h4>"On every frame" runs your blocks repeatedly</h4>
       <p>Until now every challenge ran ONCE. "On every frame" is different — it re-runs its contents dozens of times per second, forever. Combined with <code>mouse X</code>/<code>mouse Y</code> blocks (which always report the CURRENT mouse position), redrawing a circle there every frame makes it look like it's following your cursor live.</p></div>
@@ -3135,6 +3193,9 @@ const CHALLENGE_LESSON = {
       <p><code>health</code> drives the rectangle's WIDTH directly — as health drops from 100 to 20, the bar visibly shrinks, with zero extra code needed beyond plugging the variable into the width input. This "one variable, automatically reflected in the visuals" pattern is exactly how every health bar, progress bar, and loading bar in every real game works.</p></div>
     <div class="cl-block"><h4>Separate the icon from the bar</h4>
       <p>The heart icon doesn't need to react to health at all — it's just decoration next to the functional part. Not everything on screen needs to be driven by a variable.</p></div>` },
+  g2s4: { title: '"Set" replaces a variable\'s value entirely', html: `
+    <div class="cl-block"><h4>Not addition — replacement</h4>
+      <p>Using "set size to 60" after "set size to 20" doesn't give you 80 — it throws away the old value completely and replaces it with the new one. A variable only ever holds ONE value at a time; setting it again overwrites what was there.</p></div>` },
   g2boss: { title: 'BOSS — A variable that changes over time', html: `
     <div class="cl-block"><h4>Combining a variable, a frame loop, and an IF</h4>
       <p><code>score</code> starts at 0 and only changes when a condition is met (Space is held) inside "on every frame" — three ideas from this world and the last one, working together: a variable that persists between frames, a repeating loop, and a condition deciding when to act.</p></div>
@@ -3157,6 +3218,9 @@ const CHALLENGE_LESSON = {
       <p>Checking <code>x > 400</code> against a wall drawn at a fixed position is a genuine collision-adjacent idea: comparing a CHANGING value (x) against a FIXED threshold (the wall's position) to decide what to draw. You'll build on this exact pattern properly in G6 — Collision & Physics.</p></div>
     <div class="cl-block"><h4>Color as feedback</h4>
       <p>Using red/green to instantly show "danger" vs. "safe" is a real design pattern called visual feedback — telling the player something is wrong without needing any text at all.</p></div>` },
+  g3s4: { title: 'else-if chains — more than two outcomes', html: `
+    <div class="cl-block"><h4>Three bands, checked top to bottom</h4>
+      <p>An if/else-if/else chain is checked IN ORDER, top to bottom — the first condition that's true "wins" and its branch runs, and the rest are skipped entirely, even if they'd also technically be true. This is exactly how three (or more) outcomes are chosen from one value, not just two.</p></div>` },
   g3boss: { title: 'BOSS — Multiple IFs, one per key', html: `
     <div class="cl-block"><h4>Four separate IFs, checked every frame</h4>
       <p>Each arrow key needs its OWN if block — "if left pressed, x = x − 4" is completely separate from "if right pressed, x = x + 4". Multiple IFs can all run within the same "on every frame" loop, each independently checking its own condition.</p></div>
@@ -3179,6 +3243,9 @@ const CHALLENGE_LESSON = {
       <p>x and y were numbers; <code>isBig</code> was true/false; this function's third parameter is TEXT — a color name. Parameters can carry any type of value, and the function's job is always the same: use whatever was passed in to decide what happens this call.</p></div>
     <div class="cl-block"><h4>Three parameters, one function</h4>
       <p>A function isn't limited to one or two parameters — <code>powerUp(x, y, color)</code> takes three, and Blockly happily supports even more if a task needs it.</p></div>` },
+  g4s4: { title: 'A function can take ZERO parameters', html: `
+    <div class="cl-block"><h4>Not every function needs inputs</h4>
+      <p>spawnEnemy() and shoot() needed parameters because each CALL was different (different positions, different sizes). titleScreen() does the exact same thing every single time it's called, so it needs none at all — a function's job decides whether parameters make sense, not some rule that every function must have them.</p></div>` },
   g4boss: { title: 'BOSS — A function called from inside a loop', html: `
     <div class="cl-block"><h4>Planning in pseudocode BEFORE building</h4>
       <p>Writing "IF up-arrow pressed AND on ground THEN y = y − 40" in plain English before touching a single block is called <strong>pseudocode</strong> — planning the LOGIC first, separate from the actual block syntax. Real programmers do this constantly, especially for anything as fiddly as jump physics.</p></div>
@@ -3201,6 +3268,9 @@ const CHALLENGE_LESSON = {
       <p>Two players need two SEPARATE sets of variables (x1/y1 and x2/y2) and two separate groups of key checks — mixing them up (e.g. both players sharing one x variable) would make them move together instead of independently.</p></div>
     <div class="cl-block"><h4>One loop, multiple independent behaviours</h4>
       <p>A single "on every frame" loop can absolutely control multiple independent things at once — this is exactly how real games manage dozens of characters/objects simultaneously, all inside one shared loop.</p></div>` },
+  g5s4: { title: 'Nested ifs — a decision inside a decision', html: `
+    <div class="cl-block"><h4>Checking Shift is a SECOND, separate question</h4>
+      <p>"Is the arrow key down?" and "is Shift ALSO down?" are two independent questions — nesting one if inside another means the inner one is only even asked when the outer one is already true. This is exactly how a real game adds modifiers (sprint, crouch, aim) on top of basic movement, without rewriting the movement logic itself.</p></div>` },
   g5boss: { title: 'BOSS — Two input schemes, one game', html: `
     <div class="cl-block"><h4>Keyboard AND mouse, at the same time</h4>
       <p>Arrow keys move the player rectangle; the mouse independently controls a reticle — both running inside the SAME "on every frame" loop, neither interfering with the other. Real games constantly combine multiple input devices exactly like this.</p></div>
