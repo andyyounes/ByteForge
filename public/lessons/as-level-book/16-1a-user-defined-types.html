@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>16.01 User-Defined Data Types — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(99,102,241,.12); color: #818cf8; border: 1px solid rgba(99,102,241,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(99,102,241,.06); border: 1px solid rgba(99,102,241,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #818cf8; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.25); color: #818cf8; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 16 · Data Representation</span>
+  <div class="topic-title">16.01 User-Defined Data Types</div>
+  <div class="topic-subtitle">Enumerated types, pointers, records, and sets — data types the programmer defines rather than uses ready-made. Opens the A-Level portion of the course.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What "user" means here</h4>
+    <ul>
+      <li>Normally, a programmer writes a program for a "user". But when DEFINING a new data type, the programmer becomes the "user" of the programming language itself — hence "user-defined data type".</li>
+      <li>A NON-COMPOSITE user-defined type has a definition that does NOT reference another type. A COMPOSITE type's definition DOES reference at least one other type.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Non-composite: enumerated data type</h4>
+    <ul>
+      <li>Defines a list of possible values for a type.</li>
+      <li>The values LOOK like strings, but are NOT — they must never be enclosed in quote marks.</li>
+      <li>Enumerated values are ORDINAL — they have an implied order, which is what makes them genuinely useful (not just a list of names).</li>
+    </ul>
+    <div class="pseudo-box">TYPE
+  TDirections = (North, East, South, West)
+  TDays = (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
+
+DECLARE Direction1 : TDirections
+DECLARE StartDay : TDays
+Direction1 ← North
+StartDay ← Wednesday
+
+// because TDays is ordinal, comparisons are meaningful:
+DECLARE Day : TDays
+DECLARE Weekend : BOOLEAN
+Weekend ← TRUE IF Day > Friday</div>
+    <div class="key-term-box"><strong>Enumerated data type:</strong> a list of possible data values.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Non-composite: pointer data type</h4>
+    <ul>
+      <li>References a memory location — used to build dynamically varying data structures.</li>
+      <li>Its definition must relate to the TYPE of the variable being pointed to.</li>
+      <li>DEREFERENCING a pointer means accessing the value stored at the address it points to.</li>
+    </ul>
+    <div class="pseudo-box">TYPE
+  TMyPointer = ^&lt;TypeName&gt;
+
+DECLARE MyPointer : TMyPointer          // no caret needed to declare
+ValuePointedTo ← MyPointer^             // dereferencing — get the value it points to</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Composite: record, set, and class</h4>
+    <ul>
+      <li>A RECORD holds a FIXED NUMBER of components (fields), which can be of DIFFERENT types — the most widely-used composite type, because it groups related values into one coherent whole.</li>
+      <li>Individual fields are accessed with DOT NOTATION: <code>Employee1.DateEmployed</code>.</li>
+      <li>A SET type supports mathematical set operations: union, intersection, difference, testing membership, including/excluding an element.</li>
+      <li>A CLASS (object-oriented programming) is also a user-defined type — every class you define is used to create objects (Chapter 27).</li>
+    </ul>
+    <div class="pseudo-box">TYPE TEmployeeRecord
+  DECLARE EmployeeFirstName : STRING
+  DECLARE EmployeeFamilyName : STRING
+  DECLARE DateEmployed : DATE
+  DECLARE Salary : CURRENCY
+ENDTYPE
+
+Employee1.DateEmployed ← #16/05/2017#</div>
+    <div class="key-term-box"><strong>Record data type:</strong> a data type that contains a fixed number of components, which can be of different types.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why bother with user-defined types at all?</h4>
+    <ul>
+      <li>Without object-oriented programming, a programmer COULD avoid user-defined types entirely — but for any reasonably large program, using them makes the code more understandable and less error-prone.</li>
+      <li>There CANNOT be a single built-in "record" type, because every different problem needs its OWN specific combination of fields — user-definition becomes inevitable once you need a structure that isn't one of the built-in simple types.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — enumerated types, pointers, records, and sets (completes Section 16.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why must enumerated data type values NOT be written in quote marks?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because although they look like strings, they are NOT strings — they are their own distinct ordinal data type, and quoting them would be treating them as the wrong type.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What makes an enumerated data type "ordinal", and why does that matter?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Its values have an implied ORDER (e.g. Monday comes before Tuesday) — this lets you use comparison operators like &gt; and &lt; meaningfully with them, which wouldn't make sense for a plain unordered list of names.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ type's definition does not reference another type; a ______ type's definition references at least one other type.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Non-composite; composite.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student declares <code>DECLARE StartDay : TDays</code> then writes <code>StartDay ← "Wednesday"</code>, with quote marks. What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Enumerated values must NOT be quoted — they aren't strings. It should be <code>StartDay ← Wednesday</code>, without quote marks.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write pseudocode to define a record type storing an animal's name (STRING), age (INTEGER), and enclosure location (STRING).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>TYPE TAnimalRecord<br>&nbsp;&nbsp;DECLARE AnimalName : STRING<br>&nbsp;&nbsp;DECLARE AnimalAge : INTEGER<br>&nbsp;&nbsp;DECLARE Location : STRING<br>ENDTYPE</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why can't there be a single, universal, built-in "record" type provided by every programming language?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because every different problem needs its own specific combination of fields — unlike a simple type like INTEGER, which works identically for any program, a record's structure is inherently problem-specific and must be individually defined.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 16: Data Representation — 16.01 User-Defined Data Types (completes Section 16.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 16.01
+  </div>
+
+</div>
+</body>
+</html>

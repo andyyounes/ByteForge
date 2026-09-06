@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>16.03 Fixed-Point vs. Floating-Point — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(56,189,248,.12); color: #38bdf8; border: 1px solid rgba(56,189,248,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(56,189,248,.06); border: 1px solid rgba(56,189,248,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #38bdf8; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 8px; text-align: center; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(56,189,248,.1); color: #38bdf8; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(56,189,248,.12); border: 1px solid rgba(56,189,248,.25); color: #38bdf8; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 16 · Data Representation</span>
+  <div class="topic-title">16.03 Fixed-Point vs. Floating-Point Representation</div>
+  <div class="topic-subtitle">Two ways to store a real number in binary — and why floating-point wins on range.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Real numbers and exponential notation</h4>
+    <ul>
+      <li>A real number has a fractional part. In denary, it can be written simply (25.3) or in EXPONENTIAL (scientific) notation, e.g. 2.53 × 10¹.</li>
+      <li>For everyday-sized numbers, the simple form is best; for VERY large or VERY small numbers, exponential notation becomes the only practical choice.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Fixed-point representation</h4>
+    <ul>
+      <li>A defined TOTAL number of bits is split: some for the sign, some for the WHOLE number part, some for the FRACTIONAL part — and this split never changes.</li>
+      <li>Example: 8 bits total — 1 sign bit, 5 bits for the whole number, 2 bits for the fraction.</li>
+    </ul>
+    <table class="dtype-table">
+      <tr><th>Description</th><th>Binary code</th><th>Denary equivalent</th></tr>
+      <tr><td>Largest positive value</td><td>0 11111 11</td><td>31.75</td></tr>
+      <tr><td>Smallest positive value</td><td>0 00000 01</td><td>0.25</td></tr>
+      <tr><td>Smallest magnitude negative</td><td>1 00000 01</td><td>−0.25</td></tr>
+      <tr><td>Largest magnitude negative</td><td>1 11111 11</td><td>−31.75</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-block">
+    <h4>Floating-point representation</h4>
+    <ul>
+      <li>A defined number of bits is used for the MANTISSA (significand), M, and the remaining bits for the EXPONENT, E. The RADIX, R, is not stored — it has an implied value of 2.</li>
+      <li>Example: 8 bits total — 4 bits for the mantissa, 4 bits for the exponent, both in two's complement.</li>
+      <li>Where should the implied binary point sit within the mantissa? Placing it IMMEDIATELY AFTER the sign bit gives the SMALLEST spacing between representable values — this is the preferred choice.</li>
+    </ul>
+    <div class="key-term-box"><strong>Floating-point representation:</strong> a representation of real numbers that stores a value for the mantissa and a value for the exponent.</div>
+    <table class="dtype-table">
+      <tr><th>Description</th><th>Binary code</th><th>Denary equivalent</th></tr>
+      <tr><td>Largest positive value</td><td>0111 0111</td><td>.875 × 2⁷ = 112</td></tr>
+      <tr><td>Smallest positive value</td><td>0001 1000</td><td>.125 × 2⁻⁸ = 1/2048</td></tr>
+      <tr><td>Smallest magnitude negative</td><td>1111 1000</td><td>−.125 × 2⁻⁸ = −1/2048</td></tr>
+      <tr><td>Largest magnitude negative</td><td>1000 0111</td><td>−1 × 2⁷ = −128</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why floating-point wins on range</h4>
+    <ul>
+      <li>Comparing the two 8-bit examples: fixed-point tops out at ±31.75, but floating-point can reach as high as 112 and as low in magnitude as 1/2048 — a FAR wider range of representable values from the same number of bits.</li>
+      <li>The trade-off: floating-point's mantissa has fewer bits dedicated to it than a fixed-point number's whole fractional part would get, so PRECISION for any single value can suffer — covered further in the next lesson on normalisation.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — fixed-point vs. floating-point representation (part of Section 16.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">In a floating-point representation, what do the mantissa and exponent each represent?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The mantissa (significand) stores the significant digits of the value; the exponent stores the power that the implied radix (2) is raised to, which scales the mantissa.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Is the radix (base) stored as part of a floating-point representation?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — it has an implied value of 2 and is never explicitly stored.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In a fixed-point representation, the split between whole-number bits and fractional bits is ______ (never changes); in floating-point, the exponent effectively lets the binary point ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Fixed; float (move).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student claims fixed-point representation is always worse than floating-point, so it should never be used. What's the oversight?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Fixed-point trades RANGE for a simpler, more predictable representation with consistent precision across its whole range — it can still be appropriate where the expected range of values is known and limited (e.g. currency with a fixed number of decimal places), even though floating-point wins on overall range.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is placing the implied binary point immediately after the sign bit the preferred choice for a floating-point mantissa?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It produces the SMALLEST spacing between values that can be represented — giving finer-grained precision across the mantissa's range compared to placing the point elsewhere.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which representation generally allows a WIDER range of values to be stored using the same total number of bits — fixed-point or floating-point?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Floating-point.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 16: Data Representation — 16.03 Fixed-Point vs. Floating-Point Representation (part of Section 16.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 16.03
+  </div>
+
+</div>
+</body>
+</html>

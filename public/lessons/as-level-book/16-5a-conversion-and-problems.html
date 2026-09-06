@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>16.03 Converting to Floating-Point &amp; Its Problems — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(251,146,60,.06); border: 1px solid rgba(251,146,60,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #fb923c; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 16 · Data Representation</span>
+  <div class="topic-title">16.03 Converting to Floating-Point, and Its Problems</div>
+  <div class="topic-subtitle">Denary-to-binary conversion, rounding errors, overflow, and underflow. Completes Chapter 16.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Converting a positive denary real number — the method</h4>
+    <ul>
+      <li>1. Convert the whole-number part to binary (Chapter 1 method).</li>
+      <li>2. Add the sign bit (0 for positive).</li>
+      <li>3. Convert the fractional part to binary (the "multiply by 2, record whole-number parts" method).</li>
+      <li>4. Combine the two parts, with the exponent temporarily set to zero.</li>
+      <li>5. Shift the binary point and adjust the exponent to reach the NORMALISED form.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — converting 8.75</h4>
+    <div class="pseudo-box">1. 8 converts to 1000; adding the sign bit gives 01000
+2. .75 is exactly .11 in binary
+3. Combined: 01000.11  (exponent = 0)
+4. Shift the binary point: 0.100011  (exponent = denary 4)
+5. With 10 mantissa bits and 4 exponent bits:
+   mantissa = 0100011000, exponent = 0100</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — converting 8.63 (an inexact fraction)</h4>
+    <ul>
+      <li>Most denary fractional parts do NOT convert to an exact binary value — binary fractions represent halves, quarters, eighths, etc. Of the values .1 through .9, only .5 converts exactly.</li>
+      <li>The "multiply by 2" method for .63: .63×2=1.26 → 1; .26×2=.52 → 0; .52×2=1.04 → 1; .04×2=.08 → 0 ...</li>
+      <li>Since this keeps producing near-zero results, the process is stopped, APPROXIMATING .63 as .625 — an unavoidable rounding step baked into the conversion.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Rounding errors in extended calculations</h4>
+    <ul>
+      <li>Because converting a real value to binary almost always introduces some approximation, ANY calculation using floating-point numbers carries a small rounding error.</li>
+      <li>In programs with REPEATED calculations (e.g. weather forecasting, economic modelling), these small errors can ACCUMULATE and become significant.</li>
+      <li>The fix: use more mantissa bits, via "double precision" or "quadruple precision" modes offered by programming languages — more bits reduces (but never fully eliminates) the rounding error per calculation.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Overflow and underflow</h4>
+    <ul>
+      <li>OVERFLOW: a calculation produces a value LARGER than the representation's maximum magnitude (e.g. exceeding 112 in the 8-bit example from the previous lesson).</li>
+      <li>UNDERFLOW: dividing a very small number by a number greater than 1 can produce a result SMALLER in magnitude than the smallest value the representation can store.</li>
+      <li>Depending on the situation, a program facing underflow might simply convert the tiny result to zero and continue — but this carries its own risk of silently losing meaningful precision.</li>
+    </ul>
+    <div class="key-term-box"><strong>Overflow:</strong> a calculated value exceeds the maximum magnitude a representation can store.<br><strong>Underflow:</strong> a calculated value is smaller in magnitude than the smallest value a representation can store.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 16 summary</h4>
+    <ul>
+      <li>Non-composite user-defined types: enumerated, pointer. Composite: record, set, class.</li>
+      <li>File organisation: serial, sequential, or direct access (hashed).</li>
+      <li>Floating-point trades some precision for far greater range compared to fixed-point.</li>
+      <li>Normalisation maximises precision by using the largest possible magnitude for the mantissa.</li>
+      <li>Floating-point values are rarely an EXACT match for their denary equivalent, due to unavoidable rounding during conversion — and repeated calculations can accumulate this error, or trigger overflow/underflow.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover converting denary to floating-point, rounding errors, overflow, and underflow (completes Section 16.03 and Chapter 16).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does converting 0.63 to binary require an approximation, but converting 0.5 does not?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>0.5 is exactly representable as a binary fraction (½), but 0.63 is not a sum of exact binary fractions (halves, quarters, eighths...) — so its binary representation must be truncated at some point, introducing an approximation.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the difference between overflow and underflow?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Overflow occurs when a value is too LARGE in magnitude for the representation to store. Underflow occurs when a value is too SMALL in magnitude (closer to zero than the smallest representable value) to be stored accurately.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Using more bits for the mantissa, via "double" or "quadruple" precision, reduces (but does not eliminate) ______ errors that accumulate over repeated calculations.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Rounding.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A programmer assumes that because a program's floating-point calculations look correct on the first few test runs, rounding errors aren't a concern for their weather-forecasting simulation. Why is this risky?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Weather forecasting involves REPEATED calculations over a long simulation — small rounding errors from each step can ACCUMULATE over many iterations, becoming significant even if any single calculation looks negligible in isolation.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A program divides a very small floating-point number by a number greater than 1, and the result silently becomes zero. What error condition caused this, and what's the risk of the program just continuing anyway?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Underflow — the true result was smaller in magnitude than the representation could store. Continuing by treating it as zero risks losing meaningful precision in later calculations that depend on that value, potentially producing an incorrect final result without any visible crash.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">List, in order, the five steps for converting a positive denary real number into normalised floating-point binary.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1) Convert the whole-number part to binary. 2) Add the 0 sign bit. 3) Convert the fractional part to binary. 4) Combine both parts with exponent zero. 5) Adjust the binary point's position and the exponent to reach normalised form.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 16: Data Representation — 16.03 Converting to Floating-Point &amp; Its Problems (completes Section 16.03 and Chapter 16)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 16.03
+  </div>
+
+</div>
+</body>
+</html>

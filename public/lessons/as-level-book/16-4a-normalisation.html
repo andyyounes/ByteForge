@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>16.03 Precision and Normalisation — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(163,230,53,.12); color: #a3e635; border: 1px solid rgba(163,230,53,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 8px; text-align: center; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(163,230,53,.1); color: #a3e635; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(163,230,53,.12); border: 1px solid rgba(163,230,53,.25); color: #a3e635; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 16 · Data Representation</span>
+  <div class="topic-title">16.03 Precision and Normalisation</div>
+  <div class="topic-subtitle">Getting the most precision out of a fixed number of mantissa bits.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The mantissa/exponent trade-off</h4>
+    <ul>
+      <li>More bits for the MANTISSA → better PRECISION, but fewer bits left for the exponent → smaller RANGE.</li>
+      <li>In practice, the total number of bits is often choosable when writing a program, but the SPLIT between mantissa and exponent bits is usually fixed by the floating-point processor itself.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why normalise?</h4>
+    <ul>
+      <li>NORMALISATION here is completely UNRELATED to database normalisation (Chapter 10) — same word, different concept entirely.</li>
+      <li>Since precision improves with more mantissa bits actually being USED meaningfully, optimum precision requires using the LARGEST possible magnitude for the mantissa's value.</li>
+      <li>The SAME denary value can be represented multiple different ways in floating-point (different mantissa/exponent combinations) — normalisation picks the ONE representation that maximises precision.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — three representations of denary 2</h4>
+    <table class="dtype-table">
+      <tr><th>Denary representation</th><th>Floating-point binary</th></tr>
+      <tr><td>0.125 × 2⁴</td><td>0 0010 100</td></tr>
+      <tr><td>0.25 × 2³</td><td>0 0100 011</td></tr>
+      <tr><td>0.5 × 2²</td><td>0 1000 010</td></tr>
+    </table>
+    <ul>
+      <li>All three represent the SAME value (2), but 0.5 × 2² uses the mantissa's bits most fully — this is the NORMALISED form.</li>
+      <li>Recognising normalised form: for a POSITIVE number, the mantissa's two most significant bits are DIFFERENT (0 followed by 1).</li>
+      <li>For a NEGATIVE number, normalised form has the two most significant bits as 1 followed by 0 — for example, −4 normalised is −1.0 × 2², as opposed to less-precise alternatives like −0.25 × 2⁴.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How to normalise a value</h4>
+    <ul>
+      <li>For a POSITIVE number: shift the mantissa bits LEFT until the most significant bits read 0 followed by 1. Each left shift REDUCES the exponent by 1 (to keep the overall value the same).</li>
+      <li>For a NEGATIVE number: shift left until the most significant bits read 1 followed by 0 — bits falling off the most significant end during this process are simply discarded, with no special handling.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — precision and normalisation (part of Section 16.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does increasing the number of mantissa bits improve precision but reduce range?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>More mantissa bits let a value be stored more exactly (better precision), but since the total number of bits is fixed, this leaves FEWER bits available for the exponent, which shrinks the range of magnitudes that can be represented.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">How can you recognise, just by looking at the bits, whether a POSITIVE floating-point number is normalised?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Its mantissa's two most significant bits are different — specifically 0 followed by 1.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Normalisation in floating-point representation is completely ______ to normalisation in database design — the same word describes two ______ concepts.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Unrelated; different.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      When normalising a positive value, a student shifts the mantissa left by 3 places but forgets to change the exponent. What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Each left shift of the mantissa must be matched by REDUCING the exponent by 1 for each shift (3 shifts → exponent reduced by 3) — otherwise the represented value changes, since the mantissa's magnitude increased without the exponent compensating.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Of the three representations of denary 2 shown above (0.125×2⁴, 0.25×2³, 0.5×2²), which is normalised, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>0.5 × 2² — it uses the mantissa's available bits most fully (the largest possible magnitude for the mantissa), which is what defines a normalised representation.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What happens to bits that "fall off" the most significant end of the mantissa when normalising a negative number?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They are simply discarded — no special handling or carrying is applied to them.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 16: Data Representation — 16.03 Precision and Normalisation (part of Section 16.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 16.03
+  </div>
+
+</div>
+</body>
+</html>

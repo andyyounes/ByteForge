@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>16.02 File Organisation — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,113,133,.12); color: #fb7185; border: 1px solid rgba(251,113,133,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(251,113,133,.06); border: 1px solid rgba(251,113,133,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #fb7185; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; }
+  .dtype-table th { background: rgba(251,113,133,.1); color: #fb7185; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,113,133,.12); border: 1px solid rgba(251,113,133,.25); color: #fb7185; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 16 · Data Representation</span>
+  <div class="topic-title">16.02 File Organisation</div>
+  <div class="topic-subtitle">Serial, sequential, and direct-access files — how records are stored and found again.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Text files vs. binary files</h4>
+    <ul>
+      <li>A TEXT file stores data using a defined character code (Chapter 1) — it can be created and read with any text editor.</li>
+      <li>A BINARY file stores data in its INTERNAL representation (e.g. an integer stored as two's complement in two bytes) — it requires a specific program to create and interpret it.</li>
+      <li>A binary file's organisation is built from RECORDS, and each record is built from FIELDS, each holding one value.</li>
+    </ul>
+    <div class="key-term-box"><strong>Binary file:</strong> a file designed for storing data to be used by a computer program.<br><strong>Record:</strong> a collection of fields containing data values.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Serial files</h4>
+    <ul>
+      <li>Records have NO defined order — a new record is simply appended as it arrives (e.g. a bank's raw transaction log, in chronological order but not otherwise sorted).</li>
+      <li>A text file is a KIND of serial file, but differs: it has repeating LINES defined by end-of-line characters, with no separate end-of-record character.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Sequential files</h4>
+    <ul>
+      <li>Records ARE ordered — suited to long-term storage, and comparable to a database as an alternative storage method.</li>
+      <li>Requires a KEY FIELD whose values are unique and SEQUENTIAL, but not necessarily consecutive. This differs from a database's primary key, which must be unique but NOT sequential.</li>
+      <li>A specific record is found by reading key-field values in order until the target is reached — inherently slower for large files than direct access.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Direct-access (hashed) files</h4>
+    <ul>
+      <li>Sometimes called "random-access" — but the randomness is just that access ISN'T defined by reading sequentially, not that positions are literally random.</li>
+      <li>A HASHING ALGORITHM converts a key-field value into a calculated POSITION in the file — allowing (near-)immediate access for large files.</li>
+      <li>Hashing can produce COLLISIONS (two different keys hashing to the same position) — when this happens, the next available position is used instead, meaning a search may need an initial direct access followed by a LIMITED serial search.</li>
+      <li>A simple hashing method for a numeric key: divide by a suitably large number and use the REMAINDER as the position.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Organisation</th><th>Order</th><th>Best suited to</th></tr>
+    <tr><td>Serial</td><td>None (arrival order only)</td><td>Batch processing, backup on magnetic tape</td></tr>
+    <tr><td>Sequential</td><td>Ordered by unique, sequential key field</td><td>Long-term storage, periodic batch updates</td></tr>
+    <tr><td>Direct-access</td><td>Positioned via a hashing algorithm</td><td>Frequent individual read/update/delete</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>File access — reading, editing, deleting</h4>
+    <ul>
+      <li>Serial file: read record by record, successively, until the target is found.</li>
+      <li>Sequential file: similar, but only the key-field value needs reading at each step.</li>
+      <li>Direct-access file: the key value is submitted to the SAME hashing algorithm used at input time, giving the same position back.</li>
+      <li>Editing/deleting a SEQUENTIAL file: a NEW version of the whole file is normally created, copying records across until the target is reached, then continuing with the edit/deletion applied.</li>
+      <li>Editing/deleting a DIRECT-ACCESS file: no new file is needed (unless it becomes full) — a deleted record is simply FLAGGED so future reads skip over it.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — text/binary files, and serial/sequential/direct-access organisation (completes Section 16.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between a sequential file's key field and a database table's primary key?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A sequential file's key field values must be unique AND sequential (in order). A database primary key must be unique, but does NOT need to be sequential.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is a hashing algorithm used for in a direct-access file?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Converting a key-field value into a calculated position in the file, allowing a record to be located quickly without a full sequential search.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ file has records with no defined order; a ______ file has records ordered by a unique, sequential key field.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Serial; sequential.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says direct-access files are called "random-access" because records are placed at genuinely RANDOM positions in the file. What's the misconception?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The "random" in random-access doesn't mean the position is arbitrary — it means access is NOT restricted to reading sequentially. The actual position is calculated DETERMINISTICALLY by a hashing algorithm from the key field, so the same key always produces the same position.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A bank needs to record every withdrawal and deposit as it happens throughout the day, with no need to search for a specific past transaction quickly. Which file organisation fits best, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Serial — transactions just need appending in the order they occur; there's no requirement for fast individual lookups, which is exactly what serial organisation is well suited to (e.g. batch processing or backup).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why might two different keys hash to the same calculated position, and what happens when that occurs?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because a hashing algorithm can't guarantee unique positions for every possible key — this is called a collision. When it happens, the next available position in the file is used instead, meaning a later search may need a direct access followed by a short serial search.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 16: Data Representation — 16.02 File Organisation (completes Section 16.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 16.02
+  </div>
+
+</div>
+</body>
+</html>
