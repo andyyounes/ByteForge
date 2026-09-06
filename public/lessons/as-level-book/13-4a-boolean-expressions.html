@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>13.04 Boolean Expressions — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: center; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(232,121,249,.1); color: #e879f9; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 13 · Programming &amp; Data Representation</span>
+  <div class="topic-title">13.04 Boolean Expressions</div>
+  <div class="topic-subtitle">Logic statements from Chapter 11, now with exact comparison and boolean operator syntax.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Conditions ARE Boolean expressions</h4>
+    <ul>
+      <li>Chapter 11's "logic statements" (conditions) are also known as Boolean expressions — they evaluate to either TRUE or FALSE, known as Boolean values.</li>
+      <li>Simple Boolean expressions use COMPARISON operators. Complex ones also use BOOLEAN operators.</li>
+    </ul>
+  </div>
+
+  <table class="dtype-table">
+    <tr><th>Operation</th><th>Pseudocode</th><th>Python</th></tr>
+    <tr><td>Equal</td><td>=</td><td>==</td></tr>
+    <tr><td>Not equal</td><td>&lt;&gt;</td><td>!=</td></tr>
+    <tr><td>Greater than</td><td>&gt;</td><td>&gt;</td></tr>
+    <tr><td>Less than</td><td>&lt;</td><td>&lt;</td></tr>
+    <tr><td>Greater than or equal to</td><td>&gt;=</td><td>&gt;=</td></tr>
+    <tr><td>Less than or equal to</td><td>&lt;=</td><td>&lt;=</td></tr>
+  </table>
+
+  <table class="dtype-table">
+    <tr><th>Operation</th><th>Pseudocode</th><th>Python</th></tr>
+    <tr><td>AND (logical conjunction)</td><td>AND</td><td>and</td></tr>
+    <tr><td>OR (logical inclusion)</td><td>OR</td><td>or</td></tr>
+    <tr><td>NOT (logical negation)</td><td>NOT</td><td>not</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>The trap worth flagging explicitly</h4>
+    <ul>
+      <li>Pseudocode uses a PLAIN <code>=</code> for equality comparison — but Python (like most real languages) needs the DOUBLE equals <code>==</code> for comparison, reserving single <code>=</code> purely for assignment.</li>
+      <li>Confusing these two in real code is one of the most common early programming mistakes.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — comparison and Boolean operators (completes Section 13.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What are conditions also known as, and what two values can they evaluate to?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Boolean expressions — they evaluate to TRUE or FALSE (Boolean values).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In Python, what symbol is used to test for EQUALITY, as opposed to assignment?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>==</code> (double equals) — a single <code>=</code> is reserved for assignment.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In pseudocode, "not equal to" is written as ______; in Python, it's written as ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>&lt;&gt;; !=</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student writes Python code <code>if x = 5:</code> intending to check if x equals 5. What's wrong, and what should it be?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A single <code>=</code> is the ASSIGNMENT operator in Python (this would actually cause a syntax error inside an if-condition) — it should be <code>if x == 5:</code>, using the double-equals comparison operator.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Which Boolean operator would you use to check that BOTH of two conditions are true at once?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>AND (Python: <code>and</code>).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Name the three Boolean operators covered in this lesson.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>AND, OR, NOT.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 13: Programming &amp; Data Representation — 13.04 Boolean Expressions (completes Section 13.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 13.04
+  </div>
+
+</div>
+</body>
+</html>

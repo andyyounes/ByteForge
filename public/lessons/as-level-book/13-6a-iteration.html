@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>13.06 Iteration — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 13 · Programming &amp; Data Representation</span>
+  <div class="topic-title">13.06 Iteration</div>
+  <div class="topic-subtitle">FOR, REPEAT…UNTIL, WHILE — and Python's genuine gap: no post-condition loop at all.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Count-controlled (FOR) loops</h4>
+    <div class="pseudo-box">FOR &lt;control variable&gt; ← s TO e STEP i   // STEP is optional
+  &lt;statement(s)&gt;
+ENDFOR</div>
+    <ul>
+      <li>The control variable starts at <code>s</code>, increases by <code>i</code> each pass, and finishes once it reaches <code>e</code>.</li>
+      <li>Python: <code>for x in range(s, e, i):</code> — but Python's range STOPS BEFORE <code>e</code> is reached (exclusive upper bound), unlike the pseudocode version which counts up TO and including <code>e</code>. This is a genuine, common source of off-by-one mistakes when translating.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Post-condition loops — REPEAT…UNTIL</h4>
+    <ul>
+      <li>Executes the loop body AT LEAST once. The condition is checked AFTER each pass — while it's FALSE, the loop repeats; once TRUE, execution moves on.</li>
+      <li>You MUST ensure something inside the loop will eventually make the condition TRUE — otherwise it runs forever.</li>
+    </ul>
+    <div class="pseudo-box">REPEAT
+  &lt;statement(s)&gt;
+UNTIL &lt;condition&gt;</div>
+    <ul>
+      <li>Genuine gap: <strong>Python has NO post-condition loop at all</strong> — a pre-condition (WHILE) loop must be used instead, restructured so the condition can be checked up front.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Pre-condition loops — WHILE…ENDWHILE</h4>
+    <ul>
+      <li>Checks the condition BEFORE running the loop body. Runs WHILE the condition is TRUE; stops the moment it's FALSE.</li>
+      <li>Can run ZERO times, if the condition is already false the first time it's checked. Any variable used in the condition must NOT be undefined when the loop is first reached.</li>
+    </ul>
+    <div class="pseudo-box">Pseudocode:                 Python:
+WHILE &lt;condition&gt;        while &lt;condition&gt;:
+  &lt;statement(s)&gt;             &lt;statement(s)&gt;
+ENDWHILE</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Which loop structure to choose?</h4>
+    <ul>
+      <li>If you KNOW how many times you need to loop when execution reaches it — use a COUNT-CONTROLLED (FOR) loop.</li>
+      <li>If termination depends on a CONDITION determined by what happens inside the loop — use a CONDITIONAL loop.</li>
+      <li>A pre-condition (WHILE) loop has the added benefit that the loop might not run AT ALL, if the condition doesn't require it.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — FOR, REPEAT…UNTIL, and WHILE loops (completes Section 13.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which loop type does Python NOT provide at all, and what must be used instead?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Python has no post-condition (REPEAT…UNTIL) loop — a pre-condition WHILE loop must be used instead.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why can a pre-condition (WHILE) loop run zero times, but a post-condition (REPEAT) loop cannot?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>WHILE checks its condition BEFORE the first pass, so if it's already false, the body never runs. REPEAT checks its condition AFTER the first pass, so the body always runs at least once regardless.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Python's <code>range(s, e, i)</code> stops BEFORE reaching ______ — this is a genuine, common trap when translating a pseudocode FOR loop.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>e (the end value).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student translates pseudocode <code>FOR i ← 1 TO 10</code> directly into <code>for i in range(1, 10):</code> in Python. What subtle bug has been introduced?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The pseudocode loop runs from 1 UP TO AND INCLUDING 10 (10 iterations), but <code>range(1, 10)</code> stops BEFORE 10, only running 9 times (1 through 9). It should be <code>range(1, 11)</code> to correctly include 10.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      You need to keep asking a user for input until they type "Y". Which loop type fits best, and why?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A post-condition (REPEAT…UNTIL) loop — the user must be asked AT LEAST once, and the termination condition (typing "Y") depends on what happens inside the loop, not a known count.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What must you ensure exists inside any conditional loop (REPEAT or WHILE), to avoid an infinite loop?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A statement that will, at some point, change the value of the controlling condition — without this, the loop runs forever.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 13: Programming &amp; Data Representation — 13.06 Iteration (completes Section 13.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 13.06
+  </div>
+
+</div>
+</body>
+</html>

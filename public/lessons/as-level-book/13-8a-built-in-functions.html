@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>13.08 Built-in Functions — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(251,146,60,.12); color: #fb923c; border: 1px solid rgba(251,146,60,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: left; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(251,146,60,.1); color: #fb923c; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.25); color: #fb923c; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 13 · Programming &amp; Data Representation</span>
+  <div class="topic-title">13.08 Built-in Functions</div>
+  <div class="topic-subtitle">String slicing, rounding vs. truncation, and converting a string into a real number. Completes Chapter 13.</div>
+
+  <div class="section-label">Theory</div>
+
+  <table class="dtype-table">
+    <tr><th>Task</th><th>Pseudocode</th><th>Python</th></tr>
+    <tr><td>Character at position P</td><td>ThisString[P]</td><td>ThisString[P]</td></tr>
+    <tr><td>Character from ASCII code i</td><td>CHAR(i)</td><td>chr(i)</td></tr>
+    <tr><td>ASCII code of a character</td><td>ASCII(ch)</td><td>ord(ch)</td></tr>
+    <tr><td>Length of a string</td><td>LENGTH(S)</td><td>len(S)</td></tr>
+    <tr><td>Substring, length L from the left</td><td>LEFT(S, L)</td><td>S[0:L]</td></tr>
+    <tr><td>Substring, length L from the right</td><td>RIGHT(S, L)</td><td>S[-L:]</td></tr>
+    <tr><td>Substring, length L from position P</td><td>MID(S, P, L)</td><td>S[P:P+L]</td></tr>
+    <tr><td>Join strings</td><td>CONCAT(S1, S2)</td><td>S1 + S2</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>Slicing in Python — the general-purpose way to grab a substring</h4>
+    <ul>
+      <li>A slice of length L starting at position P is written <code>S[P : P + L]</code>.</li>
+      <li>Position counts from 0; the position at the UPPER bound of the slice is NOT included in the result.</li>
+      <li>If you omit the upper bound, the slice runs to the END of the string. If you omit the lower bound, it runs from the BEGINNING.</li>
+      <li>A NEGATIVE lower bound counts backward from the end of the string; a negative upper bound TERMINATES the slice that many characters before the end.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Rounding — always away from zero</h4>
+    <ul>
+      <li>Python: <code>round(x[, ndigits])</code> — rounds <code>x</code> to <code>ndigits</code> after the decimal point (default 0 if omitted). The result is still a floating-point number.</li>
+      <li>Rounding convention: AWAY from zero — so 0.5 rounds to 1, and -0.5 rounds to -1.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Truncation — just chop off the decimal part</h4>
+    <ul>
+      <li>Truncation is DIFFERENT from rounding — it simply returns the WHOLE NUMBER part of a real number, with no rounding logic at all.</li>
+      <li>Python: <code>int(x)</code> — if <code>x</code> is a float, this truncates TOWARDS zero (e.g. <code>int(3.9)</code> gives 3, and <code>int(-3.9)</code> gives -3).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Converting a string to a number</h4>
+    <ul>
+      <li>A whole number held as a STRING (e.g. from user input) must be converted to use it in a calculation.</li>
+      <li>Python: <code>int(S)</code> converts a string like "5" to the integer 5. <code>float(S)</code> converts a string like "75.43" to the real number 75.43.</li>
+      <li>This is exactly why <code>input()</code>'s result (always a string) often needs converting before it can be used in arithmetic — a direct callback to Section 13.02.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — string functions, slicing, rounding, truncation, and string-to-number conversion (completes Section 13.08 and Chapter 13).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between rounding and truncation?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Rounding finds the NEAREST whole number (away from zero for exact halves); truncation simply DISCARDS the decimal part entirely, with no consideration of how close it is to rounding up or down.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In Python, what does <code>ThisString[3:6]</code> return, given a string "ABCDEFG"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"DEF" — starting at index 3 (the 4th character, D), up to but NOT including index 6 (G).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Rounding is always done ______ zero — so both 0.5 and -0.5 round to values FURTHER from zero, not closer.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Away from.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student reads a number with <code>Age = input("Enter age: ")</code> and then tries <code>Age + 10</code>, expecting arithmetic. What goes wrong, and how is it fixed?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>input()</code> always returns a STRING, so <code>Age + 10</code> would try to add a string and a number, causing an error. It needs converting first: <code>Age = int(input("Enter age: "))</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write the Python slice expression that returns the LAST 3 characters of a string called Word.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>Word[-3:]</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does <code>ord(ch)</code> return, and what is its pseudocode equivalent?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The ASCII code (integer value) of the character ch — pseudocode's <code>ASCII(ch)</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 13: Programming &amp; Data Representation — 13.08 Built-in Functions (completes Section 13.08 and Chapter 13)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 13.08
+  </div>
+
+</div>
+</body>
+</html>
