@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>21.03 SSL and TLS — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #34d399; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 21 · Security</span>
+  <div class="topic-title">21.03 SSL and TLS</div>
+  <div class="topic-subtitle">How HTTPS actually secures a connection — an extra layer slotted into the TCP/IP stack.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Where SSL/TLS sits</h4>
+    <ul>
+      <li>SSL (Secure Socket Layer) and TLS (Transport Layer Security) are CLOSELY RELATED protocols — TLS is a slightly modified, more modern version of SSL.</li>
+      <li>Recall from Chapter 17: the interface between an application and TCP uses a PORT NUMBER; an IP address + port number together form a "SOCKET".</li>
+      <li>SSL functions as an ADDITIONAL LAYER, sitting between TCP (transport layer) and the application layer.</li>
+      <li>When SSL is active, HTTP becomes HTTPS. Despite being called "a protocol", SSL is actually a whole PROTOCOL SUITE.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>How an SSL session is set up</h4>
+    <ul>
+      <li>1. TCP first establishes a normal connection between client and server.</li>
+      <li>2. The HANDSHAKE PROTOCOL (part of the SSL suite) creates a SESSION allowing client and server to communicate securely.</li>
+      <li>3. During the handshake, client and server AGREE which encryption algorithm(s) to use, and establish the SESSION KEYS — this exchange may involve checking DIGITAL CERTIFICATES.</li>
+      <li>4. For the actual transmission, SSL provides ENCRYPTION, COMPRESSION, and INTEGRITY CHECKING.</li>
+      <li>5. When the transmission finishes, the session CLOSES and all records of that session's encryption are discarded.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why this matters in practice</h4>
+    <ul>
+      <li>An HTTPS application can GUARANTEE secure communication — letting users safely send confidential data (e.g. credit card details in an e-commerce transaction).</li>
+      <li>Crucially, the USER remains completely UNAWARE of all this happening — the whole encryption/certificate/session process is invisible, yet still delivers confidentiality and integrity.</li>
+    </ul>
+    <div class="key-term-box"><strong>Socket:</strong> the combination of an IP address and a port number, identifying a specific communication endpoint.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — SSL/TLS and how they secure HTTPS (completes Section 21.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Where does SSL sit in relation to TCP and the application layer?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>As an additional layer sitting BETWEEN TCP (transport layer) and the application layer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the role of the Handshake Protocol at the start of an SSL connection?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It creates a session allowing the client and server to communicate, during which they agree on encryption algorithms and establish the session keys to be used.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A socket is the combination of an ______ and a ______ number.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>IP address; port.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says "SSL is a single protocol, just like HTTP or FTP". What's the correction?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Despite the name, SSL is actually a PROTOCOL SUITE — a collection of related protocols (including the Handshake Protocol) working together, not a single protocol.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does a user shopping on an HTTPS website not need to understand anything about certificates or session keys?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The entire handshake, certificate-checking, and encryption process happens automatically behind the scenes — the browser and server handle it all, so the user experiences secure communication transparently, without needing any technical involvement.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What happens to the session's encryption records once a transmission using SSL is complete?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The session is closed and all records of that session's encryption disappear.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 21: Security — 21.03 SSL and TLS (completes Section 21.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 21.03
+  </div>
+
+</div>
+</body>
+</html>

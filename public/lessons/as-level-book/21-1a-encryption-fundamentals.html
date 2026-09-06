@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>21.01 Encryption Fundamentals — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(248,113,113,.06); border: 1px solid rgba(248,113,113,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #f87171; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 21 · Security</span>
+  <div class="topic-title">21.01 Encryption Fundamentals</div>
+  <div class="topic-subtitle">Symmetric vs. asymmetric key encryption, and the security concerns encryption addresses.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The basic model</h4>
+    <ul>
+      <li>PLAINTEXT is encrypted (using an algorithm plus a KEY) into CIPHERTEXT. The receiver DECRYPTS the ciphertext (using an algorithm plus a key) back into plaintext.</li>
+    </ul>
+    <div class="key-term-box"><strong>Plaintext:</strong> data before encryption.<br><strong>Ciphertext:</strong> the result of applying an encryption algorithm to data.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Five security concerns (this chapter covers three)</h4>
+    <ul>
+      <li>CONFIDENTIALITY: only the intended recipient can decrypt the ciphertext.</li>
+      <li>AUTHENTICITY: the receiver must be certain WHO sent the message.</li>
+      <li>INTEGRITY: the ciphertext must not be modified in transit.</li>
+      <li>Non-repudiation and availability are the other two, but NOT covered further in this chapter.</li>
+      <li>Confidentiality concerns arise because a message could be INTERCEPTED and read. Integrity concerns cover both DELIBERATE tampering and ACCIDENTAL corruption during transmission.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>A fundamental principle: the algorithm is public, the key is secret</h4>
+    <ul>
+      <li>The encryption ALGORITHM must NOT be secret — it's in the public domain. The KEY must be secret.</li>
+      <li>There are two approaches: SYMMETRIC key encryption and ASYMMETRIC key encryption.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Symmetric key encryption</h4>
+    <ul>
+      <li>ONE key is used for BOTH encryption and decryption — shared secretly between sender and receiver.</li>
+      <li>The hard problem: how do sender and receiver both get hold of this shared secret key SECURELY in the first place?</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Asymmetric key encryption</h4>
+    <ul>
+      <li>TWO different keys: one for encryption, a DIFFERENT one for decryption. Only ONE of the pair is secret.</li>
+      <li>The process starts with the RECEIVER, who holds a PUBLIC key (not secret) and a PRIVATE key (secret, known only to them).</li>
+      <li>The receiver sends their PUBLIC key to a sender. The sender encrypts with the public key and sends the ciphertext. Only the receiver — holding the matching PRIVATE key — can decrypt it.</li>
+      <li>The same public key can be given to MANY different people, letting the receiver get private messages from ANY of them.</li>
+      <li>For TWO-WAY communication, both parties need their OWN private key and must send their matching public key to the other.</li>
+    </ul>
+    <div class="key-term-box"><strong>Public key:</strong> the non-secret half of an asymmetric key pair, shared openly.<br><strong>Private key:</strong> the secret half of an asymmetric key pair, known only to its owner.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Ensuring real confidentiality against interception</h4>
+    <ul>
+      <li>Two requirements: the encryption ALGORITHM must be COMPLEX, and the KEY must use a LARGE number of bits.</li>
+      <li>Even with public algorithms and asymmetric keys, one gap remains: some organisation is still needed to PROVIDE keys and ensure their SAFE delivery to the right individuals — this is addressed in the next lesson (digital certificates).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — encryption basics, security concerns, and symmetric/asymmetric keys (completes Section 21.01).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why must the encryption ALGORITHM be public, while the key stays secret?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Security should depend only on the secrecy of the key, not on the algorithm remaining unknown — a publicly scrutinised algorithm can be tested and trusted, while the key alone provides the actual protection.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In asymmetric encryption, which key does a sender use to encrypt a confidential message to a receiver?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The receiver's PUBLIC key — only the receiver's matching PRIVATE key can then decrypt it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In symmetric key encryption, there is ______ key, used for ______ encryption and decryption.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>One (a single); both.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says asymmetric encryption needs both keys to be kept secret, "since they're both part of the same pair". What's wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Only ONE key in the pair (the private key) needs to stay secret. The public key is deliberately shared openly — that's the whole point of asymmetric encryption, avoiding the need to securely exchange a shared secret in advance.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Two people, Alice and Bob, want secure TWO-WAY communication using asymmetric encryption. What must each of them have?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Each needs their own public-private key pair, and each must send their PUBLIC key to the other — so Alice encrypts to Bob using Bob's public key, and Bob encrypts to Alice using Alice's public key.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which security concern addresses whether a message was tampered with (deliberately or accidentally) during transmission?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Integrity.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 21: Security — 21.01 Encryption Fundamentals (completes Section 21.01)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 21.01
+  </div>
+
+</div>
+</body>
+</html>

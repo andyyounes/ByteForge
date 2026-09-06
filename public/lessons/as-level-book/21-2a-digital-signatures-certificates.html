@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>21.02 Digital Signatures and Digital Certificates — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(232,121,249,.12); color: #e879f9; border: 1px solid rgba(232,121,249,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(232,121,249,.12); border: 1px solid rgba(232,121,249,.25); color: #e879f9; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 21 · Security</span>
+  <div class="topic-title">21.02 Digital Signatures and Digital Certificates</div>
+  <div class="topic-subtitle">Using asymmetric keys backwards to prove identity — and the trust problem that certificates solve.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The digital signature idea: reversing the key roles</h4>
+    <ul>
+      <li>If a sender encrypts with their OWN PRIVATE key, anyone with the matching PUBLIC key can decrypt it. This does NOT provide confidentiality (anyone with the public key can read it) — but it DOES prove identity, since ONLY the private key's owner could have created ciphertext that decrypts correctly with that public key.</li>
+      <li>Used this way, the encrypted result acts as a DIGITAL SIGNATURE.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Using a hash instead of encrypting the whole message</h4>
+    <ul>
+      <li>Encrypting the ENTIRE message just to sign it is inefficient. Instead: a CRYPTOGRAPHIC ONE-WAY HASH FUNCTION creates a "DIGEST" — a number uniquely tied to that specific message.</li>
+      <li>The sender's private key encrypts just the DIGEST — this is much faster, and is the actual digital signature sent alongside the plaintext message.</li>
+    </ul>
+    <div class="pseudo-box">SENDER: Message → hash function → Digest → encrypt with sender's PRIVATE key → Digital signature
+(Message sent as plaintext + digital signature, as two parts)
+
+RECEIVER: Message → SAME public hash function → Digest (recomputed)
+          Digital signature → decrypt with sender's PUBLIC key → Digest (recovered)
+          If both digests MATCH → message is authentic AND unaltered</div>
+    <ul>
+      <li>If the two digests match, the receiver can be confident the message is BOTH authentic (really from that sender) AND unaltered (integrity confirmed).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>The remaining gap: what if the public key itself is forged?</h4>
+    <ul>
+      <li>This whole scheme assumes the receiver has the SENDER's genuine public key — but someone could forge a public key and pretend to be someone else entirely.</li>
+      <li>The fix: a CERTIFICATION AUTHORITY (CA), part of a PUBLIC KEY INFRASTRUCTURE (PKI).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Obtaining a digital certificate</h4>
+    <ul>
+      <li>1. A would-be receiver (Person A) with a public-private key pair contacts a local CA.</li>
+      <li>2. The CA CONFIRMS Person A's identity; Person A's public key is given to the CA.</li>
+      <li>3. The CA creates a DIGITAL CERTIFICATE containing Person A's public key.</li>
+      <li>4. The CA encrypts with ITS OWN private key to add its digital signature to the certificate.</li>
+      <li>5. The signed certificate is given to Person A, who typically posts it publicly (their own website, or a dedicated certificate-hosting site).</li>
+      <li>Anyone wanting Person A's genuine public key downloads the certificate and uses the CA's OWN (widely trusted) public key to verify the CA's signature and extract Person A's public key with confidence.</li>
+      <li>The relevant standard for this whole process is X.509.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — digital signatures, hashing, and digital certificates (completes Section 21.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does encrypting a message with a sender's private key NOT provide confidentiality?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The corresponding public key is not secret — anyone who has it can decrypt the message. This technique proves WHO sent it, not that only one person can READ it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is a digest used instead of encrypting the entire message for a digital signature?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Encrypting an entire message just to sign it is inefficient; hashing produces a much smaller, unique digest that can be signed (encrypted) far faster while still proving both authenticity and integrity.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A digital certificate is issued by a ______ ______, which is part of a Public Key Infrastructure.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Certification Authority.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student says a digital certificate stores the CA's private key so anyone can verify it. What's the mistake?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A certificate contains the SUBJECT's public key, signed using the CA's PRIVATE key. Verification uses the CA's PUBLIC key — the CA's private key must stay secret, exactly like any other private key, or the whole trust system collapses.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A receiver recomputes a digest from a received message and finds it does NOT match the digest recovered from the digital signature. What does this indicate?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Either the message was altered in transit, or the signature wasn't genuinely created by the claimed sender's private key — either way, authenticity and/or integrity has failed, and the message should not be trusted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What real-world problem does a Certification Authority solve that a plain digital signature alone cannot?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It prevents someone from forging a public key and falsely claiming to be a different person — the CA independently verifies identity before vouching for a public key via its own trusted signature.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 21: Security — 21.02 Digital Signatures and Digital Certificates (completes Section 21.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 21.02
+  </div>
+
+</div>
+</body>
+</html>
