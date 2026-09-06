@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>14.06 By Value vs. By Reference — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(244,114,182,.12); color: #f472b6; border: 1px solid rgba(244,114,182,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(244,114,182,.12); border: 1px solid rgba(244,114,182,.25); color: #f472b6; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 14 · Structured Programming</span>
+  <div class="topic-title">14.06 Passing Parameters to Procedures</div>
+  <div class="topic-subtitle">BYVAL vs. BYREF — whether changes inside a procedure escape back to the caller.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>By value — a copy goes in</h4>
+    <ul>
+      <li>A copy of the current value is passed into the subroutine. Changes made to the parameter inside the subroutine do NOT affect the original variable in the calling program.</li>
+      <li>Written in pseudocode as: <code>BYVAL &lt;identifier&gt; : &lt;dataType&gt;</code>.</li>
+    </ul>
+    <div class="pseudo-box">PROCEDURE OutputSymbols(BYVAL NumberOfSymbols : INTEGER, BYVAL Symbol : CHAR)
+  DECLARE Count : INTEGER
+  FOR Count ← 1 TO NumberOfSymbols
+    OUTPUT Symbol   // without moving to next line
+  ENDFOR
+  OUTPUT NewLine
+END PROCEDURE</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>By reference — the address goes in</h4>
+    <ul>
+      <li>The ARGUMENT must be a variable (not a literal value). A pointer to that variable's memory location is passed in — so changes made inside the procedure DO affect the original variable back in the caller.</li>
+      <li>Written in pseudocode as: <code>BYREF &lt;identifier&gt; : &lt;dataType&gt;</code>.</li>
+    </ul>
+    <div class="pseudo-box">PROCEDURE AdjustValuesForNextRow(BYREF Spaces : INTEGER, BYREF Symbols : INTEGER)
+  Spaces ← Spaces - 1
+  Symbols ← Symbols + 2
+END PROCEDURE
+
+CALL AdjustValuesForNextRow(NumberOfSpaces, NumberOfSymbols)
+// NumberOfSpaces and NumberOfSymbols themselves are changed by this call</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Python is different — pass by object reference</h4>
+    <ul>
+      <li>Python has NEITHER true BYVAL nor true BYREF — its own mechanism ("pass by object reference") is beyond AS-Level scope, but the practical fix is simple: to get a BYREF-like effect, write a FUNCTION that returns the updated value(s) and reassign them in the caller.</li>
+    </ul>
+    <div class="pseudo-box"># Python — simulating BYREF using multiple return values
+def AdjustValuesForNextRow(Spaces, Symbols):
+    Spaces = Spaces - 1
+    Symbols = Symbols + 2
+    return Spaces, Symbols
+
+NumberOfSpaces, NumberOfSymbols = AdjustValuesForNextRow(NumberOfSpaces, NumberOfSymbols)</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — BYVAL, BYREF, and Python's alternative (completes Section 14.06).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is passed into a subroutine when a parameter is BYREF?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A pointer to the memory location (address) of the variable — not a copy of its value.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Does the calling program's variable change if it's passed BYVAL and the procedure modifies the parameter?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>No — BYVAL passes a COPY, so any changes inside the procedure only affect that copy, not the original variable.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      In pseudocode, a parameter passed by reference is written with the keyword ______ before its identifier.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>BYREF.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student tries to call <code>CALL AdjustValues(BYREF 10, BYREF Count)</code>, passing the literal value 10 as a BYREF argument. Why is this invalid?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A BYREF argument must be a VARIABLE, since a memory address is passed in — a literal value like 10 has no variable memory location to reference.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Since Python has no BYREF, how can you get the effect of updating two variables inside a subroutine and having those changes visible in the caller?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Write it as a function that returns both updated values as a tuple, then reassign both variables from that call: <code>a, b = MyFunction(a, b)</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which parameter-passing method — BYVAL or BYREF — is generally used just to supply data into a procedure without expecting any changes back?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>BYVAL.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 14: Structured Programming — 14.06 Passing Parameters to Procedures (completes Section 14.06)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 14.06
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>14.07 Putting It All Together — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(163,230,53,.12); color: #a3e635; border: 1px solid rgba(163,230,53,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(163,230,53,.12); border: 1px solid rgba(163,230,53,.25); color: #a3e635; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 14 · Structured Programming</span>
+  <div class="topic-title">14.07 Putting It All Together</div>
+  <div class="topic-subtitle">The pyramid-drawing program, fully modularised — procedures, functions, BYVAL and BYREF working together. Completes Chapter 14.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The full pyramid program, in pseudocode</h4>
+    <div class="pseudo-box">CONSTANT SPACE ← " "
+
+FUNCTION InputMaxNumberOfSymbols() RETURNS INTEGER
+  DECLARE Number : INTEGER
+  Number ← 0
+  WHILE Number MOD 2 = 0
+    OUTPUT "How many symbols make the base?"
+    INPUT "Input an odd number: ", Number
+  ENDWHILE
+  RETURN Number
+END FUNCTION
+
+PROCEDURE OutputChars(BYVAL Number : INTEGER, BYVAL Symbol : CHAR)
+  DECLARE Count : INTEGER
+  FOR Count ← 1 TO Number
+    OUTPUT Symbol   // without moving to next line
+  ENDFOR
+END PROCEDURE
+
+PROCEDURE AdjustValuesForNextRow(BYREF Spaces : INTEGER, BYREF Symbols : INTEGER)
+  Spaces ← Spaces - 1
+  Symbols ← Symbols + 2
+END PROCEDURE</div>
+    <ul>
+      <li>Notice the DELIBERATE choice of parameter/local identifiers that differ from the main program's variable names — this makes it explicit that a subroutine's own namespace is separate from the calling program's.</li>
+      <li>InputMaxNumberOfSymbols is a FUNCTION (returns a value); OutputChars uses BYVAL (only supplies data in); AdjustValuesForNextRow uses BYREF (updates the caller's variables).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Translating to Python — no BYREF, so functions return tuples instead</h4>
+    <div class="pseudo-box"># Python
+SPACE = ' '
+
+def InputMaxNumberOfSymbols():
+    Number = 0
+    while Number % 2 == 0:
+        print("How many symbols make the base?")
+        Number = int(input("Input an odd number: "))
+    return Number
+
+def OutputChars(Number, Symbol):
+    for Count in range(Number):
+        print(Symbol, end='')
+
+def AdjustValuesForNextRow(Spaces, Symbols):
+    Spaces = Spaces - 1
+    Symbols = Symbols + 2
+    return Spaces, Symbols   # simulates BYREF via multiple return values
+
+def main():
+    MaxNumberOfSymbols = InputMaxNumberOfSymbols()
+    NumberOfSpaces = (MaxNumberOfSymbols + 1) // 2
+    NumberOfSymbols = 1
+    while NumberOfSymbols <= MaxNumberOfSymbols:
+        OutputChars(NumberOfSpaces, SPACE)
+        OutputChars(NumberOfSymbols, "*")
+        print()
+        NumberOfSpaces, NumberOfSymbols = AdjustValuesForNextRow(NumberOfSpaces, NumberOfSymbols)
+
+main()</div>
+    <ul>
+      <li>Discussion point from the coursebook: separate OutputSpaces and OutputSymbols procedures can be MERGED into a single OutputChars procedure that just repeats whatever character it's given — a small but real example of reducing duplication through good subroutine design.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 14 summary</h4>
+    <ul>
+      <li>Subroutines (procedures and functions) are declared BEFORE the main program body.</li>
+      <li>Calling a procedure is a program STATEMENT; calling a function happens WITHIN an expression.</li>
+      <li>Parameters are placeholders in the subroutine header; arguments are the actual values supplied at call time — together they form the subroutine interface.</li>
+      <li>BYVAL passes a copy (changes don't escape); BYREF passes an address (changes DO escape back to the caller).</li>
+      <li>Python has no BYREF — the only way to update a caller's variable is to return the new value(s) from a function.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions draw on the whole of Chapter 14 — procedures, functions, parameters, BYVAL/BYREF, and modular design (completes Section 14.07 and Chapter 14).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why are the parameter names inside AdjustValuesForNextRow deliberately different from the variable names used to call it in the main program?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>To make it explicit that parameters and local variables inside a subroutine occupy a SEPARATE namespace from the calling program's variables — even though, with BYREF, they end up referencing the same memory location.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the merged design, how did separate OutputSpaces and OutputSymbols procedures become one OutputChars procedure?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Both procedures did the same underlying job — repeat a character N times — so they were combined into ONE procedure that takes the character as a parameter, removing duplicated logic.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Calling a function happens within an ______; calling a procedure is a program ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Expression; statement.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      In the Python version, a student writes <code>AdjustValuesForNextRow(NumberOfSpaces, NumberOfSymbols)</code> as a plain statement (not reassigning the result). What goes wrong on the next loop iteration?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Since Python has no BYREF, the function's changes are LOST — NumberOfSpaces and NumberOfSymbols in main() never actually update, so the loop either runs forever or produces the same row repeatedly. It must be written as <code>NumberOfSpaces, NumberOfSymbols = AdjustValuesForNextRow(NumberOfSpaces, NumberOfSymbols)</code>.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write program code for a procedure OutputTimesTable that takes one integer parameter, n, and outputs the times table for n (e.g. "1 x 5 = 5" through "10 x 5 = 50" for n = 5). Use pseudocode.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>PROCEDURE OutputTimesTable(BYVAL n : INTEGER)<br>&nbsp;&nbsp;DECLARE Count : INTEGER<br>&nbsp;&nbsp;FOR Count ← 1 TO 10<br>&nbsp;&nbsp;&nbsp;&nbsp;OUTPUT Count, " x ", n, " = ", Count * n<br>&nbsp;&nbsp;ENDFOR<br>END PROCEDURE</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Write a pseudocode function header for isDivisible, taking two INTEGER parameters x and y, returning a BOOLEAN.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>FUNCTION isDivisible(x : INTEGER, y : INTEGER) RETURNS BOOLEAN</code></p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 14: Structured Programming — 14.07 Putting It All Together (completes Section 14.07 and Chapter 14)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 14.07
+  </div>
+
+</div>
+</body>
+</html>
