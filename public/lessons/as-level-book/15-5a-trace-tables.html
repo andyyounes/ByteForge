@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>15.05 Dry-Running with Trace Tables — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(45,212,191,.12); color: #2dd4bf; border: 1px solid rgba(45,212,191,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(45,212,191,.06); border: 1px solid rgba(45,212,191,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #2dd4bf; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 8px; text-align: center; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(45,212,191,.1); color: #2dd4bf; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(45,212,191,.12); border: 1px solid rgba(45,212,191,.25); color: #2dd4bf; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 15 · Software Development</span>
+  <div class="topic-title">15.05 Dry-Running an Algorithm</div>
+  <div class="topic-subtitle">Trace tables — checking an algorithm works by hand, one line at a time, without running any code.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>What a dry-run is</h4>
+    <ul>
+      <li>A DRY-RUN checks an algorithm's execution by recording variable values in a TRACE TABLE, WITHOUT actually running it on a computer.</li>
+      <li>A trace table has one column for each variable (and often each condition) used in the algorithm.</li>
+    </ul>
+    <div class="key-term-box"><strong>Dry-run:</strong> checking the execution of an algorithm or program by recording variable values in a trace table.<br><strong>Trace table:</strong> a table with a column for each variable that records its changing values.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>The core rule: only write down what CHANGES</h4>
+    <ul>
+      <li>You only make an entry in a cell when an ASSIGNMENT actually occurs for that variable at that step.</li>
+      <li>A blank cell means the value from the previous row REMAINS unchanged — you don't need to keep repeating unchanged values.</li>
+      <li>Start a NEW row for each iteration of a loop (each time round the loop).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — number-guessing game</h4>
+    <div class="pseudo-box">SecretNumber ← 34
+INPUT "Guess a number: ", Guess
+NumberOfGuesses ← 1
+REPEAT
+  IF Guess = SecretNumber
+    THEN OUTPUT "You took ", NumberOfGuesses, " guesses"
+    ELSE
+      IF Guess > SecretNumber
+        THEN INPUT "Guess a smaller number: ", Guess
+        ELSE INPUT "Guess a larger number: ", Guess
+      ENDIF
+      NumberOfGuesses ← NumberOfGuesses + 1
+  ENDIF
+UNTIL Guess = SecretNumber</div>
+    <table class="dtype-table">
+      <tr><th>SecretNumber</th><th>Guess</th><th>NumberOfGuesses</th><th>Guess &gt; SecretNumber</th><th>Message</th></tr>
+      <tr><td>34</td><td>5</td><td>1</td><td>FALSE</td><td>...larger...</td></tr>
+      <tr><td></td><td>55</td><td>2</td><td>TRUE</td><td>...smaller...</td></tr>
+      <tr><td></td><td>30</td><td>3</td><td>FALSE</td><td>...larger...</td></tr>
+      <tr><td></td><td>42</td><td>4</td><td>TRUE</td><td>...smaller...</td></tr>
+      <tr><td></td><td>36</td><td>5</td><td>TRUE</td><td>...smaller...</td></tr>
+      <tr><td></td><td>33</td><td>6</td><td>FALSE</td><td>...larger...</td></tr>
+      <tr><td></td><td>34</td><td>7</td><td>—</td><td>...7 guesses</td></tr>
+    </table>
+    <ul>
+      <li>Notice SecretNumber is only written ONCE — it never changes after the initial assignment, so every later row leaves that column blank.</li>
+      <li>The loop terminates on the row where Guess finally equals SecretNumber (34), triggering the "You took 7 guesses" message.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — dry-running and trace tables (completes Section 15.05).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is a dry-run?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Checking an algorithm's execution by recording variable values in a trace table, without actually running it on a computer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does a blank cell in a trace table mean?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>That variable's value hasn't changed since the last row where it was recorded — the previous value still applies.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A new row in a trace table should be started for each ______ of a loop.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Iteration.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student fills in EVERY cell of a trace table on EVERY row, even repeating a value that hasn't changed since the previous row. Is this wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It's not strictly incorrect, but it goes against the standard convention — the coursebook convention is to leave a cell blank when the value hasn't changed, which makes it much clearer at a glance WHICH assignments actually happened at each step.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In the number-guessing game trace table, why does the "Guess &gt; SecretNumber" column exist as a separate column from Guess itself?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because it records the result of a CONDITION (used to decide which branch of the algorithm runs next), not a variable's value — trace tables track both variables and important condition outcomes, since the condition determines the algorithm's path just as much as a variable does.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why is a dry-run useful even before you've typed any actual program code?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It lets you verify the LOGIC of a pseudocode algorithm is correct before investing time coding it — catching design errors early, when they're cheapest to fix.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 15: Software Development — 15.05 Dry-Running an Algorithm (completes Section 15.05)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 15.05
+  </div>
+
+</div>
+</body>
+</html>

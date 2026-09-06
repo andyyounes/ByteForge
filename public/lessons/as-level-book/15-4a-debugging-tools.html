@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>15.04 Debugging with an IDE — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(250,204,21,.12); color: #facc15; border: 1px solid rgba(250,204,21,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(250,204,21,.06); border: 1px solid rgba(250,204,21,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #facc15; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(250,204,21,.12); border: 1px solid rgba(250,204,21,.25); color: #facc15; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 15 · Software Development</span>
+  <div class="topic-title">15.04 Program Testing Using the IDE</div>
+  <div class="topic-subtitle">Breakpoints, single-stepping, and variable watch windows — the debugger's toolkit.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Debugging</h4>
+    <ul>
+      <li>DEBUGGING is finding and correcting errors ("bugs") in a program. Most IDEs include built-in tools to make this easier than reading code line by line.</li>
+    </ul>
+    <div class="key-term-box"><strong>Debugging:</strong> finding and correcting errors in a program.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Breakpoints</h4>
+    <ul>
+      <li>A BREAKPOINT marks a specific line where execution should PAUSE, so you can inspect the program's state at that exact moment.</li>
+      <li>Set by clicking in the editor's margin (VB.NET, Pascal) or right-clicking the line (Python IDLE).</li>
+      <li>Running the program with the debugger active stops it as soon as it reaches the breakpoint — the rest of the program hasn't executed yet.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Single-stepping</h4>
+    <ul>
+      <li>Once paused at a breakpoint, "Step" / "Step Into" / "Trace into" buttons let you execute ONE instruction at a time.</li>
+      <li>This lets you watch exactly how each line changes the program's variables, pinpointing the EXACT line where behaviour diverges from what was expected.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Variable watch windows</h4>
+    <ul>
+      <li>A WATCH WINDOW displays the current value of chosen variables, updating live as you step through the program.</li>
+      <li>Set up via the Debug menu (VB.NET: Windows → Watch; Pascal/Delphi: Run → Add Watch...), typing in the variable name(s) you want to monitor.</li>
+      <li>This avoids having to manually print variable values just to check them — a much faster way to catch exactly where a value goes wrong.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — debugging, breakpoints, single-stepping, and watch windows (completes Section 15.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is a breakpoint, and what does it do when the program runs?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A marker on a specific line of code that causes execution to PAUSE when it reaches that line, letting you inspect the program's state at that point.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does single-stepping let you do that just running the whole program doesn't?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Execute ONE instruction at a time, so you can watch exactly how each individual line changes the program's variables and pinpoint precisely where things go wrong.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ window displays the live values of chosen variables as you step through a program.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Watch.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student sets a breakpoint AFTER the line where a bug occurs, then wonders why the debugger doesn't help them see what went wrong. What's the issue?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>By the time execution pauses at the breakpoint, the buggy line has already run — its effect on the variables is already baked in. The breakpoint should be set BEFORE (or on) the suspect line, so you can single-step through it and watch the exact moment a variable takes on the wrong value.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      You suspect a variable Total is being calculated incorrectly somewhere inside a loop. What two debugging tools together would best help you find the exact line responsible?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A breakpoint set just before or inside the loop, combined with a watch window on Total — then single-stepping through each iteration to see exactly which line causes it to take on an unexpected value.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the Delphi (Pascal) editor, what must be enabled in Debugger Options before breakpoints will work?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The Integrated Debugger option.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 15: Software Development — 15.04 Program Testing Using the IDE (completes Section 15.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 15.04
+  </div>
+
+</div>
+</body>
+</html>

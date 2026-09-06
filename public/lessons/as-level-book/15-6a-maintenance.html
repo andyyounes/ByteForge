@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>15.06-15.07 Program Maintenance — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(192,132,252,.12); color: #c084fc; border: 1px solid rgba(192,132,252,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .key-term-box { background: rgba(192,132,252,.06); border: 1px solid rgba(192,132,252,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #c084fc; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(192,132,252,.12); border: 1px solid rgba(192,132,252,.25); color: #c084fc; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 15 · Software Development</span>
+  <div class="topic-title">15.06–15.07 Corrective &amp; Adaptive Maintenance</div>
+  <div class="topic-subtitle">Fixing bugs vs. extending functionality — the two reasons a finished program still gets changed. Completes Chapter 15 and the AS portion of the course.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Corrective maintenance</h4>
+    <ul>
+      <li>Maintaining software is NOT like maintaining a mechanical device — code doesn't wear out or need "lubricating".</li>
+      <li>CORRECTIVE maintenance is the work required when a program isn't working correctly, due to a logic error or a run-time error.</li>
+      <li>Errors sometimes stay hidden for a long time, because the affected part of the program is rarely used, or because the triggering data only shows up under extreme/unusual circumstances.</li>
+      <li>To FIND a bug, a programmer uses either IDE debugging features (Section 15.04) or a trace table (Section 15.05).</li>
+    </ul>
+    <div class="key-term-box"><strong>Corrective maintenance:</strong> correcting identified errors.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Adaptive maintenance</h4>
+    <ul>
+      <li>ADAPTIVE maintenance means amending a program to make it perform functions it was NOT originally designed to do.</li>
+      <li>Example from Chapter 12: a two-player Connect 4 game could be adapted so ONE player is the computer — a genuine change in functionality, not a bug fix.</li>
+      <li>This kind of change is made either to ENHANCE functionality, or in response to a change in the original SPECIFICATION.</li>
+    </ul>
+    <div class="key-term-box"><strong>Adaptive maintenance:</strong> amending a program to enhance functionality or in response to specification changes.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Telling the two apart</h4>
+    <ul>
+      <li>Ask: "Is the program doing something WRONG (a bug), or is it doing exactly what it was designed to do, but we now want it to do MORE (a new requirement)?"</li>
+      <li>The first case is corrective maintenance; the second is adaptive maintenance. The distinction matters because the APPROACH differs — corrective maintenance starts from tracing an existing error, while adaptive maintenance starts from designing new algorithm/data-structure changes from scratch.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 15 summary</h4>
+    <ul>
+      <li>The program development cycle: problem-solving, design, coding, translation, execution, testing.</li>
+      <li>IDE features: prettyprint, context-sensitive prompts, dynamic syntax checks, collapsible code blocks.</li>
+      <li>Testing strategies: stub testing, black-box testing (specification-driven, no code visibility), white-box testing (every code path exercised).</li>
+      <li>Locating errors: IDE debugging tools (breakpoints, single-stepping, watch windows) or dry-running with a trace table.</li>
+      <li>Maintenance: corrective (fixing bugs) vs. adaptive (extending functionality or meeting new specification requirements).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover corrective and adaptive maintenance, and draw together the whole of Chapter 15 (completes Sections 15.06–15.07 and Chapter 15).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between corrective and adaptive maintenance?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Corrective maintenance fixes an existing error so the program works as originally intended. Adaptive maintenance changes the program to do something it was NOT originally designed to do — enhancing functionality or responding to a new specification.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Name the two techniques mentioned for finding the cause of a reported bug.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Using IDE debugging features (breakpoints, single-stepping, watch windows), or dry-running the algorithm with a trace table.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Unlike a mechanical device, software doesn't ______ out or need lubricating — but it can still develop bugs that require ______ maintenance.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Wear; corrective.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A team labels "adding a single-player mode against the computer to Connect 4" as corrective maintenance. Why is this the wrong label?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The original two-player program isn't broken — nothing needs "correcting". Adding entirely new functionality (a computer opponent) that wasn't part of the original design is a textbook example of ADAPTIVE maintenance, not corrective.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      A payroll program has worked fine for years, but a bug appears only when an employee's salary is exactly £0 (a rare edge case). Why is this a classic example of why hidden bugs are dangerous?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because the triggering data (a £0 salary) is so rare, the bug could remain undiscovered for years — and by the time it surfaces, it may already have caused real, hard-to-trace consequences, unlike a bug that crashes the program every single time it runs.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which testing approach (black-box or white-box) would most directly help you locate the exact LINE of code responsible for an already-confirmed bug?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>White-box testing — it requires and uses knowledge of the code's internal structure to trace exactly which path (and therefore which line) is at fault, unlike black-box testing which only confirms THAT a bug exists.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 15: Software Development — 15.06–15.07 Corrective &amp; Adaptive Maintenance (completes Sections 15.06–15.07 and Chapter 15 — this completes the AS-Level portion of the course)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Sections 15.06–15.07
+  </div>
+
+</div>
+</body>
+</html>

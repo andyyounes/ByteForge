@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>15.03 Testing Strategies — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(248,113,113,.12); color: #f87171; border: 1px solid rgba(248,113,113,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(248,113,113,.06); border: 1px solid rgba(248,113,113,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #f87171; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 9px; text-align: center; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(248,113,113,.1); color: #f87171; font-family: system-ui, sans-serif; font-size: 10px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">AS Level · Chapter 15 · Software Development</span>
+  <div class="topic-title">15.03 Testing Strategies</div>
+  <div class="topic-subtitle">Stub testing, black-box testing, and white-box testing — three ways to hunt for logic and run-time errors.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Logic errors and run-time errors</h4>
+    <ul>
+      <li>Syntax errors are easy — the compiler/interpreter finds them and hints at the fix.</li>
+      <li>Much harder: a LOGIC ERROR (causes the program not to behave as intended) and a RUN-TIME ERROR (causes the program to crash or freeze). Both are only found through careful testing.</li>
+      <li>The danger: these errors may only appear under CERTAIN circumstances — a program that seems to work fine, then fails on rare data, is far harder to catch than one that crashes every time.</li>
+    </ul>
+    <div class="key-term-box"><strong>Logic error:</strong> an error in the logic of the solution that causes it not to behave as intended.<br><strong>Run-time error:</strong> an error that causes program execution to crash or freeze.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Stub testing</h4>
+    <ul>
+      <li>Used to test a user interface BEFORE all facilities are fully implemented.</li>
+      <li>Each "stub" procedure body contains just an OUTPUT statement acknowledging the call was made — the real logic is filled in later.</li>
+      <li>Lets you confirm the overall menu/control structure works correctly before investing time coding every feature.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Black-box testing</h4>
+    <ul>
+      <li>Testing done by someone who does NOT see the program code and doesn't know how it was coded — the program is a "black box".</li>
+      <li>The tester looks at the SPECIFICATION to determine what the program should do, then devises test data (normal, boundary, and erroneous values) and works out the EXPECTED results.</li>
+      <li>If actual results don't match expected results, a problem exists — but black-box testing alone doesn't reveal WHICH lines of code are at fault; white-box methods (Sections 15.04–15.05) are needed for that.</li>
+    </ul>
+    <div class="key-term-box"><strong>Test data:</strong> carefully chosen values that will test a program.<br><strong>Black-box testing:</strong> comparing expected results with actual results when a program is run.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>White-box testing</h4>
+    <ul>
+      <li>Testing EVERY PATH through the program code — this requires knowledge of the code's internal structure, unlike black-box testing.</li>
+    </ul>
+    <div class="key-term-box"><strong>White-box testing:</strong> testing every path through the program code.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — choosing white-box test data for a nested IF</h4>
+    <div class="pseudo-box">INPUT Number1
+INPUT Number2
+INPUT Number3
+IF Number1 > Number2
+  THEN
+    IF Number1 > Number3
+      THEN OUTPUT Number1
+      ELSE OUTPUT Number3
+    ENDIF
+  ELSE
+    IF Number2 > Number3
+      THEN OUTPUT Number2
+      ELSE OUTPUT Number3
+    ENDIF
+ENDIF</div>
+    <ul>
+      <li>To exercise every path, four sets of test data are needed: (1) first number largest, (2) first number bigger than second, third is largest, (3) second number largest, (4) second number bigger than first, third is largest.</li>
+      <li>It doesn't matter what EXACT values are chosen — only that the relative sizes force each branch of the nested IF to run at least once.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — logic/run-time errors, stub testing, black-box, and white-box testing (completes Section 15.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the key difference between black-box and white-box testing?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Black-box testing is done without seeing the code, comparing expected vs. actual results against the specification. White-box testing requires seeing the code, and aims to exercise every possible path through it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does the body of a "stub" procedure typically contain?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Just an output statement that acknowledges the procedure was called — the real logic isn't implemented yet.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Test data usually consists of three categories: ______ values, ______ values, and ______ values.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Normal; boundary; erroneous.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A tester runs a nested-IF program with only ONE set of test data where the first number happens to be the largest, and declares the program fully tested. What's wrong with this approach?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Only one path through the nested IF has been exercised — several other branches (e.g. where the second or third number is largest) remain completely untested, so bugs in those paths would go undetected. Proper white-box testing requires data that exercises EVERY path.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why is it dangerous that a logic error might only appear under rare circumstances?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>If a program appears to work correctly most of the time, the error could go unnoticed for a long time — potentially causing serious consequences before it's finally triggered by unusual data or a rarely-used feature.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What do black-box testers use to determine what a program is meant to do?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The program specification.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 15: Software Development — 15.03 Testing Strategies (completes Section 15.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 15.03
+  </div>
+
+</div>
+</body>
+</html>
