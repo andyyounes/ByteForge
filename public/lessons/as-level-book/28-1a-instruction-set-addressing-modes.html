@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>28.01-28.02 Instruction Set &amp; Symbolic Addresses — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .dtype-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 16px; }
+  .dtype-table th, .dtype-table td { border: 1px solid rgba(255,255,255,.1); padding: 6px 8px; text-align: left; font-family: ui-monospace, monospace; }
+  .dtype-table th { background: rgba(96,165,250,.1); color: #60a5fa; font-family: system-ui, sans-serif; font-size: 9.5px; text-transform: uppercase; }
+  .dtype-table td { color: #e2e8f0; }
+  .key-term-box { background: rgba(96,165,250,.06); border: 1px solid rgba(96,165,250,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #60a5fa; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 28 · Low-Level Programming</span>
+  <div class="topic-title">28.01–28.02 The Processor Instruction Set &amp; Symbolic Addresses</div>
+  <div class="topic-subtitle">The assembly-language instruction set used throughout this chapter, and why labels beat raw addresses.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Notation conventions used in this chapter</h4>
+    <ul>
+      <li><code>ACC</code> = the Accumulator; <code>IX</code> = the Index Register.</li>
+      <li><code>#</code> denotes IMMEDIATE addressing (a literal value follows, not an address).</li>
+      <li><code>B</code> prefixes a BINARY number (e.g. <code>B01001010</code>); <code>&amp;</code> prefixes a HEXADECIMAL number (e.g. <code>&amp;4A</code>).</li>
+      <li><code>&lt;address&gt;</code> can be an ABSOLUTE address (a raw number) or a SYMBOLIC address (a label).</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Data movement and arithmetic instructions</h4>
+    <table class="dtype-table">
+      <tr><th>Instruction</th><th>Addressing mode</th><th>Effect</th></tr>
+      <tr><td>LDM #n</td><td>Immediate</td><td>Load the number n directly into ACC</td></tr>
+      <tr><td>LDD &lt;address&gt;</td><td>Direct</td><td>Load the contents AT the given address into ACC</td></tr>
+      <tr><td>LDI &lt;address&gt;</td><td>Indirect</td><td>The address to use is stored AT the given address — load the contents of THAT second address into ACC</td></tr>
+      <tr><td>LDX &lt;address&gt;</td><td>Indexed</td><td>Form the address as &lt;address&gt; + contents of IX; load contents of the calculated address into ACC</td></tr>
+      <tr><td>LDR #n</td><td>Immediate</td><td>Load the number n into IX</td></tr>
+      <tr><td>STO / STX / STI &lt;address&gt;</td><td>Direct / Indexed / Indirect</td><td>Store the contents of ACC at the (calculated) address</td></tr>
+      <tr><td>ADD &lt;address&gt;</td><td>—</td><td>Add the contents of the given address to ACC</td></tr>
+      <tr><td>INC / DEC &lt;register&gt;</td><td>—</td><td>Add 1 to / subtract 1 from the register (ACC or IX)</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-block">
+    <h4>Comparison, jump, I/O, and bit-manipulation instructions</h4>
+    <table class="dtype-table">
+      <tr><th>Instruction</th><th>Effect</th></tr>
+      <tr><td>CMP &lt;address&gt; / CMP #n</td><td>Compare ACC's contents with the address's contents / with number n</td></tr>
+      <tr><td>JMP &lt;address&gt;</td><td>Jump unconditionally to the given address</td></tr>
+      <tr><td>JPE &lt;address&gt;</td><td>Following a CMP, jump if the comparison was TRUE (equal)</td></tr>
+      <tr><td>JPN &lt;address&gt;</td><td>Following a CMP, jump if the comparison was FALSE (not equal)</td></tr>
+      <tr><td>IN / OUT</td><td>Key in a character (store its ASCII code in ACC) / output the character whose ASCII code is in ACC</td></tr>
+      <tr><td>AND / XOR / OR #n or &lt;address&gt;</td><td>Bitwise operation between ACC and the operand</td></tr>
+      <tr><td>LSL #n / LSR #n</td><td>Shift ACC's bits n places left/right, filling with zeros</td></tr>
+      <tr><td>END</td><td>Return control to the operating system</td></tr>
+      <tr><td>&lt;label&gt;: &lt;data&gt;</td><td>Gives a symbolic address (label) to a memory location holding &lt;data&gt;</td></tr>
+    </table>
+    <ul>
+      <li>Data movement, arithmetic, comparison, and jump instructions were introduced in Chapter 6; bitwise instructions in Chapter 22. IN/OUT are new here — needed for genuinely useful, interactive programs.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Symbolic addresses (labels)</h4>
+    <ul>
+      <li>A LABEL is a symbolic name for a memory location — treat it like a variable name.</li>
+      <li>Using ABSOLUTE addresses directly is very restrictive: adding even ONE extra instruction shifts every address that comes after it.</li>
+      <li>Writing with LABELS lets you think at a higher level — the ASSEMBLER allocates the actual absolute addresses during assembly (Chapter 7).</li>
+    </ul>
+    <div class="key-term-box"><strong>Label:</strong> a symbolic name for the memory location it represents.</div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — the instruction set and symbolic addressing (completes Sections 28.01–28.02).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the difference between LDD and LDI?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>LDD (direct) loads the contents found AT the given address directly into ACC. LDI (indirect) treats the given address as pointing to ANOTHER address — it loads the contents of THAT second address into ACC.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What does the # symbol indicate in an operand like #34?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Immediate addressing — the number itself (34) is the value to use directly, not a memory address to look up.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A ______ is a symbolic name for a memory location, allocated an actual absolute address by the ______ during assembly.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Label; assembler.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A programmer writes a whole program using only absolute addresses, then needs to insert one extra instruction near the start. What problem does this create?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Every instruction and jump target AFTER the insertion point now needs its address manually recalculated and updated, since absolute addresses don't automatically shift — this is exactly the restrictiveness that symbolic addressing (labels) avoids.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Following a CMP instruction that evaluates to FALSE, which jump instruction (JPE or JPN) would actually be taken?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>JPN (jump if the comparison was false/not-equal) — JPE only jumps when the comparison was TRUE.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What must every program end with, and why?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The END instruction — it returns control to the operating system. Without it, the processor would try to interpret whatever binary pattern comes next as an instruction, likely crashing.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 28: Low-Level Programming — 28.01–28.02 The Processor Instruction Set &amp; Symbolic Addresses (completes Sections 28.01–28.02)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Sections 28.01–28.02
+  </div>
+
+</div>
+</body>
+</html>

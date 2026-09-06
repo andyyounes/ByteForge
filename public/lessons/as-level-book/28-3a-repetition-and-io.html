@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>28.03 Assembly Patterns: Repetition and Input-Output — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(250,204,21,.12); color: #facc15; border: 1px solid rgba(250,204,21,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(250,204,21,.12); border: 1px solid rgba(250,204,21,.25); color: #facc15; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 28 · Low-Level Programming</span>
+  <div class="topic-title">28.03 Assembly Patterns: Repetition and Input/Output</div>
+  <div class="topic-subtitle">Loops via jump-back instructions, and handling strings with indexed addressing. Completes Section 28.03.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Repetition — REPEAT...UNTIL</h4>
+    <div class="pseudo-box">A ← 0                  LDM #0
+REPEAT                 STO A
+  OUTPUT "*"    LOOP:  LDM #42     // ASCII '*'
+  A ← A + 1             OUT
+UNTIL A = 5            LDD A
+                       INC ACC
+                       STO A
+                       CMP #5
+                       JPN LOOP    // loop back if NOT yet equal to 5</div>
+    <ul>
+      <li>The pattern: a LABEL (<code>LOOP:</code>) marks the top of the loop; the body executes; a condition is tested; JPN jumps BACK to the label if the loop should CONTINUE.</li>
+      <li>This mirrors REPEAT...UNTIL directly — the loop body always runs at least ONCE, and the test happens at the END.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Input and output — single characters</h4>
+    <div class="pseudo-box">INPUT A         IN
+                STO A
+
+OUTPUT B        LDD B
+                OUT</div>
+    <ul>
+      <li>IN stores the typed character's ASCII code into ACC; a simple STO then saves it to a variable.</li>
+      <li>OUT outputs whatever character corresponds to ACC's current ASCII value.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Handling a whole STRING — indexed addressing and a sentinel value</h4>
+    <ul>
+      <li>To output a string stored in CONSECUTIVE memory locations, a LOOP plus INDEXED addressing is used — the index register (IX) counts through each character position in turn.</li>
+      <li>Loop structure: initialise IX (often to -1, so the first INC makes it 0), increment IX each pass, use LDX to fetch the character at the calculated position, OUT it, then check for the END-OF-STRING marker — conventionally the CARRIAGE RETURN character (ASCII 13).</li>
+      <li>If the carriage return hasn't been reached yet, JPN loops back for the next character.</li>
+    </ul>
+    <div class="pseudo-box">// Outputting a string stored starting at label STR, until ASCII 13 (carriage return)
+LDR #-1
+LOOP:  INC IX
+       LDX STR
+       OUT
+       CMP #13
+       JPN LOOP</div>
+    <ul>
+      <li>The SAME technique — indexed addressing plus a sentinel value — works for INPUT: read characters one at a time with IN, store each at the calculated indexed position with STX, and stop once the carriage return is entered.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Outputting a NUMBER (not just a character)</h4>
+    <ul>
+      <li>A number must first be CONVERTED into its equivalent STRING representation (digit by digit), stored in consecutive memory locations — THEN the string-output method above can be reused unchanged.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — assembly patterns for repetition and I/O (completes Section 28.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does the REPEAT...UNTIL pattern test its condition AFTER the loop body, rather than before?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>This matches REPEAT...UNTIL's own semantics — the body must always run at least once, with the test only happening at the end of each pass, unlike a WHILE loop which tests first.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What ASCII value is conventionally used as the "end of string" sentinel?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>13 (carriage return).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      To output a string of characters stored in consecutive memory locations, a loop combined with ______ addressing is used.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Indexed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's loop initialises IX with <code>LDR #0</code> instead of <code>LDR #-1</code>, then immediately does <code>INC IX</code> before the first character access. What position does the first LDX actually read from?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Position 1, not position 0 — starting IX at 0 and incrementing before the first use skips over the very first character in the string, since IX becomes 1 before any character is read.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why must a number be converted to a string before the string-output loop pattern can display it on screen?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>OUT only knows how to display ONE character based on ACC's ASCII value — a multi-digit number needs to become a sequence of individual digit CHARACTERS stored consecutively, so the same character-by-character output loop can process it.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">In the "output a string" loop, what instruction actually fetches each character using the current index?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>LDX (load, indexed addressing) — it forms the address from the base label plus the current contents of IX.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 28: Low-Level Programming — 28.03 Assembly Patterns: Repetition and Input/Output (completes Section 28.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 28.03
+  </div>
+
+</div>
+</body>
+</html>

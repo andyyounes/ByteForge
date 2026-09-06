@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>28.05 Indirect Addressing — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(192,132,252,.12); color: #c084fc; border: 1px solid rgba(192,132,252,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(192,132,252,.12); border: 1px solid rgba(192,132,252,.25); color: #c084fc; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 28 · Low-Level Programming</span>
+  <div class="topic-title">28.05 Indirect Addressing</div>
+  <div class="topic-subtitle">When the address to use is itself stored somewhere else — a worked queue implementation. Completes Chapter 28.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>When is indirect addressing useful?</h4>
+    <ul>
+      <li>Indirect addressing helps when the memory address an instruction should use CHANGES during program execution.</li>
+      <li>Two classic uses: subroutines with parameters passed BY REFERENCE (beyond this book's scope), and implementing a POINTER VARIABLE.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — a simple queue using pointers</h4>
+    <ul>
+      <li>Structured English design:</li>
+    </ul>
+    <div class="pseudo-box">Add a character to the queue (JOINQ):
+  1. Store the contents of the accumulator at the memory location
+     POINTED TO by the tail pointer.
+  2. Increment the tail pointer.
+
+Remove a character from the queue (LEAVEQ):
+  1. Load the contents of the memory location POINTED TO by the head pointer.
+  2. Increment the head pointer.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why this NEEDS indirect addressing</h4>
+    <ul>
+      <li>The tail pointer's VALUE (an address) changes every time a new item joins the queue — so the instruction can't use a FIXED direct address. It must look up the CURRENT address stored in the pointer variable, then act on THAT location.</li>
+      <li>This is exactly what STI (store, indirect) and LDI (load, indirect) do: <code>STI TAILPTR</code> stores ACC's contents at the address CURRENTLY held in TAILPTR — not at TAILPTR's own location.</li>
+    </ul>
+    <div class="pseudo-box">JOINQ:   STI TAILPTR      // store ACC at the address TAILPTR currently points to
+         LDD TAILPTR
+         INC ACC
+         STO TAILPTR     // increment the tail pointer itself
+
+LEAVEQ:  LDI HEADPTR      // load from the address HEADPTR currently points to
+         OUT
+         LDD HEADPTR
+         INC ACC
+         STO HEADPTR     // increment the head pointer itself
+
+HEADPTR: QSTART           // pointer to the start of the queue data
+TAILPTR: QSTART           // pointer to the next free slot in the queue
+QSTART:                   // reserved memory for the queue data, currently empty</div>
+    <ul>
+      <li>As values are ADDED, TAILPTR's value increases to point further along the queue. As values are REMOVED, HEADPTR's value increases to follow.</li>
+      <li>Note the crucial distinction: <code>STO TAILPTR</code> (direct) changes the POINTER's own value; <code>STI TAILPTR</code> (indirect) changes the DATA at the address the pointer refers to.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Chapter 28 summary</h4>
+    <ul>
+      <li>A value must be loaded into ACC before it can be processed — via keyboard input, immediate addressing, or a load instruction using direct/relative/indirect/indexed addressing.</li>
+      <li>Assignment, selection, iteration, and I/O each have reusable assembly "design patterns" built from this instruction set.</li>
+      <li>An address can be absolute (a fixed number) or symbolic (a label) — relative addressing (base register + offset) lets a program be loaded anywhere in memory.</li>
+      <li>Indirect addressing is essential whenever the target address itself can change during execution — most notably for pointer variables, as in a queue implementation.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions cover indirect addressing and draw together the whole of Chapter 28 (completes Section 28.05 and Chapter 28).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why does implementing a queue with pointers require indirect addressing rather than direct addressing?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The tail/head pointer's VALUE (the address of the next free/occupied slot) changes as items are added/removed — a fixed direct address can't follow this, but indirect addressing looks up whatever address the pointer CURRENTLY holds.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the difference between STO TAILPTR and STI TAILPTR?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>STO TAILPTR (direct) stores ACC's value AT the location labelled TAILPTR — changing the pointer itself. STI TAILPTR (indirect) stores ACC's value at the address that TAILPTR currently CONTAINS — changing the queue's actual data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Two classic uses of indirect addressing are ______ variables and by-reference parameter passing.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Pointer.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      In the JOINQ routine, a student swaps the order to increment TAILPTR BEFORE storing the new character. What goes wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The character would be stored at the WRONG (already-incremented) position, meaning it lands one slot further along than intended — the first "next free" slot would be skipped and left with stale/uninitialised data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      In LEAVEQ, why must HEADPTR be incremented AFTER the character has been loaded and output, not before?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The current front-of-queue character must be read from the CURRENT head position first — incrementing beforehand would read and remove the WRONG (next) character instead of the one actually at the front.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does HEADPTR and TAILPTR both initially point to, before any items join the queue?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>QSTART — the start of the memory reserved for the queue's data, since the queue begins empty.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 28: Low-Level Programming — 28.05 Indirect Addressing (completes Section 28.05 and Chapter 28)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 28.05
+  </div>
+
+</div>
+</body>
+</html>

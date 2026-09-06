@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>28.03 Assembly Patterns: Assignment and Selection — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 28 · Low-Level Programming</span>
+  <div class="topic-title">28.03 Assembly Patterns: Assignment and Selection</div>
+  <div class="topic-subtitle">Translating pseudocode assignment and IF statements into assembly language design patterns.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>The general problem-solving approach</h4>
+    <ul>
+      <li>Break the problem into the SAME basic constructs used in high-level languages: assignment, selection, iteration, input/output — then translate EACH construct using a reusable "design pattern" in assembly.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Assignment patterns</h4>
+    <ul>
+      <li>Core rule: a value must FIRST be generated in the ACCUMULATOR before it can be stored anywhere.</li>
+    </ul>
+    <div class="pseudo-box">A ← 34                    B ← B + 1              B ← B + A
+LDM #34                   LDD B                  LDD B
+STO A                     INC ACC                ADD A
+                          STO B                  STO B</div>
+    <ul>
+      <li>Simple assignment: generate the value with LDM, then STO it.</li>
+      <li>Incrementing: LOAD the current value, INC it, STORE it back.</li>
+      <li>Adding two variables: LOAD the first, ADD the second, STORE the result.</li>
+    </ul>
+    <div class="pseudo-box"># A ← -A  (two's complement negation, assuming 8-bit values)
+LDD A
+XOR #&FF      // one's complement: flip every bit
+INC ACC       // add 1 to get two's complement
+STO A</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Selection patterns — a plain IF</h4>
+    <div class="pseudo-box">IF A = 0             LDD A
+  THEN               CMP #0
+    B ← B + 1         JPN ENDIF
+ENDIF          THEN:  LDD B
+                      INC ACC
+                      STO B
+               ENDIF: ...</div>
+    <ul>
+      <li>LOAD the value to test, COMPARE it, then JPN (jump if NOT equal) to skip over the THEN block entirely if the condition is FALSE.</li>
+      <li>Using LABELS like THEN and ENDIF makes the logic much easier to follow than raw addresses.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Selection patterns — IF/ELSE</h4>
+    <div class="pseudo-box">IF A = B                LDD A
+  THEN                  XOR #&FF       // negate A...
+    OUTPUT "Y"           INC ACC
+  ELSE                   ADD B         // ...then add B: zero result means A=B
+    OUTPUT "N"           CMP #0
+ENDIF                    JPN ELSE
+                  THEN:  LDM #89       // ASCII 'Y'
+                         OUT
+                         JMP ENDIF     // must jump OVER the ELSE block!
+                  ELSE:  LDM #78       // ASCII 'N'
+                         OUT
+                  ENDIF: ...</div>
+    <ul>
+      <li>Testing equality WITHOUT a direct "equals" comparison: negate one value and ADD the other — the result is ZERO exactly when the two original values were equal.</li>
+      <li>CRITICAL detail: after the THEN block finishes, an explicit JMP is needed to jump OVER the ELSE block — otherwise execution would fall through and run the ELSE code too.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — assembly patterns for assignment and selection (part of Section 28.03).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Before a value can be stored in a memory location, where must it first be generated?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>In the accumulator (ACC).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is an explicit JMP needed at the end of the THEN block in an IF/ELSE translation?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Without it, execution would simply continue into the ELSE block after finishing the THEN block — the JMP is needed to skip over the ELSE code entirely, since only one branch should ever execute.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      Following a comparison, ______ jumps if the result was NOT equal (false); ______ jumps if the result was equal (true).
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>JPN; JPE.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student translates <code>IF A = 0 THEN B ← B + 1 ENDIF</code> but uses JPE instead of JPN after the CMP. What goes wrong?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>JPE jumps when the comparison IS true — this would SKIP the THEN block exactly when the condition holds (A=0), and execute it when the condition is FALSE — the logic is completely inverted from what's intended.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Write the assembly pattern (using LDM and STO) for the pseudocode assignment C ← 7.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p><code>LDM #7</code><br><code>STO C</code></p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">How can equality between two values (A = B) be tested without a direct "equals" comparison operator?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Negate one value (e.g. take its two's complement) and ADD the other — if the result is zero, the two original values were equal.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 28: Low-Level Programming — 28.03 Assembly Patterns: Assignment and Selection (part of Section 28.03)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 28.03
+  </div>
+
+</div>
+</body>
+</html>

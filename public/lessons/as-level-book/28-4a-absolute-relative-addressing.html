@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>28.04 Absolute and Relative Addressing — AS &amp; A Level Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(244,114,182,.12); color: #f472b6; border: 1px solid rgba(244,114,182,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pseudo-box { background: #0a0c18; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre; }
+  .key-term-box { background: rgba(244,114,182,.06); border: 1px solid rgba(244,114,182,.25); border-radius: 8px; padding: 12px 14px; margin: 10px 0; font-size: 12.5px; color: #e2e8f0; }
+  .key-term-box strong { color: #f472b6; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(244,114,182,.12); border: 1px solid rgba(244,114,182,.25); color: #f472b6; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .answer-body code { background: rgba(74,222,128,.08); color: #4ade80; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">A Level · Chapter 28 · Low-Level Programming</span>
+  <div class="topic-title">28.04 Absolute and Relative Addressing</div>
+  <div class="topic-subtitle">Why a program that only knows absolute addresses can't be loaded just anywhere in memory.</div>
+
+  <div class="section-label">Theory</div>
+
+  <div class="theory-block">
+    <h4>Absolute addressing — the restriction</h4>
+    <ul>
+      <li>An ABSOLUTE address is the actual numeric address of a memory location.</li>
+      <li>A program written using absolute addresses can ONLY be loaded at the ONE specific memory location it was designed for — it cannot be relocated.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Relative addressing — the solution</h4>
+    <ul>
+      <li>RELATIVE addresses are expressed relative to a BASE address (typically the address of the program's first instruction).</li>
+      <li>When the program loads, this base address is stored in a BASE REGISTER (BR). Every address reference then combines the BASE REGISTER's value with an OFFSET.</li>
+      <li>Example: <code>STO [BR] + 10</code> stores ACC's contents at the address calculated from (contents of BR) + 10.</li>
+      <li>This lets an assembler produce a program that can be LOADED ANYWHERE in memory — the offsets stay the same regardless of where the base address actually ends up.</li>
+    </ul>
+    <div class="key-term-box"><strong>Absolute address:</strong> the actual numeric address of a memory location.<br><strong>Relative address:</strong> an address expressed relative to a base address, resolved via a base register plus an offset.</div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Three ways of writing the same instruction</h4>
+    <div class="pseudo-box">Symbolic (label-based):        LDD A
+Relative (offset from base):   LDD [BR] + 3
+Absolute (raw number):         LDD 203</div>
+    <ul>
+      <li>All three could refer to the EXACT SAME memory location — they differ only in HOW that location is expressed, not in what the instruction actually does.</li>
+      <li>Symbolic addressing (labels) is what the PROGRAMMER writes; the ASSEMBLER translates this into either relative or absolute addresses depending on the target system.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Why the END instruction is critical</h4>
+    <ul>
+      <li>Once program execution reaches the end, control MUST be passed back to the operating system via END.</li>
+      <li>Without it, the processor would try to EXECUTE whatever binary pattern happens to occupy the next memory location as if it were an instruction — if that pattern doesn't correspond to a valid instruction, the processor CRASHES.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what THIS subsection taught — absolute and relative addressing (completes Section 28.04).</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Why can't a program using only absolute addresses be loaded at a different memory location than the one it was designed for?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Every address reference in the program is a fixed, specific number — if the program is loaded somewhere else, those hard-coded addresses would no longer point to the correct data/instructions.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is stored in the base register (BR)?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The address at which the program was actually loaded into memory (typically the address of its first instruction).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">
+      A relative address is calculated as the contents of the ______ register, plus an ______.
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Base; offset.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">
+      A student's assembly program omits the final END instruction. What is the risk?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Execution will continue past the intended end of the program and try to interpret whatever data happens to sit in the next memory location as an instruction — if it isn't a valid instruction, the processor crashes.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">
+      Why does using relative addressing make a program more flexible for an operating system to run?
+    </div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The OS can load the program at ANY available memory location, simply setting the base register accordingly — since all internal address references are relative offsets from that base, the program works correctly regardless of exactly where it ends up in memory.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What role does symbolic addressing (labels) play relative to absolute and relative addressing?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It's what the programmer actually writes — the assembler then translates these labels into either absolute or relative addresses, depending on how the target system needs the final machine code structured.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — AS &amp; A Level Computer Science — Chapter 28: Low-Level Programming — 28.04 Absolute and Relative Addressing (completes Section 28.04)<br>
+    Adapted from: Cambridge International AS &amp; A Level Computer Science Coursebook (Cambridge University Press) — Section 28.04
+  </div>
+
+</div>
+</body>
+</html>
