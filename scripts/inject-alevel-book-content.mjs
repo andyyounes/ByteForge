@@ -145,6 +145,24 @@ const PAPER4 = CHAPTERS.filter(c => c.num >= 23)
 function esc(s) { return String(s).replace(/'/g, "\\'") }
 function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;') }
 
+// Reads the lesson's own <div class="topic-title"> and splits it into its
+// real book subsection number (e.g. "23.02", "30.04") and label text —
+// rather than a sequential "23.1, 23.2, ..." number, so the sidebar always
+// shows the exact number the embedded page itself displays.
+const _metaCache = new Map()
+function getLessonMeta(file) {
+  if (_metaCache.has(file)) return _metaCache.get(file)
+  const src = readFileSync(path.join(__dirname, '..', 'public', 'lessons', 'as-level-book', file), 'utf8')
+  const m = src.match(/<div class="topic-title">([^<]*)<\/div>/)
+  if (!m) throw new Error('No topic-title found in ' + file)
+  const raw = m[1].replace(/&amp;/g, '&').replace(/&#39;/g, "'")
+  const nm = raw.match(/^([\d.–]+)\s+(.*)$/)
+  if (!nm) throw new Error('Could not parse number/title from: ' + raw)
+  const meta = { number: nm[1], label: nm[2] }
+  _metaCache.set(file, meta)
+  return meta
+}
+
 // ── 1. Sidebar chapter blocks ────────────────────────────────────────────────
 function buildSidebar(chapters, firstUnlocked) {
   return chapters.map(ch => {
@@ -153,9 +171,10 @@ function buildSidebar(chapters, firstUnlocked) {
     const progText = unlocked ? `0/${ids.length}` : 'Soon'
     const collapsedCls = unlocked ? '' : ' collapsed'
     const arrowCls = unlocked ? ' open' : ''
-    const topicRows = ch.lessons.map(([, label], i) =>
-      `          <div class="topic-item" id="nav-ch${ch.num}-${i + 1}" onclick="loadTopic('ch${ch.num}-${i + 1}')">${ch.num}.${i + 1} ${escHtml(label)}</div>`
-    ).join('\n')
+    const topicRows = ch.lessons.map(([file], i) => {
+      const meta = getLessonMeta(file)
+      return `          <div class="topic-item" id="nav-ch${ch.num}-${i + 1}" onclick="loadTopic('ch${ch.num}-${i + 1}')">${escHtml(meta.number)} ${escHtml(meta.label)}</div>`
+    }).join('\n')
     return `      <!-- Chapter ${ch.num} -->
       <div class="chapter-block">
         <div class="chapter-toggle" onclick="toggleChapter('ch${ch.num}')">
@@ -199,14 +218,15 @@ ${lines.join('\n')}
 function buildTopicsEntries() {
   const out = []
   for (const ch of CHAPTERS) {
-    ch.lessons.forEach(([file, label], i) => {
+    ch.lessons.forEach(([file], i) => {
+      const meta = getLessonMeta(file)
       const id = `ch${ch.num}-${i + 1}`
       const src = BOOK_DIR + file
-      const theory = `<iframe src="${src}" style="width:100%;min-height:900px;border:0;border-radius:10px;background:#0d0f1a;" loading="lazy" title="${escHtml(label)}" onload="try{this.style.height=(this.contentWindow.document.body.scrollHeight+40)+'px'}catch(e){}"></iframe>`
+      const theory = `<iframe src="${src}" style="width:100%;min-height:900px;border:0;border-radius:10px;background:#0d0f1a;" loading="lazy" title="${escHtml(meta.label)}" onload="try{this.style.height=(this.contentWindow.document.body.scrollHeight+40)+'px'}catch(e){}"></iframe>`
       const example = `<p style="color:#9ca3af;">The full worked example is embedded in the lesson above — scroll down inside it for the complete walkthrough.</p>`
       out.push(`  '${id}': {
     chapter: 'Chapter ${ch.num} — ${esc(ch.title)}',
-    title: '${ch.num}.${i + 1} ${esc(label)}',
+    title: '${esc(meta.number)} ${esc(meta.label)}',
     subtitle: 'From the Cambridge coursebook — includes a full worked lesson and 6 practice questions with answer keys.',
     keyTerms: [],
     theory: \`${theory}\`,

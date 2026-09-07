@@ -53,6 +53,25 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const TARGET = path.join(__dirname, '..', 'public', 'lessons', 'as-level.html')
 const BOOK_DIR = '/lessons/as-level-book/'
+const BOOK_SRC_DIR = path.join(__dirname, '..', 'public', 'lessons', 'as-level-book')
+
+// Reads the lesson's own <div class="topic-title"> and splits it into its
+// real book subsection number (e.g. "13.02", "14.01–14.02") and label text —
+// rather than inventing a sequential "13.1, 13.2, ..." number, so the
+// sidebar always shows the exact number the embedded page itself displays.
+const _metaCache = new Map()
+function getLessonMeta(file) {
+  if (_metaCache.has(file)) return _metaCache.get(file)
+  const src = readFileSync(path.join(BOOK_SRC_DIR, file), 'utf8')
+  const m = src.match(/<div class="topic-title">([^<]*)<\/div>/)
+  if (!m) throw new Error('No topic-title found in ' + file)
+  const raw = m[1].replace(/&amp;/g, '&').replace(/&#39;/g, "'")
+  const nm = raw.match(/^([\d.–]+)\s+(.*)$/)
+  if (!nm) throw new Error('Could not parse number/title from: ' + raw)
+  const meta = { number: nm[1], label: nm[2] }
+  _metaCache.set(file, meta)
+  return meta
+}
 
 // ── Manifest: real Cambridge chapters 1-15, one entry per lesson file ───────
 const CHAPTERS = [
@@ -194,9 +213,10 @@ function buildSidebar(chapters, firstUnlocked) {
     const progText = unlocked ? `0/${ids.length}` : 'Soon'
     const collapsedCls = unlocked ? '' : ' collapsed'
     const arrowCls = unlocked ? ' open' : ''
-    const topicRows = ch.lessons.map(([, label], i) =>
-      `          <div class="topic-item" id="nav-ch${ch.num}-${i + 1}" onclick="loadTopic('ch${ch.num}-${i + 1}')">${ch.num}.${i + 1} ${escHtml(label)}</div>`
-    ).join('\n')
+    const topicRows = ch.lessons.map(([file], i) => {
+      const meta = getLessonMeta(file)
+      return `          <div class="topic-item" id="nav-ch${ch.num}-${i + 1}" onclick="loadTopic('ch${ch.num}-${i + 1}')">${escHtml(meta.number)} ${escHtml(meta.label)}</div>`
+    }).join('\n')
     return `      <!-- Chapter ${ch.num} -->
       <div class="chapter-block">
         <div class="chapter-toggle" onclick="toggleChapter('ch${ch.num}')">
@@ -230,14 +250,15 @@ ${p2lines.join('\n')}
 function buildTopicsEntries() {
   const out = []
   for (const ch of CHAPTERS) {
-    ch.lessons.forEach(([file, label], i) => {
+    ch.lessons.forEach(([file], i) => {
+      const meta = getLessonMeta(file)
       const id = `ch${ch.num}-${i + 1}`
       const src = BOOK_DIR + file
-      const theory = `<iframe src="${src}" style="width:100%;min-height:900px;border:0;border-radius:10px;background:#0d0f1a;" loading="lazy" title="${escHtml(label)}" onload="try{this.style.height=(this.contentWindow.document.body.scrollHeight+40)+'px'}catch(e){}"></iframe>`
+      const theory = `<iframe src="${src}" style="width:100%;min-height:900px;border:0;border-radius:10px;background:#0d0f1a;" loading="lazy" title="${escHtml(meta.label)}" onload="try{this.style.height=(this.contentWindow.document.body.scrollHeight+40)+'px'}catch(e){}"></iframe>`
       const example = `<p style="color:#9ca3af;">The full worked example is embedded in the lesson above — scroll down inside it for the complete walkthrough.</p>`
       out.push(`  '${id}': {
     chapter: 'Chapter ${ch.num} — ${esc(ch.title)}',
-    title: '${ch.num}.${i + 1} ${esc(label)}',
+    title: '${esc(meta.number)} ${esc(meta.label)}',
     subtitle: 'From the Cambridge coursebook — includes a full worked lesson and 6 practice questions with answer keys.',
     videos: [],
     keyTerms: [],
@@ -348,6 +369,40 @@ let html = readFileSync(TARGET, 'utf8')
   const needsComma = !/,\s*$/.test(before)
   const block = `${needsComma ? ',' : ''}\n${START}\n${buildTopicsEntries()}\n${END}\n`
   html = before + block + html.slice(insertAt)
+}
+
+// ── Splice 5: cosmetic cleanup ───────────────────────────────────────────────
+// (a) Dead section-divider comments (e.g. "// ── Chapter 7 — Monitoring &
+//     Control ──") left behind over now-empty gaps by Splice 4's entry
+//     stripping — these described the OLD mismatched content and no longer
+//     precede anything. Strip any such divider that isn't immediately
+//     followed by a real entry (the db-1 block's own header is real and kept).
+// (b) A stale doc comment quoting the old Paper 1 topic count.
+// (c) The standalone SQL Practice Lab's sidebar label still says "Ch 11 —
+//     Databases", which now collides with the real Chapter 11 (Algorithm
+//     Design) shown in the Paper 2 panel. Rename it so both can't be read as
+//     the same numbered chapter.
+{
+  const topicsStart2 = html.indexOf('const TOPICS = {')
+  const db1Start = html.indexOf("'db-1':")
+  if (topicsStart2 !== -1 && db1Start !== -1 && db1Start > topicsStart2) {
+    const headerEnd = topicsStart2 + 'const TOPICS = {'.length
+    let header = html.slice(headerEnd, db1Start)
+    // Drop every dead divider comment except the real one right above db-1
+    // ("Chapter 11 — Databases (Paper 1) — uses db-x IDs..."), then collapse
+    // the resulting run of blank lines down to a single blank line.
+    header = header
+      .split('\n')
+      .filter(line => !/^\s*\/\/ ── Chapter \d+.*── *\r?$/.test(line) || /Databases \(Paper 1\)/.test(line))
+      .join('\n')
+      .replace(/(\r\n|\n){3,}/g, '\r\n\r\n')
+    html = html.slice(0, headerEnd) + header + html.slice(db1Start)
+  }
+  html = html.replace('45 Paper 1 topics', '66 Paper 1 topics')
+  html = html.replace(
+    '<span class="chapter-toggle-label">Ch 11 — Databases</span>',
+    '<span class="chapter-toggle-label">Databases — SQL Practice Lab</span>'
+  )
 }
 
 writeFileSync(TARGET, html, 'utf8')
