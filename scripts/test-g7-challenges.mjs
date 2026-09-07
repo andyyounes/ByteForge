@@ -32,10 +32,12 @@ let pass = 0, fail = 0
 // the maximal log needs a shape actually sitting at every position any of
 // them names, or this generic satisfiability test would wrongly flag a
 // perfectly good position-aware check as unsatisfiable.
-const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, texts: 999, hasIf: true, hasVar: true, hasFunction: true,
+const maximalLog = () => ({ frames: 999, rects: 999, circles: 999, lines: 999, texts: 999, hasIf: true, hasVar: true, hasFunction: true, hasAnd: true,
   positions: [[20,20],[440,20],[20,220],[440,220], [220,130], [60,130],[240,130],[420,130],
     // sc2s2 "Marching Line" — an evenly-spaced row of 5 at y=130.
-    [40,130],[120,130],[200,130],[280,130],[360,130]],
+    [40,130],[120,130],[200,130],[280,130],[360,130],
+    // sc2s3 "Vertical Column" — an evenly-spaced column of 4 at x=240.
+    [240,30],[240,90],[240,150],[240,210]],
   // Story Studio's "page" stages (st1*) — a DOM preview, not the canvas —
   // check headings/paragraphs/links/buttons instead of shapes/frames.
   headings: 999, paragraphs: 999, links: 999, buttons: 999,

@@ -39,6 +39,22 @@ const SOLUTIONS = {
 
 for (const m of MISSIONS) {
   if (m.type === 'battle' || m.type === 'data' || m.type === 'learn' || m.type === 'cards' || m.type === 'flowchart') continue   // validated separately, below (learn/cards/flowchart bubbles have no code/solution at all)
+  if (m.type === 'quiz') {
+    // Quiz bubbles have no turtle solution — instead verify every question
+    // is actually answerable and unambiguous: 2+ distinct options, and the
+    // marked answer is one of them (catches a typo'd answer that would
+    // silently make a question impossible to pass).
+    const qs = m.quiz?.questions || []
+    if (!qs.length) { bad(m.id + ' — quiz has no questions'); continue }
+    let okQuiz = true
+    qs.forEach((q, i) => {
+      const opts = q.options || []
+      if (new Set(opts).size < 2) { bad(m.id + ` — Q${i + 1} has fewer than 2 distinct options`); okQuiz = false }
+      if (!opts.includes(q.answer)) { bad(m.id + ` — Q${i + 1}'s answer "${q.answer}" is not among its own options`); okQuiz = false }
+    })
+    if (okQuiz) ok(m.id + ' — ' + qs.length + ' quiz question(s), each answerable and unambiguous')
+    continue
+  }
   const sol = SOLUTIONS[m.id]
   if (!sol) { bad(m.id + ' — no reference solution'); continue }
   const sim = simTurtle(m.scene, sol)

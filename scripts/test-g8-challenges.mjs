@@ -39,23 +39,34 @@ function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
 // code-regex convention every Python stage below uses.
 const webMaximalLog = () => ({ bodyText: 'true false you see 1. item 3 items ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
   hasFunction: true, functionCount: 999, hasReturn: true, hasIf: true,
-  hasLSSet: true, hasLSGet: true, hasJSONStringify: true, hasJSONParse: true,
-  hasLoop: true, listItems: 999,
+  hasLSSet: true, hasLSGet: true, hasLSRemove: true, hasJSONStringify: true, hasJSONParse: true,
+  // ws4s4 additionally checks listItems < 4 — 3 is the one value that
+  // satisfies every ">= 3" challenge elsewhere AND that upper bound.
+  hasLoop: true, listItems: 3,
   hasClick: true, listItemsGrewOnClick: true, bodyChangedOnClick: true,
   hasIndex: true, hasLength: true, hasAnd: true,
   // Semester 1 (3-semester rebuild, web1-web4) — real element counts +
-  // EXACT computed colors (getComputedStyle's rgb() form of #FFF7E6/#2F3B52).
-  h1s: 999, paragraphs: 999, buttons: 999, links: 999,
+  // EXACT computed colors (getComputedStyle's rgb() form of each challenge's
+  // own hex color — h1/body from #2F3B52/#FFF7E6, h2/h3/p/link/button colors
+  // from web3's own per-tag palette, per web3s2-5/web3boss/web4boss).
+  h1s: 999, h1Count: 999, h2Count: 999, h3Count: 999, h4Count: 999, h5Count: 999,
+  paragraphs: 999, buttons: 999, links: 999,
   headingText: ['My Page','My Page'], paragraphText: ['This is my page.','This is my page.'],
-  bgColor: 'rgb(255, 247, 230)', headingColor: 'rgb(47, 59, 82)', hasVariable: true })
+  bgColor: 'rgb(255, 247, 230)', headingColor: 'rgb(47, 59, 82)',
+  h2Color: 'rgb(124, 58, 237)', h3Color: 'rgb(5, 150, 105)', pColor: 'rgb(75, 85, 99)',
+  linkColor: 'rgb(29, 78, 216)', buttonBg: 'rgb(230, 57, 70)', buttonColor: 'rgb(255, 255, 255)',
+  hasVariable: true })
 const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false,
   hasFunction: false, functionCount: 0, hasReturn: false, hasIf: false,
-  hasLSSet: false, hasLSGet: false, hasJSONStringify: false, hasJSONParse: false,
+  hasLSSet: false, hasLSGet: false, hasLSRemove: false, hasJSONStringify: false, hasJSONParse: false,
   hasLoop: false, listItems: 0,
   hasClick: false, listItemsGrewOnClick: false, bodyChangedOnClick: false,
   hasIndex: false, hasLength: false, hasAnd: false,
-  h1s: 0, paragraphs: 0, buttons: 0, links: 0,
-  headingText: [], paragraphText: [], bgColor: '', headingColor: '', hasVariable: false })
+  h1s: 0, h1Count: 0, h2Count: 0, h3Count: 0, h4Count: 0, h5Count: 0,
+  paragraphs: 0, buttons: 0, links: 0,
+  headingText: [], paragraphText: [], bgColor: '', headingColor: '',
+  h2Color: '', h3Color: '', pColor: '', linkColor: '', buttonBg: '', buttonColor: '',
+  hasVariable: false })
 
 let pass = 0, fail = 0
 for (const ch of CHALLENGES) {

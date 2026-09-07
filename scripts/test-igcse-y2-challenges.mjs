@@ -23,9 +23,35 @@ const { CHALLENGES } = new Function(ctx + '\nreturn { CHALLENGES }')()
 
 console.log(`Found ${CHALLENGES.length} IGCSE Y2 challenges.\n`)
 
-let pass = 0, fail = 0
+let pass = 0, fail = 0, skipped = 0
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.name}`
+  // Only the (undefined-type) real pseudocode-writing challenges have a
+  // starter that runs through the interpreter — 'lesson' (embedded book
+  // pages), 'fill'/'identify' (plain-text answer, checked like IGCSE Y1's
+  // ANSWERS pattern) and 'complete' challenges have no code/starter at all
+  // and are validated by their own check(answerString) signature instead.
+  if (!ch.starter) {
+    // 'fill' / 'identify' / 'complete' challenges take a plain typed answer
+    // string, checked directly by ch.check(ans) — no interpreter involved.
+    // 'lesson' bubbles (embedded static pages) have no check() at all.
+    if (typeof ch.check === 'function' && (ch.type === 'fill' || ch.type === 'identify' || ch.type === 'complete')) {
+      let blankOk = false, junkOk = false
+      try { blankOk = !ch.check('') } catch { blankOk = true /* throwing on blank is an acceptable rejection */ }
+      // Deliberately not an English word/phrase (unlike IGCSE Y1's junk
+      // string) — several fill-in checks here are loose substring regexes
+      // (e.g. /finite|.../), and "definitely" itself contains "finite".
+      try { junkOk = !ch.check('xqz9988774kwv') } catch { junkOk = true }
+      if (blankOk && junkOk) { pass++; console.log(`✓ ${label} — correctly rejects blank and garbage answers`) }
+      else {
+        fail++
+        console.log(`✗ ${label} — ${!blankOk ? 'a BLANK answer passes check()' : 'a nonsense answer passes check()'}`)
+      }
+    } else {
+      skipped++
+    }
+    continue
+  }
   let res
   try {
     res = new Interpreter().run(ch.starter.replace(/<-/g, '←'), [])
@@ -113,7 +139,7 @@ for (const { label, code } of [
   } catch { pass++; console.log(`✓ ${label}`) }
 }
 
-console.log(`\n${pass} passed, ${fail} failed.`)
+console.log(`\n${pass} passed, ${fail} failed (${skipped} non-code challenges skipped — no interpreter starter to run).`)
 if (fail > 0) process.exit(1)
 console.log('all IGCSE Y2 challenge starters run cleanly and are genuinely incomplete')
 console.log('2D arrays, file re-reads and array write bounds all behave correctly')
