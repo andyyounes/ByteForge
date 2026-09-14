@@ -18,7 +18,10 @@
 import { readFileSync } from 'fs'
 
 const html = readFileSync('c:/Users/user/Downloads/ICT website/public/lessons/grade8.html', 'utf8')
-const s = html.indexOf('const MODULES = [')
+// Starts from the Colors & Shading palette helpers (COLOR_PALETTE,
+// isAllowedColor, colorBrightness, etc.) rather than 'const MODULES = ['
+// directly — several web3/web4/web5 checks now close over those helpers.
+const s = html.indexOf('// ── Colors & Shading — shared palette data')
 const e = html.indexOf('const CHALLENGES = MODULES')
 const ctx = html.slice(s, e) + '\nconst CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({ ...s, mod: m.id.toUpperCase() })))'
 const { CHALLENGES } = new Function(ctx + '\nreturn { CHALLENGES }')()

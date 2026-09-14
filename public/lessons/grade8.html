@@ -292,6 +292,7 @@
       <div class="web-tab" id="web-tab-css" onclick="switchWebTab('css')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">CSS</div>
       <div class="web-tab" id="web-tab-js" onclick="switchWebTab('js')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">JS</div>
     </div>
+    <div id="palette-bar" style="display:none;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg-card);"></div>
     <div class="cm-outer" style="position:relative;">
       <textarea id="web-editor-html"></textarea>
       <textarea id="web-editor-css"  style="display:none;"></textarea>
@@ -919,6 +920,76 @@ function highlightError(line) {
   setTimeout(() => editor.removeLineClass(line - 1, 'background', 'cm-error-line'), 4000)
 }
 
+// ── Colors & Shading — shared palette data + helpers ────────────────────────
+// One shared color pool used across every web3 (Colors & Shading) stage —
+// deliberately curated so any two members read clearly against each other,
+// so grading can check for real *design choices* (pick two DIFFERENT,
+// mutually-readable colors) instead of "type this one exact hex value".
+// The 8 CORE swatches are the module's original literal values (unchanged,
+// so nothing that already depended on them breaks); the two SHADE_FAMILIES
+// are new — three lightness steps of the same hue, for the "shades of one
+// color" stage.
+const COLOR_PALETTE = {
+  cream:     '#FFF7E6',   // page background
+  navy:      '#2F3B52',   // headings
+  purple:    '#7C3AED',   // h2
+  emerald:   '#059669',   // h3
+  slate:     '#4B5563',   // paragraph text
+  oceanBlue: '#1D4ED8',   // links
+  coral:     '#E63946',   // button fill
+  white:     '#FFFFFF',   // button text / light extreme
+  black:     '#000000',   // dark extreme (for button text on light fills)
+}
+const SHADE_FAMILIES = {
+  blue:  { light: '#93C5FD', base: '#3B82F6', dark: '#1E40AF' },
+  green: { light: '#86EFAC', base: '#22C55E', dark: '#15803D' },
+}
+const ALL_SWATCHES = { ...COLOR_PALETTE }
+Object.entries(SHADE_FAMILIES).forEach(([fam, shades]) => {
+  Object.entries(shades).forEach(([step, hex]) => { ALL_SWATCHES[fam + '_' + step] = hex })
+})
+function hexToRgbStr(hex) {
+  const h = hex.replace('#', '')
+  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16)
+  return 'rgb(' + r + ', ' + g + ', ' + b + ')'
+}
+const ALLOWED_RGB = new Set(Object.values(ALL_SWATCHES).map(hexToRgbStr))
+function isAllowedColor(rgbStr) { return ALLOWED_RGB.has(rgbStr) }
+// Perceptual-ish brightness (0-255, not full WCAG contrast) — enough to tell
+// "these two are meaningfully different lightness" apart from "basically
+// the same," which is what actually breaks readability at this level.
+function colorBrightness(rgbStr) {
+  const m = /rgb\((\d+),\s*(\d+),\s*(\d+)/.exec(rgbStr || '')
+  if (!m) return null
+  const [, r, g, b] = m.map(Number)
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+function swatchButton(name, hex) {
+  return `<button type="button" onclick="insertColorSwatch('${hex}')" title="${name} — ${hex}"
+    style="width:26px;height:26px;border-radius:6px;border:1.5px solid rgba(255,255,255,.3);cursor:pointer;background:${hex};padding:0;flex-shrink:0;"></button>`
+}
+function swatchChip(name, hex) {
+  // Non-interactive reference chip for quiz text (no code editor to insert into).
+  return `<span style="display:inline-flex;align-items:center;gap:5px;margin:2px 8px 2px 0;font-size:12px;">
+    <span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:${hex};border:1px solid rgba(255,255,255,.3);"></span>
+    ${name} <code>${hex}</code></span>`
+}
+function renderPaletteBar(ch) {
+  const bar = document.getElementById('palette-bar')
+  if (!bar) return
+  const list = ch && ch.palette
+  if (!list || !list.length) { bar.style.display = 'none'; bar.innerHTML = ''; return }
+  bar.style.display = 'flex'
+  bar.innerHTML = '<span style="font-size:11px;color:var(--fg-faint);font-weight:700;margin-right:4px;white-space:nowrap;">🎨 Palette — click to insert:</span>'
+    + list.map(([name, hex]) => swatchButton(name, hex)).join('')
+}
+function insertColorSwatch(hex) {
+  const ed = webEditors[webTab]
+  if (!ed) return
+  ed.replaceSelection(hex)
+  ed.focus()
+}
+
 // ── Builder City — 10 modules, Python-first (from-blocks-to-text -> a real
 // data app capstone). M1-M4 are live this session; M5-M10 stubbed locked on
 // the map. check(code, log) gets the raw source text plus drawLog
@@ -1063,90 +1134,136 @@ const MODULES = [
       check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 2 && log.buttons >= 2 && log.listItems >= 3,
     },
   ]},
-  // ── Semester 1, Week 4: Colors & Shading — exact hex values, checked via
-  // real computed style (getComputedStyle normalizes to rgb(...)).
-  { id:'web3', name:'🎨 Colors & Shading', sub:'CSS — content vs. style, now with exact colors', live:true, stages:[
-    { id:'web3s1', name:'Background & Heading Color', xp:30, lang:'web',
-      text:`<strong>Challenge 1</strong> — Set the page background to EXACTLY <code>#FFF7E6</code> and the heading color to EXACTLY <code>#2F3B52</code>.`,
+  // ── Semester 1, Week 4: Colors & Shading — EXPANDED (was 6 stages of
+  // "type this one exact hex", now real design choice + real shading).
+  // Every check below validates against the shared ALL_SWATCHES pool
+  // (isAllowedColor) rather than one literal value, so "which colors" is a
+  // genuine student decision — grading instead checks the PRINCIPLES that
+  // make a color choice work: different-enough elements, readable against
+  // the background, and (for the button) dark-fill-needs-light-text /
+  // light-fill-needs-dark-text. A clickable palette bar (rendered from each
+  // stage's own `palette` field — see renderPaletteBar/insertColorSwatch
+  // above MODULES) sits above the CSS editor so choosing a color never
+  // means memorising or mistyping a hex code.
+  { id:'web3', name:'🎨 Colors & Shading', sub:'Hex colors, real palettes, and real shading — not just one exact value', live:true, stages:[
+    { id:'web3s0', name:'What Is a Hex Color?', xp:20, type:'quiz',
+      text:`<strong>Before you touch any CSS</strong> — a hex color like <code>#E63946</code> is really THREE 2-digit numbers stuck together: how much RED, how much GREEN, and how much BLUE (00 = none, FF = maximum). Here's the palette you'll be choosing from all month:<br><br>
+        ${Object.entries(COLOR_PALETTE).map(([k, hex]) => swatchChip(k, hex)).join('')}<br>
+        Study a couple of these hex codes above, then answer:`,
+      hints:['Each pair of digits is one channel: RR, then GG, then BB.', '00 means none of that color; FF means the maximum amount.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'A hex color code like #E63946 is made of three 2-digit parts. What do they stand for?',
+          options: ['Row, Column, Depth', 'Red, Green, Blue', 'Height, Width, Border', 'Hue, Saturation, Lightness'],
+          answer: 'Red, Green, Blue' },
+        { type:'match', prompt:'#FFFFFF (all three parts at maximum) is which color?',
+          options: ['Black', 'White', 'Red', 'Grey'], answer: 'White' },
+        { type:'match', prompt:'#000000 (all three parts at zero — none of any color) is which color?',
+          options: ['White', 'Black', 'Blue', 'Grey'], answer: 'Black' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'web3s1', name:'Choose Your Palette — Background & Heading', xp:30, lang:'web',
+      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
+                ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
+                ['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Challenge 1</strong> — Pick TWO different colors from the palette above (click a swatch to insert its hex code into your CSS): one for the page background, one for your <code>&lt;h1&gt;</code> heading. They must be different from each other AND different enough in lightness that the heading is actually easy to read against the background — not two colors that are basically the same brightness.`,
       hints:[
-        'CSS: body { background-color: #FFF7E6; }',
-        'CSS: h1 { color: #2F3B52; }',
-        'Both go in the CSS tab, not the HTML tab.',
+        'CSS: body { background-color: #____; } and h1 { color: #____; }',
+        'Click a palette swatch above the CSS editor to insert its hex code right where your cursor is.',
+        'A light background (like cream) reads best with a DARK heading (like navy) — not another light color.',
       ],
       webStarter: {
         html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
-        css: `/* TODO: set body background to #FFF7E6 and h1 color to #2F3B52 */\n`,
+        css: `/* TODO: pick a background color and a different, readable heading color from the palette */\n`,
         js: ``,
       },
-      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)',
+      check:(log) => isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
+                  && log.bgColor !== log.headingColor
+                  && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40,
     },
-    { id:'web3s2', name:'Color the Tags — Links', xp:30, lang:'web',
-      text:`<strong>Challenge 2</strong> — CSS can target ANY tag, not just headings. Keep last week's colors, and set every <code>&lt;a&gt;</code> link's color to EXACTLY <code>#1D4ED8</code>.`,
+    { id:'web3s2', name:'Shades of One Color', xp:35, lang:'web',
+      palette: [['blue light',SHADE_FAMILIES.blue.light],['blue base',SHADE_FAMILIES.blue.base],['blue dark',SHADE_FAMILIES.blue.dark],
+                ['green light',SHADE_FAMILIES.green.light],['green base',SHADE_FAMILIES.green.base],['green dark',SHADE_FAMILIES.green.dark]],
+      text:`<strong>Challenge 2</strong> — A single color has SHADES: the same hue, just lighter or darker. Above are two shade families (blue and green), each with a light/base/dark version. Pick ONE family, use its LIGHT shade for the background and its DARK shade for your <code>&lt;h1&gt;</code> heading — this is the real design trick behind "light background, dark text": same color family, different lightness.`,
       hints:[
-        'CSS: a { color: #1D4ED8; }',
-        'The selector "a" targets EVERY link on the page at once.',
+        'Stay within ONE family — don\'t mix a blue shade with a green shade.',
+        'Light shade → background-color. Dark shade → heading color.',
+        'This is the exact same readability idea as Challenge 1, just now using shades of ONE hue instead of unrelated colors.',
       ],
       webStarter: {
-        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<a href="#">Click here</a>\n`,
-        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: set every <a> link's color to #1D4ED8 */\n`,
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
+        css: `/* TODO: pick a family (blue or green) — light shade for background, dark shade for the h1 */\n`,
         js: ``,
       },
-      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)' && log.linkColor === 'rgb(29, 78, 216)',
+      check:(log) => isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
+                  && colorBrightness(log.bgColor) > colorBrightness(log.headingColor) + 30,
     },
-    { id:'web3s3', name:'Color the Buttons — Fill & Text', xp:35, lang:'web',
-      text:`<strong>Challenge 3</strong> — A button has TWO colors: its fill (the <code>background-color</code> behind it) and its text (<code>color</code>). Set the button's fill to EXACTLY <code>#E63946</code> and its text to EXACTLY <code>#FFFFFF</code>.`,
+    { id:'web3s3', name:'Color the Buttons — Fill & Text That Actually Reads', xp:35, lang:'web',
+      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
+                ['emerald',COLOR_PALETTE.emerald],['oceanBlue',COLOR_PALETTE.oceanBlue],['coral',COLOR_PALETTE.coral],
+                ['white',COLOR_PALETTE.white],['black',COLOR_PALETTE.black]],
+      text:`<strong>Challenge 3</strong> — A button has TWO colors: its fill (<code>background-color</code>) and its text (<code>color</code>). Pick ANY palette color for the fill — then pick whichever text color actually reads clearly against it: <strong>white text on a DARK fill</strong>, or <strong>black text on a LIGHT fill</strong>. Picking wrong (e.g. white text on a light fill) won't pass.`,
       hints:[
-        'CSS: button { background-color: #E63946; color: #FFFFFF; }',
-        '"Fill" here just means the background-color of the button itself, same property as the page background.',
+        'CSS: button { background-color: #____; color: #FFFFFF or #000000; }',
+        'Coral, navy, purple, emerald, oceanBlue are all dark enough for WHITE text. Cream is light enough for BLACK text.',
+        '"Fill" is just the background-color of the button itself.',
       ],
       webStarter: {
         html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<button>Click me</button>\n`,
-        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: set the button's fill (background-color) to #E63946 and its text color to #FFFFFF */\n`,
+        css: `/* TODO: pick a button fill color, then white or black text — whichever actually reads */\n`,
         js: ``,
       },
-      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)'
-                  && log.buttonBg === 'rgb(230, 57, 70)' && log.buttonColor === 'rgb(255, 255, 255)',
+      check:(log) => {
+        if (!isAllowedColor(log.buttonBg)) return false
+        const dark = colorBrightness(log.buttonBg) < 128
+        return dark ? log.buttonColor === 'rgb(255, 255, 255)' : log.buttonColor === 'rgb(0, 0, 0)'
+      },
     },
-    { id:'web3s4', name:'Every Heading Level, Its Own Color', xp:35, lang:'web',
-      text:`<strong>Challenge 4</strong> — Keep your h1's color, and give an <code>&lt;h2&gt;</code> the exact color <code>#7C3AED</code> and an <code>&lt;h3&gt;</code> the exact color <code>#059669</code> — three different heading levels, three different colors.`,
+    { id:'web3s4', name:'A Coordinated Page — Multiple Colors, Together', xp:40, lang:'web',
+      palette: Object.entries(ALL_SWATCHES),
+      text:`<strong>Challenge 4</strong> — A real page uses SEVERAL colors together, not just one. Pick a background, then give your <code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code>, and paragraph text each a DIFFERENT color from the full palette above (mix core colors and shade families freely) — every one of them must still read clearly against your background.`,
       hints:[
-        'CSS: h2 { color: #7C3AED; } and h3 { color: #059669; } — separate rules for each tag.',
-        'h1, h2, and h3 can each have their OWN color rule — nothing stops you styling every level differently.',
+        'Four different text colors: h1, h2, h3, and p all need their OWN, DIFFERENT color.',
+        'Every one of those four still has to be readable against whatever background you picked — recheck each one.',
+        'This is the "multiple colors that work together" idea — not clashing, just clearly different roles.',
       ],
       webStarter: {
         html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<h2>A Section</h2>\n<p>More text.</p>\n<h3>A Sub-Section</h3>\n<p>Even more text.</p>\n`,
-        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: h2 color #7C3AED, h3 color #059669 */\n`,
+        css: `/* TODO: a background, then 4 DIFFERENT, readable colors for h1, h2, h3, and p */\n`,
         js: ``,
       },
-      check:(log) => log.headingColor === 'rgb(47, 59, 82)' && log.h2Color === 'rgb(124, 58, 237)' && log.h3Color === 'rgb(5, 150, 105)',
+      check:(log) => {
+        const bg = log.bgColor
+        const els = [log.headingColor, log.h2Color, log.h3Color, log.pColor]
+        const allAllowed = isAllowedColor(bg) && els.every(isAllowedColor)
+        const allDistinct = new Set(els).size === els.length
+        const allReadable = els.every(c => Math.abs(colorBrightness(bg) - colorBrightness(c)) > 30)
+        return allAllowed && allDistinct && allReadable
+      },
     },
-    { id:'web3s5', name:'Color the Paragraph Text', xp:30, lang:'web',
-      text:`<strong>Challenge 5</strong> — CSS targets paragraphs too. Keep every color so far, and set every <code>&lt;p&gt;</code> paragraph's text color to EXACTLY <code>#4B5563</code> — a softer grey, easier to read than pure black for body text.`,
+    { id:'web3boss', name:'BOSS — Design Your Own Color Scheme', xp:70, lang:'web', boss:true,
+      palette: Object.entries(ALL_SWATCHES),
+      text:`<strong>BOSS</strong> — Design a complete, coordinated color scheme from the palette: a background, a DIFFERENT readable color each for h1/h2/h3/p/link, and a button whose fill+text actually reads. Nothing new — every rule you've already learned this month, combined into one real page you'd actually want to look at.`,
       hints:[
-        'CSS: p { color: #4B5563; }',
-        'This is the same pattern as coloring "a" or "h2" — just a different selector, targeting paragraphs instead.',
+        'This is genuinely Challenges 1-4 combined, plus the button rule from Challenge 3.',
+        'Six different text-ish colors total (h1, h2, h3, p, a, plus the button pair) — go one rule at a time and re-check often.',
       ],
       webStarter: {
-        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
-        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: set every <p> paragraph's color to #4B5563 */\n`,
+        html: `<!-- TODO: h1, h2, h3 (each with a paragraph), a link, a button, and a <ul> with 3+ <li> items -->\n`,
+        css: `/* TODO: a background, then DIFFERENT readable colors for h1/h2/h3/p/a, and a button fill+text pair that reads */\n`,
         js: ``,
       },
-      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)' && log.pColor === 'rgb(75, 85, 99)',
-    },
-    { id:'web3boss', name:'BOSS — A Fully Colored Page', xp:65, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — Nothing new: page background, h1 color, paragraph color, link color, button fill + text color, AND h2/h3 colors — every rule from this month's Colors & Shading challenges, on one page.`,
-      hints:[
-        'This is genuinely just Challenges 1-5 combined — seven separate CSS rules total.',
-        'Go rule by rule: body, h1, p, a, button (two properties), h2, h3.',
-      ],
-      webStarter: {
-        html: `<!-- TODO: h1, p, a link, button, h2 (with p), h3 (with p) -->\n`,
-        css: `/* TODO: body #FFF7E6, h1 #2F3B52, p #4B5563, a #1D4ED8, button fill #E63946 + text #FFFFFF, h2 #7C3AED, h3 #059669 */\n`,
-        js: ``,
+      check:(log) => {
+        const bg = log.bgColor
+        const textEls = [log.headingColor, log.h2Color, log.h3Color, log.pColor, log.linkColor]
+        const allAllowed = isAllowedColor(bg) && textEls.every(isAllowedColor) && isAllowedColor(log.buttonBg)
+        const allDistinct = new Set(textEls).size === textEls.length
+        const allReadable = textEls.every(c => Math.abs(colorBrightness(bg) - colorBrightness(c)) > 30)
+        const buttonDark = colorBrightness(log.buttonBg) < 128
+        const buttonOk = buttonDark ? log.buttonColor === 'rgb(255, 255, 255)' : log.buttonColor === 'rgb(0, 0, 0)'
+        return allAllowed && allDistinct && allReadable && buttonOk
       },
-      check:(log) => log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)' && log.pColor === 'rgb(75, 85, 99)'
-                  && log.linkColor === 'rgb(29, 78, 216)' && log.buttonBg === 'rgb(230, 57, 70)' && log.buttonColor === 'rgb(255, 255, 255)'
-                  && log.h2Color === 'rgb(124, 58, 237)' && log.h3Color === 'rgb(5, 150, 105)',
     },
   ]},
   // ── Semester 1, Week 5: Structure + Style, Together — checkpoint boss
@@ -1162,20 +1279,29 @@ const MODULES = [
       check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1 && log.listItems >= 3,
     },
     { id:'web4boss', name:'BOSS — The Complete Warm-Up Page', xp:90, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — The real final page requiring EVERYTHING from this whole month: h1, h2, h3, a paragraph under each, a link, a button, a 3-item list, background EXACTLY <code>#FFF7E6</code>, h1 color EXACTLY <code>#2F3B52</code>, h2 color EXACTLY <code>#7C3AED</code>, h3 color EXACTLY <code>#059669</code>, link color EXACTLY <code>#1D4ED8</code>, button fill EXACTLY <code>#E63946</code> with text EXACTLY <code>#FFFFFF</code>. No subset accepted — this is the whole month, together.`,
+      palette: Object.entries(ALL_SWATCHES),
+      text:`<strong>BOSS</strong> — The real final page requiring EVERYTHING from this whole month: h1, h2, h3, a paragraph under each, a link, a button, a 3-item list, PLUS the color scheme from Colors & Shading — a background, a different readable color each for h1/h2/h3, a link color, and a button fill+text pair that actually reads. No subset accepted — this is the whole month, together.`,
       hints:[
         'This is genuinely just web1 + web2 + web3 combined into one page — nothing new to learn, just a LOT of pieces at once.',
         'Build it in order: structure first (all the tags), THEN add every CSS color rule one at a time, checking each as you go.',
+        'Same palette rules as Colors & Shading: pick a background, then different, readable colors for h1/h2/h3/a, and a button fill+text pair that reads.',
       ],
       webStarter: {
         html: `<!-- TODO: h1, h2, h3 (each with a paragraph), a link, a button, and a <ul> with 3+ <li> items -->\n`,
-        css: `/* TODO: body #FFF7E6, h1 #2F3B52, h2 #7C3AED, h3 #059669, a #1D4ED8, button fill #E63946 + text #FFFFFF */\n`,
+        css: `/* TODO: a background, then DIFFERENT readable colors for h1/h2/h3/a, and a button fill+text pair that reads */\n`,
         js: ``,
       },
-      check:(log) => log.h1s >= 1 && log.paragraphs >= 3 && log.links >= 1 && log.buttons >= 1 && log.listItems >= 3
-                  && log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)'
-                  && log.h2Color === 'rgb(124, 58, 237)' && log.h3Color === 'rgb(5, 150, 105)'
-                  && log.linkColor === 'rgb(29, 78, 216)' && log.buttonBg === 'rgb(230, 57, 70)' && log.buttonColor === 'rgb(255, 255, 255)',
+      check:(log) => {
+        if (!(log.h1s >= 1 && log.paragraphs >= 3 && log.links >= 1 && log.buttons >= 1 && log.listItems >= 3)) return false
+        const bg = log.bgColor
+        const textEls = [log.headingColor, log.h2Color, log.h3Color, log.linkColor]
+        const allAllowed = isAllowedColor(bg) && textEls.every(isAllowedColor) && isAllowedColor(log.buttonBg)
+        const allDistinct = new Set(textEls).size === textEls.length
+        const allReadable = textEls.every(c => Math.abs(colorBrightness(bg) - colorBrightness(c)) > 30)
+        const buttonDark = colorBrightness(log.buttonBg) < 128
+        const buttonOk = buttonDark ? log.buttonColor === 'rgb(255, 255, 255)' : log.buttonColor === 'rgb(0, 0, 0)'
+        return allAllowed && allDistinct && allReadable && buttonOk
+      },
     },
   ]},
   // ── Semester 1, Weeks 7-11: Build Your Portfolio (project) — new for the
@@ -1193,13 +1319,19 @@ const MODULES = [
       check:(log) => log.h1s >= 2 && log.paragraphs >= 2 && log.headingText.every(t => t.length > 0) && log.paragraphText.filter(t => t.length > 0).length >= 2,
     },
     { id:'web5s2', name:'Consistent Styling', xp:35, lang:'web',
-      text:`<strong>Sessions 3-4</strong> — Apply the SAME background EXACTLY <code>#FFF7E6</code> and heading color EXACTLY <code>#2F3B52</code> across your whole portfolio — one CSS rule each, applying to every section at once.`,
+      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
+                ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
+                ['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Sessions 3-4</strong> — Apply the SAME background and heading color (any two different, readable colors from the palette — same rule as Colors & Shading) across your whole portfolio — one CSS rule each, applying to every section at once.`,
       hints:[
-        'body { background-color: #FFF7E6; } applies to the WHOLE page — every section, automatically.',
-        'h1 { color: #2F3B52; } applies to every heading, however many sections you have.',
+        'body { background-color: #____; } applies to the WHOLE page — every section, automatically.',
+        'h1 { color: #____; } applies to every heading, however many sections you have.',
+        'Same readability rule as Colors & Shading: pick two DIFFERENT colors, light enough apart to actually read.',
       ],
-      webStarter: { html: `<h1>About Me</h1>\n<p>Hi, I'm...</p>\n<h1>My Hobbies</h1>\n<p>I enjoy...</p>\n`, css: `/* TODO: body background #FFF7E6, h1 color #2F3B52 */\n`, js: `` },
-      check:(log) => log.h1s >= 2 && log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)',
+      webStarter: { html: `<h1>About Me</h1>\n<p>Hi, I'm...</p>\n<h1>My Hobbies</h1>\n<p>I enjoy...</p>\n`, css: `/* TODO: pick a background and a different, readable heading color */\n`, js: `` },
+      check:(log) => log.h1s >= 2 && isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
+                  && log.bgColor !== log.headingColor
+                  && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40,
     },
     { id:'web5s3', name:'One Button, One Change', xp:40, lang:'web',
       text:`<strong>Sessions 5-6</strong> — Add ONE button. When clicked, it changes ONE piece of text on the page (e.g. reveals a fun fact). This is the FIRST real JavaScript idea this semester — one click, one change.`,
@@ -4443,13 +4575,16 @@ function selectChallenge(i) {
     webEditors.html.setValue((ch.webStarter && ch.webStarter.html) || '')
     webEditors.css.setValue((ch.webStarter && ch.webStarter.css) || '')
     webEditors.js.setValue((ch.webStarter && ch.webStarter.js) || '')
-    switchWebTab('html')
+    switchWebTab(ch.palette && ch.palette.length ? 'css' : 'html')
     document.getElementById('out-web').srcdoc = '<body style="font-family:sans-serif;color:#94a3b8;font-size:12px;padding:14px;">Page output — write HTML/CSS/JS, then press ▶ Run</body>'
+    renderPaletteBar(ch)
   } else {
     editor.setValue(ch.starter || '# Write your Python here\n')
     editor.focus()
     ctx.clearRect(0,0,W,H)
+    renderPaletteBar(null)
   }
+  if (isQuiz) renderPaletteBar(null)
   renderPills()
   // The Exercise page shows ONLY the exercise — the full lesson lives on its
   // own dedicated per-module page (openModuleLesson), reachable via "Review
