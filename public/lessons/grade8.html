@@ -1360,18 +1360,24 @@ const MODULES = [
       check:(log) => log.hasVariable && log.hasClick && log.bodyChangedOnClick,
     },
     { id:'web5boss', name:'BOSS — Ship the Portfolio', xp:90, lang:'web', boss:true,
-      text:`<strong>Sessions 9-10 — BOSS</strong> — Ship the complete portfolio: 2+ real sections, consistent styling (EXACT colors from Week 4), and at least one working onclick interaction with a variable. Everything from this project, together.`,
+      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
+                ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
+                ['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Sessions 9-10 — BOSS</strong> — Ship the complete portfolio: 2+ real sections, consistent styling (your background + heading color from Week 4, any two different, readable colors), and at least one working onclick interaction with a variable. Everything from this project, together.`,
       hints:[
         'This is genuinely web5s1-web5s4 combined into one finished page — nothing new to learn.',
+        'Same palette rule as Week 4: pick a background and a different, readable heading color.',
         'Check each piece separately first: sections, then colors, then the click+variable interaction.',
       ],
       webStarter: {
         html: `<!-- TODO: 2+ sections, a button, somewhere to show the variable's value -->\n`,
-        css: `/* TODO: body background #FFF7E6, h1 color #2F3B52 */\n`,
+        css: `/* TODO: pick a background and a different, readable heading color */\n`,
         js: `// TODO: a variable your button's click updates and displays\n`,
       },
       check:(log) => log.h1s >= 2 && log.paragraphs >= 2
-                  && log.bgColor === 'rgb(255, 247, 230)' && log.headingColor === 'rgb(47, 59, 82)'
+                  && isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
+                  && log.bgColor !== log.headingColor
+                  && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40
                   && log.hasVariable && log.hasClick && log.bodyChangedOnClick,
     },
   ]},
