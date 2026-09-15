@@ -944,7 +944,12 @@ const SHADE_FAMILIES = {
   blue:  { light: '#93C5FD', base: '#3B82F6', dark: '#1E40AF' },
   green: { light: '#86EFAC', base: '#22C55E', dark: '#15803D' },
 }
-const ALL_SWATCHES = { ...COLOR_PALETTE }
+// Two more warm swatches (amber, rose) — the 8-color CORE palette above is
+// almost entirely cool (only coral+cream are warm), too thin to teach a
+// real warm/cool COMBINATION lesson. Kept separate from COLOR_PALETTE so
+// that comment's "8 core swatches, unchanged" claim stays accurate.
+const WARM_EXTRA = { amber: '#F59E0B', rose: '#DB2777' }
+const ALL_SWATCHES = { ...COLOR_PALETTE, ...WARM_EXTRA }
 Object.entries(SHADE_FAMILIES).forEach(([fam, shades]) => {
   Object.entries(shades).forEach(([step, hex]) => { ALL_SWATCHES[fam + '_' + step] = hex })
 })
@@ -955,6 +960,16 @@ function hexToRgbStr(hex) {
 }
 const ALLOWED_RGB = new Set(Object.values(ALL_SWATCHES).map(hexToRgbStr))
 function isAllowedColor(rgbStr) { return ALLOWED_RGB.has(rgbStr) }
+// Warm (reds/oranges/yellows) vs Cool (blues/greens/purples) — white/black
+// stay unclassified (neutral), same convention as basic color theory.
+const WARM_RGB = new Set([COLOR_PALETTE.coral, COLOR_PALETTE.cream, WARM_EXTRA.amber, WARM_EXTRA.rose].map(hexToRgbStr))
+const COOL_RGB = new Set([
+  COLOR_PALETTE.navy, COLOR_PALETTE.purple, COLOR_PALETTE.emerald, COLOR_PALETTE.slate, COLOR_PALETTE.oceanBlue,
+  SHADE_FAMILIES.blue.light, SHADE_FAMILIES.blue.base, SHADE_FAMILIES.blue.dark,
+  SHADE_FAMILIES.green.light, SHADE_FAMILIES.green.base, SHADE_FAMILIES.green.dark,
+].map(hexToRgbStr))
+function isWarmColor(rgbStr) { return WARM_RGB.has(rgbStr) }
+function isCoolColor(rgbStr) { return COOL_RGB.has(rgbStr) }
 // Perceptual-ish brightness (0-255, not full WCAG contrast) — enough to tell
 // "these two are meaningfully different lightness" apart from "basically
 // the same," which is what actually breaks readability at this level.
@@ -1386,7 +1401,43 @@ const MODULES = [
       check:(log) => isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
                   && colorBrightness(log.bgColor) > colorBrightness(log.headingColor) + 30,
     },
-    { id:'web3s14', name:'A Coordinated Page — Multiple Colors, Together', xp:40, lang:'web',
+    { id:'web3s14', name:'Color Combinations — Warm & Cool', xp:20, type:'quiz',
+      text:`<strong>Which colors actually go together?</strong> Every color leans WARM (reds, oranges, yellows — think fire, sunsets) or COOL (blues, greens, purples — think water, forests). Two easy combinations:
+        <ul style="margin:8px 0 0 18px;padding:0;">
+          <li><strong>Contrast (pop):</strong> ONE warm + ONE cool — they stand out against each other.</li>
+          <li><strong>Harmony (calm):</strong> two or more colors from the SAME temperature — they blend together peacefully.</li>
+        </ul>
+        From your palette: ${swatchChip('coral (warm)', COLOR_PALETTE.coral)}${swatchChip('cream (warm)', COLOR_PALETTE.cream)}
+        ${swatchChip('navy (cool)', COLOR_PALETTE.navy)}${swatchChip('emerald (cool)', COLOR_PALETTE.emerald)}${swatchChip('oceanBlue (cool)', COLOR_PALETTE.oceanBlue)}`,
+      hints:['Warm = fire colors (red, orange, yellow). Cool = water/plant colors (blue, green, purple).', 'Contrast pairs ONE of each; harmony picks several from the SAME group.'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'Which of these is a WARM color?', options: ['navy', 'coral', 'emerald', 'oceanBlue'], answer: 'coral' },
+        { type:'match', prompt:'Which of these is a COOL color?', options: ['cream', 'coral', 'navy', 'amber'], answer: 'navy' },
+        { type:'match', prompt:'Pairing ONE warm color with ONE cool color creates which effect?', options: ['Contrast (pop)', 'Harmony (calm)', 'No effect', 'Invisible text'], answer: 'Contrast (pop)' },
+        { type:'match', prompt:'Using SEVERAL colors from the same temperature (e.g. navy + emerald + oceanBlue, all cool) creates which effect?', options: ['Contrast (pop)', 'Harmony (calm)', 'No effect', 'Invisible text'], answer: 'Harmony (calm)' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
+    { id:'web3s15', name:'Try a Warm + Cool Combo', xp:30, lang:'web',
+      palette: [['coral (warm)',COLOR_PALETTE.coral],['cream (warm)',COLOR_PALETTE.cream],['amber (warm)',WARM_EXTRA.amber],['rose (warm)',WARM_EXTRA.rose],
+                ['navy (cool)',COLOR_PALETTE.navy],['purple (cool)',COLOR_PALETTE.purple],['emerald (cool)',COLOR_PALETTE.emerald],
+                ['slate (cool)',COLOR_PALETTE.slate],['oceanBlue (cool)',COLOR_PALETTE.oceanBlue]],
+      text:`<strong>Challenge</strong> — Build a real CONTRAST combination: give your background ONE warm color, and your <code>&lt;h1&gt;</code> heading ONE cool color (or the other way round — warm heading, cool background). One of each, nothing else required.`,
+      hints:[
+        'Warm swatches above: coral, cream, amber, rose. Cool swatches: navy, purple, emerald, slate, oceanBlue.',
+        'One property goes on body, the other on h1 — same format you already know.',
+        'Either order works: warm bg + cool heading, OR cool bg + warm heading — just one of each temperature.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
+        css: `/* TODO: one warm color and one cool color — background and heading, either order */\n`,
+        js: ``,
+      },
+      check:(log) => isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
+                  && ((isWarmColor(log.bgColor) && isCoolColor(log.headingColor)) || (isCoolColor(log.bgColor) && isWarmColor(log.headingColor))),
+    },
+    { id:'web3s16', name:'A Coordinated Page — Multiple Colors, Together', xp:40, lang:'web',
       palette: Object.entries(ALL_SWATCHES),
       text:`<strong>Challenge</strong> — Now put it all together. A real page uses SEVERAL colors at once, not just one. Pick a background, then give your <code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code>, and paragraph text each a DIFFERENT color from the full palette above (mix core colors and shade families freely) — every one of them must still read clearly against your background.`,
       hints:[
