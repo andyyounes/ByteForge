@@ -194,8 +194,46 @@ const QuestMap = (() => {
   function renderPath() {
     const OFF = [0, 52, 82, 52, 0, -52, -82, -52]
     let html = '<div class="qm-path">'
-    let foundCurrent = false
+    // "Next up" used to mean "the first incomplete stage anywhere" — correct
+    // for a student progressing in order, but wrong the moment a stage gets
+    // inserted EARLIER than where a student already is (e.g. a new intro
+    // module added after some students had already finished later modules,
+    // during a later curriculum rebuild): it would send them all the way
+    // back to redo something new instead of resuming from their real
+    // position. Two-pass instead: find the student's FURTHEST completed
+    // stage first, then "next up" is the first incomplete stage AFTER that
+    // point — falling back to the old "first incomplete anywhere" only if
+    // literally everything past their furthest point is already done too
+    // (some earlier gap is all that's left), so a badge still shows up
+    // somewhere rather than never appearing.
+    // Grade 6/7/8's per-world "Lesson" bubble (id 'lesson-<world>') is always
+    // done:true unconditionally (see their showJourney() comments — it's a
+    // pure unlock-chain placeholder, never real progress), so it must never
+    // count as the student's "furthest real progress" or it drags
+    // maxDoneIdx all the way to whichever world's Lesson bubble sorts last.
+    const isRealStage = (s) => !(s.id && s.id.indexOf('lesson-') === 0)
+    let maxDoneIdx = -1, firstIncompleteIdx = -1, flatIdx = 0
+    for (const w of cfg.worlds) {
+      if (!w.live || !w.stages) continue
+      for (const s of w.stages) {
+        if (isRealStage(s)) {
+          if (s.done) maxDoneIdx = flatIdx
+          else if (firstIncompleteIdx === -1) firstIncompleteIdx = flatIdx
+        }
+        flatIdx++
+      }
+    }
+    let currentIdx = -1, scanIdx = 0
+    for (const w of cfg.worlds) {
+      if (!w.live || !w.stages) continue
+      for (const s of w.stages) {
+        if (isRealStage(s) && !s.done && scanIdx > maxDoneIdx && currentIdx === -1) currentIdx = scanIdx
+        scanIdx++
+      }
+    }
+    if (currentIdx === -1) currentIdx = firstIncompleteIdx
     let k = 0
+    let idx = 0
     for (const w of cfg.worlds) {
       const wDone = w.stages ? w.stages.filter(s => s.done).length : 0
       const allDone = w.stages && wDone === w.stages.length
@@ -205,9 +243,15 @@ const QuestMap = (() => {
       if (!w.live) continue
       html += '<div class="qm-pcol">'
       for (const s of w.stages) {
-        const isCurrent = !s.done && !foundCurrent
-        if (isCurrent) foundCurrent = true
-        const soon = cfg.softLock && !s.done && !isCurrent
+        const isCurrent = idx === currentIdx
+        // "soon" (and hardLock, below) must mean genuinely FUTURE content —
+        // strictly after the current node — not just "not currently
+        // highlighted". An earlier incomplete gap (idx <= currentIdx, e.g. a
+        // module inserted before a student's real position) stays fully
+        // open so they can go back and fill it in; only content the
+        // student hasn't reached yet gets locked.
+        const soon = cfg.softLock && !s.done && idx > currentIdx
+        idx++
         // hardLock: unlike softLock (dimmed but still clickable — meant for
         // exam revision pages where jumping around is fine), a hard-locked
         // "soon" node genuinely cannot be opened until every stage before it
