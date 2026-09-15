@@ -1145,9 +1145,36 @@ const MODULES = [
   // stage's own `palette` field — see renderPaletteBar/insertColorSwatch
   // above MODULES) sits above the CSS editor so choosing a color never
   // means memorising or mistyping a hex code.
-  { id:'web3', name:'🎨 Colors & Shading', sub:'Hex colors, real palettes, and real shading — not just one exact value', live:true, stages:[
-    { id:'web3s0', name:'What Is a Hex Color?', xp:20, type:'quiz',
-      text:`<strong>Before you touch any CSS</strong> — a hex color like <code>#E63946</code> is really THREE 2-digit numbers stuck together: how much RED, how much GREEN, and how much BLUE (00 = none, FF = maximum). Here's the palette you'll be choosing from all month:<br><br>
+  { id:'web3', name:'🎨 Colors & Shading', sub:'One CSS idea at a time: the rule format, then each element, alone, before combining', live:true, stages:[
+    { id:'web3s0', name:'What Is a CSS Rule?', xp:20, type:'quiz',
+      text:`<strong>Before any color</strong> — every CSS rule has the exact same shape:<br><br>
+        <code style="font-size:14px;">selector { property: value; }</code><br><br>
+        Take <code>h1 { color: #2F3B52; }</code> as a real example:
+        <ul style="margin:10px 0 0 18px;padding:0;">
+          <li><code>h1</code> is the <strong>selector</strong> — WHICH element(s) this rule styles.</li>
+          <li><code>color</code> is the <strong>property</strong> — WHICH aspect of it you're changing.</li>
+          <li><code>#2F3B52</code> is the <strong>value</strong> — the actual setting you're giving that property.</li>
+          <li><code>:</code> separates the property from its value. <code>;</code> ends the rule. <code>{ }</code> wraps everything the selector applies to.</li>
+        </ul>
+        Get this shape right and every CSS rule you'll ever write follows it.`,
+      hints:['selector { property: value; } — same four pieces, every single time.', 'The colon comes right after the property name; the semicolon comes right after the value.'],
+      passCount:5,
+      questions: [
+        { type:'match', prompt:'In `h1 { color: #2F3B52; }`, what do we call `h1` — the part that says WHICH element to style?',
+          options: ['Selector', 'Property', 'Value', 'Comment'], answer: 'Selector' },
+        { type:'match', prompt:'What do we call `color` — the part that says WHICH aspect you\'re changing?',
+          options: ['Selector', 'Property', 'Value', 'Semicolon'], answer: 'Property' },
+        { type:'match', prompt:'What do we call `#2F3B52` — the actual setting you\'re giving that property?',
+          options: ['Selector', 'Property', 'Value', 'Unit'], answer: 'Value' },
+        { type:'match', prompt:'What symbol goes BETWEEN the property and its value?',
+          options: [':', ';', '=', '->'], answer: ':' },
+        { type:'match', prompt:'Every property-and-value pair must END with which punctuation mark?',
+          options: [';', '.', ',', ':'], answer: ';' },
+      ],
+      check:(log) => log.quizCorrect >= 5,
+    },
+    { id:'web3s1', name:'What Is a Hex Color?', xp:20, type:'quiz',
+      text:`<strong>One more thing before you write any CSS</strong> — a hex color like <code>#E63946</code> is really THREE 2-digit numbers stuck together: how much RED, how much GREEN, and how much BLUE (00 = none, FF = maximum). Here's the palette you'll be choosing from all month:<br><br>
         ${Object.entries(COLOR_PALETTE).map(([k, hex]) => swatchChip(k, hex)).join('')}<br>
         Study a couple of these hex codes above, then answer:`,
       hints:['Each pair of digits is one channel: RR, then GG, then BB.', '00 means none of that color; FF means the maximum amount.'],
@@ -1163,49 +1190,110 @@ const MODULES = [
       ],
       check:(log) => log.quizCorrect >= 3,
     },
-    { id:'web3s1', name:'Choose Your Palette — Background & Heading', xp:30, lang:'web',
+    { id:'web3s2', name:'Color the Background — Alone', xp:25, lang:'web',
       palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
                 ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
                 ['coral',COLOR_PALETTE.coral]],
-      text:`<strong>Challenge 1</strong> — Pick TWO different colors from the palette above (click a swatch to insert its hex code into your CSS): one for the page background, one for your <code>&lt;h1&gt;</code> heading. They must be different from each other AND different enough in lightness that the heading is actually easy to read against the background — not two colors that are basically the same brightness.`,
+      text:`<strong>Challenge</strong> — Just the background, on its own. The selector for "the whole page" is <code>body</code>; the property for its fill color is <code>background-color</code>. Format: <code>body { background-color: #______; }</code>. Pick ANY one color from the palette above.`,
       hints:[
-        'CSS: body { background-color: #____; } and h1 { color: #____; }',
-        'Click a palette swatch above the CSS editor to insert its hex code right where your cursor is.',
-        'A light background (like cream) reads best with a DARK heading (like navy) — not another light color.',
+        'The selector is body — it means "style the whole page".',
+        'The property is background-color — note it\'s TWO words joined by a hyphen, not "background" alone.',
+        'Format: body { background-color: #____; }',
       ],
       webStarter: {
         html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
-        css: `/* TODO: pick a background color and a different, readable heading color from the palette */\n`,
+        css: `/* TODO: body { background-color: #____; } */\n`,
         js: ``,
       },
-      check:(log) => isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
-                  && log.bgColor !== log.headingColor
-                  && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40,
+      check:(log) => isAllowedColor(log.bgColor),
     },
-    { id:'web3s2', name:'Shades of One Color', xp:35, lang:'web',
-      palette: [['blue light',SHADE_FAMILIES.blue.light],['blue base',SHADE_FAMILIES.blue.base],['blue dark',SHADE_FAMILIES.blue.dark],
-                ['green light',SHADE_FAMILIES.green.light],['green base',SHADE_FAMILIES.green.base],['green dark',SHADE_FAMILIES.green.dark]],
-      text:`<strong>Challenge 2</strong> — A single color has SHADES: the same hue, just lighter or darker. Above are two shade families (blue and green), each with a light/base/dark version. Pick ONE family, use its LIGHT shade for the background and its DARK shade for your <code>&lt;h1&gt;</code> heading — this is the real design trick behind "light background, dark text": same color family, different lightness.`,
+    { id:'web3s3', name:'Color the Heading — h1, Alone', xp:25, lang:'web',
+      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
+                ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
+                ['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Challenge</strong> — Now just the <code>&lt;h1&gt;</code> heading, on its own. The selector is <code>h1</code>; the property this time is just <code>color</code> — on a heading (or any text), <code>color</code> means the TEXT color, not the background. Format: <code>h1 { color: #______; }</code>. Pick any one palette color.`,
       hints:[
-        'Stay within ONE family — don\'t mix a blue shade with a green shade.',
-        'Light shade → background-color. Dark shade → heading color.',
-        'This is the exact same readability idea as Challenge 1, just now using shades of ONE hue instead of unrelated colors.',
+        'The selector is h1 — it means "style every h1 on the page".',
+        'The property is color (not background-color) — for text, "color" always means TEXT color.',
+        'Format: h1 { color: #____; }',
       ],
       webStarter: {
         html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
-        css: `/* TODO: pick a family (blue or green) — light shade for background, dark shade for the h1 */\n`,
+        css: `body { background-color: #FFF7E6; }\n/* TODO: h1 { color: #____; } */\n`,
         js: ``,
       },
-      check:(log) => isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
-                  && colorBrightness(log.bgColor) > colorBrightness(log.headingColor) + 30,
+      check:(log) => isAllowedColor(log.headingColor),
     },
-    { id:'web3s3', name:'Color the Buttons — Fill & Text That Actually Reads', xp:35, lang:'web',
+    { id:'web3s4', name:'Color a Paragraph — p, Alone', xp:25, lang:'web',
+      palette: [['navy',COLOR_PALETTE.navy],['slate',COLOR_PALETTE.slate],['emerald',COLOR_PALETTE.emerald],
+                ['purple',COLOR_PALETTE.purple],['oceanBlue',COLOR_PALETTE.oceanBlue],['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Challenge</strong> — Same idea, different selector: <code>&lt;p&gt;</code> paragraphs. The selector is <code>p</code>; the property is still <code>color</code> (text color again, exactly like h1). Format: <code>p { color: #______; }</code>. Pick any one palette color.`,
+      hints:[
+        'The selector is p — it means "style every paragraph".',
+        'Same property as h1: color (text color) — the SELECTOR is what changed, not the property.',
+        'Format: p { color: #____; }',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: p { color: #____; } */\n`,
+        js: ``,
+      },
+      check:(log) => isAllowedColor(log.pColor),
+    },
+    { id:'web3s5', name:'Color a Link — a, Alone', xp:25, lang:'web',
+      palette: [['navy',COLOR_PALETTE.navy],['oceanBlue',COLOR_PALETTE.oceanBlue],['purple',COLOR_PALETTE.purple],
+                ['emerald',COLOR_PALETTE.emerald],['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Challenge</strong> — Links use the tag <code>&lt;a&gt;</code> (short for "anchor"), so their selector is just <code>a</code>. Format: <code>a { color: #______; }</code> — targets EVERY link on the page at once. Pick any one palette color.`,
+      hints:[
+        'The selector is a (the tag name for a link) — not "link".',
+        'Same property again: color.',
+        'Format: a { color: #____; }',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<a href="#">Click here</a>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: a { color: #____; } */\n`,
+        js: ``,
+      },
+      check:(log) => isAllowedColor(log.linkColor),
+    },
+    { id:'web3s6', name:'Another Heading Level — h2, Alone', xp:25, lang:'web',
+      palette: [['purple',COLOR_PALETTE.purple],['navy',COLOR_PALETTE.navy],['emerald',COLOR_PALETTE.emerald],
+                ['oceanBlue',COLOR_PALETTE.oceanBlue],['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Challenge</strong> — Headings come in levels: <code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code>... each is its OWN selector with its OWN color rule. Give your <code>&lt;h2&gt;</code> a color: <code>h2 { color: #______; }</code>. Pick any one palette color.`,
+      hints:[
+        'h2 is a completely separate selector from h1 — its own rule, its own color.',
+        'Format: h2 { color: #____; }',
+        'Nothing stops h1 and h2 having totally different colors.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<h2>A Section</h2>\n<p>More text.</p>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: h2 { color: #____; } */\n`,
+        js: ``,
+      },
+      check:(log) => isAllowedColor(log.h2Color),
+    },
+    { id:'web3s7', name:'One More Heading Level — h3, Alone', xp:25, lang:'web',
+      palette: [['emerald',COLOR_PALETTE.emerald],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
+                ['oceanBlue',COLOR_PALETTE.oceanBlue],['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Challenge</strong> — One level deeper still: <code>&lt;h3&gt;</code>. Same pattern exactly. Format: <code>h3 { color: #______; }</code>. Pick any one palette color.`,
+      hints:[
+        'Same pattern as h2, just a different selector: h3.',
+        'Format: h3 { color: #____; }',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<h2>A Section</h2>\n<p>More text.</p>\n<h3>A Sub-Section</h3>\n<p>Even more text.</p>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\nh2 { color: #7C3AED; }\n/* TODO: h3 { color: #____; } */\n`,
+        js: ``,
+      },
+      check:(log) => isAllowedColor(log.h3Color),
+    },
+    { id:'web3s8', name:'Color the Buttons — Fill & Text, Together', xp:35, lang:'web',
       palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
                 ['emerald',COLOR_PALETTE.emerald],['oceanBlue',COLOR_PALETTE.oceanBlue],['coral',COLOR_PALETTE.coral],
                 ['white',COLOR_PALETTE.white],['black',COLOR_PALETTE.black]],
-      text:`<strong>Challenge 3</strong> — A button has TWO colors: its fill (<code>background-color</code>) and its text (<code>color</code>). Pick ANY palette color for the fill — then pick whichever text color actually reads clearly against it: <strong>white text on a DARK fill</strong>, or <strong>black text on a LIGHT fill</strong>. Picking wrong (e.g. white text on a light fill) won't pass.`,
+      text:`<strong>Challenge</strong> — First time ONE selector gets TWO properties at once. A button has a fill (<code>background-color</code>) and text (<code>color</code>) — both inside the SAME <code>button { }</code> block. Pick ANY palette color for the fill — then pick whichever text color actually reads clearly against it: <strong>white text on a DARK fill</strong>, or <strong>black text on a LIGHT fill</strong>. Picking wrong (e.g. white text on a light fill) won't pass.`,
       hints:[
-        'CSS: button { background-color: #____; color: #FFFFFF or #000000; }',
+        'CSS: button { background-color: #____; color: #FFFFFF or #000000; } — two property:value pairs, one selector.',
         'Coral, navy, purple, emerald, oceanBlue are all dark enough for WHITE text. Cream is light enough for BLACK text.',
         '"Fill" is just the background-color of the button itself.',
       ],
@@ -1220,9 +1308,26 @@ const MODULES = [
         return dark ? log.buttonColor === 'rgb(255, 255, 255)' : log.buttonColor === 'rgb(0, 0, 0)'
       },
     },
-    { id:'web3s4', name:'A Coordinated Page — Multiple Colors, Together', xp:40, lang:'web',
+    { id:'web3s9', name:'Shades of One Color', xp:35, lang:'web',
+      palette: [['blue light',SHADE_FAMILIES.blue.light],['blue base',SHADE_FAMILIES.blue.base],['blue dark',SHADE_FAMILIES.blue.dark],
+                ['green light',SHADE_FAMILIES.green.light],['green base',SHADE_FAMILIES.green.base],['green dark',SHADE_FAMILIES.green.dark]],
+      text:`<strong>Challenge</strong> — A single color has SHADES: the same hue, just lighter or darker. Above are two shade families (blue and green), each with a light/base/dark version. Pick ONE family, use its LIGHT shade for the background and its DARK shade for your <code>&lt;h1&gt;</code> heading — this is the real design trick behind "light background, dark text": same color family, different lightness.`,
+      hints:[
+        'Stay within ONE family — don\'t mix a blue shade with a green shade.',
+        'Light shade → background-color. Dark shade → heading color.',
+        'This is the exact same readability idea as coloring the background and heading separately, just now using shades of ONE hue instead of unrelated colors.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>This is my page.</p>\n`,
+        css: `/* TODO: pick a family (blue or green) — light shade for background, dark shade for the h1 */\n`,
+        js: ``,
+      },
+      check:(log) => isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
+                  && colorBrightness(log.bgColor) > colorBrightness(log.headingColor) + 30,
+    },
+    { id:'web3s10', name:'A Coordinated Page — Multiple Colors, Together', xp:40, lang:'web',
       palette: Object.entries(ALL_SWATCHES),
-      text:`<strong>Challenge 4</strong> — A real page uses SEVERAL colors together, not just one. Pick a background, then give your <code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code>, and paragraph text each a DIFFERENT color from the full palette above (mix core colors and shade families freely) — every one of them must still read clearly against your background.`,
+      text:`<strong>Challenge</strong> — Now put it all together. A real page uses SEVERAL colors at once, not just one. Pick a background, then give your <code>&lt;h1&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;h3&gt;</code>, and paragraph text each a DIFFERENT color from the full palette above (mix core colors and shade families freely) — every one of them must still read clearly against your background.`,
       hints:[
         'Four different text colors: h1, h2, h3, and p all need their OWN, DIFFERENT color.',
         'Every one of those four still has to be readable against whatever background you picked — recheck each one.',
@@ -1246,7 +1351,7 @@ const MODULES = [
       palette: Object.entries(ALL_SWATCHES),
       text:`<strong>BOSS</strong> — Design a complete, coordinated color scheme from the palette: a background, a DIFFERENT readable color each for h1/h2/h3/p/link, and a button whose fill+text actually reads. Nothing new — every rule you've already learned this month, combined into one real page you'd actually want to look at.`,
       hints:[
-        'This is genuinely Challenges 1-4 combined, plus the button rule from Challenge 3.',
+        'This is genuinely every element you\'ve colored alone this month — background, h1, h2, h3, p, a, button — combined onto one page.',
         'Six different text-ish colors total (h1, h2, h3, p, a, plus the button pair) — go one rule at a time and re-check often.',
       ],
       webStarter: {
