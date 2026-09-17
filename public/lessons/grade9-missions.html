@@ -194,7 +194,16 @@
   .fc-shape[data-type="decision"] .fc-label { transform:rotate(-45deg); width:120px; }
   .fc-shape[data-type="io"] { transform:skewX(-12deg); border-color:#a78bfa; }
   .fc-shape[data-type="io"] .fc-label { transform:skewX(12deg); }
+  .fc-shape[data-type="declare"] { border-radius:2px; border-color:#facc15; background:#1a1810; }
+  .fc-shape[data-type="for"], .fc-shape[data-type="while"] {
+    clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);
+    border-color:#fb923c; min-width:150px;
+  }
   .fc-shape .fc-label { outline:none; }
+  .fc-conn-label { fill:#67e8f9; font-size:11px; font-weight:700; paint-order:stroke; stroke:#0a0c18; stroke-width:3px; }
+  .fc-run-output { margin-top:10px; padding:10px 12px; background:#0a0c18; border:1px solid rgba(255,255,255,.1);
+    border-radius:8px; font-family:'Cascadia Code',Consolas,monospace; font-size:12.5px; color:#b8ef4a; white-space:pre-wrap; min-height:20px; }
+  .fc-run-output:empty { display:none; }
   .fc-shape .fc-del { position:absolute; top:-8px; right:-8px; width:18px; height:18px; border-radius:50%;
                        background:#f87171; color:#1a0505; font-size:11px; font-weight:900; display:flex;
                        align-items:center; justify-content:center; cursor:pointer; }
@@ -424,19 +433,26 @@
       <p class="cards-intro" id="fc-intro"></p>
       <div class="fc-palette">
         <div class="fc-palette-btn" onclick="addShape('terminator')">⬭ Start/End</div>
-        <div class="fc-palette-btn" onclick="addShape('process')">▭ Process</div>
+        <div class="fc-palette-btn" onclick="addShape('declare')">🗄 Declare</div>
+        <div class="fc-palette-btn" onclick="addShape('process')">▭ Assign</div>
         <div class="fc-palette-btn" onclick="addShape('decision')">◇ Decision</div>
-        <div class="fc-palette-btn" onclick="addShape('io')">▱ Input/Output</div>
+        <div class="fc-palette-btn" onclick="addShape('for')">⬡ For</div>
+        <div class="fc-palette-btn" onclick="addShape('while')">⬡ While</div>
+        <div class="fc-palette-btn" onclick="addShape('io')">▱ Output</div>
         <div class="fc-palette-btn" id="fc-connect-btn" onclick="toggleConnectMode()">🔗 Connect Shapes</div>
         <div class="fc-palette-btn" onclick="clearFlowchart()">🗑 Clear</div>
       </div>
       <div class="fc-canvas-wrap" id="fc-canvas-wrap">
         <svg id="fc-svg"></svg>
       </div>
-      <div class="fc-status" id="fc-status">Drag shapes to reposition. Click a shape's text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.</div>
+      <div class="fc-status" id="fc-status">Drag shapes to reposition. Click a shape's text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them — from a Decision/For/While, the FIRST arrow you draw is True/Next, the SECOND is False/Done.</div>
       <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
       <div class="g9-hint-display" id="g9-hint-display-flow"></div>
-      <button class="btn btn-run" id="fc-check-btn" onclick="checkFlowchart()">✓ Check My Flowchart</button>
+      <div class="btn-row" style="display:flex;gap:8px;">
+        <button class="btn btn-reset" onclick="runFlowchart()">▶ Run</button>
+        <button class="btn btn-run" id="fc-check-btn" onclick="checkFlowchart()">✓ Check My Flowchart</button>
+      </div>
+      <div class="fc-run-output" id="fc-run-output"></div>
     </div>
   </div>
 </div>
@@ -3705,10 +3721,14 @@ function clearFlowchart() {
   canvas.querySelectorAll('.fc-shape').forEach(el => el.remove())
   document.getElementById('fc-svg').innerHTML = ''
   document.getElementById('fc-status').textContent = 'Drag shapes to reposition. Click a shape\'s text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.'
+  document.getElementById('fc-run-output').textContent = ''
 }
 function addShape(type) {
   const id = _fcNextId++
-  const labelDefault = { terminator: 'Start', process: 'Do something', decision: 'Yes/No?', io: 'Input/Output' }[type]
+  const labelDefault = {
+    terminator: 'Start', process: 'n = n + 1', decision: 'n > 10',
+    declare: 'Integer n', for: 'n = 1 to 10', while: 'n < 10', io: 'Output n',
+  }[type]
   // Spread new shapes out based on how many currently exist, not `id`
   // (which keeps climbing even after deletions) — avoids everything
   // spawning stacked in the same top-left corner.
@@ -3766,12 +3786,21 @@ function toggleConnectMode() {
     ? 'Connect mode ON — click a FROM shape, then a TO shape, to draw an arrow between them.'
     : 'Drag shapes to reposition. Click a shape\'s text to edit its label.'
 }
+// Decision/For/While shapes branch — the first outgoing arrow drawn from
+// one is the "primary" branch (True / Next), the second is the
+// "secondary" branch (False / Done). Anything else (terminator, declare,
+// process, io) only ever has ONE outgoing arrow, so it needs no label.
+const BRANCH_LABELS = { decision: ['True', 'False'], for: ['Next', 'Done'], while: ['Next', 'Done'] }
 function handleConnectClick(id, el) {
   if (_fcConnectFrom === null) {
     _fcConnectFrom = id
     el.classList.add('selected-for-connect')
   } else if (_fcConnectFrom !== id) {
-    _fcConns.push({ from: _fcConnectFrom, to: id })
+    const fromShape = _fcShapes.find(s => s.id === _fcConnectFrom)
+    const branches = fromShape ? BRANCH_LABELS[fromShape.type] : null
+    const existingOut = _fcConns.filter(c => c.from === _fcConnectFrom).length
+    const label = branches ? (branches[existingOut] ?? branches[branches.length - 1]) : undefined
+    _fcConns.push({ from: _fcConnectFrom, to: id, label })
     document.querySelectorAll('.fc-shape').forEach(e => e.classList.remove('selected-for-connect'))
     _fcConnectFrom = null
     drawConnections()
@@ -3795,9 +3824,179 @@ function drawConnections() {
     line.setAttribute('x2', b.x); line.setAttribute('y2', b.y)
     line.setAttribute('stroke', '#67e8f9'); line.setAttribute('stroke-width', '2')
     line.setAttribute('marker-end', 'url(#fc-arrow)')
+    if (c.label) {
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+      text.setAttribute('x', (a.x + b.x) / 2 + 6)
+      text.setAttribute('y', (a.y + b.y) / 2 - 6)
+      text.setAttribute('class', 'fc-conn-label')
+      text.textContent = c.label
+      svg.appendChild(text)
+    }
     svg.appendChild(line)
   })
 }
+// ── Flowchart execution engine ───────────────────────────────────────────────
+// A real (small) interpreter — Declare/Assign/Decision/For/While/Output
+// shapes are executed for real against a variable-state object, walking the
+// graph of connections exactly like Flowgorithm's own "Run" does. Deliberately
+// NOT `new Function`/eval — a tiny hand-written tokenizer + recursive-descent
+// parser instead, so a student's flowchart can only ever do arithmetic,
+// string concatenation, and comparisons, never arbitrary JS.
+function fcTokenize(s) {
+  const toks = []
+  let i = 0
+  while (i < s.length) {
+    const c = s[i]
+    if (/\s/.test(c)) { i++; continue }
+    if (c === '"') {
+      let j = i + 1
+      while (j < s.length && s[j] !== '"') j++
+      toks.push({ type: 'str', value: s.slice(i + 1, j) })
+      i = j + 1
+      continue
+    }
+    if (/[0-9]/.test(c)) {
+      let j = i
+      while (j < s.length && /[0-9.]/.test(s[j])) j++
+      toks.push({ type: 'num', value: parseFloat(s.slice(i, j)) })
+      i = j
+      continue
+    }
+    if (/[A-Za-z_]/.test(c)) {
+      let j = i
+      while (j < s.length && /[A-Za-z0-9_]/.test(s[j])) j++
+      const word = s.slice(i, j)
+      if (word.toUpperCase() === 'MOD') toks.push({ type: 'op', value: '%' })
+      else toks.push({ type: 'id', value: word })
+      i = j
+      continue
+    }
+    if (c === '(' || c === ')') { toks.push({ type: c === '(' ? 'lparen' : 'rparen', value: c }); i++; continue }
+    if ('+-*/'.includes(c)) { toks.push({ type: 'op', value: c }); i++; continue }
+    i++ // skip anything unrecognised rather than crash on stray punctuation
+  }
+  return toks
+}
+function fcParseExpr(tokens, vars) {
+  let pos = 0
+  const peek = () => tokens[pos]
+  const next = () => tokens[pos++]
+  function parsePrimary() {
+    const t = next()
+    if (!t) throw new Error('Incomplete expression')
+    if (t.type === 'num' || t.type === 'str') return t.value
+    if (t.type === 'id') {
+      if (!(t.value in vars)) throw new Error('Unknown variable: ' + t.value)
+      return vars[t.value]
+    }
+    if (t.type === 'lparen') { const v = parseAdd(); next(); return v }
+    throw new Error('Unexpected token near "' + t.value + '"')
+  }
+  function parseMul() {
+    let v = parsePrimary()
+    while (peek() && peek().type === 'op' && ['*', '/', '%'].includes(peek().value)) {
+      const op = next().value
+      const rhs = parsePrimary()
+      v = op === '*' ? v * rhs : op === '/' ? v / rhs : v % rhs
+    }
+    return v
+  }
+  function parseAdd() {
+    let v = parseMul()
+    while (peek() && peek().type === 'op' && ['+', '-'].includes(peek().value)) {
+      const op = next().value
+      const rhs = parseMul()
+      v = op === '+' ? ((typeof v === 'string' || typeof rhs === 'string') ? String(v) + String(rhs) : v + rhs) : v - rhs
+    }
+    return v
+  }
+  const result = parseAdd()
+  if (pos < tokens.length) throw new Error('Unexpected trailing tokens in expression')
+  return result
+}
+function fcEval(exprText, vars) { return fcParseExpr(fcTokenize(exprText), vars) }
+function fcEvalCondition(text, vars) {
+  const m = text.match(/^(.+?)(>=|<=|==|!=|<>|=|>|<)(.+)$/)
+  if (!m) throw new Error('No comparison operator (=, >, <, >=, <=, !=) found in: "' + text + '"')
+  const lhs = fcEval(m[1].trim(), vars)
+  const rhs = fcEval(m[3].trim(), vars)
+  const op = m[2] === '=' ? '==' : m[2] === '<>' ? '!=' : m[2]
+  if (op === '==') return lhs == rhs
+  if (op === '!=') return lhs != rhs
+  if (op === '>') return lhs > rhs
+  if (op === '<') return lhs < rhs
+  if (op === '>=') return lhs >= rhs
+  return lhs <= rhs
+}
+function fcExecAssign(text, vars) {
+  const eq = text.indexOf('=')
+  if (eq === -1) throw new Error('An Assign shape needs "variable = expression" — got: "' + text + '"')
+  vars[text.slice(0, eq).trim()] = fcEval(text.slice(eq + 1).trim(), vars)
+}
+function runFlowchart() {
+  const outEl = document.getElementById('fc-run-output')
+  const vars = {}, output = [], forState = {}
+  const terminators = _fcShapes.filter(s => s.type === 'terminator')
+  const start = terminators.find(t => !_fcConns.some(c => c.to === t.id))
+  if (!start) { outEl.textContent = '❌ No Start shape found — add a Terminator with no incoming arrow.'; return { output, vars, error: true } }
+  let current = start.id, steps = 0
+  const MAX_STEPS = 5000
+  try {
+    while (true) {
+      if (++steps > MAX_STEPS) throw new Error('Stopped after ' + MAX_STEPS + ' steps — check for a loop that never reaches its Done condition.')
+      const shape = _fcShapes.find(s => s.id === current)
+      if (!shape) throw new Error('Flow reached a dead end.')
+      const outs = _fcConns.filter(c => c.from === current)
+      if (shape.type === 'terminator') {
+        if (outs.length === 0) break
+        current = outs[0].to
+        continue
+      }
+      if (shape.type === 'declare') {
+        vars[shape.label.trim().split(/\s+/).pop()] = 0
+      } else if (shape.type === 'process') {
+        fcExecAssign(shape.label, vars)
+      } else if (shape.type === 'io') {
+        const m = shape.label.match(/^\s*Output\s+(.+)$/i)
+        if (m) output.push(String(fcEval(m[1], vars)))
+      } else if (shape.type === 'decision') {
+        const result = fcEvalCondition(shape.label, vars)
+        const branch = outs.find(o => o.label === (result ? 'True' : 'False'))
+        if (!branch) throw new Error('Decision "' + shape.label + '" is missing its ' + (result ? 'True' : 'False') + ' branch.')
+        current = branch.to
+        continue
+      } else if (shape.type === 'for') {
+        const m = shape.label.match(/^\s*(\w+)\s*=\s*(.+?)\s+to\s+(.+)$/i)
+        if (!m) throw new Error('A For shape needs "var = start to end" — got: "' + shape.label + '"')
+        const [, varName, startExpr, endExpr] = m
+        let st = forState[shape.id]
+        if (!st) { st = forState[shape.id] = { value: fcEval(startExpr, vars), end: fcEval(endExpr, vars) } }
+        else st.value++
+        vars[varName] = st.value
+        const done = st.value > st.end
+        if (done) delete forState[shape.id]
+        const branch = outs.find(o => o.label === (done ? 'Done' : 'Next'))
+        if (!branch) throw new Error('For "' + shape.label + '" is missing its ' + (done ? 'Done' : 'Next') + ' branch.')
+        current = branch.to
+        continue
+      } else if (shape.type === 'while') {
+        const result = fcEvalCondition(shape.label, vars)
+        const branch = outs.find(o => o.label === (result ? 'Next' : 'Done'))
+        if (!branch) throw new Error('While "' + shape.label + '" is missing its ' + (result ? 'Next' : 'Done') + ' branch.')
+        current = branch.to
+        continue
+      }
+      current = outs[0]?.to
+      if (current === undefined) break
+    }
+  } catch (e) {
+    outEl.textContent = '❌ ' + e.message
+    return { output, vars, error: true }
+  }
+  outEl.textContent = output.length ? output.join('\n') : '(no output produced — add an Output shape if this flowchart is meant to print something)'
+  return { output, vars, error: false }
+}
+
 function checkFlowchart() {
   const req = activeMission.flowchart
   const missing = []
@@ -3815,6 +4014,25 @@ function checkFlowchart() {
   if (missing.length) {
     document.getElementById('fc-status').innerHTML = '❌ Not quite — still needs: ' + missing.join(' · ')
     return
+  }
+  // Missions built for the execution engine (req.expectedOutput set) are
+  // graded on what the flowchart actually PRODUCES when run, not just its
+  // shape/connection counts — the real Flowgorithm-style check. Missions
+  // without it (the original flow-build) keep the purely structural check
+  // above exactly as before.
+  if (req.expectedOutput) {
+    const result = runFlowchart()
+    if (result.error) {
+      document.getElementById('fc-status').innerHTML = '❌ Your flowchart hit an error when run — check the ▶ Run output above and fix it, then check again.'
+      return
+    }
+    const want = req.expectedOutput.map(String)
+    const got = result.output.map(String)
+    const matches = got.length === want.length && got.every((v, i) => v === want[i])
+    if (!matches) {
+      document.getElementById('fc-status').innerHTML = '❌ It runs, but the output doesn\'t match yet.<br>Expected: <code>' + want.join(', ') + '</code><br>Got: <code>' + (got.join(', ') || '(nothing)') + '</code>'
+      return
+    }
   }
   const p = getProg()
   const firstTime = !(p[activeMission.id] || {}).stars
