@@ -90,7 +90,14 @@
              border-bottom:1px solid rgba(255,255,255,.08); flex-shrink:0; }
   .ed-lang { font-size:11px; font-weight:800; color:#67e8f9; background:rgba(103,232,249,.08);
              border:1px solid rgba(103,232,249,.25); border-radius:6px; padding:4px 10px; }
-  .ed-btns { margin-left:auto; display:flex; gap:8px; }
+  .ed-btns { margin-left:auto; display:flex; gap:8px; align-items:center; }
+  .g9-hint-btn { font-size:11px; font-weight:700; color:#fbbf24; cursor:pointer; user-select:none; }
+  .g9-hint-btn:hover { text-decoration:underline; }
+  .g9-hint-display:empty { display:none; }
+  .g9-hint-display { padding:8px 14px; font-size:12px; color:#fbbf24; background:rgba(251,191,36,.08);
+    border-bottom:1px solid rgba(251,191,36,.18); flex-shrink:0; }
+  .g9-hint-display .g9-hint-line { margin-bottom:4px; }
+  .g9-hint-display .g9-hint-line:last-child { margin-bottom:0; }
   .btn { border:none; border-radius:8px; padding:8px 18px; font-size:12.5px; font-weight:800; cursor:pointer; transition:.15s; }
   .btn-run { background:#b8ef4a; color:#0d0f1a; }
   .btn-run:hover { background:#a5d83d; }
@@ -353,6 +360,8 @@
         <div class="learn-section-title">📖 Theory</div>
         <div class="learn-theory" id="learn-theory"></div>
       </div>
+      <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
+      <div class="g9-hint-display" id="g9-hint-display-learn"></div>
       <button class="btn btn-run" id="learn-continue-btn" onclick="completeLearnBubble()">✓ I've got it — Continue</button>
     </div>
   </div>
@@ -372,6 +381,8 @@
     <div class="learn-body">
       <p class="cards-intro" id="quiz-intro"></p>
       <div id="quiz-questions"></div>
+      <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
+      <div class="g9-hint-display" id="g9-hint-display-quiz"></div>
       <div class="cards-status" id="quiz-status"></div>
     </div>
   </div>
@@ -391,6 +402,8 @@
     <div class="learn-body">
       <p class="cards-intro" id="cards-intro"></p>
       <div class="cards-row" id="cards-row"></div>
+      <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
+      <div class="g9-hint-display" id="g9-hint-display-cards"></div>
       <div class="cards-status" id="cards-status"></div>
       <button class="btn btn-run" id="cards-check-btn" onclick="checkCards()">✓ Check My Total</button>
     </div>
@@ -421,6 +434,8 @@
         <svg id="fc-svg"></svg>
       </div>
       <div class="fc-status" id="fc-status">Drag shapes to reposition. Click a shape's text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.</div>
+      <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
+      <div class="g9-hint-display" id="g9-hint-display-flow"></div>
       <button class="btn btn-run" id="fc-check-btn" onclick="checkFlowchart()">✓ Check My Flowchart</button>
     </div>
   </div>
@@ -457,11 +472,13 @@
         <option value="ps">Pseudocode</option>
       </select>
       <div class="ed-btns">
+        <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
         <button class="btn btn-reset" onclick="resetMission()">↺ Reset</button>
         <button class="btn btn-run" id="btn-run" onclick="runMission(false)">▶ Run</button>
         <button class="btn btn-submit" id="btn-submit" onclick="runMission(true)" disabled>✓ Submit</button>
       </div>
     </div>
+    <div class="g9-hint-display" id="g9-hint-display"></div>
     <div class="ed-body"><textarea id="code"></textarea></div>
   </div>
 </div>
@@ -594,7 +611,8 @@ const MISSIONS = [
   // it what to do), a student should know a computer even HAS these parts
   // in the first place: CPU, memory, storage, input/output.
   {
-    id: 'learn-computer', type: 'learn', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '🖥️', title: 'What Is a Computer?', xp: 15,
+    id: 'learn-computer', type: 'learn', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '🖥️', title: 'What Is a Computer?',
+    hints: ["Match each term to its definition below — re-read the theory panel above if one doesn't click."], xp: 15,
     brief: 'Before anything else — what actually IS a computer, and what are its real parts?',
     api: [],
     learn: {
@@ -666,7 +684,8 @@ const MISSIONS = [
     // Converted from a Python/pseudocode answer() mission to a quiz — these
     // are identification questions (which component is which), not real
     // code, so a short click-to-answer quiz is a much better fit than an IDE.
-    id: 'comp-p1', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '💾', title: 'RAM or Storage?', xp: 20,
+    id: 'comp-p1', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '💾', title: 'RAM or Storage?',
+    hints: ["RAM disappears the instant power is lost. Storage doesn't."], xp: 20,
     brief: 'Two real components, one job each — click the right answer for each scenario below.',
     api: [],
     quiz: {
@@ -685,7 +704,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'comp-p2', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '🖨️', title: 'Input, Process, or Output?', xp: 20,
+    id: 'comp-p2', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '🖨️', title: 'Input, Process, or Output?',
+    hints: ["Input = going IN to the computer. Output = coming OUT to you. Process = the computer working it out."], xp: 20,
     brief: 'Every computer follows the IPOS cycle — click which stage each example belongs to.',
     api: [],
     quiz: {
@@ -705,7 +725,8 @@ const MISSIONS = [
     // Harder than comp-p1/comp-p2 on purpose: a real calculation using the
     // 1024-multiplier chain just taught in the theory (bytes -> KB -> MB ->
     // GB), not a single-fact lookup — now multiple-choice rather than typed.
-    id: 'comp-p3', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '📐', title: 'Storage Unit Conversion', xp: 30,
+    id: 'comp-p3', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '📐', title: 'Storage Unit Conversion',
+    hints: ["1 MB = 1024 KB, always — not 1000. Multiply by 1024 to go from MB to KB."], xp: 30,
     brief: 'Remember: 1 MB = 1024 KB. Work out each conversion, then click the right answer.',
     api: [],
     quiz: {
@@ -724,7 +745,8 @@ const MISSIONS = [
   {
     // Also harder: a real trade-off comparison across the three storage
     // device types just taught (HDD/SSD/Cloud), not a single definition.
-    id: 'comp-p4', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '⚡', title: 'Pick the Right Storage', xp: 30,
+    id: 'comp-p4', type: 'quiz', phase: 'FOUNDATIONS 1 · WHAT IS A COMPUTER?', emoji: '⚡', title: 'Pick the Right Storage',
+    hints: ["Cloud = stored somewhere else, accessed over the internet. HDD/SSD = stored locally, in the device itself."], xp: 30,
     brief: 'HDD, SSD, or Cloud — click the storage type that best fits each real scenario.',
     api: [],
     quiz: {
@@ -750,7 +772,8 @@ const MISSIONS = [
   // Phase 0 jumped straight into converting numbers to binary without ever
   // teaching what a variable or an integer even IS.
   {
-    id: 'learn-cb', type: 'learn', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '📘', title: 'What Is a Variable?', xp: 15,
+    id: 'learn-cb', type: 'learn', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '📘', title: 'What Is a Variable?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
     brief: 'Before writing any real code, learn what a variable and a data type actually are.',
     api: [],
     learn: {
@@ -772,7 +795,8 @@ const MISSIONS = [
     },
   },
   {
-    id: 'cb1', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '💾', title: 'Store a Number', xp: 20,
+    id: 'cb1', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '💾', title: 'Store a Number',
+    hints: ["A variable is created with a name, then =, then its value: score = 10", "answer() takes the variable, not a hardcoded number — answer(score), not answer(10)."], xp: 20,
     brief: 'A <b>variable</b> is a labeled box that stores a value so your code can use it later. Create one called <code>score</code>, store the number 10 inside it, then <b>answer()</b> what it holds.',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
@@ -785,7 +809,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'cb2', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '🔤', title: 'What Kind of Value?', xp: 20,
+    id: 'cb2', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '🔤', title: 'What Kind of Value?',
+    hints: ["Text needs quotes around it: callsign = \"Nova\" — without quotes, Python thinks it's a variable name.", "A string is just text — words, letters, symbols — anything in quotes."], xp: 20,
     brief: 'Not all values are numbers. A number like 10 is an <b>integer</b>. Text — even a single word — is called a <b>string</b>, and always needs QUOTES around it. Store your callsign as text, then answer() it.',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
@@ -798,7 +823,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'cb3', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '➕', title: 'Do the Math', xp: 25,
+    id: 'cb3', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '➕', title: 'Do the Math',
+    hints: ["Store each number in its own variable first, then add the variables together: total = a + b", "answer(a + b) works too, but naming the result makes it clearer."], xp: 25,
     brief: 'Variables holding numbers (integers) can be used in calculations, exactly like numbers themselves. Store two numbers, then answer() their sum.',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
@@ -811,7 +837,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'cb4', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '🔗', title: 'Combine Two Texts', xp: 25,
+    id: 'cb4', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '🔗', title: 'Combine Two Texts',
+    hints: ["Joining strings uses the same + symbol as adding numbers: full = first + \" \" + last", "Don't forget a space \" \" between the two words if you want one in the output."], xp: 25,
     brief: 'Text (strings) can be joined together with <b>+</b>, the same symbol used for adding numbers — but on strings, + means "stick them together", not "add up".',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
@@ -827,7 +854,8 @@ const MISSIONS = [
     // New content: a variable that gets REASSIGNED, not just set once —
     // genuinely different from cb1-cb4 (all single-assignment), and the
     // exact skill cbboss's boss mission needs (health = health - 25).
-    id: 'cb5', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '🔄', title: 'A Variable Can Change', xp: 25,
+    id: 'cb5', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '🔄', title: 'A Variable Can Change',
+    hints: ["Reassigning a variable overwrites its old value: health = 100 then health = health - 30", "answer() the variable AFTER you've updated it, not before."], xp: 25,
     brief: 'A variable is not stuck with its first value forever. Store health as 100, then UPDATE it by subtracting 30 (health = health - 30). answer() the NEW value.',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
@@ -843,7 +871,8 @@ const MISSIONS = [
     // New content: comparisons produce a Boolean (True/False) — a genuine
     // new idea, and harder than cb1-cb5 because it requires understanding
     // that >= itself IS the value being stored, not a number or text.
-    id: 'cb6', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '✅', title: 'True or False?', xp: 30,
+    id: 'cb6', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '✅', title: 'True or False?',
+    hints: ["A comparison like score >= 50 evaluates to True or False directly — you can store that result: passed = score >= 50", "Don't write passed = \"True\" — that's a string, not the actual Boolean value."], xp: 30,
     brief: 'A comparison like score >= 50 doesn\'t give you a number back — it gives you True or False. Store score as 85, then store passed as the RESULT of checking score >= 50. answer() what passed holds.',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
@@ -856,7 +885,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'cbboss', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🏆', title: 'BOSS — Your First Program', xp: 45,
+    id: 'cbboss', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🏆', title: 'BOSS — Your First Program',
+    hints: ["str(health) turns the NUMBER into text so you can join it with other text using +.", "Build it piece by piece: callsign + \" \" + str(health), then answer() the whole thing."], xp: 45,
     brief: 'Combine everything: store a callsign (text) and health (a number, starts at 100, then drops by 25). <code>str(health)</code> converts the NUMBER into text so it can be joined with other text. answer() the combined message.',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
@@ -872,7 +902,8 @@ const MISSIONS = [
     // Harder than cbboss: THREE variables combined (not two), and a
     // comparison feeding into the message via a Boolean, tying cb6's new
     // skill into the same combine-everything capstone spirit.
-    id: 'cbboss2', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🎖️', title: 'BOSS — Three Values, One Message', xp: 55,
+    id: 'cbboss2', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🎖️', title: 'BOSS — Three Values, One Message',
+    hints: ["Build the message in pieces with +, converting every number with str() first: callsign + \": \" + str(score) + \" points, complete=\" + str(complete)", "complete should be the RESULT of a comparison (score >= 100), not typed in by hand."], xp: 55,
     brief: 'Store a callsign (text), a score (number), and whether the mission is complete (score >= 100, a Boolean). answer() "<callsign>: <score> points, complete=<True/False>" — e.g. "Nova: 120 points, complete=True".',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
@@ -888,7 +919,8 @@ const MISSIONS = [
     // Genuinely new skill: DEBUGGING, not writing from scratch — given
     // real broken code with the classic type-mismatch bug, fix it. This
     // is a real, common first bug every beginner hits.
-    id: 'cbboss3', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🐛', title: 'BOSS — Fix the Bug', xp: 50,
+    id: 'cbboss3', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🐛', title: 'BOSS — Fix the Bug',
+    hints: ["The crash happens because you can't join text and a number directly — wrap the number in str() first.", "Find the exact line joining text + number, and add str() around just the number part."], xp: 50,
     brief: 'This code crashes with a type error: it tries to join text and a number directly. Fix it (hint: str() converts a number to text first), then answer() the working result.',
     api: ['answer(value)'],
     dataTitle: 'Broken Code', dataFields: [],
@@ -909,7 +941,8 @@ const MISSIONS = [
   // unlike Weeks 4-5 (sequence/selection/iteration), already covered by
   // p1m1-p1m9 below.
   {
-    id: 'learn-binary', type: 'learn', phase: 'FOUNDATIONS 2 · BINARY', emoji: '📘', title: 'What Is Binary?', xp: 15,
+    id: 'learn-binary', type: 'learn', phase: 'FOUNDATIONS 2 · BINARY', emoji: '📘', title: 'What Is Binary?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
     brief: 'Before converting any numbers, learn what binary actually is and why computers use it.',
     api: [],
     learn: {
@@ -934,21 +967,24 @@ const MISSIONS = [
     },
   },
   {
-    id: 'cards-make', type: 'cards', phase: 'FOUNDATIONS 2 · BINARY', emoji: '🃏', title: 'Binary Cards — Make the Number', xp: 25,
+    id: 'cards-make', type: 'cards', phase: 'FOUNDATIONS 2 · BINARY', emoji: '🃏', title: 'Binary Cards — Make the Number',
+    hints: ["Each card is worth double the one before it — start from the LARGEST card and work down, flipping any card whose value doesn't push you over the target."], xp: 25,
     brief: 'The classic "unplugged" binary cards trick. Each card is worth a place value — flip cards face-up to ADD their value, face-down to leave them out. Flip cards until the total matches the target.',
     api: [],
     cards: { mode: 'match', values: [16, 8, 4, 2, 1], target: 22,
       intro: 'Each card shows ONE side only — its place value (16, 8, 4, 2, or 1). Face-up = counted, face-down = not counted. This is exactly what a 1 or 0 means in binary — flip the right cards to make 22.' },
   },
   {
-    id: 'cards-add', type: 'cards', phase: 'FOUNDATIONS 2 · BINARY', emoji: '➕', title: 'Binary Cards — Addition', xp: 30,
+    id: 'cards-add', type: 'cards', phase: 'FOUNDATIONS 2 · BINARY', emoji: '➕', title: 'Binary Cards — Addition',
+    hints: ["Work out 9 + 5 on paper first (=14), THEN flip cards to represent 14, not 9 and 5 separately."], xp: 30,
     brief: 'Two signals need to be added together: 9 and 5. Work out 9 + 5 first, then flip the cards to represent the ANSWER in binary.',
     api: [],
     cards: { mode: 'match', values: [16, 8, 4, 2, 1], target: 14,
       intro: '9 + 5 = 14. Now flip the cards to make 14 — the same trick as before, just starting from an addition instead of a number you were simply given.' },
   },
   {
-    id: 'cardsboss', type: 'cards', phase: 'FOUNDATIONS 2 · CAPSTONE', emoji: '🏆', title: 'BOSS — Bigger Numbers', xp: 40,
+    id: 'cardsboss', type: 'cards', phase: 'FOUNDATIONS 2 · CAPSTONE', emoji: '🏆', title: 'BOSS — Bigger Numbers',
+    hints: ["Same strategy as before: start from the biggest card, flip it if it doesn't overshoot 45, then move to the next-biggest."], xp: 40,
     brief: 'One more card added to the row — now you can make bigger numbers. Flip the cards to make 45.',
     api: [],
     cards: { mode: 'match', values: [32, 16, 8, 4, 2, 1], target: 45,
@@ -958,7 +994,8 @@ const MISSIONS = [
     // New teaching content: introduces "byte" concretely (8 bits, all
     // flipped on = the biggest number 8 bits can hold) — ties directly
     // back to Foundations 1's storage-units theory (comp-p3/comp-p4).
-    id: 'cards-byte', type: 'cards', phase: 'FOUNDATIONS 2 · BINARY', emoji: '📦', title: 'One Byte, Maxed Out', xp: 35,
+    id: 'cards-byte', type: 'cards', phase: 'FOUNDATIONS 2 · BINARY', emoji: '📦', title: 'One Byte, Maxed Out',
+    hints: ["Every single card face-up, no exceptions — that's the biggest number a byte can represent."], xp: 35,
     brief: 'A byte is exactly 8 bits. Flip every single card face-up — the biggest number one whole byte can ever hold.',
     api: [],
     cards: { mode: 'match', values: [128, 64, 32, 16, 8, 4, 2, 1], target: 255,
@@ -968,7 +1005,8 @@ const MISSIONS = [
     // Harder, and new: reasoning about HOW MANY bits a number needs,
     // rather than just building one specific number — a genuine
     // comparison/estimation skill, not a lookup.
-    id: 'bits-needed', type: 'data', phase: 'FOUNDATIONS 2 · BINARY', emoji: '📏', title: 'How Many Bits Do You Need?', xp: 35,
+    id: 'bits-needed', type: 'data', phase: 'FOUNDATIONS 2 · BINARY', emoji: '📏', title: 'How Many Bits Do You Need?',
+    hints: ["One byte's biggest possible value is 255 (all 8 bits on). Anything bigger than that can't fit."], xp: 35,
     brief: 'A one-byte (8-bit) signal can only ever hold 0 to 255. Which of these two numbers would OVERFLOW a single byte and need a second byte to store: 200, or 400? answer() the one that overflows.',
     api: ['answer(value)'],
     dataTitle: 'Two Signals', dataFields: ['a', 'b'],
@@ -981,7 +1019,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0m1', type: 'data', phase: 'FOUNDATIONS 4 · BINARY IN CODE & LOGIC', emoji: '🔢', title: 'Denary to Binary', xp: 30,
+    id: 'p0m1', type: 'data', phase: 'FOUNDATIONS 4 · BINARY IN CODE & LOGIC', emoji: '🔢', title: 'Denary to Binary',
+    hints: ["Repeatedly divide by 2, writing down each remainder (0 or 1), until you reach 0.", "Read the remainders from LAST to FIRST (bottom to top) to get the binary digits in the right order."], xp: 30,
     brief: 'Before you can pilot anything, every system runs on <b>binary</b>. Convert the denary number below into binary (no "0b" prefix) and report it with <b>answer(value)</b>.',
     api: ['answer(value)'],
     dataTitle: 'Number to Convert', dataFields: ['denary'],
@@ -994,7 +1033,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0m2', type: 'data', phase: 'FOUNDATIONS 4 · BINARY IN CODE & LOGIC', emoji: '📡', title: 'Binary to Denary', xp: 35,
+    id: 'p0m2', type: 'data', phase: 'FOUNDATIONS 4 · BINARY IN CODE & LOGIC', emoji: '📡', title: 'Binary to Denary',
+    hints: ["Each binary digit is worth a power of 2, counting from the right: 1, 2, 4, 8, 16... Add up the place values where there's a 1."], xp: 35,
     brief: 'A sensor reports a value in raw binary. Convert it back to a denary number and answer() it.',
     api: ['answer(value)'],
     dataTitle: 'Signal to Decode', dataFields: ['binary'],
@@ -1007,7 +1047,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'learn-logic', type: 'learn', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '📘', title: 'What Is Boolean Logic?', xp: 15,
+    id: 'learn-logic', type: 'learn', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '📘', title: 'What Is Boolean Logic?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
     brief: 'Before combining true/false values, learn what Boolean logic actually is and how AND/OR/NOT really work.',
     api: [],
     learn: {
@@ -1031,7 +1072,8 @@ const MISSIONS = [
     },
   },
   {
-    id: 'p0m3', type: 'data', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '🔀', title: 'AND Gate', xp: 30,
+    id: 'p0m3', type: 'data', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '🔀', title: 'AND Gate',
+    hints: ["AND is only True when BOTH sides are True — if either one is False, the whole thing is False."], xp: 30,
     brief: 'Two ship systems report their status as booleans. answer() the result of <b>a AND b</b> — True only if BOTH are true.',
     api: ['answer(value)'],
     dataTitle: 'System Status', dataFields: ['a', 'b'],
@@ -1044,7 +1086,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0m4', type: 'data', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '⚡', title: 'Truth Table Row', xp: 40,
+    id: 'p0m4', type: 'data', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '⚡', title: 'Truth Table Row',
+    hints: ["Work from the innermost brackets outward: first NOT(a AND b), then combine that result with OR c."], xp: 40,
     brief: 'A real diagnostic rule: <b>NOT (a AND b) OR c</b>. Work through it for the values given and answer() the result.',
     api: ['answer(value)'],
     dataTitle: 'System Status', dataFields: ['a', 'b', 'c'],
@@ -1057,7 +1100,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'learn-datatypes', type: 'learn', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '📘', title: 'What Are Data Types?', xp: 15,
+    id: 'learn-datatypes', type: 'learn', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '📘', title: 'What Are Data Types?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
     brief: 'Before identifying types, learn what a data type actually is and why mixing them up causes real bugs.',
     api: [],
     learn: {
@@ -1079,7 +1123,8 @@ const MISSIONS = [
     },
   },
   {
-    id: 'p0m5', type: 'data', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '🏷️', title: 'Pick the Type', xp: 30,
+    id: 'p0m5', type: 'data', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '🏷️', title: 'Pick the Type',
+    hints: ["Look at HOW the value is written: quotes around it = string, decimal point = float, no quotes/no decimal = integer, True/False = Boolean."], xp: 30,
     brief: 'Not everything that LOOKS like a number IS one. answer() the type name of the mystery value below.',
     api: ['answer(value)'],
     dataTitle: 'Mystery Value', dataFields: ['value'],
@@ -1092,7 +1137,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0m6', type: 'data', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '🔧', title: 'Type Coercion Trap', xp: 35,
+    id: 'p0m6', type: 'data', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '🔧', title: 'Type Coercion Trap',
+    hints: ["Coercion often converts to the \"wider\" type automatically — a string + a number, or an integer mixed with a float, doesn't always crash the way you'd expect. Work it through step by step."], xp: 35,
     brief: 'Converting between types on purpose is called <b>coercion</b>. Work out what this expression evaluates to and answer() it.',
     api: ['answer(value)'],
     dataTitle: 'Evaluate This', dataFields: ['expression'],
@@ -1105,7 +1151,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'learn-images', type: 'learn', phase: 'FOUNDATIONS 5 · IMAGES', emoji: '📘', title: 'What Is a Digital Image?', xp: 15,
+    id: 'learn-images', type: 'learn', phase: 'FOUNDATIONS 5 · IMAGES', emoji: '📘', title: 'What Is a Digital Image?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
     brief: 'Before counting pixels, learn what a digital image actually IS — and why it\'s really just more binary.',
     api: [],
     learn: {
@@ -1127,7 +1174,8 @@ const MISSIONS = [
     },
   },
   {
-    id: 'p0m7', type: 'data', phase: 'FOUNDATIONS 5 · IMAGES', emoji: '🖼️', title: 'Count the Lit Pixels', xp: 40,
+    id: 'p0m7', type: 'data', phase: 'FOUNDATIONS 5 · IMAGES', emoji: '🖼️', title: 'Count the Lit Pixels',
+    hints: ["Loop through every row, and inside that, count how many characters in the row equal \"1\".", "A running total variable, incremented once per lit pixel, is exactly what you need."], xp: 40,
     brief: 'A tiny black-and-white image is stored as binary — each row a string of 0s (dark) and 1s (lit). Loop through every row and answer() the TOTAL number of lit pixels in the whole image.',
     api: ['answer(value)'],
     require: 'loop',
@@ -1142,7 +1190,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0m8', type: 'data', phase: 'FOUNDATIONS 5 · IMAGES', emoji: '📡', title: 'Which Row Has the Most Light', xp: 45,
+    id: 'p0m8', type: 'data', phase: 'FOUNDATIONS 5 · IMAGES', emoji: '📡', title: 'Which Row Has the Most Light',
+    hints: ["Count the 1s in EACH row separately, then compare the counts to find the biggest one.", "Keep track of both the best count so far AND which row number gave it."], xp: 45,
     brief: 'Sensor diagnostics need the BRIGHTEST row — the one with the most lit (1) pixels. answer() its row number (1-based).',
     api: ['answer(value)'],
     require: 'loop',
@@ -1158,7 +1207,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0boss', type: 'data', phase: 'FOUNDATIONS 4 · CAPSTONE', emoji: '🏆', title: 'BOSS — Systems Check Complete', xp: 60,
+    id: 'p0boss', type: 'data', phase: 'FOUNDATIONS 4 · CAPSTONE', emoji: '🏆', title: 'BOSS — Systems Check Complete',
+    hints: ["First convert the binary signal to denary (same technique as Binary to Denary).", "Then use MOD 2 on that denary value: remainder 0 means even, remainder 1 means odd."], xp: 60,
     brief: '<b>Everything from Systems Check:</b> convert the binary signal to denary, then answer() "EVEN" or "ODD" depending on whether it\'s even — a genuine IF decision, not a hardcoded guess.',
     api: ['answer(value)'],
     require: 'if',
@@ -1174,7 +1224,8 @@ const MISSIONS = [
 
   // ── Foundations 6 · Flowcharts — planning an algorithm before writing it ───
   {
-    id: 'learn-flowcharts', type: 'learn', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '📘', title: 'What Is a Flowchart?', xp: 15,
+    id: 'learn-flowcharts', type: 'learn', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '📘', title: 'What Is a Flowchart?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
     brief: 'Before writing real algorithms, learn how to plan one out visually — a flowchart, using standard shapes.',
     api: [],
     learn: {
@@ -1196,7 +1247,8 @@ const MISSIONS = [
     },
   },
   {
-    id: 'flow-p1', type: 'data', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart', xp: 25,
+    id: 'flow-p1', type: 'data', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart',
+    hints: ["Follow the arrows exactly as written: is 15 \"18 or over\"? No — so take the NO branch."], xp: 25,
     brief: 'Follow this flowchart by hand: START → INPUT someone\'s age → DECISION: is age 18 or over? → YES: OUTPUT "Adult" → NO: OUTPUT "Minor" → END. With the age 15, what does it output? answer() the result.',
     api: ['answer(value)'],
     dataTitle: 'Flowchart Trace', dataFields: [],
@@ -1209,7 +1261,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'flow-p2', type: 'data', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '💠', title: 'Which Shape?', xp: 25,
+    id: 'flow-p2', type: 'data', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '💠', title: 'Which Shape?',
+    hints: ["A Decision shape is always a yes/no or true/false question — \"is X correct?\" fits that exactly."], xp: 25,
     brief: '"Checking if a password is correct" — which flowchart shape represents THIS step? answer() "Decision", "Process", or "Input/Output".',
     api: ['answer(value)'],
     dataTitle: 'Flowchart Step', dataFields: [],
@@ -1222,7 +1275,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'flow-build', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '🧩', title: 'Build It — Even or Odd', xp: 60,
+    id: 'flow-build', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '🧩', title: 'Build It — Even or Odd',
+    hints: ["Use the palette buttons to drop shapes onto the canvas, then \"Connect Shapes\" and click two shapes in order to draw an arrow between them.", "A Decision shape needs exactly TWO outgoing arrows — one for each branch (Yes and No)."], xp: 60,
     brief: 'Build a REAL flowchart: Start → Input a number → Decision (is it even?) → two branches (Yes/No), each leading to its own output step → End. Drag shapes onto the canvas, connect them with arrows, and label each one.',
     api: [],
     flowchart: {
@@ -1236,7 +1290,8 @@ const MISSIONS = [
     // IF/ELSE, the two branches become the two arms — directly matching
     // what learn-flowcharts' theory promised ("this is exactly what an
     // IF/ELSE becomes"). This is the bridge from diagram to syntax.
-    id: 'flow-code', type: 'data', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '🔁', title: 'From Flowchart to Code', xp: 35,
+    id: 'flow-code', type: 'data', phase: 'FOUNDATIONS 6 · FLOWCHARTS', emoji: '🔁', title: 'From Flowchart to Code',
+    hints: ["The Decision diamond becomes an IF statement; each branch becomes what happens inside the IF or the ELSE.", "MOD 2 == 0 is how you check \"is it even?\" in code — the same test the flowchart's diamond represents."], xp: 35,
     brief: 'You just BUILT this flowchart: Start → Input a number → Decision (is it even?) → Yes: output "Even" / No: output "Odd" → End. '
       + 'Now write the SAME logic as real code. The <b>Decision diamond becomes an IF/ELSE</b> — each branch becomes one arm. '
       + 'Store the number 12 in <code>num</code>, then answer() "Even" or "Odd".',
@@ -1258,7 +1313,8 @@ const MISSIONS = [
   // genuine algorithmic thinking (variables, loops, arrays, sorting,
   // functions) before the ship ever leaves the pad.
   {
-    id: 'p0bm1', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📟', title: 'First Transmission', xp: 30,
+    id: 'p0bm1', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📟', title: 'First Transmission',
+    hints: ["Store each number in its own variable, then answer() their sum: answer(a + b)"], xp: 30,
     brief: 'Before launch, prove the flight computer can do real arithmetic. Store two numbers in variables and answer() their sum.',
     api: ['answer(value)'],
     dataTitle: 'Fuel Tanks', dataFields: ['a', 'b'],
@@ -1271,7 +1327,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm2', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '🔋', title: 'Countdown Log', xp: 35,
+    id: 'p0bm2', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '🔋', title: 'Countdown Log',
+    hints: ["A loop that runs from 1 to 10, adding each number to a running total variable as it goes.", "Start the total at 0 BEFORE the loop begins."], xp: 35,
     brief: 'A real loop, not a print statement. Use a LOOP to add up every number from 1 to 10, and answer() the total.',
     api: ['answer(value)'],
     require: 'loop',
@@ -1285,7 +1342,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm3', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📡', title: 'Fizz Report', xp: 40,
+    id: 'p0bm3', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📡', title: 'Fizz Report',
+    hints: ["n MOD 3 == 0 checks \"divisible by 3\"; n MOD 5 == 0 checks \"divisible by 5\". Combine them with OR.", "Count matches with a running total, incremented by 1 each time the condition is true."], xp: 40,
     brief: 'Loop through 1 to 20. Count how many numbers are divisible by 3 OR 5 (MOD gives you a remainder — 0 means divides evenly). answer() the count.',
     api: ['answer(value)'],
     require: 'loop',
@@ -1299,7 +1357,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm4', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '⛽', title: 'Average Fuel Reading', xp: 40,
+    id: 'p0bm4', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '⛽', title: 'Average Fuel Reading',
+    hints: ["Sum every reading first, then divide the sum by how many readings there are (5)."], xp: 40,
     brief: 'Five sensors report fuel readings. Loop through them, sum them, then answer() the AVERAGE.',
     api: ['answer(value)'],
     require: 'loop',
@@ -1313,7 +1372,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm5', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📦', title: 'Sort the Manifest', xp: 50,
+    id: 'p0bm5', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: '📦', title: 'Sort the Manifest',
+    hints: ["Bubble sort: compare each pair of neighbours, swap them if they're in the wrong order, and repeat the whole pass until nothing needs swapping.", "You'll need a loop, possibly nested, plus a temporary variable to hold one value during a swap."], xp: 50,
     brief: 'Cargo weights arrived in a random order. Sort them (bubble sort — compare neighbours, swap if out of order, repeat) and answer() the sorted list, comma-separated.',
     api: ['answer(value)'],
     require: 'loop',
@@ -1327,7 +1387,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bm6', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: 'ƒ', title: 'Recursive Fuel Calculation', xp: 50,
+    id: 'p0bm6', type: 'data', phase: 'FOUNDATIONS 7 · FLIGHT COMPUTER', emoji: 'ƒ', title: 'Recursive Fuel Calculation',
+    hints: ["A recursive function calls ITSELF with a smaller input until it hits a base case (n=0 or n=1, where factorial is 1).", "Factorial(n) = n * Factorial(n - 1) — that's the whole recursive step."], xp: 50,
     brief: 'Write a recursive FUNCTION Factorial(n) — the fuel formula needs n! (n factorial). Call it with n=5 and answer() the result.',
     api: ['answer(value)'],
     require: 'function',
@@ -1341,7 +1402,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p0bboss', type: 'data', phase: 'FOUNDATIONS 7 · CAPSTONE', emoji: '🏆', title: 'BOSS — Flight Computer Online', xp: 70,
+    id: 'p0bboss', type: 'data', phase: 'FOUNDATIONS 7 · CAPSTONE', emoji: '🏆', title: 'BOSS — Flight Computer Online',
+    hints: ["Loop through every reading, and inside the loop, check if it's above 80 — if so, add 1 to a counter."], xp: 70,
     brief: 'Loop through the sensor readings and count how many are ABOVE 80 — a loop AND a decision, working together, just like every real algorithm from this tier.',
     api: ['answer(value)'],
     require: 'loop',
@@ -1357,7 +1419,8 @@ const MISSIONS = [
 
   // ── Tier 1 — Sequencing ──────────────────────────────────────────────────────
   {
-    id: 'p1m1', phase: 'PHASE 1 · TURTLE', emoji: '🛰️', title: 'Dock at the Station', xp: 30,
+    id: 'p1m1', phase: 'PHASE 1 · TURTLE', emoji: '🛰️', title: 'Dock at the Station',
+    hints: ["forward(distance) moves in the direction you're currently facing — work out how far and which way to turn first.", "You start facing EAST — plan your turns (left/right 90°) before writing any forward() calls."], xp: 30,
     brief: 'Your supply pod <b>starts facing EAST</b> (→). Fly it to the space station 🛰️. '
       + '<b>forward(distance)</b> moves in the direction you face; <b>left(90)</b> / <b>right(90)</b> '
       + 'rotate on the spot. One grid square = <b>40px</b>.',
@@ -1373,7 +1436,8 @@ const MISSIONS = [
     stars: { par: 3 },
   },
   {
-    id: 'p1m2', phase: 'PHASE 1 · TURTLE', emoji: '🪨', title: 'The Detour', xp: 35,
+    id: 'p1m2', phase: 'PHASE 1 · TURTLE', emoji: '🪨', title: 'The Detour',
+    hints: ["Plan the whole route on paper first: how far up, how far across, how far back down, before touching the editor.", "Going \"over the top\" usually means: turn, go up, turn, go across, turn, come back down."], xp: 35,
     brief: 'An <b>asteroid wall</b> blocks the direct route — touching it destroys the pod. '
       + 'Fly over the top. Plan the whole route <b>before</b> you run.',
     api: ['forward(d)', 'left(deg)', 'right(deg)'],
@@ -1389,7 +1453,8 @@ const MISSIONS = [
     stars: { par: 6 },
   },
   {
-    id: 'p1m3', phase: 'PHASE 1 · TURTLE', emoji: '🔙', title: 'Reverse Thrusters', xp: 30,
+    id: 'p1m3', phase: 'PHASE 1 · TURTLE', emoji: '🔙', title: 'Reverse Thrusters',
+    hints: ["backward(distance) moves you in the OPPOSITE direction to the one you're facing — no turning needed at all."], xp: 30,
     brief: 'Steering is <b>damaged</b> — no turning today! You only have <b>forward()</b> and '
       + '<b>backward()</b>… and the station is <b>behind</b> you. One command can do this.',
     api: ['forward(d)', 'backward(d)'],
@@ -1407,7 +1472,8 @@ const MISSIONS = [
 
   // ── Tier 2 — Loops (star metric = lines of code) ────────────────────────────
   {
-    id: 'p1m4', phase: 'PHASE 1 · LOOPS', emoji: '🔁', title: 'Square Patrol', xp: 40,
+    id: 'p1m4', phase: 'PHASE 1 · LOOPS', emoji: '🔁', title: 'Square Patrol',
+    hints: ["A loop that repeats 4 times, each time going forward(160) then turning 90°, draws a perfect square.", "Stars now count LINES OF CODE — a loop with 2 lines inside beats 8 lines written out by hand."], xp: 40,
     brief: 'Patrol all <b>4 checkpoints</b> and return to the pad — a perfect square, '
       + '<b>160px per side</b>. This mission <b>requires a loop</b>, and stars now count your '
       + '<b>lines of code</b>, not commands. Loops = shorter code!',
@@ -1424,7 +1490,8 @@ const MISSIONS = [
     stars: { metric: 'lines', par: 4 },
   },
   {
-    id: 'p1m5', phase: 'PHASE 1 · LOOPS', emoji: '🪜', title: 'The Staircase', xp: 40,
+    id: 'p1m5', phase: 'PHASE 1 · LOOPS', emoji: '🪜', title: 'The Staircase',
+    hints: ["One \"step\" is forward(40) then a 90° turn, then forward(40) and turn back — repeat that whole pattern 5 times in a loop."], xp: 40,
     brief: 'Climb the <b>5-step staircase</b> to the station. Every step is the same '
       + 'pattern: <b>40px across, 40px up</b>. One loop, one step pattern.',
     api: ['forward(d)', 'left(deg)', 'right(deg)'],
@@ -1440,7 +1507,8 @@ const MISSIONS = [
     stars: { metric: 'lines', par: 6 },
   },
   {
-    id: 'p1m6', phase: 'PHASE 1 · LOOPS', emoji: '🌀', title: 'Spiral Scan', xp: 45,
+    id: 'p1m6', phase: 'PHASE 1 · LOOPS', emoji: '🌀', title: 'Spiral Scan',
+    hints: ["Each leg is 40px longer than the last — use the loop's own counter variable to calculate that growing distance (e.g. distance = 40 * loop_number)."], xp: 45,
     brief: 'Scan the sector in an <b>expanding spiral</b>: each leg is <b>40px longer</b> than '
       + 'the last (40, 80, 120 … 240), turning left between legs. The <b>loop variable</b> is the key.',
     api: ['forward(d)', 'left(deg)', 'right(deg)'],
@@ -1456,7 +1524,8 @@ const MISSIONS = [
     stars: { metric: 'lines', par: 4 },
   },
   {
-    id: 'p1m7', phase: 'PHASE 1 · LOOPS', emoji: '☄️', title: 'Comet Chain', xp: 45,
+    id: 'p1m7', phase: 'PHASE 1 · LOOPS', emoji: '☄️', title: 'Comet Chain',
+    hints: ["6 sides, 120px each, turning LEFT 60° between sides — a loop that repeats exactly 6 times."], xp: 45,
     brief: 'Collect all <b>6 comets</b> around the hexagon ring: 6 sides of <b>120px</b>, '
       + 'turning <b>LEFT 60°</b> at each corner. No starter this time — you know the pattern.',
     api: ['forward(d)', 'left(deg)', 'right(deg)'],
@@ -1475,7 +1544,8 @@ const MISSIONS = [
 
   // ── Tier 3 — Signals & decisions ─────────────────────────────────────────────
   {
-    id: 'p1m8', phase: 'PHASE 1 · SIGNALS', emoji: '🚦', title: 'Signal Run', xp: 50,
+    id: 'p1m8', phase: 'PHASE 1 · SIGNALS', emoji: '🚦', title: 'Signal Run',
+    hints: ["Loop through get_signals() one at a time: forward(120), then check the colour — G turns left, R turns right.", "After the loop finishes, one extra forward(120) is needed to actually dock."], xp: 50,
     brief: 'Navigation beacons line the corridor — <b>get_signals()</b> gives you their colours in order. '
       + 'Protocol: fly <b>120px</b>, then <b>G = turn LEFT</b>, <b>R = turn RIGHT</b>. After the last beacon, '
       + 'one final <b>forward(120)</b> docks you. An <b>if</b> decision is required.',
@@ -1494,7 +1564,8 @@ const MISSIONS = [
     stars: { metric: 'lines', par: 9 },
   },
   {
-    id: 'p1m9', phase: 'PHASE 1 · SIGNALS', emoji: '🌃', title: 'Night Convoy', xp: 55,
+    id: 'p1m9', phase: 'PHASE 1 · SIGNALS', emoji: '🌃', title: 'Night Convoy',
+    hints: ["Three possible signals now need three branches — an IF / ELSE IF / ELSE, not just IF / ELSE.", "B means \"do nothing extra\" — just move forward, no turn at all."], xp: 55,
     brief: 'A new beacon colour joins the protocol: <b>B (blue) = fly straight through</b>, no turn. '
       + 'Full protocol: <b>R = RIGHT, G = LEFT, B = nothing</b>. 120px corridors, final forward to dock. '
       + 'Three-way decisions — think <b>if / elif</b>.',
@@ -1514,7 +1585,8 @@ const MISSIONS = [
     stars: { metric: 'lines', par: 11 },
   },
   {
-    id: 'p1m10', phase: 'PHASE 1 · SIGNALS', emoji: '🛸', title: 'Asteroid Slalom', xp: 60,
+    id: 'p1m10', phase: 'PHASE 1 · SIGNALS', emoji: '🛸', title: 'Asteroid Slalom',
+    hints: ["You need BOTH the beacon's position (to know which turn direction) AND its value (the distance to fly) — track the loop index alongside the value.", "Alternating turns: keep a counter, and turn RIGHT when it's odd, LEFT when it's even (or vice versa)."], xp: 60,
     brief: 'The beacons now transmit <b>DISTANCES</b> in grid squares (1 square = 40px). '
       + 'Fly that many squares, then turn — <b>1st turn RIGHT, 2nd LEFT, 3rd RIGHT…</b> alternating. '
       + 'You need the beacon <b>number</b> as well as its value (odd/even — think <b>MOD</b> / <b>%</b>).',
@@ -1536,7 +1608,8 @@ const MISSIONS = [
 
   // ── Capstone ─────────────────────────────────────────────────────────────────
   {
-    id: 'p1m11', phase: 'PHASE 1 · CAPSTONE', emoji: '🏆', title: 'The Grand Tour', xp: 80,
+    id: 'p1m11', phase: 'PHASE 1 · CAPSTONE', emoji: '🏆', title: 'The Grand Tour',
+    hints: ["Break it into three separate goals — comets, then the asteroid detour, then the final dock — and solve each piece before combining them.", "Stars count total COMMANDS this time, not lines — a loop that repeats the SAME pattern still helps, but each individual move counts."], xp: 80,
     brief: '<b>Everything at once:</b> collect all <b>3 comets</b>, dodge the asteroid wall, dock at '
       + 'the station. Stars are back to <b>fewest COMMANDS</b> — every move and every turn counts. '
       + 'Plan on paper first; the perfect run is tight.',
@@ -1558,7 +1631,8 @@ const MISSIONS = [
   // Turn-based: your code is RE-RUN fresh every turn with the latest `state`.
   // Call attack(id) or wait() — whichever fires first each turn is your move.
   {
-    id: 'p2m1', type: 'battle', phase: 'PHASE 2 · TUTORIAL', emoji: '🎯', title: 'First Contact', xp: 40,
+    id: 'p2m1', type: 'battle', phase: 'PHASE 2 · TUTORIAL', emoji: '🎯', title: 'First Contact',
+    hints: ["Read state to see the enemy's id, then call attack(id) — this drone never fires back, so there's no real risk in attacking every turn."], xp: 40,
     brief: 'A <b>training drone</b> is powering up target locks — it never fires back. Every turn you '
       + 'receive <b>state</b> describing your ship and the enemy fleet. Call <b>attack(id)</b> to fire, or '
       + '<b>wait()</b> to hold. Your code runs <b>fresh each turn</b> — read state, decide, act.',
@@ -1577,7 +1651,8 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 2 },
   },
   {
-    id: 'p2m2', type: 'battle', phase: 'PHASE 2 · TUTORIAL', emoji: '⚡', title: 'Counter Fire', xp: 45,
+    id: 'p2m2', type: 'battle', phase: 'PHASE 2 · TUTORIAL', emoji: '⚡', title: 'Counter Fire',
+    hints: ["Every turn you don't attack, this enemy hits you — check state['self']['hp'] but generally just keep calling attack(id) every turn."], xp: 45,
     brief: 'This one <b>fires back</b> — every turn it survives, it hits your ship. Same shape of '
       + 'decision, but now hesitation costs HP. Keep an eye on <b>state[\'self\'][\'hp\']</b> and stay '
       + 'aggressive.',
@@ -1598,7 +1673,8 @@ const MISSIONS = [
 
   // ── Phase 2 · Functions Required — a mission checker enforces decomposition ──
   {
-    id: 'p2m3', type: 'battle', phase: 'PHASE 2 · FUNCTIONS', emoji: '🧰', title: 'Twin Threats', xp: 50,
+    id: 'p2m3', type: 'battle', phase: 'PHASE 2 · FUNCTIONS', emoji: '🧰', title: 'Twin Threats',
+    hints: ["Write a real function (Python: def, pseudocode: FUNCTION ... RETURNS) that takes the enemy list and returns which one to attack, rather than writing the decision inline."], xp: 50,
     brief: 'Two enemies now! From here on, missions require you to <b>write your own function</b> to '
       + 'decide who to attack — don\'t just inline the logic. Python: <code>def</code>. Pseudocode: '
       + '<code>FUNCTION … RETURNS</code>.',
@@ -1618,7 +1694,8 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 3 },
   },
   {
-    id: 'p2m4', type: 'battle', phase: 'PHASE 2 · FUNCTIONS', emoji: '🎯', title: 'Weakest First', xp: 55,
+    id: 'p2m4', type: 'battle', phase: 'PHASE 2 · FUNCTIONS', emoji: '🎯', title: 'Weakest First',
+    hints: ["Loop through the enemy fleet, tracking whichever one has the LOWEST hp seen so far — return that one at the end."], xp: 55,
     brief: 'Write a <b>FindWeakest()</b>-style function that scans the enemy fleet and returns the one '
       + 'with the <b>lowest hp</b> — killing the cheapest target first keeps you out of danger longest.',
     api: ['attack(id)', 'wait()'],
@@ -1641,7 +1718,8 @@ const MISSIONS = [
 
   // ── Phase 2 · State Tracking — new action: defend() halves incoming damage ──
   {
-    id: 'p2m5', type: 'battle', phase: 'PHASE 2 · STATE TRACKING', emoji: '🛡', title: 'Shields Up', xp: 55,
+    id: 'p2m5', type: 'battle', phase: 'PHASE 2 · STATE TRACKING', emoji: '🛡', title: 'Shields Up',
+    hints: ["defend() halves incoming damage this turn but doesn't attack — use it right before the charge-up turn.", "state['turn'] tells you which turn it is — check if it's about to be a multiple of 3."], xp: 55,
     brief: 'NEW ACTION: <b>defend()</b> halves ALL incoming damage this turn (but you don\'t attack). '
       + 'This enemy <b>charges up every 3rd turn</b> for a devastating hit — read <b>state[\'turn\']</b> '
       + '(pseudocode: <b>turn</b>) to see it coming and defend just in time.',
@@ -1661,7 +1739,8 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 6 },
   },
   {
-    id: 'p2m6', type: 'battle', phase: 'PHASE 2 · STATE TRACKING', emoji: '⚡', title: 'Pulsar Watch', xp: 60,
+    id: 'p2m6', type: 'battle', phase: 'PHASE 2 · STATE TRACKING', emoji: '⚡', title: 'Pulsar Watch',
+    hints: ["Same idea as the every-3rd-turn enemy, but check for EVEN turns instead: state['turn'] MOD 2 == 0."], xp: 60,
     brief: 'Same idea, different rhythm — this one charges on <b>EVEN</b> turns instead of every 3rd. '
       + 'No starter this time: read the pattern and write the full IF yourself.',
     api: ['attack(id)', 'defend()', 'wait()'],
@@ -1679,7 +1758,8 @@ const MISSIONS = [
 
   // ── Phase 2 · Multiple Enemies — must prioritize or the pile-on kills you ───
   {
-    id: 'p2m7', type: 'battle', phase: 'PHASE 2 · MULTIPLE ENEMIES', emoji: '👥', title: 'Double Trouble', xp: 60,
+    id: 'p2m7', type: 'battle', phase: 'PHASE 2 · MULTIPLE ENEMIES', emoji: '👥', title: 'Double Trouble',
+    hints: ["Rank threat by a mix of low HP (cheap kill) and high attack (dangerous if left alive) — not just whichever has less HP.", "Killing the cheap-but-dangerous enemy first usually reduces total incoming damage more than killing the tanky one."], xp: 60,
     brief: 'Two enemies, very different threats. One is <b>cheap to kill but hits HARD</b>; the other is '
       + '<b>tanky but weak</b>. Kill the wrong one first and you won\'t survive — <b>prioritize the '
       + 'biggest threat</b>, not just whoever\'s closest.',
@@ -1698,7 +1778,8 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 4 },
   },
   {
-    id: 'p2m8', type: 'battle', phase: 'PHASE 2 · MULTIPLE ENEMIES', emoji: '⚔️', title: 'Triple Threat', xp: 65,
+    id: 'p2m8', type: 'battle', phase: 'PHASE 2 · MULTIPLE ENEMIES', emoji: '⚔️', title: 'Triple Threat',
+    hints: ["Write a function that scores every enemy by threat (something like attack power vs remaining hp) and picks the highest-scoring one.", "Re-run this decision EVERY turn — the most dangerous enemy can change as they take damage."], xp: 65,
     brief: 'Three enemies. Rank them by threat (cheap-and-dangerous first, tanky-and-weak last) and work '
       + 'down the list — get it wrong and the pile-on damage finishes you before you finish them. '
       + 'Write a <b>MostDangerous()</b> function.',
@@ -1723,7 +1804,8 @@ const MISSIONS = [
 
   // ── Phase 2 · Adaptive AI — the enemy reacts to what you just did ────────────
   {
-    id: 'p2m9', type: 'battle', phase: 'PHASE 2 · ADAPTIVE AI', emoji: '🔰', title: 'Shield Recharge', xp: 65,
+    id: 'p2m9', type: 'battle', phase: 'PHASE 2 · ADAPTIVE AI', emoji: '🔰', title: 'Shield Recharge',
+    hints: ["If you attacked last turn, this turn's attack would be wasted by the shield — alternate: attack(), wait(), attack(), wait()...", "Track whether your LAST action was an attack, and do the opposite this turn."], xp: 65,
     brief: 'This enemy has a <b>shield that blocks two attacks in a row</b> — if you attacked LAST turn, '
       + 'this turn\'s attack is wasted. Alternate <b>attack()</b> and <b>wait()</b> to land every hit.',
     api: ['attack(id)', 'wait()', 'defend()'],
@@ -1743,7 +1825,8 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 5 },
   },
   {
-    id: 'p2m10', type: 'battle', phase: 'PHASE 2 · ADAPTIVE AI', emoji: '😡', title: 'Enrage', xp: 70,
+    id: 'p2m10', type: 'battle', phase: 'PHASE 2 · ADAPTIVE AI', emoji: '😡', title: 'Enrage',
+    hints: ["Once the enemy passes half health, its attack roughly triples — the safe play is to end the fight BEFORE that point, not to slow down.", "Keep attacking aggressively rather than defending — defending gives it more turns to ramp up."], xp: 70,
     brief: 'This one gets ANGRIER as it takes damage — past half health its attack roughly triples. '
       + 'The lesson here is the OPPOSITE of Shields Up: don\'t stall, don\'t defend — <b>rush it down '
       + 'before the rage compounds</b>.',
@@ -1764,7 +1847,8 @@ const MISSIONS = [
 
   // ── Phase 2 · Boss — everything at once, gates entry to Phase 3 ─────────────
   {
-    id: 'p2m11', type: 'battle', phase: 'PHASE 2 · BOSS', emoji: '👹', title: 'The Gauntlet', xp: 100, boss: true,
+    id: 'p2m11', type: 'battle', phase: 'PHASE 2 · BOSS', emoji: '👹', title: 'The Gauntlet',
+    hints: ["Combine every trick from this tier: prioritize the cheap-and-dangerous enemy, alternate attack/wait for the shield, and watch for the every-3rd-turn charge.", "Solve one mechanic at a time on paper before combining all three in code."], xp: 100, boss: true,
     brief: '<b>Boss fight.</b> Two enemies, a shield that blocks back-to-back attacks, AND a charge '
       + 'attack every 3rd turn. Everything from this tier, at once. Kill the cheap-and-dangerous one '
       + 'first, alternate your attacks to beat the shield, and watch the turn counter. Beat this to '
@@ -1793,7 +1877,8 @@ const MISSIONS = [
   // ── Phase 3 · Read & Report — new mission type, no battle: parse the report,
   // call answer(v) once. Isolates the data skill before it's combined with combat.
   {
-    id: 'p3m1', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '📦', title: 'Cargo Count', xp: 40,
+    id: 'p3m1', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '📦', title: 'Cargo Count',
+    hints: ["Loop through every record in data, adding each one's weight to a running total — then answer() the total ONCE, after the loop."], xp: 40,
     brief: 'NEW MISSION TYPE. No battle this time — just a <b>data table</b>. Loop through <b>data</b> '
       + '(a list of records) and call <b>answer(value)</b> ONCE to report the total cargo weight.',
     api: ['answer(value)'],
@@ -1809,7 +1894,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p3m2', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '👩‍🚀', title: 'Crew Roster', xp: 45,
+    id: 'p3m2', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '👩‍🚀', title: 'Crew Roster',
+    hints: ["Loop through the crew, tracking whichever record has the highest skill seen so far — answer() that person's NAME, not their skill number."], xp: 45,
     brief: 'Find the crew member with the <b>highest skill rating</b> and report their name. This mission '
       + '<b>requires a LOOP</b> — hardcoding "the third one" doesn\'t scale to a bigger crew.',
     api: ['answer(value)'],
@@ -1828,7 +1914,8 @@ const MISSIONS = [
 
   // ── Phase 3 · One Decision — the data determines a single choice ────────────
   {
-    id: 'p3m3', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '🗺️', title: 'Route Planner', xp: 45,
+    id: 'p3m3', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '🗺️', title: 'Route Planner',
+    hints: ["Loop through the three routes, tracking whichever has the LOWEST fuel cost seen so far — answer() its name."], xp: 45,
     brief: 'Three hyperspace routes, three fuel costs. Report the name of the <b>CHEAPEST</b> route.',
     api: ['answer(value)'],
     require: 'loop',
@@ -1844,7 +1931,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p3m4', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '📡', title: 'Threat Count', xp: 50,
+    id: 'p3m4', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '📡', title: 'Threat Count',
+    hints: ["Loop through the 5 contacts, adding 1 to a counter every time a contact's hp is above 50."], xp: 50,
     brief: 'Sensor sweep picked up 5 contacts. Report <b>how many</b> have more than <b>50 hp</b> — '
       + 'that\'s your real threat count for the mission ahead.',
     api: ['answer(value)'],
@@ -1859,7 +1947,8 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'p3m5', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '⛽', title: 'Fuel Budget', xp: 50,
+    id: 'p3m5', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '⛽', title: 'Fuel Budget',
+    hints: ["Start with the full budget (80), then subtract each leg's cost one at a time as you go through the loop."], xp: 50,
     brief: 'Budget: <b>80 fuel</b>. Four legs of the journey, each with a cost. Report how much fuel '
       + '<b>remains</b> after every leg.',
     api: ['answer(value)'],
@@ -1879,7 +1968,8 @@ const MISSIONS = [
   // Enemy 'attack' is hidden (hideAttack:true) — the ONLY way to know who's
   // dangerous is to read the static intel report before writing your tactics.
   {
-    id: 'p3m6', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '🔭', title: 'Blind Contact', xp: 65,
+    id: 'p3m6', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '🔭', title: 'Blind Contact',
+    hints: ["The intel report gives you the REAL attack values sensors can't see — read it before deciding who to prioritize, not the (hidden/wrong) live sensor data."], xp: 65,
     brief: 'Sensors are jammed — <b>state[\'enemies\'][i][\'attack\']</b> reads as hidden this time. Before '
       + 'you fly, an intelligence report reveals each contact\'s TRUE attack power. Read it, then prioritize '
       + 'the cheap-but-dangerous one — same idea as Double Trouble, but now YOU have to find the danger first. '
@@ -1908,7 +1998,8 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 4 },
   },
   {
-    id: 'p3m7', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '👻', title: 'Ghost Squadron', xp: 70,
+    id: 'p3m7', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '👻', title: 'Ghost Squadron',
+    hints: ["Write a function using the INTEL values (not the hidden sensor ones) to rank enemies — and only consider enemies still alive."], xp: 70,
     brief: 'Three contacts, all attack values hidden. Recon reveals the truth — write a <b>MostDangerous()</b> '
       + 'function that ranks the still-ALIVE enemies by their intel attack value. Intel doesn\'t update as '
       + 'enemies die, so cross-check against <b>state[\'enemies\']</b> — don\'t target a destroyed contact.',
@@ -1936,7 +2027,8 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 5 },
   },
   {
-    id: 'p3m8', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '🎯', title: 'The Weak Point', xp: 75,
+    id: 'p3m8', type: 'battle', phase: 'PHASE 3 · FULL STRATEGY', emoji: '🎯', title: 'The Weak Point',
+    hints: ["Combine two tricks at once: use intel to pick the priority target, AND alternate attack()/wait() to get past the shield."], xp: 75,
     brief: 'Two contacts, hidden attack values, AND a shield that blocks back-to-back attacks. Read the '
       + 'recon report to find the priority target, then alternate <b>attack()</b>/<b>wait()</b> to beat the shield.',
     api: ['attack(id)', 'wait()'],
@@ -1958,7 +2050,8 @@ const MISSIONS = [
 
   // ── Phase 3 capstone — gates entry to Phase 4 ────────────────────────────────
   {
-    id: 'p3m9', type: 'battle', phase: 'PHASE 3 · CAPSTONE', emoji: '🛰️', title: 'Full Spectrum Scan', xp: 110, boss: true,
+    id: 'p3m9', type: 'battle', phase: 'PHASE 3 · CAPSTONE', emoji: '🛰️', title: 'Full Spectrum Scan',
+    hints: ["This is every mechanic from Phase 3 at once — read the intel report first, decide priority, then execute your attack/wait rhythm while watching for the timed charge.", "Solve it in writing first: who do I attack, in what order, and when do I defend or hold fire?"], xp: 110, boss: true,
     brief: '<b>Capstone.</b> Everything: hidden stats, a shield, a timed charge attack, two enemies. The '
       + 'recon report is the only way to know Core\'s real attack power — misread it and you\'ll prioritize '
       + 'wrong and lose. Write a real targeting function, alternate for the shield, and win in 9.',
@@ -3322,6 +3415,8 @@ function openMission(id) {
   activeMission = MISSIONS.find(m => m.id === id)
   if (!activeMission) return
   missionStartedAt = Date.now()
+  g9HintIdx = 0
+  document.querySelectorAll('.g9-hint-display').forEach(el => { el.innerHTML = '' })
   if (activeMission.type === 'learn') { renderLearnBubble(); return }
   if (activeMission.type === 'quiz') { renderQuizBubble(); return }
   if (activeMission.type === 'cards') { renderCardsBubble(); return }
@@ -4019,6 +4114,38 @@ async function reportRealProgress(mission, timeSpentMs) {
       body: JSON.stringify({ concept_id: conceptId, correct: true, time_spent_ms: timeSpentMs || 0 }),
     })
   } catch (e) {}
+}
+
+// ── Hints — one shared button/display pair per mission-type template, all
+// wired to the SAME activeMission.hints array (a mission keeps its hints
+// regardless of which UI template renders it). Cycles one hint further per
+// click, same UX as Grade 7/8's showHint(), reset whenever a new mission
+// opens (see openMission() above).
+let g9HintIdx = 0
+function g9HintDisplayId() {
+  const t = activeMission?.type
+  if (t === 'learn') return 'g9-hint-display-learn'
+  if (t === 'quiz') return 'g9-hint-display-quiz'
+  if (t === 'cards') return 'g9-hint-display-cards'
+  if (t === 'flowchart') return 'g9-hint-display-flow'
+  return 'g9-hint-display'
+}
+function showG9Hint() {
+  const hints = activeMission?.hints || []
+  const disp = document.getElementById(g9HintDisplayId())
+  if (!disp) return
+  if (g9HintIdx < hints.length) {
+    const line = document.createElement('div')
+    line.className = 'g9-hint-line'
+    line.textContent = '💡 Hint ' + (g9HintIdx + 1) + ': ' + hints[g9HintIdx]
+    g9HintIdx++
+    disp.appendChild(line)
+  } else if (!disp.textContent) {
+    const line = document.createElement('div')
+    line.className = 'g9-hint-line'
+    line.textContent = 'No more hints — you\'ve got everything you need!'
+    disp.appendChild(line)
+  }
 }
 
 // Shared win-screen presenter — every mission TYPE (turtle/code/battle/data
