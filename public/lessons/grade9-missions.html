@@ -3449,10 +3449,13 @@ function completeLearnBubble() {
   // "correct answer" to grade, just genuinely engaging with the material
   // (the Match-Up itself already proves that much).
   const p = getProg()
+  const firstTime = !(p[activeMission.id] || {}).stars
+  const xp = firstTime ? activeMission.xp : 0
   p[activeMission.id] = { stars: 3, xp: (p[activeMission.id] || {}).xp || activeMission.xp, lang, code: '' }
   saveProg(p)
-  try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
-  mbarBack()
+  try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+  try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
+  showWinScreen(3, xp, 'Nicely matched — that theory is locked in.')
 }
 
 // ── Quiz — short MCQ / image-matching stages, no code editor ───────────────
@@ -3510,11 +3513,14 @@ function updateQuizStatus() {
 }
 function completeQuizBubble() {
   const p = getProg()
+  const firstTime = !(p[activeMission.id] || {}).stars
+  const xp = firstTime ? activeMission.xp : 0
   p[activeMission.id] = { stars: 3, xp: (p[activeMission.id] || {}).xp || activeMission.xp, lang, code: '' }
   saveProg(p)
-  try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
+  try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+  try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
   document.getElementById('quiz-status').textContent = '✅ All correct!'
-  setTimeout(mbarBack, 1200)
+  showWinScreen(3, xp, 'All correct — nice work!')
 }
 
 // ── Binary Cards — flip place-value cards until the total matches target ───
@@ -3564,11 +3570,14 @@ function checkCards() {
     return
   }
   const p = getProg()
+  const firstTime = !(p[activeMission.id] || {}).stars
+  const xp = firstTime ? activeMission.xp : 0
   p[activeMission.id] = { stars: 3, xp: (p[activeMission.id] || {}).xp || activeMission.xp, lang, code: '' }
   saveProg(p)
-  try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
+  try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+  try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
   document.getElementById('cards-status').innerHTML = '✅ Correct! ' + activeMission.cards.target + ' made from ' + [..._cardsFlipped].map(i => activeMission.cards.values[i]).join(' + ')
-  setTimeout(mbarBack, 1200)
+  showWinScreen(3, xp, activeMission.cards.target + ' made from ' + [..._cardsFlipped].map(i => activeMission.cards.values[i]).join(' + ') + '.')
 }
 
 // ── Flowchart Builder — real drag-and-drop shapes, click-to-connect arrows ──
@@ -3713,11 +3722,14 @@ function checkFlowchart() {
     return
   }
   const p = getProg()
+  const firstTime = !(p[activeMission.id] || {}).stars
+  const xp = firstTime ? activeMission.xp : 0
   p[activeMission.id] = { stars: 3, xp: (p[activeMission.id] || {}).xp || activeMission.xp, lang, code: '' }
   saveProg(p)
-  try { if (me) BF.addXP(me.id, activeMission.xp) } catch (e) {}
+  try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
+  try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
   document.getElementById('fc-status').innerHTML = '✅ Correct! A genuine flowchart — start, end, and a real decision branch, all connected.'
-  setTimeout(mbarBack, 1400)
+  showWinScreen(3, xp, 'A genuine flowchart — start, end, and a real decision branch, all connected.')
 }
 
 // Draws each mission type's starting frame — routed by activeMission.type
@@ -4009,6 +4021,21 @@ async function reportRealProgress(mission, timeSpentMs) {
   } catch (e) {}
 }
 
+// Shared win-screen presenter — every mission TYPE (turtle/code/battle/data
+// AND the learn/quiz/cards/flowchart "bubble" types below) must end the same
+// way: stars, an XP readout, and one click straight into the next mission
+// (winNext()/winList(), already wired on the #win overlay's own buttons).
+// Before this, the bubble types silently faded back to the mission list
+// instead — no stars shown, no one-click "next", exactly the gap between
+// Grade 9 and Grade 7/8's uniform win-overlay flow that this fixes.
+function showWinScreen(stars, xp, subtext) {
+  document.getElementById('win-stars').innerHTML =
+    '⭐'.repeat(stars) + '<span class="dim">' + '⭐'.repeat(3 - stars) + '</span>'
+  document.getElementById('win-sub').textContent = subtext
+  document.getElementById('win-xp').textContent = xp > 0 ? '+' + xp + ' XP' : 'Already earned — nice revisit!'
+  document.getElementById('win').classList.add('open')
+}
+
 function completeMission(stats) {
   const st = starsFor(activeMission, stats)
   const p = getProg()
@@ -4032,9 +4059,7 @@ function completeMission(stats) {
   try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
 
   const metric = activeMission.stars.metric || 'cmds'
-  document.getElementById('win-stars').innerHTML =
-    '⭐'.repeat(st) + '<span class="dim">' + '⭐'.repeat(3 - st) + '</span>'
-  document.getElementById('win-sub').textContent =
+  const subtext =
     metric === 'pass' ? 'Correct answer, straight from the data. Nicely read.'
     : metric === 'turns'
       ? (st === 3 ? 'Flawless victory — minimum turns. Efficient combat!'
@@ -4044,8 +4069,7 @@ function completeMission(stats) {
                   : 'Completed in ' + stats.lines + ' lines. Tighter code earns more stars — refactor and re-submit!')
       : (st === 3 ? 'Perfect flight — minimum commands. That\'s pilot thinking.'
                   : 'Docked with ' + stats.cmds + ' commands. A shorter flight plan earns more stars!')
-  document.getElementById('win-xp').textContent = xp > 0 ? '+' + xp + ' XP' : 'Already earned — chase the stars!'
-  document.getElementById('win').classList.add('open')
+  showWinScreen(st, xp, subtext)
 }
 
 function winNext() {
