@@ -1322,6 +1322,85 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
 
+  // ── Foundations 6b · Flowgorithm — real execution, not just structure ──────
+  // The Flowchart Builder above only ever checked shape/connection COUNTS.
+  // These missions use the real engine (fcEval/runFlowchart) — build it,
+  // press ▶ Run, and the flowchart actually EXECUTES: Decision, For, While,
+  // Declare, Assign, and Output all do real work against real variables,
+  // graded on what it actually PRODUCES (flowchart.expectedOutput), exactly
+  // like Flowgorithm's own "run the diagram" workflow.
+  {
+    id: 'flowg1', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM', emoji: '🔀', title: 'Odd or Even?',
+    hints: ['Declare n, then Assign n = 7 — Declare just creates the variable (starts at 0), Assign gives it a real value.',
+      'Decision: n MOD 2 = 0 — the FIRST arrow out of a Decision is True, the SECOND is False (drawn in that order).',
+      'True branch outputs "Even", False branch outputs "Odd" — both need their own Output shape, both lead to End.'],
+    xp: 35,
+    brief: 'Build a REAL flowchart, then RUN it: Declare a number <code>n</code>, Assign it <b>7</b>, then a Decision checks <code>n MOD 2 = 0</code> — True outputs "Even", False outputs "Odd". Start → Declare → Assign → Decision → (two Output branches) → End.',
+    flowchart: { intro: 'Drag shapes onto the canvas: Start, Declare, Assign, Decision, two Outputs, End. Connect them, set n = 7, then press ▶ Run to test it before checking.',
+      minShapes: 6, minConnections: 6, requiresDecision: true, expectedOutput: ['Odd'] },
+  },
+  {
+    id: 'flowg2', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM', emoji: '📝', title: 'Pass or Fail?',
+    hints: ['Assign score = 82 (no Declare needed first if you assign it directly — Assign creates the variable too).',
+      'A number comparison, not MOD this time: score >= 50.',
+      'True → Output "Pass". False → Output "Fail".'],
+    xp: 35,
+    brief: 'A real grade checker. Assign <code>score</code> to <b>82</b>, then Decision: <code>score >= 50</code> — True outputs "Pass", False outputs "Fail".',
+    flowchart: { intro: 'Same shape as Odd or Even, different condition — a comparison (>=) instead of MOD.',
+      minShapes: 5, minConnections: 5, requiresDecision: true, expectedOutput: ['Pass'] },
+  },
+  {
+    id: 'flowg3', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM', emoji: '🔢', title: 'Count to Five',
+    hints: ['A For shape\'s label is "var = start to end", e.g. i = 1 to 5.',
+      'The FIRST arrow out of a For (into the loop body) is Next; the SECOND (out of the loop) is Done.',
+      'Output i INSIDE the loop (on the Next branch), then loop back to the For shape itself — that\'s what makes it repeat.'],
+    xp: 35,
+    brief: 'Your first REAL loop. A For shape (<code>i = 1 to 5</code>) with an Output <code>i</code> on its Next branch, looping back — outputs 1, 2, 3, 4, 5, one per line.',
+    flowchart: { intro: 'For shapes work like Decisions but with two special branch names: Next (keep looping) and Done (finished).',
+      minShapes: 4, minConnections: 4, expectedOutput: ['1', '2', '3', '4', '5'] },
+  },
+  {
+    id: 'flowg4', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM', emoji: '➕', title: 'Sum 1 to 10',
+    hints: ['Declare total BEFORE the loop starts (it needs to exist at 0 first).',
+      'Inside the loop (the For\'s Next branch): total = total + i, THEN loop back to the For shape.',
+      'Output total AFTER the loop is Done — not inside it, or you\'ll print a running total 10 times instead of once.'],
+    xp: 40,
+    brief: 'Add up 1 to 10 using a real loop. Declare <code>total</code>, a For shape <code>i = 1 to 10</code>, and inside it <code>total = total + i</code> — then Output <code>total</code> once the loop is Done.',
+    flowchart: { intro: 'The loop body needs an Assign shape (total = total + i) as well as an Output — build the whole chain: For -> Assign -> back to For -> (Done) -> Output -> End.',
+      minShapes: 5, minConnections: 5, expectedOutput: ['55'] },
+  },
+  {
+    id: 'flowg5', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM', emoji: '🚀', title: 'Countdown',
+    hints: ['A While shape\'s label is just a condition, like a Decision: n > 0.',
+      'Loop body: Output n, then Assign n = n - 1, then loop back to the While shape.',
+      'After the loop is Done, one more Output — "Liftoff!" — outside the loop.'],
+    xp: 40,
+    brief: 'Declare and Assign <code>n = 5</code>. While <code>n > 0</code>: Output <code>n</code>, then subtract 1 from it. When the loop is Done, Output "Liftoff!".',
+    flowchart: { intro: 'A While shape branches exactly like a For: Next (condition still true, keep looping) and Done (condition false, exit).',
+      minShapes: 6, minConnections: 6, expectedOutput: ['5', '4', '3', '2', '1', 'Liftoff!'] },
+  },
+  {
+    id: 'flowg6', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM', emoji: '✌️', title: 'Evens Only',
+    hints: ['A For loop (i = 1 to 10) with a Decision INSIDE its body — a loop and a decision, working together.',
+      'Decision: i MOD 2 = 0 — True outputs i, False just loops back to the For with no output.',
+      'Both the True branch AND the False branch need to eventually connect back to the For shape.'],
+    xp: 40,
+    brief: 'Combine a loop AND a decision: For <code>i = 1 to 10</code>, and inside it a Decision <code>i MOD 2 = 0</code> — only output <code>i</code> when it\'s even.',
+    flowchart: { intro: 'This is Count to Five and Odd or Even, combined — a Decision living inside a For loop\'s body.',
+      minShapes: 5, minConnections: 6, requiresDecision: true, expectedOutput: ['2', '4', '6', '8', '10'] },
+  },
+  {
+    id: 'flowgboss', type: 'flowchart', phase: 'FOUNDATIONS 6 · CAPSTONE', emoji: '🏆', boss: true, title: 'BOSS — FizzBuzz',
+    hints: ['Three nested Decisions, in this order: n MOD 15 = 0 first, then (on its False branch) n MOD 3 = 0, then (on THAT False branch) n MOD 5 = 0.',
+      'Every branch — all four possible outcomes — eventually needs to loop back to the For shape, or the loop will never continue.',
+      'Order matters: checking MOD 3 or MOD 5 before MOD 15 would never let "FizzBuzz" print at all, since 15 is also divisible by 3 and 5.'],
+    xp: 70,
+    brief: 'The real thing — build a genuine FizzBuzz flowchart. For <code>n = 1 to 20</code>: if <code>n MOD 15 = 0</code> output "FizzBuzz"; else if <code>n MOD 3 = 0</code> output "Fizz"; else if <code>n MOD 5 = 0</code> output "Buzz"; else output <code>n</code>.',
+    flowchart: { intro: 'Everything from this unit at once: a For loop with three Decisions nested inside its body, each False branch leading to the next check.',
+      minShapes: 9, minConnections: 12, requiresDecision: true,
+      expectedOutput: ['1','2','Fizz','4','Buzz','Fizz','7','8','Fizz','Buzz','11','Fizz','13','14','FizzBuzz','16','17','Fizz','19','Buzz'] },
+  },
+
   // ── Phase 0B · Flight Computer — algorithmic thinking, before you fly ───────
   // Bridges Systems Check into Phase 1: the SAME real code + answer() format
   // as everything else here, not a separate disconnected sandbox tool — one
