@@ -40,7 +40,9 @@ function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
 // state read), not a Python code string — same shape as Grade 7's page-type
 // stages. Mirrors that file's maximal/empty log pattern instead of the
 // code-regex convention every Python stage below uses.
-const webMaximalLog = () => ({ bodyText: 'true false you see 1. item 3 items ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
+const webMaximalLog = () => ({
+  html: '<!DOCTYPE html>\n<html>\n<head>\n<title>My Page</title>\n</head>\n<body>\n<h1>My Page</h1>\n<h2>Sub</h2>\n<img src="x" alt="x">\n<p>Text</p>\n</body>\n</html>',
+  bodyText: 'true false you see 1. item 3 items ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
   hasFunction: true, functionCount: 999, hasReturn: true, hasIf: true,
   hasLSSet: true, hasLSGet: true, hasLSRemove: true, hasJSONStringify: true, hasJSONParse: true,
   // ws4s4 additionally checks listItems < 4 — 3 is the one value that
@@ -58,8 +60,8 @@ const webMaximalLog = () => ({ bodyText: 'true false you see 1. item 3 items ' +
   bgColor: 'rgb(255, 247, 230)', headingColor: 'rgb(47, 59, 82)',
   h2Color: 'rgb(124, 58, 237)', h3Color: 'rgb(5, 150, 105)', pColor: 'rgb(75, 85, 99)',
   linkColor: 'rgb(29, 78, 216)', buttonBg: 'rgb(230, 57, 70)', buttonColor: 'rgb(255, 255, 255)',
-  hasVariable: true })
-const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, hasPush: false,
+  hasVariable: true, imgCount: 1, imgAltOk: true, pageTitle: 'My Favorite Animal' })
+const webEmptyLog   = () => ({ html: '', bodyText: '', hasArray: false, hasObject: false, hasPush: false,
   hasFunction: false, functionCount: 0, hasReturn: false, hasIf: false,
   hasLSSet: false, hasLSGet: false, hasLSRemove: false, hasJSONStringify: false, hasJSONParse: false,
   hasLoop: false, listItems: 0,
@@ -69,7 +71,7 @@ const webEmptyLog   = () => ({ bodyText: '', hasArray: false, hasObject: false, 
   paragraphs: 0, buttons: 0, links: 0,
   headingText: [], paragraphText: [], bgColor: '', headingColor: '',
   h2Color: '', h3Color: '', pColor: '', linkColor: '', buttonBg: '', buttonColor: '',
-  hasVariable: false })
+  hasVariable: false, imgCount: 0, imgAltOk: false, pageTitle: '' })
 
 let pass = 0, fail = 0
 for (const ch of CHALLENGES) {
