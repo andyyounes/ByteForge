@@ -1136,6 +1136,99 @@ const MODULES = [
                   && log.imgCount >= 1 && log.imgAltOk && log.paragraphs >= 1,
     },
   ]},
+  // ── Semester 1, Week 1c: Directories, Files & Paths — new module. The
+  // editor here is a single HTML/CSS/JS tab set, not real separate files on
+  // a real disk, so this can't be a hands-on "create these files" exercise
+  // the way web0b's skeleton stage is — it's concept quizzes (matching
+  // web0's own style) PLUS free-text "type the real path" questions
+  // (type:'prompt', already used elsewhere in this file's quiz engine),
+  // which genuinely tests relative-path reasoning without needing a real
+  // file system. Real, separate files are exactly what the earlier
+  // "Colors/HTML/CSS lesson" writeup describes doing OUTSIDE this platform.
+  { id:'web0c', name:'📁 Directories, Files & Paths', sub:'Folders, file extensions, and how one file finds another', live:true, stages:[
+    { id:'web0cs1', name:'What\'s a Directory?', xp:20, type:'quiz',
+      text:`<strong>A directory is just another word for a FOLDER.</strong> A real project lives inside one main folder, holding all its files — and folders can hold OTHER folders too. Every file also has an <b>extension</b> (the letters after the dot) telling you what KIND of file it is: <code>.html</code>, <code>.css</code>, <code>.js</code>, <code>.jpg</code>.`,
+      hints:['Directory = Folder — genuinely the same thing, just two names for it.', 'The extension is everything after the LAST dot in a filename.'],
+      passCount:3,
+      questions:[
+        { type:'match', prompt:'Another word for "folder" is a ___.', options:['Directory','Extension','Path','Server'], answer:'Directory' },
+        { type:'match', prompt:'The .css at the end of styles.css is called the file\'s ___.', options:['Extension','Directory','Path','Domain'], answer:'Extension' },
+        { type:'match', prompt:'Which extension would a JavaScript file typically have?', options:['.js','.html','.css','.jpg'], answer:'.js' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'web0cs2', name:'Reading a File Structure', xp:20, type:'quiz',
+      text:`<strong>A real small project might look like this:</strong><br><br>
+        <code style="display:block;white-space:pre;font-size:13px;line-height:1.6;background:rgba(255,255,255,.05);padding:10px 14px;border-radius:8px;">my-website/
+├── index.html
+├── styles.css
+├── script.js
+└── images/
+    └── cat.jpg</code><br>
+        <code>my-website</code> is the main folder. <code>index.html</code>, <code>styles.css</code>, and <code>script.js</code> sit directly inside it. <code>images</code> is a SUBFOLDER, and <code>cat.jpg</code> lives inside THAT.`,
+      hints:['Indentation in a tree diagram shows what\'s INSIDE what — cat.jpg is indented under images/, so it\'s inside it.', 'styles.css lines up with index.html — same folder, not inside images.'],
+      passCount:3,
+      questions:[
+        { type:'match', prompt:'Which file is INSIDE the images folder?', options:['cat.jpg','styles.css','script.js','index.html'], answer:'cat.jpg' },
+        { type:'match', prompt:'Is styles.css inside the images folder, or directly inside my-website?', options:['Directly inside my-website','Inside images'], answer:'Directly inside my-website' },
+        { type:'match', prompt:'How many SUBFOLDERS are inside my-website (not counting my-website itself)?', options:['1','0','2','3'], answer:'1' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'web0cs3', name:'Same Folder, Simple Path', xp:25, type:'quiz',
+      text:`<strong>When a file is in the SAME folder</strong> as the one linking to it, the path is just its filename — nothing else needed.<br><br>
+        <code>index.html</code> and <code>styles.css</code> sit in the SAME folder. What path goes inside <code>&lt;link rel="stylesheet" href="___"&gt;</code> in index.html?`,
+      hints:['Same folder = just the filename, no folder name in front of it at all.'],
+      passCount:1,
+      questions:[
+        { type:'prompt', prompt:'Type the href value (just the path, no quotes):', answer:'styles.css' },
+      ],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'web0cs4', name:'A File Inside a Subfolder', xp:25, type:'quiz',
+      text:`<strong>When a file is INSIDE a subfolder</strong>, the path includes that folder's name, then a <code>/</code>, then the filename.<br><br>
+        Using the same structure as before — <code>index.html</code> is in the main folder, and <code>images/cat.jpg</code> is inside the images subfolder. What src goes inside <code>&lt;img src="___"&gt;</code> in index.html?`,
+      hints:['foldername/filename — the subfolder\'s name, a forward slash, then the file inside it.'],
+      passCount:1,
+      questions:[
+        { type:'prompt', prompt:'Type the src value (just the path, no quotes):', answer:['images/cat.jpg', './images/cat.jpg'] },
+      ],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'web0cs5', name:'Going Up a Level — ../', xp:30, type:'quiz',
+      text:`<strong>Sometimes a file needs to reach OUT of its own folder</strong>, to something in the folder above it — that's what <code>../</code> means: "go up one level".<br><br>
+        <code style="display:block;white-space:pre;font-size:13px;line-height:1.6;background:rgba(255,255,255,.05);padding:10px 14px;border-radius:8px;">my-website/
+├── styles.css
+└── pages/
+    └── about.html</code><br>
+        <code>about.html</code> is INSIDE the pages folder, but <code>styles.css</code> is one level UP, in the main folder. What href goes inside about.html to link it?`,
+      hints:['../ means "go up out of this folder, into the one above it" — then continue the path from there.', 'about.html is inside pages/, so it needs to go UP one level to reach styles.css.'],
+      passCount:1,
+      questions:[
+        { type:'prompt', prompt:'Type the href value (just the path, no quotes):', answer:'../styles.css' },
+      ],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'web0cboss', name:'BOSS — Map the Project', xp:60, type:'quiz', boss:true,
+      text:`<strong>BOSS</strong> — One real project, several correct paths to work out, all from <code>index.html</code>'s point of view:<br><br>
+        <code style="display:block;white-space:pre;font-size:13px;line-height:1.6;background:rgba(255,255,255,.05);padding:10px 14px;border-radius:8px;">my-website/
+├── index.html
+├── css/
+│   └── styles.css
+├── js/
+│   └── script.js
+└── images/
+    └── dog.jpg</code>`,
+      hints:['Every one of these is index.html reaching DOWN into a subfolder — none of them need ../ this time.', 'foldername/filename, every time — css/, js/, and images/ are three separate subfolders.'],
+      passCount:3,
+      questions:[
+        { type:'prompt', prompt:'href for the stylesheet, written inside index.html:', answer:['css/styles.css', './css/styles.css'] },
+        { type:'prompt', prompt:'src for the script tag, written inside index.html:', answer:['js/script.js', './js/script.js'] },
+        { type:'prompt', prompt:'src for the dog image, written inside index.html:', answer:['images/dog.jpg', './images/dog.jpg'] },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+  ]},
   // ── Semester 1, Week 2: Your First Tags — new for the 3-semester rebuild.
   // Real typed HTML via the existing lang:'web' editor (Web Story's own
   // mechanism), checked via webLog's real element counts.
