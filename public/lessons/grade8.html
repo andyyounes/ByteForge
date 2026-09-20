@@ -1633,6 +1633,39 @@ const MODULES = [
                   && log.bgColor !== log.headingColor
                   && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40,
     },
+    { id:'web5s2b', name:'Your First Variable — Alone', xp:30, lang:'web',
+      text:`<strong>Before any clicking</strong> — a JS variable, displayed on the page, with no button at all yet. Create a variable holding your favorite animal's name, then show it inside a paragraph using <code>.textContent</code>.`,
+      hints:[
+        'let animal = "Red Panda"; — the SAME "let name = value" shape as every other variable you\'ve seen.',
+        'document.querySelector("#animal-name").textContent = animal; — this is what actually puts the variable\'s VALUE onto the page.',
+        'Nothing needs to be clicked for this one — the variable just needs to show up the moment the page runs.',
+      ],
+      webStarter: {
+        html: `<h1>About Me</h1>\n<p id="animal-name">Loading...</p>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
+        js: `// TODO: a variable holding your favorite animal, shown inside #animal-name\n`,
+      },
+      check:(log) => {
+        const m = log.js.match(/\b(?:let|const|var)\s+(\w+)\s*=/)
+        if (!m) return false
+        const usesRe = new RegExp('\\.(?:textContent|innerText)\\s*=\\s*[^;]*\\b' + m[1] + '\\b')
+        return usesRe.test(log.js)
+      },
+    },
+    { id:'web5s2c', name:'Combining Text and a Variable', xp:30, lang:'web',
+      text:`<strong>Challenge</strong> — Join a plain piece of text together with a variable's value using <code>+</code> — the exact same joining trick you already know from Python string concatenation, just in JS. Show a sentence like "My favorite animal is Red Panda" — NOT just the animal name alone.`,
+      hints:[
+        '"My favorite animal is " + animal — text in quotes, then +, then the variable name (no quotes on the variable).',
+        'Don\'t forget the space at the end of the quoted text, or the words will run together.',
+        'Assign the WHOLE combined sentence to .textContent in one go.',
+      ],
+      webStarter: {
+        html: `<h1>About Me</h1>\n<p id="animal-sentence">Loading...</p>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
+        js: `let animal = "Red Panda";\n// TODO: combine "My favorite animal is " with the animal variable, show it in #animal-sentence\n`,
+      },
+      check:(log) => /\.(?:textContent|innerText)\s*=\s*["'][^"']*["']\s*\+\s*\w+/.test(log.js) || /\.(?:textContent|innerText)\s*=\s*\w+\s*\+\s*["'][^"']*["']/.test(log.js),
+    },
     { id:'web5s3', name:'One Button, One Change', xp:40, lang:'web',
       text:`<strong>Sessions 5-6</strong> — Add ONE button. When clicked, it changes ONE piece of text on the page (e.g. reveals a fun fact). This is the FIRST real JavaScript idea this semester — one click, one change.`,
       hints:[

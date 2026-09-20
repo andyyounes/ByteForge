@@ -42,6 +42,10 @@ function stripPyComments(code) { return code.replace(/#.*$/gm, '') }
 // code-regex convention every Python stage below uses.
 const webMaximalLog = () => ({
   html: '<!DOCTYPE html>\n<html>\n<head>\n<title>My Page</title>\n</head>\n<body>\n<h1>My Page</h1>\n<h2>Sub</h2>\n<img src="x" alt="x">\n<p>Text</p>\n</body>\n</html>',
+  // Raw JS source — needed by checks (web5s2b/web5s2c) that inspect log.js
+  // directly (a declared variable's name later appearing in a textContent
+  // assignment) rather than relying only on the pre-computed hasX flags below.
+  js: 'let animal = "Red Panda"; document.querySelector("#x").textContent = "My favorite animal is " + animal;',
   bodyText: 'true false you see 1. item 3 items ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
   hasFunction: true, functionCount: 999, hasReturn: true, hasIf: true,
   hasLSSet: true, hasLSGet: true, hasLSRemove: true, hasJSONStringify: true, hasJSONParse: true,
@@ -61,7 +65,7 @@ const webMaximalLog = () => ({
   h2Color: 'rgb(124, 58, 237)', h3Color: 'rgb(5, 150, 105)', pColor: 'rgb(75, 85, 99)',
   linkColor: 'rgb(29, 78, 216)', buttonBg: 'rgb(230, 57, 70)', buttonColor: 'rgb(255, 255, 255)',
   hasVariable: true, imgCount: 1, imgAltOk: true, pageTitle: 'My Favorite Animal' })
-const webEmptyLog   = () => ({ html: '', bodyText: '', hasArray: false, hasObject: false, hasPush: false,
+const webEmptyLog   = () => ({ html: '', js: '', bodyText: '', hasArray: false, hasObject: false, hasPush: false,
   hasFunction: false, functionCount: 0, hasReturn: false, hasIf: false,
   hasLSSet: false, hasLSGet: false, hasLSRemove: false, hasJSONStringify: false, hasJSONParse: false,
   hasLoop: false, listItems: 0,
