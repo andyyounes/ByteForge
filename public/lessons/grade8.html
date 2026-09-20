@@ -1721,6 +1721,30 @@ const MODULES = [
   // runWebCode/checkWebChallenge), not a code string — unlike this file's
   // Python stages below, which check(code) the raw Python source directly.
   { id:'ws1', name:'📗 Web Story 1 — Remembering the Reader', sub:'Arrays and objects — a story that tracks the reader\'s inventory and flags', live:true, stages:[
+    { id:'ws1s0', name:'Just Make an Array', xp:20, lang:'web',
+      text:`<strong>Before displaying anything</strong> — just CREATE an array called <code>inventory</code> holding at least 2 items (e.g. "sword", "shield"). No display needed yet — the array itself, sitting in a variable, is the whole challenge.`,
+      hints:[
+        'let inventory = ["sword", "shield"]; — square brackets, items separated by commas.',
+        'Nothing needs to show on the page for this one — just the array existing is enough.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: create an array called inventory with at least 2 items — nothing to display yet\n`,
+      },
+      check:(log) => {
+        // A source-level check, not a runtime one — `let`/`const` never
+        // attach to `window`, so there is no such thing as inspecting a
+        // let-declared array's real value without ALSO requiring it be
+        // displayed somewhere, defeating the point of this "no display
+        // needed yet" stage. Instead: find the array literal itself in the
+        // source and count its comma-separated entries directly.
+        const m = log.js.match(/\[([^\]]*)\]/)
+        if (!m) return false
+        const items = m[1].split(',').map(s => s.trim()).filter(Boolean)
+        return log.hasArray && items.length >= 2
+      },
+    },
     { id:'ws1s1', name:'Your First Array', xp:25, lang:'web',
       text:`<strong>Challenge 1</strong> — In JS, create an array <code>inventory</code> with at least 2 items (e.g. "sword", "shield"). Display them, joined by commas, inside the <code>#story</code> div in the HTML.`,
       hints:[
@@ -1811,6 +1835,26 @@ const MODULES = [
   ]},
   // ── Web Story 2 — Semester 1, Week 2: functions organizing story logic ────
   { id:'ws2', name:'📘 Web Story 2 — Organizing the Telling', sub:'Functions — reusable, named pieces of story logic', live:true, stages:[
+    { id:'ws2s0', name:'Your First Function — No Inputs Yet', xp:20, lang:'web',
+      text:`<strong>Before parameters</strong> — write <code>function greet()</code> with NO inputs at all, that RETURNS a fixed greeting like "Welcome, traveler!". Call it (with empty parentheses) and display the result inside <code>#story</code>.`,
+      hints:[
+        'function greet() { return "Welcome, traveler!"; } — empty parentheses means no parameters.',
+        'document.getElementById("story").textContent = greet(); — calling it also uses empty parentheses.',
+        'This is a function that always returns the SAME thing every time — parameters (letting it return something DIFFERENT each call) come next.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: function greet() with NO parameters, RETURNS a fixed greeting\n\n// TODO: call greet() and show the result in #story\n`,
+      },
+      check:(log) => {
+        if (!log.hasFunction || !log.hasReturn) return false
+        const m = log.js.match(/function\s+(\w+)\s*\(\s*\)/)
+        if (!m) return false
+        const callRe = new RegExp('\\b' + m[1] + '\\s*\\(\\s*\\)')
+        return callRe.test(log.js.slice(m.index + m[0].length)) && log.bodyText.trim().length > 0
+      },
+    },
     { id:'ws2s1', name:'Your First Story Function', xp:25, lang:'web',
       text:`<strong>Challenge 1</strong> — Write <code>function describeItem(name)</code> that RETURNS the text "You see a " + name + ".". Call it with an item name and display the RESULT inside <code>#story</code>.`,
       hints:[
@@ -1962,6 +2006,20 @@ const MODULES = [
   ]},
   // ── Web Story 4 — Semester 1, Week 4: loops generating repeated UI ─────────
   { id:'ws4', name:'🔁 Web Story 4 — One Loop, Many Choices', sub:'A loop that builds page elements — one per item, automatically', live:true, stages:[
+    { id:'ws4s0', name:'Just Loop — No Array Yet', xp:20, lang:'web',
+      text:`<strong>Before looping over an array</strong> — just use a loop to count from 1 to 5, building up one growing piece of text ("1 2 3 4 5") and displaying it in <code>#story</code>. No array, no page elements yet — just a loop repeating 5 times.`,
+      hints:[
+        'for (let i = 1; i <= 5; i++) { ... } — repeats the code inside exactly 5 times, with i counting 1, 2, 3, 4, 5.',
+        'Build up a growing piece of text INSIDE the loop: let text = ""; then, each time round, text = text + i + " ";',
+        'Display the finished text AFTER the loop ends, not once per number.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: loop from 1 to 5, building up "1 2 3 4 5" and showing it in #story\n`,
+      },
+      check:(log) => log.hasLoop && /1\D+2\D+3\D+4\D+5/.test(log.bodyText),
+    },
     { id:'ws4s1', name:'A List of Choices', xp:30, lang:'web',
       text:`<strong>Challenge 1</strong> — Given an array of choices, use a LOOP to add one &lt;li&gt; per item into a &lt;ul id="choices"&gt; — not three separate lines of code copy-pasted.`,
       hints:[
