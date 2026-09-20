@@ -2171,6 +2171,163 @@ const MISSIONS = [
     },
     stars: { metric: 'turns', par: 9 },
   },
+
+  // ── Phase 4 · The Archive — recursion. Grade 9 originally had only ONE
+  // recursion mission anywhere (p0bm6, back in Foundations) and nothing
+  // after Phase 3's capstone — this closes both gaps: a real dedicated
+  // phase, and recursion actually taught (learn bubble) before being used.
+  {
+    id: 'learn-recursion', type: 'learn', phase: 'PHASE 4 · THE ARCHIVE', emoji: '🌀', title: 'What Is Recursion?',
+    hints: ['Re-watch the video or re-read the theory panel, then try the Match-Up again.'], xp: 15,
+    brief: 'Before writing any recursive function — what recursion actually IS, and the one rule every recursive function must follow.',
+    api: [],
+    learn: {
+      videoQuery: 'recursion explained GCSE computer science',
+      terms: [
+        { term: 'Recursion', def: 'A function that calls ITSELF, working on a smaller version of the same problem each time.' },
+        { term: 'Base case', def: 'The condition that STOPS the recursion — without one, a recursive function calls itself forever.' },
+        { term: 'Recursive case', def: 'The part where the function calls itself again, with a smaller/simpler input than it received.' },
+        { term: 'Call stack', def: 'Where the computer keeps track of every "paused" call waiting for the one below it to finish and return a value.' },
+      ],
+      theory: `
+        <h4>The one rule: every recursive function needs a base case</h4>
+        <p>Recursion means a function calls ITSELF — but if it always called itself, it would never stop. Every recursive function needs a <b>base case</b>: a condition simple enough to answer directly, with no further recursive call. Everything else is the <b>recursive case</b> — call yourself again with a SMALLER version of the problem, moving closer to that base case every time.</p>
+        <h4>Worked example: Countdown(3)</h4>
+        <p><code>Countdown(3)</code> calls <code>Countdown(2)</code>, which calls <code>Countdown(1)</code>, which calls <code>Countdown(0)</code> — the base case, which just returns "Liftoff!" directly, no further call. Each paused call is waiting on the <b>call stack</b> for the one below it to finish, then they unwind back up, each one adding its own number onto the result: "1 Liftoff!", then "2 1 Liftoff!", then "3 2 1 Liftoff!".</p>
+        <h4>Recursion vs a loop</h4>
+        <p>Almost anything recursion can do, a loop can also do — recursion isn't magic, it's just a different way of repeating something, one that's often a more NATURAL fit for problems that are themselves built from smaller copies of themselves (like exploring nested folders, or nested data).</p>`,
+    },
+  },
+  {
+    id: 'p4m1', type: 'data', phase: 'PHASE 4 · THE ARCHIVE', emoji: '🚀', title: 'Countdown, Recursively',
+    hints: ["The base case is n = 0 — return \"Liftoff!\" directly, no further call.", "The recursive case: return the number, a space, then Countdown(n - 1) — the SAME function, one smaller."],
+    xp: 40,
+    brief: 'Write a recursive FUNCTION <code>Countdown(n)</code>: base case <code>n = 0</code> returns "Liftoff!"; otherwise it returns the number, a space, then calls itself with <code>n - 1</code>. Call it with n=5 and <code>answer()</code> the result.',
+    api: ['answer(value)'],
+    require: 'function',
+    dataTitle: 'Launch Sequence', dataFields: [],
+    data: [],
+    starter: {
+      py: 'def countdown(n):\n    # TODO: base case n == 0 returns "Liftoff!"\n    # TODO: otherwise return str(n) + " " + countdown(n - 1)\n    pass\n\nanswer(countdown(5))\n',
+      ps: 'FUNCTION Countdown(n : INTEGER) RETURNS STRING\n    // TODO: base case n = 0 — RETURN "Liftoff!"\n    // TODO: otherwise RETURN n + " " + Countdown(n - 1) — + joins a number and text automatically\nENDFUNCTION\n\nanswer(Countdown(5))\n',
+    },
+    answer: '5 4 3 2 1 Liftoff!',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p4m2', type: 'data', phase: 'PHASE 4 · THE ARCHIVE', emoji: '📦', title: 'Sum a Row of Cargo, Recursively',
+    hints: ["Base case: i is past the last row (i >= number of rows) — return 0.", "Recursive case: this row's weight + SumFrom(the NEXT index) — the same function, one row further along."],
+    xp: 45,
+    brief: 'No loop this time — write a recursive FUNCTION <code>SumFrom(i)</code> that adds up <code>data</code> starting from row <code>i</code>: base case is running off the end of the data (return 0); otherwise this row\'s weight plus <code>SumFrom(i + 1)</code>.',
+    api: ['answer(value)'],
+    require: 'function',
+    dataTitle: 'Cargo Manifest', dataFields: ['item', 'weight'],
+    data: [{ item: 'Water', weight: 4 }, { item: 'Food', weight: 8 }, { item: 'Tools', weight: 15 }, { item: 'Spare Parts', weight: 16 }, { item: 'Fuel Cell', weight: 23 }],
+    starter: {
+      py: "def sumFrom(i):\n    # TODO: base case — i >= len(data) — return 0\n    # TODO: otherwise return data[i]['weight'] + sumFrom(i + 1)\n    pass\n\nanswer(sumFrom(0))\n",
+      ps: 'FUNCTION SumFrom(i : INTEGER) RETURNS INTEGER\n    // TODO: base case — i > dataCount — RETURN 0\n    // TODO: otherwise RETURN dataWeight[i] + SumFrom(i + 1)\nENDFUNCTION\n\nanswer(SumFrom(1))\n',
+    },
+    answer: 66,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p4m3', type: 'data', phase: 'PHASE 4 · THE ARCHIVE', emoji: '🔢', title: 'Digit Sum',
+    hints: ["Base case: n < 10 — it's already a single digit, return it directly.", "Recursive case: (n MOD 10) is the LAST digit; (n DIV 10) is everything else — add the last digit to DigitSum of the rest."],
+    xp: 40,
+    brief: 'Write a recursive FUNCTION <code>DigitSum(n)</code> that adds up every digit of a number — e.g. 4829 → 4+8+2+9 = 23. Base case: a single digit (n &lt; 10) returns itself. Otherwise: the last digit (n MOD 10) plus <code>DigitSum</code> of the rest (n DIV 10).',
+    api: ['answer(value)'],
+    require: 'function',
+    dataTitle: 'Access Code', dataFields: [],
+    data: [],
+    starter: {
+      py: 'def digitSum(n):\n    # TODO: base case n < 10 — return n\n    # TODO: otherwise return (n % 10) + digitSum(n // 10)\n    pass\n\nanswer(digitSum(4829))\n',
+      ps: 'FUNCTION DigitSum(n : INTEGER) RETURNS INTEGER\n    // TODO: base case n < 10 — RETURN n\n    // TODO: otherwise RETURN (n MOD 10) + DigitSum(n DIV 10)\nENDFUNCTION\n\nanswer(DigitSum(4829))\n',
+    },
+    answer: 23,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p4m4', type: 'data', phase: 'PHASE 4 · THE ARCHIVE', emoji: '⚡', title: 'Power, Recursively',
+    hints: ["Base case: exp = 0 — anything to the power 0 is 1.", "Recursive case: base * Power(base, exp - 1) — one multiplication, then hand the rest to yourself."],
+    xp: 45,
+    brief: 'Write a recursive FUNCTION <code>Power(base, exp)</code> computing base^exp WITHOUT using any built-in power operator. Base case: exp = 0 returns 1. Otherwise: base multiplied by <code>Power(base, exp - 1)</code>. Call it with base=3, exp=4.',
+    api: ['answer(value)'],
+    require: 'function',
+    dataTitle: 'Signal Amplifier', dataFields: [],
+    data: [],
+    starter: {
+      py: 'def power(base, exp):\n    # TODO: base case exp == 0 — return 1\n    # TODO: otherwise return base * power(base, exp - 1)\n    pass\n\nanswer(power(3, 4))\n',
+      ps: 'FUNCTION Power(base : INTEGER, exp : INTEGER) RETURNS INTEGER\n    // TODO: base case exp = 0 — RETURN 1\n    // TODO: otherwise RETURN base * Power(base, exp - 1)\nENDFUNCTION\n\nresult ← Power(3, 4)\nanswer(result)\n',
+    },
+    answer: 81,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p4m5', type: 'data', phase: 'PHASE 4 · THE ARCHIVE', emoji: '🐚', title: 'Fibonacci',
+    hints: ["Base case: n <= 1 — return n directly (Fib(0)=0, Fib(1)=1).", "Recursive case: Fib(n - 1) + Fib(n - 2) — TWO recursive calls this time, not one."],
+    xp: 50,
+    brief: 'Write a recursive FUNCTION <code>Fib(n)</code> — the classic Fibonacci sequence (0, 1, 1, 2, 3, 5, 8...), where each number is the sum of the two before it. Base case: n ≤ 1 returns n. Otherwise: <code>Fib(n - 1) + Fib(n - 2)</code>. Call it with n=10.',
+    api: ['answer(value)'],
+    require: 'function',
+    dataTitle: 'Signal Pattern', dataFields: [],
+    data: [],
+    starter: {
+      py: 'def fib(n):\n    # TODO: base case n <= 1 — return n\n    # TODO: otherwise return fib(n - 1) + fib(n - 2)\n    pass\n\nanswer(fib(10))\n',
+      ps: 'FUNCTION Fib(n : INTEGER) RETURNS INTEGER\n    // TODO: base case n <= 1 — RETURN n\n    // TODO: otherwise RETURN Fib(n - 1) + Fib(n - 2)\nENDFUNCTION\n\nanswer(Fib(10))\n',
+    },
+    answer: 55,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p4m6', type: 'quiz', phase: 'PHASE 4 · THE ARCHIVE', emoji: '⚖️', title: 'Recursion vs Loops — Which One?',
+    hints: ['Fib(n) recomputes the SAME smaller Fib values over and over — that repeated work is what makes it slow.', 'Every paused recursive call sits on the call stack, waiting — a loop has no such stack of pending calls.'],
+    xp: 25,
+    brief: 'Recursion isn\'t always the best tool — a quick check on when it costs you.',
+    quiz: {
+      intro: 'Think back to Fibonacci, and to how a loop repeats versus how recursion does.',
+      questions: [
+        { prompt: 'Fib(30) computed the naive recursive way recalculates the SAME smaller values many times over. This makes it:',
+          options: ['Very slow', 'Very fast', 'Impossible', 'Illegal'], answer: 'Very slow' },
+        { prompt: 'Deep recursion uses more of a computer\'s ___ than an equivalent loop, since every paused call sits on the call stack waiting.',
+          options: ['Memory', 'Screen space', 'Electricity', 'Time zone'], answer: 'Memory' },
+        { prompt: 'The condition that STOPS a recursive function from calling itself forever is called the:',
+          options: ['Base case', 'Recursive case', 'Call stack', 'Loop counter'], answer: 'Base case' },
+      ],
+    },
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p4m7', type: 'data', phase: 'PHASE 4 · THE ARCHIVE', emoji: '🔍', title: 'Recursive Search',
+    hints: ["Base case: i is past the last row — return 0 (nothing left to check).", "Recursive case: (1 if this row matches the target else 0) + CountMatches(the next index) — check one row, then hand the rest to yourself."],
+    xp: 45,
+    brief: 'Write a recursive FUNCTION <code>CountMatches(i, target)</code> counting how many rows in <code>data</code> equal <code>target</code>, starting the search from row <code>i</code>. No loop — each call checks ONE row, then recurses on the rest. Call it with i=0 (or 1 in pseudocode), target=3.',
+    api: ['answer(value)'],
+    require: 'function',
+    dataTitle: 'Archive Fragment', dataFields: ['value'],
+    data: [{ value: 3 }, { value: 7 }, { value: 3 }, { value: 9 }, { value: 3 }, { value: 1 }, { value: 3 }, { value: 2 }, { value: 8 }],
+    starter: {
+      py: "def countMatches(i, target):\n    # TODO: base case i >= len(data) — return 0\n    # TODO: otherwise (1 if data[i]['value'] == target else 0) + countMatches(i + 1, target)\n    pass\n\nanswer(countMatches(0, 3))\n",
+      ps: 'FUNCTION CountMatches(i : INTEGER, target : INTEGER) RETURNS INTEGER\n    // TODO: base case i > dataCount — RETURN 0\n    // TODO: otherwise set match to 1 if dataValue[i] = target, else 0 (just match ← 1, no DECLARE needed)\n    // TODO: RETURN match + CountMatches(i + 1, target)\nENDFUNCTION\n\nresult ← CountMatches(1, 3)\nanswer(result)\n',
+    },
+    answer: 4,
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'p4boss', type: 'data', phase: 'PHASE 4 · CAPSTONE', emoji: '🏆', boss: true, title: 'BOSS — Decode the Archive',
+    hints: ["Same shape as SumFrom, but add a check: only add THIS row's value if it's even (value MOD 2 = 0).", "Get the rest of the sum FIRST via the recursive call, then decide whether to add this row's value on top."],
+    xp: 80,
+    brief: 'Everything from this phase, combined. Write a recursive FUNCTION <code>SumEven(i)</code> that sums only the EVEN values in <code>data</code> — a base case, a recursive call, AND a decision, all in one function.',
+    api: ['answer(value)'],
+    require: 'function',
+    dataTitle: 'Archive Core', dataFields: ['value'],
+    data: [{ value: 12 }, { value: 7 }, { value: 20 }, { value: 15 }, { value: 8 }, { value: 33 }, { value: 14 }],
+    starter: {
+      py: "def sumEven(i):\n    # TODO: base case i >= len(data) — return 0\n    # TODO: rest = sumEven(i + 1)\n    # TODO: if data[i]['value'] is even, return data[i]['value'] + rest, else return rest\n    pass\n\nanswer(sumEven(0))\n",
+      ps: 'FUNCTION SumEven(i : INTEGER) RETURNS INTEGER\n    // TODO: base case i > dataCount — RETURN 0\n    // TODO: rest ← SumEven(i + 1) — no DECLARE needed, assigning a new name creates it\n    // TODO: IF (dataValue[i] MOD 2) = 0 THEN RETURN dataValue[i] + rest ELSE RETURN rest\nENDFUNCTION\n\nanswer(SumEven(1))\n',
+    },
+    answer: 54,
+    stars: { metric: 'pass' },
+  },
 ]
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2741,6 +2898,7 @@ function execPseudo(src, mission, battleEnv) {
         if (t === '*') { i++; v = v * primary() }
         else if (t === '/') { i++; v = v / primary() }
         else if (low(t) === 'mod') { i++; v = v % primary() }
+        else if (low(t) === 'div') { i++; v = Math.trunc(v / primary()) }
         else return v
       }
     }
