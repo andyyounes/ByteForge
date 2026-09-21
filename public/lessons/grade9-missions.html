@@ -902,14 +902,14 @@ const MISSIONS = [
   },
   {
     id: 'cbboss', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🏆', title: 'BOSS — Your First Program',
-    hints: ["str(health) turns the NUMBER into text so you can join it with other text using +.", "Build it piece by piece: callsign + \" \" + str(health), then answer() the whole thing."], xp: 45,
+    hints: ["In Python, str(health) turns the NUMBER into text first. In pseudocode, + joins a number directly — no conversion needed.", "Build it piece by piece: callsign + \" \" + health, then answer() the whole thing."], xp: 45,
     brief: 'Combine everything: store a callsign (text) and health (a number, starts at 100, then drops by 25). <code>str(health)</code> converts the NUMBER into text so it can be joined with other text. answer() the combined message.',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
     data: [],
     starter: {
       py: 'callsign = "Nova"\nhealth = 100\nhealth = health - 25\n# TODO: answer() callsign + " has " + str(health) + " HP"\n# str(health) turns the NUMBER into text so + can join it with other text\n',
-      ps: 'callsign ← "Nova"\nhealth ← 100\nhealth ← health - 25\n// TODO: answer() callsign & " has " & STR(health) & " HP"\n// STR(health) turns the NUMBER into text so it can join with other text\n',
+      ps: 'callsign ← "Nova"\nhealth ← 100\nhealth ← health - 25\n// TODO: answer() callsign + " has " + health + " HP"\n// + joins text and a number automatically — no separate conversion needed\n',
     },
     answer: 'Nova has 75 HP',
     stars: { metric: 'pass' },
@@ -919,14 +919,14 @@ const MISSIONS = [
     // comparison feeding into the message via a Boolean, tying cb6's new
     // skill into the same combine-everything capstone spirit.
     id: 'cbboss2', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🎖️', title: 'BOSS — Three Values, One Message',
-    hints: ["Build the message in pieces with +, converting every number with str() first: callsign + \": \" + str(score) + \" points, complete=\" + str(complete)", "complete should be the RESULT of a comparison (score >= 100), not typed in by hand."], xp: 55,
+    hints: ["In Python, convert every number/Boolean with str() first: callsign + \": \" + str(score) + \" points, complete=\" + str(complete). In pseudocode, + joins them directly with no conversion needed.", "complete should be the RESULT of a comparison (score >= 100), not typed in by hand."], xp: 55,
     brief: 'Store a callsign (text), a score (number), and whether the mission is complete (score >= 100, a Boolean). answer() "<callsign>: <score> points, complete=<True/False>" — e.g. "Nova: 120 points, complete=True".',
     api: ['answer(value)'],
     dataTitle: 'First Steps', dataFields: [],
     data: [],
     starter: {
       py: 'callsign = "Nova"\nscore = 120\ncomplete = score >= 100\n# TODO: answer() callsign + ": " + str(score) + " points, complete=" + str(complete)\n',
-      ps: 'callsign ← "Nova"\nscore ← 120\ncomplete ← score >= 100\n// TODO: answer() callsign & ": " & STR(score) & " points, complete=" & STR(complete)\n',
+      ps: 'callsign ← "Nova"\nscore ← 120\ncomplete ← score >= 100\n// TODO: msg ← callsign + ": " + score + " points, complete=" + complete\n// TODO: answer(msg)\n// + joins text, numbers, and True/False together automatically\n',
     },
     answer: 'Nova: 120 points, complete=True',
     stars: { metric: 'pass' },
