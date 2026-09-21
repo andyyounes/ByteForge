@@ -311,6 +311,14 @@
 <nav class="nav">
   <div class="nav-logo"><span class="bolt">⚡</span><span>ByteForge · 🌊 Deep Diver</span></div>
   <div style="display:flex;align-items:center;gap:16px;">
+    <!-- One persistent, ALWAYS-visible way back to the map, regardless of
+         which of the 5 different mission-view templates (main/learn/quiz/
+         cards/flowchart) or the Tournament screen is currently showing —
+         matching Grade 6/7/8's single always-present map link, rather than
+         relying only on each template's own separate "☰ Missions" button
+         (still there too, unchanged) or the win-screen's "Mission list"
+         button, which only appear once you're already inside a mission. -->
+    <a href="#" onclick="mbarBack(); return false;" style="color:#67e8f9;font-weight:700;">🌊 Deep Diver Map</a>
     <a href="#" onclick="openToolkit(); return false;">🧰 Project Toolkit</a>
     <a href="/student/dashboard">← Dashboard</a>
   </div>
@@ -1140,16 +1148,22 @@ const MISSIONS = [
   },
   {
     id: 'p0m5', type: 'data', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '🏷️', title: 'Pick the Type',
-    hints: ["Look at HOW the value is written: quotes around it = string, decimal point = float, no quotes/no decimal = integer, True/False = Boolean."], xp: 30,
-    brief: 'Not everything that LOOKS like a number IS one. answer() the type name of the mystery value below.',
+    // Answer key is the Cambridge pseudocode type name (INTEGER/REAL/STRING/
+    // BOOLEAN), not Python's own type(x).__name__ spelling (str/int/float/
+    // bool) — both starters now explicitly ask for THIS spelling either way,
+    // so a Python student does the (intentional, valuable) small mental
+    // translation from str -> STRING rather than just typing type(x).__name__
+    // verbatim and silently landing on a different, ungraded word.
+    hints: ["Look at HOW the value is written: quotes around it = STRING, decimal point = REAL, no quotes/no decimal = INTEGER, True/False = BOOLEAN.", "Whichever language you're in, answer() the CAMBRIDGE type name — INTEGER, REAL, STRING, or BOOLEAN — not Python's own str/int/float/bool spelling."], xp: 30,
+    brief: 'Not everything that LOOKS like a number IS one. answer() the Cambridge type name of the mystery value below — INTEGER, REAL, STRING, or BOOLEAN.',
     api: ['answer(value)'],
     dataTitle: 'Mystery Value', dataFields: ['value'],
     data: [{ value: '"7"' }],
     starter: {
-      py: 'x = "7"\n# TODO: answer() the name of x\'s type\n# Hint: type(x).__name__ gives the type as text, e.g. "int" or "str"\n',
-      ps: '// x ← "7"\n// TODO: answer() the data type of x: INTEGER, REAL, STRING, or BOOLEAN\n// Quotes around a value mean it\'s TEXT, even if it looks like a number\n',
+      py: 'x = "7"\n# TODO: what Python type is x? (type(x).__name__ gives you Python\'s own name for it)\n# TODO: answer() the CAMBRIDGE name for that type instead: "INTEGER", "REAL", "STRING", or "BOOLEAN"\n',
+      ps: '// x ← "7"\n// TODO: answer() the data type of x: "INTEGER", "REAL", "STRING", or "BOOLEAN"\n// Quotes around a value mean it\'s TEXT, even if it looks like a number\n',
     },
-    answer: 'str',
+    answer: 'STRING',
     stars: { metric: 'pass' },
   },
   {
@@ -5044,6 +5058,7 @@ function closeDuel() {
 }
 function mbarBack() {
   if (document.body.classList.contains('duel-mode')) closeDuel()
+  else if (document.getElementById('tourney')?.classList.contains('open')) closeTourney()
   else showJourney()
 }
 
