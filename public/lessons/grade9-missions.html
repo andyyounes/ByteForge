@@ -2914,11 +2914,21 @@ function execPseudo(src, mission, battleEnv) {
           return f(...args)
         }
         let v = getVar(name, ln)
-        while (peek() === '[') {        // 1-based array indexing
+        while (peek() === '[') {        // 1-based array/string indexing
           i++
           const idx = orExpr()
           if (toks[i++] !== ']') throw { message: 'Missing ]', ln }
-          if (!Array.isArray(v)) throw { message: t + ' is not an array', ln }
+          // A string indexes to its i-th CHARACTER (still 1-based, same
+          // convention as arrays) — needed for any mission that processes
+          // a row of a bitmap/text data field character by character
+          // (confirmed real gap: p0m7/p0m8's own starters ask students to
+          // index dataRow[i] this way and had no way to actually do it).
+          if (typeof v === 'string') {
+            if (idx < 1 || idx > v.length) throw { message: 'Index ' + idx + ' is outside ' + t + ' (1..' + v.length + ')', ln }
+            v = v[idx - 1]
+            continue
+          }
+          if (!Array.isArray(v)) throw { message: t + ' is not an array or string', ln }
           if (idx < 1 || idx > v.length) throw { message: 'Index ' + idx + ' is outside ' + t + ' (1..' + v.length + ')', ln }
           v = v[idx - 1]
         }
@@ -2961,14 +2971,30 @@ function execPseudo(src, mission, battleEnv) {
       }
       return v
     }
+    // AND/OR must ALWAYS parse (consume) their right-hand side, even when
+    // the left side alone already determines the result — using real JS
+    // &&/|| short-circuiting here left the right operand's tokens
+    // unconsumed whenever short-circuiting kicked in, which the caller then
+    // saw as leftover tokens and threw a spurious "Unexpected ..." on
+    // (confirmed real bug: broke p0bm3's own hinted `i MOD 3 = 0 OR i MOD 5
+    // = 0` the moment the left side became true). Both sides are evaluated
+    // unconditionally; only the boolean COMBINING is short-circuit-free.
     function andExpr() {
+      // Raw value (NOT truthy()-coerced) as long as no real AND follows —
+      // andExpr/orExpr sit in the precedence chain of EVERY expression
+      // (evalExpr's entry point is orExpr()), so unconditionally coercing
+      // here would corrupt every plain non-boolean result (a real second
+      // regression introduced and caught while fixing the short-circuit
+      // bug below — "hello" or 5 silently became the literal value `true`
+      // for ANY expression at all, confirmed via a before/after diff
+      // against the pre-fix file).
       let v = cmpExpr()
-      while (low(peek()) === 'and') { i++; v = truthy(v) && truthy(cmpExpr()) }
+      while (low(peek()) === 'and') { i++; const r = truthy(cmpExpr()); v = truthy(v) && r }
       return v
     }
     function orExpr() {
       let v = andExpr()
-      while (low(peek()) === 'or') { i++; v = truthy(v) || truthy(andExpr()) }
+      while (low(peek()) === 'or') { i++; const r = truthy(andExpr()); v = truthy(v) || r }
       return v
     }
     const result = orExpr()
