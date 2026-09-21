@@ -183,6 +183,13 @@
   .fc-canvas-wrap { position:relative; width:100%; height:420px; background:#0a0c18;
                     border:1px solid rgba(255,255,255,.1); border-radius:10px; overflow:hidden; margin-bottom:14px; }
   .fc-canvas-wrap.connecting { cursor:crosshair; }
+  .fc-context-menu { position:fixed; display:none; flex-direction:column; z-index:200;
+    background:#161927; border:1px solid rgba(255,255,255,.18); border-radius:8px; padding:4px;
+    box-shadow:0 8px 24px rgba(0,0,0,.4); min-width:170px; }
+  .fc-context-menu.open { display:flex; }
+  .fc-context-menu div { padding:8px 12px; font-size:12.5px; font-weight:700; color:#e2e8f0;
+    border-radius:6px; cursor:pointer; white-space:nowrap; }
+  .fc-context-menu div:hover { background:rgba(103,232,249,.12); color:#67e8f9; }
   #fc-svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
   .fc-shape { position:absolute; min-width:110px; min-height:52px; display:flex; align-items:center; justify-content:center;
               padding:6px 10px; font-size:11.5px; font-weight:700; text-align:center; cursor:move; user-select:none;
@@ -450,10 +457,24 @@
         <div class="fc-palette-btn" id="fc-connect-btn" onclick="toggleConnectMode()">🔗 Connect Shapes</div>
         <div class="fc-palette-btn" onclick="clearFlowchart()">🗑 Clear</div>
       </div>
-      <div class="fc-canvas-wrap" id="fc-canvas-wrap">
+      <div class="fc-canvas-wrap" id="fc-canvas-wrap" oncontextmenu="return showFcContextMenu(event)">
         <svg id="fc-svg"></svg>
       </div>
-      <div class="fc-status" id="fc-status">Drag shapes to reposition. Click a shape's text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them — from a Decision/For/While, the FIRST arrow you draw is True/Next, the SECOND is False/Done.</div>
+      <!-- Right-click-to-add — a second, faster way to reach the SAME
+           addShape(type) the top palette buttons call, dropping the new
+           shape exactly where the canvas was right-clicked instead of the
+           palette buttons' auto-grid position. Palette buttons stay,
+           unchanged, alongside this. -->
+      <div class="fc-context-menu" id="fc-context-menu">
+        <div onclick="fcContextAdd('terminator')">⬭ Start/End</div>
+        <div onclick="fcContextAdd('declare')">🗄 Declare</div>
+        <div onclick="fcContextAdd('process')">▭ Assign</div>
+        <div onclick="fcContextAdd('decision')">◇ Decision (If)</div>
+        <div onclick="fcContextAdd('for')">⬡ For</div>
+        <div onclick="fcContextAdd('while')">⬡ While</div>
+        <div onclick="fcContextAdd('io')">▱ Output</div>
+      </div>
+      <div class="fc-status" id="fc-status">Drag shapes to reposition. Click a shape's text to edit its label. Right-click the canvas (or use the buttons above) to add a shape. Use "Connect Shapes" then click two shapes in order to draw an arrow between them — from a Decision/For/While, the FIRST arrow you draw is True/Next, the SECOND is False/Done.</div>
       <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
       <div class="g9-hint-display" id="g9-hint-display-flow"></div>
       <div class="btn-row" style="display:flex;gap:8px;">
@@ -3974,7 +3995,31 @@ function clearFlowchart() {
   document.getElementById('fc-status').textContent = 'Drag shapes to reposition. Click a shape\'s text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.'
   document.getElementById('fc-run-output').textContent = ''
 }
-function addShape(type) {
+// ── Right-click-to-add — records where on the canvas the menu was opened
+// (in canvas-local coordinates, matching how dragged/placed shapes are
+// already positioned) so the chosen shape drops exactly there.
+let _fcContextPos = null
+function showFcContextMenu(e) {
+  e.preventDefault()
+  const canvas = document.getElementById('fc-canvas-wrap')
+  const rect = canvas.getBoundingClientRect()
+  _fcContextPos = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+  const menu = document.getElementById('fc-context-menu')
+  menu.style.left = e.clientX + 'px'
+  menu.style.top = e.clientY + 'px'
+  menu.classList.add('open')
+  return false
+}
+function fcContextAdd(type) {
+  document.getElementById('fc-context-menu').classList.remove('open')
+  addShape(type, _fcContextPos || undefined)
+}
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('fc-context-menu')
+  if (menu && menu.classList.contains('open') && !menu.contains(e.target)) menu.classList.remove('open')
+})
+
+function addShape(type, pos) {
   const id = _fcNextId++
   const labelDefault = {
     terminator: 'Start', process: 'n = n + 1', decision: 'n > 10',
@@ -3982,9 +4027,13 @@ function addShape(type) {
   }[type]
   // Spread new shapes out based on how many currently exist, not `id`
   // (which keeps climbing even after deletions) — avoids everything
-  // spawning stacked in the same top-left corner.
+  // spawning stacked in the same top-left corner. Right-clicking the
+  // canvas (see fc-context-menu below) instead places the new shape
+  // exactly where the student clicked, via the optional `pos` override.
   const n = _fcShapes.length
-  const shape = { id, type, label: labelDefault, x: 20 + (n % 4) * 160, y: 20 + Math.floor(n / 4) * 130 }
+  const shape = pos
+    ? { id, type, label: labelDefault, x: pos.x, y: pos.y }
+    : { id, type, label: labelDefault, x: 20 + (n % 4) * 160, y: 20 + Math.floor(n / 4) * 130 }
   _fcShapes.push(shape)
   const el = document.createElement('div')
   el.className = 'fc-shape'
