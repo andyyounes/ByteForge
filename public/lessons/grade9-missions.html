@@ -1511,7 +1511,7 @@ const MISSIONS = [
     data: [{ weight: 64 }, { weight: 34 }, { weight: 25 }, { weight: 12 }, { weight: 22 }],
     starter: {
       py: "weights = [row['weight'] for row in data]\n# TODO: bubble sort weights — nested loops, swap adjacent out-of-order pairs\n\nanswer(','.join(str(w) for w in weights))\n",
-      ps: '// dataWeight[1..dataCount] holds the values to sort\n// TODO: bubble sort — nested FOR loops, swap adjacent out-of-order pairs\n\n// TODO: answer() the sorted values, comma-separated\n',
+      ps: '// dataWeight[1..dataCount] holds the values to sort\n// TODO: bubble sort — nested FOR loops, swap adjacent out-of-order pairs\n// A swap: temp <- dataWeight[j] then dataWeight[j] <- dataWeight[j+1] then dataWeight[j+1] <- temp\n\n// TODO: build a comma-separated string (result <- result + "," + dataWeight[i], one per loop) and answer(result)\n',
     },
     answer: '12,22,25,34,64',
     stars: { metric: 'pass' },
@@ -3112,6 +3112,22 @@ function execPseudo(src, mission, battleEnv) {
         if (rest) outputs.push(rest.split(',').map(p => String(evalExpr(p, ln))).join(' '))
         i++
         continue
+      }
+      // Array-index assignment (dataWeight[j] ← ...) — did not exist at
+      // all before (confirmed real gap: bubble sort, whose own hint
+      // explicitly says "compare neighbours, swap if out of order", is
+      // unwritable in pseudocode without this — every prior array use was
+      // read-only). Mutates the SAME array object bound in scope, matching
+      // dataEnvFor()'s per-run env.
+      const iam = t.match(/^([A-Za-z_]\w*)\s*\[\s*(.+?)\s*\]\s*(?:←|<-)\s*(.+)$/)
+      if (iam) {
+        const arrName = iam[1].toLowerCase()
+        const arr = getVar(arrName, ln)
+        if (!Array.isArray(arr)) throw { message: iam[1] + ' is not an array', ln }
+        const idx = evalExpr(iam[2], ln)
+        if (idx < 1 || idx > arr.length) throw { message: 'Index ' + idx + ' is outside ' + iam[1] + ' (1..' + arr.length + ')', ln }
+        arr[idx - 1] = evalExpr(iam[3], ln)
+        i++; continue
       }
       const am = t.match(/^([A-Za-z_]\w*)\s*(?:←|<-)\s*(.+)$/)
       if (am) { setVar(am[1].toLowerCase(), evalExpr(am[2], ln)); i++; continue }
