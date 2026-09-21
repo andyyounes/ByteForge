@@ -3001,9 +3001,12 @@ colored_tile(220, 80,  80,  40,  80, tile_size)   # red
 colored_tile(80,  200, 100, 130, 80, tile_size)   # green
 # Keep adding tiles — try making a full 3-column × 2-row grid!
 `,
+    // 4 was one short of the 3×2 = 6 tiles the task itself asks for — the
+    // starter already ships 2, so a student only had to add 2 more (a
+    // partial, non-grid-shaped 4) to pass.
     check: (code, log) => {
       const hasDef = /def\s+\w+/.test(code)
-      return hasDef && log.rects >= 4
+      return hasDef && log.rects >= 6
     },
   },
   {
@@ -3080,11 +3083,19 @@ scores = [45, 82, 19, 67, 90, 33]
 # TODO: low, high = min_and_max(scores)
 print(f"Lowest: {low}, Highest: {high}")
 `,
+    // Structural-only checks let the loop stay a bare `pass` — the starter
+    // already ships `return smallest, largest` AND the call-site TODO is the
+    // only thing left undone, so hasDef/hasTupleReturn/hasUnpack all pass
+    // without the student ever scanning the list. Require the loop body to
+    // actually reassign smallest/largest against a comparison (either the
+    // manual if-chain or min()/max() called ON the loop variable/list).
     check:(code) => {
       const hasDef = /def\s+min_and_max\s*\(/.test(code)
       const hasTupleReturn = /return\s+\w+\s*,\s*\w+/.test(code)
       const hasUnpack = /\w+\s*,\s*\w+\s*=\s*min_and_max\s*\(/.test(code)
-      return hasDef && hasTupleReturn && hasUnpack
+      const updatesSmallest = /if\s+n\s*<\s*smallest\s*:/.test(code) || /smallest\s*=\s*min\s*\(\s*smallest\s*,\s*n\s*\)/.test(code) || /smallest\s*=\s*min\s*\(\s*numbers\s*\)/.test(code)
+      const updatesLargest = /if\s+n\s*>\s*largest\s*:/.test(code) || /largest\s*=\s*max\s*\(\s*largest\s*,\s*n\s*\)/.test(code) || /largest\s*=\s*max\s*\(\s*numbers\s*\)/.test(code)
+      return hasDef && hasTupleReturn && hasUnpack && updatesSmallest && updatesLargest
     },
   },
   ]},
@@ -3151,11 +3162,13 @@ for color in colors:
     # TODO: draw a circle at (x, 130) with radius 35
     x = x + 70
 `,
+    // Text/hints explicitly ask for "at least 6 colors" — this required only
+    // 5 (satisfied by the starter's 3 tuples plus just 2 more).
     check: (code, log) => {
       const hasList = /\[/.test(code)
       const hasFor  = /for\s+\w+\s+in\s+/.test(code)
       const colorCount = (code.match(/\(\d+,\s*\d+,\s*\d+\)/g) || []).length
-      return hasList && hasFor && log.circles >= 5 && colorCount >= 5
+      return hasList && hasFor && log.circles >= 6 && colorCount >= 6
     },
   },
   {
@@ -3410,11 +3423,15 @@ for line in lines[1:]:      # skip the header row
     line = line.strip()
     # TODO: split "line" by comma into name and grade, then print both
 `,
+      // Never actually required a print() — a student could split() the line
+      // and never display anything, yet the whole task is "print each
+      // student's name and grade".
       check:(code) => {
         const hasOpen  = /open\s*\(/.test(code)
         const hasSplit = /\.split\s*\(\s*['"],['"]\s*\)/.test(code)
         const hasFor   = /for\s+\w+\s+in\s+/.test(code)
-        return hasOpen && hasSplit && hasFor
+        const hasPrint = /print\s*\(/.test(code)
+        return hasOpen && hasSplit && hasFor && hasPrint
       },
     },
     {
@@ -3598,11 +3615,14 @@ size_in_bytes = 262144000
 small_number = 42
 # TODO: print bin(small_number)
 `,
+      // Never checked the DIRECTION of the arithmetic — a student who
+      // multiplied by 1024 instead of dividing (producing a nonsense "KB"
+      // bigger than the byte count) still passed has1024/hasBin/hasPrint.
       check:(code) => {
-        const has1024 = /1024/.test(code)
+        const hasDivide = /\/\/?\s*1024/.test(code)
         const hasBin  = /\bbin\s*\(/.test(code)
         const hasPrint = (code.match(/print\s*\(/g) || []).length >= 3
-        return has1024 && hasBin && hasPrint
+        return hasDivide && hasBin && hasPrint
       },
     },
     {
@@ -3630,9 +3650,12 @@ for pixel in photo:
 
 print("Grayscale values:", grayscale)
 `,
+      // hasAvg only matched the substring "r+g+b" — never checked for a
+      // division, so appending the raw SUM (e.g. 300, not a valid 0-255
+      // grayscale value, and not an "average") passed.
       check:(code) => {
         const hasUnpack = /\w+\s*,\s*\w+\s*,\s*\w+\s*=\s*pixel/.test(code)
-        const hasAvg    = /\(\s*r\s*\+\s*g\s*\+\s*b\s*\)/.test(code) || /r\s*\+\s*g\s*\+\s*b/.test(code)
+        const hasAvg    = /\(\s*r\s*\+\s*g\s*\+\s*b\s*\)\s*\/\/?\s*3/.test(code)
         const hasAppend = /\.append\s*\(/.test(code)
         return hasUnpack && hasAvg && hasAppend
       },
@@ -4282,7 +4305,7 @@ print(f"Final score: {score}/{len(answers)} ({round(percentage)}%)")
       text:`<strong>Challenge 5 — Sort and Display</strong> — <code>highscores.txt</code> has one score per line, appended over many games. Read them all in, sort them, and print the top 3 — a real leaderboard.`,
       hints:[
         'Read every line, strip it, and int() it into a list of numbers.',
-        'sorted(scores)[-3:] gives the top 3, lowest-to-highest — reverse it (or index from the end) to show best first.',
+        'sorted(scores, reverse=True)[:3] gives the top 3, BEST first — so #1 really is the highest score.',
         'Print with a rank: for i, score in enumerate(top_3): print(f"#{i+1}: {score}")',
       ],
       files: { 'highscores.txt': '72\n85\n91\n68\n77\n95\n' },
@@ -4294,13 +4317,20 @@ for line in file.readlines():
     pass
 file.close()
 
-# TODO: top_3 = sorted(scores)[-3:]
+# TODO: top_3 = sorted(scores, reverse=True)[:3]
 top_3 = []
 
 for i, score in enumerate(top_3):
     print(f"#{i+1}: {score}")
 `,
-      check:(code) => /sorted\s*\(\s*scores\s*\)/.test(code) && /\[-3:\]/.test(code) && /scores\.append\s*\(/.test(code),
+      // sorted(scores)[-3:] (the old hint's own suggestion) gives the top 3
+      // LOWEST-first, so #1 in the printed leaderboard was the WORST of the
+      // top three, not the best — a real logic bug baked into the hint
+      // itself. Now requires the reverse=True form so best-is-#1 actually
+      // holds; also accept the equivalent sorted(scores)[-3:][::-1].
+      check:(code) => /scores\.append\s*\(/.test(code)
+        && (/sorted\s*\(\s*scores\s*,\s*reverse\s*=\s*True\s*\)\s*\[\s*:\s*3\s*\]/.test(code)
+          || /sorted\s*\(\s*scores\s*\)\s*\[-3:\]\s*\[::-1\]/.test(code)),
     },
     {
       id:'m10s6', name:'Polish & Present', xp:70,
