@@ -349,6 +349,13 @@ const REF = {
   p2m10: 'attack(enemyId[1])',
   p2m11: 'FUNCTION PickTarget() RETURNS STRING\n    RETURN enemyId[1]\nENDFUNCTION\n\n'
     + 'IF turn MOD 2 = 1 THEN\n    attack(PickTarget())\nELSE\n    wait()\nENDIF',
+  p2m12: 'attack(enemyId[1])',
+  p2m13: 'IF enemyHp[1] > 0 THEN\n    attack(enemyId[1])\nELSE\n    attack(enemyId[2])\nENDIF',
+  p2m14: 'IF turn MOD 2 = 1 THEN\n'
+    + '    IF enemyHp[1] > 0 THEN\n        attack(enemyId[1])\n    ELSE\n'
+    + '        IF enemyHp[2] > 0 THEN\n            attack(enemyId[2])\n        ELSE\n            attack(enemyId[3])\n        ENDIF\n    ENDIF\n'
+    + 'ELSE\n    wait()\nENDIF',
+  p2m15: 'IF enemyCount = 2 THEN\n    attack(enemyId[2])\nELSE\n    attack(enemyId[1])\nENDIF',
 }
 for (const [id, src] of Object.entries(REF)) {
   const m = MISSIONS.find(x => x.id === id)

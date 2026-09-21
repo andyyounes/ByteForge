@@ -1975,6 +1975,107 @@ const MISSIONS = [
     stars: { metric: 'turns', par: 4 },
   },
 
+  // ── Phase 2 · Regeneration — a genuinely new mechanic: an enemy that heals ──
+  {
+    id: 'p2m12', type: 'battle', phase: 'PHASE 2 · REGENERATION', emoji: '💚', title: 'Regeneration',
+    hints: ["Watch its HP bar — every so often it ticks UP instead of down. There's no way to stop that except finishing the fight faster.", "Just attack every turn — the question is whether your damage per turn beats its heal per turn, not some clever trick."], xp: 75,
+    brief: 'This one <b>heals itself back up</b> periodically — watch its HP rise instead of fall some turns. '
+      + 'There\'s no special trick to dodge it: just keep attacking every turn and out-damage the regen before it outlasts you.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    starter: {
+      py: "# It heals some HP back every so often — full send, every turn, no defending.\n"
+        + "attack(state['enemies'][0]['id'])\n",
+      ps: '// It heals some HP back every so often — full send, every turn, no defending.\n'
+        + 'attack(enemyId[1])\n',
+    },
+    battle: {
+      playerHp: 50, playerAttack: 14,
+      enemies: [{ id: 'e1', name: 'Regenerator', hp: 60, attack: 8, heal: ctx => (ctx.turn % 3 === 0 ? 15 : 0), dist: 3 }],
+      maxTurns: 14,
+    },
+    stars: { metric: 'turns', par: 6 },
+  },
+
+  // ── Phase 2 · Dual Rhythms — two enemies, two INDEPENDENT timed patterns ────
+  {
+    id: 'p2m13', type: 'battle', phase: 'PHASE 2 · DUAL RHYTHMS', emoji: '🥁', title: 'Twin Rhythms',
+    hints: ["Two enemies, two separate cycles — one charges on even turns, the other every 3rd turn. Track both at once, not just one.", "Killing the enemy with fewer HP first shortens how long you're exposed to BOTH cycles running together."], xp: 70,
+    brief: 'Two contacts, each with its <b>own independent timing pattern</b> — one charges on even turns, '
+      + 'the other every 3rd turn. You have to track both cycles at once, not just the one you\'ve seen before.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    starter: {
+      py: "# Two enemies, two DIFFERENT timers. state['enemies'] lists both — pick one and\n"
+        + "# chip away, watching state['turn'] for when EITHER one is about to charge.\n"
+        + "attack(state['enemies'][0]['id'])\n",
+      ps: '// Two enemies, two DIFFERENT timers. enemyId[] lists both — pick one and chip\n'
+        + '// away, watching turn for when EITHER one is about to charge.\n'
+        + 'attack(enemyId[1])\n',
+    },
+    battle: {
+      playerHp: 50, playerAttack: 14,
+      enemies: [{ id: 'e1', name: 'Pulse', hp: 20, attack: ctx => (ctx.turn % 2 === 0 ? 16 : 4), dist: 3 },
+                { id: 'e2', name: 'Tempo', hp: 24, attack: ctx => (ctx.turn % 3 === 0 ? 16 : 4), dist: 5 }],
+      maxTurns: 12,
+    },
+    stars: { metric: 'turns', par: 4 },
+  },
+
+  // ── Phase 2 · Full Squad — three enemies AND the shield, together for the ──
+  // first time (existing mechanics, new combination — no prior mission stacked
+  // this many enemies with the alternating-attack shield rule)
+  {
+    id: 'p2m14', type: 'battle', phase: 'PHASE 2 · FULL SQUAD', emoji: '🛡️', title: 'Full Squad',
+    hints: ["Same shield rule as Shield Recharge (attack(), wait(), attack(), wait()...) — it just now applies while THREE enemies are all still attacking you every turn.", "Each hit is a one-shot kill here — the only real decision is picking an order, then holding the attack/wait rhythm."], xp: 80,
+    brief: 'Three enemies at once, PLUS the shield that blocks two attacks in a row — a combination you '
+      + 'haven\'t seen yet. Alternate <b>attack()</b>/<b>wait()</b> exactly like Shield Recharge, just with '
+      + 'three targets instead of one.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    starter: {
+      py: "# Shield rule from Shield Recharge still applies: alternate attack/wait.\n"
+        + "# state['turn'] tells you which turn it is — odd turns attack, even turns wait.\n"
+        + "if state['turn'] % 2 == 1:\n    attack(state['enemies'][0]['id'])\nelse:\n"
+        + '    # TODO: wait() to let the shield drop\n    pass\n',
+      ps: '// Shield rule from Shield Recharge still applies: alternate attack/wait.\n'
+        + '// turn tells you which turn it is — odd turns attack, even turns wait.\n'
+        + 'IF turn MOD 2 = 1 THEN\n    attack(enemyId[1])\nELSE\n    // TODO: wait() to let the shield drop\nENDIF\n',
+    },
+    battle: {
+      playerHp: 40, playerAttack: 14,
+      shield: true,
+      enemies: [{ id: 'e1', name: 'Grunt A', hp: 14, attack: 5, dist: 2 },
+                { id: 'e2', name: 'Grunt B', hp: 14, attack: 5, dist: 4 },
+                { id: 'e3', name: 'Grunt C', hp: 14, attack: 6, dist: 6 }],
+      maxTurns: 12,
+    },
+    stars: { metric: 'turns', par: 5 },
+  },
+
+  // ── Phase 2 · Pre-boss — regen + a support enemy, warming up for The Gauntlet
+  {
+    id: 'p2m15', type: 'battle', phase: 'PHASE 2 · PRE-BOSS', emoji: '⚠️', title: 'Overload',
+    hints: ["Kill the non-healing support first — it doesn't regen, so it's the safer, faster kill.", "Once only the regenerator is left, race its heal timer the same way you did in Regeneration."], xp: 90,
+    brief: 'One enemy heals itself, the other doesn\'t — kill the <b>non-healing one first</b> so you '
+      + 'aren\'t fighting two problems at once, then race the regenerator\'s heal timer like before. Warm-up '
+      + 'for The Gauntlet.',
+    api: ['attack(id)', 'defend()', 'wait()'],
+    require: 'if',
+    starter: {
+      py: "# Two enemies — one heals, one doesn't. Kill the non-healer first.\n"
+        + "# TODO: pick whichever enemy in state['enemies'] has NO heal — attack it.\n"
+        + "attack(state['enemies'][0]['id'])\n",
+      ps: "// Two enemies — one heals, one doesn't. Kill the non-healer first.\n"
+        + '// TODO: pick the right target and attack it.\n'
+        + 'attack(enemyId[1])\n',
+    },
+    battle: {
+      playerHp: 55, playerAttack: 16,
+      enemies: [{ id: 'e1', name: 'Medic Drone', hp: 30, attack: 6, heal: ctx => (ctx.turn % 4 === 0 ? 10 : 0), dist: 3 },
+                { id: 'e2', name: 'Gun Drone', hp: 24, attack: 8, dist: 5 }],
+      maxTurns: 12,
+    },
+    stars: { metric: 'turns', par: 4 },
+  },
+
   // ── Phase 2 · Boss — everything at once, gates entry to Phase 3 ─────────────
   {
     id: 'p2m11', type: 'battle', phase: 'PHASE 2 · BOSS', emoji: '👹', title: 'The Gauntlet',
@@ -2534,6 +2635,26 @@ const MISSION_LESSON = {
       <p>An enemy that gets ANGRIER as it's hurt means every turn you stall or defend gives it MORE time to ramp up its attack — the correct strategy here is the direct opposite of Shields Up's caution: rush it down before the rage compounds.</p></div>
     <div class="ml-block"><h4>Reading a mechanic correctly, not just pattern-matching</h4>
       <p>If you copied Shields Up's "be cautious" instinct here, you'd actually do WORSE. Real problem-solving means reading each new situation on its own terms, not blindly reapplying whatever worked last time.</p></div>` },
+  p2m12: { title: 'A new mechanic: healing', html: `
+    <div class="ml-block"><h4>Not every fight is a race downward</h4>
+      <p>Every enemy so far has only ever lost HP. This one gains some back periodically — the fight is no longer just "attack until it's dead," it's "attack faster than it can undo your damage."</p></div>
+    <div class="ml-block"><h4>No clever trick — just arithmetic</h4>
+      <p>There's no timing pattern to dodge here; the only lever you have is attacking every single turn. The real skill is recognising when brute force IS the correct strategy, not everything needs a clever workaround.</p></div>` },
+  p2m13: { title: 'Two independent clocks running at once', html: `
+    <div class="ml-block"><h4>Tracking more than one pattern simultaneously</h4>
+      <p>Every earlier timing mission (Shields Up, Enrage) had exactly ONE clock to watch. Here there are two, on different cycles, ticking at the same time — a step up in how much state you have to hold in your head together.</p></div>
+    <div class="ml-block"><h4>Order matters when clocks overlap</h4>
+      <p>Killing the weaker enemy first shortens how long you're exposed to the SECOND enemy's cycle too — an ordering decision that only exists because two independent patterns are running at once.</p></div>` },
+  p2m14: { title: 'A familiar rule, under new pressure', html: `
+    <div class="ml-block"><h4>Same shield, three times the incoming damage</h4>
+      <p>The alternating attack/wait rhythm from Shield Recharge doesn't change — but three enemies attacking every turn (not just one) makes every wasted turn much more costly than before.</p></div>
+    <div class="ml-block"><h4>Combining mechanics doesn't always mean new code</h4>
+      <p>Sometimes "harder" just means the same rule under worse conditions, not a new rule to learn — recognising when a situation is genuinely new versus just a harsher version of something familiar is its own skill.</p></div>` },
+  p2m15: { title: 'Two problems, solved in the right order', html: `
+    <div class="ml-block"><h4>Support enemies change kill order</h4>
+      <p>A non-healing enemy is a strictly easier kill than a healing one — dealing with the easy problem first, rather than splitting your attention, is a real prioritization lesson, not just more HP to grind through.</p></div>
+    <div class="ml-block"><h4>Warm-up before the real boss</h4>
+      <p>This combines two ideas from this tier (support-first prioritization, racing a heal timer) at a smaller scale than The Gauntlet — a deliberate rehearsal before that fight asks you to combine three ideas at once under a tighter turn limit.</p></div>` },
   p2m11: { title: 'BOSS — every Phase 2 idea, at once', html: `
     <div class="ml-block"><h4>Prioritization + shield-timing + charge-timing, together</h4>
       <p>Two enemies (prioritize the cheap-and-dangerous one, from Double Trouble), a back-to-back shield (alternate attacks, from Shield Recharge), AND a 3rd-turn charge attack (from Shields Up) — nothing new, just every Phase 2 skill required simultaneously under real pressure.</p></div>
@@ -2717,6 +2838,21 @@ function simBattleTurn(state, action, mission) {
 
   for (const e of enemies) {
     if (e.hp <= 0) continue
+    // Optional per-enemy regeneration — same ctx shape as attack (number or
+    // a function of it), applied before that enemy's attack so a healed-up
+    // enemy's own attack ctx.hpFrac already reflects the new, higher HP.
+    // Capped at maxHp; visible to the student only via enemyhp[] visibly
+    // ticking UP turn to turn, same as Enrage is inferred from hpFrac alone.
+    if (e.heal) {
+      const healAmt = typeof e.heal === 'function'
+        ? e.heal({ turn: state.turn, actionType, hpFrac: e.hp / e.maxHp })
+        : e.heal
+      if (healAmt > 0) {
+        const before = e.hp
+        e.hp = Math.min(e.maxHp, e.hp + healAmt)
+        if (e.hp > before) events.push({ kind: 'enemyHeal', from: e.id, name: e.name, amount: e.hp - before, hpAfter: e.hp })
+      }
+    }
     let dmg = typeof e.attack === 'function'
       ? e.attack({ turn: state.turn, actionType, hpFrac: e.hp / e.maxHp })
       : e.attack
