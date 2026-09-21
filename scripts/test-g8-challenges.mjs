@@ -119,6 +119,17 @@ for (const ch of CHALLENGES) {
 const strip = c => c.replace(/#.*$/gm, '')
 const byId  = id => CHALLENGES.find(c => c.id === id)
 
+// web1boss required 7 paragraphs while its own instructions only describe 6
+// headings (1 h1 + 2 h2 + 1 h3 + 1 h4 + 1 h5), each with "its own paragraph"
+// — a student following the spec exactly (6 headings, 6 paragraphs) was
+// rejected until this was tightened.
+{
+  const ch = byId('web1boss')
+  const exactSpecLog = { h1Count: 1, h2Count: 2, h3Count: 1, h4Count: 1, h5Count: 1, paragraphs: 6 }
+  if (ch.check(exactSpecLog)) { pass++; console.log('✓ web1boss — correctly accepts: exactly the 6 headings/6 paragraphs the spec describes') }
+  else { fail++; console.log('✗ web1boss — REJECTS the exact 6-heading/6-paragraph structure its own instructions describe') }
+}
+
 const REJECT = [
   ['m7s3',  'safe division 1/2 never raises, so the except branch never runs',
    'try:\n    r = 1 / 2\nexcept ZeroDivisionError:\n    print("Caught it!")', {}],

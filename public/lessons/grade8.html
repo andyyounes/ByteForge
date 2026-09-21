@@ -1280,10 +1280,15 @@ const MODULES = [
       text:`<strong>BOSS</strong> — Nothing new: one full page using EVERY heading level together — h1, TWO h2 sections, and inside one of those sections a real h3, h4, AND h5 — each with its own paragraph. A real outline, not a flat list of headings.`,
       hints:[
         'This is genuinely just Challenges 1-4 combined, with an extra h2 section.',
-        'Count carefully: 1 h1, 2 h2s, 1 h3, 1 h4, 1 h5 — seven headings total, seven paragraphs.',
+        'Count carefully: 1 h1, 2 h2s, 1 h3, 1 h4, 1 h5 — six headings total, six paragraphs.',
       ],
       webStarter: { html: `<!-- TODO: h1, then h2 (with p), then another h2 (with p), and inside it h3, h4, and h5 (each with p) -->\n`, css: ``, js: `` },
-      check:(log) => log.h1Count >= 1 && log.h2Count >= 2 && log.h3Count >= 1 && log.h4Count >= 1 && log.h5Count >= 1 && log.paragraphs >= 7,
+      // Required 7 paragraphs while only requiring 6 headings (1+2+1+1+1) —
+      // the hint's own "seven headings" count was arithmetically wrong too
+      // (1+2+1+1+1=6), so a student who built exactly the described 6
+      // heading/paragraph pairs was rejected and had to add an unexplained
+      // extra paragraph.
+      check:(log) => log.h1Count >= 1 && log.h2Count >= 2 && log.h3Count >= 1 && log.h4Count >= 1 && log.h5Count >= 1 && log.paragraphs >= 6,
     },
   ]},
   // ── Semester 1, Week 3: More Tags — links vs. buttons.
