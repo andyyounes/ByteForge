@@ -1819,6 +1819,43 @@ const MODULES = [
   // runWebCode/checkWebChallenge), not a code string — unlike this file's
   // Python stages below, which check(code) the raw Python source directly.
   { id:'ws1', name:'📗 Web Story 1 — Remembering the Reader', sub:'Arrays and objects — a story that tracks the reader\'s inventory and flags', live:true, stages:[
+    { id:'ws1sdiv', name:'What Is a <div>?', xp:20, type:'quiz',
+      // Every ws1 stage hands the student a bare `<div id="story"></div>`
+      // with zero prior explanation of what a div even IS or why the id is
+      // there — this was flagged as too vague. A div has no built-in look or
+      // meaning (unlike h1/p/a) — it's just a labeled, empty box JS can find
+      // and fill in. Diagram: a little "browser window" sketch showing the
+      // div as an empty, dashed-outline box with its id tag, plus an arrow
+      // showing document.getElementById("story") reaching in to change it.
+      text:`<strong>Every page in this project starts with one mysterious line:</strong> <code>&lt;div id="story"&gt;&lt;/div&gt;</code>. Before writing any JS, let's see exactly what that is.<br><br>
+        <div style="border:1px solid var(--border-hi);border-radius:10px;padding:14px;margin:10px 0;background:var(--bg-raised);">
+          <div style="font-size:11px;color:var(--fg-faint);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase;">The page, as the browser sees it</div>
+          <div style="border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--bg-card);">
+            <div style="font-size:13px;color:var(--fg-dim);margin-bottom:8px;">&lt;h1&gt;My Story&lt;/h1&gt; <span style="opacity:.6">— a heading. The browser KNOWS how to show this: bold, big text.</span></div>
+            <div style="border:2px dashed var(--accent);border-radius:6px;padding:10px;background:transparent;">
+              <div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:4px;">&lt;div id="story"&gt;&lt;/div&gt; ← an empty BOX, with a name tag: id="story"</div>
+              <div style="font-size:12px;color:var(--fg-faint);">On its own this shows up as… nothing. No text, no border, no color. A div has NO built-in meaning — it's just a container.</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--fg-dim);margin-top:10px;">📜 <code>document.getElementById("story")</code> is JS reaching into the page and grabbing THAT exact box, by its name tag — so it can put text inside it. That's the whole reason the div is there.</div>
+        </div>
+        A <code>&lt;p&gt;</code> or <code>&lt;h1&gt;</code> already means something to the browser. A <code>&lt;div&gt;</code> means nothing by itself — it's an empty, labeled box that YOUR code fills in.`,
+      hints:[
+        'A div is a blank box — it has no special look, unlike h1 (big bold text) or p (a paragraph).',
+        'The id is just a NAME TAG on one specific box, so JS can find that exact one out of possibly many boxes on the page.',
+        'getElementById("story") means: "find the element whose id is story" — the string must match EXACTLY.',
+      ],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'What does a plain <div> look like on the page, before any JS touches it?',
+          options: ['Nothing visible — an empty box', 'Bold, large text', 'A clickable button', 'A bulleted list'], answer: 'Nothing visible — an empty box' },
+        { type:'match', prompt:'What is the id="story" attribute FOR?',
+          options: ['A name tag so JS can find that exact element', 'It makes the text bigger', 'It\'s required on every tag', 'It changes the div\'s color'], answer: 'A name tag so JS can find that exact element' },
+        { type:'match', prompt:'document.getElementById("story") does what?',
+          options: ['Finds the element whose id is "story"', 'Creates a new div called story', 'Deletes the story div', 'Changes every div on the page'], answer: 'Finds the element whose id is "story"' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
     { id:'ws1s0', name:'Just Make an Array', xp:20, lang:'web',
       text:`<strong>Before displaying anything</strong> — just CREATE an array called <code>inventory</code> holding at least 2 items (e.g. "sword", "shield"). No display needed yet — the array itself, sitting in a variable, is the whole challenge.`,
       hints:[
@@ -1900,10 +1937,51 @@ const MODULES = [
       needsArray:true, needsPush:true, needsObject:true,
       check:(log) => log.hasArray && log.hasPush && log.hasObject && /true|false/i.test(log.bodyText),
     },
+    { id:'ws1sidx', name:'Array Index, Visually', xp:20, type:'quiz',
+      // "How does the index of the array work" was flagged as too vague —
+      // ws1s4 jumped straight to inventory[0] with only a one-line hint. This
+      // isolates indexing on its own, with a real boxes-in-a-row diagram, so
+      // the "counting starts at 0" trap is SEEN, not just told.
+      text:`<strong>Before reading from an array by position</strong> — here's exactly what <code>inventory[0]</code> means, drawn out.<br><br>
+        <div style="border:1px solid var(--border-hi);border-radius:10px;padding:14px;margin:10px 0;background:var(--bg-raised);">
+          <div style="font-size:11px;color:var(--fg-faint);margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase;">let inventory = ["sword", "shield", "potion"];</div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;text-align:center;">
+              <div style="border:1px solid var(--border-hi);border-radius:6px;padding:10px 4px;background:var(--bg-card);font-size:13px;">sword</div>
+              <div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:4px;">index 0</div>
+            </div>
+            <div style="flex:1;text-align:center;">
+              <div style="border:1px solid var(--border-hi);border-radius:6px;padding:10px 4px;background:var(--bg-card);font-size:13px;">shield</div>
+              <div style="font-size:12px;color:var(--fg-dim);margin-top:4px;">index 1</div>
+            </div>
+            <div style="flex:1;text-align:center;">
+              <div style="border:1px solid var(--border-hi);border-radius:6px;padding:10px 4px;background:var(--bg-card);font-size:13px;">potion</div>
+              <div style="font-size:12px;color:var(--fg-dim);margin-top:4px;">index 2</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--fg-dim);margin-top:10px;">Counting starts at <strong>0</strong>, not 1 — so <code>inventory[0]</code> is the FIRST item ("sword"), and the LAST item ("potion") is <code>inventory[2]</code>, not <code>inventory[3]</code>, even though there are 3 items.</div>
+        </div>
+        This off-by-one trap catches everyone at first — <code>inventory.length</code> (3) and the LAST valid index (2) are always ONE APART, because length counts items but indexes count gaps-from-the-start.`,
+      hints:[
+        'The first item is always index 0, never index 1.',
+        'The last valid index is length - 1 (here, 3 items → last index is 2).',
+        'inventory[3] on a 3-item array would be reaching one box PAST the end — there\'s nothing there.',
+      ],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'inventory = ["sword", "shield", "potion"]. What is inventory[0]?',
+          options: ['"sword"', '"shield"', '"potion"', 'undefined — indexes start at 1'], answer: '"sword"' },
+        { type:'match', prompt:'Same array (3 items). What is the index of the LAST item, "potion"?',
+          options: ['2', '3', '1', '0'], answer: '2' },
+        { type:'match', prompt:'inventory.length is 3. What does inventory[3] give you?',
+          options: ['Nothing — that index is past the end of the array', '"potion", the last item', 'The whole array again', 'An error that stops the page'], answer: 'Nothing — that index is past the end of the array' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
     { id:'ws1s4', name:'Read One Item, Count Them All', xp:35, lang:'web',
       text:`<strong>Challenge 4</strong> — Start with an inventory array of 3+ items. Display the FIRST item specifically (using <code>inventory[0]</code>, not .join()) AND the total count (using <code>inventory.length</code>) — e.g. "First: sword (3 total)".`,
       hints:[
-        'inventory[0] reads just the first item — index 0, not the whole array.',
+        'inventory[0] reads just the first item — index 0, not the whole array (see the diagram from the last stage if you need a refresher).',
         'inventory.length gives you the total count as a real number, no counting by hand.',
         'Both need to appear together in your #story message.',
       ],
