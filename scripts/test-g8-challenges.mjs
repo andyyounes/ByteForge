@@ -77,6 +77,15 @@ const webMaximalLog = () => ({
   inputCount: 5, numberInputCount: 3, radioInputCount: 3,
   hasNumberConvert: true, hasToFixed: true, hasValueRead: true,
   bodyTextAfterClick: 'Tip: $20.00 Total: $120.00 Tip: $10.00 Total: $60.00 14',
+  // web7 (Real Multi-Page Websites) — log.pages[filename] mirrors this same
+  // maximal shape, one level deeper, for each page in the project.
+  currentPage: 'index.html', pageOrder: ['index.html', 'about.html'],
+  pages: {
+    'index.html': { h1s: 1, paragraphs: 1, links: 1, headingText: ['Home Page'],
+      html: '<h1>Home Page</h1><p>Welcome!</p><nav><a href="about.html">About</a></nav>' },
+    'about.html': { h1s: 1, paragraphs: 1, links: 1, headingText: ['About Page'],
+      html: '<h1>About Page</h1><p>All about me.</p><nav><a href="index.html">Home</a></nav>' },
+  },
   // Semester 1 (3-semester rebuild, web1-web4) — real element counts +
   // EXACT computed colors (getComputedStyle's rgb() form of each challenge's
   // own hex color — h1/body from #2F3B52/#FFF7E6, h2/h3/p/link/button colors
@@ -235,6 +244,16 @@ const WEB_REJECT = [
   ['web6s1', 'only 1 number input and 1 paragraph (needs 2 inputs, 3 paragraphs)', { numberInputCount: 1, buttons: 1, paragraphs: 1 }],
   ['web6s2', 'wrong math — a bug that computes the WRONG tip/total for bill=100,tip=20%', { hasNumberConvert: true, hasToFixed: true, hasClick: true, bodyTextAfterClick: 'Tip: $2.00 Total: $102.00' }],
   ['web6boss', 'quick-tip button uses the wrong percentage (not actually 20%)', { bodyTextAfterClick: 'Tip: $5.00 Total: $55.00' }],
+  ['web7s1', 'no log.pages at all (a single-page log, not a multi-page one)', {}],
+  ['web7s1', 'both pages have the SAME heading (not genuinely different content)', { pages: {
+    'index.html': { h1s: 1, paragraphs: 1, headingText: ['Same Title'] },
+    'about.html': { h1s: 1, paragraphs: 1, headingText: ['Same Title'] } } }],
+  ['web7boss', 'index.html has no link to about.html at all', { pages: {
+    'index.html': { h1s: 1, links: 0, html: '<h1>Home</h1>' },
+    'about.html': { h1s: 1, links: 1, html: '<h1>About</h1><a href="index.html">Home</a>' } } }],
+  ['web7boss', 'about.html links to itself instead of back to index.html', { pages: {
+    'index.html': { h1s: 1, links: 1, html: '<h1>Home</h1><a href="about.html">About</a>' },
+    'about.html': { h1s: 1, links: 1, html: '<h1>About</h1><a href="about.html">About</a>' } } }],
 ]
 const WEB_ACCEPT = [
   ['jsf1s2', 'a real quoted console.log message', { js: 'console.log("hi there");' }],
@@ -254,6 +273,12 @@ const WEB_ACCEPT = [
   ['web6s1', 'the full required layout', { numberInputCount: 2, buttons: 1, paragraphs: 3 }],
   ['web6s2', 'correct math for bill=100, tip=20% -> tip $20.00, total $120.00', { hasNumberConvert: true, hasToFixed: true, hasClick: true, bodyTextAfterClick: 'Tip: $20.00 Total: $120.00' }],
   ['web6boss', 'quick-tip button correctly computes 20% of bill=50 -> $10.00 tip, $60.00 total', { bodyTextAfterClick: 'Tip: $10.00 Total: $60.00' }],
+  ['web7s1', 'two pages, genuinely different headings', { pages: {
+    'index.html': { h1s: 1, paragraphs: 1, headingText: ['Home Page'] },
+    'about.html': { h1s: 1, paragraphs: 1, headingText: ['About Page'] } } }],
+  ['web7boss', 'real two-way nav, both directions present', { pages: {
+    'index.html': { h1s: 1, links: 1, html: '<h1>Home</h1><nav><a href="about.html">About</a></nav>' },
+    'about.html': { h1s: 1, links: 1, html: '<h1>About</h1><nav><a href="index.html">Home</a></nav>' } } }],
 ]
 for (const [id, label, log] of WEB_REJECT) {
   const ch = byId(id)

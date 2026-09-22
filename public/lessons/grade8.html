@@ -566,12 +566,67 @@ const webEditors = {
   js:   CodeMirror.fromTextArea(document.getElementById('web-editor-js'),   { mode:'javascript', theme:'dracula', lineNumbers:true, indentUnit:2, tabSize:2, lineWrapping:false }),
 }
 let webTab = 'html'
+// ── Multi-page project support ──────────────────────────────────────────────
+// A stage opts in via webStarter.pages = { 'index.html': '...', 'about.html':
+// '...' } instead of a single webStarter.html — CSS/JS stay SHARED across
+// every page in the project (one stylesheet/script for the whole site, same
+// as a real multi-page website). pageEditors/pageOrder/currentPage are only
+// ever populated when a multi-page stage is active; every single-page stage
+// (the vast majority of this file) leaves them empty and runs through the
+// EXACT unchanged code path it always has — see the `pageOrder.length`
+// branch in runWebCode() below.
+let pageEditors = {}, pageOrder = [], currentPage = null
+function teardownPageEditors() {
+  Object.values(pageEditors).forEach(ed => { try { ed.toTextArea() } catch (e) {} })
+  document.querySelectorAll('.page-editor-ta').forEach(el => el.remove())
+  document.querySelectorAll('.page-tab').forEach(el => el.remove())
+  pageEditors = {}; pageOrder = []; currentPage = null
+  document.getElementById('web-tab-html').style.display = ''
+}
+function setupPageEditors(pages) {
+  teardownPageEditors()
+  pageOrder = Object.keys(pages)
+  const cmOuter = document.querySelector('.cm-outer')
+  const tabBar = document.getElementById('web-tab-html').parentElement
+  document.getElementById('web-tab-html').style.display = 'none'
+  pageOrder.slice().reverse().forEach(filename => {
+    const ta = document.createElement('textarea')
+    ta.className = 'page-editor-ta'
+    cmOuter.appendChild(ta)
+    const ed = CodeMirror.fromTextArea(ta, { mode:'htmlmixed', theme:'dracula', lineNumbers:true, indentUnit:2, tabSize:2, lineWrapping:false })
+    ed.setValue(pages[filename] || '')
+    pageEditors[filename] = ed
+    const tabDiv = document.createElement('div')
+    tabDiv.className = 'web-tab page-tab'
+    tabDiv.textContent = filename
+    tabDiv.style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
+    tabDiv.onclick = () => switchPageTab(filename)
+    tabBar.insertBefore(tabDiv, document.getElementById('web-tab-html'))
+  })
+  switchPageTab(pageOrder[0])
+}
+function switchPageTab(filename) {
+  currentPage = filename
+  webTab = 'page:' + filename
+  document.querySelectorAll('.page-tab').forEach(el => {
+    const active = el.textContent === filename
+    el.style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid ' + (active ? '#fbbf24' : 'transparent') + ';color:' + (active ? '#fbbf24' : 'var(--fg-faint)') + ';'
+  })
+  ;['html','css','js'].forEach(t => {
+    document.getElementById('web-tab-' + t).style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);' + (t === 'html' ? 'display:none;' : '')
+    webEditors[t].getWrapperElement().style.display = 'none'
+  })
+  Object.entries(pageEditors).forEach(([f, ed]) => { ed.getWrapperElement().style.display = (f === filename) ? '' : 'none' })
+  pageEditors[filename].refresh()
+}
 function switchWebTab(tab) {
   webTab = tab
-  ;['html','css','js'].forEach(t => {
-    document.getElementById('web-editor-' + t).nextSibling // no-op, CodeMirror wraps the textarea
-  })
-  document.getElementById('web-tab-html').style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
+  document.querySelectorAll('.page-tab').forEach(el => { el.style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);' })
+  Object.values(pageEditors).forEach(ed => { ed.getWrapperElement().style.display = 'none' })
+  // cssText assignment below replaces the WHOLE inline style, which would
+  // otherwise wipe out the display:none setupPageEditors() set on this tab —
+  // re-apply it in the same breath whenever a multi-page project is active.
+  document.getElementById('web-tab-html').style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);' + (pageOrder.length ? 'display:none;' : '')
   document.getElementById('web-tab-css').style.cssText  = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
   document.getElementById('web-tab-js').style.cssText   = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
   document.getElementById('web-tab-' + tab).style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid #fbbf24;color:#fbbf24;'
@@ -581,29 +636,39 @@ function switchWebTab(tab) {
 function resetWebToStarter() {
   const ch = CHALLENGES[activeIdx]
   if (!ch || !ch.webStarter) return
-  webEditors.html.setValue(ch.webStarter.html || '')
   webEditors.css.setValue(ch.webStarter.css || '')
   webEditors.js.setValue(ch.webStarter.js || '')
+  if (ch.webStarter.pages) {
+    setupPageEditors(ch.webStarter.pages)
+  } else {
+    teardownPageEditors()
+    webEditors.html.setValue(ch.webStarter.html || '')
+  }
 }
 
-async function runWebCode() {
-  const html = webEditors.html.getValue()
-  const css  = webEditors.css.getValue()
-  const js   = webEditors.js.getValue()
-  const iframe = document.getElementById('out-web')
-  document.getElementById('pass-badge').style.display = 'none'
-
-  // Built with '<' + 'script>' pieces rather than a literal opening tag —
-  // this whole function lives inside the page's OWN script block, and the
-  // literal closing-tag sequence in a JS string (or even a comment) here
-  // would close THAT tag early, the instant the browser's HTML parser (not
-  // just the JS engine) sees the raw character sequence.
+// Built with '<' + 'script>' pieces rather than a literal opening tag — this
+// whole function lives inside the page's OWN script block, and the literal
+// closing-tag sequence in a JS string (or even a comment) here would close
+// THAT tag early, the instant the browser's HTML parser (not just the JS
+// engine) sees the raw character sequence.
+function buildWebSrcdoc(html, css, js) {
   const openTag  = '<' + 'script>'
   const closeTag = '<' + '/script>'
-  const srcdoc = `<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}`
+  return `<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}`
     + `${openTag}window.onerror = function(msg){ parent.postMessage({__bfWebError: String(msg)}, '*'); };\n`
+    // Multi-page nav — clicking a real <a href="about.html"> would otherwise
+    // try to navigate this sandboxed srcdoc iframe to a URL that doesn't
+    // really exist. Intercept clicks whose href is a bare "somename.html"
+    // and hand it to the parent instead, which actually owns that page's
+    // content — this is what makes real multi-page nav links work at all.
+    + `document.addEventListener('click', function(e){ var a = e.target.closest('a'); if(!a) return; var href = a.getAttribute('href'); if(href && /^[\\w-]+\\.html$/.test(href)){ e.preventDefault(); parent.postMessage({__bfPageNav: href}, '*'); } });\n`
     + `try {\n${js}\n} catch(e) { parent.postMessage({__bfWebError: String(e.message)}, '*'); }\n${closeTag}</body></html>`
-
+}
+// Loads one page's srcdoc into the (shared) preview iframe and waits for it
+// to settle. Returns { doc, win } on success or { error } on failure — never
+// throws, so callers (single-page and multi-page alike) can just check
+// result.error rather than wrapping every call in try/catch.
+async function loadWebPage(iframe, srcdoc) {
   await new Promise(resolve => {
     const onLoad = () => { iframe.removeEventListener('load', onLoad); resolve() }
     iframe.addEventListener('load', onLoad)
@@ -611,19 +676,20 @@ async function runWebCode() {
   })
   // Give any script (esp. one relying on DOMContentLoaded timing) a beat to settle.
   await new Promise(r => setTimeout(r, 50))
-
   let webError = null
   const errHandler = (e) => { if (e.data && e.data.__bfWebError) webError = e.data.__bfWebError }
   window.addEventListener('message', errHandler)
   await new Promise(r => setTimeout(r, 30))
   window.removeEventListener('message', errHandler)
-
-  if (webError) { clog('Error: ' + webError, 'err'); return }
-
-  let doc, win
-  try { doc = iframe.contentDocument; win = iframe.contentWindow } catch (e) { clog('Could not read the page: ' + e.message, 'err'); return }
-
-  const webLog = {
+  if (webError) return { error: 'Error: ' + webError }
+  try { return { doc: iframe.contentDocument, win: iframe.contentWindow } }
+  catch (e) { return { error: 'Could not read the page: ' + e.message } }
+}
+// Every DOM-inspection field checks read from — extracted so both the
+// single-page path AND the multi-page grading loop (one call per page) can
+// share the exact same logic rather than maintaining two copies.
+function buildWebLog(doc, win, html, css, js) {
+  return {
     html, css, js,
     bodyText: doc.body ? doc.body.textContent : '',
     h1s: doc.querySelectorAll('h1,h2,h3').length,
@@ -710,30 +776,89 @@ async function runWebCode() {
     hasToFixed:       /\.toFixed\s*\(/.test(js),
     hasValueRead:     /\.value\b/.test(js),
   }
+}
+// Real behavioral test, not just structural regex — a mission's own
+// `testInputs: { elementId: value }` (see p0m5-style rigor established
+// elsewhere this session) lets a check() verify a calculator-style page
+// ACTUALLY computes the right number, not just that it calls the right
+// functions. testButtonId picks WHICH button to click when a page has more
+// than one (e.g. a "Calculate" button plus a "Quick 20% Tip" button) —
+// defaults to the first button on the page when not specified. Mutates
+// `log` in place with the click-testing fields, same shape either mode uses.
+function runClickTest(doc, log, mission) {
   const liBefore = doc.querySelectorAll('li').length
-  const bodyBefore = webLog.bodyText
-  // Real behavioral test, not just structural regex — a mission's own
-  // `testInputs: { elementId: value }` (see p0m5-style rigor established
-  // elsewhere this session) lets a check() verify the calculator ACTUALLY
-  // computes the right number, not just that it calls the right functions.
-  const mission = CHALLENGES[activeIdx]
+  const bodyBefore = log.bodyText
   if (mission && mission.testInputs) {
     for (const [id, val] of Object.entries(mission.testInputs)) {
       const el = doc.getElementById(id)
       if (el) el.value = val
     }
   }
-  // testButtonId picks WHICH button to click when a page has more than one
-  // (e.g. a "Calculate" button plus a "Quick 20% Tip" button) — defaults to
-  // the first button on the page, same as before, when not specified.
   const btn = mission && mission.testButtonId ? doc.getElementById(mission.testButtonId) : doc.querySelector('button')
   if (btn) btn.click()
-  webLog.listItemsGrewOnClick = btn != null && doc.querySelectorAll('li').length > liBefore
-  webLog.bodyChangedOnClick   = btn != null && doc.body.textContent !== bodyBefore
-  webLog.bodyTextAfterClick   = doc.body.textContent
+  log.listItemsGrewOnClick = btn != null && doc.querySelectorAll('li').length > liBefore
+  log.bodyChangedOnClick   = btn != null && doc.body.textContent !== bodyBefore
+  log.bodyTextAfterClick   = doc.body.textContent
+}
+async function runWebCode() {
+  const iframe = document.getElementById('out-web')
+  document.getElementById('pass-badge').style.display = 'none'
+  const css = webEditors.css.getValue()
+  const js  = webEditors.js.getValue()
+  const mission = CHALLENGES[activeIdx]
+
+  if (pageOrder.length > 0) {
+    // ── Multi-page project ── grade EVERY page (log.pages[filename]), but
+    // only run click-testing against the CURRENTLY SELECTED page — clicking
+    // through every page during a single grading pass doesn't make sense
+    // when different pages can have entirely different buttons/inputs.
+    const pagesHtml = {}
+    pageOrder.forEach(f => { pagesHtml[f] = pageEditors[f].getValue() })
+    const activePage = currentPage
+    const pagesLog = {}
+    let activeLog = null
+    for (const filename of pageOrder) {
+      const result = await loadWebPage(iframe, buildWebSrcdoc(pagesHtml[filename], css, js))
+      if (result.error) {
+        clog(result.error + ' (on ' + filename + ')', 'err')
+        await loadWebPage(iframe, buildWebSrcdoc(pagesHtml[activePage], css, js)) // restore the visible preview
+        return
+      }
+      const log = buildWebLog(result.doc, result.win, pagesHtml[filename], css, js)
+      pagesLog[filename] = log
+      if (filename === activePage) activeLog = log
+    }
+    // Reload the active page fresh (the loop above left the iframe on
+    // whichever page was graded last) so click-testing runs against a
+    // clean, just-loaded copy, then leaves the visible preview showing it.
+    const activeResult = await loadWebPage(iframe, buildWebSrcdoc(pagesHtml[activePage], css, js))
+    if (!activeResult.error) runClickTest(activeResult.doc, activeLog, mission)
+    activeLog.pages = pagesLog
+    activeLog.currentPage = activePage
+    activeLog.pageOrder = pageOrder.slice()
+    clog('Ran — checking your ' + pageOrder.length + '-page site…', 'info')
+    checkWebChallenge(activeLog)
+    return
+  }
+
+  // ── Single page (the original, unchanged behavior every existing stage uses) ──
+  const html = webEditors.html.getValue()
+  const result = await loadWebPage(iframe, buildWebSrcdoc(html, css, js))
+  if (result.error) { clog(result.error, 'err'); return }
+  const webLog = buildWebLog(result.doc, result.win, html, css, js)
+  runClickTest(result.doc, webLog, mission)
   clog('Ran — checking your page…', 'info')
   checkWebChallenge(webLog)
 }
+// Clicking a real nav link inside the preview iframe posts this message —
+// switch to that page's tab and re-render so it actually feels like real
+// navigation, not just a dead link.
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.__bfPageNav && pageOrder.includes(e.data.__bfPageNav)) {
+    switchPageTab(e.data.__bfPageNav)
+    runWebCode()
+  }
+})
 
 // ── Quiz stages (ported from Grade 7) — matching / fill-in-the-blank /
 // scenario judgment, no code editor involved at all. ──────────────────────
@@ -1027,7 +1152,7 @@ function renderPaletteBar(ch) {
     + list.map(([name, hex]) => swatchButton(name, hex)).join('')
 }
 function insertColorSwatch(hex) {
-  const ed = webEditors[webTab]
+  const ed = webTab.startsWith('page:') ? pageEditors[webTab.slice(5)] : webEditors[webTab]
   if (!ed) return
   ed.replaceSelection(hex)
   ed.focus()
@@ -3131,6 +3256,82 @@ let bill = billInput.value;</pre>
       testInputs: { billTotal: '50' },
       testButtonId: 'quickTipBtn',
       check:(log) => /10\.00/.test(log.bodyTextAfterClick) && /60\.00/.test(log.bodyTextAfterClick),
+    },
+  ]},
+  // ── Real Multi-Page Websites — genuinely new engine feature, built this
+  // session: webStarter.pages = { 'index.html': ..., 'about.html': ... }
+  // instead of a single webStarter.html gives a stage REAL separate,
+  // independently-editable pages sharing one CSS/JS, with a real working
+  // <a href="other.html"> that actually navigates between them inside the
+  // preview (intercepted and handed to the parent — see buildWebSrcdoc/the
+  // __bfPageNav message handler). check(log) reads log.pages[filename] for
+  // each page's own DOM stats, exactly like the single-page log shape, just
+  // one level deeper. log.currentPage/log.pageOrder are also available.
+  { id:'web7', name:'🗂️ Real Multi-Page Websites', sub:'Separate pages, linked by real navigation — index.html + about.html', live:true, stages:[
+    { id:'web7q0', name:'Separate Pages, One Shared Style', xp:25, type:'quiz',
+      text:`<h4>A real website is rarely just one page</h4>
+        <p>So far, everything you've built lived on one single page. A real site is usually SEVERAL separate pages — a homepage, an About page, a Contact page — linked together so visitors can move between them.</p>
+        <h4>One CSS file, every page</h4>
+        <p>Every page in a real multi-page site typically shares the SAME stylesheet — so the fonts, colors, and spacing stay consistent everywhere, instead of every page looking like a different website.</p>
+        <h4>Real navigation, not just decoration</h4>
+        <p>A <code>&lt;nav&gt;</code> full of <code>&lt;a href="about.html"&gt;About&lt;/a&gt;</code>-style links is what actually CONNECTS separate pages — clicking one genuinely takes the visitor to a different page's content, unlike a plain button that does nothing without JavaScript.</p>
+        <h4>Two-way navigation</h4>
+        <p>A well-built multi-page site lets you navigate BOTH ways — from the homepage TO the About page, and from the About page back HOME again. A page with no way back is a dead end.</p>`,
+      hints:['One shared CSS file keeps every page\'s look consistent — you don\'t re-style each page separately.', 'A real nav link\'s href names the exact page it goes to, e.g. href="about.html".', 'Forgetting a link BACK to the homepage traps a visitor on that page.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'Why do multiple pages on the same site usually share ONE CSS file?', options: ['So every page looks visually consistent', 'Because HTML requires it', 'To make the site load slower', 'CSS can only be written once per project'], answer: 'So every page looks visually consistent' },
+        { type:'match', prompt:'What does <a href="about.html">About</a> actually do when clicked?', options: ['Navigates to the about.html page', 'Just decorates the text', 'Runs a JavaScript function', 'Opens a popup window'], answer: 'Navigates to the about.html page' },
+        { type:'match', prompt:'Why is a page with a link TO it, but no link back, considered bad design?', options: ['It traps the visitor with no way back', 'It loads slower', 'It breaks the CSS', 'It\'s not actually a problem'], answer: 'It traps the visitor with no way back' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'web7s1', name:'Two Real Pages', xp:35, lang:'web',
+      text:`<strong>Challenge 1</strong> — You now have TWO separate page tabs: <code>index.html</code> and <code>about.html</code>. Give each one its own real heading and paragraph — different content on each page.`,
+      hints:[
+        'Click between the index.html and about.html tabs (where the HTML tab used to be) to edit each page separately.',
+        'CSS and JS still only have ONE tab each — they apply to BOTH pages at once.',
+        'Each page needs its own <h1> — they should say something different from each other.',
+      ],
+      webStarter: {
+        pages: {
+          'index.html': `<!-- TODO: a heading and paragraph for the HOME page -->\n`,
+          'about.html': `<!-- TODO: a DIFFERENT heading and paragraph for the ABOUT page -->\n`,
+        },
+        css: `body { font-family: sans-serif; padding: 20px; }\n`,
+        js: ``,
+      },
+      check:(log) => {
+        if (!log.pages) return false
+        const idx = log.pages['index.html'], abt = log.pages['about.html']
+        if (!idx || !abt) return false
+        return idx.h1s >= 1 && idx.paragraphs >= 1 && abt.h1s >= 1 && abt.paragraphs >= 1
+          && idx.headingText[0] !== abt.headingText[0]
+      },
+    },
+    { id:'web7boss', name:'BOSS — Real Two-Way Navigation', xp:70, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Add a <code>&lt;nav&gt;</code> to EACH page. On <code>index.html</code>, link to <code>about.html</code>. On <code>about.html</code>, link BACK to <code>index.html</code> — real two-way navigation between two real pages.`,
+      hints:[
+        'index.html needs: <nav><a href="about.html">About</a></nav>',
+        'about.html needs its own: <nav><a href="index.html">Home</a></nav>',
+        'Test it for real: click ▶ Run, then click your nav link in the preview — it should actually switch which page you\'re viewing.',
+      ],
+      webStarter: {
+        pages: {
+          'index.html': `<h1>Home</h1>\n<p>Welcome to my site!</p>\n<!-- TODO: <nav> with a link to about.html -->\n`,
+          'about.html': `<h1>About</h1>\n<p>This page is all about me.</p>\n<!-- TODO: <nav> with a link BACK to index.html -->\n`,
+        },
+        css: `body { font-family: sans-serif; padding: 20px; }\nnav a { margin-right: 10px; }\n`,
+        js: ``,
+      },
+      check:(log) => {
+        if (!log.pages) return false
+        const idx = log.pages['index.html'], abt = log.pages['about.html']
+        if (!idx || !abt) return false
+        const idxLinksToAbout = /href\s*=\s*["']about\.html["']/.test(idx.html)
+        const abtLinksToIndex = /href\s*=\s*["']index\.html["']/.test(abt.html)
+        return idx.h1s >= 1 && abt.h1s >= 1 && idxLinksToAbout && abtLinksToIndex && idx.links >= 1 && abt.links >= 1
+      },
     },
   ]},
   // ── Semester 2, Week 1: What Is Python? / Variables — new for the
@@ -5637,6 +5838,14 @@ const CHALLENGE_LESSON = {
   web6boss: { title: 'Two buttons, two separate click handlers', html: `
     <div class="cl-block"><h4>Shortcuts don\'t have to reuse existing functions</h4>
       <p>The quick-tip button could call calculateTip() after secretly setting tipPercent to 20 — but writing its own small, separate calculation directly is simpler here, and just as valid a way to solve the problem.</p></div>` },
+  web7s1: { title: 'Two pages, genuinely separate content', html: `
+    <div class="cl-block"><h4>Shared style, independent content</h4>
+      <p>index.html and about.html are edited completely separately — but both still use the SAME css/js tabs. Changing the CSS once changes how both pages look, without needing to repeat any styling.</p></div>` },
+  web7boss: { title: 'A real link, going both directions', html: `
+    <div class="cl-block"><h4>href names the exact destination file</h4>
+      <p>href="about.html" on index.html and href="index.html" on about.html are two separate, independent links — one page linking TO another doesn\'t automatically create a way back; you have to add that link yourself, on the OTHER page.</p></div>
+    <div class="cl-block"><h4>This is a genuinely new engine feature</h4>
+      <p>Every earlier project lived on one page — clicking a real nav link here actually swaps which page's content the whole preview shows, the same way a real website\'s navigation works.</p></div>` },
   // ── M1 — From Blocks to Text ────────────────────────────────────────────────
   m1s1: { title: 'print() — your first real line of code', html: `
     <div class="cl-block"><h4>The classic first line, in any language</h4>
@@ -6098,10 +6307,15 @@ function selectChallenge(i) {
   if (isQuiz) {
     renderQuiz(ch)
   } else if (isWeb) {
-    webEditors.html.setValue((ch.webStarter && ch.webStarter.html) || '')
     webEditors.css.setValue((ch.webStarter && ch.webStarter.css) || '')
     webEditors.js.setValue((ch.webStarter && ch.webStarter.js) || '')
-    switchWebTab(ch.palette && ch.palette.length ? 'css' : 'html')
+    if (ch.webStarter && ch.webStarter.pages) {
+      setupPageEditors(ch.webStarter.pages)
+    } else {
+      teardownPageEditors()
+      webEditors.html.setValue((ch.webStarter && ch.webStarter.html) || '')
+      switchWebTab(ch.palette && ch.palette.length ? 'css' : 'html')
+    }
     document.getElementById('out-web').srcdoc = '<body style="font-family:sans-serif;color:#94a3b8;font-size:12px;padding:14px;">Page output — write HTML/CSS/JS, then press ▶ Run</body>'
     renderPaletteBar(ch)
   } else {
