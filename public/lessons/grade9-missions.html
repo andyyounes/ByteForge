@@ -840,6 +840,54 @@ const MISSIONS = [
     },
   },
   {
+    // Naming conventions were never taught anywhere before this — students
+    // jumped straight into cb1's own variable examples with no rules
+    // explained at all. Covers what MUST be true (syntax, or the code won't
+    // run) vs what SHOULD be true (PEP 8 style), since conflating "won't
+    // run" with "unprofessional" is itself a common source of confusion.
+    id: 'learn-naming', type: 'learn', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '📘', title: 'Naming Your Variables',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'Before making more variables — the rules for what you\'re allowed to call one, and the style real programmers actually follow.',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'Identifier',   def: 'The technical name for a variable/function/procedure name.' },
+        { term: 'Case-sensitive', def: 'Treats different capitalisation as a DIFFERENT name — age and Age are two separate variables.' },
+        { term: 'snake_case',   def: 'Python\'s naming style: lowercase words joined by underscores, e.g. total_score.' },
+        { term: 'camelCase',    def: 'Pseudocode\'s naming style: first word lowercase, each next word capitalised, e.g. totalScore.' },
+        { term: 'Reserved word', def: 'A word the language already uses for something else — cannot be used as a variable name.' },
+      ],
+      theory: `
+        <h4>Mandatory rules — break these and your code will NOT run</h4>
+        <p>A name can ONLY contain letters, digits, and underscores — no spaces, hyphens, or symbols. It can NEVER start with a digit (<code>score2</code> is fine, <code>2score</code> is not — the computer needs the first character to tell a NAME apart from a NUMBER). And it can never be a reserved word like <code>if</code>, <code>for</code>, or <code>class</code>.</p>
+        <h4>Case-sensitivity is a fact, not a style choice</h4>
+        <p><code>total</code>, <code>Total</code>, and <code>TOTAL</code> are three completely different variables to the computer. This causes real, hard-to-spot bugs: update <code>Total</code> in a loop but print <code>total</code>, and you'll see the ORIGINAL unchanged value with no error or warning.</p>
+        <h4>Style rules — your code still runs, but professionals follow these anyway</h4>
+        <p>Python's own style guide is called <b>PEP 8</b> — it says use <code>snake_case</code> (<code>student_name</code>). Cambridge pseudocode instead uses <code>camelCase</code> (<code>studentName</code>). Never mix the two styles within one program. A constant (a value that never changes) is written in <code>ALL_CAPS</code> in BOTH languages — the one rule that doesn't change between them.</p>`,
+    },
+  },
+  {
+    id: 'naming-quiz', type: 'quiz', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '🔤', title: 'Valid or Invalid?',
+    hints: ["Check each name against the mandatory rules in order: does it contain a space/hyphen/symbol? Does it start with a digit? Is it a reserved word?"], xp: 30,
+    brief: 'Put the naming rules to the test — for each name, decide whether Python would actually accept it.',
+    api: [],
+    quiz: {
+      intro: 'For each name, decide: Valid, or Invalid (and if invalid, why)?',
+      questions: [
+        { prompt: '‘user_id’ — valid or invalid?', options: ['Valid', 'Invalid — contains a space', 'Invalid — starts with a digit'], answer: 'Valid' },
+        { prompt: '‘2nd_place’ — valid or invalid?', options: ['Valid', 'Invalid — contains a space', 'Invalid — starts with a digit'], answer: 'Invalid — starts with a digit' },
+        { prompt: '‘high score’ — valid or invalid?', options: ['Valid', 'Invalid — contains a space', 'Invalid — reserved word'], answer: 'Invalid — contains a space' },
+        { prompt: '‘class’ — valid or invalid?', options: ['Valid', 'Invalid — reserved word', 'Invalid — starts with a digit'], answer: 'Invalid — reserved word' },
+        { prompt: '‘total_amount2’ — valid or invalid?', options: ['Valid', 'Invalid — starts with a digit', 'Invalid — contains a symbol'], answer: 'Valid' },
+        { prompt: '‘exam-score’ — valid or invalid?', options: ['Valid', 'Invalid — contains a hyphen', 'Invalid — reserved word'], answer: 'Invalid — contains a hyphen' },
+        { prompt: 'Python code sets total = 0, then later Total = Total + 10, then prints total. What prints?',
+          options: ['10, because total and Total are the same variable', '0, because total and Total are DIFFERENT variables', 'An error, because Total was never defined'],
+          answer: '0, because total and Total are DIFFERENT variables' },
+      ],
+    },
+    stars: { metric: 'pass' },
+  },
+  {
     id: 'cb1', type: 'data', phase: 'FOUNDATIONS 3 · YOUR FIRST CODE', emoji: '💾', title: 'Store a Number',
     hints: ["A variable is created with a name, then =, then its value: score = 10", "answer() takes the variable, not a hardcoded number — answer(score), not answer(10)."], xp: 20,
     brief: 'A <b>variable</b> is a labeled box that stores a value so your code can use it later. Create one called <code>score</code>, store the number 10 inside it, then <b>answer()</b> what it holds.',
@@ -1145,6 +1193,34 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
+    // AND/OR/NOT so far only tested COMPUTING a given expression — this
+    // deepens it into CHOOSING the right operator for a real-world rule, the
+    // single most common real bug (writing AND where OR was meant, e.g. "is
+    // it Saturday AND Sunday" — a day can never be both, so that's always
+    // False no matter what). Word problems + one spot-the-bug question.
+    id: 'p0m4b', type: 'quiz', phase: 'FOUNDATIONS 4 · LOGIC', emoji: '🤔', title: 'Which Operator?',
+    hints: ["If a value needs to match ANY ONE of several options, that's almost always OR, not AND — a single value can never equal two different things at once.", "AND is strict (both must hold). OR is generous (one is enough). NOT just flips a single value."], xp: 35,
+    brief: 'AND/OR aren\'t just for computing a given expression — the real skill is CHOOSING the right one for a real-world rule. Get this wrong (a very common mistake) and your condition can end up permanently True or permanently False.',
+    api: [],
+    quiz: {
+      intro: 'For each rule, pick the operator that correctly connects the two conditions.',
+      questions: [
+        { prompt: 'A ticket is free if the visitor is under 5 OR over 65. Which operator connects these two conditions?',
+          options: ['AND', 'OR', 'NOT'], answer: 'OR' },
+        { prompt: 'A password is strong if it is at least 8 characters AND contains a digit. Which operator?',
+          options: ['AND', 'OR', 'NOT'], answer: 'AND' },
+        { prompt: 'Keep looping until the user has NOT entered "quit" — which single operator flips isQuit into the loop condition?',
+          options: ['AND', 'OR', 'NOT'], answer: 'NOT' },
+        { prompt: 'A day is the "weekend" if it is Saturday OR Sunday. A student instead writes: day = "Saturday" AND day = "Sunday". What happens?',
+          options: ['Works correctly, same as OR', 'Always False — a day can never equal both values at once', 'Always True', 'Causes a crash'],
+          answer: 'Always False — a day can never equal both values at once' },
+        { prompt: 'A student is "eligible" if their age is 18 or above AND they are a registered citizen. Which operator?',
+          options: ['AND', 'OR', 'NOT'], answer: 'AND' },
+      ],
+    },
+    stars: { metric: 'pass' },
+  },
+  {
     id: 'learn-datatypes', type: 'learn', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '📘', title: 'What Are Data Types?',
     hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
     brief: 'Before identifying types, learn what a data type actually is and why mixing them up causes real bugs.',
@@ -1434,6 +1510,94 @@ const MISSIONS = [
     flowchart: { intro: 'Everything from this unit at once: a For loop with three Decisions nested inside its body, each False branch leading to the next check.',
       minShapes: 9, minConnections: 12, requiresDecision: true,
       expectedOutput: ['1','2','Fizz','4','Buzz','Fizz','7','8','Fizz','Buzz','11','Fizz','13','14','FizzBuzz','16','17','Fizz','19','Buzz'] },
+  },
+
+  // ── Foundations 6c · Flowgorithm Practice — a second real-world round on ──
+  // the same engine, no new mechanics beyond flowg1-6/flowgboss (chained
+  // Decisions instead of a single compound one, since fcEvalCondition only
+  // supports ONE comparison per Decision — the engine has no AND/OR token at
+  // all, confirmed by reading fcTokenize/fcParseExpr directly). Every
+  // expectedOutput below was hand-verified against the real fcEval/
+  // fcEvalCondition/fcExecAssign functions before being written here.
+  {
+    id: 'flowg7', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM PRACTICE', emoji: '📮', title: 'Postage Cost by Weight',
+    hints: ['This engine only supports ONE comparison per Decision — chain three Decisions instead of writing one big compound condition.',
+      'Order them narrowest-first: weight <= 1, then (on False) weight <= 5, then (on False) weight <= 10, then a final else for anything heavier.',
+      'weight = 7 should land in the ">5 and <=10" band.'],
+    xp: 45,
+    brief: 'Assign <code>weight</code> to <b>7</b>. Chain three Decisions to sort it into a postage band: <code>&le;1 &rarr; "$3"</code>, <code>&le;5 &rarr; "$6"</code>, <code>&le;10 &rarr; "$12"</code>, otherwise <code>"$20"</code>.',
+    flowchart: { intro: 'Three Decisions in a row, each only reached if the previous one was False — the same "narrow the range down" idea as a real IF/ELIF/ELIF/ELSE chain.',
+      minShapes: 8, minConnections: 9, requiresDecision: true, expectedOutput: ['$12'] },
+  },
+  {
+    id: 'flowg8', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM PRACTICE', emoji: '🥇', title: 'Largest of Three',
+    hints: ['No loop needed — just nested Decisions. First compare a > b, THEN (inside whichever branch) compare against c.',
+      'a=7, b=15, c=3 — work out on paper which one wins before you wire the diamonds.',
+      'Every branch of every Decision needs to lead somewhere — don\'t leave a branch dangling.'],
+    xp: 45,
+    brief: 'Assign <code>a</code>=7, <code>b</code>=15, <code>c</code>=3. Using ONLY comparisons (no loop), output whichever of the three is largest.',
+    flowchart: { intro: 'Decision 1: a > b? Decision 2 (inside the True branch): a > c? Decision 3 (inside the False branch): b > c? — three simple comparisons find the winner.',
+      minShapes: 9, minConnections: 10, requiresDecision: true, expectedOutput: ['15'] },
+  },
+  {
+    id: 'flowg9', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM PRACTICE', emoji: '🏧', title: 'ATM Withdrawal',
+    hints: ['Assign balance = 100 and amount = 40 first.',
+      'One Decision: amount <= balance. True branch: subtract, THEN output the new balance. False branch: output "Insufficient Funds" (balance unchanged).',
+      'The subtraction (Assign) has to happen BEFORE the Output in the True branch, not after.'],
+    xp: 40,
+    brief: 'Assign <code>balance</code>=100, <code>amount</code>=40. If <code>amount &le; balance</code>, subtract it and output the new balance — otherwise output <code>"Insufficient Funds"</code>.',
+    flowchart: { intro: 'A Decision whose True branch does a Process (the subtraction) BEFORE its Output — the balance has to actually change before you print it.',
+      minShapes: 7, minConnections: 7, requiresDecision: true, expectedOutput: ['60'] },
+  },
+  {
+    id: 'flowg10', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM PRACTICE', emoji: '📅', title: 'Weekday or Weekend',
+    hints: ['This engine can\'t write "day = 6 OR day = 7" in one Decision — chain two instead: check day=6 first, and only if that\'s False, check day=7.',
+      'Both Decisions\' True branches should reach the SAME "Weekend" Output shape — that\'s allowed, two arrows can point to one shape.',
+      'Assign day = 7 so your flowchart actually has to fall through the FIRST Decision to reach the second.'],
+    xp: 45,
+    brief: 'Assign <code>day</code>=7. Output <code>"Weekend"</code> if <code>day</code> is 6 OR 7 — otherwise output <code>"Weekday"</code>. Build the OR as two chained Decisions.',
+    flowchart: { intro: 'Chaining Decisions for OR: the first one\'s False branch flows into a second check, rather than giving up. Both True branches can lead to the same Output.',
+      minShapes: 6, minConnections: 7, requiresDecision: true, expectedOutput: ['Weekend'] },
+  },
+  {
+    id: 'flowg11', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM PRACTICE', emoji: '✖️', title: 'Times Table Generator',
+    hints: ['Assign n = 7, then a For loop i = 1 to 12.',
+      'One Output shape inside the loop, building a whole sentence: n + " x " + i + " = " + (n*i) — the parentheses matter for the multiplication.',
+      'This is exactly the same For-loop shape as Count to Five, just with a longer, formatted Output expression.'],
+    xp: 45,
+    brief: 'Assign <code>n</code>=7. Using a For loop (<code>i = 1 to 12</code>), output all 12 lines of the 7 times table, in the form <code>"7 x 1 = 7"</code>.',
+    flowchart: { intro: 'String-building with +: joining a variable, literal text, and a calculation (in brackets) into one Output line.',
+      minShapes: 5, minConnections: 5, expectedOutput: ['7 x 1 = 7','7 x 2 = 14','7 x 3 = 21','7 x 4 = 28','7 x 5 = 35','7 x 6 = 42','7 x 7 = 49','7 x 8 = 56','7 x 9 = 63','7 x 10 = 70','7 x 11 = 77','7 x 12 = 84'] },
+  },
+  {
+    id: 'flowg12', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM PRACTICE', emoji: '➗', title: 'Sum of Evens 1 to 50',
+    hints: ['This is Evens Only and Sum 1 to 10, combined — a Decision INSIDE a For loop, but accumulating instead of printing each one.',
+      'Declare/Assign total = 0 before the loop. Inside: Decision i MOD 2 = 0 — True adds i to total, False does nothing — EITHER way, loop back to the For.',
+      'Output total only ONCE, after the loop is Done — not inside it.'],
+    xp: 45,
+    brief: 'Assign <code>total</code>=0. Using a For loop (<code>i = 1 to 50</code>) with a Decision inside it, add up only the EVEN numbers and output the final total once.',
+    flowchart: { intro: 'Both branches of the inner Decision must eventually loop back to the For shape — the accumulation only happens on the True branch, but the LOOPING happens either way.',
+      minShapes: 7, minConnections: 8, requiresDecision: true, expectedOutput: ['650'] },
+  },
+  {
+    id: 'flowg13', type: 'flowchart', phase: 'FOUNDATIONS 6 · FLOWGORITHM PRACTICE', emoji: '💰', title: 'Savings Growth',
+    hints: ['Assign balance = 1000, rate = 0.1, year = 1.',
+      'While year <= 3: balance = balance + balance * rate, THEN year = year + 1, THEN loop back to the While.',
+      'Multiplication happens before addition automatically — balance + balance * rate is safe to write directly, no extra brackets needed.'],
+    xp: 50,
+    brief: 'Assign <code>balance</code>=1000, <code>rate</code>=0.1, <code>year</code>=1. While <code>year &le; 3</code>, grow the balance by its rate each year, then output the final balance.',
+    flowchart: { intro: 'A While loop whose body has TWO Assigns (grow the balance, then advance the year) before looping back — compounding growth, one year at a time.',
+      minShapes: 8, minConnections: 8, expectedOutput: ['1331'] },
+  },
+  {
+    id: 'flowg14', type: 'flowchart', phase: 'FOUNDATIONS 6 · CAPSTONE', emoji: '🔍', boss: true, title: 'BOSS — Prime Number Check',
+    hints: ['This engine has no True/False literal — Declare isPrime and Assign it to 1 (meaning true) or 0 (meaning false) instead, then Decision isPrime = 1 at the end.',
+      'While divisor < num: Decision num MOD divisor = 0 — True sets isPrime = 0. EITHER way, then divisor = divisor + 1, then loop back to the While.',
+      'After the While is Done: one more Decision (isPrime = 1?) picks between outputting "Prime" or "Not Prime".'],
+    xp: 75,
+    brief: 'Assign <code>num</code>=17, <code>isPrime</code>=1, <code>divisor</code>=2. While <code>divisor &lt; num</code>, check whether <code>divisor</code> evenly divides <code>num</code> — if it ever does, <code>num</code> isn\'t prime. Output <code>"Prime"</code> or <code>"Not Prime"</code>.',
+    flowchart: { intro: 'The hardest one yet: a While loop with a Decision inside it (checking each divisor), PLUS a second Decision after the loop (reading the flag it built up). No real True/False — use 1 and 0.',
+      minShapes: 10, minConnections: 12, requiresDecision: true, expectedOutput: ['Prime'] },
   },
 
   // ── Phase 0B · Flight Computer — algorithmic thinking, before you fly ───────
@@ -4933,12 +5097,21 @@ const TIERS = [
   // don't teach coding before the underlying idea (binary) is understood
   // on its own terms; save actual piloting/coding for Semester 2.
   { name: '🃏 FOUNDATIONS 2 · BINARY (UNPLUGGED) — no code yet, just the idea', ids: ['learn-binary', 'cards-make', 'cards-add', 'cardsboss', 'cards-byte', 'bits-needed'] },
-  { name: '📘 FOUNDATIONS 3 · YOUR FIRST CODE', ids: ['learn-cb', 'cb1', 'cb2', 'cb3', 'cb4', 'cb5', 'cb6'] },
+  { name: '📘 FOUNDATIONS 3 · YOUR FIRST CODE', ids: ['learn-cb', 'learn-naming', 'naming-quiz', 'cb1', 'cb2', 'cb3', 'cb4', 'cb5', 'cb6'] },
   { name: '🏆 FOUNDATIONS 3 CAPSTONE', ids: ['cbboss', 'cbboss2', 'cbboss3'] },
-  { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'learn-datatypes', 'p0m5', 'p0m6'] },
+  { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'p0m4b', 'learn-datatypes', 'p0m5', 'p0m6'] },
   { name: '🖼️ FOUNDATIONS 5 · IMAGES — binary pixels', ids: ['learn-images', 'p0m7', 'p0m8'] },
   { name: '🏆 FOUNDATIONS 4-5 CAPSTONE', ids: ['p0boss'] },
   { name: '📊 FOUNDATIONS 6 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'flow-p1', 'flow-p2', 'flow-build', 'flow-code'] },
+  // flowg1-6/flowgboss existed in MISSIONS but were never registered in
+  // TIERS at all — a real bug: the map (built from TIERS.map(...)) had no
+  // way to show them, so they were unreachable however the game normally
+  // routes students between missions. Fixed here while adding the new
+  // flowg7-14 practice/capstone batch.
+  { name: '🔀 FOUNDATIONS 6 · FLOWGORITHM — real execution, not just structure', ids: ['flowg1', 'flowg2', 'flowg3', 'flowg4', 'flowg5', 'flowg6'] },
+  { name: '🏆 FOUNDATIONS 6 FLOWGORITHM CAPSTONE', ids: ['flowgboss'] },
+  { name: '🧮 FOUNDATIONS 6 · FLOWGORITHM PRACTICE — real-world scenarios, same engine', ids: ['flowg7', 'flowg8', 'flowg9', 'flowg10', 'flowg11', 'flowg12', 'flowg13'] },
+  { name: '🏆 FOUNDATIONS 6 PRACTICE CAPSTONE', ids: ['flowg14'] },
   { name: '📟 FOUNDATIONS 7 · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },
   { name: '🏆 FOUNDATIONS 7 CAPSTONE', ids: ['p0bboss'] },
   { name: '🧭 TIER 1 — SEQUENCING', ids: ['p1m1', 'p1m2', 'p1m3'] },
