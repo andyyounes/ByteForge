@@ -1725,9 +1725,11 @@ const MODULES = [
   // leaving two out-of-order introductions to the same idea, the same
   // M1/M2-style bug already found and fixed once this session.
   { id:'jsf1', name:'📗 JS Foundations 1 — Print & Comment', sub:'What JavaScript is, console.log vs document.write, variables, and comments', live:true, stages:[
-    { id:'jsf1s0', name:'What Is JavaScript?', xp:20, type:'quiz',
-      text:`<strong>JavaScript is the programming language of the web.</strong> HTML gives your page structure, CSS adds style — JavaScript brings it to life. It lets your page respond to clicks, change text, calculate numbers, and make decisions.<br><br>
-        HTML and CSS are <b>markup and styling languages</b> — they describe what a page LOOKS like. JavaScript is a real <b>programming language</b> — it gives the computer actual instructions to DO things.`,
+    { id:'jsf1s0', name:'What Is JavaScript?', xp:25, type:'quiz',
+      text:`<h4>JavaScript is the programming language of the web</h4>
+        <p>While HTML gives your page structure and CSS adds style, JavaScript brings your page to life. It lets your site respond to clicks, change text, calculate numbers, and more.</p>
+        <p>HTML and CSS are <b>markup and styling languages</b>, not programming languages. When we say JavaScript is a <b>programming language</b>, this means it gives the computer instructions to do things — respond to clicks, change text, or make decisions. HTML gives your webpage its structure (headings, paragraphs, images). CSS controls the appearance — colors, fonts, spacing. But only JavaScript lets your page perform actions, like reacting to a button click or calculating a total. It brings your site to life by making it interactive.</p>
+        <p>JavaScript also lets your program make decisions based on conditions — code that responds to user input, checks values, or changes what happens depending on the situation. You'll explore that soon; first, the basics.</p>`,
       hints:['HTML = structure. CSS = style. JavaScript = behavior/actions.', 'Only JavaScript can react to a click or calculate something — HTML and CSS can\'t.'],
       passCount:3,
       questions: [
@@ -1740,8 +1742,8 @@ const MODULES = [
       ],
       check:(log) => log.quizCorrect >= 3,
     },
-    { id:'jsf1s1', name:'Where Do You Write JavaScript?', xp:20, type:'quiz',
-      text:`Just like CSS, JavaScript can be written two ways:<br><br>
+    { id:'jsf1s1', name:'Quiz — Internal vs. External JavaScript', xp:20, type:'quiz',
+      text:`<strong>From the last lesson:</strong> JavaScript can be written two ways:<br><br>
         <b>Internal JS</b> — embedded directly in the HTML file, inside <code>&lt;script&gt;</code> tags:
         <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">&lt;body&gt;
   &lt;h1&gt;Hello Page&lt;/h1&gt;
@@ -1759,6 +1761,31 @@ const MODULES = [
           options: ['External — a separate file automatically linked to the page', 'Internal — typed directly between <script> tags you write', 'Neither — ByteForge doesn\'t use real JavaScript', 'It doesn\'t matter, they\'re identical'], answer: 'External — a separate file automatically linked to the page' },
       ],
       check:(log) => log.quizCorrect >= 2,
+    },
+    { id:'jsf1printq', name:'Print Statements in JavaScript', xp:25, type:'quiz',
+      text:`<h4>Why start with print statements</h4>
+        <p>In most programming languages, your first program is a simple one that prints a message like "Hello, World!" This tradition helps you make sure everything is working correctly and gives you a basic example of how to write and run code. It's helpful to start with print statements — lines of code that display output, either in the browser console or directly on the webpage.</p>
+        <h4>console.log() — for testing, behind the scenes</h4>
+        <p>This command sends a message to the browser's console. It's useful for testing and debugging your code behind the scenes. You won't see the output on the HTML page when using console.log() — but you can view it in the console.</p>
+        <p>Breaking down <code>console.log('Hello, JavaScript!');</code>: <code>console</code> is a built-in object that gives you access to the browser's debugging tools — an object is like a container that holds related tools or information. <code>.log()</code> is a function (or command) that tells the console to print a message. The text inside the parentheses must be in quotes — syntax matters.</p>
+        <p>You can also view the console directly in your web browser. To open it: right-click the page and choose Inspect, then click the Console tab. You can type JavaScript directly into that area and press Enter to run it instantly.</p>
+        <h4>document.write() — visible, but old-fashioned</h4>
+        <p>This command prints directly to the webpage. It's helpful when you're first learning JavaScript and want to see visible results right away. Keep in mind that document.write() is mostly used for simple examples and learning — in real-world websites, it's better to update the page using more modern techniques like manipulating the DOM (Document Object Model) with JavaScript. The DOM is the structure of the page that JavaScript can change, like text, images, and buttons.</p>
+        <h4>Strings — the thing you're actually printing</h4>
+        <p>When you use console.log() or document.write(), you're usually printing something called a <b>string</b> — any piece of text written inside quotes. That can be a word, a sentence, a number as text, or even an emoji: <code>console.log("Hello, world!");</code> and <code>console.log("🍕 Pizza is life!");</code> are both perfectly valid strings.</p>`,
+      hints:['Only one of these shows up on the actual page without opening dev tools.', 'The console object holds debugging tools — .log() is a function that uses them.'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'Which one prints a message directly onto the webpage?',
+          options: ['console.log()', 'document.write()', 'Both do', 'Neither does'], answer: 'document.write()' },
+        { type:'match', prompt:'In console.log("hi"), what is "console"?',
+          options: ['A built-in object holding debugging tools', 'A function', 'A string', 'A variable you created'], answer: 'A built-in object holding debugging tools' },
+        { type:'match', prompt:'How do you open the browser console to test JavaScript directly?',
+          options: ['Right-click the page, choose Inspect, click Console', 'Press Ctrl+P', 'It opens automatically', 'You can\'t — it\'s ByteForge-only'], answer: 'Right-click the page, choose Inspect, click Console' },
+        { type:'match', prompt:'Which of these is a valid string?',
+          options: ['"Hello, world!"', 'Hello, world!', '42', 'true'], answer: '"Hello, world!"' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
     },
     { id:'jsf1s2', name:'Your First console.log()', xp:25, lang:'web',
       text:`<strong>console.log()</strong> sends a message to the browser's console — useful for testing and debugging, but it does NOT show up on the actual webpage.<br><br>
@@ -1801,6 +1828,31 @@ const MODULES = [
           options: ['console.log("Hello")', 'alert("Hello")', 'document.write("Hello")', 'print("Hello")'], answer: 'document.write("Hello")' },
       ],
       check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'jsf1varq', name:'What Is a Variable?', xp:25, type:'quiz',
+      text:`<h4>A variable stores information for later</h4>
+        <p>A variable is a way to store information so you can use it later. Think of it as a container. It has a NAME for what you're calling the container, and a VALUE for what's inside the container.</p>
+        <p>You can store all kinds of information in variables. One common type is text, called a <b>string</b> in JavaScript — strings are always written inside quotes.</p>
+        <h4>A real example, using a few string variables</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">let userName = "Jordan";
+let favoriteFood = "pizza";
+let favoriteEmoji = "🍕";
+
+document.write("Hi, my name is " + userName + ".&lt;br&gt;");
+document.write("My favorite food is " + favoriteFood + "!&lt;br&gt;");
+document.write("Here's an emoji I love: " + favoriteEmoji);</pre>
+        <p><code>let</code> is a JavaScript keyword that tells the computer you're creating a new variable. The <code>+</code> sign is used to combine strings or mix strings and variables together — this is called <b>string concatenation</b>.</p>`,
+      hints:['let creates a NEW variable — you only need it once per variable.', '+ between two strings joins them; it never adds numbers unless BOTH sides are numbers.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'let favoriteFood = "pizza"; — what does "favoriteFood" refer to?',
+          options: ['The variable\'s NAME', 'The variable\'s VALUE', 'A function', 'A comment'], answer: 'The variable\'s NAME' },
+        { type:'match', prompt:'Which keyword creates a new JavaScript variable?',
+          options: ['let', 'var name', 'new', 'variable'], answer: 'let' },
+        { type:'match', prompt:'"Hi, " + userName + "!" — what does + do here?',
+          options: ['Joins the strings and variable together', 'Adds numbers', 'Creates a new variable', 'Causes an error'], answer: 'Joins the strings and variable together' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
     },
     { id:'jsf1s4', name:'What Is a Variable? — String Variables', xp:30, lang:'web',
       text:`<strong>A variable stores information you can use later</strong> — think of it as a labeled container: a NAME for the container, and a VALUE inside it.<br><br>
@@ -1905,8 +1957,11 @@ console.log("Hello!");</pre>
   // const comparison itself is quiz-only (jsf2s3) rather than live code —
   // exactly how the source material's own Checkpoints work anyway.
   { id:'jsf2', name:'📘 JS Foundations 2 — Data Types & Math', sub:'string/number/boolean, let vs const, math operators, the Math object', live:true, stages:[
-    { id:'jsf2s0', name:'What Are Data Types?', xp:20, type:'quiz',
-      text:`<strong>Not all data is the same.</strong> JavaScript has different TYPES of values, each used for a different purpose:<br><br>
+    { id:'jsf2s0', name:'What Are Data Types?', xp:25, type:'quiz',
+      text:`<h4>Why data types matter</h4>
+        <p>In JavaScript, not all data is the same. There are different types of data, and each one is used for a different purpose. Choosing the correct data type helps your program run correctly.</p>
+        <h4>The three basic types</h4>
+        <p><b>Strings</b> are text inside quotes, used for words, sentences, or characters. <b>Numbers</b> are any numeric value, written without quotes. <b>Booleans</b> use true or false to represent a yes/no or on/off value.</p><br>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin:10px 0;">
           <div style="flex:1;min-width:150px;border:1px solid var(--border-hi);border-radius:8px;padding:10px;background:var(--bg-raised);text-align:center;">
             <div style="font-size:11px;color:var(--fg-faint);">let userName =</div>
@@ -1977,8 +2032,10 @@ console.log("Hello!");</pre>
       ],
       check:(log) => log.quizCorrect >= 1,
     },
-    { id:'jsf2s3', name:'let vs. const', xp:25, type:'quiz',
-      text:`Most variables you expect to CHANGE use <code>let</code>:
+    { id:'jsf2s3', name:'let vs. const', xp:30, type:'quiz',
+      text:`<h4>Most variables are expected to change</h4>
+        <p>Most of the time, you'll use variables because you expect their value to change as the program runs. Think about keeping score in a game — the score might start at 0, then increase each time you get a point.</p>
+        Most variables you expect to CHANGE use <code>let</code>:
         <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;">let score = 0;
 score = score + 1;
 score = score + 2;
@@ -1996,6 +2053,24 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
         { type:'match', prompt:'const birthYear = 2010; birthYear = 2011; — what happens?', options: ['Runs fine, birthYear becomes 2011', 'Error — cannot reassign a const', 'birthYear becomes undefined', 'It creates a second variable'], answer: 'Error — cannot reassign a const' },
       ],
       check:(log) => log.quizCorrect >= 2,
+    },
+    { id:'jsf2mathq', name:'Using Variables for Math', xp:25, type:'quiz',
+      text:`<h4>JavaScript can do math just like a calculator</h4>
+        <p>You can store numbers in variables and use math operators to calculate totals, averages, or anything else.</p>
+        <p><b>Addition (+)</b>: <code>5 + 3</code> adds two numbers. <b>Subtraction (-)</b>: <code>10 - 4</code> subtracts one number from another. <b>Multiplication (*)</b>: <code>6 * 2</code> multiplies numbers. <b>Division (/)</b>: <code>12 / 3</code> divides numbers. <b>Modulo (%)</b>: <code>7 % 2</code> gives the remainder after division.</p>
+        <h4>The Math object — built-in math tools</h4>
+        <p>In JavaScript, an <b>object</b> is a container that holds related information. It groups together values and functions (called properties and methods) that belong to the same thing. One example is the <code>Math</code> object — it comes with built-in math functionality that's helpful for calculations. For example, you can use <code>Math.PI</code> to represent the value of π (pi), about 3.14159.</p>
+        <p><code>Math.pow(base, exponent)</code> raises a number to a power: <code>let squared = Math.pow(4, 2); // 4^2 = 16</code>. <code>Math.sqrt(x)</code> finds the square root: <code>let root = Math.sqrt(25); // 5</code>. <code>Math.round(x)</code> rounds to the nearest whole number: <code>Math.round(3.7); // 4</code>.</p>
+        <p>In JavaScript, <code>.PI</code> is a <b>property</b>, which means it holds a fixed value (about 3.14159) — read directly, no parentheses. <code>.pow()</code> is a <b>method</b>, which means it's a function you can call to do something, such as calculate exponents.</p>`,
+      hints:['% gives you the REMAINDER, not a percentage.', 'A property has no parentheses (Math.PI). A method DOES (Math.round()).'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'What does 7 % 2 give you?', options: ['1', '3.5', '9', '14'], answer: '1' },
+        { type:'match', prompt:'Math.PI — is this a property or a method?', options: ['Property', 'Method', 'Neither', 'Both'], answer: 'Property' },
+        { type:'match', prompt:'Math.round(3.7) gives you...', options: ['4', '3', '3.7', '0'], answer: '4' },
+        { type:'match', prompt:'Math.pow(4, 2) calculates...', options: ['4 squared (16)', 'The square root of 4', '4 divided by 2', '4 times 2'], answer: '4 squared (16)' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
     },
     { id:'jsf2s4', name:'Using Variables for Math', xp:30, lang:'web',
       text:`JavaScript does math like a calculator: <code>+</code> (add), <code>-</code> (subtract), <code>*</code> (multiply), <code>/</code> (divide), <code>%</code> (modulo — the REMAINDER after division, e.g. <code>7 % 2</code> is <code>1</code>).<br><br>
