@@ -2475,6 +2475,26 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
       },
       check:(log) => /\.(?:textContent|innerText)\s*=\s*["'][^"']*["']\s*\+\s*\w+/.test(log.js) || /\.(?:textContent|innerText)\s*=\s*\w+\s*\+\s*["'][^"']*["']/.test(log.js),
     },
+    { id:'web5qclick', name:'Event-Driven Programming', xp:25, type:'quiz',
+      text:`<h4>Nothing happens until the visitor does something</h4>
+        <p>Every page so far ran its JavaScript once, immediately, the moment the page loaded. A button click changes that — the code inside a click handler doesn't run at load time at all. It sits there, WAITING, and only runs the moment a visitor actually clicks.</p>
+        <p>Web pages don't run all their code at once. Instead, they wait for the user to do something — click a button, type in a box. This style of programming is called <b>event-driven programming</b>. Nothing happens until an <b>event</b> (a click, a key press) triggers your code to run.</p>
+        <h4>addEventListener() — attaching a response to an event</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">document.querySelector("button").addEventListener("click", function() {
+  document.querySelector("p").textContent = "You clicked it!";
+});</pre>
+        <p>Read it in three pieces: <code>document.querySelector("button")</code> finds the element. <code>.addEventListener("click", ...)</code> says WHICH event to listen for. The function passed in is the code that actually runs — but only once that click genuinely happens, not before.</p>
+        <h4>The function runs LATER, not immediately</h4>
+        <p>This is the single trickiest part for beginners: the code INSIDE the function doesn't execute when the page loads, even though it's written right there in your script. It's saved for later, and only runs at the moment of the click — possibly seconds, minutes, or never, depending on what the visitor does.</p>`,
+      hints:['addEventListener("click", fn) doesn\'t run fn immediately — it saves fn to run LATER, only when that click actually happens.', 'Nothing on the page changes until the visitor actually clicks — that\'s the whole point of event-driven code.', 'The exact same idea as Grade 7\'s onclick blocks, just written as real JavaScript syntax now.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'document.querySelector("button").addEventListener("click", function(){ ... }); — when does the code inside the function actually run?', options: ['Only when the button is clicked', 'The instant the page loads', 'Once per second automatically', 'Never — it\'s just a comment'], answer: 'Only when the button is clicked' },
+        { type:'match', prompt:'What is "event-driven programming"?', options: ['Code that waits and reacts to things like clicks, instead of running once top-to-bottom', 'Writing code as fast as possible', 'A style where nothing ever changes', 'Code that only works with animations'], answer: 'Code that waits and reacts to things like clicks, instead of running once top-to-bottom' },
+        { type:'match', prompt:'In .addEventListener("click", fn), what does the string "click" specify?', options: ['WHICH event to listen for', 'The name of the function', 'The element being clicked', 'The color of the button'], answer: 'WHICH event to listen for' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
     { id:'web5s3', name:'One Button, One Change', xp:40, lang:'web',
       text:`<strong>Sessions 5-6</strong> — Add ONE button. When clicked, it changes ONE piece of text on the page (e.g. reveals a fun fact). This is the FIRST real JavaScript idea this semester — one click, one change.`,
       hints:[
@@ -2487,6 +2507,28 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
         js: `// TODO: when the button is clicked, change the paragraph's text\n`,
       },
       check:(log) => log.hasClick && log.bodyChangedOnClick,
+    },
+    { id:'web5qvar', name:'A Variable That Survives Between Clicks', xp:25, type:'quiz',
+      text:`<h4>Where you declare a variable changes what it can do</h4>
+        <p>So far, every variable inside a click handler only ever held a value for that ONE click. To build something like a click counter, the variable needs to REMEMBER its value from one click to the next — and that depends entirely on WHERE it's declared.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">let clicks = 0;   // OUTSIDE the handler — created ONCE, when the page loads
+
+document.querySelector("button").addEventListener("click", function() {
+  clicks = clicks + 1;   // updates the SAME variable, every single click
+  document.querySelector("p").textContent = "Clicked " + clicks + " times";
+});</pre>
+        <h4>Outside the handler = created once, shared by every click</h4>
+        <p><code>let clicks = 0;</code> sitting OUTSIDE the function runs exactly ONCE, the moment the page loads. Every click afterward reaches OUT to that same variable and updates it — which is exactly why the count keeps climbing (1, then 2, then 3) instead of resetting.</p>
+        <h4>The mistake: declaring it INSIDE the handler</h4>
+        <p>If <code>let clicks = 0;</code> were written INSIDE the function instead, it would be recreated fresh, reset to 0, on EVERY single click — the count would be stuck at 1 forever, no matter how many times you clicked. Declaring a variable outside the function, then only CHANGING it inside, is what lets it genuinely persist.</p>`,
+      hints:['A variable declared OUTSIDE the click handler is created ONCE — every click after that reaches the SAME variable.', 'A variable declared INSIDE the handler resets to its starting value on every single click.', 'clicks = clicks + 1; only works correctly if clicks was already declared somewhere OUTSIDE.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'let clicks = 0; is written OUTSIDE the click handler. What happens across 3 clicks?', options: ['clicks correctly counts up: 1, 2, 3', 'clicks resets to 0 every click', 'clicks becomes undefined after the first click', 'The page crashes'], answer: 'clicks correctly counts up: 1, 2, 3' },
+        { type:'match', prompt:'If let clicks = 0; were moved INSIDE the click handler instead, what would happen?', options: ['clicks would reset to 0 every single click, stuck at 1 forever', 'Nothing would change', 'It would count even faster', 'It would cause a syntax error'], answer: 'clicks would reset to 0 every single click, stuck at 1 forever' },
+        { type:'match', prompt:'Why does declaring the variable OUTSIDE the function let it survive between clicks?', options: ['It\'s created once at page load, and every click reaches the SAME variable', 'JavaScript automatically saves all variables forever', 'It has nothing to do with WHERE it\'s declared', 'Outside variables are always numbers'], answer: 'It\'s created once at page load, and every click reaches the SAME variable' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
     },
     { id:'web5s4', name:'A Variable the Click Updates', xp:45, lang:'web',
       text:`<strong>Sessions 7-8</strong> — Add a variable your button's click UPDATES and displays (e.g. a click counter). This is the SECOND JS idea, building directly on the click handler from last time.`,
@@ -5662,9 +5704,19 @@ const CHALLENGE_LESSON = {
   web5s2: { title: 'One CSS rule reaches every section', html: `
     <div class="cl-block"><h4>Style once, applies everywhere</h4>
       <p>body { background-color: ...} and h1 { color: ...} apply to the WHOLE page and EVERY heading — however many sections you add, the styling stays consistent automatically.</p></div>` },
+  web5qclick: { title: 'Code that waits, instead of running immediately', html: `
+    <div class="cl-block"><h4>A genuinely different execution model</h4>
+      <p>Every earlier script ran top-to-bottom the instant the page loaded. A click handler's code is saved and held — it might run in 2 seconds, in 10 minutes, or never, entirely depending on whether the visitor ever clicks. This is the real meaning of "event-driven": the ORDER things happen in is no longer decided by the order you wrote them in.</p></div>
+    <div class="cl-block"><h4>Three separate pieces, one line</h4>
+      <p>.querySelector() finds the element, .addEventListener() names WHICH event to wait for, and the function is the code that eventually runs — mixing these up (e.g. thinking the function runs immediately) is the most common early misunderstanding.</p></div>` },
   web5s3: { title: 'One click, one change — the first real JS idea', html: `
     <div class="cl-block"><h4>addEventListener("click", ...)</h4>
       <p>This is the exact same idea as Grade 7's onclick blocks, now in real JavaScript syntax. One button, one function that runs when it's clicked, one thing changes.</p></div>` },
+  web5qvar: { title: 'WHERE a variable lives decides what it remembers', html: `
+    <div class="cl-block"><h4>Created once vs. recreated every time</h4>
+      <p>A variable declared OUTSIDE a function is set up exactly once, when the page loads — every later call to that function reaches out to the SAME variable. One declared INSIDE the function is rebuilt from scratch every single call, which is exactly why a counter placed there can never count past 1.</p></div>
+    <div class="cl-block"><h4>This idea reappears everywhere, under different names</h4>
+      <p>"Declared outside so it persists" is the same underlying idea behind a game's running score, a shopping cart's item count, or any total that has to survive across many separate actions — not just click counters.</p></div>` },
   web5s4: { title: 'A variable the click updates', html: `
     <div class="cl-block"><h4>Declared OUTSIDE the handler, changed INSIDE it</h4>
       <p>let clicks = 0; outside the function means it survives between clicks — each click adds to the SAME variable, not a fresh one every time.</p></div>` },
