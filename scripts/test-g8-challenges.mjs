@@ -70,6 +70,13 @@ const webMaximalLog = () => ({
   hasLoop: true, listItems: 3,
   hasClick: true, listItemsGrewOnClick: true, bodyChangedOnClick: true,
   hasIndex: true, hasLength: true, hasAnd: true,
+  // Forms/Tip Calculator project — real <input> elements + behavioral
+  // click-testing fields (bodyTextAfterClick includes both a calculator's
+  // correct result AND the quick-tip-button's correct result, since the
+  // same generic fixture has to satisfy every check that reads it).
+  inputCount: 5, numberInputCount: 3, radioInputCount: 3,
+  hasNumberConvert: true, hasToFixed: true, hasValueRead: true,
+  bodyTextAfterClick: 'Tip: $20.00 Total: $120.00 Tip: $10.00 Total: $60.00 14',
   // Semester 1 (3-semester rebuild, web1-web4) — real element counts +
   // EXACT computed colors (getComputedStyle's rgb() form of each challenge's
   // own hex color — h1/body from #2F3B52/#FFF7E6, h2/h3/p/link/button colors
@@ -222,6 +229,12 @@ const WEB_REJECT = [
   ['jsf2s5', 'Math.pow used but Math.sqrt is missing', { js: 'let squared=Math.pow(5,2);document.write(squared);' }],
   ['jsf2s6', 'perimeter formula has no doubling at all (mathematically wrong)', { js: 'let width=8;let height=5;let area=width*height;let perimeter=width+height;console.log(width);console.log(height);console.log(area);console.log(perimeter);' }],
   ['jsf2boss', 'never divides by MPG at all (gasCost formula missing)', { js: 'let driver="Sam";let dest="Miami";let snacks=true;let distance=200;let time=4;\nlet a1="Beach";let a2="Pier";let a3="Museum";\nconst MPG=25;const gasPrice=3.50;\n// trip calcs\nlet speed=distance/time;\nconsole.log(speed);' }],
+  ['web5cs1', 'only 1 input (needs 2, one of them a number input)', { inputCount: 1, numberInputCount: 0 }],
+  ['web5cs2', 'never converts with Number() (string concatenation instead of doubling)', { hasNumberConvert: false, hasValueRead: true, hasClick: true, bodyTextAfterClick: '77' }],
+  ['web5cboss', 'only 2 radio buttons (needs 3)', { radioInputCount: 2, hasClick: true }],
+  ['web6s1', 'only 1 number input and 1 paragraph (needs 2 inputs, 3 paragraphs)', { numberInputCount: 1, buttons: 1, paragraphs: 1 }],
+  ['web6s2', 'wrong math — a bug that computes the WRONG tip/total for bill=100,tip=20%', { hasNumberConvert: true, hasToFixed: true, hasClick: true, bodyTextAfterClick: 'Tip: $2.00 Total: $102.00' }],
+  ['web6boss', 'quick-tip button uses the wrong percentage (not actually 20%)', { bodyTextAfterClick: 'Tip: $5.00 Total: $55.00' }],
 ]
 const WEB_ACCEPT = [
   ['jsf1s2', 'a real quoted console.log message', { js: 'console.log("hi there");' }],
@@ -235,6 +248,12 @@ const WEB_ACCEPT = [
   ['jsf2s5', 'both Math.pow and Math.sqrt used', { js: 'let squared=Math.pow(5,2);let root=Math.sqrt(36);document.write(squared+root);' }],
   ['jsf2s6', 'the doubled-terms alternate formula (mathematically equivalent to the hint)', { js: 'let width=8;let height=5;let area=width*height;let perimeter=width*2+height*2;console.log(width);console.log(height);console.log(area);console.log(perimeter);' }],
   ['jsf2boss', 'a genuine full solution', { js: 'let driver="Sam";let dest="Miami";let snacks=true;let distance=200;let time=4;\nlet a1="Beach";let a2="Pier";let a3="Museum";\nconst MPG=25;const gasPrice=3.50;\n// convert distance and time into a real speed and cost\nlet speed=distance/time;\nlet gasCost=(distance/MPG)*gasPrice;\nconsole.log(speed);\nconsole.log(gasCost);', bodyText: '' }],
+  ['web5cs1', 'a real text input + number input', { inputCount: 2, numberInputCount: 1 }],
+  ['web5cs2', 'genuine Number() conversion, doubled correctly (7*2=14)', { hasNumberConvert: true, hasValueRead: true, hasClick: true, bodyTextAfterClick: '14' }],
+  ['web5cboss', '3 radio buttons, real click handler', { radioInputCount: 3, hasClick: true }],
+  ['web6s1', 'the full required layout', { numberInputCount: 2, buttons: 1, paragraphs: 3 }],
+  ['web6s2', 'correct math for bill=100, tip=20% -> tip $20.00, total $120.00', { hasNumberConvert: true, hasToFixed: true, hasClick: true, bodyTextAfterClick: 'Tip: $20.00 Total: $120.00' }],
+  ['web6boss', 'quick-tip button correctly computes 20% of bill=50 -> $10.00 tip, $60.00 total', { bodyTextAfterClick: 'Tip: $10.00 Total: $60.00' }],
 ]
 for (const [id, label, log] of WEB_REJECT) {
   const ch = byId(id)

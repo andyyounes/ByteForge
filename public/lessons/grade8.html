@@ -702,13 +702,35 @@ async function runWebCode() {
     hasIndex:  /\[\s*\d+\s*\]/.test(js),
     hasLength: /\.length\b/.test(js),
     hasAnd:    /&&/.test(js),
+    // Forms/Tip Calculator project — real <input> elements, not just JS.
+    inputCount:       doc.querySelectorAll('input').length,
+    numberInputCount: doc.querySelectorAll('input[type="number"]').length,
+    radioInputCount:  doc.querySelectorAll('input[type="radio"]').length,
+    hasNumberConvert: /\bNumber\s*\(/.test(js),
+    hasToFixed:       /\.toFixed\s*\(/.test(js),
+    hasValueRead:     /\.value\b/.test(js),
   }
   const liBefore = doc.querySelectorAll('li').length
   const bodyBefore = webLog.bodyText
-  const btn = doc.querySelector('button')
+  // Real behavioral test, not just structural regex — a mission's own
+  // `testInputs: { elementId: value }` (see p0m5-style rigor established
+  // elsewhere this session) lets a check() verify the calculator ACTUALLY
+  // computes the right number, not just that it calls the right functions.
+  const mission = CHALLENGES[activeIdx]
+  if (mission && mission.testInputs) {
+    for (const [id, val] of Object.entries(mission.testInputs)) {
+      const el = doc.getElementById(id)
+      if (el) el.value = val
+    }
+  }
+  // testButtonId picks WHICH button to click when a page has more than one
+  // (e.g. a "Calculate" button plus a "Quick 20% Tip" button) — defaults to
+  // the first button on the page, same as before, when not specified.
+  const btn = mission && mission.testButtonId ? doc.getElementById(mission.testButtonId) : doc.querySelector('button')
   if (btn) btn.click()
   webLog.listItemsGrewOnClick = btn != null && doc.querySelectorAll('li').length > liBefore
   webLog.bodyChangedOnClick   = btn != null && doc.body.textContent !== bodyBefore
+  webLog.bodyTextAfterClick   = doc.body.textContent
   clog('Ran — checking your page…', 'info')
   checkWebChallenge(webLog)
 }
@@ -2978,6 +3000,137 @@ localStorage.removeItem("name");        // delete</pre>
       needsLoop:true, needsFunction:true, needsArray:true, needsObject:true, needsPush:true, needsClick:true, needsLSSet:true, needsJSON:true,
       check:(log) => log.hasLoop && log.hasFunction && log.hasArray && log.hasObject && log.hasPush && log.hasClick
                   && log.hasLSSet && log.hasJSONStringify && log.listItemsGrewOnClick && log.bodyChangedOnClick,
+    },
+  ]},
+  // ── Forms — Real User Input. Genuinely new HTML (buttons/images were
+  // already taught in web0b/web2) — <input> elements were never taught
+  // anywhere before this, and the Tip Calculator project right after this
+  // module needs them. Single-page, no engine changes needed.
+  { id:'web5c', name:'📋 Forms — Real User Input', sub:'Text/number inputs, radio buttons, and reading .value with JavaScript', live:true, stages:[
+    { id:'web5cq0', name:'What Is an Input?', xp:25, type:'quiz',
+      text:`<h4>Every page so far only ever DISPLAYED things</h4>
+        <p>An <code>&lt;input&gt;</code> is different — it's a real box the VISITOR types into, or a control they click. This is how a real page actually collects information from someone, instead of only showing them things.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">&lt;input type="text" id="userName" placeholder="Your name"&gt;
+&lt;input type="number" id="billTotal" placeholder="Bill Total"&gt;</pre>
+        <p><code>type="text"</code> accepts any typed text. <code>type="number"</code> restricts it to numbers (and shows up/down arrows on most browsers) — use this whenever the answer should genuinely be a number, like a bill amount. <code>placeholder="..."</code> shows faint grey hint text INSIDE the empty box — it disappears the moment the visitor starts typing, and is never actually submitted as a real value.</p>
+        <h4>Reading what the visitor typed: .value</h4>
+        <p>Every input element has a <code>.value</code> property holding whatever's currently typed in it — read with plain JavaScript, exactly like any other property:</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">const billInput = document.getElementById("billTotal");
+let bill = billInput.value;</pre>
+        <p><b>Important:</b> <code>.value</code> ALWAYS comes back as a STRING, even for <code>type="number"</code> inputs — typing 100 gives you the text "100", not the number 100. Just like <code>prompt()</code>, you need <code>Number(billInput.value)</code> to actually do math with it.</p>
+        <h4>Radio buttons — pick exactly ONE from a group</h4>
+        <p>Radio buttons let a visitor choose exactly one option out of several. They only work as a GROUP if every button in the group shares the same <code>name</code> attribute — that's what tells the browser "these buttons are mutually exclusive, only one can be selected."</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">&lt;input type="radio" name="size" value="small"&gt; Small
+&lt;input type="radio" name="size" value="large"&gt; Large</pre>
+        <p>Reading which one is selected uses <code>.checked</code> (true/false) on each individual radio button, not <code>.value</code> on the group.</p>`,
+      hints:['.value on an input ALWAYS returns a string — Number() converts it before you can do real math with it.', 'placeholder text is just a visual hint — it\'s never actually submitted as data.', 'Radio buttons only behave as a mutually-exclusive group when they share the same name attribute.'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'What type of value does inputElement.value always give you, even for a number input?', options: ['A string', 'A real number', 'A boolean', 'Undefined'], answer: 'A string' },
+        { type:'match', prompt:'What happens to placeholder text when the visitor starts typing?', options: ['It disappears — it was never real data', 'It gets submitted along with what they typed', 'It turns into the input\'s permanent value', 'It stays visible behind their typing'], answer: 'It disappears — it was never real data' },
+        { type:'match', prompt:'Why must two radio buttons share the same name attribute to work as a group?', options: ['It tells the browser only ONE of them can be selected at once', 'It\'s required for any HTML to be valid', 'It makes them the same color', 'It links them to the same CSS file'], answer: 'It tells the browser only ONE of them can be selected at once' },
+        { type:'match', prompt:'billInput.value gives "100" (as text). How do you get the real number 100 to do math with?', options: ['Number(billInput.value)', 'billInput.value.number()', 'It\'s already a number, no conversion needed', 'parseInput(billInput.value)'], answer: 'Number(billInput.value)' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
+    { id:'web5cs1', name:'Build the Inputs', xp:25, lang:'web',
+      text:`<strong>Challenge 1</strong> — Add a text input (id <code>"userName"</code>, placeholder "Your name") and a number input (id <code>"userAge"</code>, placeholder "Your age") to the page. No JavaScript yet — just the HTML.`,
+      hints:[
+        '<input type="text" id="userName" placeholder="Your name">',
+        '<input type="number" id="userAge" placeholder="Your age">',
+        'Inputs are self-closing — no separate closing tag needed.',
+      ],
+      webStarter: {
+        html: `<h1>Sign Up</h1>\n<!-- TODO: a text input (id="userName") and a number input (id="userAge") -->\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\ninput { padding: 6px; margin: 4px 0; display: block; }\n`,
+        js: ``,
+      },
+      check:(log) => log.inputCount >= 2 && log.numberInputCount >= 1,
+    },
+    { id:'web5cs2', name:'Read the Input, Do the Math', xp:35, lang:'web',
+      text:`<strong>Challenge 2</strong> — Read a number input's value with <code>.value</code>, convert it with <code>Number()</code>, double it, and show the result in <code>#story</code> when the button is clicked.`,
+      hints:[
+        'const numInput = document.getElementById("num"); — grab the element once, outside the click handler.',
+        'Inside the click handler: let n = Number(numInput.value); then display n * 2.',
+        'Forgetting Number() means n * 2 on a STRING does something very different from real multiplication.',
+      ],
+      webStarter: {
+        html: `<input type="number" id="num" placeholder="Enter a number">\n<button id="goBtn">Double It</button>\n<p id="story"></p>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `const numInput = document.getElementById("num");\nconst goBtn = document.getElementById("goBtn");\n\n// TODO: goBtn click — read numInput.value, Number() it, double it, show the result in #story\n`,
+      },
+      testInputs: { num: '7' },
+      check:(log) => log.hasNumberConvert && log.hasValueRead && log.hasClick && /\b14\b/.test(log.bodyTextAfterClick),
+    },
+    { id:'web5cboss', name:'BOSS — Pick One, Radio Buttons', xp:60, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Add THREE radio buttons (same <code>name</code>) for a favorite season, plus a button that reads which one is <code>.checked</code> and displays it in <code>#story</code>.`,
+      hints:[
+        'All three radios need the SAME name attribute — e.g. name="season" — to behave as one group.',
+        'document.querySelectorAll(\'input[name="season"]\') gives you all three — loop through them checking .checked.',
+        'Only ONE will have .checked === true at any moment — that\'s the one the visitor picked.',
+      ],
+      webStarter: {
+        html: `<!-- TODO: 3 radio buttons, same name, different values (e.g. Summer/Winter/Spring) -->\n<button id="pickBtn">See My Choice</button>\n<p id="story"></p>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `// TODO: pickBtn click — find which radio is .checked, show its value in #story\n`,
+      },
+      check:(log) => log.radioInputCount >= 3 && log.hasClick,
+    },
+  ]},
+  // ── Project — Tip Calculator. The first genuinely standalone utility-app
+  // project (not part of the ongoing "Web Story" narrative) — combines
+  // inputs (web5c), DOM (web5), math (jsf2), and a function (ws2), which is
+  // exactly why it's positioned after all of Semester 1's JS content rather
+  // than earlier. Verified with REAL computed values via testInputs, not
+  // just structural regex — bill=100, tip=20% must genuinely produce
+  // tip=$20.00 and total=$120.00.
+  { id:'web6', name:'🧮 Project — Tip Calculator', sub:'A real utility app: bill total + tip % in, tip amount + final total out', live:true, stages:[
+    { id:'web6s1', name:'Build the Calculator Layout', xp:35, lang:'web',
+      text:`<strong>Step 1</strong> — Build the page: a number input for the bill total (id <code>"billTotal"</code>), a number input for the tip % (id <code>"tipPercent"</code>), a button (id <code>"calculateBtn"</code>), and two empty result paragraphs (<code>"tipAmount"</code>, <code>"totalAmount"</code>). No JavaScript yet.`,
+      hints:[
+        '<input type="number" id="billTotal" placeholder="Bill Total">',
+        '<input type="number" id="tipPercent" placeholder="Tip %">',
+        '<button id="calculateBtn">Calculate Tip</button> then two empty <p> tags for the results.',
+      ],
+      webStarter: {
+        html: `<h2>Smart Tip Calculator</h2>\n<p>Enter the bill total and how much you want to tip.</p>\n<!-- TODO: number input billTotal, number input tipPercent, button calculateBtn, p#tipAmount, p#totalAmount -->\n`,
+        css: `body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; }\ninput { padding: 8px; font-size: 16px; margin: 5px; width: 150px; }\nbutton { padding: 10px 15px; font-size: 16px; cursor: pointer; }\np { font-weight: bold; margin-top: 15px; }\n`,
+        js: ``,
+      },
+      check:(log) => log.numberInputCount >= 2 && log.buttons >= 1 && log.paragraphs >= 3,
+    },
+    { id:'web6s2', name:'The Calculate Function', xp:45, lang:'web',
+      text:`<strong>Steps 2-4</strong> — Grab the inputs/button/output paragraphs with <code>getElementById</code>. Write <code>calculateTip()</code>: read both inputs (converted with <code>Number()</code>), compute <code>tipAmount = bill * (tip / 100)</code> and <code>total = bill + tipAmount</code>, display both using <code>.toFixed(2)</code> (e.g. "$20.00"). Connect it to the button's click.`,
+      hints:[
+        'const billInput = document.getElementById("billTotal"); — one getElementById per element you need, done ONCE outside the function.',
+        'function calculateTip() { let bill = Number(billInput.value); let tip = Number(tipPercent.value); ... }',
+        '.toFixed(2) always shows exactly 2 decimal places — $20 becomes "$20.00", matching real money formatting.',
+        'calculateBtn.onclick = calculateTip; — connects the function to the button (no parentheses after calculateTip here — you\'re naming the function, not calling it yet).',
+      ],
+      webStarter: {
+        html: `<h2>Smart Tip Calculator</h2>\n<p>Enter the bill total and how much you want to tip.</p>\n<input type="number" id="billTotal" placeholder="Bill Total">\n<input type="number" id="tipPercent" placeholder="Tip %">\n<br><br>\n<button id="calculateBtn">Calculate Tip</button>\n<p id="tipAmount"></p>\n<p id="totalAmount"></p>\n`,
+        css: `body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; }\ninput { padding: 8px; font-size: 16px; margin: 5px; width: 150px; }\nbutton { padding: 10px 15px; font-size: 16px; cursor: pointer; }\np { font-weight: bold; margin-top: 15px; }\n`,
+        js: `const billInput = document.getElementById("billTotal");\nconst tipInput = document.getElementById("tipPercent");\nconst calculateBtn = document.getElementById("calculateBtn");\nconst tipDisplay = document.getElementById("tipAmount");\nconst totalDisplay = document.getElementById("totalAmount");\n\n// TODO: function calculateTip() { ...compute tipAmount and total, display both with .toFixed(2)... }\n\n// TODO: calculateBtn.onclick = calculateTip;\n`,
+      },
+      testInputs: { billTotal: '100', tipPercent: '20' },
+      check:(log) => log.hasNumberConvert && log.hasToFixed && log.hasClick
+        && /20\.00/.test(log.bodyTextAfterClick) && /120\.00/.test(log.bodyTextAfterClick),
+    },
+    { id:'web6boss', name:'BOSS — Quick 20% Tip Button', xp:60, lang:'web', boss:true,
+      text:`<strong>Step 5 — BOSS</strong> — Keep the full calculator from before, and add a SECOND button ("20% Tip") that instantly computes and shows a 20% tip using ONLY the bill total — no need to type a tip % or press Calculate first.`,
+      hints:[
+        'A second, separate onclick handler — it can do the math directly inline, without needing calculateTip() at all.',
+        'quickTipBtn.onclick = function() { let bill = Number(billInput.value); let tipAmount = bill * 0.2; ...display it... };',
+        'This button ignores whatever is typed in tipPercent entirely — it always uses exactly 20%.',
+      ],
+      webStarter: {
+        html: `<h2>Smart Tip Calculator</h2>\n<input type="number" id="billTotal" placeholder="Bill Total">\n<input type="number" id="tipPercent" placeholder="Tip %">\n<br><br>\n<button id="calculateBtn">Calculate Tip</button>\n<!-- TODO: a second button, id="quickTipBtn", labeled "20% Tip" -->\n<p id="tipAmount"></p>\n<p id="totalAmount"></p>\n`,
+        css: `body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; }\ninput { padding: 8px; font-size: 16px; margin: 5px; width: 150px; }\nbutton { padding: 10px 15px; font-size: 16px; cursor: pointer; margin: 0 4px; }\np { font-weight: bold; margin-top: 15px; }\n`,
+        js: `const billInput = document.getElementById("billTotal");\nconst tipInput = document.getElementById("tipPercent");\nconst calculateBtn = document.getElementById("calculateBtn");\nconst tipDisplay = document.getElementById("tipAmount");\nconst totalDisplay = document.getElementById("totalAmount");\n\nfunction calculateTip() {\n  let bill = Number(billInput.value);\n  let tip = Number(tipInput.value);\n  let tipAmount = bill * (tip / 100);\n  let total = bill + tipAmount;\n  tipDisplay.textContent = "Tip: $" + tipAmount.toFixed(2);\n  totalDisplay.textContent = "Total: $" + total.toFixed(2);\n}\ncalculateBtn.onclick = calculateTip;\n\n// TODO: const quickTipBtn = document.getElementById("quickTipBtn");\n// TODO: quickTipBtn.onclick = function() { ...always use 20%, regardless of tipPercent... }\n`,
+      },
+      testInputs: { billTotal: '50' },
+      testButtonId: 'quickTipBtn',
+      check:(log) => /10\.00/.test(log.bodyTextAfterClick) && /60\.00/.test(log.bodyTextAfterClick),
     },
   ]},
   // ── Semester 2, Week 1: What Is Python? / Variables — new for the
@@ -5467,6 +5620,23 @@ const CHALLENGE_LESSON = {
       <p>State (arrays/objects), functions organizing logic, loops building UI, real click events, and localStorage persistence — this is genuinely the same shape as a real, if small, interactive web application, built entirely from ideas introduced one at a time.</p></div>
     <div class="cl-block"><h4>This is what the actual project will build on</h4>
       <p>Every mechanic here — inventory, flags, a click-driven update, saved progress — is a real building block for the actual Semester 1 interactive story project this course leads into.</p></div>` },
+  // ── Forms & Tip Calculator — real user input, the first standalone app ──────
+  web5cq0: { title: '.value is always a string, even for numbers', html: `
+    <div class="cl-block"><h4>The same trap as prompt()</h4>
+      <p>Typing 100 into a number input still gives you the TEXT "100" via .value — Number() is what turns it into a real number you can do maths with, exactly the same conversion prompt() always needed too.</p></div>
+    <div class="cl-block"><h4>name is what makes radio buttons a GROUP</h4>
+      <p>Without a shared name attribute, "radio" buttons would just be a pile of independent checkboxes that can all be selected at once — name is the one thing telling the browser they're mutually exclusive.</p></div>` },
+  web5cs2: { title: 'Read once, use everywhere', html: `
+    <div class="cl-block"><h4>getElementById outside the click handler</h4>
+      <p>Grabbing the input element ONCE, in a variable outside the function, and reusing that same variable every click is more efficient (and more readable) than calling getElementById again inside the handler every single time.</p></div>` },
+  web6s2: { title: 'A real, working utility — not just an exercise', html: `
+    <div class="cl-block"><h4>Every earlier idea, combined into something useful</h4>
+      <p>Reading input (.value), converting types (Number()), real arithmetic, formatting output (.toFixed(2)), and connecting it to a click — this is genuinely the same shape as any real calculator app, just small enough to build in one sitting.</p></div>
+    <div class="cl-block"><h4>toFixed(2) is a formatting choice, not a math one</h4>
+      <p>The actual calculation doesn't need toFixed() at all — it exists purely so $20 displays as "$20.00" instead of just "$20", matching how money is normally written.</p></div>` },
+  web6boss: { title: 'Two buttons, two separate click handlers', html: `
+    <div class="cl-block"><h4>Shortcuts don\'t have to reuse existing functions</h4>
+      <p>The quick-tip button could call calculateTip() after secretly setting tipPercent to 20 — but writing its own small, separate calculation directly is simpler here, and just as valid a way to solve the problem.</p></div>` },
   // ── M1 — From Blocks to Text ────────────────────────────────────────────────
   m1s1: { title: 'print() — your first real line of code', html: `
     <div class="cl-block"><h4>The classic first line, in any language</h4>
