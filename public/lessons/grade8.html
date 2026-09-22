@@ -2511,6 +2511,35 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
   ]},
   // ── Web Story 2 — Semester 1, Week 2: functions organizing story logic ────
   { id:'ws2', name:'📘 Web Story 2 — Organizing the Telling', sub:'Functions — reusable, named pieces of story logic', live:true, stages:[
+    { id:'ws2q0', name:'What Is a Function?', xp:25, type:'quiz',
+      text:`<h4>A function is a named, reusable block of instructions</h4>
+        <p>Every stage in Web Story 1 wrote code that ran once, top to bottom. A <b>function</b> is different — it's a block of code you give a NAME to, so you can run that exact same block again later just by calling its name, instead of retyping it.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">function greet() {
+  return "Welcome, traveler!";
+}
+
+let message = greet(); // runs the function, stores what it RETURNS</pre>
+        <p><code>function greet() { ... }</code> DEFINES the function — it doesn't run anything yet, it just teaches the computer this new instruction exists. <code>greet()</code> (with parentheses) is what actually CALLS it — this is when the code inside actually runs.</p>
+        <h4>return hands a value back out</h4>
+        <p><code>return "Welcome, traveler!";</code> is how a function sends a value back to whoever called it. Crucially, a function that <code>return</code>s a value does NOT automatically display it anywhere — <code>greet()</code> on its own just produces the text "Welcome, traveler!" sitting there unused. A SEPARATE line has to actually do something with it, like <code>document.getElementById("story").textContent = greet();</code>.</p>
+        <h4>Parameters — a function that takes INPUT</h4>
+        <p>A function with no parameters always does exactly the same thing every time. A <b>parameter</b> lets you pass in different information each call: <code>function describeItem(name) { return "You see a " + name + "."; }</code> — calling <code>describeItem("lantern")</code> and <code>describeItem("sword")</code> gives two different results from the SAME function, because <code>name</code> is different each time.</p>
+        <h4>Why bother with functions at all?</h4>
+        <p>Without functions, any piece of logic you need more than once has to be copy-pasted everywhere you need it — and if you later find a bug in it, you have to fix it in every single copy. A function exists in exactly ONE place; fix it once, and every call to it is instantly fixed too.</p>`,
+      hints:['A function DEFINITION (function greet() {...}) doesn\'t run anything by itself — it only runs when you CALL it (greet()).', 'return sends a value OUT of the function — it does not display anything on its own.', 'A parameter is how a function receives different input each time it\'s called.'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'function greet() { return "Hi"; } — does writing this line alone display "Hi" anywhere?',
+          options: ['No — it only defines the function; it has to be CALLED to run', 'Yes, it prints immediately', 'Yes, but only in the console', 'It causes an error'], answer: 'No — it only defines the function; it has to be CALLED to run' },
+        { type:'match', prompt:'In function describeItem(name) { ... }, what is "name"?',
+          options: ['A parameter — input the function receives each call', 'The function\'s return value', 'A global variable', 'A comment'], answer: 'A parameter — input the function receives each call' },
+        { type:'match', prompt:'What does return actually do?',
+          options: ['Hands a value back to whoever called the function', 'Displays the value on the page automatically', 'Stops the whole program', 'Deletes the function'], answer: 'Hands a value back to whoever called the function' },
+        { type:'match', prompt:'What\'s the main benefit of writing a function instead of copy-pasting the same code everywhere?',
+          options: ['Fix a bug once, in one place, instead of in every copy', 'Functions run faster than any other code', 'Functions are required by JavaScript', 'It uses less memory'], answer: 'Fix a bug once, in one place, instead of in every copy' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
     { id:'ws2s0', name:'Your First Function — No Inputs Yet', xp:20, lang:'web',
       text:`<strong>Before parameters</strong> — write <code>function greet()</code> with NO inputs at all, that RETURNS a fixed greeting like "Welcome, traveler!". Call it (with empty parentheses) and display the result inside <code>#story</code>.`,
       hints:[
@@ -2607,6 +2636,28 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
   ]},
   // ── Web Story 3 — Semester 1, Week 3: saving progress with localStorage ────
   { id:'ws3', name:'💾 Web Story 3 — Remembering After You Leave', sub:'localStorage — data that survives a page refresh', live:true, stages:[
+    { id:'ws3q0', name:'What Is localStorage?', xp:25, type:'quiz',
+      text:`<h4>Every variable so far has been temporary</h4>
+        <p>Every array, object, and variable you've made in Web Stories 1-2 disappears the instant the page reloads — refresh, and it's gone. <b>localStorage</b> is different: it's a small storage space in the BROWSER itself that genuinely survives a page refresh, closing the tab, or even restarting the computer.</p>
+        <h4>Three core commands</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">localStorage.setItem("name", "Alex");   // save
+localStorage.getItem("name");           // read back -> "Alex"
+localStorage.removeItem("name");        // delete</pre>
+        <p><code>setItem(key, value)</code> saves something under a NAME (the key) you choose. <code>getItem(key)</code> reads it back later — even after a real refresh. <code>removeItem(key)</code> deletes just that one saved value, leaving everything else untouched.</p>
+        <h4>The big limitation: TEXT ONLY</h4>
+        <p>localStorage can only ever store STRINGS — never a real array or object directly. To save something more complex, you convert it to a string first with <code>JSON.stringify()</code>, then convert it back with <code>JSON.parse()</code> when you read it: <code>localStorage.setItem("inventory", JSON.stringify(["sword","shield"]));</code> then later <code>JSON.parse(localStorage.getItem("inventory"))</code> gives you back a REAL array again, not just text that looks like one.</p>
+        <h4>getItem() can return null</h4>
+        <p>If nothing was ever saved under a key, <code>getItem()</code> doesn't error — it returns <code>null</code>. Real save systems always check for this: <code>if (saved) { ... }</code> reads naturally as "if something was actually found", since <code>null</code> counts as false in an if-check.</p>`,
+      hints:['localStorage only stores TEXT — arrays/objects need JSON.stringify() before saving and JSON.parse() after reading.', 'getItem() on a key that was never set returns null, not an error.', 'removeItem() only deletes ONE key — everything else saved stays exactly as it was.'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'What makes localStorage different from an ordinary JavaScript variable?', options: ['It survives a real page refresh/tab close', 'It runs faster', 'It only works with numbers', 'It\'s the same as a variable, just renamed'], answer: 'It survives a real page refresh/tab close' },
+        { type:'match', prompt:'Why do you need JSON.stringify() before saving an array to localStorage?', options: ['localStorage can only store text (strings), not real arrays/objects', 'It makes the array save faster', 'It\'s required by every setItem() call, even for plain text', 'It sorts the array first'], answer: 'localStorage can only store text (strings), not real arrays/objects' },
+        { type:'match', prompt:'localStorage.getItem("score") is called, but "score" was never saved. What happens?', options: ['Returns null', 'Throws an error', 'Returns 0', 'Returns an empty array'], answer: 'Returns null' },
+        { type:'match', prompt:'localStorage.removeItem("name") — what does this do to other saved keys, like "score"?', options: ['Nothing — only "name" is deleted', 'Deletes everything in localStorage', 'Also deletes "score"', 'Renames "score" to "name"'], answer: 'Nothing — only "name" is deleted' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
     { id:'ws3s1', name:'Remember After Refresh', xp:30, lang:'web',
       text:`<strong>Challenge 1</strong> — Save a name to localStorage with <code>localStorage.setItem("name", "Alex")</code>, then read it BACK with <code>localStorage.getItem("name")</code> and display it in <code>#story</code>.`,
       hints:[
@@ -2682,6 +2733,28 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
   ]},
   // ── Web Story 4 — Semester 1, Week 4: loops generating repeated UI ─────────
   { id:'ws4', name:'🔁 Web Story 4 — One Loop, Many Choices', sub:'A loop that builds page elements — one per item, automatically', live:true, stages:[
+    { id:'ws4q0', name:'What Is a Loop?', xp:25, type:'quiz',
+      text:`<h4>A loop repeats code without retyping it</h4>
+        <p>Building 3 list items by writing 3 nearly-identical lines works — but what about 30 items, or a list whose size changes? A <b>loop</b> runs the same block of code a set number of times, so you write the pattern ONCE and let the computer repeat it.</p>
+        <h4>The for loop — three parts, in order</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">for (let i = 0; i < choices.length; i++) {
+  // this block runs once per item
+}</pre>
+        <p>A <code>for</code> loop has three parts separated by semicolons: <code>let i = 0</code> runs ONCE at the very start (set up a counter). <code>i &lt; choices.length</code> is checked BEFORE every repeat — the loop keeps going as long as this stays true. <code>i++</code> runs AFTER every repeat (increase the counter by 1). Miss the <code>i++</code> part and the condition never becomes false — the loop runs forever.</p>
+        <h4>i is just a counter, not the item itself</h4>
+        <p>Inside the loop, <code>i</code> counts 0, 1, 2, 3... — to get the actual ARRAY ITEM at that position, you index into the array with it: <code>choices[i]</code>. This is exactly the same 0-based indexing from Web Story 1's <code>inventory[0]</code>.</p>
+        <h4>Building real page elements inside a loop</h4>
+        <p>A loop doesn't just calculate things — it can build real HTML elements too: <code>document.createElement("li")</code> makes a brand new, empty <code>&lt;li&gt;</code>; setting its <code>.textContent</code> gives it text; <code>.appendChild(li)</code> actually inserts it into the page. Doing this once per loop repeat is how ONE small loop can build an entire list, automatically sized to however many items the array actually has.</p>`,
+      hints:['A for loop\'s three parts run in this order: setup ONCE, then check-repeat-check-repeat..., stopping the moment the condition is false.', 'i is a counter (0, 1, 2...) — choices[i] is what gets you the actual array item at that position.', 'createElement() makes a new element; appendChild() is what actually puts it onto the page.'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'In for (let i = 0; i < choices.length; i++), when does i < choices.length get checked?', options: ['Before every single repeat of the loop', 'Only once, at the very start', 'Only once, at the very end', 'It\'s never actually checked'], answer: 'Before every single repeat of the loop' },
+        { type:'match', prompt:'What happens if you forget the i++ part of a for loop?', options: ['The loop runs forever (i never changes, so the condition never becomes false)', 'The loop runs exactly once', 'JavaScript adds it automatically', 'The loop skips every other item'], answer: 'The loop runs forever (i never changes, so the condition never becomes false)' },
+        { type:'match', prompt:'Inside the loop, what does choices[i] give you?', options: ['The actual array item at position i', 'The number i itself', 'The total length of the array', 'The last item in the array'], answer: 'The actual array item at position i' },
+        { type:'match', prompt:'What does appendChild() actually do?', options: ['Inserts a created element onto the real page', 'Creates a brand new empty element', 'Deletes an element from the page', 'Counts how many elements exist'], answer: 'Inserts a created element onto the real page' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
     { id:'ws4s0', name:'Just Loop — No Array Yet', xp:20, lang:'web',
       text:`<strong>Before looping over an array</strong> — just use a loop to count from 1 to 5, building up one growing piece of text ("1 2 3 4 5") and displaying it in <code>#story</code>. No array, no page elements yet — just a loop repeating 5 times.`,
       hints:[
@@ -5236,6 +5309,11 @@ const CHALLENGE_LESSON = {
     <div class="cl-block"><h4>The else branch is just as real as the if</h4>
       <p>Real code almost always needs to handle "not both" too, not just the success case — an if WITHOUT an else silently does nothing when the condition fails, which is rarely what you actually want.</p></div>` },
   // ── Web Story 2 — Organizing the Telling: functions ─────────────────────────
+  ws2q0: { title: 'A function is a named, reusable block', html: `
+    <div class="cl-block"><h4>Defining vs. calling — two separate steps</h4>
+      <p>function greet() { ... } only TEACHES the computer this instruction exists — nothing runs until you actually CALL it with greet(). Confusing "defined" with "ran" is one of the most common early mistakes.</p></div>
+    <div class="cl-block"><h4>One place to fix, not many</h4>
+      <p>The real payoff of a function isn't saving keystrokes once — it's that a bug found later only needs fixing in ONE place, not hunted down across every copy-pasted version of the same logic.</p></div>` },
   ws2s1: { title: 'A function RETURNS a value — it doesn\'t display one', html: `
     <div class="cl-block"><h4>Two separate steps, on purpose</h4>
       <p>describeItem() hands back a string; a SEPARATE line decides what to do with it (here, show it in #story). Keeping "compute the text" and "display the text" as two different steps is what makes describeItem() reusable for other items, other pages, anywhere you need that same sentence shape.</p></div>` },
@@ -5252,6 +5330,11 @@ const CHALLENGE_LESSON = {
     <div class="cl-block"><h4>Structure comes from HOW you split the work</h4>
       <p>A working page could technically be one giant block of code — but splitting it into functions, each with ONE clear job, is what makes a real project readable, testable, and changeable later without breaking everything else.</p></div>` },
   // ── Web Story 3 — Remembering After You Leave: localStorage ─────────────────
+  ws3q0: { title: 'localStorage vs. an ordinary variable', html: `
+    <div class="cl-block"><h4>Persistence is the whole point</h4>
+      <p>Every earlier variable vanished on refresh — localStorage is deliberately different, living in the browser itself rather than in the page's temporary memory, which is exactly why it needs its own dedicated API (setItem/getItem/removeItem) instead of just being a normal variable.</p></div>
+    <div class="cl-block"><h4>Text-only is a real constraint, not a quirk</h4>
+      <p>JSON.stringify()/JSON.parse() aren't optional extras — they're the ONLY way to save anything beyond plain text, because localStorage's storage format is fundamentally string-based.</p></div>` },
   ws3s1: { title: 'localStorage genuinely survives a refresh', html: `
     <div class="cl-block"><h4>Different from every variable so far</h4>
       <p>Every variable, array, and object this course has used disappears the instant the page reloads. localStorage is different — it\'s saved to the browser itself, tied to this page\'s address, and is still there even after closing the tab entirely.</p></div>` },
@@ -5270,6 +5353,11 @@ const CHALLENGE_LESSON = {
     <div class="cl-block"><h4>Every idea from this week, working together</h4>
       <p>Saving structured data (arrays/objects via JSON), loading it back, and checking whether it existed first — this is genuinely the same shape as how real websites remember your shopping cart, your game progress, or your preferences between visits.</p></div>` },
   // ── Web Story 4 — One Loop, Many Choices: loops generating UI ───────────────
+  ws4q0: { title: 'A for loop\'s three parts, in order', html: `
+    <div class="cl-block"><h4>Setup once, check-and-repeat, update every time</h4>
+      <p>for (let i = 0; i < choices.length; i++) reads as: set i to 0 ONCE, then keep repeating AS LONG AS i is still less than the array's length, increasing i by 1 after every single pass — miss the i++ and the loop never stops.</p></div>
+    <div class="cl-block"><h4>The counter and the item are two different things</h4>
+      <p>i is just a number counting 0, 1, 2... — choices[i] is what actually gets you the real array item sitting at that position. Mixing these two up (using i where you meant choices[i]) is a very common early bug.</p></div>` },
   ws4s1: { title: 'A loop builds elements — it doesn\'t just repeat text', html: `
     <div class="cl-block"><h4>Real elements, not copy-pasted HTML</h4>
       <p>Each pass through the loop creates a genuinely NEW &lt;li&gt; element and adds it to the page — the number of choices in the array directly decides how many list items appear, with zero hardcoded &lt;li&gt; tags in the HTML itself.</p></div>
