@@ -675,5 +675,23 @@ for (const pb of PRACTICE_BOTS) {
   else ok('g9-progress route.ts — TOTAL_MISSIONS (' + m[1] + ') matches the real MISSIONS.length')
 }
 
+// ── Session 8: every mission must be reachable through the map ───────────────
+// TIERS is a SEPARATE array from each mission's own `phase` field, and is
+// what showJourney() actually renders onto the map (worlds = TIERS.map(...)).
+// A mission can exist in MISSIONS, pass every check above, and still be
+// completely unreachable through normal play if nobody added its id to
+// TIERS too — this has now happened 3 separate times in one session
+// (flowg1-6/flowgboss, all of Phase 4, and this session's own p2m12-p2m15),
+// so it's worth a permanent automated check rather than relying on catching
+// it by hand again.
+{
+  const tStart = html.indexOf('const TIERS = [')
+  const tEnd = html.indexOf('\n]', tStart) + 2
+  const tierIds = new Set([...html.slice(tStart, tEnd).matchAll(/'([\w-]+)'/g)].map(x => x[1]))
+  const orphans = MISSIONS.map(m => m.id).filter(id => !tierIds.has(id))
+  if (orphans.length) bad('TIERS is missing ' + orphans.length + ' mission id(s) — unreachable through the map: ' + orphans.join(', '))
+  else ok('every mission id in MISSIONS is registered in TIERS (reachable through the map)')
+}
+
 console.log(fail ? '\n' + fail + ' problems' : '\nall missions verified — both engines honest')
 process.exit(fail ? 1 : 0)

@@ -1757,6 +1757,31 @@ const MISSIONS = [
 
   // ── Tier 1 — Sequencing ──────────────────────────────────────────────────────
   {
+    // Phase 1-3 jumped straight into missions with no intro 'learn' bubble
+    // anywhere — unlike Phase 0 (Foundations), which has one before nearly
+    // every new concept. Real gap: "asking students to DO something before
+    // ever teaching them WHAT it was", now closed the same way Phase 0 was.
+    id: 'learn-turtle', type: 'learn', phase: 'PHASE 1 · TURTLE', emoji: '🛰️', title: 'What Is Sequencing?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'Before flying anything — the single most important idea in programming: the computer does EXACTLY what you say, in EXACTLY the order you say it.',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'Sequence',  def: 'A list of instructions carried out ONE AT A TIME, in the exact order they\'re written.' },
+        { term: 'Command',   def: 'One single instruction the computer knows how to carry out, e.g. forward(80).' },
+        { term: 'Heading',   def: 'The direction something is currently facing — turning changes it, moving forward uses it.' },
+        { term: 'forward(d)', def: 'Moves d pixels in whatever direction you\'re CURRENTLY facing.' },
+      ],
+      theory: `
+        <h4>The computer does exactly what you say — no more, no less</h4>
+        <p>A program is a <b>sequence</b>: a list of commands run one after another, top to bottom. There's no "figuring out what you meant" — if you write the wrong order, it runs the WRONG order, precisely.</p>
+        <h4>Your ship has a HEADING</h4>
+        <p>It starts facing EAST. <code>forward(80)</code> always moves in whatever direction it's CURRENTLY facing — not toward the goal, not "the right way". Turn FIRST with <code>left(90)</code>/<code>right(90)</code>, then move.</p>
+        <h4>Plan on paper before you type</h4>
+        <p>Since order matters completely, working out the full sequence of turns and moves BEFORE writing any code (even just on paper) avoids the classic mistake: moving forward, then realising you needed to turn first.</p>`,
+    },
+  },
+  {
     id: 'p1m1', phase: 'PHASE 1 · TURTLE', emoji: '🛰️', title: 'Dock at the Station',
     hints: ["forward(distance) moves in the direction you're currently facing — work out how far and which way to turn first.", "You start facing EAST — plan your turns (left/right 90°) before writing any forward() calls."], xp: 30,
     brief: 'Your supply pod <b>starts facing EAST</b> (→). Fly it to the space station 🛰️. '
@@ -1809,6 +1834,27 @@ const MISSIONS = [
   },
 
   // ── Tier 2 — Loops (star metric = lines of code) ────────────────────────────
+  {
+    id: 'learn-loops-p1', type: 'learn', phase: 'PHASE 1 · LOOPS', emoji: '🔁', title: 'What Is a Loop?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'Sequencing got you moving — but repeating the same 2 lines 4 times by hand is exactly the kind of thing a computer should do FOR you.',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'Loop',       def: 'A block of code that runs more than once, instead of being copy-pasted repeatedly.' },
+        { term: 'Iteration',  def: 'ONE single run-through of a loop\'s body.' },
+        { term: 'range(4)',   def: 'Python: produces 4 iterations, numbered 0, 1, 2, 3.' },
+        { term: 'FOR ... NEXT', def: 'Pseudocode\'s loop: FOR i ← 1 TO 4 ... NEXT i runs the body 4 times.' },
+      ],
+      theory: `
+        <h4>Copy-paste doesn't scale</h4>
+        <p>A square needs the same "move forward, turn" pair FOUR times. Writing it out 4 times works — but what about a 100-sided shape? A <b>loop</b> runs the same block of code a set number of times, so you write the pattern ONCE.</p>
+        <h4>for i in range(4): — Python's loop</h4>
+        <p><code>for i in range(4):</code> repeats everything indented under it 4 times. You don't even need to use <code>i</code> — sometimes you just need "do this N times", not "which time is it".</p>
+        <h4>Stars now count LINES, not commands</h4>
+        <p>From this mission on, a shorter solution (using a loop) scores better than a longer one that just repeats itself — the SAME reason real programmers avoid copy-pasting: fewer lines means fewer places for a mistake to hide.</p>`,
+    },
+  },
   {
     id: 'p1m4', phase: 'PHASE 1 · LOOPS', emoji: '🔁', title: 'Square Patrol',
     hints: ["A loop that repeats 4 times, each time going forward(160) then turning 90°, draws a perfect square.", "Stars now count LINES OF CODE — a loop with 2 lines inside beats 8 lines written out by hand."], xp: 40,
@@ -1881,6 +1927,27 @@ const MISSIONS = [
   },
 
   // ── Tier 3 — Signals & decisions ─────────────────────────────────────────────
+  {
+    id: 'learn-decisions', type: 'learn', phase: 'PHASE 1 · SIGNALS', emoji: '🚦', title: 'Reacting to Live Data',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'Every mission so far had a FIXED path, planned in advance. This one is different — you won\'t know the beacon colours until you actually read them.',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'Decision',   def: 'A branch in your code that does DIFFERENT things depending on a condition.' },
+        { term: 'if / else',  def: 'if runs its block ONLY when the condition is true; else runs instead when it\'s false.' },
+        { term: 'Condition',  def: 'A True/False question your code checks, e.g. colour == "G".' },
+        { term: 'get_signals()', def: 'Returns the beacon colours as a list, in order — data you can\'t know until you read it.' },
+      ],
+      theory: `
+        <h4>Fixed plan vs. reacting to what you're given</h4>
+        <p>Tiers 1-2 were entirely plannable on paper — you always knew exactly what was coming. <code>get_signals()</code> changes that: the beacon colours are only known once you actually READ them, so your code has to REACT, not just follow a memorised path.</p>
+        <h4>if is how code branches</h4>
+        <p><code>if colour == "G": left(90)</code> — this line does something ONLY when the condition is true. Add <code>else:</code> to say what happens otherwise. Without <code>if</code>, code always does the same thing no matter what it reads.</p>
+        <h4>Same idea, real consequences</h4>
+        <p>Get the condition wrong (<code>==</code> vs <code>=</code>, or checking the wrong variable) and your ship turns the WRONG way — a decision mission fails differently than a sequencing one: not "ran out of moves", but "reacted incorrectly to what it saw".</p>`,
+    },
+  },
   {
     id: 'p1m8', phase: 'PHASE 1 · SIGNALS', emoji: '🚦', title: 'Signal Run',
     hints: ["Loop through get_signals() one at a time: forward(120), then check the colour — G turns left, R turns right.", "After the loop finishes, one extra forward(120) is needed to actually dock."], xp: 50,
@@ -1969,6 +2036,27 @@ const MISSIONS = [
   // Turn-based: your code is RE-RUN fresh every turn with the latest `state`.
   // Call attack(id) or wait() — whichever fires first each turn is your move.
   {
+    id: 'learn-battle', type: 'learn', phase: 'PHASE 2 · TUTORIAL', emoji: '🎯', title: 'How Battles Work',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'A genuinely different kind of mission — your code doesn\'t run once start-to-finish anymore. It runs FRESH, every single turn.',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'Turn-based', def: 'The fight happens in rounds — your code runs once PER TURN, not once for the whole fight.' },
+        { term: 'state',      def: 'A fresh snapshot handed to your code each turn: your ship\'s hp, and every enemy\'s id/hp/dist.' },
+        { term: 'attack(id)', def: 'Fires at the enemy with that id — spend your turn on damage.' },
+        { term: 'wait()',     def: 'Does nothing this turn — sometimes the right call, if there\'s a reason to hold.' },
+      ],
+      theory: `
+        <h4>Your code runs AGAIN every turn — not once</h4>
+        <p>Every Phase 1 mission ran your code ONE TIME, start to finish. A battle mission runs your code ONCE PER TURN — each time, it gets a brand new <code>state</code> describing the CURRENT situation, and must return exactly ONE decision for that turn.</p>
+        <h4>state tells you everything you can currently see</h4>
+        <p><code>state['self']</code> is your ship (hp, maxHp). <code>state['enemies']</code> is a list — each entry has <code>id</code>, <code>name</code>, <code>hp</code>, <code>dist</code>. Read it FRESH every turn — it changes as the fight goes on.</p>
+        <h4>One decision, every turn, until it's over</h4>
+        <p>Call <code>attack(id)</code> or <code>wait()</code> — whichever your code calls FIRST each turn is your move for that turn. The fight ends when one side's hp hits 0, or the turn limit runs out.</p>`,
+    },
+  },
+  {
     id: 'p2m1', type: 'battle', phase: 'PHASE 2 · TUTORIAL', emoji: '🎯', title: 'First Contact',
     hints: ["Read state to see the enemy's id, then call attack(id) — this drone never fires back, so there's no real risk in attacking every turn."], xp: 40,
     brief: 'A <b>training drone</b> is powering up target locks — it never fires back. Every turn you '
@@ -2010,6 +2098,27 @@ const MISSIONS = [
   },
 
   // ── Phase 2 · Functions Required — a mission checker enforces decomposition ──
+  {
+    id: 'learn-functions-battle', type: 'learn', phase: 'PHASE 2 · FUNCTIONS', emoji: '🧰', title: 'Functions Organize Decisions',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'Two enemies means a real decision — WHICH one do you attack? From here, missions require that decision to live inside its own function.',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'Function/procedure', def: 'A named, reusable block of code you can CALL instead of retyping the same logic.' },
+        { term: 'def (Python)',       def: 'How Python defines a function: def pick_target(): ... ' },
+        { term: 'FUNCTION ... RETURNS (pseudocode)', def: 'Cambridge pseudocode\'s equivalent — names the function AND what type it gives back.' },
+        { term: 'return',             def: 'Hands a value back out of the function to whatever called it.' },
+      ],
+      theory: `
+        <h4>One enemy, no real choice — two enemies, a genuine decision</h4>
+        <p>First Contact only ever had one target. Now there are two — WHICH one you attack is itself a decision worth naming and reusing, not just an inline if buried in your turn logic.</p>
+        <h4>A function is a named, reusable block</h4>
+        <p><code>def pick_target(): ... return enemy_id</code> — call <code>pick_target()</code> and it runs that logic, then hands back whatever it <code>return</code>s. You call it fresh every turn, same as before, but the DECISION itself is now organized and named.</p>
+        <h4>Why bother, if it still works without one?</h4>
+        <p>As missions get harder (more enemies, more rules), a decision inlined directly into your turn code turns into a tangled mess. A function keeps "HOW do I decide" separate and readable from "WHAT do I do with that decision" — exactly the organizing idea this tier is built to teach.</p>`,
+    },
+  },
   {
     id: 'p2m3', type: 'battle', phase: 'PHASE 2 · FUNCTIONS', emoji: '🧰', title: 'Twin Threats',
     hints: ["Write a real function (Python: def, pseudocode: FUNCTION ... RETURNS) that takes the enemy list and returns which one to attack, rather than writing the decision inline."], xp: 50,
@@ -2055,6 +2164,27 @@ const MISSIONS = [
   },
 
   // ── Phase 2 · State Tracking — new action: defend() halves incoming damage ──
+  {
+    id: 'learn-defend', type: 'learn', phase: 'PHASE 2 · STATE TRACKING', emoji: '🛡', title: 'Tracking a Pattern Over Time',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'A new action, and a new KIND of question — not "who do I hit", but "should I even attack THIS turn"?',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'defend()',    def: 'A new action: halves ALL incoming damage this turn — but you don\'t attack.' },
+        { term: "state['turn']", def: "The current turn number, counting up from 1 — read it to spot a repeating PATTERN." },
+        { term: 'Pattern',     def: 'Behaviour that repeats predictably — e.g. "charges up every 3rd turn".' },
+        { term: 'Trade-off',   def: 'Choosing defend() means giving up your OWN attack that turn — a genuine cost, not a free bonus.' },
+      ],
+      theory: `
+        <h4>A new kind of decision: not WHO, but WHETHER</h4>
+        <p>So far every decision was "which enemy to attack". <code>defend()</code> introduces a different question entirely: should you attack AT ALL this turn, or protect yourself instead?</p>
+        <h4>Reading state['turn'] to predict, not just react</h4>
+        <p>An enemy that "charges every 3rd turn" is a PATTERN, not a random event — <code>state['turn'] % 3 == 0</code> tells you exactly when it's coming, BEFORE it hits, so you can <code>defend()</code> on that exact turn instead of guessing.</p>
+        <h4>defend() is a real trade-off, not a free shield</h4>
+        <p>Defending every single turn is safe but you'll never win — you deal zero damage while defending. The actual skill is timing it: attack normally, defend ONLY on the turn you know the big hit is coming.</p>`,
+    },
+  },
   {
     id: 'p2m5', type: 'battle', phase: 'PHASE 2 · STATE TRACKING', emoji: '🛡', title: 'Shields Up',
     hints: ["defend() halves incoming damage this turn but doesn't attack — use it right before the charge-up turn.", "state['turn'] tells you which turn it is — check if it's about to be a multiple of 3."], xp: 55,
@@ -2315,6 +2445,27 @@ const MISSIONS = [
 
   // ── Phase 3 · Read & Report — new mission type, no battle: parse the report,
   // call answer(v) once. Isolates the data skill before it's combined with combat.
+  {
+    id: 'learn-data', type: 'learn', phase: 'PHASE 3 · READ & REPORT', emoji: '📦', title: 'Working With a Data Table',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'A completely different mission shape — no combat, no turns. Just a table of real records to process, and ONE answer to report.',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'Record',   def: 'One row of a data table — e.g. one cargo item, with its own name and weight.' },
+        { term: 'Field',    def: 'One named piece of information inside a record, e.g. weight.' },
+        { term: 'Accumulate', def: 'Keep a running total that grows as you loop through every record.' },
+        { term: 'answer(v)', def: 'Reports your FINAL result, called exactly ONCE, after the loop finishes.' },
+      ],
+      theory: `
+        <h4>Not combat — a table, like a real spreadsheet</h4>
+        <p><code>data</code> is a list of records — think rows in a spreadsheet. Each record has named fields, e.g. <code>row['item']</code> and <code>row['weight']</code>. Your job is to process ALL of them, not just look at one.</p>
+        <h4>Loop through every row, building up a total</h4>
+        <p>Start a variable at 0 (<code>total = 0</code>), then loop through every record, adding its field to that running total each time — this "start at zero, add one at a time" pattern is called <b>accumulating</b>, and it's the core skill of this whole phase.</p>
+        <h4>answer() ONCE, at the very end</h4>
+        <p>Unlike battle's "one decision every turn", a data mission wants exactly ONE final result, reported AFTER the loop is completely done — call <code>answer(total)</code> too early (inside the loop) and you'll report the wrong, incomplete number.</p>`,
+    },
+  },
   {
     id: 'p3m1', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '📦', title: 'Cargo Count',
     hints: ["Loop through every record in data, adding each one's weight to a running total — then answer() the total ONCE, after the loop."], xp: 40,
@@ -5176,20 +5327,33 @@ const TIERS = [
   { name: '🏆 FOUNDATIONS 6 PRACTICE CAPSTONE', ids: ['flowg14'] },
   { name: '📟 FOUNDATIONS 7 · FLIGHT COMPUTER — algorithmic thinking', ids: ['p0bm1', 'p0bm2', 'p0bm3', 'p0bm4', 'p0bm5', 'p0bm6'] },
   { name: '🏆 FOUNDATIONS 7 CAPSTONE', ids: ['p0bboss'] },
-  { name: '🧭 TIER 1 — SEQUENCING', ids: ['p1m1', 'p1m2', 'p1m3'] },
-  { name: '🔁 TIER 2 — LOOPS (new: stars count code lines)', ids: ['p1m4', 'p1m5', 'p1m6', 'p1m7'] },
-  { name: '🚦 TIER 3 — SIGNALS & DECISIONS', ids: ['p1m8', 'p1m9', 'p1m10'] },
+  { name: '🧭 TIER 1 — SEQUENCING', ids: ['learn-turtle', 'p1m1', 'p1m2', 'p1m3'] },
+  { name: '🔁 TIER 2 — LOOPS (new: stars count code lines)', ids: ['learn-loops-p1', 'p1m4', 'p1m5', 'p1m6', 'p1m7'] },
+  { name: '🚦 TIER 3 — SIGNALS & DECISIONS', ids: ['learn-decisions', 'p1m8', 'p1m9', 'p1m10'] },
   { name: '🏆 PHASE 1 CAPSTONE', ids: ['p1m11'] },
-  { name: '⚔️ PHASE 2 · TUTORIAL — your code fights (new: stars count turns)', ids: ['p2m1', 'p2m2'] },
-  { name: '🧰 TIER — FUNCTIONS REQUIRED', ids: ['p2m3', 'p2m4'] },
-  { name: '🛡 TIER — STATE TRACKING (new: defend() action)', ids: ['p2m5', 'p2m6'] },
+  { name: '⚔️ PHASE 2 · TUTORIAL — your code fights (new: stars count turns)', ids: ['learn-battle', 'p2m1', 'p2m2'] },
+  { name: '🧰 TIER — FUNCTIONS REQUIRED', ids: ['learn-functions-battle', 'p2m3', 'p2m4'] },
+  { name: '🛡 TIER — STATE TRACKING (new: defend() action)', ids: ['learn-defend', 'p2m5', 'p2m6'] },
   { name: '👥 TIER — MULTIPLE ENEMIES', ids: ['p2m7', 'p2m8'] },
   { name: '🔰 TIER — ADAPTIVE AI', ids: ['p2m9', 'p2m10'] },
+  // p2m12-p2m15 were added earlier this session (Phase 2 Battle expansion)
+  // but never added to TIERS either — the same class of bug as flowg1-6 and
+  // Phase 4, just self-inflicted this time. Fixed here.
+  { name: '💚 TIER — REGENERATION', ids: ['p2m12'] },
+  { name: '🥁 TIER — DUAL RHYTHMS', ids: ['p2m13'] },
+  { name: '🛡️ TIER — FULL SQUAD', ids: ['p2m14'] },
+  { name: '⚠️ TIER — PRE-BOSS', ids: ['p2m15'] },
   { name: '👹 PHASE 2 BOSS', ids: ['p2m11'] },
-  { name: '📦 PHASE 3 · READ & REPORT — new mission type: data, no battle', ids: ['p3m1', 'p3m2'] },
+  { name: '📦 PHASE 3 · READ & REPORT — new mission type: data, no battle', ids: ['learn-data', 'p3m1', 'p3m2'] },
   { name: '🗺️ PHASE 3 · ONE DECISION', ids: ['p3m3', 'p3m4', 'p3m5'] },
   { name: '🔭 PHASE 3 · FULL STRATEGY — data feeds a live battle', ids: ['p3m6', 'p3m7', 'p3m8'] },
   { name: '🛰️ PHASE 3 CAPSTONE', ids: ['p3m9'] },
+  // PHASE 4 · THE ARCHIVE (recursion, 9 missions incl. its own learn-recursion
+  // bubble) existed in MISSIONS but was NEVER added to TIERS at all — the
+  // exact same "invisible on the map" bug already found and fixed for
+  // flowg1-6 this session, just in a different phase. Fixed here.
+  { name: '🌀 PHASE 4 · THE ARCHIVE — recursion', ids: ['learn-recursion', 'p4m1', 'p4m2', 'p4m3', 'p4m4', 'p4m5', 'p4m6', 'p4m7'] },
+  { name: '🏆 PHASE 4 CAPSTONE', ids: ['p4boss'] },
 ]
 // Shared QuestMap engine, same winding-path shape every other grade/IGCSE/
 // AS-A page uses — each TIER becomes a chapter banner on the path (exactly
