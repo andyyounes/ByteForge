@@ -1702,116 +1702,6 @@ const MODULES = [
       },
     },
   ]},
-  // ── Semester 1, Weeks 7-11: Build Your Portfolio (project) — new for the
-  // 3-semester rebuild. JS introduced strictly incrementally: ONE new idea
-  // per stage (onclick, then a variable), reusing Web Story 3's onclick
-  // pattern but as single introduced ideas, not a full ladder at once.
-  { id:'web5', name:'💼 Build Your Portfolio', sub:'Multiple sections, consistent style, then real JS — one idea at a time', live:true, stages:[
-    { id:'web5s1', name:'Plan & Skeleton', xp:40, lang:'web',
-      text:`<strong>Sessions 1-2</strong> — Build the HTML skeleton for your portfolio: at least TWO real sections (e.g. "About Me" and one more), each with its own heading and a real paragraph.`,
-      hints:[
-        'Two separate headings, each followed by its own paragraph — two real sections, not one long page.',
-        'Plan on paper first: what sections does YOUR portfolio need?',
-      ],
-      webStarter: { html: `<!-- TODO: at least 2 sections, each with its own heading + paragraph -->\n<h1>About Me</h1>\n<p></p>\n\n<h1>___</h1>\n<p></p>\n`, css: ``, js: `` },
-      check:(log) => log.h1s >= 2 && log.paragraphs >= 2 && log.headingText.every(t => t.length > 0) && log.paragraphText.filter(t => t.length > 0).length >= 2,
-    },
-    { id:'web5s2', name:'Consistent Styling', xp:35, lang:'web',
-      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
-                ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
-                ['coral',COLOR_PALETTE.coral]],
-      text:`<strong>Sessions 3-4</strong> — Apply the SAME background and heading color (any two different, readable colors from the palette — same rule as Colors & Shading) across your whole portfolio — one CSS rule each, applying to every section at once.`,
-      hints:[
-        'body { background-color: #____; } applies to the WHOLE page — every section, automatically.',
-        'h1 { color: #____; } applies to every heading, however many sections you have.',
-        'Same readability rule as Colors & Shading: pick two DIFFERENT colors, light enough apart to actually read.',
-      ],
-      webStarter: { html: `<h1>About Me</h1>\n<p>Hi, I'm...</p>\n<h1>My Hobbies</h1>\n<p>I enjoy...</p>\n`, css: `/* TODO: pick a background and a different, readable heading color */\n`, js: `` },
-      check:(log) => log.h1s >= 2 && isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
-                  && log.bgColor !== log.headingColor
-                  && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40,
-    },
-    { id:'web5s2b', name:'Your First Variable — Alone', xp:30, lang:'web',
-      text:`<strong>Before any clicking</strong> — a JS variable, displayed on the page, with no button at all yet. Create a variable holding your favorite animal's name, then show it inside a paragraph using <code>.textContent</code>.`,
-      hints:[
-        'let animal = "Red Panda"; — the SAME "let name = value" shape as every other variable you\'ve seen.',
-        'document.querySelector("#animal-name").textContent = animal; — this is what actually puts the variable\'s VALUE onto the page.',
-        'Nothing needs to be clicked for this one — the variable just needs to show up the moment the page runs.',
-      ],
-      webStarter: {
-        html: `<h1>About Me</h1>\n<p id="animal-name">Loading...</p>\n`,
-        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
-        js: `// TODO: a variable holding your favorite animal, shown inside #animal-name\n`,
-      },
-      check:(log) => {
-        const m = log.js.match(/\b(?:let|const|var)\s+(\w+)\s*=/)
-        if (!m) return false
-        const usesRe = new RegExp('\\.(?:textContent|innerText)\\s*=\\s*[^;]*\\b' + m[1] + '\\b')
-        return usesRe.test(log.js)
-      },
-    },
-    { id:'web5s2c', name:'Combining Text and a Variable', xp:30, lang:'web',
-      text:`<strong>Challenge</strong> — Join a plain piece of text together with a variable's value using <code>+</code> — the exact same joining trick you already know from Python string concatenation, just in JS. Show a sentence like "My favorite animal is Red Panda" — NOT just the animal name alone.`,
-      hints:[
-        '"My favorite animal is " + animal — text in quotes, then +, then the variable name (no quotes on the variable).',
-        'Don\'t forget the space at the end of the quoted text, or the words will run together.',
-        'Assign the WHOLE combined sentence to .textContent in one go.',
-      ],
-      webStarter: {
-        html: `<h1>About Me</h1>\n<p id="animal-sentence">Loading...</p>\n`,
-        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
-        js: `let animal = "Red Panda";\n// TODO: combine "My favorite animal is " with the animal variable, show it in #animal-sentence\n`,
-      },
-      check:(log) => /\.(?:textContent|innerText)\s*=\s*["'][^"']*["']\s*\+\s*\w+/.test(log.js) || /\.(?:textContent|innerText)\s*=\s*\w+\s*\+\s*["'][^"']*["']/.test(log.js),
-    },
-    { id:'web5s3', name:'One Button, One Change', xp:40, lang:'web',
-      text:`<strong>Sessions 5-6</strong> — Add ONE button. When clicked, it changes ONE piece of text on the page (e.g. reveals a fun fact). This is the FIRST real JavaScript idea this semester — one click, one change.`,
-      hints:[
-        'document.querySelector("button").addEventListener("click", function() { ... })',
-        'Inside the handler: change some text, e.g. document.querySelector("p").textContent = "..."',
-      ],
-      webStarter: {
-        html: `<h1>About Me</h1>\n<p id="fact">Click below for a fun fact!</p>\n<button>Reveal</button>\n`,
-        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
-        js: `// TODO: when the button is clicked, change the paragraph's text\n`,
-      },
-      check:(log) => log.hasClick && log.bodyChangedOnClick,
-    },
-    { id:'web5s4', name:'A Variable the Click Updates', xp:45, lang:'web',
-      text:`<strong>Sessions 7-8</strong> — Add a variable your button's click UPDATES and displays (e.g. a click counter). This is the SECOND JS idea, building directly on the click handler from last time.`,
-      hints:[
-        'let clicks = 0; outside the click handler, so it survives between clicks.',
-        'Inside the handler: clicks = clicks + 1; then show it, e.g. document.querySelector("p").textContent = "Clicked " + clicks + " times";',
-      ],
-      webStarter: {
-        html: `<h1>About Me</h1>\n<p id="counter">Clicked 0 times</p>\n<button>Click me</button>\n`,
-        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
-        js: `// TODO: a variable the click updates and displays\nlet clicks = 0;\n`,
-      },
-      check:(log) => log.hasVariable && log.hasClick && log.bodyChangedOnClick,
-    },
-    { id:'web5boss', name:'BOSS — Ship the Portfolio', xp:90, lang:'web', boss:true,
-      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
-                ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
-                ['coral',COLOR_PALETTE.coral]],
-      text:`<strong>Sessions 9-10 — BOSS</strong> — Ship the complete portfolio: 2+ real sections, consistent styling (your background + heading color from Week 4, any two different, readable colors), and at least one working onclick interaction with a variable. Everything from this project, together.`,
-      hints:[
-        'This is genuinely web5s1-web5s4 combined into one finished page — nothing new to learn.',
-        'Same palette rule as Week 4: pick a background and a different, readable heading color.',
-        'Check each piece separately first: sections, then colors, then the click+variable interaction.',
-      ],
-      webStarter: {
-        html: `<!-- TODO: 2+ sections, a button, somewhere to show the variable's value -->\n`,
-        css: `/* TODO: pick a background and a different, readable heading color */\n`,
-        js: `// TODO: a variable your button's click updates and displays\n`,
-      },
-      check:(log) => log.h1s >= 2 && log.paragraphs >= 2
-                  && isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
-                  && log.bgColor !== log.headingColor
-                  && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40
-                  && log.hasVariable && log.hasClick && log.bodyChangedOnClick,
-    },
-  ]},
   // ── JS Foundations 1 — ported from a CodeMonkey-style lesson at the
   // user's request, full granularity (every checkpoint/You-Try-It/Activity
   // as its own stage, not condensed). Two things the source material relies
@@ -1826,6 +1716,14 @@ const MODULES = [
   // array literals) rather than runtime output, since there's nothing to
   // observe it with yet. User chose to defer prompt()/alert()-based content
   // (Lesson 3) rather than build the engine support for it right now.
+  // Positioned BEFORE web5 (not after, as first built) — web5s2b/s2c
+  // originally re-taught "what is a variable" and + concatenation from
+  // scratch, which is now fully redundant with jsf1's own (more thorough)
+  // treatment of the same ground. Moved jsf1/jsf2 here and trimmed web5's
+  // JS intro down to just what it still teaches that jsf1/jsf2 don't
+  // (querySelector()/.textContent — real DOM targeting) rather than
+  // leaving two out-of-order introductions to the same idea, the same
+  // M1/M2-style bug already found and fixed once this session.
   { id:'jsf1', name:'📗 JS Foundations 1 — Print & Comment', sub:'What JavaScript is, console.log vs document.write, variables, and comments', live:true, stages:[
     { id:'jsf1s0', name:'What Is JavaScript?', xp:20, type:'quiz',
       text:`<strong>JavaScript is the programming language of the web.</strong> HTML gives your page structure, CSS adds style — JavaScript brings it to life. It lets your page respond to clicks, change text, calculate numbers, and make decisions.<br><br>
@@ -2200,6 +2098,107 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
         const hasOutput = /console\.log\s*\(/.test(log.js) || (/document\.write\s*\(/.test(log.js) && log.bodyText.replace(/Road Trip Planner/, '').trim().length > 0)
         return stringVars >= 4 && boolVar && numberVars >= 1 && hasConstMpg && hasSpeed && hasGasCost && comments >= 1 && hasOutput
       },
+    },
+  ]},
+  // ── Semester 1, Weeks 7-11: Build Your Portfolio (project) — new for the
+  // 3-semester rebuild. By this point jsf1/jsf2 (just before this module)
+  // already taught variables, +, data types, and Math thoroughly — web5's
+  // own JS stages now apply that knowledge to a real page (querySelector()/
+  // .textContent, then onclick), rather than re-introducing variables again.
+  { id:'web5', name:'💼 Build Your Portfolio', sub:'Multiple sections, consistent style, then real JS — one idea at a time', live:true, stages:[
+    { id:'web5s1', name:'Plan & Skeleton', xp:40, lang:'web',
+      text:`<strong>Sessions 1-2</strong> — Build the HTML skeleton for your portfolio: at least TWO real sections (e.g. "About Me" and one more), each with its own heading and a real paragraph.`,
+      hints:[
+        'Two separate headings, each followed by its own paragraph — two real sections, not one long page.',
+        'Plan on paper first: what sections does YOUR portfolio need?',
+      ],
+      webStarter: { html: `<!-- TODO: at least 2 sections, each with its own heading + paragraph -->\n<h1>About Me</h1>\n<p></p>\n\n<h1>___</h1>\n<p></p>\n`, css: ``, js: `` },
+      check:(log) => log.h1s >= 2 && log.paragraphs >= 2 && log.headingText.every(t => t.length > 0) && log.paragraphText.filter(t => t.length > 0).length >= 2,
+    },
+    { id:'web5s2', name:'Consistent Styling', xp:35, lang:'web',
+      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
+                ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
+                ['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Sessions 3-4</strong> — Apply the SAME background and heading color (any two different, readable colors from the palette — same rule as Colors & Shading) across your whole portfolio — one CSS rule each, applying to every section at once.`,
+      hints:[
+        'body { background-color: #____; } applies to the WHOLE page — every section, automatically.',
+        'h1 { color: #____; } applies to every heading, however many sections you have.',
+        'Same readability rule as Colors & Shading: pick two DIFFERENT colors, light enough apart to actually read.',
+      ],
+      webStarter: { html: `<h1>About Me</h1>\n<p>Hi, I'm...</p>\n<h1>My Hobbies</h1>\n<p>I enjoy...</p>\n`, css: `/* TODO: pick a background and a different, readable heading color */\n`, js: `` },
+      check:(log) => log.h1s >= 2 && isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
+                  && log.bgColor !== log.headingColor
+                  && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40,
+    },
+    // Used to be two stages (variable-alone, then +-concatenation) — now
+    // that jsf1/jsf2 sit BEFORE web5 and already taught variables and +
+    // thoroughly, re-teaching both from scratch here would be the exact
+    // "teach it twice, out of order" bug found and fixed for M1/M2 earlier
+    // this session. The one genuinely NEW skill web5 still needs to teach is
+    // querySelector()+.textContent — actually putting a variable's value
+    // onto a REAL page element, which jsf1/jsf2 (console.log/document.write
+    // only) never touched. Merged into one stage focused on just that.
+    { id:'web5s2b', name:'Show a Variable on the Page', xp:35, lang:'web',
+      text:`<strong>You already know variables and +</strong> from JS Foundations — this is about a new piece: getting a value to actually SHOW UP inside a specific element on the real page, using <code>document.querySelector()</code> and <code>.textContent</code>.<br><br>
+        Create a variable holding your favorite animal's name, then show a full sentence like "My favorite animal is Red Panda" (not just the name alone) inside the paragraph below.`,
+      hints:[
+        'document.querySelector("#animal-name") finds the exact element with that id — same targeting idea as CSS selectors.',
+        '.textContent = "..." is what actually puts text ONTO the page, replacing whatever was there ("Loading...").',
+        'You already know how to combine text with + — use that same trick here: "My favorite animal is " + animal.',
+      ],
+      webStarter: {
+        html: `<h1>About Me</h1>\n<p id="animal-name">Loading...</p>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
+        js: `let animal = "Red Panda";\n// TODO: use document.querySelector("#animal-name").textContent = ... to show a full sentence\n`,
+      },
+      check:(log) => /\.(?:textContent|innerText)\s*=\s*["'][^"']*["']\s*\+\s*\w+/.test(log.js) || /\.(?:textContent|innerText)\s*=\s*\w+\s*\+\s*["'][^"']*["']/.test(log.js),
+    },
+    { id:'web5s3', name:'One Button, One Change', xp:40, lang:'web',
+      text:`<strong>Sessions 5-6</strong> — Add ONE button. When clicked, it changes ONE piece of text on the page (e.g. reveals a fun fact). This is the FIRST real JavaScript idea this semester — one click, one change.`,
+      hints:[
+        'document.querySelector("button").addEventListener("click", function() { ... })',
+        'Inside the handler: change some text, e.g. document.querySelector("p").textContent = "..."',
+      ],
+      webStarter: {
+        html: `<h1>About Me</h1>\n<p id="fact">Click below for a fun fact!</p>\n<button>Reveal</button>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
+        js: `// TODO: when the button is clicked, change the paragraph's text\n`,
+      },
+      check:(log) => log.hasClick && log.bodyChangedOnClick,
+    },
+    { id:'web5s4', name:'A Variable the Click Updates', xp:45, lang:'web',
+      text:`<strong>Sessions 7-8</strong> — Add a variable your button's click UPDATES and displays (e.g. a click counter). This is the SECOND JS idea, building directly on the click handler from last time.`,
+      hints:[
+        'let clicks = 0; outside the click handler, so it survives between clicks.',
+        'Inside the handler: clicks = clicks + 1; then show it, e.g. document.querySelector("p").textContent = "Clicked " + clicks + " times";',
+      ],
+      webStarter: {
+        html: `<h1>About Me</h1>\n<p id="counter">Clicked 0 times</p>\n<button>Click me</button>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
+        js: `// TODO: a variable the click updates and displays\nlet clicks = 0;\n`,
+      },
+      check:(log) => log.hasVariable && log.hasClick && log.bodyChangedOnClick,
+    },
+    { id:'web5boss', name:'BOSS — Ship the Portfolio', xp:90, lang:'web', boss:true,
+      palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
+                ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
+                ['coral',COLOR_PALETTE.coral]],
+      text:`<strong>Sessions 9-10 — BOSS</strong> — Ship the complete portfolio: 2+ real sections, consistent styling (your background + heading color from Week 4, any two different, readable colors), and at least one working onclick interaction with a variable. Everything from this project, together.`,
+      hints:[
+        'This is genuinely web5s1-web5s4 combined into one finished page — nothing new to learn.',
+        'Same palette rule as Week 4: pick a background and a different, readable heading color.',
+        'Check each piece separately first: sections, then colors, then the click+variable interaction.',
+      ],
+      webStarter: {
+        html: `<!-- TODO: 2+ sections, a button, somewhere to show the variable's value -->\n`,
+        css: `/* TODO: pick a background and a different, readable heading color */\n`,
+        js: `// TODO: a variable your button's click updates and displays\n`,
+      },
+      check:(log) => log.h1s >= 2 && log.paragraphs >= 2
+                  && isAllowedColor(log.bgColor) && isAllowedColor(log.headingColor)
+                  && log.bgColor !== log.headingColor
+                  && Math.abs(colorBrightness(log.bgColor) - colorBrightness(log.headingColor)) > 40
+                  && log.hasVariable && log.hasClick && log.bodyChangedOnClick,
     },
   ]},
   // ── Web Story 1 — Semester 1, Week 1: objects/arrays for story state ──────
@@ -5047,7 +5046,77 @@ const CHALLENGE_LESSON = {
       <p>Page Source shows the ORIGINAL HTML exactly as the server sent it. Inspect shows the page's LIVE current state — which JavaScript can change after the page loads, so it can look different from Page Source.</p></div>
     <div class="cl-block"><h4>Why this matters</h4>
       <p>When you build your own portfolio later this semester, Inspect is how you'll check that your HTML/CSS actually did what you intended — it's the real tool professional developers use every day.</p></div>` },
+  // ── JS Foundations 1-2 — the CodeMonkey-style port ───────────────────────────
+  jsf1s0: { title: 'HTML/CSS describe; JavaScript DOES', html: `
+    <div class="cl-block"><h4>A different kind of language</h4>
+      <p>HTML and CSS are markup and styling — they describe what a page looks like. JavaScript is a real programming language: it gives the computer actual instructions to carry out, like reacting to a click or calculating a total.</p></div>` },
+  jsf1s1: { title: 'Internal vs. external JavaScript', html: `
+    <div class="cl-block"><h4>Same idea as external CSS</h4>
+      <p>JS can live directly inside &lt;script&gt; tags in the HTML (internal), or in its own linked .js file (external) — exactly like ByteForge's own JS tab, which is automatically linked and runs on page load without you ever writing a &lt;script&gt; tag yourself.</p></div>` },
+  jsf1s2: { title: 'console.log() — for testing, not display', html: `
+    <div class="cl-block"><h4>console is an object, .log() is a function</h4>
+      <p>console is a built-in object holding debugging tools; .log() is one of its functions. The message never appears on the actual page — it's meant for YOU, while testing, not for whoever's viewing the site.</p></div>` },
+  jsf1s3: { title: 'document.write() — visible, but old-fashioned', html: `
+    <div class="cl-block"><h4>Real output, real limitations</h4>
+      <p>Unlike console.log(), this actually shows up on the page — which is why it's useful for learning. Real sites avoid it in favor of manipulating the DOM directly (what ws1 onward teaches), since document.write() can wipe out an already-loaded page if called after load.</p></div>` },
+  jsf1cp1: { title: 'Checkpoint — pick the one that\'s visible', html: `
+    <div class="cl-block"><h4>Console vs. page, one more time</h4>
+      <p>Of console.log(), alert(), and document.write() — only document.write() (and alert(), which pops up but isn't part of the page itself) show anything without opening dev tools. console.log() is invisible unless you go looking for it.</p></div>` },
+  jsf1s4: { title: 'Strings store text; + joins them', html: `
+    <div class="cl-block"><h4>A named box, same idea as ever</h4>
+      <p>let userName = "Jordan"; is still just "name for a box, value inside it" — the same variable idea from every earlier lesson, now with real JS syntax (let, and a semicolon).</p></div>
+    <div class="cl-block"><h4>+ does two different jobs depending on the types</h4>
+      <p>Between two strings, + joins (concatenates) them into one longer string — completely different from + between two numbers, which adds. JavaScript decides which job to do based on what's on each side.</p></div>` },
+  jsf1s5: { title: 'Reading and changing someone else\'s starter code', html: `
+    <div class="cl-block"><h4>A real, common task</h4>
+      <p>Most real coding work isn't writing from a blank file — it's reading code someone else wrote and changing exactly the right part. Here that means finding the two quoted values and leaving the rest (the variable names, the document.write() call) completely alone.</p></div>` },
+  jsf1s6: { title: 'Comments are for humans, not the computer', html: `
+    <div class="cl-block"><h4>// is ignored completely</h4>
+      <p>Everything after // on a line is skipped when the code runs — comments cost nothing to include and cost a LOT to skip, once code gets complicated enough that you (or someone else) can't immediately tell what a variable is for.</p></div>` },
+  jsf1cp2: { title: 'Checkpoint — + combines, it doesn\'t just add', html: `
+    <div class="cl-block"><h4>The same answer as jsf1s4</h4>
+      <p>"Hi, " + userName only makes sense as joining text together — + between a string and a variable is always concatenation, never arithmetic, since arithmetic needs two numbers on both sides.</p></div>` },
+  jsf1boss: { title: 'BOSS — every idea from this module, combined', html: `
+    <div class="cl-block"><h4>Nothing new, just all of it at once</h4>
+      <p>3+ string variables, comments explaining each one, console.log() AND document.write() — this is genuinely just jsf1s2 through jsf1s6 combined into one program, proving you can use every tool together rather than one at a time with scaffolding.</p></div>` },
+  jsf2s0: { title: 'Quotes decide string vs. number, not the digits', html: `
+    <div class="cl-block"><h4>"150" and 150 are NOT the same type</h4>
+      <p>Quotes are the entire difference — "150" is text that happens to look like a number (a STRING), while 150 with no quotes is a real NUMBER you can do maths with. This exact confusion causes real bugs later (Grade 9's p0m5 hit students with precisely this).</p></div>` },
+  jsf2s1: { title: 'camelCase, and never start with a digit', html: `
+    <div class="cl-block"><h4>JavaScript's own casing convention</h4>
+      <p>favoriteColor, not favorite_color (that's Python's style) or favorite color (spaces are never allowed) — camelCase is JavaScript's standard, the same way Cambridge pseudocode uses it too.</p></div>` },
+  jsf2s2: { title: 'Six variables, three real types', html: `
+    <div class="cl-block"><h4>Practice recognizing types by how they're written</h4>
+      <p>2 strings (quotes), 2 numbers (no quotes), 2 booleans (true/false, no quotes) — six console.log() calls forces you to actually create and name all six deliberately, rather than only ever practicing one type at a time.</p></div>` },
+  jsf2cp1: { title: 'Checkpoint — the digit-first rule again', html: `
+    <div class="cl-block"><h4>A hard rule, not a style opinion</h4>
+      <p>let 2cool = "yes"; isn't ugly code — it's CODE THAT DOESN'T RUN. A variable name starting with a digit is invalid in essentially every mainstream language, JavaScript included.</p></div>` },
+  jsf2s3: { title: 'const isn\'t just "a stricter let"', html: `
+    <div class="cl-block"><h4>Reassigning a const doesn't fail quietly</h4>
+      <p>const birthYear = 2010; birthYear = 2011; doesn't just "not work" — it throws a real error and stops the whole script. Choosing const isn't optional style; it's a deliberate promise that a value will never change.</p></div>` },
+  jsf2s4: { title: 'Store the calculation, THEN print it', html: `
+    <div class="cl-block"><h4>Two separate steps, same as functions elsewhere</h4>
+      <p>let sum = a + b; computes and stores; document.write(sum) displays. Printing the raw expression directly works too, but naming the RESULT (sum, product) makes code far more readable once there's more than one calculation happening.</p></div>` },
+  jsf2s5: { title: 'A property you read; a method you call', html: `
+    <div class="cl-block"><h4>Math.PI vs. Math.pow() — the distinction matters</h4>
+      <p>Math.PI has no parentheses because it's a fixed VALUE sitting there, ready to read. Math.pow(4, 2) has parentheses because it's a FUNCTION you're asking to run, with inputs it needs to do its job.</p></div>` },
+  jsf2s6: { title: 'Order of operations still applies in code', html: `
+    <div class="cl-block"><h4>2 * (width + height), not 2 * width + height</h4>
+      <p>The brackets around (width + height) aren't decoration — without them, * would only apply to width, giving a completely different (wrong) number. This is the exact same order-of-operations rule from maths class, now enforced by real code.</p></div>` },
+  jsf2cp2: { title: 'Checkpoint — the multiplication symbol', html: `
+    <div class="cl-block"><h4>* not x</h4>
+      <p>A small but real trap for beginners — the letter x or a raised dot doesn't work in code. JavaScript (and nearly every language) uses the asterisk * for multiplication.</p></div>` },
+  jsf2boss: { title: 'BOSS — real research feeding real calculations', html: `
+    <div class="cl-block"><h4>const for values that truly don\'t change</h4>
+      <p>MPG and gasPrice are constants ON PURPOSE — they're fixed facts for this trip, not values the program updates as it runs, which is exactly the distinction jsf2s3 introduced.</p></div>
+    <div class="cl-block"><h4>Every data type, working together</h4>
+      <p>Strings (names, landmarks), a number (distance), a boolean (snacks), and two calculations built from all of it — this is the first time in the module every single type and skill has to combine into one coherent program.</p></div>` },
   // ── Web Story 1 — Remembering the Reader: arrays & objects ──────────────────
+  ws1sdiv: { title: 'A <div> is a blank, labeled box', html: `
+    <div class="cl-block"><h4>No built-in meaning, on purpose</h4>
+      <p>Unlike &lt;h1&gt; or &lt;p&gt;, a &lt;div&gt; has no default look at all — it's just a container. That's exactly why every ws1 stage starts with one: it's a blank box JS can find and fill in, not a piece of content with its own style already decided.</p></div>
+    <div class="cl-block"><h4>id is a name tag, not decoration</h4>
+      <p><code>id="story"</code> is what <code>document.getElementById("story")</code> actually searches for — the string has to match EXACTLY. Get the id wrong in either place and JS silently finds nothing.</p></div>` },
   ws1s1: { title: 'An array is an ordered list of values', html: `
     <div class="cl-block"><h4>Real JavaScript, real syntax</h4>
       <p><code>["sword", "shield"]</code> is a genuine JavaScript array — an ordered collection, indexed from 0. <code>.join(", ")</code> turns it back into one readable string, which is exactly how a real inventory display works.</p></div>
@@ -5063,14 +5132,29 @@ const CHALLENGE_LESSON = {
       <p>An array is a list, ordered by position; an object is a set of NAMED properties (<code>flags.hasKey</code>), not ordered by position at all. Both are "collections", but they answer different questions — "what's item #2?" vs. "does this thing have a key?".</p></div>
     <div class="cl-block"><h4>Booleans track yes/no story state</h4>
       <p>true/false properties are exactly how a real interactive story tracks whether something has happened yet — has the door been unlocked, has a character been met — without needing a whole separate variable for each one.</p></div>` },
-  ws1boss: { title: 'BOSS — arrays and objects, together', html: `
-    <div class="cl-block"><h4>A real story tracks both kinds of state</h4>
-      <p>An inventory (an ordered LIST of items) and a set of flags (NAMED yes/no facts) are genuinely different shapes of data, and a real interactive story needs both — this boss is the smallest real example of tracking each correctly.</p></div>` },
+  ws1sidx: { title: 'Indexes count from 0, not 1', html: `
+    <div class="cl-block"><h4>The single most common off-by-one trap</h4>
+      <p>The first item is index 0, not index 1 — so a 3-item array's LAST valid index is 2, not 3. <code>inventory.length</code> (3) and the last valid index (2) are always exactly one apart, because length counts items while an index counts gaps-from-the-start.</p></div>
+    <div class="cl-block"><h4>Seeing it beats being told it</h4>
+      <p>This stage exists purely as a visual — boxes labeled with their real index — because a one-line hint ("index 0, not the whole array") wasn't enough on its own for most students to internalize before ws1s4 asks them to actually use it.</p></div>` },
   ws1s4: { title: 'Indexing and .length — reading ONE item, or the total count', html: `
     <div class="cl-block"><h4>join() shows everything; [0] shows just one</h4>
       <p><code>inventory[0]</code> reads ONE specific item by its position — index 0 is always the FIRST item, never the "1st" in everyday counting. This is genuinely different from <code>.join()</code>, which shows the whole array at once.</p></div>
     <div class="cl-block"><h4>.length is a real property, not a method you call</h4>
       <p><code>inventory.length</code> gives you the array's total count directly — no counting loop needed. Notice it has no brackets: it's a property being READ, not a function being called.</p></div>` },
+  ws1s5a: { title: 'An object can hold MORE than one flag', html: `
+    <div class="cl-block"><h4>Same shape, more properties</h4>
+      <p>ws1s3's flags object only ever had one property. Nothing changes structurally to add a second — <code>{ hasKey: true, hasMap: false }</code> is still just one object, just with two named facts instead of one.</p></div>
+    <div class="cl-block"><h4>Display first, decide later</h4>
+      <p>This stage deliberately stops at just SHOWING both values — no &amp;&amp; yet, no decision yet. Combining ideas is easier once each one is solid on its own, which is exactly what ws1s5b and the final ws1s5 build on next.</p></div>` },
+  ws1s5b: { title: '&& in isolation, before it touches an object', html: `
+    <div class="cl-block"><h4>One new symbol, tested on its own first</h4>
+      <p>Two plain boolean variables, no object properties yet — this isolates exactly what <code>&amp;&amp;</code> does (both sides must be true) before ws1s5 asks you to combine it with an object's properties at the same time.</p></div>
+    <div class="cl-block"><h4>Why isolate it at all</h4>
+      <p>ws1s5 (next) needs both "an object with two properties" AND "&amp;&amp; logic" working together — debugging two new ideas introduced simultaneously is much harder than debugging each one once, separately, first.</p></div>` },
+  ws1boss: { title: 'BOSS — arrays and objects, together', html: `
+    <div class="cl-block"><h4>A real story tracks both kinds of state</h4>
+      <p>An inventory (an ordered LIST of items) and a set of flags (NAMED yes/no facts) are genuinely different shapes of data, and a real interactive story needs both — this boss is the smallest real example of tracking each correctly.</p></div>` },
   ws1s5: { title: 'Combining two conditions with &&', html: `
     <div class="cl-block"><h4>ONE flag was enough before — this needs BOTH</h4>
       <p>ws1s3 only ever checked a single flag. <code>flags.hasKey &amp;&amp; flags.hasMap</code> is only true when BOTH sides are true — exactly the same strict AND idea from real Boolean logic, now doing real work on two object properties at once.</p></div>
