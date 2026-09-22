@@ -1812,6 +1812,396 @@ const MODULES = [
                   && log.hasVariable && log.hasClick && log.bodyChangedOnClick,
     },
   ]},
+  // ── JS Foundations 1 — ported from a CodeMonkey-style lesson at the
+  // user's request, full granularity (every checkpoint/You-Try-It/Activity
+  // as its own stage, not condensed). Two things the source material relies
+  // on don't actually work in ByteForge's auto-grading iframe (sandbox is
+  // allow-scripts allow-same-origin, no allow-modals — prompt()/alert() are
+  // blocked; webLog has no console.log() CAPTURE at all) — confirmed by
+  // reading runWebCode() directly. document.write() DOES work (it writes
+  // real DOM content during the synchronous initial script run, which
+  // existing webLog fields like bodyText already observe) — checks below
+  // grade document.write()'s real DOM effect, and check console.log() via a
+  // source-regex presence check (same technique ws1s0 already uses for
+  // array literals) rather than runtime output, since there's nothing to
+  // observe it with yet. User chose to defer prompt()/alert()-based content
+  // (Lesson 3) rather than build the engine support for it right now.
+  { id:'jsf1', name:'📗 JS Foundations 1 — Print & Comment', sub:'What JavaScript is, console.log vs document.write, variables, and comments', live:true, stages:[
+    { id:'jsf1s0', name:'What Is JavaScript?', xp:20, type:'quiz',
+      text:`<strong>JavaScript is the programming language of the web.</strong> HTML gives your page structure, CSS adds style — JavaScript brings it to life. It lets your page respond to clicks, change text, calculate numbers, and make decisions.<br><br>
+        HTML and CSS are <b>markup and styling languages</b> — they describe what a page LOOKS like. JavaScript is a real <b>programming language</b> — it gives the computer actual instructions to DO things.`,
+      hints:['HTML = structure. CSS = style. JavaScript = behavior/actions.', 'Only JavaScript can react to a click or calculate something — HTML and CSS can\'t.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'Which of the three (HTML/CSS/JS) actually gives the computer instructions to DO something, like react to a click?',
+          options: ['HTML', 'CSS', 'JavaScript'], answer: 'JavaScript' },
+        { type:'match', prompt:'HTML and CSS are described as...',
+          options: ['Markup and styling languages', 'Programming languages', 'The same thing as JavaScript', 'Database languages'], answer: 'Markup and styling languages' },
+        { type:'match', prompt:'What does CSS control?',
+          options: ['Appearance — colors, fonts, spacing', 'Page structure like headings', 'Reacting to button clicks', 'Calculating totals'], answer: 'Appearance — colors, fonts, spacing' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'jsf1s1', name:'Where Do You Write JavaScript?', xp:20, type:'quiz',
+      text:`Just like CSS, JavaScript can be written two ways:<br><br>
+        <b>Internal JS</b> — embedded directly in the HTML file, inside <code>&lt;script&gt;</code> tags:
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">&lt;body&gt;
+  &lt;h1&gt;Hello Page&lt;/h1&gt;
+  &lt;script&gt;
+    console.log("Hello from JavaScript!");
+  &lt;/script&gt;
+&lt;/body&gt;</pre>
+        <b>External JS</b> — written in a separate <code>.js</code> file, linked from the HTML's <code>&lt;head&gt;</code> — exactly how your own ByteForge JS tab already works: any code you write there runs automatically when the page loads.`,
+      hints:['Internal = inside <script> tags, right in the HTML file.', 'External = a separate .js file, linked from <head> — this is how ByteForge\'s own JS tab works.'],
+      passCount:2,
+      questions: [
+        { type:'match', prompt:'JavaScript written directly inside <script> tags in the HTML file is called...',
+          options: ['Internal JS', 'External JS', 'Inline CSS', 'A comment'], answer: 'Internal JS' },
+        { type:'match', prompt:'In ByteForge, is your JS tab more like internal or external JavaScript?',
+          options: ['External — a separate file automatically linked to the page', 'Internal — typed directly between <script> tags you write', 'Neither — ByteForge doesn\'t use real JavaScript', 'It doesn\'t matter, they\'re identical'], answer: 'External — a separate file automatically linked to the page' },
+      ],
+      check:(log) => log.quizCorrect >= 2,
+    },
+    { id:'jsf1s2', name:'Your First console.log()', xp:25, lang:'web',
+      text:`<strong>console.log()</strong> sends a message to the browser's console — useful for testing and debugging, but it does NOT show up on the actual webpage.<br><br>
+        <code>console</code> is a built-in <b>object</b> (a container holding related tools). <code>.log()</code> is a <b>function</b> that tells it to print a message. The text inside the parentheses must be in quotes — that's the <b>syntax</b>.<br><br>
+        Write <code>console.log("Hello, JavaScript!");</code> — or your own message, in quotes.`,
+      hints:[
+        'console.log("your message here"); — quotes are required around the text.',
+        'console is the object, .log() is the function that does the printing.',
+        'This won\'t show up on the page itself — it\'s meant for testing, not display.',
+      ],
+      webStarter: {
+        html: `<h1>My First Script</h1>\n`,
+        css: ``,
+        js: `// TODO: console.log() a message of your own, in quotes\n`,
+      },
+      check:(log) => /console\.log\s*\(\s*["'][^"']+["']\s*\)/.test(log.js),
+    },
+    { id:'jsf1s3', name:'document.write() — Visible Output', xp:25, lang:'web',
+      text:`<strong>document.write()</strong> prints directly onto the webpage — you'll see it immediately, unlike <code>console.log()</code>.<br><br>
+        It's mostly used for learning and simple examples — real websites use more modern techniques (manipulating the <b>DOM</b>, the structure of the page JavaScript can change) instead. But for now, it's the fastest way to see real output.<br><br>
+        Write <code>document.write("Hello, world!");</code> — or your own message.`,
+      hints:[
+        'document.write("your message"); — quotes required, just like console.log().',
+        'Unlike console.log(), this one actually shows up ON the page.',
+        'The DOM (Document Object Model) is the structure of the page — you\'ll manipulate it more directly in later lessons.',
+      ],
+      webStarter: {
+        html: `<h1>My First Script</h1>\n`,
+        css: ``,
+        js: `// TODO: document.write() a message of your own, in quotes\n`,
+      },
+      check:(log) => /document\.write\s*\(/.test(log.js) && log.bodyText.replace(/My First Script/, '').trim().length > 0,
+    },
+    { id:'jsf1cp1', name:'Checkpoint — console.log vs document.write', xp:20, type:'quiz',
+      text:`<strong>Checkpoint #1</strong> — Which of the following JavaScript commands prints a message directly ON the webpage?`,
+      hints:['Only one of these actually shows up on the page itself, not just in the console.'],
+      passCount:1,
+      questions: [
+        { type:'match', prompt:'Which command prints a message directly on the webpage?',
+          options: ['console.log("Hello")', 'alert("Hello")', 'document.write("Hello")', 'print("Hello")'], answer: 'document.write("Hello")' },
+      ],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'jsf1s4', name:'What Is a Variable? — String Variables', xp:30, lang:'web',
+      text:`<strong>A variable stores information you can use later</strong> — think of it as a labeled container: a NAME for the container, and a VALUE inside it.<br><br>
+        Text stored in a variable is called a <b>string</b> — always written inside quotes:
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">let userName = "Jordan";
+let favoriteFood = "pizza";
+document.write("Hi, my name is " + userName + ".&lt;br&gt;");
+document.write("My favorite food is " + favoriteFood + "!");</pre>
+        <code>let</code> creates a new variable. The <code>+</code> sign joins (<b>concatenates</b>) strings and variables together.<br><br>
+        Create TWO string variables about yourself, and document.write() a sentence using both, joined with <code>+</code>.`,
+      hints:[
+        'let userName = "Jordan"; — let, then a name, then = , then the value in quotes.',
+        'document.write("Hi, I\'m " + userName + "!"); — + joins text and a variable together.',
+        'Both variables need to actually appear in your document.write() sentence.',
+      ],
+      webStarter: {
+        html: `<h1>About Me</h1>\n`,
+        css: ``,
+        js: `// TODO: two string variables about yourself\n\n// TODO: document.write() a sentence combining both, using +\n`,
+      },
+      check:(log) => {
+        const assigns = (log.js.match(/\blet\s+\w+\s*=\s*["'][^"']*["']/g) || []).length
+        const hasConcat = /document\.write\s*\([^)]*\+/.test(log.js)
+        return assigns >= 2 && hasConcat
+      },
+    },
+    { id:'jsf1s5', name:'You Try It! Personalize Variables', xp:30, lang:'web',
+      text:`<strong>You Try It!</strong> — Change the values of the variables below to match your own name and favorite food, then run the code to see your custom message.`,
+      hints:[
+        'Only change what\'s INSIDE the quotes — keep the variable names (userName, favoriteFood) the same.',
+        'The document.write() line is already written for you — it\'ll pick up your new values automatically.',
+      ],
+      webStarter: {
+        html: `<h1>About Me</h1>\n`,
+        css: ``,
+        js: `let userName = "Jordan";\nlet favoriteFood = "pizza";\n\ndocument.write("Hi, my name is " + userName + ". My favorite food is " + favoriteFood + "!");\n`,
+      },
+      check:(log) => !/userName\s*=\s*["']Jordan["']/.test(log.js) && !/favoriteFood\s*=\s*["']pizza["']/.test(log.js)
+        && log.bodyText.includes('Hi, my name is') && log.bodyText.includes('My favorite food is'),
+    },
+    { id:'jsf1s6', name:'Writing Comments', xp:20, lang:'web',
+      text:`<strong>Comments</strong> are lines the computer ignores completely — they're for HUMANS, to explain what the code is doing.<br><br>
+        In JavaScript, a comment starts with <code>//</code>:
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;">// This is a comment. It won't run as code.
+console.log("Hello!");</pre>
+        Add a <code>//</code> comment explaining what each variable below stores, then run the code (comments don't stop it from working).`,
+      hints:[
+        '// goes at the start of the line — anything after it on that line is ignored.',
+        'A good comment says WHAT the variable is for, e.g. "// stores the user\'s age".',
+        'Keyboard shortcut: Ctrl+/ (or Cmd+/) comments/uncomments a line.',
+      ],
+      webStarter: {
+        html: `<h1>My Info</h1>\n`,
+        css: ``,
+        js: `let age = 16;\n// TODO: add a comment above explaining what "age" stores\n\nconsole.log(age);\n`,
+      },
+      check:(log) => (log.js.match(/\/\/.+/g) || []).length >= 1,
+    },
+    { id:'jsf1cp2', name:'Checkpoint — What Does + Do?', xp:20, type:'quiz',
+      text:`<strong>Checkpoint #2</strong> — What is the purpose of the <code>+</code> sign in this line of code?<br><br><code>document.write("Hi, " + userName);</code>`,
+      hints:['It\'s the same joining trick from jsf1s4 and jsf1s5.'],
+      passCount:1,
+      questions: [
+        { type:'match', prompt:'What does the + sign do in document.write("Hi, " + userName)?',
+          options: ['It adds numbers', 'It prints variables only', 'It creates a new variable', 'It combines strings and variables'], answer: 'It combines strings and variables' },
+      ],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'jsf1boss', name:'ACTIVITY — All About Me in Code', xp:70, lang:'web', boss:true,
+      text:`<strong>Activity: All About Me in Code</strong> — Write a program that introduces you. Your code should include:<br>
+        <ul style="margin:8px 0 0 18px;padding:0;">
+          <li>A comment at the top with your name</li>
+          <li>Comments explaining what each variable stores</li>
+          <li>At least 3 string variables about yourself (name, favorite activity, favorite food, favorite emoji, etc.)</li>
+          <li>A message printed to the console using <code>console.log()</code></li>
+          <li>A message printed to the webpage using <code>document.write()</code></li>
+        </ul>
+        Try using <code>&lt;br&gt;</code> inside your document.write() string for line breaks.`,
+      hints:[
+        'This is genuinely everything from this module combined — 3 string variables, comments, console.log, and document.write.',
+        'Check each requirement separately: variables first, then comments, then BOTH output methods.',
+      ],
+      webStarter: {
+        html: `<h1>All About Me</h1>\n`,
+        css: ``,
+        js: `// TODO: your name, as a comment\n\n// TODO: 3+ string variables about yourself, each with a comment explaining it\n\n// TODO: console.log() a message\n\n// TODO: document.write() a message\n`,
+      },
+      check:(log) => {
+        const stringVars = (log.js.match(/\blet\s+\w+\s*=\s*["'][^"']*["']/g) || []).length
+        const comments = (log.js.match(/\/\/.+/g) || []).length
+        const hasConsole = /console\.log\s*\(/.test(log.js)
+        const hasDocWrite = /document\.write\s*\(/.test(log.js) && log.bodyText.replace(/All About Me/, '').trim().length > 0
+        return stringVars >= 3 && comments >= 3 && hasConsole && hasDocWrite
+      },
+    },
+  ]},
+  // ── JS Foundations 2 — data types, let/const, Math operators & object.
+  // Same source/constraints as jsf1 above. `let x = 5; x = 6;` runs fine and
+  // is checkable live — a REAL `const x = 5; x = 6;` reassignment throws and
+  // would short-circuit runWebCode() entirely (webError gets set, webLog
+  // never even gets built), so unlike the rest of this module, the let-vs-
+  // const comparison itself is quiz-only (jsf2s3) rather than live code —
+  // exactly how the source material's own Checkpoints work anyway.
+  { id:'jsf2', name:'📘 JS Foundations 2 — Data Types & Math', sub:'string/number/boolean, let vs const, math operators, the Math object', live:true, stages:[
+    { id:'jsf2s0', name:'What Are Data Types?', xp:20, type:'quiz',
+      text:`<strong>Not all data is the same.</strong> JavaScript has different TYPES of values, each used for a different purpose:<br><br>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin:10px 0;">
+          <div style="flex:1;min-width:150px;border:1px solid var(--border-hi);border-radius:8px;padding:10px;background:var(--bg-raised);text-align:center;">
+            <div style="font-size:11px;color:var(--fg-faint);">let userName =</div>
+            <div style="font-size:13px;font-weight:700;margin:4px 0;">"CodeMonkeyPro123"</div>
+            <div style="font-size:11px;color:var(--accent);font-weight:600;">STRING</div>
+          </div>
+          <div style="flex:1;min-width:150px;border:1px solid var(--border-hi);border-radius:8px;padding:10px;background:var(--bg-raised);text-align:center;">
+            <div style="font-size:11px;color:var(--fg-faint);">let totalScore =</div>
+            <div style="font-size:13px;font-weight:700;margin:4px 0;">150</div>
+            <div style="font-size:11px;color:var(--accent);font-weight:600;">NUMBER</div>
+          </div>
+          <div style="flex:1;min-width:150px;border:1px solid var(--border-hi);border-radius:8px;padding:10px;background:var(--bg-raised);text-align:center;">
+            <div style="font-size:11px;color:var(--fg-faint);">let winGame =</div>
+            <div style="font-size:13px;font-weight:700;margin:4px 0;">true</div>
+            <div style="font-size:11px;color:var(--accent);font-weight:600;">BOOLEAN</div>
+          </div>
+        </div>
+        A <b>string</b> is text inside quotes. A <b>number</b> is any numeric value, no quotes. A <b>boolean</b> is <code>true</code> or <code>false</code> — always lowercase.`,
+      hints:['Quotes around it = string, even if it looks like a number: "150" is a string, 150 is a number.', 'Booleans are ONLY ever true or false — lowercase, no quotes.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'let score = "150"; — what data type is score?', options: ['String', 'Number', 'Boolean'], answer: 'String' },
+        { type:'match', prompt:'let isStudent = true; — what data type is isStudent?', options: ['String', 'Number', 'Boolean'], answer: 'Boolean' },
+        { type:'match', prompt:'let age = 15; — what data type is age?', options: ['String', 'Number', 'Boolean'], answer: 'Number' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'jsf2s1', name:'Variable Syntax Rules', xp:20, type:'quiz',
+      text:`Each data type has its own syntax: strings in quotes (<code>"hello"</code>), numbers with no quotes (<code>92</code>, <code>3.14</code>), booleans always lowercase (<code>true</code>/<code>false</code>).<br><br>
+        Rules for ALL variable names: must start with a LETTER (not a number), and NO SPACES allowed — use <b>camelCase</b> instead (<code>favoriteColor</code>, not <code>favorite color</code>).`,
+      hints:['JavaScript uses camelCase: favoriteColor, not favorite_color or favorite color.', 'A name starting with a digit is always invalid, in any language.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'Which variable name is valid?', options: ['favoriteColor', 'favorite color', '2ndPlace', 'favorite-color'], answer: 'favoriteColor' },
+        { type:'match', prompt:'JavaScript\'s standard casing style for variable names is called...', options: ['camelCase', 'snake_case', 'PascalCase', 'SHOUTING_CASE'], answer: 'camelCase' },
+        { type:'match', prompt:'let 99problems = true; — valid or invalid?', options: ['Invalid — starts with a number', 'Valid', 'Invalid — booleans can\'t be named this'], answer: 'Invalid — starts with a number' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'jsf2s2', name:'You Try It! Create and Print Your Variables', xp:35, lang:'web',
+      text:`<strong>Practice all three data types.</strong> Create SIX variables total: 2 strings, 2 numbers, 2 booleans. Give each a meaningful name, then print EACH ONE using <code>console.log()</code>.`,
+      hints:[
+        'Strings: name, favoriteFood, favoriteColor. Numbers: age, numberOfSiblings, heightInCm. Booleans: isStudent, hasPet, lovesPizza.',
+        'Each variable needs its OWN console.log() call — 6 variables means 6 console.log() lines.',
+        'Booleans are true/false with no quotes — "true" in quotes would actually be a STRING, not a boolean.',
+      ],
+      webStarter: {
+        html: `<h1>My Variables</h1>\n`,
+        css: ``,
+        js: `// TODO: 2 string variables\n\n// TODO: 2 number variables\n\n// TODO: 2 boolean variables\n\n// TODO: console.log() each of the 6 variables\n`,
+      },
+      check:(log) => {
+        const strings = (log.js.match(/\blet\s+\w+\s*=\s*["'][^"']*["']/g) || []).length
+        const numbers = (log.js.match(/\blet\s+\w+\s*=\s*-?\d+\.?\d*\s*;/g) || []).length
+        const booleans = (log.js.match(/\blet\s+\w+\s*=\s*(true|false)\s*;/g) || []).length
+        const logs = (log.js.match(/console\.log\s*\(/g) || []).length
+        return strings >= 2 && numbers >= 2 && booleans >= 2 && logs >= 6
+      },
+    },
+    { id:'jsf2cp1', name:'Checkpoint — Variable Name Errors', xp:20, type:'quiz',
+      text:`<strong>Checkpoint #1</strong> — What best describes this variable declaration?<br><br><code>let 2cool = "yes";</code>`,
+      hints:['Look back at jsf2s1\'s rules for what a valid name can start with.'],
+      passCount:1,
+      questions: [
+        { type:'match', prompt:'let 2cool = "yes"; — what happens?',
+          options: ['The code runs without error', 'Error because variable names cannot start with a number', 'Error because the variable name is too short', 'Error because you cannot use let to declare a variable'],
+          answer: 'Error because variable names cannot start with a number' },
+      ],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'jsf2s3', name:'let vs. const', xp:25, type:'quiz',
+      text:`Most variables you expect to CHANGE use <code>let</code>:
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;">let score = 0;
+score = score + 1;
+score = score + 2;
+console.log(score); // 3</pre>
+        But sometimes a value should NEVER change once set — that's <code>const</code> (short for constant):
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;">let favoriteColor = "blue";
+favoriteColor = "green"; // OK — let allows this
+
+const birthYear = 2010;
+birthYear = 2011; // Error! Cannot reassign a const</pre>`,
+      hints:['let = can change later. const = locked in once set.', 'Trying to reassign a const doesn\'t just fail quietly — it stops the whole script with an error.'],
+      passCount:2,
+      questions: [
+        { type:'match', prompt:'Which keyword lets you change a variable\'s value later?', options: ['let', 'const', 'Both work the same', 'Neither'], answer: 'let' },
+        { type:'match', prompt:'const birthYear = 2010; birthYear = 2011; — what happens?', options: ['Runs fine, birthYear becomes 2011', 'Error — cannot reassign a const', 'birthYear becomes undefined', 'It creates a second variable'], answer: 'Error — cannot reassign a const' },
+      ],
+      check:(log) => log.quizCorrect >= 2,
+    },
+    { id:'jsf2s4', name:'Using Variables for Math', xp:30, lang:'web',
+      text:`JavaScript does math like a calculator: <code>+</code> (add), <code>-</code> (subtract), <code>*</code> (multiply), <code>/</code> (divide), <code>%</code> (modulo — the REMAINDER after division, e.g. <code>7 % 2</code> is <code>1</code>).<br><br>
+        Create two number variables, calculate their sum AND their product (using two separate variables), then document.write() both results.`,
+      hints:[
+        'let a = 6; let b = 4; then let sum = a + b; let product = a * b;',
+        'document.write("Sum: " + sum + ", Product: " + product);',
+        'Do the CALCULATION first (store it in its own variable), then print that variable — don\'t just print the raw expression.',
+      ],
+      webStarter: {
+        html: `<h1>Math Practice</h1>\n`,
+        css: ``,
+        js: `let a = 6;\nlet b = 4;\n\n// TODO: let sum = a + b;\n// TODO: let product = a * b;\n// TODO: document.write() both results\n`,
+      },
+      check:(log) => /\blet\s+\w+\s*=\s*\w+\s*\+\s*\w+/.test(log.js) && /\blet\s+\w+\s*=\s*\w+\s*\*\s*\w+/.test(log.js) && /document\.write\s*\(/.test(log.js),
+    },
+    { id:'jsf2s5', name:'The Math Object', xp:35, lang:'web',
+      text:`JavaScript's built-in <code>Math</code> object holds ready-made math tools. <code>Math.PI</code> is a <b>property</b> (a fixed value, ~3.14159). These are <b>methods</b> (functions you CALL):<br><br>
+        <code>Math.pow(base, exp)</code> — raises to a power: <code>Math.pow(4, 2)</code> is 16.<br>
+        <code>Math.sqrt(x)</code> — square root: <code>Math.sqrt(25)</code> is 5.<br>
+        <code>Math.round(x)</code> — rounds to the nearest whole number: <code>Math.round(3.7)</code> is 4.<br><br>
+        Use <code>Math.pow()</code> to square a number, and <code>Math.sqrt()</code> on another, then document.write() both results.`,
+      hints:[
+        'let squared = Math.pow(5, 2); — 5 squared is 25.',
+        'let root = Math.sqrt(36); — the square root of 36 is 6.',
+        '.PI is a property (just a value) — .pow()/.sqrt()/.round() are methods (you call them with parentheses).',
+      ],
+      webStarter: {
+        html: `<h1>Math Object</h1>\n`,
+        css: ``,
+        js: `// TODO: let squared = Math.pow(5, 2);\n// TODO: let root = Math.sqrt(36);\n// TODO: document.write() both results\n`,
+      },
+      check:(log) => /Math\.pow\s*\(/.test(log.js) && /Math\.sqrt\s*\(/.test(log.js) && /document\.write\s*\(/.test(log.js),
+    },
+    { id:'jsf2s6', name:'You Try It! Rectangle Math', xp:35, lang:'web',
+      text:`<strong>Calculate the area and perimeter of a rectangle.</strong> Create <code>width</code> and <code>height</code> number variables, then:<br>
+        <ul style="margin:8px 0 0 18px;padding:0;"><li>Area = width × height</li><li>Perimeter = 2 × (width + height)</li></ul>
+        Print <code>width</code>, <code>height</code>, <code>area</code>, and <code>perimeter</code> using <code>console.log()</code>.`,
+      hints:[
+        'let area = width * height;',
+        'let perimeter = 2 * (width + height); — the brackets matter, same order of operations as maths.',
+        'That\'s 4 separate console.log() calls — one for each of width, height, area, perimeter.',
+      ],
+      webStarter: {
+        html: `<h1>Rectangle Math</h1>\n`,
+        css: ``,
+        js: `let width = 8;\nlet height = 5;\n\n// TODO: let area = width * height;\n// TODO: let perimeter = 2 * (width + height);\n// TODO: console.log() width, height, area, and perimeter\n`,
+      },
+      // hasPerimeter accepts both the doubled-sum form the hint gives
+      // (2 * (width + height)) AND the mathematically equivalent doubled-
+      // terms form (width * 2 + height * 2) — an alternate-but-correct
+      // formula shouldn't be punished just for not matching the hint verbatim.
+      check:(log) => {
+        const hasArea = /\blet\s+area\s*=\s*width\s*\*\s*height/.test(log.js) || /\blet\s+area\s*=\s*height\s*\*\s*width/.test(log.js)
+        const hasPerimeter = /\blet\s+perimeter\s*=\s*2\s*\*\s*\(\s*(width\s*\+\s*height|height\s*\+\s*width)\s*\)/.test(log.js)
+          || /\blet\s+perimeter\s*=\s*(width|height)\s*\*\s*2\s*\+\s*(height|width)\s*\*\s*2/.test(log.js)
+        const logs = (log.js.match(/console\.log\s*\(/g) || []).length
+        return hasArea && hasPerimeter && logs >= 4
+      },
+    },
+    { id:'jsf2cp2', name:'Checkpoint — Which Operator Multiplies?', xp:15, type:'quiz',
+      text:`<strong>Checkpoint #2</strong> — Which operator is used to multiply two numbers in JavaScript?`,
+      hints:['Same symbol as most calculators.'],
+      passCount:1,
+      questions: [
+        { type:'match', prompt:'Which operator multiplies two numbers?', options: ['*', '**', 'multiply()', '//'], answer: '*' },
+      ],
+      check:(log) => log.quizCorrect >= 1,
+    },
+    { id:'jsf2boss', name:'ACTIVITY — Plan a Road Trip', xp:85, lang:'web', boss:true,
+      text:`<strong>Activity: Plan a Road Trip.</strong> Organize and calculate details for a road trip:<br>
+        <ul style="margin:8px 0 0 18px;padding:0;">
+          <li><b>Trip overview:</b> a string for the driver's name, a string for the destination, a boolean for bringing snacks, a number for distance (miles), a number for time (hours)</li>
+          <li><b>3 landmarks:</b> research 3 real attractions along the way, each its own string variable</li>
+          <li><b>Calculations:</b> speed = distance ÷ time; gasCost = (distance ÷ MPG) × gasPrice — using <code>const MPG = 25;</code> and <code>const gasPrice = 3.50;</code></li>
+          <li>Print a trip summary using <code>console.log()</code> or <code>document.write()</code>, including all trip info, calculations, and the 3 landmarks</li>
+          <li>At least ONE comment explaining part of your code</li>
+        </ul>`,
+      hints:[
+        'const MPG = 25; and const gasPrice = 3.50; — these never change, so const is correct here (not let).',
+        'let speed = distance / time; let gasCost = (distance / MPG) * gasPrice; — brackets matter for gasCost.',
+        'That\'s 5+ trip-overview variables, PLUS 3 landmark strings, PLUS 2 calculations, PLUS at least 1 comment.',
+      ],
+      webStarter: {
+        html: `<h1>Road Trip Planner</h1>\n`,
+        css: ``,
+        js: `// TODO: driver name, destination, snacks (boolean), distance, time\n\n`
+          + `// TODO: 3 landmark string variables\n\n`
+          + `const MPG = 25;\nconst gasPrice = 3.50;\n// TODO: let speed = distance / time;\n// TODO: let gasCost = (distance / MPG) * gasPrice;\n\n`
+          + `// TODO: print a full trip summary with console.log() or document.write()\n`,
+      },
+      check:(log) => {
+        const stringVars = (log.js.match(/\b(?:let|const)\s+\w+\s*=\s*["'][^"']*["']/g) || []).length
+        const boolVar = /\b(?:let|const)\s+\w+\s*=\s*(true|false)\s*;/.test(log.js)
+        const numberVars = (log.js.match(/\b(?:let|const)\s+\w+\s*=\s*\d+\.?\d*\s*;/g) || []).length
+        const hasConstMpg = /const\s+MPG\s*=\s*25/.test(log.js)
+        const hasSpeed = /\/\s*time/.test(log.js) || /distance\s*\/\s*\w*[Tt]ime/.test(log.js)
+        const hasGasCost = /MPG\s*\)\s*\*\s*gasPrice/.test(log.js) || /gasPrice\s*\*/.test(log.js) || /\*\s*gasPrice/.test(log.js)
+        const comments = (log.js.match(/\/\/.+/g) || []).length
+        const hasOutput = /console\.log\s*\(/.test(log.js) || (/document\.write\s*\(/.test(log.js) && log.bodyText.replace(/Road Trip Planner/, '').trim().length > 0)
+        return stringVars >= 4 && boolVar && numberVars >= 1 && hasConstMpg && hasSpeed && hasGasCost && comments >= 1 && hasOutput
+      },
+    },
+  ]},
   // ── Web Story 1 — Semester 1, Week 1: objects/arrays for story state ──────
   // Real HTML/CSS/JS text code (lang:'web') — Grade 8's story project is
   // "advanced" and matches Grade 8's own real-Python positioning, unlike

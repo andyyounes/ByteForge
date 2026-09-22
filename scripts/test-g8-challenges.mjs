@@ -47,11 +47,22 @@ const webMaximalLog = () => ({
   // assignment) rather than relying only on the pre-computed hasX flags below.
   js: 'let animal = "Red Panda"; document.querySelector("#x").textContent = "My favorite animal is " + animal; '
     + 'function greet() { return "Welcome, traveler!"; } document.querySelector("#y").textContent = greet(); '
-    + 'let inventory = ["sword", "shield"];',
+    + 'let inventory = ["sword", "shield"]; '
+    // jsf1/jsf2 (JS Foundations) — console.log/document.write/comments/data
+    // types/Math, all satisfied at once for the generic satisfiability check.
+    + 'console.log("hi"); console.log("a"); console.log("b"); console.log("c"); console.log("d"); console.log("e"); '
+    + 'document.write("visible output"); document.write("Hi " + "there"); '
+    + '// comment one\n// comment two\n// comment three\n'
+    + 'let userName = "Sam"; let favoriteFood = "tacos"; let landmark = "Museum"; let age = 16; let heightCm = 170; let isStudent = true; let hasPet = false; '
+    + 'let sum = age + heightCm; let product = age * heightCm; '
+    + 'let squared = Math.pow(5, 2); let root = Math.sqrt(36); '
+    + 'let width = 8; let height = 5; let area = width * height; let perimeter = 2 * (width + height); '
+    + 'const MPG = 25; const gasPrice = 3.50; let distance = 200; let time = 4; let speed = distance / time; let gasCost = (distance / MPG) * gasPrice;',
   // ws1s0 reads real global state (an actual array with 2+ items) rather
   // than a regex flag — needs a real array sitting on the fixture's window.
   globals: { inventory: ['sword', 'shield', 'lantern'] },
-  bodyText: 'true false you see 1. item 3 items 1 2 3 4 5 ' + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
+  bodyText: 'true false you see 1. item 3 items 1 2 3 4 5 Hi, my name is Sam. My favorite food is tacos! '
+    + 'x, '.repeat(5), hasArray: true, hasObject: true, hasPush: true,
   hasFunction: true, functionCount: 999, hasReturn: true, hasIf: true,
   hasLSSet: true, hasLSGet: true, hasLSRemove: true, hasJSONStringify: true, hasJSONParse: true,
   // ws4s4 additionally checks listItems < 4 — 3 is the one value that
@@ -192,6 +203,49 @@ for (const [id, label, code, log] of ACCEPT) {
   const ch = byId(id)
   if (!ch) { fail++; console.log(`✗ ${id} — challenge not found`); continue }
   if (ch.check(strip(code), log, code)) { pass++; console.log(`✓ ${id} — correctly accepts: ${label}`) }
+  else { fail++; console.log(`✗ ${id} — REJECTS a correct solution: ${label}`) }
+}
+
+// ── web-lang (JS) coding stages — check(log) takes ONE log object, not
+// (code, log, src) like the Python stages above. jsf1/jsf2's checks are
+// regex-only (no live browser here), so each REJECT/ACCEPT pair verifies
+// the regex logic directly against a realistic log.js/log.bodyText.
+const WEB_REJECT = [
+  ['jsf1s2', 'console.log with no quotes (not a real string argument)', { js: 'console.log(5);' }],
+  ['jsf1s3', 'document.write() called but produces no visible output', { js: 'document.write("");', bodyText: 'My First Script' }],
+  ['jsf1s4', 'only ONE string variable, not two', { js: 'let userName = "Sam";\ndocument.write("Hi " + userName);' }],
+  ['jsf1s5', 'unmodified starter — still says Jordan/pizza', { js: 'let userName = "Jordan";\nlet favoriteFood = "pizza";', bodyText: 'Hi, my name is Jordan. My favorite food is pizza!' }],
+  ['jsf1s6', 'no comment added', { js: 'let age = 16;\nconsole.log(age);' }],
+  ['jsf1boss', 'only 2 string variables (needs 3+)', { js: '// Alex\n// name\nlet name = "Alex";\n// food\nlet food = "sushi";\nconsole.log(name);\ndocument.write("hi " + name);', bodyText: 'All About Mehi Alex' }],
+  ['jsf2s2', 'only 5 console.log calls (needs 6, one variable never printed)', { js: 'let a="x";let b="y";let c=1;let d=2;let e=true;let f=false;console.log(a);console.log(b);console.log(c);console.log(d);console.log(e);' }],
+  ['jsf2s4', 'sum calculated but product is missing', { js: 'let a=6;let b=4;let sum=a+b;document.write("s:"+sum);' }],
+  ['jsf2s5', 'Math.pow used but Math.sqrt is missing', { js: 'let squared=Math.pow(5,2);document.write(squared);' }],
+  ['jsf2s6', 'perimeter formula has no doubling at all (mathematically wrong)', { js: 'let width=8;let height=5;let area=width*height;let perimeter=width+height;console.log(width);console.log(height);console.log(area);console.log(perimeter);' }],
+  ['jsf2boss', 'never divides by MPG at all (gasCost formula missing)', { js: 'let driver="Sam";let dest="Miami";let snacks=true;let distance=200;let time=4;\nlet a1="Beach";let a2="Pier";let a3="Museum";\nconst MPG=25;const gasPrice=3.50;\n// trip calcs\nlet speed=distance/time;\nconsole.log(speed);' }],
+]
+const WEB_ACCEPT = [
+  ['jsf1s2', 'a real quoted console.log message', { js: 'console.log("hi there");' }],
+  ['jsf1s3', 'document.write() with real visible output', { js: 'document.write("hi");', bodyText: 'My First Scripthi' }],
+  ['jsf1s4', 'two string variables, concatenated in document.write', { js: 'let userName = "Sam";\nlet favoriteFood = "tacos";\ndocument.write("Hi " + userName + " " + favoriteFood);' }],
+  ['jsf1s5', 'personalized with real values', { js: 'let userName = "Alex";\nlet favoriteFood = "sushi";\ndocument.write("Hi, my name is " + userName + ". My favorite food is " + favoriteFood + "!");', bodyText: 'Hi, my name is Alex. My favorite food is sushi!' }],
+  ['jsf1s6', 'a real explanatory comment', { js: 'let age = 16;\n// stores the user\'s age\nconsole.log(age);' }],
+  ['jsf1boss', '3 string vars, 3 comments, both output methods', { js: '// Alex\n// name var\nlet name = "Alex";\n// food var\nlet food = "sushi";\n// emoji var\nlet emoji = "🍣";\nconsole.log(name);\ndocument.write("Hi " + name);', bodyText: 'All About MeHi Alex' }],
+  ['jsf2s2', 'a real 2-string/2-number/2-boolean set, all 6 logged', { js: 'let a="x";let b="y";let c=1;let d=2;let e=true;let f=false;console.log(a);console.log(b);console.log(c);console.log(d);console.log(e);console.log(f);' }],
+  ['jsf2s4', 'sum and product both calculated and printed', { js: 'let a=6;let b=4;let sum=a+b;let product=a*b;document.write("s:"+sum+"p:"+product);' }],
+  ['jsf2s5', 'both Math.pow and Math.sqrt used', { js: 'let squared=Math.pow(5,2);let root=Math.sqrt(36);document.write(squared+root);' }],
+  ['jsf2s6', 'the doubled-terms alternate formula (mathematically equivalent to the hint)', { js: 'let width=8;let height=5;let area=width*height;let perimeter=width*2+height*2;console.log(width);console.log(height);console.log(area);console.log(perimeter);' }],
+  ['jsf2boss', 'a genuine full solution', { js: 'let driver="Sam";let dest="Miami";let snacks=true;let distance=200;let time=4;\nlet a1="Beach";let a2="Pier";let a3="Museum";\nconst MPG=25;const gasPrice=3.50;\n// convert distance and time into a real speed and cost\nlet speed=distance/time;\nlet gasCost=(distance/MPG)*gasPrice;\nconsole.log(speed);\nconsole.log(gasCost);', bodyText: '' }],
+]
+for (const [id, label, log] of WEB_REJECT) {
+  const ch = byId(id)
+  if (!ch) { fail++; console.log(`✗ ${id} — challenge not found`); continue }
+  if (ch.check(log)) { fail++; console.log(`✗ ${id} — ACCEPTS a wrong solution: ${label}`) }
+  else { pass++; console.log(`✓ ${id} — correctly rejects: ${label}`) }
+}
+for (const [id, label, log] of WEB_ACCEPT) {
+  const ch = byId(id)
+  if (!ch) { fail++; console.log(`✗ ${id} — challenge not found`); continue }
+  if (ch.check(log)) { pass++; console.log(`✓ ${id} — correctly accepts: ${label}`) }
   else { fail++; console.log(`✗ ${id} — REJECTS a correct solution: ${label}`) }
 }
 
