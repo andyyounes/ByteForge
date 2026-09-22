@@ -1264,6 +1264,50 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
+    // p0m6 (right after this) already assumed INT() existed and meant
+    // something, but nothing before it ever taught real conversion syntax —
+    // a genuine gap that surfaced live when a student tried answer(STRING(x))
+    // in p0m5 and hit "Unknown function". Cambridge pseudocode's real
+    // conversion functions (INT/REAL/STR) didn't even exist in this
+    // interpreter until now — see fns.int/fns.real/fns.str above execPseudo.
+    id: 'learn-conversion', type: 'learn', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '📘', title: 'Converting Between Types',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'p0m5 asked you to NAME a type. Now: how do you actually CHANGE a value from one type to another?',
+    api: [],
+    learn: {
+      terms: [
+        { term: 'INT()',  def: 'Pseudocode: converts a value to INTEGER — truncates a REAL, or parses a numeric STRING.' },
+        { term: 'REAL()', def: 'Pseudocode: converts a value to REAL — keeps any decimal places.' },
+        { term: 'STR()',  def: 'Pseudocode: converts a value to STRING — so it can be joined with other text.' },
+        { term: 'int()',  def: 'Python\'s equivalent of INT() — int("7") gives 7, int(7.9) gives 7.' },
+        { term: 'str()',  def: 'Python\'s equivalent of STR() — str(42) gives "42".' },
+      ],
+      theory: `
+        <h4>Naming a type vs. converting one</h4>
+        <p>p0m5 asked "what type IS this value?" — a question with no code involved, just reading how it's written. This is different: actually TURNING a STRING like <code>"7"</code> into a real, usable INTEGER, so you can do arithmetic with it.</p>
+        <h4>The three pseudocode conversion functions</h4>
+        <p><code>INT("7")</code> gives you the INTEGER <code>7</code>. <code>REAL("3.5")</code> gives you the REAL <code>3.5</code>. <code>STR(42)</code> gives you the STRING <code>"42"</code> — the exact reverse, turning a number INTO text so it can be joined with other words.</p>
+        <h4>Why you need this constantly</h4>
+        <p>Every value typed by a user (<code>INPUT age</code>) arrives as a STRING, even if it looks like a number — <code>age + 1</code> would try to glue text together, not add. <code>INT(age) + 1</code> converts it first, so the arithmetic actually works.</p>
+        <h4>Python uses the SAME idea, different spelling</h4>
+        <p>Python's <code>int()</code>, <code>float()</code>, and <code>str()</code> do exactly the same three jobs — <code>int("7")</code>, <code>float("3.5")</code>, <code>str(42)</code>. Only the CASE and the word for "REAL" (Python calls it <code>float</code>) are different — the idea is identical.</p>`,
+    },
+  },
+  {
+    id: 'p0m5c', type: 'data', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '🔁', title: 'Convert It',
+    hints: ["INT(text) turns a numeric STRING into a real INTEGER you can do maths with — INT(\"15\") gives you 15.", "Once it's a real INTEGER, ordinary arithmetic (+, -, *, /) works on it normally."], xp: 30,
+    brief: 'A ticket count arrives as text: <code>"15"</code>. Convert it to a real INTEGER with <code>INT()</code>, add 3 more tickets, and answer() the new total as a number.',
+    api: ['answer(value)'],
+    dataTitle: 'Ticket Count (as text)', dataFields: ['count'],
+    data: [{ count: '"15"' }],
+    starter: {
+      py: 'count = "15"\n# TODO: convert count to a real int with int(), add 3, answer() the result\n',
+      ps: 'count ← "15"\n// TODO: convert count to a real INTEGER with INT(), add 3, answer() the result\n',
+    },
+    answer: 18,
+    stars: { metric: 'pass' },
+  },
+  {
     id: 'p0m6', type: 'data', phase: 'FOUNDATIONS 4 · DATA TYPES', emoji: '🔧', title: 'Type Coercion Trap',
     hints: ["Coercion often converts to the \"wider\" type automatically — a string + a number, or an integer mixed with a float, doesn't always crash the way you'd expect. Work it through step by step."], xp: 35,
     brief: 'Converting between types on purpose is called <b>coercion</b>. Work out what this expression evaluates to and answer() it.',
@@ -1272,7 +1316,7 @@ const MISSIONS = [
     data: [{ expression: 'int("42") + 8' }],
     starter: {
       py: '# TODO: what does int("42") + 8 evaluate to? answer() the result as a number\n',
-      ps: '// TODO: what does converting "42" to INTEGER, then adding 8, evaluate to?\n// answer() the result as a number\n',
+      ps: '// TODO: what does INT("42") + 8 evaluate to?\n// answer() the result as a number\n',
     },
     answer: 50,
     stars: { metric: 'pass' },
@@ -3145,6 +3189,24 @@ function execPseudo(src, mission, battleEnv) {
     ? a.length : (() => { throw { message: 'LENGTH() needs an array or string' } })()
   fns.round  = a => Math.round(a)
   fns.sum    = a => (Array.isArray(a) ? a : (() => { throw { message: 'SUM() needs an array' } })()).reduce((x, y) => x + y, 0)
+  // Real Cambridge pseudocode type-conversion functions — did not exist at
+  // all before this (only LENGTH/ROUND/SUM did), a genuine engine gap: a
+  // student converting a STRING "7" to a usable INTEGER, or building a
+  // display string out of a number, had no real function to call, matching
+  // exactly the STRING(x)-as-a-conversion confusion reported live. INT()
+  // truncates a REAL or parses a numeric STRING; REAL() does the same but
+  // keeps decimals; STR() converts any value to its STRING form.
+  fns.int = a => {
+    const n = typeof a === 'string' ? parseInt(a, 10) : Math.trunc(a)
+    if (Number.isNaN(n)) throw { message: 'INT() could not convert "' + a + '" to a number' }
+    return n
+  }
+  fns.real = a => {
+    const n = typeof a === 'string' ? parseFloat(a) : a
+    if (Number.isNaN(n)) throw { message: 'REAL() could not convert "' + a + '" to a number' }
+    return n
+  }
+  fns.str = a => String(a)
 
   const lines = []
   src.split('\n').forEach((raw, i) => {
@@ -5099,7 +5161,7 @@ const TIERS = [
   { name: '🃏 FOUNDATIONS 2 · BINARY (UNPLUGGED) — no code yet, just the idea', ids: ['learn-binary', 'cards-make', 'cards-add', 'cardsboss', 'cards-byte', 'bits-needed'] },
   { name: '📘 FOUNDATIONS 3 · YOUR FIRST CODE', ids: ['learn-cb', 'learn-naming', 'naming-quiz', 'cb1', 'cb2', 'cb3', 'cb4', 'cb5', 'cb6'] },
   { name: '🏆 FOUNDATIONS 3 CAPSTONE', ids: ['cbboss', 'cbboss2', 'cbboss3'] },
-  { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'p0m4b', 'learn-datatypes', 'p0m5', 'p0m6'] },
+  { name: '🔢 FOUNDATIONS 4 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'p0m4b', 'learn-datatypes', 'p0m5', 'learn-conversion', 'p0m5c', 'p0m6'] },
   { name: '🖼️ FOUNDATIONS 5 · IMAGES — binary pixels', ids: ['learn-images', 'p0m7', 'p0m8'] },
   { name: '🏆 FOUNDATIONS 4-5 CAPSTONE', ids: ['p0boss'] },
   { name: '📊 FOUNDATIONS 6 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'flow-p1', 'flow-p2', 'flow-build', 'flow-code'] },

@@ -137,6 +137,37 @@ const psIdx = execPseudo("IF signals[1] = 'G' THEN\nforward(1)\nELSE\nforward(2)
 if (!psIdx.ok || psIdx.cmds[0][1] !== 1) bad('ps executor: 1-based signals indexing broken: ' + JSON.stringify(psIdx))
 else ok('ps executor: 1-based array indexing + IF/ELSE')
 
+// ── INT()/REAL()/STR() — Cambridge pseudocode conversion functions ───────────
+// Did not exist at all before this (only LENGTH/ROUND/SUM did) — a real
+// engine gap, surfaced live when a student tried answer(STRING(x)) in p0m5
+// and hit "Unknown function". Each case below is verified against the real
+// execPseudo(), not just inspected.
+{
+  const r = execPseudo('x <- "7"\nOUTPUT INT(x) + 1', m1)
+  if (!r.ok || r.outputs[0] !== '8') bad('INT(): numeric string parse broken: ' + JSON.stringify(r))
+  else ok('INT(): parses a numeric STRING and adds correctly')
+}
+{
+  const r = execPseudo('OUTPUT INT(7.9)', m1)
+  if (!r.ok || r.outputs[0] !== '7') bad('INT(): REAL truncation broken: ' + JSON.stringify(r))
+  else ok('INT(): truncates a REAL toward zero (7.9 -> 7)')
+}
+{
+  const r = execPseudo('OUTPUT REAL("3.5") + 1', m1)
+  if (!r.ok || r.outputs[0] !== '4.5') bad('REAL(): numeric string parse broken: ' + JSON.stringify(r))
+  else ok('REAL(): parses a decimal STRING and keeps the decimal')
+}
+{
+  const r = execPseudo('n <- 42\nOUTPUT STR(n) + " items"', m1)
+  if (!r.ok || r.outputs[0] !== '42 items') bad('STR(): number-to-string conversion broken: ' + JSON.stringify(r))
+  else ok('STR(): converts a number to STRING and concatenates correctly')
+}
+{
+  const r = execPseudo('OUTPUT INT("banana")', m1)
+  if (r.ok) bad('INT(): should reject a non-numeric string, not silently succeed: ' + JSON.stringify(r))
+  else ok('INT(): correctly errors on a non-numeric string instead of silently returning NaN')
+}
+
 // ── Phase 2 tutorial battles: pure combat resolution engine ───────────────────
 function constExec(action) { return async () => ({ ok: true, action }) }
 
