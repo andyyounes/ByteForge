@@ -1923,20 +1923,6 @@ const MODULES = [
       needsObject:true,
       check:(log) => log.hasObject && /true|false/i.test(log.bodyText),
     },
-    { id:'ws1boss', name:'BOSS — Inventory & Flags Together', xp:60, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — Track BOTH a 3+ item inventory array AND a flags object with at least one property, using push() to add to the array. Display both inside <code>#story</code>.`,
-      hints:[
-        'This is ws1s2\'s array + ws1s3\'s object, both shown on the same page.',
-        'Nothing new — just combining both ideas from this week into one page.',
-      ],
-      webStarter: {
-        html: `<div id="story"></div>\n`,
-        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
-        js: `// TODO: an inventory array (start with 2 items, push a 3rd)\n\n// TODO: a flags object with at least one true/false property\n\n// TODO: show both in #story\n`,
-      },
-      needsArray:true, needsPush:true, needsObject:true,
-      check:(log) => log.hasArray && log.hasPush && log.hasObject && /true|false/i.test(log.bodyText),
-    },
     { id:'ws1sidx', name:'Array Index, Visually', xp:20, type:'quiz',
       // "How does the index of the array work" was flagged as too vague —
       // ws1s4 jumped straight to inventory[0] with only a one-line hint. This
@@ -2036,6 +2022,27 @@ const MODULES = [
       },
       needsObject:true,
       check:(log) => log.hasObject && log.hasIf && log.hasAnd,
+    },
+    // Was positioned BEFORE ws1sidx/ws1s4/ws1s5a/ws1s5b/ws1s5 (right after
+    // ws1s3) — meaning the "BOSS" capstone ran in the MIDDLE of the module,
+    // with 5 more stages still to come after it. Moved to the true end,
+    // matching every other boss stage in this codebase (always the final
+    // stage of its module). Scope intentionally unchanged — it still only
+    // combines the array+object ideas from ws1s0-ws1s3, not indexing/&&,
+    // which is a fine capstone scope on its own.
+    { id:'ws1boss', name:'BOSS — Inventory & Flags Together', xp:60, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Track BOTH a 3+ item inventory array AND a flags object with at least one property, using push() to add to the array. Display both inside <code>#story</code>.`,
+      hints:[
+        'This is ws1s2\'s array + ws1s3\'s object, both shown on the same page.',
+        'Nothing new — just combining both ideas from this week into one page.',
+      ],
+      webStarter: {
+        html: `<div id="story"></div>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n#story { font-size: 15px; }\n`,
+        js: `// TODO: an inventory array (start with 2 items, push a 3rd)\n\n// TODO: a flags object with at least one true/false property\n\n// TODO: show both in #story\n`,
+      },
+      needsArray:true, needsPush:true, needsObject:true,
+      check:(log) => log.hasArray && log.hasPush && log.hasObject && /true|false/i.test(log.bodyText),
     },
   ]},
   // ── Web Story 2 — Semester 1, Week 2: functions organizing story logic ────
