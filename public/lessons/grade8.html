@@ -285,6 +285,8 @@
       <div class="btn-row">
         <button class="btn btn-danger" onclick="resetWebToStarter()">↺ Starter code</button>
         <button class="btn btn-brand"  id="web-run-btn" onclick="runWebCode()">▶ Run</button>
+        <button class="btn" id="expand-preview-btn" onclick="toggleExpandPreview()" title="See your page bigger, without leaving this screen">⤢ Expand</button>
+        <button class="btn" onclick="openPreviewInNewTab()" title="Open your page in a real new browser tab">↗ New Tab</button>
       </div>
     </div>
     <div style="flex-shrink:0;display:flex;border-bottom:1px solid var(--border);background:var(--bg-card);">
@@ -354,6 +356,10 @@
            resulting DOM/state after Run — safe here since the only code ever
            running inside it is the student's own, on their own machine. -->
       <iframe id="out-web" style="display:none;width:480px;height:260px;border:none;background:#fff;border-radius:6px;" sandbox="allow-scripts allow-same-origin"></iframe>
+      <!-- Backdrop for the ⤢ Expand toggle — out-web itself just gets
+           position:fixed'd to a much bigger size; this dims everything
+           behind it and gives students an easy click-away-to-close target. -->
+      <div id="web-preview-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9998;" onclick="toggleExpandPreview(false)"></div>
       <div id="output-quiz"></div>
       <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
     </div>
@@ -859,6 +865,66 @@ window.addEventListener('message', (e) => {
     runWebCode()
   }
 })
+
+// ── Bigger ways to see the preview — the 480x260 in-page iframe is tiny,
+// this gives students a real full-size view without changing anything
+// about how grading works (both just build the SAME srcdoc). ──────────────
+function toggleExpandPreview(force) {
+  const iframe = document.getElementById('out-web')
+  const backdrop = document.getElementById('web-preview-backdrop')
+  const btn = document.getElementById('expand-preview-btn')
+  const expand = force !== undefined ? force : iframe.style.position !== 'fixed'
+  if (expand) {
+    iframe.style.position = 'fixed'
+    iframe.style.top = '5vh'; iframe.style.left = '5vw'
+    iframe.style.width = '90vw'; iframe.style.height = '90vh'
+    iframe.style.zIndex = '10000' // above the .toast notification's own 9999
+    iframe.style.boxShadow = '0 20px 60px rgba(0,0,0,.6)'
+    backdrop.style.display = 'block'
+    if (btn) btn.textContent = '✕ Close'
+  } else {
+    iframe.style.position = ''; iframe.style.top = ''; iframe.style.left = ''
+    iframe.style.width = '480px'; iframe.style.height = '260px'
+    iframe.style.zIndex = ''; iframe.style.boxShadow = ''
+    backdrop.style.display = 'none'
+    if (btn) btn.textContent = '⤢ Expand'
+  }
+}
+// Multi-page projects opened standalone (a real new tab, no relationship to
+// this page) can't rely on postMessage-to-parent for nav — there's no
+// parent. Instead, bundle every page as a hidden <div data-page="..."> in
+// ONE document, with a small self-contained script that shows/hides the
+// right one on nav-link clicks. Trade-off: if two different pages happen to
+// reuse the same element id, the page ends up with a genuine duplicate id
+// (since both are simultaneously in the DOM, just one hidden) — acceptable
+// for this convenience view, since the real GRADED path (runWebCode) always
+// loads and inspects exactly one page in true isolation, never this bundle.
+function buildStandaloneMultiPageDoc(pagesHtml, css, js, startPage) {
+  const openTag  = '<' + 'script>'
+  const closeTag = '<' + '/script>'
+  const pageDivs = Object.entries(pagesHtml).map(([filename, html]) =>
+    `<div data-page="${filename}" style="display:${filename === startPage ? 'block' : 'none'};">${html}</div>`
+  ).join('\n')
+  return `<!DOCTYPE html><html><head><style>${css}</style></head><body>${pageDivs}`
+    + `${openTag}\n`
+    + `document.addEventListener('click', function(e){ var a = e.target.closest('a'); if(!a) return; var href = a.getAttribute('href'); var target = document.querySelector('[data-page="' + href + '"]'); if(target){ e.preventDefault(); document.querySelectorAll('[data-page]').forEach(function(d){ d.style.display = 'none'; }); target.style.display = 'block'; } });\n`
+    + `try {\n${js}\n} catch (e) { console.error(e); }\n`
+    + `${closeTag}</body></html>`
+}
+function openPreviewInNewTab() {
+  const css = webEditors.css.getValue()
+  const js  = webEditors.js.getValue()
+  let srcdoc
+  if (pageOrder.length) {
+    const pagesHtml = {}
+    pageOrder.forEach(f => { pagesHtml[f] = pageEditors[f].getValue() })
+    srcdoc = buildStandaloneMultiPageDoc(pagesHtml, css, js, currentPage)
+  } else {
+    srcdoc = buildWebSrcdoc(webEditors.html.getValue(), css, js)
+  }
+  const url = URL.createObjectURL(new Blob([srcdoc], { type: 'text/html' }))
+  window.open(url, '_blank')
+}
 
 // ── Quiz stages (ported from Grade 7) — matching / fill-in-the-blank /
 // scenario judgment, no code editor involved at all. ──────────────────────
