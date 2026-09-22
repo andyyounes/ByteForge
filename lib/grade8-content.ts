@@ -28,7 +28,16 @@ export interface Grade8Content {
 
 export function getGrade8Content(): Grade8Content {
   const html = readFileSync(path.join(process.cwd(), 'public', 'lessons', 'grade8.html'), 'utf8')
-  const s = html.indexOf('const MODULES = [')
+  // Starting the slice at 'const MODULES = [' itself is NOT enough — several
+  // stages (Colors & Shading's web3 quizzes, the palette-driven challenges)
+  // reference COLOR_PALETTE/swatchChip/isAllowedColor/colorBrightness/etc,
+  // which are defined BEFORE the MODULES declaration. Missing them makes
+  // this whole function throw ReferenceError the instant it evaluates any
+  // stage using them — this is exactly the bug a teacher hit live (the
+  // /api/teacher/grade8-content route surfaces it as "Failed to load
+  // curriculum data"). scripts/test-g8-challenges.mjs already had to make
+  // this same fix for the same reason — reusing its exact start marker.
+  const s = html.indexOf('// ── Colors & Shading — shared palette data')
   const e = html.indexOf('const STAGE_INDEX')
   const ctx = html.slice(s, e)
   const { MODULES, CHALLENGE_LESSON } = new Function(ctx + '\nreturn { MODULES, CHALLENGE_LESSON }')() as

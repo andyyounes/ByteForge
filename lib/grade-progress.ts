@@ -80,7 +80,12 @@ export function getGradeMeta(grade: 'grade6' | 'grade7' | 'grade8'): GradeMeta {
     meta = build('grade7', WORLDS)
   } else {
     const html = readHtml('grade8.html')
-    const s = html.indexOf('const MODULES = [')
+    // Starting at 'const MODULES = [' itself is NOT enough — several stages
+    // (Colors & Shading's web3 quizzes) reference COLOR_PALETTE/swatchChip/
+    // isAllowedColor/colorBrightness/etc, defined BEFORE the MODULES
+    // declaration. Same fix already applied to lib/grade8-content.ts and
+    // scripts/test-g8-challenges.mjs, for the same reason.
+    const s = html.indexOf('// ── Colors & Shading — shared palette data')
     const e = html.indexOf('const CHALLENGES = MODULES')
     const ctx = html.slice(s, e)
     const { MODULES } = new Function(ctx + '\nreturn { MODULES }')()
