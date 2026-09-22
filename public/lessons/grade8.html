@@ -2213,6 +2213,26 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
     // querySelector()+.textContent — actually putting a variable's value
     // onto a REAL page element, which jsf1/jsf2 (console.log/document.write
     // only) never touched. Merged into one stage focused on just that.
+    { id:'web5qdom', name:'What Is the DOM?', xp:25, type:'quiz',
+      text:`<h4>The browser builds a live structure of your page</h4>
+        <p>When you load a webpage, your browser builds a live structure of everything on it — every heading, paragraph, button, and section. This structure is called the <b>DOM</b>, the Document Object Model. Think of it like a map, or a tree: the top is the <code>&lt;html&gt;</code> element, branching into <code>&lt;head&gt;</code> and <code>&lt;body&gt;</code>, and inside <code>&lt;body&gt;</code> are more branches — paragraphs, images, buttons, and so on.</p>
+        <p>JavaScript can use the DOM to read from the page or change what's on it, even AFTER it has already loaded. This is how real sites respond to clicks, show new messages, or update styles live.</p>
+        <h4>Finding one specific element</h4>
+        <p>Say your page has: <code>&lt;p id="message"&gt;Welcome!&lt;/p&gt;</code>. An <b>id</b> is an HTML attribute that gives an element a unique name on the page — you can only use each id once. To change that paragraph's text with JavaScript:</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">document.querySelector("#message").textContent = "Thanks for visiting!";</pre>
+        <p><code>document</code> refers to the whole webpage. <code>querySelector("#message")</code> reaches into the page and grabs that ONE specific element, by its id. <code>.textContent = "..."</code> is what actually updates the text the user sees.</p>
+        <h4>Reading vs. changing</h4>
+        <p>The DOM isn't just for changing things — you can also READ from it, e.g. checking what an input box currently contains. But changing content, like updating <code>.textContent</code> or <code>.style</code>, is what makes a page feel genuinely alive rather than static.</p>`,
+      hints:['The DOM is the browser\'s live, structured version of your page — a tree of every element.', 'An id must be unique on the page — that\'s exactly why querySelector("#id") always finds ONE specific element, never several.', '.textContent changes the actual text a visitor sees, after the page has already loaded.'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'What does DOM stand for?', options: ['Document Object Model', 'Data Object Method', 'Document Order Map', 'Dynamic Output Module'], answer: 'Document Object Model' },
+        { type:'match', prompt:'Why must an id be unique on a page?', options: ['So querySelector("#id") always finds exactly one specific element', 'HTML requires it for validation only', 'It makes the page load faster', 'It doesn\'t need to be unique'], answer: 'So querySelector("#id") always finds exactly one specific element' },
+        { type:'match', prompt:'document.querySelector("#message").textContent = "Hi"; — what does this actually do?', options: ['Changes the visible text of the element with id "message"', 'Creates a brand new element called message', 'Only works in the console, never on the real page', 'Deletes the message element'], answer: 'Changes the visible text of the element with id "message"' },
+        { type:'match', prompt:'Can JavaScript change the page AFTER it has already finished loading?', options: ['Yes — that\'s exactly what makes a page feel interactive', 'No — HTML is fixed forever once loaded', 'Only CSS can do that, not JavaScript', 'Only if you refresh first'], answer: 'Yes — that\'s exactly what makes a page feel interactive' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
+    },
     { id:'web5s2b', name:'Show a Variable on the Page', xp:35, lang:'web',
       text:`<strong>You already know variables and +</strong> from JS Foundations — this is about a new piece: getting a value to actually SHOW UP inside a specific element on the real page, using <code>document.querySelector()</code> and <code>.textContent</code>.<br><br>
         Create a variable holding your favorite animal's name, then show a full sentence like "My favorite animal is Red Panda" (not just the name alone) inside the paragraph below.`,
@@ -2442,6 +2462,46 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
       },
       needsArray:true,
       check:(log) => log.hasArray && log.hasIndex && log.hasLength,
+    },
+    // if/else was USED starting at ws1s5b (combined with &&) but never
+    // formally TAUGHT on its own before that — a real gap, the same "two new
+    // ideas introduced at once" pattern this session has fixed elsewhere.
+    { id:'ws1qif', name:'Making Decisions With if', xp:25, type:'quiz',
+      text:`<h4>if checks a condition, then decides</h4>
+        <p>Every stage so far has run the exact same code every single time. An <code>if</code> statement changes that — it checks whether something is TRUE, and only runs its block of code when it is.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">let score = 85;
+
+if (score >= 80) {
+  document.querySelector("#story").textContent = "Great job! You passed.";
+}</pre>
+        <p>The syntax: <code>if</code>, then a condition in parentheses <code>( )</code>, then the code to run inside curly braces <code>{ }</code>. The condition must evaluate to true or false — if it's false, the whole block is simply skipped.</p>
+        <h4>else — what happens otherwise</h4>
+        <p>What if the condition is false? <code>else</code> runs a DIFFERENT block instead:</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">if (score >= 80) {
+  message = "Great job!";
+} else {
+  message = "Keep trying.";
+}</pre>
+        <h4>Comparison operators — building the condition</h4>
+        <p><code>==</code> equal to. <code>!=</code> not equal to. <code>&gt;</code> greater than. <code>&lt;</code> less than. <code>&gt;=</code> greater than or equal to. <code>&lt;=</code> less than or equal to. Each of these gives back true or false — that result is exactly what <code>if</code> checks.</p>
+        <h4>else if — more than two paths</h4>
+        <p>Sometimes there's more than one possible outcome. <code>else if</code> lets you chain multiple checks in order — JavaScript checks the <code>if</code> first, then each <code>else if</code> in turn, running only the FIRST one that's true:</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">if (grade >= 90) {
+  result = "A";
+} else if (grade >= 80) {
+  result = "B";
+} else {
+  result = "C or below";
+}</pre>`,
+      hints:['The condition inside if(...) must give a true/false answer — that\'s exactly what a comparison operator like >= produces.', 'else only runs when the if\'s condition was false — it never runs alongside the if block.', 'else if is checked IN ORDER — the first one that\'s true runs, and the rest are skipped, even if they\'d also be true.'],
+      passCount:4,
+      questions: [
+        { type:'match', prompt:'if (score >= 80) { ... } — when does the code inside the braces run?', options: ['Only when score is 80 or more', 'Every single time, no matter what', 'Only when score is exactly 80', 'Never — this is just a comment'], answer: 'Only when score is 80 or more' },
+        { type:'match', prompt:'What does the != operator check?', options: ['Not equal to', 'Equal to', 'Greater than', 'Not greater than'], answer: 'Not equal to' },
+        { type:'match', prompt:'if (grade >= 90) {A} else if (grade >= 80) {B} else {C} — grade is 95. Which block runs?', options: ['Only A', 'Only B', 'Both A and B', 'Only C'], answer: 'Only A' },
+        { type:'match', prompt:'When does the else block run?', options: ['Only when the if\'s condition was false', 'Always, in addition to if', 'Only when the if\'s condition was true', 'Only if there\'s no condition at all'], answer: 'Only when the if\'s condition was false' },
+      ],
+      check:(log) => log.quizCorrect >= 4,
     },
     { id:'ws1s5a', name:'A Second Flag', xp:20, lang:'web',
       text:`<strong>Challenge 5a</strong> — Before combining anything: create a flags object with TWO true/false properties this time (e.g. <code>hasKey</code> and <code>hasMap</code>), and display BOTH of their values in <code>#story</code> — no decision-making yet, just show them both.`,
@@ -5259,7 +5319,17 @@ const CHALLENGE_LESSON = {
       <p>MPG and gasPrice are constants ON PURPOSE — they're fixed facts for this trip, not values the program updates as it runs, which is exactly the distinction jsf2s3 introduced.</p></div>
     <div class="cl-block"><h4>Every data type, working together</h4>
       <p>Strings (names, landmarks), a number (distance), a boolean (snacks), and two calculations built from all of it — this is the first time in the module every single type and skill has to combine into one coherent program.</p></div>` },
+  web5qdom: { title: 'The DOM is a live map JS can change', html: `
+    <div class="cl-block"><h4>Structure vs. live state</h4>
+      <p>HTML describes the page as it STARTS. The DOM is what the browser actually builds from it — a live structure JavaScript can keep changing, long after the page finished loading. This is the whole reason .textContent works at all.</p></div>
+    <div class="cl-block"><h4>An id is a name tag, not decoration</h4>
+      <p>querySelector("#message") only works because id="message" is guaranteed unique on the page — the # symbol specifically means "find by id", the same convention CSS uses.</p></div>` },
   // ── Web Story 1 — Remembering the Reader: arrays & objects ──────────────────
+  ws1qif: { title: 'if checks a condition; else covers the rest', html: `
+    <div class="cl-block"><h4>Skipped, not "run anyway"</h4>
+      <p>When an if\'s condition is false, its block doesn\'t just do nothing quietly in the background — it\'s genuinely skipped, as if that code wasn\'t even there for that run.</p></div>
+    <div class="cl-block"><h4>else if checks IN ORDER</h4>
+      <p>Only the FIRST true branch runs, even if a later else if would also technically be true — this is exactly why order matters when writing a chain of else if checks (like a grade band: check >=90 before >=80, not the other way round).</p></div>` },
   ws1sdiv: { title: 'A <div> is a blank, labeled box', html: `
     <div class="cl-block"><h4>No built-in meaning, on purpose</h4>
       <p>Unlike &lt;h1&gt; or &lt;p&gt;, a &lt;div&gt; has no default look at all — it's just a container. That's exactly why every ws1 stage starts with one: it's a blank box JS can find and fill in, not a piece of content with its own style already decided.</p></div>
