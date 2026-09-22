@@ -660,8 +660,22 @@ function resetWebToStarter() {
 function buildWebSrcdoc(html, css, js) {
   const openTag  = '<' + 'script>'
   const closeTag = '<' + '/script>'
+  // window.onerror MUST live in its OWN <script> block, separate from the
+  // student's code. A SYNTAX error (not a runtime one — e.g. a hyphen in a
+  // variable name, a missing bracket) fails to PARSE the entire script
+  // block it's in, before a single statement of it runs — if window.onerror
+  // were assigned in that SAME block, it would never get installed at all,
+  // and the syntax error vanishes completely: no message, no clog(), the
+  // page just silently never updates. A student genuinely hit this (wrote
+  // `let animal-sentence = ...`, a hyphen isn't legal in an identifier) and
+  // saw nothing but the unchanged "Loading..." placeholder, with no clue
+  // why. Splitting the handler into its own always-parses-fine block means
+  // it's installed BEFORE the student's block is even attempted, so the
+  // browser's normal "a script on this page failed" reporting still reaches
+  // it even when that second block never executes a single line.
   return `<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}`
-    + `${openTag}window.onerror = function(msg){ parent.postMessage({__bfWebError: String(msg)}, '*'); };\n`
+    + `${openTag}window.onerror = function(msg){ parent.postMessage({__bfWebError: String(msg)}, '*'); };${closeTag}\n`
+    + `${openTag}`
     // Multi-page nav — clicking a real <a href="about.html"> would otherwise
     // try to navigate this sandboxed srcdoc iframe to a URL that doesn't
     // really exist. Intercept clicks whose href is a bare "somename.html"
