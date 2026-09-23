@@ -940,6 +940,16 @@ function openPreviewInNewTab() {
   window.open(url, '_blank')
 }
 
+// An option like '<body>' or '<!DOCTYPE html>' (web0bs1) inserted raw into
+// <option value="${o}">${o}</option> gets parsed by the browser as an actual
+// tag rather than option text — <option> can't contain child elements, so
+// the visible label silently disappears, exactly reproducing "the dropdown
+// is empty". Every string dropped into option/quiz-scenario HTML below must
+// go through this first.
+function escapeQuizHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 // ── Quiz stages (ported from Grade 7) — matching / fill-in-the-blank /
 // scenario judgment, no code editor involved at all. ──────────────────────
 function renderQuiz(ch) {
@@ -954,12 +964,12 @@ function renderQuiz(ch) {
         <div class="q-label">Fake or real?</div>
         <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option><option value="FAKE">FAKE</option><option value="REAL">REAL</option></select>
         ${q.flagOptions ? `<div class="q-label" style="margin-top:6px">Which red flag?</div>
-        <select id="${pfx}${i}-b" autocomplete="off"><option value="">Choose…</option>${q.flagOptions.map(f=>`<option value="${f}">${f}</option>`).join('')}</select>` : ''}
+        <select id="${pfx}${i}-b" autocomplete="off"><option value="">Choose…</option>${q.flagOptions.map(f=>`<option value="${escapeQuizHtml(f)}">${escapeQuizHtml(f)}</option>`).join('')}</select>` : ''}
       </div>`
     }
     if (q.type === 'match') {
       return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${q.prompt}</div>
-        <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option>${q.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`
+        <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option>${q.options.map(o=>`<option value="${escapeQuizHtml(o)}">${escapeQuizHtml(o)}</option>`).join('')}</select></div>`
     }
     if (q.type === 'prompt' || q.type === 'any') {
       return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${q.prompt}</div>
@@ -1191,8 +1201,18 @@ function hexToRgbStr(hex) {
   const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16)
   return 'rgb(' + r + ', ' + g + ', ' + b + ')'
 }
+// getComputedStyle(...).backgroundColor/.color for a fully-opaque color comes
+// back as "rgb(r, g, b)" in Chrome/Firefox but as "rgba(r, g, b, 1)" in
+// Safari (macOS/iOS) — a real, live cross-browser inconsistency, not a typo.
+// Every color read off the page has to funnel through this before it's ever
+// compared against ALLOWED_RGB/WARM_RGB/COOL_RGB, or every web3 (Colors &
+// Shading) check silently fails on Safari no matter what the student picks.
+function normalizeRgb(rgbStr) {
+  const m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(rgbStr || '')
+  return m ? 'rgb(' + m[1] + ', ' + m[2] + ', ' + m[3] + ')' : (rgbStr || '')
+}
 const ALLOWED_RGB = new Set(Object.values(ALL_SWATCHES).map(hexToRgbStr))
-function isAllowedColor(rgbStr) { return ALLOWED_RGB.has(rgbStr) }
+function isAllowedColor(rgbStr) { return ALLOWED_RGB.has(normalizeRgb(rgbStr)) }
 // Warm (reds/oranges/yellows) vs Cool (blues/greens/purples) — white/black
 // stay unclassified (neutral), same convention as basic color theory.
 const WARM_RGB = new Set([COLOR_PALETTE.coral, COLOR_PALETTE.cream, WARM_EXTRA.amber, WARM_EXTRA.rose].map(hexToRgbStr))
@@ -1201,13 +1221,13 @@ const COOL_RGB = new Set([
   SHADE_FAMILIES.blue.light, SHADE_FAMILIES.blue.base, SHADE_FAMILIES.blue.dark,
   SHADE_FAMILIES.green.light, SHADE_FAMILIES.green.base, SHADE_FAMILIES.green.dark,
 ].map(hexToRgbStr))
-function isWarmColor(rgbStr) { return WARM_RGB.has(rgbStr) }
-function isCoolColor(rgbStr) { return COOL_RGB.has(rgbStr) }
+function isWarmColor(rgbStr) { return WARM_RGB.has(normalizeRgb(rgbStr)) }
+function isCoolColor(rgbStr) { return COOL_RGB.has(normalizeRgb(rgbStr)) }
 // Perceptual-ish brightness (0-255, not full WCAG contrast) — enough to tell
 // "these two are meaningfully different lightness" apart from "basically
 // the same," which is what actually breaks readability at this level.
 function colorBrightness(rgbStr) {
-  const m = /rgb\((\d+),\s*(\d+),\s*(\d+)/.exec(rgbStr || '')
+  const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(rgbStr || '')
   if (!m) return null
   const [, r, g, b] = m.map(Number)
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
@@ -2367,6 +2387,35 @@ birthYear = 2011; // Error! Cannot reassign a const</pre>`,
       ],
       check:(log) => log.quizCorrect >= 1,
     },
+    { id:'jsf2qtpl', name:'Template Literals — A Cleaner Way to Combine Text', xp:25, type:'quiz',
+      text:`<h4>Backticks instead of + signs</h4>
+        <p>Every sentence built so far used <code>+</code> to glue strings and variables together: <code>"My favorite animal is " + animal</code>. That works, but it gets messy fast with more than one or two variables — lots of quote marks and plus signs to keep track of.</p>
+        <p>JavaScript has a cleaner way: a <b>template literal</b>. Instead of regular <code>"double"</code> or <code>'single'</code> quotes, it uses <b>backticks</b> — the <code>\`</code> key, usually top-left of the keyboard, next to the number 1.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">let name = "Mia";
+let age = 12;
+
+// The old way:
+console.log("Hi, I'm " + name + " and I'm " + age + " years old.");
+
+// A template literal:
+console.log(\`Hi, I'm \${name} and I'm \${age} years old.\`);</pre>
+        <h4>\${ } is where a variable gets dropped in</h4>
+        <p>Anything written inside <code>\${ }</code> gets replaced with that variable's real value, right in the middle of the sentence. No closing quotes, no <code>+</code>, no reopening quotes — just write the whole sentence once, backticks at each end, and drop variables in wherever you need them with <code>\${name}</code>.</p>
+        <h4>Same result, easier to read and to fix</h4>
+        <p>Both versions above print the exact same thing. Template literals aren't a new SKILL exactly — they're a cleaner way to do something you already know how to do, and they get more valuable the more variables one sentence needs to combine.</p>`,
+      hints:[
+        'Backticks (`) replace the regular quotes — found on the key usually just left of the 1 key.',
+        '${variableName} inside backticks gets replaced with that variable\'s actual value.',
+        'You can put as many ${ } drops into one template literal as you need — no + signs required.',
+      ],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'What key makes the special quote a template literal uses?', options: ['Backtick (`)', 'Regular apostrophe (\')', 'Regular double quote (")', 'Hyphen (-)'], answer: 'Backtick (`)' },
+        { type:'match', prompt:'let x = 5; console.log(`Value: ${x}`); — what does this print?', options: ['Value: 5', 'Value: x', 'Value: ${x}', 'A syntax error'], answer: 'Value: 5' },
+        { type:'match', prompt:'What is the MAIN benefit of a template literal over using + to combine strings?', options: ['Easier to read with multiple variables — no juggling quotes and + signs', 'It runs the code faster', 'It\'s the only way to use a variable in a string', 'It automatically fixes typos'], answer: 'Easier to read with multiple variables — no juggling quotes and + signs' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
     { id:'jsf2boss', name:'ACTIVITY — Plan a Road Trip', xp:85, lang:'web', boss:true,
       text:`<strong>Activity: Plan a Road Trip.</strong> Organize and calculate details for a road trip:<br>
         <ul style="margin:8px 0 0 18px;padding:0;">
@@ -2543,6 +2592,87 @@ document.querySelector("button").addEventListener("click", function() {
       },
       check:(log) => log.hasVariable && log.hasClick && log.bodyChangedOnClick,
     },
+    { id:'web5qtoggle', name:'classList.toggle() — Switching a Style On and Off', xp:25, type:'quiz',
+      text:`<h4>A style that switches, instead of only ever turning on</h4>
+        <p>So far, changing <code>.style.color</code> or <code>.style.backgroundColor</code> directly always sets ONE specific value. But sometimes you want a button that SWITCHES a look on and off, every click — like a dark mode toggle, or highlighting a selected item.</p>
+        <h4>Define the look in CSS, then toggle its NAME with JS</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">/* CSS */
+.highlighted { background-color: yellow; font-weight: bold; }
+
+// JS
+document.querySelector("h1").addEventListener("click", function() {
+  document.querySelector("h1").classList.toggle("highlighted");
+});</pre>
+        <p>The CSS defines what <code>.highlighted</code> LOOKS like — that part never changes. The JS's job is just to ADD or REMOVE that class name from the element. <code>classList.toggle("highlighted")</code> does both jobs in one line: if the element doesn't have that class yet, it adds it; if it already has it, it removes it.</p>
+        <h4>Why toggle beats manually setting styles</h4>
+        <p>Without <code>classList.toggle()</code>, you'd need an <code>if</code> statement checking the CURRENT state before deciding whether to turn a style on or off. <code>toggle()</code> does that checking for you, automatically, every time it's called — one line does the whole "is it on? turn it off. is it off? turn it on." job.</p>`,
+      hints:[
+        'Define the look (color, font-weight, etc.) as a normal CSS class — classList.toggle never invents styling on its own.',
+        'element.classList.toggle("className") ADDS the class if missing, REMOVES it if already there — same line does both.',
+        'This replaces writing your own if/else to check "is this class currently on?" before deciding what to do.',
+      ],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'el.classList.toggle("highlighted"); — what happens if "highlighted" is NOT currently on el?', options: ['It gets added', 'Nothing happens', 'It causes an error', 'It gets removed'], answer: 'It gets added' },
+        { type:'match', prompt:'Where do you actually define what the "highlighted" class LOOKS like?', options: ['In CSS, as a normal class rule', 'Inside classList.toggle() itself', 'It has a fixed, unchangeable look', 'In the HTML tag directly'], answer: 'In CSS, as a normal class rule' },
+        { type:'match', prompt:'What is the main advantage of classList.toggle() over manually setting .style.color each click?', options: ['It automatically switches between on/off — no need to check the current state yourself', 'It\'s the only way to change color at all', 'It works without any CSS at all', 'It only works once per page'], answer: 'It automatically switches between on/off — no need to check the current state yourself' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'web5s5', name:'A Toggle Button', xp:35, lang:'web',
+      text:`<strong>Bonus</strong> — Define a CSS class (e.g. <code>.highlighted</code>, changing background color and/or font weight). Add a button that TOGGLES that class on some element every time it's clicked, using <code>classList.toggle()</code>.`,
+      hints:[
+        '.highlighted { background-color: yellow; } — a normal CSS class, defined once.',
+        'document.querySelector(...).classList.toggle("highlighted"); inside a click handler.',
+        'Click it twice in the preview to see it switch on, then off again.',
+      ],
+      webStarter: {
+        html: `<h1 id="title">About Me</h1>\n<button>Toggle Highlight</button>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n/* TODO: define a .highlighted class */\n`,
+        js: `// TODO: on button click, classList.toggle("highlighted") on the h1\n`,
+      },
+      check:(log) => /classList\.toggle\s*\(/.test(log.js) && log.hasClick,
+    },
+    { id:'web5qinterval', name:'setInterval() — Repeating Automatically', xp:25, type:'quiz',
+      text:`<h4>Running code again and again, without a loop</h4>
+        <p>A <code>for</code> loop repeats code, but it finishes almost instantly — all its repeats happen in one tiny fraction of a second. <code>setInterval()</code> is different: it repeats code FOREVER, with a real time delay between each repeat, until something explicitly stops it.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">let seconds = 0;
+
+let timer = setInterval(function() {
+  seconds = seconds + 1;
+  document.querySelector("#count").textContent = seconds;
+}, 1000);</pre>
+        <p><code>setInterval(fn, 1000)</code> runs <code>fn</code> once every 1000 milliseconds (1000ms = 1 second) — forever, automatically, with no loop needed. The number is always in MILLISECONDS, so <code>500</code> means twice a second, <code>1000</code> means once a second.</p>
+        <h4>clearInterval() — the only way to make it stop</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">clearInterval(timer);   // stops that specific interval from repeating again</pre>
+        <p>Notice <code>setInterval()</code> was saved into a variable (<code>timer</code>) — that's essential. <code>clearInterval(timer)</code> needs to know EXACTLY which interval to stop, since a page could have several running at once. Forget to save it, and you lose your only way to stop it.</p>`,
+      hints:[
+        'setInterval(fn, ms) repeats fn forever, once every ms milliseconds — 1000ms = 1 second.',
+        'Always save setInterval()\'s result into a variable — clearInterval() needs that exact value to know what to stop.',
+        'Without ever calling clearInterval(), an interval keeps running forever, even if you wanted it to stop.',
+      ],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'setInterval(fn, 1000) — how often does fn run?', options: ['Once every 1000 milliseconds (every 1 second)', 'Exactly once, after 1000ms', 'Once every 1000 minutes', 'As fast as the computer can go'], answer: 'Once every 1000 milliseconds (every 1 second)' },
+        { type:'match', prompt:'Why must setInterval()\'s result be saved into a variable?', options: ['clearInterval() needs that exact value to know which interval to stop', 'It\'s required for the interval to start at all', 'It makes the code run faster', 'It has no real purpose'], answer: 'clearInterval() needs that exact value to know which interval to stop' },
+        { type:'match', prompt:'What happens if you never call clearInterval()?', options: ['The interval keeps repeating forever', 'It automatically stops after 10 repeats', 'It stops the moment you click elsewhere', 'It only ever runs once anyway'], answer: 'The interval keeps repeating forever' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'web5s6', name:'A Stoppable Timer', xp:40, lang:'web',
+      text:`<strong>Bonus</strong> — Build a counter that increases automatically every second using <code>setInterval()</code>, starting when a "Start" button is clicked, and add a "Stop" button that calls <code>clearInterval()</code> to make it stop.`,
+      hints:[
+        'let timer; — declare it outside both buttons\' click handlers, so both can reach it.',
+        'Start button: timer = setInterval(function() { ... }, 1000);',
+        'Stop button: clearInterval(timer);',
+      ],
+      webStarter: {
+        html: `<h1 id="count">0</h1>\n<button id="start">Start</button>\n<button id="stop">Stop</button>\n`,
+        css: `body { background-color: #FFF7E6; }\nh1 { color: #2F3B52; }\n`,
+        js: `let seconds = 0;\nlet timer;\n\n// TODO: Start button — setInterval that increases seconds and shows it, every 1000ms\n\n// TODO: Stop button — clearInterval(timer)\n`,
+      },
+      check:(log) => /setInterval\s*\(/.test(log.js) && /clearInterval\s*\(/.test(log.js),
+    },
     { id:'web5boss', name:'BOSS — Ship the Portfolio', xp:90, lang:'web', boss:true,
       palette: [['cream',COLOR_PALETTE.cream],['navy',COLOR_PALETTE.navy],['purple',COLOR_PALETTE.purple],
                 ['emerald',COLOR_PALETTE.emerald],['slate',COLOR_PALETTE.slate],['oceanBlue',COLOR_PALETTE.oceanBlue],
@@ -2662,6 +2792,30 @@ document.querySelector("button").addEventListener("click", function() {
       needsArray:true, needsPush:true,
       check:(log) => log.hasArray && log.hasPush,
     },
+    { id:'ws1qobj', name:'What Is an Object?', xp:25, type:'quiz',
+      text:`<h4>An array is a numbered list. An object is a NAMED list.</h4>
+        <p>An array like <code>["sword", "shield"]</code> is great when order matters and everything is the same KIND of thing. But sometimes you want to store a few DIFFERENT named facts about ONE thing — a player's health, a flag for whether they've visited before, a door being locked or unlocked. That's what an <b>object</b> is for.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">let flags = { hasKey: false, hasVisited: true };</pre>
+        <p>Curly braces <code>{ }</code> instead of square brackets. Inside, each fact is written as <code>name: value</code> — called a <b>property</b> — separated by commas. There's no ordering to worry about, and no counting from 0 — each property has its own NAME instead of a numbered position.</p>
+        <h4>Reading and changing a property — dot notation</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">console.log(flags.hasKey);   // false — read it with objectName.propertyName
+flags.hasKey = true;         // change it the same way you'd change any variable</pre>
+        <p><code>flags.hasKey</code> — a DOT, then the property's name — is how you reach inside an object to read or change one specific fact. No brackets, no index number, just the name you gave it.</p>
+        <h4>Array vs. object — picking the right one</h4>
+        <p>Ask: "is this a LIST of similar things?" → array (<code>inventory[0]</code>, <code>inventory[1]</code>...). Or "is this a few DIFFERENT facts about ONE thing?" → object (<code>flags.hasKey</code>, <code>flags.hasVisited</code>...). Real projects usually need both, side by side.</p>`,
+      hints:[
+        'Objects use { } and name: value pairs. Arrays use [ ] and comma-separated items with no names.',
+        'flags.hasKey reads (or sets) the hasKey property — a DOT followed by the property\'s exact name.',
+        'Arrays are for ordered lists of similar things; objects are for a few different named facts about one thing.',
+      ],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'let flags = { hasKey: false }; — how do you read the value of hasKey?', options: ['flags.hasKey', 'flags[hasKey]', 'flags(hasKey)', 'hasKey.flags'], answer: 'flags.hasKey' },
+        { type:'match', prompt:'What symbol does an object use instead of an array\'s square brackets [ ]?', options: ['Curly braces { }', 'Round brackets ( )', 'Angle brackets < >', 'Pipes | |'], answer: 'Curly braces { }' },
+        { type:'match', prompt:'You need to store 3 DIFFERENT facts about one player (health, name, isAlive). Which fits best?', options: ['An object — different named facts about ONE thing', 'An array — because there are 3 of them', 'A single variable holding all 3 at once', 'Three separate pages'], answer: 'An object — different named facts about ONE thing' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
     { id:'ws1s3', name:'A Flag Object', xp:30, lang:'web',
       text:`<strong>Challenge 3</strong> — Create an object <code>flags</code> with at least one true/false property (e.g. <code>hasKey: false</code>). Display its value inside <code>#story</code> (e.g. "Has key: false").`,
       hints:[
@@ -2731,6 +2885,30 @@ document.querySelector("button").addEventListener("click", function() {
       },
       needsArray:true,
       check:(log) => log.hasArray && log.hasIndex && log.hasLength,
+    },
+    { id:'ws1qrand', name:'Math.random() — Picking Something Random', xp:25, type:'quiz',
+      text:`<h4>A random decimal between 0 and 1</h4>
+        <p><code>Math.random()</code> gives back a random decimal number, always somewhere between 0 (included) and 1 (not quite reached) — e.g. <code>0.483920...</code>. On its own that's not very useful yet, but combined with an array it becomes a way to pick a random ITEM.</p>
+        <h4>Turning a decimal into a usable index</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">let inventory = ["sword", "shield", "potion"];
+
+let randomIndex = Math.floor(Math.random() * inventory.length);
+let picked = inventory[randomIndex];</pre>
+        <p><code>Math.random() * inventory.length</code> stretches that 0-to-1 decimal out to 0-to-3 (since <code>inventory.length</code> is 3) — but it's still a decimal, like <code>1.82</code>, and <code>inventory[1.82]</code> isn't a valid index. <code>Math.floor()</code> rounds DOWN to the nearest whole number, turning <code>1.82</code> into <code>1</code> — now it's a real, valid index (0, 1, or 2) for a 3-item array.</p>
+        <h4>Why multiply by .length specifically?</h4>
+        <p>Multiplying by the array's length is what guarantees the result always lands inside that array, no matter how many items it has — 3 items or 30, the same formula works, because <code>Math.random() * inventory.length</code> can never reach or exceed <code>inventory.length</code> itself.</p>`,
+      hints:[
+        'Math.random() alone gives a decimal between 0 and 1 (like 0.62) — never useful as an index by itself.',
+        'Math.random() * array.length stretches that into 0-to-array-length, still a decimal.',
+        'Math.floor(...) rounds DOWN to a whole number, which is what makes it a valid array index.',
+      ],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'What range of values does Math.random() give back?', options: ['A decimal between 0 (included) and 1 (not reached)', 'A whole number between 1 and 100', 'Always exactly 0.5', 'A random letter'], answer: 'A decimal between 0 (included) and 1 (not reached)' },
+        { type:'match', prompt:'Why is Math.floor() needed around Math.random() * inventory.length?', options: ['To round the decimal down into a whole, valid array index', 'To make the number bigger', 'It\'s optional and does nothing important', 'To turn the number into a string'], answer: 'To round the decimal down into a whole, valid array index' },
+        { type:'match', prompt:'inventory has 3 items. What does Math.floor(Math.random() * inventory.length) always produce?', options: ['0, 1, or 2 — always a valid index for this array', '0, 1, 2, or 3', 'Always exactly 1', 'A decimal like 1.5'], answer: '0, 1, or 2 — always a valid index for this array' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
     },
     // if/else was USED starting at ws1s5b (combined with &&) but never
     // formally TAUGHT on its own before that — a real gap, the same "two new
@@ -5720,6 +5898,22 @@ const CHALLENGE_LESSON = {
   web5s4: { title: 'A variable the click updates', html: `
     <div class="cl-block"><h4>Declared OUTSIDE the handler, changed INSIDE it</h4>
       <p>let clicks = 0; outside the function means it survives between clicks — each click adds to the SAME variable, not a fresh one every time.</p></div>` },
+  web5qtoggle: { title: 'One line does the on/off checking for you', html: `
+    <div class="cl-block"><h4>CSS defines the look, JS just flips the name</h4>
+      <p>classList.toggle("highlighted") never invents styling — it only adds or removes a class name that a normal CSS rule already defines. Splitting it this way (CSS: what it looks like, JS: whether it's currently applied) is the same separation of concerns every earlier CSS lesson used.</p></div>
+    <div class="cl-block"><h4>Replaces an if/else you'd otherwise have to write yourself</h4>
+      <p>Without toggle(), switching a style on/off needs an if checking the CURRENT state first. toggle() does that checking internally, every single call — which is exactly why it's the standard tool for anything that switches, like a highlighted item or a dark-mode button.</p></div>` },
+  web5s5: { title: 'A toggle button', html: `
+    <div class="cl-block"><h4>classList.toggle("highlighted")</h4>
+      <p>One line, one class name, switches on then off every click — the CSS rule defining .highlighted never has to change.</p></div>` },
+  web5qinterval: { title: 'Repeating forever, with a real time delay', html: `
+    <div class="cl-block"><h4>Different from a for loop entirely</h4>
+      <p>A for loop's repeats all happen in a tiny fraction of a second. setInterval(fn, 1000) spreads its repeats out over REAL time — once every 1000 milliseconds — and keeps going forever unless something explicitly stops it.</p></div>
+    <div class="cl-block"><h4>Save it, or you can never stop it</h4>
+      <p>setInterval()'s return value has to be saved into a variable, because clearInterval() needs that EXACT value to know which interval to cancel — a page could have more than one running at once.</p></div>` },
+  web5s6: { title: 'A stoppable timer', html: `
+    <div class="cl-block"><h4>timer = setInterval(...) then clearInterval(timer)</h4>
+      <p>Declaring let timer; outside both click handlers is what lets the Start button's setInterval() and the Stop button's clearInterval() both reach the SAME interval.</p></div>` },
   web5boss: { title: 'BOSS — everything from this project, together', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Sections, consistent colors, and a working click+variable interaction — every piece already built across Sessions 1-8, assembled into one real, finished portfolio.</p></div>` },
@@ -5800,6 +5994,11 @@ const CHALLENGE_LESSON = {
   jsf2cp2: { title: 'Checkpoint — the multiplication symbol', html: `
     <div class="cl-block"><h4>* not x</h4>
       <p>A small but real trap for beginners — the letter x or a raised dot doesn't work in code. JavaScript (and nearly every language) uses the asterisk * for multiplication.</p></div>` },
+  jsf2qtpl: { title: 'Backticks and ${ } replace + for combining text', html: `
+    <div class="cl-block"><h4>Same result, less punctuation to juggle</h4>
+      <p>A template literal doesn\'t do anything a + chain couldn\'t already do — it\'s purely about readability. The more variables one sentence needs, the more a chain of + signs and re-opened quotes turns into a source of typos.</p></div>
+    <div class="cl-block"><h4>\${ } is the ONLY special part</h4>
+      <p>Everything else inside backticks is just normal text, typed exactly as it should appear. Only what\'s inside \${ } gets replaced with a real variable\'s value — that\'s the one rule to remember.</p></div>` },
   jsf2boss: { title: 'BOSS — real research feeding real calculations', html: `
     <div class="cl-block"><h4>const for values that truly don\'t change</h4>
       <p>MPG and gasPrice are constants ON PURPOSE — they're fixed facts for this trip, not values the program updates as it runs, which is exactly the distinction jsf2s3 introduced.</p></div>
@@ -5831,6 +6030,11 @@ const CHALLENGE_LESSON = {
       <p>An array isn't fixed once written — <code>.push("potion")</code> genuinely adds a new element after the array already exists, exactly like a player finding a new item mid-story.</p></div>
     <div class="cl-block"><h4>Order matters</h4>
       <p>Push BEFORE displaying — the display always reflects whatever the array holds at the moment you read it, so a push after the display line wouldn't show up.</p></div>` },
+  ws1qobj: { title: 'Objects have named properties, not numbered positions', html: `
+    <div class="cl-block"><h4>{ } and : replace [ ] and position</h4>
+      <p>An object\'s properties have no order to keep track of — each one is reached by its NAME (<code>flags.hasKey</code>), never by a position like <code>[0]</code>. That\'s the core difference from an array, and it\'s why objects fit "a few different facts about one thing" so much better than a list does.</p></div>
+    <div class="cl-block"><h4>Dot notation works for reading AND changing</h4>
+      <p><code>flags.hasKey = true;</code> uses the exact same dot syntax as reading it — an object\'s property is just a variable that lives inside a named container, and it\'s changed the same way any variable is.</p></div>` },
   ws1s3: { title: 'An object groups related NAMED values', html: `
     <div class="cl-block"><h4>Different from an array</h4>
       <p>An array is a list, ordered by position; an object is a set of NAMED properties (<code>flags.hasKey</code>), not ordered by position at all. Both are "collections", but they answer different questions — "what's item #2?" vs. "does this thing have a key?".</p></div>
@@ -5846,6 +6050,11 @@ const CHALLENGE_LESSON = {
       <p><code>inventory[0]</code> reads ONE specific item by its position — index 0 is always the FIRST item, never the "1st" in everyday counting. This is genuinely different from <code>.join()</code>, which shows the whole array at once.</p></div>
     <div class="cl-block"><h4>.length is a real property, not a method you call</h4>
       <p><code>inventory.length</code> gives you the array's total count directly — no counting loop needed. Notice it has no brackets: it's a property being READ, not a function being called.</p></div>` },
+  ws1qrand: { title: 'Math.floor(Math.random() * length) is one whole idiom', html: `
+    <div class="cl-block"><h4>Three pieces, one job</h4>
+      <p>Math.random() alone is rarely useful — it\'s always seen combined with * something.length (stretch the range) and Math.floor() (round down to a valid index). Learning this as ONE combined pattern matters more than memorizing each piece separately.</p></div>
+    <div class="cl-block"><h4>Multiplying by .length is what keeps it safe</h4>
+      <p>The formula automatically adapts to any array size — 3 items or 300 — because Math.random() * inventory.length can mathematically never reach inventory.length itself, so the rounded-down result can never be an out-of-range index.</p></div>` },
   ws1s5a: { title: 'An object can hold MORE than one flag', html: `
     <div class="cl-block"><h4>Same shape, more properties</h4>
       <p>ws1s3's flags object only ever had one property. Nothing changes structurally to add a second — <code>{ hasKey: true, hasMap: false }</code> is still just one object, just with two named facts instead of one.</p></div>
@@ -6338,10 +6547,16 @@ function showJourney() {
   const STAGE_EMO = ['🐍', '📗', '🧩']
   const worlds = MODULES.map(m => {
     if (!m.live) return { name: m.name, sub: m.sub, live: false, count: m.count }
-    const stages = m.stages.map((s, i) => ({
-      id: s.id, emoji: STAGE_EMO[i % STAGE_EMO.length], label: s.name,
-      done: completed.has(STAGE_INDEX[s.id]),
-    }))
+    const stages = m.stages.map((s, i) => {
+      const done = completed.has(STAGE_INDEX[s.id])
+      // Grade 8 never scores by attempts/lines/turns (see the .win-stars
+      // comment above) — a pass is always worth the full 3 stars, but
+      // quest-map.js only draws '⭐'.repeat(s.stars) when s.stars is
+      // actually set. Leaving it unset (as before) meant every completed
+      // node fell back to quest-map.js's boss/plain-star default instead of
+      // showing 3.
+      return { id: s.id, emoji: STAGE_EMO[i % STAGE_EMO.length], label: s.name, done, stars: done ? 3 : 0 }
+    })
     // One Lesson bubble per module, same node style as exercises, placed
     // first (ported from Grade 7). done:true always -- see Grade 7's
     // same comment: the unlock chain checks stages[i-1].done, so a real,

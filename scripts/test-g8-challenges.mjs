@@ -57,7 +57,10 @@ const webMaximalLog = () => ({
     + 'let sum = age + heightCm; let product = age * heightCm; '
     + 'let squared = Math.pow(5, 2); let root = Math.sqrt(36); '
     + 'let width = 8; let height = 5; let area = width * height; let perimeter = 2 * (width + height); '
-    + 'const MPG = 25; const gasPrice = 3.50; let distance = 200; let time = 4; let speed = distance / time; let gasCost = (distance / MPG) * gasPrice;',
+    + 'const MPG = 25; const gasPrice = 3.50; let distance = 200; let time = 4; let speed = distance / time; let gasCost = (distance / MPG) * gasPrice; '
+    // web5s5/web5s6 (classList.toggle / setInterval bonus stages)
+    + 'document.querySelector("h1").addEventListener("click", function() { document.querySelector("h1").classList.toggle("highlighted"); }); '
+    + 'let timer; timer = setInterval(function() { seconds = seconds + 1; }, 1000); clearInterval(timer);',
   // ws1s0 reads real global state (an actual array with 2+ items) rather
   // than a regex flag — needs a real array sitting on the fixture's window.
   globals: { inventory: ['sword', 'shield', 'lantern'] },
@@ -254,6 +257,10 @@ const WEB_REJECT = [
   ['web7boss', 'about.html links to itself instead of back to index.html', { pages: {
     'index.html': { h1s: 1, links: 1, html: '<h1>Home</h1><a href="about.html">About</a>' },
     'about.html': { h1s: 1, links: 1, html: '<h1>About</h1><a href="about.html">About</a>' } } }],
+  ['web5s5', 'no classList.toggle at all, just a plain style change', { js: 'document.querySelector("h1").style.color = "red";', hasClick: true }],
+  ['web5s5', 'classList.toggle used but never wired to a click', { js: 'document.querySelector("h1").classList.toggle("highlighted");', hasClick: false }],
+  ['web5s6', 'setInterval used but clearInterval never called (can\'t actually stop)', { js: 'let timer = setInterval(function() { seconds++; }, 1000);' }],
+  ['web5s6', 'clearInterval called on a variable that was never assigned a real setInterval', { js: 'let timer;\nclearInterval(timer);' }],
 ]
 const WEB_ACCEPT = [
   ['jsf1s2', 'a real quoted console.log message', { js: 'console.log("hi there");' }],
@@ -279,6 +286,8 @@ const WEB_ACCEPT = [
   ['web7boss', 'real two-way nav, both directions present', { pages: {
     'index.html': { h1s: 1, links: 1, html: '<h1>Home</h1><nav><a href="about.html">About</a></nav>' },
     'about.html': { h1s: 1, links: 1, html: '<h1>About</h1><nav><a href="index.html">Home</a></nav>' } } }],
+  ['web5s5', 'classList.toggle wired to a real click handler', { js: 'document.querySelector("h1").addEventListener("click", function() { document.querySelector("h1").classList.toggle("highlighted"); });', hasClick: true }],
+  ['web5s6', 'setInterval AND clearInterval both genuinely used', { js: 'let timer;\ntimer = setInterval(function() { seconds = seconds + 1; }, 1000);\nclearInterval(timer);' }],
 ]
 for (const [id, label, log] of WEB_REJECT) {
   const ch = byId(id)
