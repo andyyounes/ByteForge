@@ -13,6 +13,15 @@ export default function ForgotPasswordPage() {
   const [sent,    setSent]    = useState(false)
   const [error,   setError]   = useState<string | null>(null)
 
+  // Second path — asks the teacher to set a new password directly, instead
+  // of depending on an email actually arriving. Doesn't touch the email flow
+  // above at all; a student can try either, independently.
+  const [showTeacherForm, setShowTeacherForm] = useState(false)
+  const [teacherEmail,    setTeacherEmail]    = useState('')
+  const [teacherLoading,  setTeacherLoading]  = useState(false)
+  const [teacherSent,     setTeacherSent]     = useState<string | null>(null)
+  const [teacherError,    setTeacherError]    = useState<string | null>(null)
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -26,6 +35,28 @@ export default function ForgotPasswordPage() {
     setLoading(false)
     if (error) setError(error.message)
     else setSent(true)
+  }
+
+  async function handleTeacherSubmit(e: FormEvent) {
+    e.preventDefault()
+    setTeacherLoading(true)
+    setTeacherError(null)
+    try {
+      const res  = await fetch('/api/auth/password-reset-request', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          studentEmail: email.trim().toLowerCase(),
+          teacherEmail: teacherEmail.trim().toLowerCase(),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to send request')
+      setTeacherSent(data.message ?? 'Request sent')
+    } catch (e: unknown) {
+      setTeacherError((e as Error).message ?? 'Failed to send request')
+    }
+    setTeacherLoading(false)
   }
 
   return (
@@ -92,6 +123,63 @@ export default function ForgotPasswordPage() {
                 <ChevronRightIcon size={12} strokeWidth={2.2} className="rotate-180" />
                 Back to sign in
               </Link>
+
+              {/* Second path — no email needs to arrive at all */}
+              <div className="mt-5 pt-5 border-t border-b2">
+                {teacherSent ? (
+                  <div className="text-center space-y-2">
+                    <div className="flex justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-emerald/10 border border-emerald/25 flex items-center justify-center">
+                        <CheckCircleIcon size={18} strokeWidth={1.6} className="text-emerald" />
+                      </div>
+                    </div>
+                    <p className="text-sm text-fg-dim">{teacherSent}</p>
+                  </div>
+                ) : showTeacherForm ? (
+                  <form onSubmit={handleTeacherSubmit} className="space-y-3">
+                    <p className="text-xs text-fg-dim">
+                      Your teacher can set a new password for you directly — no email needed.
+                    </p>
+                    {teacherError && (
+                      <div className="px-3 py-2 rounded-md bg-rose/10 border border-rose/20 text-rose text-xs">
+                        {teacherError}
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs font-medium text-t2 mb-1.5" htmlFor="email2">
+                        Your email
+                      </label>
+                      <input
+                        id="email2" type="email" required
+                        value={email} onChange={e => setEmail(e.target.value)}
+                        placeholder="you@school.com"
+                        className="w-full h-9 px-3 rounded-md bg-s2 border border-b2 text-fg text-sm placeholder:text-t3 focus:border-accent focus:outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-t2 mb-1.5" htmlFor="teacherEmail">
+                        Your teacher's email
+                      </label>
+                      <input
+                        id="teacherEmail" type="email" required
+                        value={teacherEmail} onChange={e => setTeacherEmail(e.target.value)}
+                        placeholder="teacher@school.com"
+                        className="w-full h-9 px-3 rounded-md bg-s2 border border-b2 text-fg text-sm placeholder:text-t3 focus:border-accent focus:outline-none transition-colors"
+                      />
+                    </div>
+                    <Button type="submit" loading={teacherLoading} className="w-full" variant="secondary">
+                      Ask my teacher instead
+                    </Button>
+                  </form>
+                ) : (
+                  <button
+                    onClick={() => setShowTeacherForm(true)}
+                    className="w-full text-center text-sm text-fg-dim hover:text-fg transition-colors"
+                  >
+                    Can't get the email? Ask your teacher instead →
+                  </button>
+                )}
+              </div>
             </>
           )}
         </div>

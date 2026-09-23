@@ -95,3 +95,60 @@ export function joinRequestEmailHtml({ teacherName, studentName, studentEmail, g
 </html>
 `.trim()
 }
+
+// ── Password reset request notification for teachers ──────────────────────────
+// Same shape as joinRequestEmailHtml — this is the notify-only half of the
+// flow; the teacher still sets the actual new password from their dashboard,
+// never over email, so there's no reset link or token in this message at all.
+
+export function passwordResetRequestEmailHtml({ teacherName, studentName, studentEmail, dashboardUrl }: {
+  teacherName:  string
+  studentName:  string
+  studentEmail: string
+  dashboardUrl: string
+}) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body { margin:0; padding:0; background:#0d1117; font-family:Inter,system-ui,sans-serif; color:#e6edf3; }
+    .wrapper { max-width:520px; margin:40px auto; padding:0 16px; }
+    .card { background:#161b22; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:40px; }
+    .logo { font-size:32px; text-align:center; margin-bottom:8px; }
+    .brand { text-align:center; font-size:22px; font-weight:700; color:#e6edf3; margin-bottom:32px; }
+    h1 { font-size:20px; font-weight:600; margin:0 0 12px; }
+    p { color:#8b949e; font-size:14px; line-height:1.6; margin:0 0 20px; }
+    .student-box { background:#0d1117; border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:16px 20px; margin:24px 0; }
+    .student-name { font-size:16px; font-weight:700; color:#e6edf3; }
+    .student-meta { font-size:13px; color:#8b949e; margin-top:4px; }
+    .btn { display:block; background:#06b6d4; color:#0d1117; text-decoration:none; font-weight:700; font-size:15px; text-align:center; padding:14px 32px; border-radius:12px; margin:24px 0; }
+    .footer { text-align:center; font-size:12px; color:#484f58; margin-top:24px; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <div class="logo">🔑</div>
+      <div class="brand">ByteForge</div>
+
+      <h1>Password reset requested</h1>
+      <p>Hi ${teacherName}, a student is locked out and asked you to reset their password.</p>
+
+      <div class="student-box">
+        <div class="student-name">${studentName}</div>
+        <div class="student-meta">${studentEmail}</div>
+      </div>
+
+      <a href="${dashboardUrl}" class="btn">Set a new password →</a>
+
+      <p style="font-size:12px;color:#484f58">Approving from your dashboard lets you set a new password directly — hand it to the student in person, not over email. If you don't recognise this student, just decline the request.</p>
+    </div>
+    <div class="footer">ByteForge · ICT Learning Platform</div>
+  </div>
+</body>
+</html>
+`.trim()
+}

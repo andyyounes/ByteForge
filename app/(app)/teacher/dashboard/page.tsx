@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { BookIcon, UserIcon, ZapIcon, ChartBarIcon } from '@/components/ui/Icons'
 import TeacherTabs from './TeacherTabs'
 import { JoinRequestsPanel } from '@/components/teacher/JoinRequestsPanel'
+import { PasswordResetRequestsPanel } from '@/components/teacher/PasswordResetRequestsPanel'
 import type { Profile, ConceptMastery, Topic } from '@/types'
 
 export const metadata: Metadata = { title: 'Teacher Dashboard' }
@@ -105,6 +106,9 @@ export default async function TeacherDashboardPage() {
       <JoinRequestsPanel
         classes={(classes ?? []).map((c: { id: string; name: string; grade: string }) => ({ id: c.id, name: c.name, grade: c.grade }))}
       />
+
+      {/* Pending password reset requests — shows only when students are locked out */}
+      <PasswordResetRequestsPanel />
 
       {/* Overview stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
