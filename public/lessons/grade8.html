@@ -1053,15 +1053,87 @@ function checkWebChallenge(log) {
     renderModuleXPBar(findModuleForChallenge(ch))
   } else {
     clog('❌ Not quite — check the task above and try the 💡 Hint button.', 'err')
-    // Color stages compare exact palette values read back from the rendered
-    // page, so a "looks right but won't pass" report is otherwise impossible
-    // to diagnose. Show what the page actually reported.
-    if (ch.palette) {
-      const seen = [['background', log.bgColor], ['h1', log.headingColor], ['h2', log.h2Color], ['h3', log.h3Color], ['p', log.pColor], ['link', log.linkColor]]
-        .filter(([, v]) => v).map(([k, v]) => k + ': ' + v + (isAllowedColor(v) ? '' : ' (not a palette color)'))
-      if (seen.length) clog('🎨 Colors the page reported — ' + seen.join(' · '), 'err')
+    if (ch.palette) explainColorFailure(ch, log).forEach(line => clog(line, 'info'))
+  }
+}
+
+// ── "Why isn't this passing?" for color stages ───────────────────────────────
+// Color checks compare exact palette values read back from the rendered page,
+// so "it looks right but won't pass" was impossible for a student to act on.
+// This works out which colors the stage actually looks at (by reading the
+// names of the log fields its check() uses), then says in plain words what's
+// wrong and suggests palette colors that would work.
+const COLOR_SLOTS = [
+  ['bgColor', 'background'], ['headingColor', 'h1 heading'], ['h2Color', 'h2 heading'], ['h3Color', 'h3 heading'],
+  ['pColor', 'paragraph text'], ['linkColor', 'link'], ['buttonBg', 'button fill'], ['buttonColor', 'button text'],
+]
+function rgbToHex(rgbStr) {
+  const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(rgbStr || '')
+  return m ? '#' + [m[1], m[2], m[3]].map(n => Number(n).toString(16).padStart(2, '0')).join('').toUpperCase() : (rgbStr || '')
+}
+function swatchNameFor(rgbStr) {
+  const n = normalizeRgb(rgbStr)
+  const hit = Object.entries(ALL_SWATCHES).find(([, hex]) => hexToRgbStr(hex) === n)
+  return hit ? hit[0].replace('_', ' ') : null
+}
+function explainColorFailure(ch, log) {
+  const src = ch.check.toString()
+  const slots = COLOR_SLOTS.filter(([field]) => src.includes('log.' + field) && log[field])
+  if (!slots.length) return []
+  const lines = ['🎨 Here\'s what I found:']
+  const pretty = c => (swatchNameFor(c) ? swatchNameFor(c) + ' ' : '') + rgbToHex(c)
+  const suggest = (test, n = 3) => Object.entries(ALL_SWATCHES)
+    .filter(([, hex]) => test(hexToRgbStr(hex))).slice(0, n)
+    .map(([name, hex]) => name.replace('_', ' ') + ' ' + hex).join(', ')
+
+  // 1. Colors that aren't in the palette at all
+  const off = /isAllowedColor/.test(src) ? slots.filter(([f]) => !isAllowedColor(log[f])) : []
+  const bgOk = isAllowedColor(log.bgColor) ? colorBrightness(log.bgColor) : null
+  off.forEach(([f, label]) => {
+    // Suggest colors that would also read on the chosen background, so the
+    // first suggestion isn't something that then fails the contrast check.
+    const ideas = f !== 'bgColor' && bgOk != null ? suggest(rgb => Math.abs(bgOk - colorBrightness(rgb)) > 30) : suggest(() => true)
+    lines.push('• Your ' + label + ' is ' + rgbToHex(log[f]) + ', which isn\'t one of the palette colors. Click one of the colored squares above the editor instead (try ' + ideas + ').')
+  })
+
+  // 2. Text colors that have to be different from each other
+  const textFields = slots.filter(([f]) => ['headingColor', 'h2Color', 'h3Color', 'pColor', 'linkColor'].includes(f))
+  if (/new Set/.test(src) && textFields.length > 1) {
+    const seen = {}
+    textFields.forEach(([f, label]) => { const k = normalizeRgb(log[f]); (seen[k] = seen[k] || []).push(label) })
+    Object.values(seen).filter(l => l.length > 1).forEach(l => {
+      lines.push('• Your ' + l.join(' and ') + ' are the same color. Each one needs its own different color.')
+    })
+  }
+
+  // 3. Text that's hard to read against the background
+  const bgB = colorBrightness(log.bgColor)
+  if (/colorBrightness\(/.test(src) && bgB != null) {
+    textFields.filter(([f]) => colorBrightness(log[f]) != null).forEach(([f, label]) => {
+      const b = colorBrightness(log[f])
+      if (b != null && Math.abs(bgB - b) <= 30) {
+        const ideas = suggest(rgb => { const x = colorBrightness(rgb); return Math.abs(bgB - x) > 30 && normalizeRgb(rgb) !== normalizeRgb(log[f]) })
+        lines.push('• Your ' + label + ' (' + pretty(log[f]) + ') is too close to the background (' + pretty(log.bgColor) + ') — it\'s hard to read. Try ' + (ideas || 'a much lighter or darker color') + '.')
+      }
+    })
+  }
+
+  // 4. Button text has to be pure white on a dark fill, pure black on a light fill
+  if (src.includes('log.buttonColor') && !src.includes("'rgb(255, 255, 255)'") && log.buttonBg && log.buttonColor
+      && colorBrightness(log.buttonBg) != null && colorBrightness(log.buttonColor) != null
+      && Math.abs(colorBrightness(log.buttonBg) - colorBrightness(log.buttonColor)) <= 30) {
+    lines.push('• Your button text (' + rgbToHex(log.buttonColor) + ') is too close to the button fill (' + rgbToHex(log.buttonBg) + ') — make one much lighter or darker so the label can be read.')
+  }
+  if (src.includes("'rgb(255, 255, 255)'") && log.buttonBg && log.buttonColor && isAllowedColor(log.buttonBg)) {
+    const dark = colorBrightness(log.buttonBg) < 128
+    const want = dark ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)'
+    if (normalizeRgb(log.buttonColor) !== want) {
+      lines.push('• Your button fill (' + pretty(log.buttonBg) + ') is ' + (dark ? 'dark' : 'light') + ', so the button text should be ' + (dark ? 'white #FFFFFF' : 'black #000000') + ' to read clearly — right now it\'s ' + rgbToHex(log.buttonColor) + '.')
     }
   }
+
+  if (lines.length === 1) lines.push('• I couldn\'t spot one specific problem — re-read the task and check every color it asks for. Colors seen: ' + slots.map(([f, l]) => l + ' ' + rgbToHex(log[f])).join(', ') + '.')
+  return lines
 }
 
 // ── Execution ─────────────────────────────────────────────────────────────────
@@ -1901,7 +1973,7 @@ const MODULES = [
     },
     { id:'web3boss', name:'BOSS — Design Your Own Color Scheme', xp:70, lang:'web', boss:true,
       palette: Object.entries(ALL_SWATCHES),
-      text:`<strong>BOSS</strong> — Design a complete, coordinated color scheme from the palette: a background, a DIFFERENT readable color each for h1/h2/h3/p/link, and a button whose fill+text actually reads. Nothing new — every rule you've already learned this month, combined into one real page you'd actually want to look at.`,
+      text:`<strong>BOSS</strong> — Design a complete, coordinated color scheme in ANY colors you like (the palette is just for inspiration): a background, a DIFFERENT readable color each for h1/h2/h3/p/link, and a button whose fill+text actually reads. Nothing new — every rule you've already learned this month, combined into one real page you'd actually want to look at.`,
       hints:[
         'This is genuinely every element you\'ve colored alone this month — background, h1, h2, h3, p, a, button — combined onto one page.',
         'Six different text-ish colors total (h1, h2, h3, p, a, plus the button pair) — go one rule at a time and re-check often.',
@@ -1912,14 +1984,16 @@ const MODULES = [
         js: ``,
       },
       check:(log) => {
+        // Free-choice boss: ANY colors are allowed (no palette restriction),
+        // but the readability/variety rules the module taught still apply.
         const bg = log.bgColor
         const textEls = [log.headingColor, log.h2Color, log.h3Color, log.pColor, log.linkColor]
-        const allAllowed = isAllowedColor(bg) && textEls.every(isAllowedColor) && isAllowedColor(log.buttonBg)
-        const allDistinct = new Set(textEls).size === textEls.length
+        const allSet = [bg, ...textEls, log.buttonBg, log.buttonColor].every(c => colorBrightness(c) != null)
+        if (!allSet) return false
+        const allDistinct = new Set(textEls.map(normalizeRgb)).size === textEls.length
         const allReadable = textEls.every(c => Math.abs(colorBrightness(bg) - colorBrightness(c)) > 30)
-        const buttonDark = colorBrightness(log.buttonBg) < 128
-        const buttonOk = buttonDark ? normalizeRgb(log.buttonColor) === 'rgb(255, 255, 255)' : normalizeRgb(log.buttonColor) === 'rgb(0, 0, 0)'
-        return allAllowed && allDistinct && allReadable && buttonOk
+        const buttonOk = Math.abs(colorBrightness(log.buttonBg) - colorBrightness(log.buttonColor)) > 30
+        return allDistinct && allReadable && buttonOk
       },
     },
   ]},
@@ -1937,7 +2011,7 @@ const MODULES = [
     },
     { id:'web4boss', name:'BOSS — The Complete Warm-Up Page', xp:90, lang:'web', boss:true,
       palette: Object.entries(ALL_SWATCHES),
-      text:`<strong>BOSS</strong> — The real final page requiring EVERYTHING from this whole month: h1, h2, h3, a paragraph under each, a link, a button, a 3-item list, PLUS the color scheme from Colors & Shading — a background, a different readable color each for h1/h2/h3, a link color, and a button fill+text pair that actually reads. No subset accepted — this is the whole month, together.`,
+      text:`<strong>BOSS</strong> — The real final page requiring EVERYTHING from this whole month: h1, h2, h3, a paragraph under each, a link, a button, a 3-item list, PLUS a color scheme in ANY colors you like (the palette is just for inspiration) — a background, a different readable color each for h1/h2/h3/link, and a button fill+text pair that actually reads. No subset accepted — this is the whole month, together.`,
       hints:[
         'This is genuinely just web1 + web2 + web3 combined into one page — nothing new to learn, just a LOT of pieces at once.',
         'Build it in order: structure first (all the tags), THEN add every CSS color rule one at a time, checking each as you go.',
@@ -1950,14 +2024,16 @@ const MODULES = [
       },
       check:(log) => {
         if (!(log.h1s >= 1 && log.paragraphs >= 3 && log.links >= 1 && log.buttons >= 1 && log.listItems >= 3)) return false
+        // Free-choice boss: ANY colors are allowed (no palette restriction),
+        // but the readability/variety rules the module taught still apply.
         const bg = log.bgColor
         const textEls = [log.headingColor, log.h2Color, log.h3Color, log.linkColor]
-        const allAllowed = isAllowedColor(bg) && textEls.every(isAllowedColor) && isAllowedColor(log.buttonBg)
-        const allDistinct = new Set(textEls).size === textEls.length
+        const allSet = [bg, ...textEls, log.buttonBg, log.buttonColor].every(c => colorBrightness(c) != null)
+        if (!allSet) return false
+        const allDistinct = new Set(textEls.map(normalizeRgb)).size === textEls.length
         const allReadable = textEls.every(c => Math.abs(colorBrightness(bg) - colorBrightness(c)) > 30)
-        const buttonDark = colorBrightness(log.buttonBg) < 128
-        const buttonOk = buttonDark ? normalizeRgb(log.buttonColor) === 'rgb(255, 255, 255)' : normalizeRgb(log.buttonColor) === 'rgb(0, 0, 0)'
-        return allAllowed && allDistinct && allReadable && buttonOk
+        const buttonOk = Math.abs(colorBrightness(log.buttonBg) - colorBrightness(log.buttonColor)) > 30
+        return allDistinct && allReadable && buttonOk
       },
     },
   ]},
