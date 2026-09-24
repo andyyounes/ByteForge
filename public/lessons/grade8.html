@@ -964,7 +964,7 @@ function renderQuiz(ch) {
     if (q.type === 'judge') {
       return `<div class="q-item" id="${pfx}${i}-item">
         <span class="q-mark" id="${pfx}${i}-mark"></span>
-        <div class="q-scenario">${q.scenario}</div>
+        <div class="q-scenario">${escapeQuizHtml(q.scenario)}</div>
         <div class="q-label">Fake or real?</div>
         <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option><option value="FAKE">FAKE</option><option value="REAL">REAL</option></select>
         ${q.flagOptions ? `<div class="q-label" style="margin-top:6px">Which red flag?</div>
@@ -972,14 +972,14 @@ function renderQuiz(ch) {
       </div>`
     }
     if (q.type === 'match') {
-      return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${q.prompt}</div>
+      return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${escapeQuizHtml(q.prompt)}</div>
         <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option>${q.options.map(o=>`<option value="${escapeQuizHtml(o)}">${escapeQuizHtml(o)}</option>`).join('')}</select></div>`
     }
     if (q.type === 'prompt' || q.type === 'any') {
-      return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${q.prompt}</div>
+      return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${escapeQuizHtml(q.prompt)}</div>
         <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="Write your answer…" style="width:100%"></div>`
     }
-    return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${q.prompt}</div>
+    return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${escapeQuizHtml(q.prompt)}</div>
       <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="Type your answer…"></div>`
   }).join('') + '</div>' + `<button class="q-check-btn" onclick="checkQuiz()">✅ Submit Answer</button><div class="q-result" id="quiz-result"></div>`
 }
@@ -6092,6 +6092,120 @@ const CHALLENGE_LESSON = {
       <p>MPG and gasPrice are constants ON PURPOSE — they're fixed facts for this trip, not values the program updates as it runs, which is exactly the distinction jsf2s3 introduced.</p></div>
     <div class="cl-block"><h4>Every data type, working together</h4>
       <p>Strings (names, landmarks), a number (distance), a boolean (snacks), and two calculations built from all of it — this is the first time in the module every single type and skill has to combine into one coherent program.</p></div>` },
+  // ── Lessons for stages that previously had no Lesson panel content at all ────
+  web0bs1: { title: 'Every page starts with the same four pieces', html: `
+    <div class="cl-block"><h4>DOCTYPE, html, head, body — in that order</h4>
+      <p><code>&lt;!DOCTYPE html&gt;</code> tells the browser this is a modern HTML5 page and always comes first. <code>&lt;html&gt;</code> wraps everything else. Inside it, <code>&lt;head&gt;</code> holds information ABOUT the page and <code>&lt;body&gt;</code> holds everything a visitor actually sees.</p></div>
+    <div class="cl-block"><h4>Head is invisible, body is visible</h4>
+      <p>Nothing you put in the head appears on the page itself (the <code>&lt;title&gt;</code> shows in the browser tab, not the page). If you want people to see it — text, images, buttons — it belongs in the body.</p></div>` },
+  web0bs2: { title: 'Build the skeleton by hand', html: `
+    <div class="cl-block"><h4>Close tags in reverse order</h4>
+      <p>The last tag you opened is the first one you close: <code>&lt;body&gt;</code> ends before <code>&lt;/html&gt;</code>, and a heading inside the body ends before <code>&lt;/body&gt;</code>. Tags nest like boxes inside boxes — they can never overlap.</p></div>` },
+  web0bs3: { title: '"Title" means two different things', html: `
+    <div class="cl-block"><h4>&lt;title&gt; vs &lt;h1&gt;</h4>
+      <p>The <code>&lt;title&gt;</code> tag lives in the head and appears on the browser TAB (and in search results). The <code>&lt;h1&gt;</code> lives in the body and is the big heading visitors read ON the page. They can say different things — both are needed on a real page.</p></div>` },
+  web0bs4: { title: 'Headings have levels', html: `
+    <div class="cl-block"><h4>h1 is the title, h2 is a subtitle</h4>
+      <p>Headings run from <code>&lt;h1&gt;</code> (most important) down to <code>&lt;h6&gt;</code>. An <code>&lt;h2&gt;</code> right under the h1 works as a subtitle or section heading — smaller, but still clearly a heading, not just bigger text.</p></div>` },
+  web0bs5: { title: 'Images need a source AND a description', html: `
+    <div class="cl-block"><h4>src = where, alt = what</h4>
+      <p><code>&lt;img src="..." alt="..."&gt;</code>: <code>src</code> is the address of the picture file; <code>alt</code> is a text description. Screen readers read the alt text aloud, and browsers show it if the image fails to load — so it should describe what the picture actually shows, never be left empty.</p></div>
+    <div class="cl-block"><h4>No closing tag</h4>
+      <p>An <code>&lt;img&gt;</code> is self-closing: there is no <code>&lt;/img&gt;</code>.</p></div>` },
+  web0bboss: { title: 'BOSS — a complete page, every piece together', html: `
+    <div class="cl-block"><h4>Nothing new — just all of it at once</h4>
+      <p>Skeleton, a title in the head, an h1 and h2 in the body, an image with real alt text, and a paragraph. Build it in that order and re-check each piece as you add it.</p></div>` },
+  web0cs1: { title: 'A directory is just a folder', html: `
+    <div class="cl-block"><h4>Two names, one thing</h4>
+      <p>Directory and folder mean the same thing. A project lives in one main folder that can hold files AND other folders. The letters after the last dot in a filename are its <b>extension</b>: <code>.html</code>, <code>.css</code>, <code>.js</code>, <code>.jpg</code> tell you what kind of file it is.</p></div>` },
+  web0cs2: { title: 'Reading a file tree', html: `
+    <div class="cl-block"><h4>Indentation means "inside"</h4>
+      <p>In a tree diagram, anything indented under a folder lives INSIDE it. Files lined up at the same level sit in the same folder. So <code>cat.jpg</code> indented under <code>images/</code> is inside images, while <code>styles.css</code> lined up with <code>index.html</code> is beside it.</p></div>` },
+  web0cs3: { title: 'Same folder means just the filename', html: `
+    <div class="cl-block"><h4>href="styles.css"</h4>
+      <p>When the file you are linking to is in the SAME folder as the page, the path is only its name — no folder, no slash. The browser looks right next to the page first.</p></div>` },
+  web0cs4: { title: 'Into a subfolder: folder/file', html: `
+    <div class="cl-block"><h4>images/cat.jpg</h4>
+      <p>To reach a file inside a subfolder, write the folder name, a forward slash, then the filename. Each extra level adds another <code>folder/</code> in front.</p></div>` },
+  web0cs5: { title: 'Going up a level with ../', html: `
+    <div class="cl-block"><h4>../ means "out of this folder"</h4>
+      <p>A page inside <code>pages/</code> can not see a file in the main folder by name alone. <code>../styles.css</code> says: go UP one level, then find styles.css there.</p></div>` },
+  web0cboss: { title: 'BOSS — work out every path from one page', html: `
+    <div class="cl-block"><h4>Always start from where the page is</h4>
+      <p>Every path is written from the point of view of the file doing the linking. From <code>index.html</code>, each subfolder is one step down: <code>css/styles.css</code>, <code>js/script.js</code>, <code>images/dog.jpg</code>.</p></div>` },
+  web3s0: { title: 'Every CSS rule has the same shape', html: `
+    <div class="cl-block"><h4>selector { property: value; }</h4>
+      <p>The <b>selector</b> says WHICH element(s); the <b>property</b> says WHAT you are changing; the <b>value</b> is the new setting. A colon separates property from value, a semicolon ends the line, and curly braces wrap the whole rule.</p></div>` },
+  web3s6: { title: 'Each heading level is its own selector', html: `
+    <div class="cl-block"><h4>h2 { color: ... }</h4>
+      <p>Styling <code>h1</code> does not touch <code>h2</code>. Each level has its own selector and its own rule, so they can be totally different colors.</p></div>` },
+  web3s7: { title: 'h3 follows the same pattern', html: `
+    <div class="cl-block"><h4>Same rule, new selector</h4>
+      <p>Nothing new to learn: <code>h3 { color: #...; }</code> works exactly like h1 and h2. Only the selector changes.</p></div>` },
+  web3s8: { title: 'color always means text color', html: `
+    <div class="cl-block"><h4>button { color: ... }</h4>
+      <p>The <code>color</code> property changes the TEXT color of whatever the selector picks — headings, paragraphs, links, and buttons alike.</p></div>` },
+  web3s9: { title: 'background-color fills the box behind', html: `
+    <div class="cl-block"><h4>Fill vs text</h4>
+      <p><code>background-color</code> is the solid color behind an element. It is the same property you used on <code>body</code>; only the selector (<code>button</code>) is different.</p></div>` },
+  web3s10: { title: 'Two properties, one selector', html: `
+    <div class="cl-block"><h4>Fill and text must read together</h4>
+      <p>One <code>button { }</code> block can hold several property: value pairs. White text reads on a DARK fill; black text reads on a LIGHT fill. Matching them badly (white on light) makes a label nobody can read.</p></div>` },
+  web3s11: { title: 'A shade is a lighter or darker version of one hue', html: `
+    <div class="cl-block"><h4>More values, same property</h4>
+      <p>Blue and green each come in light, base and dark shades. Using a shade changes nothing about the rule: it is still <code>body { background-color: #...; }</code>, just with a different hex value.</p></div>` },
+  web3s12: { title: 'Dark shades make strong text', html: `
+    <div class="cl-block"><h4>h1 { color: dark shade }</h4>
+      <p>Dark shades of a hue are ideal for headings on a light page because they stand out clearly while staying in the same color family.</p></div>` },
+  web3s13: { title: 'Light background + dark text of ONE family', html: `
+    <div class="cl-block"><h4>A pair from the same hue</h4>
+      <p>Light shade behind, dark shade on top: this is the classic way to get a calm, readable design without clashing colors. Stay inside ONE family.</p></div>` },
+  web3s14: { title: 'Warm and cool colors', html: `
+    <div class="cl-block"><h4>Contrast vs harmony</h4>
+      <p>Warm colors (reds, oranges, yellows) feel energetic; cool colors (blues, greens, purples) feel calm. One warm plus one cool POPS (contrast). Several colors from the same temperature blend together (harmony).</p></div>` },
+  web3s15: { title: 'Build a contrast pair', html: `
+    <div class="cl-block"><h4>One warm, one cool</h4>
+      <p>Put one temperature on the background and the other on the heading. It works either way round, as long as you have one of each and the heading is still readable.</p></div>` },
+  web3s16: { title: 'Several colors that work together', html: `
+    <div class="cl-block"><h4>Every element needs its own color AND to be readable</h4>
+      <p>A real page uses many colors. Give h1, h2, h3 and paragraph text each a different color, and check every one against the background. If a color is too close to the background in lightness, it becomes hard to read — pick a much lighter or darker one.</p></div>` },
+  jsf1printq: { title: 'Two ways to print in JavaScript', html: `
+    <div class="cl-block"><h4>console.log() vs document.write()</h4>
+      <p><code>console.log()</code> prints to the browser console (right-click, Inspect, Console) — great for testing, invisible to visitors. <code>document.write()</code> prints onto the page itself, fine for learning but old-fashioned for real sites.</p></div>
+    <div class="cl-block"><h4>Strings go in quotes</h4>
+      <p>Text you print is a <b>string</b>, and it must sit inside quote marks: <code>console.log("Hello!");</code> Forgetting the quotes is the most common first error.</p></div>` },
+  jsf1varq: { title: 'A variable is a named container', html: `
+    <div class="cl-block"><h4>let name = value;</h4>
+      <p>A variable has a NAME (what you call the container) and a VALUE (what is inside). <code>let</code> creates it once; after that you just use the name. Text values are strings and always go in quotes.</p></div>
+    <div class="cl-block"><h4>+ joins strings</h4>
+      <p>Between two strings, <code>+</code> glues them together: <code>"Hi " + userName</code>. It only adds numerically when both sides are numbers.</p></div>` },
+  jsf2mathq: { title: 'JavaScript is a calculator', html: `
+    <div class="cl-block"><h4>Operators and the Math object</h4>
+      <p><code>+ - * /</code> add, subtract, multiply and divide; <code>%</code> gives the REMAINDER (7 % 2 is 1), not a percentage. The built-in <code>Math</code> object adds tools like <code>Math.PI</code> (a property, no brackets) and <code>Math.round()</code> (a method, with brackets).</p></div>` },
+  web5s2b: { title: 'Put a variable ONTO the page', html: `
+    <div class="cl-block"><h4>querySelector + textContent</h4>
+      <p><code>document.querySelector("#animal-name")</code> finds the element with that id. <code>.textContent = ...</code> replaces its text. Combining them with <code>+</code> lets a variable's value appear inside a full sentence on the real page.</p></div>` },
+  ws1s0: { title: 'An array is a list in a variable', html: `
+    <div class="cl-block"><h4>let inventory = ["sword", "shield"];</h4>
+      <p>Square brackets hold the items, separated by commas. Nothing has to show on the page yet — the array simply exists, ready to be used.</p></div>` },
+  ws2s0: { title: 'A function with no inputs', html: `
+    <div class="cl-block"><h4>function greet() { return "..."; }</h4>
+      <p>Empty parentheses mean the function takes no inputs. <code>return</code> hands a value back to whoever called it, so <code>greet()</code> can be used anywhere a value is expected — like the text of an element.</p></div>` },
+  ws4s0: { title: 'A loop that just counts', html: `
+    <div class="cl-block"><h4>for (let i = 1; i &lt;= 5; i++)</h4>
+      <p>Start at 1, keep going while <code>i &lt;= 5</code>, add 1 each time. Building one growing piece of text inside the loop (<code>text = text + i + " "</code>) shows exactly how many times it ran.</p></div>` },
+  web5cs1: { title: 'Inputs are self-closing elements', html: `
+    <div class="cl-block"><h4>type decides the kind of input</h4>
+      <p><code>type="text"</code> accepts words, <code>type="number"</code> accepts numbers. The <code>id</code> is the name JavaScript will use to find it later, and <code>placeholder</code> is the faint hint text. Inputs have no closing tag.</p></div>` },
+  web5cboss: { title: 'Radio buttons share one name', html: `
+    <div class="cl-block"><h4>Same name = one group</h4>
+      <p>Radio buttons with the same <code>name</code> behave as one choice: picking one un-picks the others. To find the chosen one, loop through them and check which has <code>.checked</code> set to true.</p></div>` },
+  web6s1: { title: 'Lay out the calculator first', html: `
+    <div class="cl-block"><h4>Structure before behavior</h4>
+      <p>Two number inputs (bill and tip %), a button, and two empty result paragraphs. Giving each an <code>id</code> now is what lets the JavaScript in the next step read the inputs and fill in the results.</p></div>` },
+  web7q0: { title: 'Real sites are many pages with one style', html: `
+    <div class="cl-block"><h4>Shared stylesheet, real links</h4>
+      <p>Every page of a site usually uses the SAME CSS file so the look stays consistent. Navigation links use the exact filename of the page they go to, like <code>href="about.html"</code> — and every page needs a link BACK, or visitors get stuck.</p></div>` },
   web5qdom: { title: 'The DOM is a live map JS can change', html: `
     <div class="cl-block"><h4>Structure vs. live state</h4>
       <p>HTML describes the page as it STARTS. The DOM is what the browser actually builds from it — a live structure JavaScript can keep changing, long after the page finished loading. This is the whole reason .textContent works at all.</p></div>

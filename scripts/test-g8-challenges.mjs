@@ -308,6 +308,48 @@ for (const [id, label, log] of WEB_ACCEPT) {
   else { fail++; console.log(`✗ ${id} — REJECTS a correct solution: ${label}`) }
 }
 
+// ── Every live stage must have Lesson panel content ─────────────────────────
+// Stages added without a CHALLENGE_LESSON entry showed an empty "📘 Lesson"
+// panel (and a whole module's Lesson node could be blank). 35 stages had
+// drifted into that state before this test existed.
+{
+  const se = html.indexOf('const STAGE_INDEX')
+  const { CHALLENGE_LESSON } = new Function(html.slice(s, se) + '\nreturn { CHALLENGE_LESSON }')()
+  for (const ch of CHALLENGES) {
+    const l = CHALLENGE_LESSON[ch.id]
+    if (!l || !l.title || !l.html || l.html.replace(/<[^>]+>/g, '').trim().length < 40) {
+      fail++; console.log(`✗ ${ch.id} — no (or empty) Lesson panel content in CHALLENGE_LESSON`)
+    } else pass++
+  }
+  console.log(`✓ ${CHALLENGES.length} stages checked for Lesson panel content`)
+}
+
+// ── Quiz rendering: no question/option text may become a real HTML tag ──────
+// renderQuiz() builds innerHTML from raw strings. Prompts/options containing
+// tag-like text ("<script> tags", "<body>", "<!DOCTYPE html>") were parsed as
+// real elements — swallowing the dropdown, later questions and the Submit
+// button (a stage that showed "no quiz" at all). Render every quiz stage with
+// a stub box and assert the only tags produced are the renderer's own.
+{
+  const rs = html.indexOf('function escapeQuizHtml')
+  const re = html.indexOf('function markQuestion')
+  const stub = { innerHTML: '' }
+  const renderer = new Function('document', html.slice(rs, re) + '\nreturn renderQuiz')({ getElementById: () => stub })
+  const ownTags = new Set(['div', 'span', 'select', 'option', 'input', 'button'])
+  let quizStages = 0
+  for (const ch of CHALLENGES.filter(c => c.type === 'quiz')) {
+    quizStages++
+    renderer(ch)
+    const stray = [...stub.innerHTML.matchAll(/<\/?([a-zA-Z!][\w-]*)/g)].map(m => m[1].toLowerCase()).filter(t => !ownTags.has(t))
+    const expectedSelects = (ch.questions || []).filter(q => q.type === 'match' || q.type === 'judge').length
+    const gotSelects = (stub.innerHTML.match(/<select /g) || []).length
+    if (stray.length || gotSelects < expectedSelects) {
+      fail++; console.log(`✗ ${ch.id} — quiz renders stray tags [${[...new Set(stray)].join(', ')}] or lost dropdowns (${gotSelects}/${expectedSelects})`)
+    } else pass++
+  }
+  console.log(`✓ ${quizStages} quiz stages render with no stray tags and every dropdown present`)
+}
+
 console.log(`\n${pass} passed, ${fail} failed.`)
 if (fail > 0) process.exit(1)
 console.log('all Grade 8 challenge checks are non-vacuous, every starter stub is genuinely incomplete,')
