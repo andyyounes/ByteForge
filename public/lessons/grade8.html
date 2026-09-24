@@ -1793,7 +1793,7 @@ const MODULES = [
       check:(log) => {
         if (!isAllowedColor(log.buttonBg)) return false
         const dark = colorBrightness(log.buttonBg) < 128
-        return dark ? log.buttonColor === 'rgb(255, 255, 255)' : log.buttonColor === 'rgb(0, 0, 0)'
+        return dark ? normalizeRgb(log.buttonColor) === 'rgb(255, 255, 255)' : normalizeRgb(log.buttonColor) === 'rgb(0, 0, 0)'
       },
     },
     { id:'web3s11', name:'Try a Light Shade — Alone', xp:20, lang:'web',
@@ -1918,7 +1918,7 @@ const MODULES = [
         const allDistinct = new Set(textEls).size === textEls.length
         const allReadable = textEls.every(c => Math.abs(colorBrightness(bg) - colorBrightness(c)) > 30)
         const buttonDark = colorBrightness(log.buttonBg) < 128
-        const buttonOk = buttonDark ? log.buttonColor === 'rgb(255, 255, 255)' : log.buttonColor === 'rgb(0, 0, 0)'
+        const buttonOk = buttonDark ? normalizeRgb(log.buttonColor) === 'rgb(255, 255, 255)' : normalizeRgb(log.buttonColor) === 'rgb(0, 0, 0)'
         return allAllowed && allDistinct && allReadable && buttonOk
       },
     },
@@ -1956,7 +1956,7 @@ const MODULES = [
         const allDistinct = new Set(textEls).size === textEls.length
         const allReadable = textEls.every(c => Math.abs(colorBrightness(bg) - colorBrightness(c)) > 30)
         const buttonDark = colorBrightness(log.buttonBg) < 128
-        const buttonOk = buttonDark ? log.buttonColor === 'rgb(255, 255, 255)' : log.buttonColor === 'rgb(0, 0, 0)'
+        const buttonOk = buttonDark ? normalizeRgb(log.buttonColor) === 'rgb(255, 255, 255)' : normalizeRgb(log.buttonColor) === 'rgb(0, 0, 0)'
         return allAllowed && allDistinct && allReadable && buttonOk
       },
     },

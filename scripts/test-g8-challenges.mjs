@@ -286,6 +286,9 @@ const WEB_ACCEPT = [
   ['web7boss', 'real two-way nav, both directions present', { pages: {
     'index.html': { h1s: 1, links: 1, html: '<h1>Home</h1><nav><a href="about.html">About</a></nav>' },
     'about.html': { h1s: 1, links: 1, html: '<h1>About</h1><nav><a href="index.html">Home</a></nav>' } } }],
+  ['web3boss', 'Chrome-format colors: a valid scheme with white text on a dark button', { bgColor: 'rgb(255, 247, 230)', headingColor: 'rgb(47, 59, 82)', h2Color: 'rgb(124, 58, 237)', h3Color: 'rgb(5, 150, 105)', pColor: 'rgb(75, 85, 99)', linkColor: 'rgb(29, 78, 216)', buttonBg: 'rgb(230, 57, 70)', buttonColor: 'rgb(255, 255, 255)' }],
+  ['web3boss', 'Safari-format (rgba) colors: the same valid scheme must still pass', { bgColor: 'rgba(255, 247, 230, 1)', headingColor: 'rgba(47, 59, 82, 1)', h2Color: 'rgba(124, 58, 237, 1)', h3Color: 'rgba(5, 150, 105, 1)', pColor: 'rgba(75, 85, 99, 1)', linkColor: 'rgba(29, 78, 216, 1)', buttonBg: 'rgba(230, 57, 70, 1)', buttonColor: 'rgba(255, 255, 255, 1)' }],
+  ['web3s16', 'Safari-format (rgba) colors: four distinct readable text colors', { bgColor: 'rgba(255, 247, 230, 1)', headingColor: 'rgba(47, 59, 82, 1)', h2Color: 'rgba(124, 58, 237, 1)', h3Color: 'rgba(5, 150, 105, 1)', pColor: 'rgba(75, 85, 99, 1)' }],
   ['web5s5', 'classList.toggle wired to a real click handler', { js: 'document.querySelector("h1").addEventListener("click", function() { document.querySelector("h1").classList.toggle("highlighted"); });', hasClick: true }],
   ['web5s6', 'setInterval AND clearInterval both genuinely used', { js: 'let timer;\ntimer = setInterval(function() { seconds = seconds + 1; }, 1000);\nclearInterval(timer);' }],
 ]
