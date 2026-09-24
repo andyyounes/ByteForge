@@ -1049,6 +1049,14 @@ function checkWebChallenge(log) {
     renderModuleXPBar(findModuleForChallenge(ch))
   } else {
     clog('❌ Not quite — check the task above and try the 💡 Hint button.', 'err')
+    // Color stages compare exact palette values read back from the rendered
+    // page, so a "looks right but won't pass" report is otherwise impossible
+    // to diagnose. Show what the page actually reported.
+    if (ch.palette) {
+      const seen = [['background', log.bgColor], ['h1', log.headingColor], ['h2', log.h2Color], ['h3', log.h3Color], ['p', log.pColor], ['link', log.linkColor]]
+        .filter(([, v]) => v).map(([k, v]) => k + ': ' + v + (isAllowedColor(v) ? '' : ' (not a palette color)'))
+      if (seen.length) clog('🎨 Colors the page reported — ' + seen.join(' · '), 'err')
+    }
   }
 }
 
