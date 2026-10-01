@@ -97,12 +97,20 @@ export function getGradeMeta(grade: 'grade6' | 'grade7' | 'grade8'): GradeMeta {
 }
 
 // ── Per-student progress summary, given that student's lesson_saves rows ────
+export interface ModuleProgress {
+  id:    string
+  name:  string
+  done:  number   // stages this student has passed in the module
+  total: number
+}
+
 export interface StudentGradeProgress {
   studentId:       string
   name:            string
   stagesPassed:    number
   stagesTotal:     number
   currentModule:   string | null   // null once every module is complete
+  modules:         ModuleProgress[]   // per-chapter breakdown, in teaching order
   lastStageName:   string | null
   lastActive:      string | null   // ISO timestamp
 }
@@ -127,12 +135,20 @@ export function summarizeStudent(
     null as (typeof relevantRows)[number] | null
   )
 
+  const modules: ModuleProgress[] = meta.modules.map(m => ({
+    id:    m.id,
+    name:  m.name,
+    done:  m.stages.filter(s => passedIds.has(s.id)).length,
+    total: m.stages.length,
+  }))
+
   return {
     studentId,
     name,
     stagesPassed:  passedIds.size,
     stagesTotal:   meta.total,
     currentModule,
+    modules,
     lastStageName: lastRow?.challenge_id ? (meta.byId.get(lastRow.challenge_id)?.name ?? null) : null,
     lastActive:    lastRow?.saved_at ?? null,
   }

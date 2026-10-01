@@ -334,6 +334,8 @@
   <script src="../js/config.js"></script>
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
+  <script src="../js/lang.js"></script>
+  <script src="grade7-ru.js"></script>
 </head>
 <body>
 
@@ -3844,36 +3846,58 @@ function renderQuiz(ch) {
   // "CPU" inside a free-text prompt box). autocomplete="off" alone isn't
   // reliably honoured by every browser for this; unique ids fix it for real.
   const pfx = 'quiz-' + ch.id + '-'
+  // Language: only the visible LABELS change. Every <option value> stays the
+  // original English string, so checkQuiz() grades identically in any language.
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+  const tr = (ru && typeof G7_RU_QUIZ !== 'undefined' && G7_RU_QUIZ[ch.id]) || null
+  const L = (en, rus) => (ru ? rus : en)
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  const choose = L('Choose…', 'Выберите…')
+  // Switching language mid-quiz must not wipe what the student already picked/typed.
+  const kept = {}
+  if (box.querySelectorAll) box.querySelectorAll('select,input').forEach(el => { if (el.value) kept[el.id] = el.value })
   box.innerHTML = '<div class="quiz-grid">' + qs.map((q, i) => {
+    const t = tr && tr[i]
+    const prompt = esc((t && t[0]) || q.prompt || q.scenario)
     if (q.type === 'judge') {
       return `<div class="q-item" id="${pfx}${i}-item">
         <span class="q-mark" id="${pfx}${i}-mark"></span>
-        <div class="q-scenario">${q.scenario}</div>
-        <div class="q-label">Fake or real?</div>
-        <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option><option value="FAKE">FAKE</option><option value="REAL">REAL</option></select>
-        ${q.flagOptions ? `<div class="q-label" style="margin-top:6px">Which red flag?</div>
-        <select id="${pfx}${i}-b" autocomplete="off"><option value="">Choose…</option>${q.flagOptions.map(f=>`<option value="${f}">${f}</option>`).join('')}</select>` : ''}
+        <div class="q-scenario">${prompt}</div>
+        <div class="q-label">${L('Fake or real?', 'Подделка или настоящее?')}</div>
+        <select id="${pfx}${i}-a" autocomplete="off"><option value="">${choose}</option><option value="FAKE">${L('FAKE', 'ПОДДЕЛКА')}</option><option value="REAL">${L('REAL', 'НАСТОЯЩЕЕ')}</option></select>
+        ${q.flagOptions ? `<div class="q-label" style="margin-top:6px">${L('Which red flag?', 'Какой тревожный признак?')}</div>
+        <select id="${pfx}${i}-b" autocomplete="off"><option value="">${choose}</option>${q.flagOptions.map((f, j) => `<option value="${esc(f)}">${esc((t && t[1] && t[1][j]) || f)}</option>`).join('')}</select>` : ''}
       </div>`
     }
     if (q.type === 'match') {
+      const labels = (t && t[1]) || q.options
       return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span>
-        ${q.image ? `<img class="q-img" src="${q.image}" alt="${q.imageAlt || ''}">` : ''}
-        <div class="q-label">${q.prompt}</div>
-        <select id="${pfx}${i}-a" autocomplete="off"><option value="">Choose…</option>${q.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`
+        ${q.image ? `<img class="q-img" src="${q.image}" alt="${esc(q.imageAlt || '')}">` : ''}
+        <div class="q-label">${prompt}</div>
+        <select id="${pfx}${i}-a" autocomplete="off"><option value="">${choose}</option>${q.options.map((o, j) => `<option value="${esc(o)}">${esc(labels[j] != null ? labels[j] : o)}</option>`).join('')}</select></div>`
     }
     if (q.type === 'prompt' || q.type === 'any') {
       // Free-text prompt-writing — checked against a real specificity
       // rule (subject + constraint + format keyword), not an exact match.
       // 'any' is the same input but just requires SOMETHING written — used
       // for the baseline "write a vague prompt" observation step.
-      return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${q.prompt}</div>
-        <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="Write your prompt…" style="width:100%">
+      return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${prompt}</div>
+        <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="${L('Write your prompt…', 'Напиши свой запрос…')}" style="width:100%">
         <div class="q-sim-output" id="${pfx}${i}-sim"></div></div>`
     }
     // 'fill'
-    return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${q.prompt}</div>
-      <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="Type your answer…"></div>`
-  }).join('') + '</div>' + `<button class="q-check-btn" onclick="checkQuiz()">✅ Submit Answer</button><div class="q-result" id="quiz-result"></div>`
+    return `<div class="q-item" id="${pfx}${i}-item"><span class="q-mark" id="${pfx}${i}-mark"></span><div class="q-label">${prompt}</div>
+      <input type="text" id="${pfx}${i}-a" autocomplete="off" placeholder="${L('Type your answer…', 'Введи ответ…')}"></div>`
+  }).join('') + '</div>' + `<button class="q-check-btn" onclick="checkQuiz()">${L('✅ Submit Answer', '✅ Отправить ответ')}</button><div class="q-result" id="quiz-result"></div>`
+  Object.keys(kept).forEach(id => { const el = document.getElementById(id); if (el) el.value = kept[id] })
+}
+if (typeof BFLang !== 'undefined') {
+  // Re-draw the open quiz in the new language (its answers are kept, see above).
+  BFLang.onChange(() => {
+    const ch = CHALLENGES[activeIdx]
+    const box = document.getElementById('output-quiz')
+    if (ch && ch.type === 'quiz' && box && box.style.display !== 'none') renderQuiz(ch)
+  })
 }
 
 // Marks one question card correct/incorrect right on the card itself — a
@@ -3892,7 +3916,10 @@ function checkQuiz() {
   const pfx = 'quiz-' + ch.id + '-'
   let correct = 0
   qs.forEach((q, i) => {
-    const a = (document.getElementById(pfx + i + '-a')?.value || '').trim().toLowerCase()
+    const rawVal = document.getElementById(pfx + i + '-a')?.value || ''
+    // norm(): trim + lower-case (Cyrillic too) + ё→е + collapsed spaces, so a
+    // correct answer in any language isn't rejected over case or spacing.
+    const a = typeof BFLang !== 'undefined' ? BFLang.norm(rawVal) : rawVal.trim().toLowerCase()
     const bEl = document.getElementById(pfx + i + '-b')
     if (q.type === 'judge') {
       const okA = a === (q.answer || '').toLowerCase()
@@ -3905,10 +3932,16 @@ function checkQuiz() {
       // (length/tone/audience), and a format word (list/paragraph/steps).
       const rawA = document.getElementById(pfx + i + '-a')?.value || ''
       const hasSubject    = rawA.trim().split(/\s+/).length >= 3
-      const constraintWords = ['short','long','funny','serious','simple','for kids','words','sentence','sentences','tone']
-      const formatWords     = ['list','bullet','bullets','paragraph','steps','step-by-step']
-      const hasConstraint = constraintWords.some(w => rawA.toLowerCase().includes(w))
-      const hasFormat     = formatWords.some(w => rawA.toLowerCase().includes(w))
+      // English AND Russian keywords (Russian as word stems, so "короткий",
+      // "коротко", "короткую" all match) — a prompt written in Russian is just as
+      // specific as one written in English.
+      const constraintWords = ['short','long','funny','serious','simple','for kids','words','sentence','sentences','tone',
+        'коротк','длинн','смешн','серьёзн','серьезн','прост','для детей','слов','предложен','тон','стиль','объём','объем']
+      const formatWords     = ['list','bullet','bullets','paragraph','steps','step-by-step',
+        'список','пункт','маркир','абзац','параграф','шаг','по шагам','пошагов','таблиц','план']
+      const rawLow = rawA.toLowerCase().replace(/ё/g, 'е')
+      const hasConstraint = constraintWords.some(w => rawLow.includes(w.replace(/ё/g, 'е')))
+      const hasFormat     = formatWords.some(w => rawLow.includes(w.replace(/ё/g, 'е')))
       const passed = hasSubject && hasConstraint && hasFormat
       if (passed) correct++
       markQuestion(pfx, i, passed)
@@ -3917,14 +3950,19 @@ function checkQuiz() {
       // of the exercise being pure text-in, nothing-out.
       const simEl = document.getElementById(pfx + i + '-sim')
       if (simEl) {
+        const ruUi = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
         if (passed) {
-          simEl.innerHTML = '<b>🤖 Simulated response:</b> A focused, on-topic answer matching your length, tone, and format — because the prompt told it exactly what to produce.'
+          simEl.innerHTML = ruUi
+            ? '<b>🤖 Имитация ответа:</b> Точный ответ по теме, с нужной длиной, тоном и форматом — потому что запрос точно сказал, что нужно создать.'
+            : '<b>🤖 Simulated response:</b> A focused, on-topic answer matching your length, tone, and format — because the prompt told it exactly what to produce.'
         } else {
           const missing = []
-          if (!hasSubject) missing.push('a clear subject')
-          if (!hasConstraint) missing.push('a constraint (length/tone/audience)')
-          if (!hasFormat) missing.push('a format (list/paragraph/steps)')
-          simEl.innerHTML = '<b>🤖 Simulated response:</b> Still too generic — try adding ' + missing.join(' and ') + '.'
+          if (!hasSubject) missing.push(ruUi ? 'чёткую тему' : 'a clear subject')
+          if (!hasConstraint) missing.push(ruUi ? 'ограничение (длина/тон/для кого)' : 'a constraint (length/tone/audience)')
+          if (!hasFormat) missing.push(ruUi ? 'формат (список/абзац/шаги)' : 'a format (list/paragraph/steps)')
+          simEl.innerHTML = ruUi
+            ? '<b>🤖 Имитация ответа:</b> Пока слишком общо — попробуй добавить ' + missing.join(' и ') + '.'
+            : '<b>🤖 Simulated response:</b> Still too generic — try adding ' + missing.join(' and ') + '.'
         }
       }
     } else if (q.type === 'any') {
@@ -3940,8 +3978,12 @@ function checkQuiz() {
         simEl.innerHTML = '<b>🤖 Simulated response:</b> "Dogs are animals. People like dogs. Dogs make good pets." — vague and generic, because the prompt never said how long, what tone, or what shape the answer should take.'
       }
     } else {
-      const acceptable = Array.isArray(q.answer) ? q.answer : [q.answer]
-      const ok = acceptable.some(ans => a === String(ans).toLowerCase())
+      // English answer(s) PLUS the Russian ones from G7_RU_QUIZ — accepted whichever
+      // language the page is currently showing.
+      const ruExtra = (typeof G7_RU_QUIZ !== 'undefined' && G7_RU_QUIZ[ch.id] && G7_RU_QUIZ[ch.id][i] && G7_RU_QUIZ[ch.id][i][2]) || []
+      const acceptable = (Array.isArray(q.answer) ? q.answer : [q.answer]).concat(ruExtra)
+      const nrm = typeof BFLang !== 'undefined' ? BFLang.norm : (s => String(s).trim().toLowerCase())
+      const ok = acceptable.some(ans => a === nrm(ans))
       if (ok) correct++
       markQuestion(pfx, i, ok)
     }
@@ -3949,7 +3991,10 @@ function checkQuiz() {
   const need = ch.passCount != null ? ch.passCount : qs.length
   const resultEl = document.getElementById('quiz-result')
   const pass = correct >= need
-  resultEl.textContent = correct + ' / ' + qs.length + ' correct' + (pass ? ' — passed!' : ` — need ${need}`)
+  const ruUi = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+  resultEl.textContent = ruUi
+    ? correct + ' / ' + qs.length + ' верно' + (pass ? ' — пройдено!' : ` — нужно ${need}`)
+    : correct + ' / ' + qs.length + ' correct' + (pass ? ' — passed!' : ` — need ${need}`)
   resultEl.className = 'q-result ' + (pass ? 'ok' : 'bad')
   checkChallenge({ quizCorrect: correct, quizTotal: qs.length })
 }

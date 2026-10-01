@@ -147,5 +147,17 @@ const LessonSaves = (() => {
     return ws ? ws.code : null
   }
 
-  return { load, save, completedSet, completedIds, savedWorkspace, savedCode }
+  // ── codeFor ─────────────────────────────────────────────────────────────────
+  // Returns the last-saved code/draft for ONE specific challenge id, whether or
+  // not it was ever passed — so a page can restore a student's in-progress (or
+  // already-correct) work instead of always resetting to the starter code.
+  // Returns null if nothing was ever saved for that id. Must call load() first.
+  function codeFor(challengeId, lessonKey) {
+    const rows = _rows(lessonKey)
+    if (!rows) return null
+    const row = rows.find(s => s.challenge_id === challengeId)
+    return row ? row.code : null
+  }
+
+  return { load, save, completedSet, completedIds, savedWorkspace, savedCode, codeFor }
 })()

@@ -1493,7 +1493,10 @@ function selectChallenge(i) {
   const ch=CHALLENGES[i]
   document.getElementById('ch-text').innerHTML=ch.text
   document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
-  editor.setValue(ch.starter||'')
+  // Restore whatever was last saved for THIS stage — correct or not, and even
+  // if already passed — instead of always resetting to the starter.
+  const saved = LessonSaves.codeFor(ch.mod + '/' + ch.name, 'grade9')
+  editor.setValue(saved != null ? saved : (ch.starter||''))
   document.getElementById('output').innerHTML=''
   clearTraceTable()
   renderPills()
@@ -1538,13 +1541,19 @@ function resetStarter() {
 }
 
 function validateChallenge(code, result) {
-  const ch=CHALLENGES[activeIdx]; if(!ch||completed.has(activeIdx)) return
-  if(ch.check(code,result)) {
+  const ch=CHALLENGES[activeIdx]; if(!ch) return
+  const passOk = ch.check(code,result)
+  const firstPass = passOk && !completed.has(activeIdx)
+  // Always save the current code — pass or fail, and even after an earlier
+  // pass — so a draft (or further edits after already passing) is never lost
+  // just because the student navigated away. passed/xp are monotonic
+  // server-side, so this can never un-complete an already-passed stage.
+  LessonSaves.save('grade9', ch.mod + '/' + ch.name, { passed: passOk, code, xpEarned: firstPass ? ch.xp : 0 })
+  if (firstPass) {
     completed.add(activeIdx); renderPills()
     document.getElementById('pass-badge')?.remove?.()
     showToast('Challenge complete! +'+ch.xp+' XP')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + (ch.mod||'c') + activeIdx, { passed: true, score: 100 }); }
-    LessonSaves.save('grade9', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code })
     reportRealProgress(ch, Date.now() - challengeStartedAt)
   }
 }

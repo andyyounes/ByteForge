@@ -312,6 +312,8 @@
 <script src="../js/auth.js"></script>
 <script src="../js/lesson-saves.js"></script>
 <script src="../js/quest-map.js"></script>
+<script src="../js/lang.js"></script>
+<script src="grade9-ru.js"></script>
 </head>
 <body>
 
@@ -4306,6 +4308,46 @@ function openMission(id) {
   setTimeout(() => editor.refresh(), 50)
 }
 
+// ── Language (EN / РУ) for quiz + learn bubbles ─────────────────────────────
+// Only the words a student reads are translated (see grade9-ru.js). Answers are
+// always checked against the original English data, so nothing about pass/fail
+// depends on the language shown. Code and identifiers stay English.
+function g9Ru() {
+  return (typeof BFLang !== 'undefined' && BFLang.get() === 'ru' && typeof G9_RU !== 'undefined') ? G9_RU : null
+}
+function uiTxt(en, ru) { return g9Ru() ? ru : en }
+function quizLabels(m, qi) {
+  const q = m.quiz.questions[qi], r = g9Ru()
+  const t = r && r.quiz[m.id] && r.quiz[m.id].q[qi]
+  return { prompt: (t && t[0]) || q.prompt, options: (t && t[1]) || q.options }
+}
+function learnLabels(m, i) {
+  const term = m.learn.terms[i], r = g9Ru()
+  const t = r && r.learn[m.id] && r.learn[m.id][i]
+  return { term: (t && t[0]) || term.term, def: (t && t[1]) || term.def }
+}
+// Re-label whatever bubble is open when the language is switched (progress is kept — only text changes).
+function applyBubbleLang() {
+  const m = activeMission
+  if (!m) return
+  if (m.type === 'quiz' && m.quiz) {
+    const r = g9Ru()
+    document.getElementById('quiz-intro').textContent = (r && r.quiz[m.id] && r.quiz[m.id].intro) || m.quiz.intro || ''
+    m.quiz.questions.forEach((q, qi) => {
+      const L = quizLabels(m, qi)
+      const p = document.querySelector('#quiz-q-' + qi + ' .quiz-prompt')
+      if (p) p.textContent = L.prompt
+      document.querySelectorAll('#quiz-q-' + qi + ' .quiz-opt').forEach((b, oi) => { b.textContent = L.options[oi] != null ? L.options[oi] : q.options[oi] })
+    })
+    updateQuizStatus()
+  }
+  if (m.type === 'learn' && m.learn) {
+    document.querySelectorAll('.lm-term').forEach(el => { el.textContent = learnLabels(m, +el.dataset.i).term })
+    document.querySelectorAll('.lm-def').forEach(el => { el.textContent = learnLabels(m, +el.dataset.i).def })
+  }
+}
+if (typeof BFLang !== 'undefined') BFLang.onChange(applyBubbleLang)
+
 // ── Learn bubble — video/Match-Up/theory, rendered in place of the IDE ──────
 let _lmSelected = null   // currently-selected term index, or null
 let _lmMatched  = new Set()
@@ -4344,13 +4386,14 @@ function renderMatchup(terms) {
   const defsCol  = document.createElement('div')
   termsShuffled.forEach(t => {
     const el = document.createElement('div')
-    el.className = 'lm-term'; el.textContent = t.term; el.dataset.i = t.i
+    // Matching is by index (data-i), never by text — so the labels can be shown in any language.
+    el.className = 'lm-term'; el.textContent = learnLabels(activeMission, t.i).term; el.dataset.i = t.i
     el.onclick = () => selectTerm(t.i)
     termsCol.appendChild(el)
   })
   defsShuffled.forEach(t => {
     const el = document.createElement('div')
-    el.className = 'lm-def'; el.textContent = t.def; el.dataset.i = t.i
+    el.className = 'lm-def'; el.textContent = learnLabels(activeMission, t.i).def; el.dataset.i = t.i
     el.onclick = () => selectDef(t.i, el)
     defsCol.appendChild(el)
   })
@@ -4393,7 +4436,7 @@ function completeLearnBubble() {
   saveProg(p)
   try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
   try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
-  showWinScreen(3, xp, 'Nicely matched — that theory is locked in.')
+  showWinScreen(3, xp, uiTxt('Nicely matched — that theory is locked in.', 'Отлично — эта теория усвоена.'))
 }
 
 // ── Quiz — short MCQ / image-matching stages, no code editor ───────────────
@@ -4410,21 +4453,37 @@ function renderQuizBubble() {
   document.getElementById('flowchart-wrap').classList.remove('open')
   document.getElementById('quiz-wrap').classList.add('open')
   document.getElementById('quiz-title').textContent = m.emoji + ' ' + m.title
-  document.getElementById('quiz-intro').textContent = m.quiz.intro || ''
+  const ruQ = g9Ru()
+  document.getElementById('quiz-intro').textContent = (ruQ && ruQ.quiz[m.id] && ruQ.quiz[m.id].intro) || m.quiz.intro || ''
   _quizSolved = new Set()
   const wrap = document.getElementById('quiz-questions')
   wrap.innerHTML = ''
   m.quiz.questions.forEach((q, qi) => {
+    const L = quizLabels(m, qi)
     const card = document.createElement('div')
     card.className = 'quiz-q'
     card.id = 'quiz-q-' + qi
-    let html = ''
-    if (q.image) html += '<img class="quiz-img" src="' + q.image + '" alt="' + (q.imageAlt || '') + '">'
-    html += '<div class="quiz-prompt">' + q.prompt + '</div>'
-    html += '<div class="quiz-opts">' + q.options.map(opt =>
-      '<button class="quiz-opt" onclick="pickQuizOption(' + qi + ', this, \'' + opt.replace(/'/g, "\\'") + '\')">' + opt + '</button>'
-    ).join('') + '</div>'
-    card.innerHTML = html
+    if (q.image) {
+      const img = document.createElement('img')
+      img.className = 'quiz-img'; img.src = q.image; img.alt = q.imageAlt || ''
+      card.appendChild(img)
+    }
+    const prompt = document.createElement('div')
+    prompt.className = 'quiz-prompt'
+    prompt.textContent = L.prompt            // text, never HTML — a prompt mentioning a tag must not become one
+    card.appendChild(prompt)
+    const opts = document.createElement('div')
+    opts.className = 'quiz-opts'
+    q.options.forEach((opt, oi) => {
+      const b = document.createElement('button')
+      b.className = 'quiz-opt'
+      b.textContent = L.options[oi] != null ? L.options[oi] : opt
+      // The value submitted is ALWAYS the original English option, whichever
+      // language the label is shown in — so grading never depends on language.
+      b.onclick = () => pickQuizOption(qi, b, opt)
+      opts.appendChild(b)
+    })
+    card.appendChild(opts)
     wrap.appendChild(card)
   })
   updateQuizStatus()
@@ -4447,7 +4506,7 @@ function pickQuizOption(qi, el, value) {
 }
 function updateQuizStatus() {
   const total = activeMission.quiz.questions.length
-  document.getElementById('quiz-status').textContent = _quizSolved.size + ' / ' + total + ' correct'
+  document.getElementById('quiz-status').textContent = _quizSolved.size + ' / ' + total + uiTxt(' correct', ' верно')
 }
 function completeQuizBubble() {
   const p = getProg()
@@ -4457,8 +4516,8 @@ function completeQuizBubble() {
   saveProg(p)
   try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
   try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
-  document.getElementById('quiz-status').textContent = '✅ All correct!'
-  showWinScreen(3, xp, 'All correct — nice work!')
+  document.getElementById('quiz-status').textContent = uiTxt('✅ All correct!', '✅ Всё верно!')
+  showWinScreen(3, xp, uiTxt('All correct — nice work!', 'Всё верно — отличная работа!'))
 }
 
 // ── Binary Cards — flip place-value cards until the total matches target ───

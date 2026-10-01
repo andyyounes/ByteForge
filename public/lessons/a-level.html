@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-no-lang-toggle>
 <head>
 <link rel="icon" href="/icon" type="image/png">
   <meta charset="UTF-8"/>
@@ -790,6 +790,7 @@
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
+  <script src="../js/lang.js"></script>
   <script src="../js/lesson-quest.js"></script>
 </head>
 <body>
@@ -3990,6 +3991,63 @@ function completeTopic(id) {
 // 3. Shows ✅ / ⚠️ / ❌ badge per question
 // 4. Reveals all mark schemes
 // 5. Unlocks the "Mark Complete" button
+// ── Written answers in ANY language ─────────────────────────────────────────
+// The keyword scorers below match English words, so an answer written in
+// Russian (or any other language) could never score. Such answers are marked
+// by the AI marker instead (BFLang.aiGrade in js/lang.js), which reads the
+// answer in the student's language and judges its MEANING against the mark
+// scheme. Numeric/worked answers and code stay on the normal scorers.
+async function gradeForeignCard(card, rawAnswer) {
+  const ru = BFLang.uiLang(rawAnswer) === 'ru'
+  card.querySelector('.answer-feedback')?.remove()
+  const header = card.querySelector('.question-card-header')
+  if (!header) return
+  const fb = document.createElement('div')
+  fb.className = 'answer-feedback fb-partial'
+  fb.textContent = ru ? '⏳ Проверяю твой ответ…' : '⏳ Checking your answer…'
+  header.after(fb)
+  try {
+    const r = await BFLang.aiGrade({
+      question:    card.querySelector('.q-stem')?.textContent || '',
+      modelAnswer: card.querySelector('.ms-body')?.textContent || '',
+      answer:      rawAnswer,
+    })
+    const note = r.feedback ? ' ' + r.feedback : ''
+    if (r.score >= 70)      { fb.className = 'answer-feedback fb-good';    fb.textContent = '✅ ' + (ru ? 'Хороший ответ!' : 'Good answer!') + note }
+    else if (r.score >= 35) { fb.className = 'answer-feedback fb-partial'; fb.textContent = '⚠️ ' + (ru ? 'Частично верно.' : 'Partial answer.') + note }
+    else                    { fb.className = 'answer-feedback fb-miss';    fb.textContent = '❌ ' + (ru ? 'Нужно подробнее.' : 'Needs more detail.') + note }
+  } catch (e) {
+    fb.className = 'answer-feedback fb-partial'
+    fb.textContent = ru
+      ? 'Не удалось проверить ответ на этом языке прямо сейчас — сравни его со схемой оценивания ниже.'
+      : 'Could not check an answer in this language right now — compare it with the mark scheme below.'
+  }
+}
+
+async function gradeForeignTheory(ex, answer, fb) {
+  const ru = BFLang.uiLang(answer) === 'ru'
+  fb.style.display = 'block'
+  fb.className = 'tprac-feedback partial'
+  fb.textContent = ru ? '⏳ Проверяю твой ответ…' : '⏳ Checking your answer…'
+  const model = '<span style="display:block;margin-top:5px;font-size:11px;">Model: ' + ex.ms + '</span>'
+  try {
+    const r = await BFLang.aiGrade({
+      question:    (ex.title ? ex.title + ' — ' : '') + String(ex.q || '').replace(/<[^>]+>/g, ' '),
+      modelAnswer: String(ex.ms || '').replace(/<[^>]+>/g, ' '),
+      answer,
+    })
+    const cls = r.score >= 80 ? 'correct' : r.score >= 40 ? 'partial' : 'wrong'
+    const icon = r.score >= 80 ? '✅' : r.score >= 40 ? '⚠️' : '❌'
+    fb.className = 'tprac-feedback ' + cls
+    fb.innerHTML = icon + ' ' + r.score + '% — ' + escapeHtml(r.feedback) + model
+  } catch (e) {
+    fb.className = 'tprac-feedback partial'
+    fb.innerHTML = (ru
+      ? '📝 Не удалось проверить ответ на этом языке прямо сейчас — сравни его с образцом.'
+      : '📝 Could not check an answer in this language right now — compare it with the model answer.') + model
+  }
+}
+
 function checkAnswers(btn) {
   const section = btn.closest('.practice-section')
   if (!section) return
@@ -4024,6 +4082,8 @@ function checkAnswers(btn) {
     const answer = Array.from(card.querySelectorAll('textarea'))
       .map(ta => ta.value).join(' ').toLowerCase()
     const msText  = (card.querySelector('.ms-body')?.textContent || '').toLowerCase()
+    const rawAnswer = Array.from(card.querySelectorAll('textarea')).map(ta => ta.value).join(' ')
+    if (typeof BFLang !== 'undefined' && BFLang.isForeign(rawAnswer)) { gradeForeignCard(card, rawAnswer); return }
 
     // Pull key 4+ char content words from the mark scheme
     const keywords = [...new Set(
@@ -7475,7 +7535,10 @@ function p2SelectChallenge(i) {
   const output = document.getElementById('p2-output')
   if (chText) chText.innerHTML = ch.text
   if (xpPill) xpPill.textContent = '+' + ch.xp + ' XP'
-  p2Editor.setValue(ch.starter || '')
+  // Restore whatever was last saved for THIS stage — correct or not, and even
+  // if already passed — instead of always resetting to the starter.
+  const p2Saved = LessonSaves.codeFor(ch.mod, 'al-paper4')
+  p2Editor.setValue(p2Saved != null ? p2Saved : (ch.starter || ''))
   p2Editor.clearHistory()
   if (output) output.innerHTML = ''
   p2ClearTrace()
@@ -7487,12 +7550,17 @@ function p2SelectChallenge(i) {
 }
 function p2ValidateChallenge(code, result) {
   const ch = P2_CHALLENGES[p2ActiveIdx]; if (!ch) return
-  if (ch.check(code, result)) {
-    if (!p2Completed.has(p2ActiveIdx)) {
+  const passOk = ch.check(code, result)
+  const firstPass = passOk && !p2Completed.has(p2ActiveIdx)
+  // Always save the current code — pass or fail, and even after an earlier
+  // pass — so a draft (or further edits made after passing) is never lost.
+  // passed/xp are monotonic server-side, so this can't un-complete a stage.
+  LessonSaves.save('al-paper4', ch.mod, { passed: passOk, xpEarned: firstPass ? ch.xp : 0, code })
+  if (passOk) {
+    if (firstPass) {
       p2Completed.add(p2ActiveIdx); p2RenderPills()
       showToast('Challenge complete! +' + ch.xp + ' XP')
       if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'asp2-c' + p2ActiveIdx, { passed: true, score: 100 }) }
-      LessonSaves.save('al-paper4', ch.mod, { passed: true, xpEarned: ch.xp, code })
     }
     p2AppendOut('✓ Challenge passed! +' + ch.xp + ' XP', 'out-ok')
   }
@@ -9250,6 +9318,7 @@ function checkTheoryShort(evt, id) {
   const fb  = document.getElementById('tprac-fb-' + id)
   const ans = (inp?.value || '').toLowerCase()
   if (!ans.trim()) { if (fb) { fb.className='tprac-feedback partial'; fb.style.display='block'; fb.textContent='Write your answer first.' } return }
+  if (fb && typeof BFLang !== 'undefined' && BFLang.isForeign(inp.value)) { gradeForeignTheory(ex, inp.value, fb); return }
   const kws   = ex.keywords || []
   const vs = detectVsTerms(ex.title)
   const sideMap = vs ? buildVsSideMap(ex, vs) : null

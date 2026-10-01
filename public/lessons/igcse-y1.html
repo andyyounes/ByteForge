@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-no-lang-toggle>
 <head>
 <link rel="icon" href="/icon" type="image/png">
   <meta charset="UTF-8"/>
@@ -96,6 +96,7 @@
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
+  <script src="../js/lang.js"></script>
 </head>
 <body>
 
@@ -1492,20 +1493,66 @@ function checkAnswer() {
   const ans = getAnswer().trim()
   if (!ans) { document.getElementById('feedback').className = 'feedback err'; document.getElementById('feedback').textContent = 'Please type an answer first.'; return }
 
+  // An answer written in another language (Russian, ...) can't match the English
+  // keyword rules in ch.check(), so a WORDED answer is marked by the AI marker
+  // instead, which reads it in the student's language. Numbers/binary/hex/traces
+  // are language-independent and stay on ch.check().
+  if (typeof BFLang !== 'undefined' && BFLang.isForeign(ans) && ['theory', 'identify', 'fill', 'complete'].includes(ch.type)) {
+    checkForeignAnswer(ch, ans)
+    return
+  }
+
   if (ch.check(ans)) {
-    document.getElementById('feedback').className = 'feedback ok'
-    document.getElementById('feedback').textContent = '✓ Correct!'
-    if (!completed.has(activeIdx)) {
-      completed.add(activeIdx)
-      renderPills()
-      showToast('Challenge complete! +' + ch.xp + ' XP')
-      if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'gy1-c' + activeIdx, { passed: true, score: 100 }) }
-      LessonSaves.save('igcse-y1', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code: ans })
-      try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
-    }
+    passChallenge(ch, ans)
   } else {
     document.getElementById('feedback').className = 'feedback err'
     document.getElementById('feedback').textContent = '✗ Not quite — check the hint for guidance.'
+  }
+}
+
+function passChallenge(ch, ans) {
+  const idx = CHALLENGES.indexOf(ch)
+  // The AI marker answers asynchronously — only touch the feedback line if the
+  // student is still looking at this challenge.
+  if (CHALLENGES[activeIdx] === ch) {
+    document.getElementById('feedback').className = 'feedback ok'
+    document.getElementById('feedback').textContent = '✓ Correct!'
+  }
+  if (!completed.has(idx)) {
+    completed.add(idx)
+    renderPills()
+    showToast('Challenge complete! +' + ch.xp + ' XP')
+    if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'gy1-c' + idx, { passed: true, score: 100 }) }
+    LessonSaves.save('igcse-y1', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code: ans })
+    try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
+  }
+}
+
+async function checkForeignAnswer(ch, ans) {
+  const fb = document.getElementById('feedback')
+  const ru = BFLang.uiLang(ans) === 'ru'
+  fb.className = 'feedback'
+  fb.textContent = ru ? '⏳ Проверяю твой ответ…' : '⏳ Checking your answer…'
+  try {
+    const r = await BFLang.aiGrade({
+      question:    String(ch.text).replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(),
+      modelAnswer: 'Hints from the lesson (they point at the expected answer): ' + (ch.hints || []).join(' | '),
+      answer:      ans,
+    })
+    const stillHere = CHALLENGES[activeIdx] === ch
+    if (r.pass) {
+      passChallenge(ch, ans)
+      if (stillHere && r.feedback) fb.textContent = '✓ ' + r.feedback
+    } else if (stillHere) {
+      fb.className = 'feedback err'
+      fb.textContent = '✗ ' + (r.feedback || (ru ? 'Пока не совсем — посмотри подсказку.' : 'Not quite — check the hint for guidance.'))
+    }
+  } catch (e) {
+    if (CHALLENGES[activeIdx] !== ch) return
+    fb.className = 'feedback err'
+    fb.textContent = ru
+      ? 'Не удалось проверить ответ на этом языке прямо сейчас. Попробуй ещё раз через минуту или ответь по-английски.'
+      : 'Could not check an answer in this language right now — try again in a minute, or answer in English.'
   }
 }
 

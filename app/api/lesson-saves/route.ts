@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
   if (challengeId) {
     const { data: existingRow } = await supabase
       .from('lesson_saves')
-      .select('id, passed')
+      .select('id, passed, xp_earned')
       .eq('student_id', user.id)
       .eq('lesson_key', lesson)
       .eq('challenge_id', challengeId)
@@ -84,10 +84,15 @@ export async function POST(request: NextRequest) {
       lesson_key:    lesson,
       challenge_idx: null,
       challenge_id:  challengeId,
-      passed:        !!passed,
+      // `passed` is monotonic — a stage that was already passed must stay
+      // passed. This save call is also used for plain code-draft autosaves
+      // (passed left false, or the current unsolved state) so a student who
+      // reopens an already-completed stage and keeps tinkering doesn't
+      // silently un-complete it the next time they press Run.
+      passed:        !!passed || !!existingRow?.passed,
       code:          code   ?? null,
       save_data:     saveData ?? null,
-      xp_earned:     xpEarned ?? 0,
+      xp_earned:     Math.max(xpEarned ?? 0, existingRow?.xp_earned ?? 0),
       saved_at:      new Date().toISOString(),
     }
 
@@ -111,15 +116,17 @@ export async function POST(request: NextRequest) {
   // ── Legacy index-keyed path (workspace autosave, challenge_idx = -1, and
   // any caller that hasn't migrated to challengeId yet) ────────────────────
   let shouldAwardXp = false
-  if (passed && xpEarned > 0 && challengeIdx >= 0) {
-    const { data: existing } = await supabase
+  let existing: { passed: boolean; xp_earned: number } | null = null
+  if (challengeIdx >= 0) {
+    const { data } = await supabase
       .from('lesson_saves')
-      .select('passed')
+      .select('passed, xp_earned')
       .eq('student_id', user.id)
       .eq('lesson_key', lesson)
       .eq('challenge_idx', challengeIdx)
       .maybeSingle()
-    shouldAwardXp = !existing?.passed   // only award if not previously passed
+    existing = data
+    shouldAwardXp = !!passed && xpEarned > 0 && !existing?.passed   // only award if not previously passed
   }
 
   const { error: upsertError } = await supabase
@@ -129,10 +136,12 @@ export async function POST(request: NextRequest) {
         student_id:    user.id,
         lesson_key:    lesson,
         challenge_idx: challengeIdx,
-        passed:        !!passed,
+        // Same monotonic rule as the id-keyed path above — a code-draft
+        // autosave on an already-passed challenge must not un-complete it.
+        passed:        !!passed || !!existing?.passed,
         code:          code   ?? null,
         save_data:     saveData ?? null,
-        xp_earned:     xpEarned ?? 0,
+        xp_earned:     Math.max(xpEarned ?? 0, existing?.xp_earned ?? 0),
         saved_at:      new Date().toISOString(),
       },
       { onConflict: 'student_id,lesson_key,challenge_idx' }

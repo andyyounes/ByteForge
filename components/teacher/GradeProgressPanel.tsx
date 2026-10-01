@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
 
 /**
  * Teacher view into per-student progress for Grade 6, 7, or 8 — the same
@@ -9,12 +9,15 @@ import { useState, useEffect, useCallback } from 'react'
  * curriculum, so this can never silently drift out of sync with it.
  */
 
+interface ModuleProgress { id: string; name: string; done: number; total: number }
+
 interface StudentProgress {
   studentId:     string
   name:          string
   stagesPassed:  number
   stagesTotal:   number
   currentModule: string | null
+  modules:       ModuleProgress[]
   lastStageName: string | null
   lastActive:    string | null
 }
@@ -37,6 +40,7 @@ function timeAgo(iso: string): string {
 export function GradeProgressPanel({ classId, grade }: { classId: string; grade: 'grade6' | 'grade7' | 'grade8' }) {
   const [students, setStudents] = useState<StudentProgress[] | null>(null)
   const [error,    setError]    = useState('')
+  const [open,     setOpen]     = useState<string | null>(null)   // student whose chapters are expanded
 
   const load = useCallback(async () => {
     try {
@@ -70,6 +74,7 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
             <tr className="text-left text-t3 border-b border-b2">
               <th className="py-2 pr-3 font-medium">Student</th>
               <th className="py-2 pr-3 font-medium">Progress</th>
+              <th className="py-2 pr-3 font-medium">Chapters done</th>
               <th className="py-2 pr-3 font-medium">Current module</th>
               <th className="py-2 pr-3 font-medium">Last stage</th>
               <th className="py-2 pr-3 font-medium">Last activity</th>
@@ -78,9 +83,16 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
           <tbody>
             {students.map(s => {
               const pct = s.stagesTotal > 0 ? Math.round((s.stagesPassed / s.stagesTotal) * 100) : 0
+              const finished = (s.modules ?? []).filter(m => m.total > 0 && m.done >= m.total).length
+              const isOpen = open === s.studentId
               return (
-                <tr key={s.studentId} className="border-b border-b2/60">
-                  <td className="py-2 pr-3 font-medium text-fg">{s.name}</td>
+                <Fragment key={s.studentId}>
+                <tr className="border-b border-b2/60">
+                  <td className="py-2 pr-3 font-medium text-fg">
+                    <button onClick={() => setOpen(isOpen ? null : s.studentId)} className="flex items-center gap-1.5 hover:text-accent transition-colors text-left" aria-expanded={isOpen}>
+                      <span className="text-t3 text-[10px]">{isOpen ? '▾' : '▸'}</span>{s.name}
+                    </button>
+                  </td>
                   <td className="py-2 pr-3">
                     <div className="flex items-center gap-2">
                       <div className="w-24 h-1.5 rounded-full bg-s2 overflow-hidden">
@@ -89,12 +101,34 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                       <span className="text-t2 tabular-nums">{s.stagesPassed}/{s.stagesTotal}</span>
                     </div>
                   </td>
+                  <td className="py-2 pr-3 text-t2 tabular-nums">{finished}/{(s.modules ?? []).length}</td>
                   <td className="py-2 pr-3 text-t2">
                     {s.currentModule ?? <span className="text-emerald font-semibold">🏆 complete</span>}
                   </td>
                   <td className="py-2 pr-3 text-t2">{s.lastStageName ?? '—'}</td>
                   <td className="py-2 pr-3 text-t3">{s.lastActive ? timeAgo(s.lastActive) : '—'}</td>
                 </tr>
+                {isOpen && (
+                  <tr className="border-b border-b2/60 bg-s2/40">
+                    <td colSpan={6} className="py-3 px-3">
+                      <div className="grid gap-1.5 sm:grid-cols-2">
+                        {(s.modules ?? []).map(m => {
+                          const complete = m.total > 0 && m.done >= m.total
+                          const started  = m.done > 0
+                          return (
+                            <div key={m.id} className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-md bg-s1 border border-b2">
+                              <span className="truncate text-t2">{m.name}</span>
+                              <span className={`shrink-0 tabular-nums font-semibold ${complete ? 'text-emerald' : started ? 'text-amber-400' : 'text-t3'}`}>
+                                {complete ? '✓ done' : started ? `${m.done}/${m.total}` : 'not started'}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               )
             })}
           </tbody>

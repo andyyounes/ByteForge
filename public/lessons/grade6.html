@@ -174,6 +174,8 @@
 <script src="../js/auth.js"></script>
 <script src="../js/lesson-saves.js"></script>
 <script src="../js/quest-map.js"></script>
+<script src="../js/lang.js"></script>
+<script src="grade6-ru.js"></script>
 </head>
 <body>
 
@@ -2155,19 +2157,24 @@ function loadGameRules() {
   const cfg = activeStage.gamerules || {}
   const wrap = document.getElementById('game-rules')
   wrap.innerHTML = ''
+  // EN / РУ: only the visible words change. Each <option value> stays the
+  // original English choice, so gameRulesCheck() grades identically either way.
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+  const tr = (ru && typeof G6_RU !== 'undefined' && G6_RU.gamerules[activeStage.id]) || null
   ;(cfg.rules || []).forEach((rule, i) => {
-    const [before, after] = rule.template.split('___')
+    const t = tr && tr[i]
+    const [before, after] = (t ? t[0] : rule.template).split('___')
     const row = document.createElement('div')
     row.style.cssText = 'font-size:13px;color:#e5e7eb;line-height:1.6;'
     const select = document.createElement('select')
     select.id = `gr-${i}`
     select.style.cssText = 'background:#0c0f1a;color:#4ade80;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:4px 8px;font-size:13px;font-weight:700;margin:0 4px;'
     const blank = document.createElement('option')
-    blank.value = ''; blank.textContent = '— choose —'
+    blank.value = ''; blank.textContent = ru ? '— выбери —' : '— choose —'
     select.appendChild(blank)
-    rule.choices.forEach(c => {
+    rule.choices.forEach((c, j) => {
       const opt = document.createElement('option')
-      opt.value = c; opt.textContent = c
+      opt.value = c; opt.textContent = (t && t[1] && t[1][j]) || c
       select.appendChild(opt)
     })
     row.append(document.createTextNode(before))
@@ -2176,6 +2183,16 @@ function loadGameRules() {
     wrap.appendChild(row)
   })
   document.getElementById('game-feedback').textContent = ''
+}
+// Switching language mid-stage re-draws the rules but keeps what was already picked.
+if (typeof BFLang !== 'undefined') {
+  BFLang.onChange(() => {
+    if (!activeStage || activeStage.type !== 'gamerules') return
+    const kept = {}
+    document.querySelectorAll('#game-rules select').forEach(s => { kept[s.id] = s.value })
+    loadGameRules()
+    Object.keys(kept).forEach(id => { const el = document.getElementById(id); if (el) el.value = kept[id] })
+  })
 }
 
 function gameRulesCheck() {
@@ -2189,11 +2206,11 @@ function gameRulesCheck() {
   })
   if (wrong === 0) {
     fb.style.color = '#4ade80'
-    fb.textContent = '✅ Solid game design!'
+    fb.textContent = (typeof BFLang !== 'undefined' && BFLang.get() === 'ru') ? '✅ Отличный дизайн игры!' : '✅ Solid game design!'
     completeStage(3)
   } else {
     fb.style.color = '#fbbf24'
-    fb.textContent = `🌡️ ${wrong} rule(s) still need fixing.`
+    fb.textContent = (typeof BFLang !== 'undefined' && BFLang.get() === 'ru') ? `🌡️ Нужно исправить правил: ${wrong}.` : `🌡️ ${wrong} rule(s) still need fixing.`
   }
 }
 

@@ -7,8 +7,15 @@
  *   title, subtitle, accent,          // accent = CSS color for the theme
  *   freeRoam,                         // true = nothing locks (AS/A Level)
  *   avatarSvg,                        // optional — marks the current stage
- *   worlds: [{ name, sub, live, count?, stages?: [{ id, emoji, label, done, boss }] }],
+ *   worlds: [{ name, sub, live, count?, stages?: [{ id, emoji, label, done, boss, isNew }] }],
  *   onOpen(stageId),                  // stage clicked (map hides itself first)
+ *   newSeenKey,                       // localStorage key for "which isNew stages has
+ *                                     // this student already opened" — a stage glows
+ *                                     // and shows a ✨ NEW badge only while isNew:true
+ *                                     // AND its id isn't in that seen-set yet; opening
+ *                                     // it (via _open) marks it seen permanently, same
+ *                                     // idea as an unread-until-clicked notification.
+ *                                     // Omit to disable the new-lesson highlight entirely.
  * })
  * QuestMap.hide() / QuestMap.refresh()
  */
@@ -96,6 +103,38 @@ const QuestMap = (() => {
                        background:linear-gradient(145deg,#78350f,#b45309) !important; }
       .qm-rusty-tag { position:absolute; top:-10px; right:-10px; font-size:14px;
                       filter:drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
+      /* ── "What's new" highlight — a genuinely different color from done/current/
+         boss, so a freshly-added lesson reads as "new", not "already in progress". */
+      .qm-node.new:not(.done) { border-color:#2dd4bf; background:linear-gradient(145deg,#0f766e,#2dd4bf);
+                                 box-shadow:0 0 14px rgba(45,212,191,.55), inset 0 -4px 8px rgba(0,0,0,.25);
+                                 animation:qmNewGlow 1.8s ease-in-out infinite; }
+      @keyframes qmNewGlow { 0%,100%{box-shadow:0 0 8px rgba(45,212,191,.4)} 50%{box-shadow:0 0 20px rgba(45,212,191,.85)} }
+      .qm-new-badge { position:absolute; top:-9px; right:-9px; font-size:8px; font-weight:900; letter-spacing:.3px;
+                      color:#04211d; background:#2dd4bf; border-radius:99px; padding:2px 6px;
+                      box-shadow:0 1px 4px rgba(0,0,0,.4); white-space:nowrap; }
+      .qm-new-pill { margin-top:6px; font-size:9px; font-weight:900; letter-spacing:1px; color:#04211d;
+                     background:#2dd4bf; border-radius:99px; padding:3px 11px; white-space:nowrap; }
+      .qm-wname .qm-wnew-tag { font-size:9px; font-weight:900; letter-spacing:.3px; color:#04211d;
+                                background:#2dd4bf; border-radius:99px; padding:2px 7px; margin-left:6px;
+                                vertical-align:2px; }
+      .qm-new-banner { max-width:560px; margin:16px auto 0; padding:11px 18px; text-align:center;
+        background:linear-gradient(135deg, rgba(45,212,191,.14), rgba(96,165,250,.1));
+        border:1px solid rgba(45,212,191,.4); border-radius:14px; font-size:13px; color:#99f6e4; line-height:1.5; }
+      /* ── "Continue" — a single unmissable button pointing straight at
+         whatever the student should do next, so they don't have to scan a
+         long winding path (or scroll) to work out where they left off. */
+      .qm-continue-btn { display:flex; align-items:center; gap:12px; width:100%; max-width:400px;
+        margin:4px auto 22px; padding:12px 16px; border-radius:16px; border:1px solid rgba(255,255,255,.14);
+        background:linear-gradient(135deg, var(--qm-accent,#e879f9), #60a5fa); color:#0d0f1a; cursor:pointer;
+        font-family:inherit; text-align:left; box-shadow:0 8px 24px rgba(232,121,249,.3); }
+      .qm-continue-btn:hover { transform:translateY(-1px); box-shadow:0 10px 28px rgba(232,121,249,.45); }
+      .qm-continue-emoji { font-size:24px; flex-shrink:0; width:40px; height:40px; border-radius:50%;
+        background:rgba(13,15,26,.18); display:flex; align-items:center; justify-content:center; }
+      .qm-continue-text { flex:1; min-width:0; display:flex; flex-direction:column; }
+      .qm-continue-eyebrow { font-size:10px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; opacity:.75; }
+      .qm-continue-name { font-size:13.5px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .qm-continue-arrow { font-size:20px; font-weight:900; flex-shrink:0; animation:qmArrowNudge 1.4s ease-in-out infinite; }
+      @keyframes qmArrowNudge { 0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)} }
     `
     const el = document.createElement('style')
     el.textContent = css
@@ -103,6 +142,25 @@ const QuestMap = (() => {
   }
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;') }
+
+  // "New lesson" highlight persistence — a stage glows until the student opens
+  // it once, then it's remembered as seen forever (localStorage, per newSeenKey).
+  function seenSet() {
+    if (!cfg || !cfg.newSeenKey) return null
+    try { return new Set(JSON.parse(localStorage.getItem(cfg.newSeenKey) || '[]')) } catch (_) { return new Set() }
+  }
+  function isGlowingNew(s) {
+    if (!s.isNew || !cfg.newSeenKey || s.done) return false
+    const seen = seenSet()
+    return !(seen && seen.has(s.id))
+  }
+  function markSeen(id) {
+    if (!cfg || !cfg.newSeenKey) return
+    const seen = seenSet() || new Set()
+    if (seen.has(id)) return
+    seen.add(id)
+    try { localStorage.setItem(cfg.newSeenKey, JSON.stringify([...seen])) } catch (_) {}
+  }
 
   function render() {
     ensureStyles()
@@ -114,10 +172,11 @@ const QuestMap = (() => {
     }
     document.documentElement.style.setProperty('--qm-accent', cfg.accent || '#e879f9')
 
-    let total = 0, done = 0
+    let total = 0, done = 0, newCount = 0
     for (const w of cfg.worlds) if (w.live && w.stages) {
       total += w.stages.length
       done += w.stages.filter(s => s.done).length
+      newCount += w.stages.filter(isGlowingNew).length
     }
 
     let html = '<div class="qm-hero">'
@@ -134,6 +193,9 @@ const QuestMap = (() => {
     if (total > 0 && done === total) {
       html += '<div class="qm-complete-banner">🎉 <b>You\'ve completed every stage!</b> '
         + 'Keep revisiting any of them for extra practice, or check with your teacher about what\'s next.</div>'
+    } else if (newCount > 0) {
+      html += '<div class="qm-new-banner">✨ <b>' + newCount + ' new lesson' + (newCount === 1 ? '' : 's') + ' added!</b> '
+        + 'Look for the teal glowing ' + (newCount === 1 ? 'stage' : 'stages') + ' below.</div>'
     }
 
     if (cfg.layout === 'path') {
@@ -157,11 +219,13 @@ const QuestMap = (() => {
       }
       const wDone = w.stages.filter(s => s.done).length
       const allDone = wDone === w.stages.length
+      const wNewCount = w.stages.filter(isGlowingNew).length
       // Clicking the chapter header opens its first unfinished stage
       const firstOpen = (w.stages.find(s => !s.done) || w.stages[0])
       html += '<div class="qm-world"><div class="qm-whead" style="cursor:pointer"'
         + (firstOpen ? ' onclick="QuestMap._open(\'' + esc(firstOpen.id) + '\')"' : '') + '><div>'
-        + '<div class="qm-wname">' + w.name + ' <span style="font-size:11px;color:#6b7280;font-weight:600;">→ open</span></div>'
+        + '<div class="qm-wname">' + w.name + ' <span style="font-size:11px;color:#6b7280;font-weight:600;">→ open</span>'
+        + (wNewCount ? '<span class="qm-wnew-tag">✨ NEW</span>' : '') + '</div>'
         + '<div class="qm-wsub">' + esc(w.sub || '') + '</div></div>'
         + '<div class="qm-wprog">' + (allDone ? '🏆 COMPLETE' : wDone + '/' + w.stages.length) + '</div></div>'
         + '<div class="qm-stages">'
@@ -169,12 +233,14 @@ const QuestMap = (() => {
         const unlocked = cfg.freeRoam || (prevWorldDone && (i === 0 || w.stages[i - 1].done || s.done))
         const isCurrent = !cfg.freeRoam && unlocked && !s.done && !foundCurrent
         if (isCurrent) foundCurrent = true
+        const glowNew = unlocked && isGlowingNew(s)
         const cls = 'qm-node' + (s.boss ? ' boss' : '') + (s.done ? ' done' : '')
-          + (isCurrent ? ' current' : '') + (unlocked ? '' : ' locked')
+          + (isCurrent ? ' current' : '') + (glowNew ? ' new' : '') + (unlocked ? '' : ' locked')
         html += (i > 0 ? '<span class="qm-arrow">›</span>' : '')
           + '<div class="' + cls + '"' + (unlocked ? ' onclick="QuestMap._open(\'' + esc(s.id) + '\')"' : '')
-          + ' title="' + esc(s.label) + '">'
+          + ' title="' + esc(glowNew ? '✨ New! ' + s.label : s.label) + '">'
           + (isCurrent && cfg.avatarSvg ? '<span class="qm-avatar">' + cfg.avatarSvg + '</span>' : '')
+          + (glowNew ? '<span class="qm-new-badge">NEW</span>' : '')
           + '<span class="qm-emoji">' + (unlocked ? (s.emoji || '📘') : '🔒') + '</span>'
           + '<span class="qm-label">' + esc(s.label) + '</span>'
           + (s.stars ? '<span class="qm-done-mark" style="letter-spacing:-1px">' + '⭐'.repeat(s.stars) + '</span>'
@@ -223,21 +289,45 @@ const QuestMap = (() => {
         flatIdx++
       }
     }
-    let currentIdx = -1, scanIdx = 0
+    let currentIdx = -1, scanIdx = 0, currentStage = null
     for (const w of cfg.worlds) {
       if (!w.live || !w.stages) continue
       for (const s of w.stages) {
-        if (isRealStage(s) && !s.done && scanIdx > maxDoneIdx && currentIdx === -1) currentIdx = scanIdx
+        if (isRealStage(s) && !s.done && scanIdx > maxDoneIdx && currentIdx === -1) { currentIdx = scanIdx; currentStage = s }
         scanIdx++
       }
     }
-    if (currentIdx === -1) currentIdx = firstIncompleteIdx
+    if (currentIdx === -1) {
+      currentIdx = firstIncompleteIdx
+      if (currentIdx !== -1) {
+        let fi = 0
+        find: for (const w of cfg.worlds) {
+          if (!w.live || !w.stages) continue
+          for (const s of w.stages) {
+            if (fi === currentIdx) { currentStage = s; break find }
+            fi++
+          }
+        }
+      }
+    }
+    // One unmissable "Continue" button at the very top, so a student doesn't
+    // have to scan or scroll a long winding path to find where they left off.
+    if (currentStage) {
+      html += '<button class="qm-continue-btn" onclick="QuestMap._open(\'' + esc(currentStage.id) + '\')">'
+        + '<span class="qm-continue-emoji">' + (currentStage.emoji || '📘') + '</span>'
+        + '<span class="qm-continue-text"><span class="qm-continue-eyebrow">Continue</span>'
+        + '<span class="qm-continue-name">' + esc(currentStage.label) + '</span></span>'
+        + '<span class="qm-continue-arrow">→</span>'
+        + '</button>'
+    }
     let k = 0
     let idx = 0
     for (const w of cfg.worlds) {
       const wDone = w.stages ? w.stages.filter(s => s.done).length : 0
       const allDone = w.stages && wDone === w.stages.length
-      html += '<div class="qm-banner"><div><div class="qm-wname">' + w.name + '</div>'
+      const wNewCount = w.stages ? w.stages.filter(isGlowingNew).length : 0
+      html += '<div class="qm-banner"><div><div class="qm-wname">' + w.name
+        + (wNewCount ? '<span class="qm-wnew-tag">✨ NEW</span>' : '') + '</div>'
         + '<div class="qm-wsub">' + esc(w.sub || '') + '</div></div>'
         + '<div class="qm-wprog">' + (w.live ? (allDone ? '🏆 COMPLETE' : wDone + '/' + w.stages.length) : '🔒 soon') + '</div></div>'
       if (!w.live) continue
@@ -258,19 +348,21 @@ const QuestMap = (() => {
         // is done — no onclick attached at all, shown with a 🔒 instead of
         // its real emoji, exactly like the grid layout already enforces.
         const hardLocked = cfg.hardLock && soon
+        const glowNew = !hardLocked && isGlowingNew(s)
         const cls = 'qm-node' + (s.boss ? ' boss' : '') + (s.cp ? ' cp' : '') + (s.done ? ' done' : '')
-          + (isCurrent ? ' current' : '') + (soon ? ' soon' : '') + (hardLocked ? ' locked' : '') + (s.rusty ? ' rusty' : '')
+          + (isCurrent ? ' current' : '') + (soon ? ' soon' : '') + (hardLocked ? ' locked' : '') + (s.rusty ? ' rusty' : '') + (glowNew ? ' new' : '')
         html += '<div class="qm-pwrap" style="transform:translateX(' + OFF[k % OFF.length] + 'px)">'
-          + '<div class="' + cls + '"' + (hardLocked ? '' : ' onclick="QuestMap._open(\'' + esc(s.id) + '\')"') + ' title="' + esc(hardLocked ? 'Complete earlier stages first' : s.label) + '">'
+          + '<div class="' + cls + '"' + (hardLocked ? '' : ' onclick="QuestMap._open(\'' + esc(s.id) + '\')"') + ' title="' + esc(hardLocked ? 'Complete earlier stages first' : (glowNew ? '✨ New! ' + s.label : s.label)) + '">'
           + (isCurrent && cfg.avatarSvg ? '<span class="qm-avatar">' + cfg.avatarSvg + '</span>' : '')
           + (s.rusty ? '<span class="qm-rusty-tag">🩹</span>' : '')
+          + (glowNew ? '<span class="qm-new-badge">NEW</span>' : '')
           + '<span class="qm-emoji">' + (hardLocked ? '🔒' : (s.emoji || '📘')) + '</span>'
           + (s.done ? '<span class="qm-done-mark">' + (s.stars ? '⭐'.repeat(s.stars) : (s.boss ? '🏆' : '⭐')) + '</span>' : '')
           + '</div>'
           + '<div class="qm-plabel">' + esc(s.label)
           + (s.rusty ? '<div class="qm-pstars" style="color:#f59e0b">rusty — re-fight the boss!</div>'
              : s.stars && !s.done ? '<div class="qm-pstars">' + '⭐'.repeat(s.stars) + '</div>' : '') + '</div>'
-          + (isCurrent ? '<div class="qm-next-pill">▶ NEXT UP</div>' : '')
+          + (isCurrent ? '<div class="qm-next-pill">▶ NEXT UP</div>' : (glowNew ? '<div class="qm-new-pill">✨ NEW</div>' : ''))
           + '</div>'
         k++
       }
@@ -288,6 +380,7 @@ const QuestMap = (() => {
     },
     _open(id) {
       const cb = cfg && cfg.onOpen
+      markSeen(id)
       QuestMap.hide()
       if (cb) cb(id)
     },
