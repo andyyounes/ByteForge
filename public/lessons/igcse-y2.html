@@ -112,6 +112,7 @@
   <script src="../js/auth.js"></script>
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
+  <script src="../js/lang.js"></script>
 </head>
 <body>
 
@@ -1791,6 +1792,17 @@ function resetStarter(){
 }
 function validateChallenge(code,result){
   const ch=CHALLENGES[activeIdx];if(!ch)return
+  // A "fill" challenge's check() is just a plain-English keyword regex over
+  // whatever the student typed — it can never match a worded Russian answer.
+  // Route a foreign-language fill answer to the AI marker instead, which
+  // reads it in the student's language (same idea as igcse-y1.html's
+  // checkAnswer()). Interp.run() itself already tolerates non-pseudocode
+  // text in the editor (logs "Unrecognised statement", doesn't throw), so
+  // this only changes how the RESULT is judged, not whether code runs.
+  if (ch.type === 'fill' && typeof BFLang !== 'undefined' && BFLang.isForeign(code)) {
+    checkForeignFillAnswer(ch, code)
+    return
+  }
   const passOk = ch.check(code,result)
   const firstPass = passOk && !completed.has(activeIdx)
   // Always save the current code — pass or fail, and even after an earlier
@@ -1801,6 +1813,37 @@ function validateChallenge(code,result){
     completed.add(activeIdx);renderPills();showToast('Challenge complete! +'+ch.xp+' XP')
     if(me){BF.addXP(me.id,ch.xp);BF.recordAttempt(me.id,'gy2-c'+activeIdx,{passed:true,score:100})}
     try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
+  }
+}
+async function checkForeignFillAnswer(ch, ans) {
+  const ru = BFLang.uiLang(ans) === 'ru'
+  appendOut(ru ? '⏳ Проверяю твой ответ…' : '⏳ Checking your answer…', 'out')
+  LessonSaves.save('igcse-y2', ch.mod + '/' + ch.name, {passed:false,xpEarned:0,code:ans})
+  try {
+    const r = await BFLang.aiGrade({
+      question:    String(ch.text).replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(),
+      modelAnswer: 'Hints from the lesson (they point at the expected answer): ' + (ch.hints || []).join(' | '),
+      answer:      ans,
+    })
+    if (CHALLENGES[activeIdx] !== ch) return
+    const idx = CHALLENGES.indexOf(ch)
+    const firstPass = r.pass && !completed.has(idx)
+    LessonSaves.save('igcse-y2', ch.mod + '/' + ch.name, {passed:r.pass,xpEarned:firstPass?ch.xp:0,code:ans})
+    if (r.pass) {
+      appendOut((r.feedback ? '✓ ' + r.feedback : '✓ Correct!'), 'out-ok')
+      if (firstPass) {
+        completed.add(idx);renderPills();showToast('Challenge complete! +'+ch.xp+' XP')
+        if(me){BF.addXP(me.id,ch.xp);BF.recordAttempt(me.id,'gy2-c'+idx,{passed:true,score:100})}
+        try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
+      }
+    } else {
+      appendOut('✗ ' + (r.feedback || (ru ? 'Пока не совсем — посмотри подсказку.' : 'Not quite — check the hint for guidance.')), 'out-err')
+    }
+  } catch (e) {
+    if (CHALLENGES[activeIdx] !== ch) return
+    appendOut(ru
+      ? 'Не удалось проверить ответ на этом языке прямо сейчас. Попробуй ещё раз через минуту или ответь по-английски.'
+      : 'Could not check that answer right now — try again in a minute, or answer in English.', 'out-err')
   }
 }
 function showHint(){

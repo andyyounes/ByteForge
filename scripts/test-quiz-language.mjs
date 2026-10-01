@@ -322,6 +322,48 @@ function fakeAI(content, calls = []) {
     ok(!off.done.has(0) && /Could not check|Не удалось/.test(off.fbEl.textContent), 'igcse-y1 theory: if the marker is unreachable the student gets a clear message, not a false pass')
   }
 
+  // ── IGCSE Y2: "fill" challenges run through the pseudocode editor+interpreter,
+  // not a dedicated text box — the AI-marker fallback has to key off ch.type and
+  // the raw editor code, not a separate getAnswer()/getIdx() pair like Y1's. ──
+  const y2 = readFileSync(ROOT + '/lessons/igcse-y2.html', 'utf8')
+  const h0y2 = y2.indexOf('const CHALLENGES='), hmy2 = y2.slice(h0y2).match(/\r?\nconst CHALLENGE_LESSON|\r?\nfunction /)
+  const { CHALLENGES: Y2 } = new Function(y2.slice(h0y2, h0y2 + hmy2.index) + '\nreturn { CHALLENGES }')()
+  const y2fnSrc = y2.slice(y2.indexOf('function validateChallenge(code,result){'), y2.indexOf('function showHint(){'))
+  function y2run(ch, code, mockContent) {
+    const outEl = { innerHTML: '', innerText: '' }
+    const appendOut = (text) => { outEl.innerText += text + '\n' }
+    const done = new Set(), calls = []
+    const lang = loadLang('ru', fakeAI(mockContent, calls))
+    const f = new Function('document', 'BFLang', 'CHALLENGES', 'activeIdx', 'completed', 'renderPills', 'showToast', 'me', 'BF', 'LessonSaves', 'reportRealProgress', 'challengeStartedAt', 'appendOut',
+      y2fnSrc + '\nreturn { validateChallenge }')(
+      { getElementById: () => outEl }, lang, [ch], 0, done, () => {}, () => {}, null, null, { save() {} }, () => {}, 0, appendOut)
+    return { rt: f, outEl, done, calls }
+  }
+  const fillCh = Y2.find(c => c.type === 'fill')
+  {
+    const good = y2run(fillCh, 'индекс массива', '{"score":90,"feedback":"Верно!"}')
+    good.rt.validateChallenge('индекс массива', null); await new Promise(r => setTimeout(r, 10))
+    ok(good.calls.length === 1 && good.done.has(0), 'igcse-y2 fill: a Russian answer typed in the editor is marked by the AI and a good one completes the challenge')
+    const bad = y2run(fillCh, 'банан', '{"score":5,"feedback":"Нет."}')
+    bad.rt.validateChallenge('банан', null); await new Promise(r => setTimeout(r, 10))
+    ok(bad.calls.length === 1 && !bad.done.has(0) && /✗/.test(bad.outEl.innerText), 'igcse-y2 fill: a wrong Russian answer is rejected')
+    const en = y2run(fillCh, 'index', '{"score":100,"feedback":"x"}')
+    en.rt.validateChallenge('index', null); await new Promise(r => setTimeout(r, 10))
+    ok(en.calls.length === 0 && en.done.has(0), 'igcse-y2 fill: an English answer still passes via the original keyword check, never calling the AI')
+    const off = y2run(fillCh, 'индекс массива', () => { throw new Error('x') })
+    off.rt.validateChallenge('индекс массива', null); await new Promise(r => setTimeout(r, 10))
+    ok(!off.done.has(0) && /Could not check|Не удалось/.test(off.outEl.innerText), 'igcse-y2 fill: if the marker is unreachable the student gets a clear message, not a false pass')
+  }
+  {
+    // A real pseudocode-writing challenge (not type:'fill') must NEVER be routed
+    // to the AI marker, even if the student's code happens to contain Cyrillic
+    // (e.g. inside a string literal or comment) — code correctness stays code-checked.
+    const codeCh = Y2.find(c => c.type !== 'fill' && c.type !== 'lesson')
+    const r = y2run(codeCh, '// комментарий на русском\nOUTPUT 1', 'should never be called')
+    r.rt.validateChallenge('// комментарий на русском\nOUTPUT 1', { output: ['wrong'] })
+    ok(r.calls.length === 0, 'igcse-y2 non-fill: a real code challenge is never routed to the AI marker, even with Cyrillic in it')
+  }
+
   // ── AS / A Level: THEORY_EXERCISES short answers ──
   for (const page of ['as-level', 'a-level']) {
     const html = readFileSync(ROOT + `/lessons/${page}.html`, 'utf8')
