@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.6-4.8 Standards, OSI/TCP-IP &amp; IP Addressing — Grade 9 Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .org-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .org-grid { grid-template-columns: 1fr; } }
+  .org-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .org-card h4 { font-size: 12px; color: #22d3ee; margin: 0 0 4px; }
+  .org-card p { font-size: 11.5px; color: #9ca3af; line-height: 1.5; margin: 0; }
+  .db-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 10px; text-align: left; vertical-align: top; }
+  .db-table th { background: rgba(34,211,238,.1); color: #22d3ee; font-size: 10px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; font-size: 12px; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">Grade 9 · Unit 4 · Data Communication &amp; Networks</span>
+  <div class="topic-title">4.6-4.8 Standard Organizations, the OSI &amp; TCP/IP Models, and IP Addressing</div>
+  <div class="topic-subtitle">Five standards bodies, seven OSI layers mapped to four TCP/IP layers, and what an IPv4 address actually is.</div>
+
+  <div class="section-label">Theory — Five Standard Organizations</div>
+  <div class="org-grid">
+    <div class="org-card"><h4>ISO</h4><p>International Organization for Standardization — covers a wide range of fields; endorses/coordinates other standards bodies.</p></div>
+    <div class="org-card"><h4>IEEE</h4><p>Institute of Electrical and Electronic Engineering — non-profit; develops communication/info-processing standards for electrical/computer engineering.</p></div>
+    <div class="org-card"><h4>IETF</h4><p>International Engineering Task Force — network designers/operators concerned with internet architecture and smooth operation.</p></div>
+    <div class="org-card"><h4>ITU</h4><p>International Telecommunication Union — resolves issues concerning information/communication technologies.</p></div>
+    <div class="org-card"><h4>ANSI</h4><p>American National Standards Institute — the official (private, non-profit) standards agency for the United States.</p></div>
+  </div>
+
+  <div class="section-label">Theory — The OSI Model (7 Layers)</div>
+  <p style="font-size:12.5px;color:#9ca3af;margin-top:-4px;margin-bottom:12px;">A conceptual model from ISO standardizing how communication happens, divided into 7 layers (from top to bottom):</p>
+  <table class="db-table">
+    <tr><th>#</th><th>Layer</th><th>What it does</th></tr>
+    <tr><td>7</td><td>Application</td><td>Lets users access the network via apps like email/file transfer; produces the data.</td></tr>
+    <tr><td>6</td><td>Presentation</td><td>Converts data to a uniform format (ASCII/Unicode); handles encryption/decryption and compression.</td></tr>
+    <tr><td>5</td><td>Session</td><td>Establishes, maintains, and ends a session between two applications; adds checkpoints.</td></tr>
+    <tr><td>4</td><td>Transport</td><td>Ensures reliable delivery — error control, flow control, requests resend if needed.</td></tr>
+    <tr><td>3</td><td>Network</td><td>Selects the shortest/suitable path; converts logical (IP) address to physical (MAC) address.</td></tr>
+    <tr><td>2</td><td>Data Link</td><td>Transmits data using physical addresses; ensures error-free transmission (unit = "Frame").</td></tr>
+    <tr><td>1</td><td>Physical</td><td>Converts electrical signals to bits; defines cable types, cards, topology.</td></tr>
+  </table>
+
+  <div class="theory-block">
+    <h4>The TCP/IP Model (4 Layers)</h4>
+    <ul>
+      <li>TCP/IP is a suite of protocols that interconnects network devices on the internet — defines how data is broken into packets, addressed, transmitted, routed, and received.</li>
+      <li><b>Application Layer</b> (= OSI's Application+Presentation+Session) — uses protocols like HTTP/FTP; encodes/decodes data.</li>
+      <li><b>Transport Layer</b> (= OSI's Transport) — uses TCP/UDP; establishes a logical connection, ensures reliable delivery.</li>
+      <li><b>Internet Layer</b> (= OSI's Network) — handles packet forwarding via the physical path.</li>
+      <li><b>Network Access Layer</b> (= OSI's Data Link+Physical) — uses logical addressing to decide how data crosses different network paths.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Theory — Network Addressing &amp; IPv4</div>
+  <div class="theory-block">
+    <h4>Physical Address vs. Logical Address</h4>
+    <ul>
+      <li><b>Physical (MAC) Address</b> — attached to the NIC's ROM by the manufacturer; 48 bits; CANNOT be changed; globally unique and permanent.</li>
+      <li><b>Logical (IP) Address</b> — assigned by an ISP or network administrator; 32 bits; CAN be changed; unique only within one network, and temporary.</li>
+    </ul>
+  </div>
+  <div class="theory-block">
+    <h4>IPv4 Address</h4>
+    <ul>
+      <li>A unique number identifying a device (computer, printer, phone, etc.) on a network — every internet-connected device needs one to communicate.</li>
+      <li>Made of 32 binary bits, split into a <b>network</b> portion (identifies the network) and a <b>host</b> portion (identifies the specific device).</li>
+      <li>Written as four number segments separated by dots — e.g. <code>192.168.108.105</code>.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what this subsection taught — standards organizations, OSI/TCP-IP, and IP addressing.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which OSI layer is responsible for converting a logical IP address into a physical MAC address?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The Network layer (layer 3).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the key difference between a Physical (MAC) Address and a Logical (IP) Address?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A MAC address is fixed to the NIC by the manufacturer, 48 bits, and can never change. An IP address is assigned by an ISP/administrator, 32 bits, and can be changed.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">An IPv4 address is made up of ______ binary bits, split into a network portion and a host portion.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>32.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">A student says the TCP/IP model has 7 layers, same as OSI. What's wrong?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>TCP/IP has only 4 layers (Application, Transport, Internet, Network Access) — several OSI layers are combined into one TCP/IP layer each.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">A video call keeps freezing because data packets arrive scrambled and need re-requesting. Which OSI layer is most directly responsible for fixing this kind of reliability issue?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The Transport layer — it handles error control, flow control, and requests a resend if data isn't properly transmitted.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Which standards organization is specifically the official standards agency for the United States?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>ANSI (American National Standards Institute).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — Grade 9 — Unit 4: Data Communication &amp; Networks — 4.6-4.8 Standards, OSI/TCP-IP &amp; IP Addressing<br>
+    Adapted from: The Textbook of Computer Science for Grade 9 (Sindh Textbook Board, Jamshoro) — Unit 4
+  </div>
+
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var classId = params.get('classId');
+  if (!classId) return;
+  var file = location.pathname.split('/').pop();
+  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=grade9-book')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.overrides)) return;
+      var row = data.overrides.find(function (o) { return o.scope === 'stage' && o.target_id === file; });
+      if (!row || !row.override_data) return;
+      if (row.override_data.html) document.body.innerHTML = row.override_data.html;
+      if (row.override_data.title) document.title = row.override_data.title;
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>

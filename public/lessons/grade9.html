@@ -115,6 +115,18 @@
     .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 
     @media(max-width:900px) { .layout { grid-template-columns:1fr; } }
+
+    /* ── Theory "lesson" overlay — a self-check book page (read + reveal-answer
+       practice questions) swapped in for type:'lesson' challenges, replacing the
+       pseudocode editor entirely since there's nothing to code for pure theory. */
+    .lesson-wrap-header { flex-shrink:0; padding:10px 14px; background:var(--bg-card); border-bottom:1px solid var(--border);
+                 display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .lesson-wrap-title { font-size:13px; font-weight:700; }
+    .lesson-wrap-body { height:calc(100vh - 64px - 48px - 46px); }
+    .lesson-wrap-body iframe { width:100%; height:100%; border:none; background:#0d0f1a; }
+    .lesson-wrap-footer { flex-shrink:0; padding:10px 14px; background:var(--bg-card); border-top:1px solid var(--border);
+                 display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    #lesson-wrap-feedback { font-size:12px; font-weight:700; }
   </style>
   <script src="../js/db.js"></script>
   <script src="../js/auth.js"></script>
@@ -135,7 +147,7 @@
   <div class="nav-links"><a href="#" onclick="showJourney();return false" style="color:#22d3ee;font-weight:800;">🧭 Mission Map</a> &nbsp; <a href="/student/dashboard">← Dashboard</a></div>
 </nav>
 
-<div class="layout">
+<div class="layout" id="mission-main">
 
   <!-- Left: pseudocode editor -->
   <div class="ed-panel">
@@ -213,6 +225,21 @@
           <tbody id="trace-body"></tbody>
         </table>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Theory "lesson" overlay — hidden unless the active challenge is type:'lesson' -->
+<div class="layout" id="lesson-wrap" style="display:none;grid-template-columns:1fr;">
+  <div style="display:flex;flex-direction:column;overflow:hidden;">
+    <div class="lesson-wrap-header">
+      <div class="lesson-wrap-title" id="lesson-wrap-title"></div>
+      <button class="btn btn-ghost" onclick="stepChallenge(-1)">← Back</button>
+    </div>
+    <div class="lesson-wrap-body"><iframe id="lesson-wrap-iframe"></iframe></div>
+    <div class="lesson-wrap-footer">
+      <span id="lesson-wrap-feedback"></span>
+      <button class="btn btn-brand" onclick="markLessonComplete()">✓ Mark Complete</button>
     </div>
   </div>
 </div>
@@ -1058,9 +1085,211 @@ function toggleTrace() {
 }
 
 // ── Challenges ────────────────────────────────────────────────────────────────
-// Curriculum arc: W6 pseudocode basics → W7 data types → W8 procedures/functions
+// Curriculum arc: Unit 1-7 theory (Sindh Textbook Board Computer Science for
+// Grade 9) → W6 pseudocode basics → W7 data types → W8 procedures/functions
 //                 → W9 trace tables → W11 sorting → W12 searching
+// Theory units use type:'lesson' (a self-check book page under
+// /lessons/grade9-book/, same pattern as igcse-y2.html's bookFile lessons —
+// read + reveal-answer practice questions, no code to check) and type:'fill'
+// (a short free-text answer typed into the editor box and checked by
+// check(ans) — same reused editor, no dedicated text-input UI needed).
 const CHALLENGES = [
+  // ── Unit 1 · Fundamentals of Computer ────────────────────────────────────
+  { mod:'U1', name:'1.1 Evolution & Classification of Computers', xp:15, type:'lesson', bookFile:'1a-evolution-classification.html', hints:[],
+    text:'Read the full lesson (the three eras of computing, the five generations, and how computers are classified by technology/size/purpose) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U1', name:'Evolution Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 1.1.1 Evolution of Computers</strong><br>Charles Babbage is known as the Father of the Computer because he designed the first complete computing machine, the Difference Engine and the ______ Engine.`,
+    hints:['The second, more ambitious machine Babbage designed (but never finished building) is considered the first general-purpose computer design.'],
+    check: ans => /analytical/i.test(ans.trim()),
+  },
+  { mod:'U1', name:'1.2 Computers in Life & IT Careers', xp:15, type:'lesson', bookFile:'1b-computers-in-life-careers.html', hints:[],
+    text:'Read the full lesson (computers across fields of life, emerging technologies, and seven IT careers) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U1', name:'IT Careers Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 1.2.2 Careers in IT Field</strong><br>A ______ is a skilled professional who maintains a secure database environment in an office, business, or organization.`,
+    hints:['The job title literally contains the word "Database".'],
+    check: ans => /database administrator|dba/i.test(ans.trim()),
+  },
+  { mod:'U1', name:'1.3 Computer Hardware', xp:15, type:'lesson', bookFile:'1c-computer-hardware.html', hints:[],
+    text:'Read the full lesson (the system unit, motherboard, the 5 parts of a microprocessor, input/output/storage devices) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U1', name:'Hardware Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 1.3.1 System Unit</strong><br>Inside the microprocessor, the ______ performs all the actual calculations — arithmetic operations and logical comparisons.`,
+    hints:['Its initials are ALU.'],
+    check: ans => /arithmetic logic unit|\balu\b/i.test(ans.trim()),
+  },
+  { mod:'U1', name:'1.4-1.5 Basic Operations & Software', xp:15, type:'lesson', bookFile:'1d-operations-software.html', hints:[],
+    text:'Read the full lesson (the four basic operations of a computer, system software vs application software, and the three language translators) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U1', name:'Software Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 1.5.1 System Software</strong><br>A ______ translates an entire high-level language program all at once into machine language before it is executed, unlike an interpreter which translates line by line.`,
+    hints:['The opposite approach to an interpreter — it translates everything up front, not line by line.'],
+    check: ans => /compiler/i.test(ans.trim()),
+  },
+  // ── Unit 2 · Fundamentals of Operating System ────────────────────────────
+  { mod:'U2', name:'2.1 OS Functions & Interfaces', xp:15, type:'lesson', bookFile:'2a-os-functions-interfaces.html', hints:[],
+    text:'Read the full lesson (the 8 functions of an OS, and Command Line vs. Graphical user interfaces) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U2', name:'OS Functions Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 2.1.1 Function of Operating System</strong><br>The OS function that decides the order in which processes get CPU time, so every process gets a fair share, is called process ______.`,
+    hints:['It is part of Process Management.'],
+    check: ans => /scheduling/i.test(ans.trim()),
+  },
+  { mod:'U2', name:'2.2 Types of Operating System', xp:15, type:'lesson', bookFile:'2b-os-types.html', hints:[],
+    text:'Read the full lesson (single/multi-user, batch processing, time sharing, and real-time operating systems) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U2', name:'OS Types Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 2.2.4 Real Time Processing OS</strong><br>A ______ Real Time System guarantees that critical tasks complete on time — even the shortest delay is unacceptable (e.g. missile systems, Air Traffic Control).`,
+    hints:['The opposite of "soft".'],
+    check: ans => /hard/i.test(ans.trim()),
+  },
+  { mod:'U2', name:'2.3 Installing Software', xp:15, type:'lesson', bookFile:'2c-installing-software.html', hints:[],
+    text:'Read the full lesson (minimum hardware requirements, MS Office components, and antivirus/virus databases) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U2', name:'Software Installation Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 2.3.3 Installing Antivirus</strong><br>The most important component of an antivirus software, which must be updated regularly to protect against new threats, is its virus ______.`,
+    hints:['It\'s the list of known viruses the antivirus checks files against.'],
+    check: ans => /database/i.test(ans.trim()),
+  },
+  // ── Unit 3 · Office Automation ────────────────────────────────────────────
+  { mod:'U3', name:'3.1 MS Word — Page Layout & ToC', xp:15, type:'lesson', bookFile:'3a-ms-word.html', hints:[],
+    text:'Read the full lesson (the 5 groups of the Page Layout tab, automatic vs. manual Table of Contents, and typing in Urdu/Sindhi) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U3', name:'MS Word Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 3.1 MS Word</strong><br>MS Word introduced the concept of ______ — meaning what you see on screen is exactly what you get when printed.`,
+    hints:['It\'s a well-known acronym — look at the capital letters.'],
+    check: ans => /wysiwyg|what you see is what you get/i.test(ans.trim()),
+  },
+  { mod:'U3', name:'3.2 MS Excel — Interface, Sorting & Formulas', xp:15, type:'lesson', bookFile:'3b-ms-excel.html', hints:[],
+    text:'Read the full lesson (the Excel interface, sorting data, writing formulas, and charts) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U3', name:'MS Excel Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 3.2.3 Formulas</strong><br>Every MS Excel formula must begin with the symbol ______.`,
+    hints:['It\'s the same symbol used in mathematics to show two things are equal.'],
+    check: ans => /^=$|equal(s)? sign/i.test(ans.trim()),
+  },
+  // ── Unit 4 · Data Communication & Computer Networks ──────────────────────
+  { mod:'U4', name:'4.1 Data Communication Basics', xp:15, type:'lesson', bookFile:'4a-data-communication-basics.html', hints:[],
+    text:'Read the full lesson (analog vs. digital signals, data rate, and baud rate) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U4', name:'Signals Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 4.1.1 Analog & Digital Signals</strong><br>A digital signal is represented by ______ waves, while an analog signal is represented by a sine wave.`,
+    hints:['Think of the shape of a digital 0/1 pattern graphed over time.'],
+    check: ans => /square/i.test(ans.trim()),
+  },
+  { mod:'U4', name:'4.1.2-4.1.3 Communication System', xp:15, type:'lesson', bookFile:'4b-communication-system.html', hints:[],
+    text:'Read the full lesson (the 5 components and 3 properties of a good communication system) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U4', name:'Communication System Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 4.1.2 Components of a Communication System</strong><br>The rules and procedures that a sender and receiver must both follow to exchange data are called a ______.`,
+    hints:['Both sides must agree on the same one for communication to work.'],
+    check: ans => /protocol/i.test(ans.trim()),
+  },
+  { mod:'U4', name:'4.2 Transmission Media', xp:15, type:'lesson', bookFile:'4c-transmission-media.html', hints:[],
+    text:'Read the full lesson (guided/unguided media and transmission impairments) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U4', name:'Transmission Media Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 4.2.3 Transmission Impairments</strong><br>______ is the loss of signal energy due to resistance in the medium — fixed using amplifiers.`,
+    hints:['Signal strength decreasing the further it travels.'],
+    check: ans => /attenuation/i.test(ans.trim()),
+  },
+  { mod:'U4', name:'4.3 Communication Devices', xp:15, type:'lesson', bookFile:'4d-communication-devices.html', hints:[],
+    text:'Read the full lesson (switch, router, three kinds of modem, and the NIC) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U4', name:'Communication Devices Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 4.3.2 Router</strong><br>A router's main function is to determine the optimal data ______ and transfer information through it.`,
+    hints:['Think of the route a router finds.'],
+    check: ans => /path/i.test(ans.trim()),
+  },
+  { mod:'U4', name:'4.4-4.5 Networks & Topologies', xp:15, type:'lesson', bookFile:'4e-networks-topologies.html', hints:[],
+    text:'Read the full lesson (LAN/MAN/WAN and bus/ring/star topologies) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U4', name:'Topologies Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 4.5.3 Star Topology</strong><br>In Star Topology, all computers connect to a central device called a hub or ______.`,
+    hints:['The same device Unit 4.3 described as connecting computers on one network.'],
+    check: ans => /switch/i.test(ans.trim()),
+  },
+  { mod:'U4', name:'4.6-4.8 Standards, OSI/TCP-IP & IP Addressing', xp:15, type:'lesson', bookFile:'4f-standards-architecture.html', hints:[],
+    text:'Read the full lesson (standards organizations, the 7-layer OSI model, the TCP/IP model, and IPv4 addressing) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U4', name:'OSI Model Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 4.7.1 ISO's OSI Model</strong><br>The OSI model divides a communication system into ______ abstraction layers.`,
+    hints:['Count: Physical, Data Link, Network, Transport, Session, Presentation, Application.'],
+    check: ans => /\bseven\b|\b7\b/i.test(ans.trim()),
+  },
+  // ── Unit 5 · Computer Security and Ethics ────────────────────────────────
+  { mod:'U5', name:'5.1 Cybercrime & Cyber Attacks', xp:15, type:'lesson', bookFile:'5a-cybercrime.html', hints:[],
+    text:'Read the full lesson (hackers vs. crackers, five real-world cybercrimes, and what to do if you become a victim) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U5', name:'Cybercrime Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 5.1.2 Cybercrime</strong><br>A hacker hired by an organization to prevent data theft (rather than cause it) is called an ethical hacker, also known as a white ______ hacker.`,
+    hints:['It\'s the item worn on the head, used as the name of this role.'],
+    check: ans => /hat/i.test(ans.trim()),
+  },
+  { mod:'U5', name:'5.2 Malware, Antivirus & Backups', xp:15, type:'lesson', bookFile:'5b-malware.html', hints:[],
+    text:'Read the full lesson (virus/worm/adware/spyware, how viruses spread, and safeguards) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U5', name:'Malware Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 5.2.1 Different Malware</strong><br>A ______ can replicate itself and spread from computer to computer WITHOUT needing to attach to a file or program.`,
+    hints:['Unlike a virus, this type doesn\'t need a host file.'],
+    check: ans => /worm/i.test(ans.trim()),
+  },
+  { mod:'U5', name:'5.3 Authentication Mechanisms', xp:15, type:'lesson', bookFile:'5c-authentication.html', hints:[],
+    text:'Read the full lesson (username/password, PIN, and biometric verification) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U5', name:'Authentication Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 5.3.1 Types of Security Mechanism</strong><br>The most common form of biometric authentication is scanning a person's ______.`,
+    hints:['Most phones use this to unlock with a touch.'],
+    check: ans => /fingerprint/i.test(ans.trim()),
+  },
+  { mod:'U5', name:'5.4 Ethics, IP Rights & Plagiarism', xp:15, type:'lesson', bookFile:'5d-ethics-ip-rights.html', hints:[],
+    text:'Read the full lesson (professional ethics, patents/copyright/trademarks, software piracy, and plagiarism) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U5', name:'IP Rights Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 5.4.2 Intellectual Property Right</strong><br>A ______ gives exclusive rights to make, use, and sell an invention for a limited period (20 years in Pakistan).`,
+    hints:['Inventors register this, not writers or brand owners.'],
+    check: ans => /patent/i.test(ans.trim()),
+  },
+  // ── Unit 6 · Web Development ──────────────────────────────────────────────
+  { mod:'U6', name:'6.1 Web Development Basics', xp:15, type:'lesson', bookFile:'6a-web-dev-basics.html', hints:[],
+    text:'Read the full lesson (web terminology and the 9 types of website) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U6', name:'Web Basics Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 6.1.1 Definition of Terms</strong><br>A ______ is a service that allows a web developer to make a website publicly accessible through the internet.`,
+    hints:['Companies that provide this often also sell domain names.'],
+    check: ans => /hosting/i.test(ans.trim()),
+  },
+  { mod:'U6', name:'6.2-6.3 HTML Intro, Tags & Formatting', xp:15, type:'lesson', bookFile:'6b-html-intro-tags.html', hints:[],
+    text:'Read the full lesson (the 4 steps to build a page, tag structure, and text-formatting tags) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U6', name:'HTML Tags Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 6.3.4 Text Formatting</strong><br>The ______ tag preserves both spaces and line breaks exactly as written in the HTML code.`,
+    hints:['Short for "preformatted".'],
+    check: ans => /\bpre\b/i.test(ans.trim()),
+  },
+  { mod:'U6', name:'6.4 Creating Lists', xp:15, type:'lesson', bookFile:'6c-lists.html', hints:[],
+    text:'Read the full lesson (unordered, ordered, description, and nested lists) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U6', name:'Lists Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 6.4.3 Description List</strong><br>In a description list, the term is defined by the &lt;dt&gt; tag and its description by the &lt;______&gt; tag.`,
+    hints:['Two letters, starts with "d".'],
+    check: ans => /\bdd\b/i.test(ans.trim()),
+  },
+  { mod:'U6', name:'6.5-6.6 Images & Hyperlinks', xp:15, type:'lesson', bookFile:'6d-images-hyperlinks.html', hints:[],
+    text:'Read the full lesson (image attributes, backgrounds, and hyperlinks) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U6', name:'Images & Links Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 6.6.1 Hyperlink Definition</strong><br>A hyperlink in HTML is defined by the &lt;a&gt; tag and its ______ attribute.`,
+    hints:['Its value is the URL or section id the link goes to.'],
+    check: ans => /href/i.test(ans.trim()),
+  },
+  { mod:'U6', name:'6.7-6.9 Tables, Frames & Tools', xp:15, type:'lesson', bookFile:'6e-tables-frames.html', hints:[],
+    text:'Read the full lesson (table/cell attributes, frames and framesets, and real web design tools) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U6', name:'Tables Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 6.7.5 Cell Attributes</strong><br>The ______ attribute merges a table cell across a given number of COLUMNS.`,
+    hints:['The other similar attribute, rowspan, merges across rows instead.'],
+    check: ans => /colspan/i.test(ans.trim()),
+  },
+  // ── Unit 7 · Introduction to Database System ─────────────────────────────
+  { mod:'U7', name:'7.1-7.2 DBMS Basics & Components', xp:15, type:'lesson', bookFile:'7a-dbms-basics.html', hints:[],
+    text:'Read the full lesson (flat file vs. DBMS, and tables/fields/records/views/data types) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U7', name:'DBMS Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 7.2 Basic Components of DBMS</strong><br>The smallest component of a database, where actual data is stored, is called a ______ (also known as an attribute or column).`,
+    hints:['Several of these make up one record.'],
+    check: ans => /field/i.test(ans.trim()),
+  },
+  { mod:'U7', name:'7.3 Entities, Relationships & Keys', xp:15, type:'lesson', bookFile:'7b-entities-relationships-keys.html', hints:[],
+    text:'Read the full lesson (entities, the 3 relationship types, and primary/foreign keys) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U7', name:'Keys Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 7.3.3 Referential Keys</strong><br>A ______ key is used to uniquely identify a record in an entity, and its value can never be null.`,
+    hints:['Not "foreign" — the other one.'],
+    check: ans => /primary/i.test(ans.trim()),
+  },
+  { mod:'U7', name:'7.3.4 Entity Relationship (ER) Model', xp:15, type:'lesson', bookFile:'7c-er-model.html', hints:[],
+    text:'Read the full lesson (the 4 ER diagram shapes and the 6 steps to design an ER model) and try its 6 practice questions, then mark it complete.' },
+  { mod:'U7', name:'ER Model Fill-In', xp:20, type:'fill',
+    text:`<strong>Fill in the blank — 7.3.4 Entity Relationship Model</strong><br>In an ER diagram, a relationship between two entities is represented by a ______ shape.`,
+    hints:['It has four equal sides, rotated 45 degrees — like a kite shape.'],
+    check: ans => /diamond/i.test(ans.trim()),
+  },
   // ── Week 6 · Pseudocode Foundations ──────────────────────────────────────
   {
     mod:'W6', name:'Temperature Converter', xp:35,
@@ -1407,6 +1636,13 @@ CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.mod + '/' + s.name] = i })
 // already has one. Friendly names for the mixed W-/M-prefixed mod labels
 // (documented elsewhere in this file as inconsistent — see G9_CHALLENGE_CONCEPT).
 const G9_MOD_NAME = {
+  U1: '🖥️ Unit 1 — Fundamentals of Computer',
+  U2: '🪟 Unit 2 — Fundamentals of Operating System',
+  U3: '📄 Unit 3 — Office Automation',
+  U4: '🌐 Unit 4 — Data Communication & Networks',
+  U5: '🔒 Unit 5 — Computer Security and Ethics',
+  U6: '🕸️ Unit 6 — Web Development',
+  U7: '🗄️ Unit 7 — Introduction to Database System',
   W6: '🌡 Variables & Selection', W7: '🔐 Selection & Strings', W8: '⚙️ Procedures & Functions',
   W9: '🔍 Trace Tables', W11: '🫧 Sorting', W12: '🎯 Searching',
   M12: '⚙️ Procedures & Functions (extra)', M13: '🎯 Searching (extra)',
@@ -1416,7 +1652,7 @@ function showJourney() {
   const byMod = {}
   CHALLENGES.forEach((ch, i) => {
     if (!byMod[ch.mod]) { byMod[ch.mod] = []; seen.push(ch.mod) }
-    byMod[ch.mod].push({ id: ch.mod + '/' + ch.name, emoji: ch.boss ? '👑' : '🧩', label: ch.name, done: completed.has(i), boss: !!ch.boss })
+    byMod[ch.mod].push({ id: ch.mod + '/' + ch.name, emoji: ch.boss ? '👑' : ch.type === 'lesson' ? '📘' : '🧩', label: ch.name, done: completed.has(i), boss: !!ch.boss })
   })
   const worlds = seen.map(mod => ({ name: G9_MOD_NAME[mod] || mod, sub: '', live: true, stages: byMod[mod] }))
   QuestMap.show({
@@ -1488,10 +1724,27 @@ const G9_MOD_LESSON = {
   M13: "🎯 <strong>Searching (extra practice).</strong> More reps on binary search over a sorted array — the same skill as the W12 mission above.",
 }
 
+// Toggles between the pseudocode editor (mission-main) and the theory
+// "lesson" book-page overlay (lesson-wrap) — mirrors igcse-y2.html's pattern,
+// since type:'lesson' challenges have nothing to code against at all.
+function showMissionMain(show) {
+  document.getElementById('mission-main').style.display = show ? '' : 'none'
+  document.getElementById('lesson-wrap').style.display = show ? 'none' : ''
+}
 function selectChallenge(i) {
   activeIdx=i; hintIdx=0
   challengeStartedAt = Date.now()
   const ch=CHALLENGES[i]
+  if (ch.type === 'lesson') {
+    showMissionMain(false)
+    document.getElementById('lesson-wrap-title').textContent = ch.mod + ' ' + ch.name
+    document.getElementById('lesson-wrap-iframe').src = '/lessons/grade9-book/' + ch.bookFile
+    document.getElementById('lesson-wrap-feedback').textContent = completed.has(i) ? '✓ Already complete' : ''
+    document.getElementById('lesson-wrap-feedback').style.color = '#4ade80'
+    renderPills()
+    return
+  }
+  showMissionMain(true)
   document.getElementById('ch-text').innerHTML=ch.text
   document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
   // Restore whatever was last saved for THIS stage — correct or not, and even
@@ -1507,6 +1760,19 @@ function selectChallenge(i) {
     lessonEl.innerHTML = lesson ? '📘 ' + lesson : ''
     lessonEl.style.display = lesson ? 'block' : 'none'
   }
+}
+function markLessonComplete() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch || ch.type !== 'lesson') return
+  const fb = document.getElementById('lesson-wrap-feedback')
+  if (completed.has(activeIdx)) { fb.textContent = '✓ Already marked complete.'; return }
+  completed.add(activeIdx)
+  renderPills()
+  showToast('Lesson complete! +' + ch.xp + ' XP')
+  if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + activeIdx, { passed: true, score: 100 }) }
+  LessonSaves.save('grade9', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code: 'self-check' })
+  try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
+  fb.textContent = '✓ Marked complete!'
 }
 
 // ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
@@ -1543,6 +1809,16 @@ function resetStarter() {
 
 function validateChallenge(code, result) {
   const ch=CHALLENGES[activeIdx]; if(!ch) return
+  // A "fill" challenge's check() is a plain-English keyword regex over
+  // whatever the student typed into the editor — it can never match a
+  // worded Russian answer. Route a foreign-language fill answer to the AI
+  // marker instead (same pattern as igcse-y2.html). Interp.run() itself
+  // already tolerates non-pseudocode text in the editor (logs "Unrecognised
+  // statement", doesn't throw), so this only changes how the result is judged.
+  if (ch.type === 'fill' && typeof BFLang !== 'undefined' && BFLang.isForeign(code)) {
+    checkForeignFillAnswer(ch, code)
+    return
+  }
   const passOk = ch.check(code,result)
   const firstPass = passOk && !completed.has(activeIdx)
   // Always save the current code — pass or fail, and even after an earlier
@@ -1556,6 +1832,37 @@ function validateChallenge(code, result) {
     showToast('Challenge complete! +'+ch.xp+' XP')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + (ch.mod||'c') + activeIdx, { passed: true, score: 100 }); }
     reportRealProgress(ch, Date.now() - challengeStartedAt)
+  }
+}
+async function checkForeignFillAnswer(ch, ans) {
+  const ru = BFLang.uiLang(ans) === 'ru'
+  appendOut(ru ? '⏳ Проверяю твой ответ…' : '⏳ Checking your answer…', 'out')
+  LessonSaves.save('grade9', ch.mod + '/' + ch.name, { passed:false, xpEarned:0, code:ans })
+  try {
+    const r = await BFLang.aiGrade({
+      question:    String(ch.text).replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(),
+      modelAnswer: 'Hints from the lesson (they point at the expected answer): ' + (ch.hints || []).join(' | '),
+      answer:      ans,
+    })
+    if (CHALLENGES[activeIdx] !== ch) return
+    const idx = CHALLENGES.indexOf(ch)
+    const firstPass = r.pass && !completed.has(idx)
+    LessonSaves.save('grade9', ch.mod + '/' + ch.name, { passed:r.pass, xpEarned:firstPass?ch.xp:0, code:ans })
+    if (r.pass) {
+      appendOut((r.feedback ? '✓ ' + r.feedback : '✓ Correct!'), 'out-ok')
+      if (firstPass) {
+        completed.add(idx); renderPills(); showToast('Challenge complete! +'+ch.xp+' XP')
+        if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + (ch.mod||'c') + idx, { passed: true, score: 100 }) }
+        reportRealProgress(ch, Date.now() - challengeStartedAt)
+      }
+    } else {
+      appendOut('✗ ' + (r.feedback || (ru ? 'Пока не совсем — посмотри подсказку.' : 'Not quite — check the hint for guidance.')), 'out-err')
+    }
+  } catch (e) {
+    if (CHALLENGES[activeIdx] !== ch) return
+    appendOut(ru
+      ? 'Не удалось проверить ответ на этом языке прямо сейчас. Попробуй ещё раз через минуту или ответь по-английски.'
+      : 'Could not check that answer right now — try again in a minute, or answer in English.', 'out-err')
   }
 }
 

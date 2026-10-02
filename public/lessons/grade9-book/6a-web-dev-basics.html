@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.1 Web Development Basics — Grade 9 Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .site-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .site-grid { grid-template-columns: 1fr; } }
+  .site-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 9px 11px; }
+  .site-card h4 { font-size: 12px; color: #60a5fa; margin: 0 0 4px; }
+  .site-card p { font-size: 11px; color: #9ca3af; line-height: 1.5; margin: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">Grade 9 · Unit 6 · Web Development</span>
+  <div class="topic-title">6.1 Web Development — Basic Terminology &amp; Types of Websites</div>
+  <div class="topic-subtitle">Nine key web terms, and nine kinds of website.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">World Wide Web (WWW)</div><div class="key-term-def">Computers connected through a network providing publicly accessible information.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Web Page</div><div class="key-term-def">A document (usually HTML) accessible via a browser.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Website</div><div class="key-term-def">A collection of web pages about a specific topic, accessed via a URL.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Web Browser</div><div class="key-term-def">Software for accessing websites (Chrome, Firefox, Safari, etc.).</div></div>
+    <div class="key-term-card"><div class="key-term-name">URL</div><div class="key-term-def">The address of a resource — protocol (https://) + server location (www.google.com).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Search Engine</div><div class="key-term-def">A tool to locate information on the web (Google, Bing, Yahoo).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Home Page</div><div class="key-term-def">The starting point / landing page of a website.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Web Hosting</div><div class="key-term-def">A service that makes a website publicly accessible on the internet.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Web Server</div><div class="key-term-def">The computer responsible for serving a website's content to users.</div></div>
+  </div>
+
+  <div class="section-label">Theory — Nine Types of Website</div>
+  <div class="site-grid">
+    <div class="site-card"><h4>Portal</h4><p>One access point for info from many sources (Yahoo, MSN).</p></div>
+    <div class="site-card"><h4>News</h4><p>Current affairs, sports, weather — the modern newspaper.</p></div>
+    <div class="site-card"><h4>Informational</h4><p>Detailed info on a specific field (science, sports, research).</p></div>
+    <div class="site-card"><h4>Educational</h4><p>Learning material for teachers/students (Khan Academy, sabaq.pk).</p></div>
+    <div class="site-card"><h4>Personal</h4><p>Someone's own biography/achievements.</p></div>
+    <div class="site-card"><h4>Business</h4><p>Markets an organization's products/services (psx.com.pk).</p></div>
+    <div class="site-card"><h4>Blog</h4><p>Articles/posts sorted by publish date (WordPress).</p></div>
+    <div class="site-card"><h4>Forum</h4><p>A place for users to discuss categorized topics.</p></div>
+    <div class="site-card"><h4>Entertainment / Social</h4><p>Videos/games for fun (YouTube) or socializing (Facebook, Twitter).</p></div>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what this subsection taught — web terminology and website types.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What are the two components of a URL?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The protocol used to access the resource (e.g. https://) and the location of the server (e.g. www.google.com).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What's the difference between a website and a web page?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A web page is a single document. A website is a COLLECTION of related web pages accessed through one URL.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">A ______ is a service that allows a web developer to make a website publicly accessible on the internet.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>web hosting (service).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">A student says the home page is any page on a website chosen at random. What's wrong?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The home page is specifically the STARTING POINT of the website — it's not random, it's the designated landing page visitors see first.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">A teacher wants students to find lesson videos and practice exercises organized by subject. Which type of website best matches this purpose?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An Educational website — purely designed to deliver educational material to teachers and students.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What is the role of a web server?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It's the computer responsible for serving a website and all its content (text, media) to a user.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — Grade 9 — Unit 6: Web Development — 6.1 Web Development Basics<br>
+    Adapted from: The Textbook of Computer Science for Grade 9 (Sindh Textbook Board, Jamshoro) — Unit 6
+  </div>
+
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var classId = params.get('classId');
+  if (!classId) return;
+  var file = location.pathname.split('/').pop();
+  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=grade9-book')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.overrides)) return;
+      var row = data.overrides.find(function (o) { return o.scope === 'stage' && o.target_id === file; });
+      if (!row || !row.override_data) return;
+      if (row.override_data.html) document.body.innerHTML = row.override_data.html;
+      if (row.override_data.title) document.title = row.override_data.title;
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>

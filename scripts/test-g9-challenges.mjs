@@ -17,7 +17,7 @@
 // The reference solutions are written from each challenge's own task text and
 // hints, and are keyed by "mod/name" so they can't silently drift out of sync
 // with the challenge list by index.
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 
 const html = readFileSync('c:/Users/user/Downloads/ICT website/public/lessons/grade9.html', 'utf8')
 
@@ -32,7 +32,37 @@ const { CHALLENGES } = new Function(ctx + '\nreturn { CHALLENGES }')()
 
 // ── Reference solutions, keyed by `${mod}/${name}` ───────────────────────────
 // { code, inputs } — inputs mirror the comma-separated INPUT box on the page.
+// 'fill' challenges (Unit 1 theory) have no starter/interpreter run at all —
+// they key { fillAnswer } instead, checked directly against ch.check(ans).
 const SOLUTIONS = {
+  'U1/Evolution Fill-In':  { fillAnswer: 'Analytical' },
+  'U1/IT Careers Fill-In': { fillAnswer: 'Database Administrator' },
+  'U1/Hardware Fill-In':   { fillAnswer: 'Arithmetic Logic Unit' },
+  'U1/Software Fill-In':   { fillAnswer: 'Compiler' },
+  'U2/OS Functions Fill-In':            { fillAnswer: 'scheduling' },
+  'U2/OS Types Fill-In':                { fillAnswer: 'Hard' },
+  'U2/Software Installation Fill-In':   { fillAnswer: 'database' },
+  'U3/MS Word Fill-In':  { fillAnswer: 'WYSIWYG' },
+  'U3/MS Excel Fill-In': { fillAnswer: '=' },
+  'U4/Signals Fill-In':              { fillAnswer: 'square' },
+  'U4/Communication System Fill-In': { fillAnswer: 'protocol' },
+  'U4/Transmission Media Fill-In':   { fillAnswer: 'Attenuation' },
+  'U4/Communication Devices Fill-In':{ fillAnswer: 'path' },
+  'U4/Topologies Fill-In':           { fillAnswer: 'switch' },
+  'U4/OSI Model Fill-In':            { fillAnswer: 'seven' },
+  'U5/Cybercrime Fill-In':      { fillAnswer: 'hat' },
+  'U5/Malware Fill-In':         { fillAnswer: 'worm' },
+  'U5/Authentication Fill-In':  { fillAnswer: 'fingerprint' },
+  'U5/IP Rights Fill-In':       { fillAnswer: 'patent' },
+  'U6/Web Basics Fill-In':     { fillAnswer: 'hosting' },
+  'U6/HTML Tags Fill-In':      { fillAnswer: 'pre' },
+  'U6/Lists Fill-In':          { fillAnswer: 'dd' },
+  'U6/Images & Links Fill-In': { fillAnswer: 'href' },
+  'U6/Tables Fill-In':         { fillAnswer: 'colspan' },
+  'U7/DBMS Fill-In':     { fillAnswer: 'field' },
+  'U7/Keys Fill-In':     { fillAnswer: 'primary' },
+  'U7/ER Model Fill-In': { fillAnswer: 'diamond' },
+
   'W6/Temperature Converter': {
     inputs: ['100'],
     code: `DECLARE celsius    : REAL
@@ -276,6 +306,29 @@ const run = (code, inputs) => new Interpreter().run(code.replace(/<-/g, '←'), 
 
 for (const ch of CHALLENGES) {
   const label = `${ch.mod}/${ch.name}`
+
+  // Unit 1 theory: 'lesson' challenges are a self-check book page — no code,
+  // no check() to run at all. Just confirm the book file actually exists, so
+  // a typo'd bookFile doesn't silently 404 for every student.
+  if (ch.type === 'lesson') {
+    const exists = existsSync('c:/Users/user/Downloads/ICT website/public/lessons/grade9-book/' + ch.bookFile)
+    t(exists, `${label} — bookFile '${ch.bookFile}' exists on disk`)
+    continue
+  }
+  // 'fill' challenges take a plain typed answer (reused editor box, checked
+  // by ch.check(ans) directly) — no interpreter/starter involved at all.
+  if (ch.type === 'fill') {
+    let blankOk = false, junkOk = false
+    try { blankOk = !ch.check('') } catch { blankOk = true }
+    try { junkOk = !ch.check('xqz9988774kwv') } catch { junkOk = true }
+    t(blankOk && junkOk, `${label} — correctly rejects blank and garbage answers`)
+    const sol = SOLUTIONS[label]
+    if (!sol || sol.fillAnswer === undefined) { t(false, `${label} — NO reference fillAnswer authored for this challenge`); continue }
+    let ok = false
+    try { ok = !!ch.check(sol.fillAnswer) } catch { ok = false }
+    t(ok, `${label} — reference answer '${sol.fillAnswer}' ${ok ? 'passes check()' : 'FAILS check()'}`)
+    continue
+  }
 
   // 1. starter must not crash
   let res = null

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>4.1 Data Communication Basics — Grade 9 Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(34,211,238,.12); color: #22d3ee; border: 1px solid rgba(34,211,238,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .key-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .key-terms-grid { grid-template-columns: 1fr; } }
+  .key-term-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .key-term-name { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 3px; }
+  .key-term-def { font-size: 11.5px; color: #9ca3af; line-height: 1.5; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 14px 16px; }
+  .compare-card h4 { font-size: 13px; color: #22d3ee; margin: 0 0 8px; }
+  .compare-card ul { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.7; color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(34,211,238,.12); border: 1px solid rgba(34,211,238,.25); color: #22d3ee; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">Grade 9 · Unit 4 · Data Communication &amp; Networks</span>
+  <div class="topic-title">4.1 Data Communication — Basic Terms</div>
+  <div class="topic-subtitle">Analog vs. digital signals, data rate vs. baud rate, and signal-to-noise ratio.</div>
+
+  <div class="section-label">Key Terms</div>
+  <div class="key-terms-grid">
+    <div class="key-term-card"><div class="key-term-name">Data</div><div class="key-term-def">A collection of raw, unprocessed facts and figures (text, numbers, images, voice, video).</div></div>
+    <div class="key-term-card"><div class="key-term-name">Data Communication</div><div class="key-term-def">The process of transferring data electrically between two parties.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Data Transmission</div><div class="key-term-def">Emission of data in any direction via a wired or wireless medium.</div></div>
+    <div class="key-term-card"><div class="key-term-name">Signal-to-Noise Ratio (SNR)</div><div class="key-term-def">Compares the level of a desired signal to background noise, often in decibels.</div></div>
+  </div>
+
+  <div class="section-label">Theory — Analog vs. Digital Signals</div>
+
+  <div class="compare-grid">
+    <div class="compare-card">
+      <h4>Analog Signal</h4>
+      <ul>
+        <li>A continuous wave that changes over time.</li>
+        <li>No fixed range.</li>
+        <li>Easily disturbed by other signals/waves.</li>
+        <li>Example: the human voice.</li>
+        <li>Represented by a sine wave.</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <h4>Digital Signal</h4>
+      <ul>
+        <li>A discrete wave carrying information in binary form.</li>
+        <li>Finite number of values — 0 or 1.</li>
+        <li>Less prone to disturbance.</li>
+        <li>Example: signals used inside a computer.</li>
+        <li>Represented by square waves.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">Theory — Data Rate vs. Baud Rate</div>
+
+  <div class="theory-block">
+    <ul>
+      <li><b>Data Rate (Bit Rate)</b> — the number of bits (0s and 1s) transmitted per second; measured in bps, kbps, or mbps. Faster when more bits are transferred per second.</li>
+      <li><b>Baud Rate</b> — the number of signal units transmitted per second. One signal can represent more than one bit.</li>
+      <li><b>Formula:</b> Bit rate = Baud rate × number of bits per signal unit. (So Baud rate = Bit rate ÷ number of bits per signal unit.)</li>
+      <li>Example: a signal that changes 1200 times per second has a baud rate of 1200.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what this subsection taught — analog/digital signals, data rate, and baud rate.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which type of signal is less prone to disturbance from noise — analog or digital? Why?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Digital — because it only has a finite number of values (0 or 1), making it much harder for noise to change its meaning compared to a continuously varying analog wave.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What is the key difference between data rate (bit rate) and baud rate?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Bit rate counts the number of bits transmitted per second. Baud rate counts the number of signal units transmitted per second — and one signal unit can represent more than one bit.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">A digital signal is represented by ______ waves, while an analog signal is represented by a ______ wave.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>square; sine.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">A student says the human voice is naturally a digital signal. What's wrong?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The human voice is a classic example of an ANALOG signal — a continuously varying wave, not a discrete 0/1 pattern.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">A signal changes 2400 times per second, and each signal unit carries 2 bits. What is the bit rate?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Bit rate = Baud rate × bits per signal unit = 2400 × 2 = 4800 bits per second.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does Signal-to-Noise Ratio (SNR) actually compare?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The level (power) of the desired signal compared to the level of background noise.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — Grade 9 — Unit 4: Data Communication &amp; Networks — 4.1 Data Communication Basics<br>
+    Adapted from: The Textbook of Computer Science for Grade 9 (Sindh Textbook Board, Jamshoro) — Unit 4
+  </div>
+
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var classId = params.get('classId');
+  if (!classId) return;
+  var file = location.pathname.split('/').pop();
+  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=grade9-book')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.overrides)) return;
+      var row = data.overrides.find(function (o) { return o.scope === 'stage' && o.target_id === file; });
+      if (!row || !row.override_data) return;
+      if (row.override_data.html) document.body.innerHTML = row.override_data.html;
+      if (row.override_data.title) document.title = row.override_data.title;
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.1-7.2 DBMS Basics &amp; Components — Grade 9 Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(168,85,247,.12); color: #c084fc; border: 1px solid rgba(168,85,247,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 14px 16px; }
+  .compare-card h4 { font-size: 13px; color: #c084fc; margin: 0 0 8px; }
+  .compare-card ul { margin: 0; padding-left: 18px; font-size: 12.5px; line-height: 1.7; color: #e2e8f0; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .db-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  .db-table th, .db-table td { border: 1px solid rgba(255,255,255,.1); padding: 7px 10px; text-align: left; }
+  .db-table th { background: rgba(168,85,247,.1); color: #c084fc; font-size: 10px; text-transform: uppercase; }
+  .db-table td { color: #e2e8f0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(168,85,247,.12); border: 1px solid rgba(168,85,247,.25); color: #c084fc; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">Grade 9 · Unit 7 · Databases</span>
+  <div class="topic-title">7.1-7.2 DBMS Basics &amp; Components</div>
+  <div class="topic-subtitle">Flat files vs. a real DBMS, and the building blocks: tables, fields, records, data types, views.</div>
+
+  <div class="theory-block">
+    <h4>What a DBMS is</h4>
+    <ul>
+      <li>A Database Management System (DBMS) is the interface between a database and its end users/programs — it keeps data consistently organized and accessible.</li>
+      <li>Popular DBMSs: MySQL, Oracle, Microsoft SQL Server, MongoDB, PostgreSQL, IBM Db2.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Theory — Flat File vs. DBMS</div>
+  <div class="compare-grid">
+    <div class="compare-card">
+      <h4>Flat File System</h4>
+      <ul>
+        <li>Single table structure, plain text, one record per line (fields separated by tabs/commas).</li>
+        <li>Only ONE user at a time.</li>
+        <li>Suitable only for small data sets.</li>
+        <li>Increases duplicate/redundant data.</li>
+        <li>No remote/online access.</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <h4>DBMS</h4>
+      <ul>
+        <li>Multiple users can access data simultaneously.</li>
+        <li>Handles huge data sets.</li>
+        <li>Reduces duplication, keeps data integrity.</li>
+        <li>Supports online/remote access.</li>
+        <li>Good for small, medium, AND large businesses.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">Theory — Four Components of DBMS</div>
+  <table class="db-table">
+    <tr><th>Component</th><th>What it is</th></tr>
+    <tr><td>Table</td><td>A collection of data organized in rows and columns (e.g. a contact list).</td></tr>
+    <tr><td>Field</td><td>The SMALLEST component — a single named column where data is actually stored. Also called an attribute or column.</td></tr>
+    <tr><td>Record</td><td>A single ENTRY (row) in a table — also called a tuple. Made up of several fields' worth of data.</td></tr>
+    <tr><td>View</td><td>A virtual way to SEE data from one or more tables — doesn't store data itself, and can't change the original data.</td></tr>
+  </table>
+  <p style="font-size:12.5px;color:#9ca3af;margin-top:-10px;margin-bottom:16px;">Hierarchy: several fields → one record; several records → one table; several tables → one database.</p>
+
+  <div class="theory-block">
+    <h4>Data Types</h4>
+    <ul>
+      <li><b>Integer</b> — whole numbers (145, -35).</li>
+      <li><b>Floating Point</b> — numbers with decimals (5.6, 3.14).</li>
+      <li><b>Character/String</b> — one character, or a combination of letters/numbers/symbols.</li>
+      <li><b>Boolean</b> — only true/false (1/0).</li>
+      <li><b>Date &amp; Time</b> — a date/time in a specific format.</li>
+      <li>Choosing the right data type matters — it helps the database run faster.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what this subsection taught — flat files vs. DBMS, and tables/fields/records/views.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What is the SMALLEST component of a database, and what is it also called?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A field — also called an attribute or column.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why can only one user access a flat file system at a time, unlike a DBMS?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A flat file system is a simple plain-text single-table structure without the multi-user access features a real DBMS provides — DBMS is specifically built to let multiple users access data simultaneously.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">A single entry (row) in a table is called a ______, also known as a tuple.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>record.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">A student says a view stores its own copy of the data separately from the original table. What's wrong?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A view does NOT store data — it only shows data virtually, fetched from the original tables, and doesn't allow changes to the underlying data.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">A field needs to store whether a student has paid their fees (yes/no only). Which data type fits best?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Boolean — it can only hold true/false (1/0), which is exactly a yes/no value.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">List the hierarchy from smallest to largest: field, database, record, table.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Field → Record → Table → Database.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — Grade 9 — Unit 7: Introduction to Database System — 7.1-7.2 DBMS Basics &amp; Components<br>
+    Adapted from: The Textbook of Computer Science for Grade 9 (Sindh Textbook Board, Jamshoro) — Unit 7
+  </div>
+
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var classId = params.get('classId');
+  if (!classId) return;
+  var file = location.pathname.split('/').pop();
+  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=grade9-book')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.overrides)) return;
+      var row = data.overrides.find(function (o) { return o.scope === 'stage' && o.target_id === file; });
+      if (!row || !row.override_data) return;
+      if (row.override_data.html) document.body.innerHTML = row.override_data.html;
+      if (row.override_data.title) document.title = row.override_data.title;
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>

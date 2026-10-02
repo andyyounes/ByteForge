@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.3 Entities, Relationships &amp; Keys — Grade 9 Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(168,85,247,.12); color: #c084fc; border: 1px solid rgba(168,85,247,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .rel-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .rel-grid { grid-template-columns: 1fr; } }
+  .rel-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 12px; }
+  .rel-card h4 { font-size: 12.5px; color: #c084fc; margin: 0 0 6px; }
+  .rel-card p { font-size: 11.5px; color: #9ca3af; line-height: 1.5; margin: 0; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(168,85,247,.12); border: 1px solid rgba(168,85,247,.25); color: #c084fc; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">Grade 9 · Unit 7 · Databases</span>
+  <div class="topic-title">7.3 Entities, Relationships &amp; Keys</div>
+  <div class="topic-subtitle">Three types of relationship, and the two keys that connect tables together.</div>
+
+  <div class="theory-block">
+    <h4>Entity</h4>
+    <ul>
+      <li>An entity is an independent TABLE; its fields are called attributes.</li>
+      <li>Example: a Payroll database has an "Employees" entity with attributes like EmployeeID, Name, Designation, Salary.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Theory — Three Types of Relationship</div>
+  <div class="rel-grid">
+    <div class="rel-card"><h4>One-to-One</h4><p>One record in an entity connects to exactly ONE record in another. Uncommon — used to split a large entity into smaller ones.</p></div>
+    <div class="rel-card"><h4>One-to-Many</h4><p>One record in an entity connects to MANY records in another. The most common relationship type in relational databases.</p></div>
+    <div class="rel-card"><h4>Many-to-Many</h4><p>Many records in one entity connect to many in another. Usually needs a third "junction table" to implement.</p></div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Primary Key vs. Foreign Key</h4>
+    <ul>
+      <li><b>Primary Key</b> — uniquely identifies a record in an entity. Rules: the value must be UNIQUE (no two records share it), and it can NEVER be null.</li>
+      <li><b>Foreign Key</b> — defines the CONNECTION between two entities. A foreign key in one entity is configured to match the primary key of another entity.</li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — Students, Class, Teachers</h4>
+    <ul>
+      <li><b>Students table</b> — has <code>Id</code> as Primary Key, and <code>ClassId</code> as a foreign key linking to Class.</li>
+      <li><b>Class table</b> — has <code>Id</code> as Primary Key. A student is in only ONE class → Students has a One-to-One relationship with Class.</li>
+      <li><b>Teachers table</b> — has <code>Id</code> as Primary Key. Many teachers can teach many classes → a Many-to-Many relationship is needed with Class.</li>
+      <li><b>TeachersClass table</b> — a JUNCTION table (its own Primary Key) that implements the Many-to-Many relationship between Teachers and Class, via a One-to-Many relationship with each.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what this subsection taught — entities, relationship types, and primary/foreign keys.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">What are the two rules that apply to any field with a Primary Key?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Its value must be unique (no two records share it), and it can never be null.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">Why is a junction table usually needed for a Many-to-Many relationship?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because a direct Many-to-Many link can't be cleanly represented between just two tables — a third "junction" table breaks it into two One-to-Many relationships instead, one with each original table.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">In database terms, an entity's fields are known as ______.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>attributes.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">A student says a foreign key must be unique in its own table, just like a primary key. What's wrong?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A foreign key's job is to MATCH a primary key value in another table — it does NOT need to be unique within its own table (many records can share the same foreign key value, e.g. many students in the same class).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">A library has many books, and each book can be borrowed by many different members over time (and each member can borrow many books). What type of relationship is this, and what extra table would likely be needed?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A Many-to-Many relationship — it would need a junction table (e.g. a "Loans" table) connecting Books and Members.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">Why is One-to-Many the MOST common relationship type in relational databases?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>Because most real-world connections naturally work that way — e.g. one class has many students, one teacher may have many classes — making it the most frequently needed relationship shape.</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — Grade 9 — Unit 7: Introduction to Database System — 7.3 Entities, Relationships &amp; Keys<br>
+    Adapted from: The Textbook of Computer Science for Grade 9 (Sindh Textbook Board, Jamshoro) — Unit 7
+  </div>
+
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var classId = params.get('classId');
+  if (!classId) return;
+  var file = location.pathname.split('/').pop();
+  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=grade9-book')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.overrides)) return;
+      var row = data.overrides.find(function (o) { return o.scope === 'stage' && o.target_id === file; });
+      if (!row || !row.override_data) return;
+      if (row.override_data.html) document.body.innerHTML = row.override_data.html;
+      if (row.override_data.title) document.title = row.override_data.title;
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>

@@ -364,6 +364,46 @@ function fakeAI(content, calls = []) {
     ok(r.calls.length === 0, 'igcse-y2 non-fill: a real code challenge is never routed to the AI marker, even with Cyrillic in it')
   }
 
+  // ── Grade 9: Unit 1 theory ("lesson" + "fill" challenges) — same pattern as
+  // igcse-y2's fill-through-the-editor AI marker fallback. ──
+  const g9 = readFileSync(ROOT + '/lessons/grade9.html', 'utf8')
+  const h0g9 = g9.indexOf('const CHALLENGES = ['), hmg9 = g9.slice(h0g9).match(/\r?\n\]\r?\n/)
+  const { CHALLENGES: G9 } = new Function(g9.slice(h0g9, h0g9 + hmg9.index + hmg9[0].indexOf(']') + 1) + '\nreturn { CHALLENGES }')()
+  const g9fnSrc = g9.slice(g9.indexOf('function validateChallenge(code, result) {'), g9.indexOf('function showHint() {'))
+  function g9run(ch, mockContent) {
+    const outEl = { innerHTML: '', innerText: '' }
+    const appendOut = (text) => { outEl.innerText += text + '\n' }
+    const done = new Set(), calls = []
+    const lang = loadLang('ru', fakeAI(mockContent, calls))
+    const f = new Function('document', 'BFLang', 'CHALLENGES', 'activeIdx', 'completed', 'renderPills', 'showToast', 'me', 'BF', 'LessonSaves', 'reportRealProgress', 'challengeStartedAt', 'appendOut',
+      g9fnSrc + '\nreturn { validateChallenge }')(
+      { getElementById: () => outEl }, lang, [ch], 0, done, () => {}, () => {}, null, null, { save() {} }, () => {}, 0, appendOut)
+    return { rt: f, outEl, done, calls }
+  }
+  const g9FillCh = G9.find(c => c.type === 'fill')
+  {
+    const good = g9run(g9FillCh, '{"score":90,"feedback":"Верно!"}')
+    good.rt.validateChallenge('аналитическая машина', null); await new Promise(r => setTimeout(r, 10))
+    ok(good.calls.length === 1 && good.done.has(0), 'grade9 fill: a Russian answer typed in the editor is marked by the AI and a good one completes the challenge')
+    const bad = g9run(g9FillCh, '{"score":5,"feedback":"Нет."}')
+    bad.rt.validateChallenge('банан', null); await new Promise(r => setTimeout(r, 10))
+    ok(bad.calls.length === 1 && !bad.done.has(0) && /✗/.test(bad.outEl.innerText), 'grade9 fill: a wrong Russian answer is rejected')
+    const en = g9run(g9FillCh, '{"score":100,"feedback":"x"}')
+    en.rt.validateChallenge('Analytical', null); await new Promise(r => setTimeout(r, 10))
+    ok(en.calls.length === 0 && en.done.has(0), 'grade9 fill: an English answer still passes via the original keyword check, never calling the AI')
+    const off = g9run(g9FillCh, () => { throw new Error('x') })
+    off.rt.validateChallenge('аналитическая машина', null); await new Promise(r => setTimeout(r, 10))
+    ok(!off.done.has(0) && /Could not check|Не удалось/.test(off.outEl.innerText), 'grade9 fill: if the marker is unreachable the student gets a clear message, not a false pass')
+  }
+  {
+    // A real pseudocode-writing challenge must never be routed to the AI
+    // marker, even with Cyrillic in a comment.
+    const g9CodeCh = G9.find(c => c.type !== 'fill' && c.type !== 'lesson')
+    const r = g9run(g9CodeCh, 'should never be called')
+    r.rt.validateChallenge('// комментарий на русском\nOUTPUT 1', { output: ['wrong'] })
+    ok(r.calls.length === 0, 'grade9 non-fill: a real code challenge is never routed to the AI marker, even with Cyrillic in it')
+  }
+
   // ── AS / A Level: THEORY_EXERCISES short answers ──
   for (const page of ['as-level', 'a-level']) {
     const html = readFileSync(ROOT + `/lessons/${page}.html`, 'utf8')

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>7.3.4 Entity Relationship Model — Grade 9 Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(168,85,247,.12); color: #c084fc; border: 1px solid rgba(168,85,247,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .shape-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .shape-grid { grid-template-columns: 1fr; } }
+  .shape-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .shape-icon { flex: none; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; }
+  .shape-icon .rect { width: 40px; height: 26px; border: 2px solid #c084fc; border-radius: 3px; }
+  .shape-icon .ellipse { width: 42px; height: 26px; border: 2px solid #60a5fa; border-radius: 50%; }
+  .shape-icon .diamond { width: 30px; height: 30px; border: 2px solid #fbbf24; transform: rotate(45deg); }
+  .shape-icon .line { width: 40px; height: 2px; background: #4ade80; }
+  .shape-card p { font-size: 12px; color: #9ca3af; line-height: 1.6; margin: 0; }
+  .shape-card b { color: #e2e8f0; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul, .theory-block ol { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(168,85,247,.12); border: 1px solid rgba(168,85,247,.25); color: #c084fc; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">Grade 9 · Unit 7 · Databases</span>
+  <div class="topic-title">7.3.4 Entity Relationship (ER) Model</div>
+  <div class="topic-subtitle">The four shapes of an ER diagram, and the six steps to design one.</div>
+
+  <div class="theory-block">
+    <h4>What an ER Model is</h4>
+    <ul>
+      <li>An Entity Relationship Diagram (ERD) describes entities, attributes, and relationships (with their types) in a simplified diagram.</li>
+      <li>Used TWO ways: (1) to design a database that doesn't exist yet, based on requirements, or (2) to DOCUMENT an existing database (many tools auto-generate an ERD from a live database).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Theory — Four ER Diagram Shapes</div>
+  <div class="shape-grid">
+    <div class="shape-card"><div class="shape-icon"><div class="rect"></div></div><p><b>Rectangle</b> — an entity (a real-world object like Student, Teacher, Class).</p></div>
+    <div class="shape-card"><div class="shape-icon"><div class="ellipse"></div></div><p><b>Ellipse</b> — an attribute of an entity (one entity can have several).</p></div>
+    <div class="shape-card"><div class="shape-icon"><div class="diamond"></div></div><p><b>Diamond</b> — a relationship between two entities.</p></div>
+    <div class="shape-card"><div class="shape-icon"><div class="line"></div></div><p><b>Line (annotated 1 or M)</b> — connects entities, labeled to show One or Many on each end.</p></div>
+  </div>
+
+  <div class="theory-block">
+    <h4>Six Steps to Design an ER Model</h4>
+    <ol>
+      <li>Identify and design the entities, based on user requirements.</li>
+      <li>Identify and design the attributes within those entities.</li>
+      <li>Identify the relationships required between entities.</li>
+      <li>Define Primary Keys in interrelated entities.</li>
+      <li>Design Foreign Key relationships, binding them to the Primary Keys already created.</li>
+      <li>Generate the final (often automated) Entity Relationship Diagram.</li>
+    </ol>
+  </div>
+
+  <div class="theory-block">
+    <h4>Worked example — "A writer creates a novel and a consumer buys a novel"</h4>
+    <ul>
+      <li><b>Entities (rectangles):</b> Writer, Consumer, Novel.</li>
+      <li><b>Relationships (diamonds):</b> Creates (Writer → Novel), Buys (Consumer → Novel).</li>
+    </ul>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what this subsection taught — ER diagram shapes and design steps.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which ER diagram shape represents an entity, and which represents a relationship?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A rectangle represents an entity. A diamond represents a relationship.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">In the ER design steps, why must Primary Keys be defined BEFORE Foreign Keys?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>A Foreign Key has to bind/connect to an existing Primary Key in another entity — so the Primary Keys must already exist before Foreign Key relationships can be designed around them.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">In an ER diagram, an attribute of an entity is represented by an ______ shape.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>ellipse.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">A student says an ER diagram can ONLY be made before a database is built, never afterward. What's wrong?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>An ERD can also be used to DOCUMENT an already-existing database — many database tools can auto-generate one from a live database for this purpose.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">In the "A writer creates a novel" example, what shape would represent "Creates", and what shape would represent "Novel"?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>"Creates" is a relationship, so it's a diamond. "Novel" is an entity, so it's a rectangle.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What do the labels "1" and "M" on a connecting line in an ER diagram represent?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>They describe the type of relationship at that end of the connection — "1" means One, "M" means Many (e.g. a 1-to-M line means one record connects to many).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — Grade 9 — Unit 7: Introduction to Database System — 7.3.4 Entity Relationship Model<br>
+    Adapted from: The Textbook of Computer Science for Grade 9 (Sindh Textbook Board, Jamshoro) — Unit 7
+  </div>
+
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var classId = params.get('classId');
+  if (!classId) return;
+  var file = location.pathname.split('/').pop();
+  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=grade9-book')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.overrides)) return;
+      var row = data.overrides.find(function (o) { return o.scope === 'stage' && o.target_id === file; });
+      if (!row || !row.override_data) return;
+      if (row.override_data.html) document.body.innerHTML = row.override_data.html;
+      if (row.override_data.title) document.title = row.override_data.title;
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>6.5-6.6 Images, Backgrounds &amp; Hyperlinks — Grade 9 Computer Science</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f1a; color: #e2e8f0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin: 0; padding: 28px 20px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .topic-chapter-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+    background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.3); text-transform: uppercase; letter-spacing: .04em; }
+  .topic-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin: 8px 0 4px; }
+  .topic-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 24px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.35); margin: 28px 0 10px; }
+  .theory-block { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .theory-block h4 { color: #e2e8f0; font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+  .theory-block ul { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.75; color: #e2e8f0; }
+  .theory-block li { margin-bottom: 8px; }
+  .theory-block li:last-child { margin-bottom: 0; }
+  .theory-block code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  pre.codeblock { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 12px 14px; font-family: ui-monospace, monospace; font-size: 12px; color: #b8ef4a; overflow-x: auto; margin: 10px 0 0; }
+  .question-card { background: #111320; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .q-number-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 6px; background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; margin-right: 8px; }
+  .q-type { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; float: right; }
+  .q-stem { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin: 8px 0; }
+  .q-stem code { background: rgba(255,255,255,.08); color: #b8ef4a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+  details.answer-key { margin-top: 8px; }
+  summary.answer-key-toggle { cursor: pointer; font-size: 11.5px; font-weight: 700; color: #4ade80; list-style: none; user-select: none; }
+  summary.answer-key-toggle::-webkit-details-marker { display: none; }
+  summary.answer-key-toggle::before { content: '▶ '; }
+  details[open] summary.answer-key-toggle::before { content: '▼ '; }
+  .answer-body { margin-top: 10px; background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.2); border-radius: 8px; padding: 12px 14px; }
+  .answer-body p { font-size: 12.5px; color: #9ca3af; line-height: 1.7; margin: 0 0 6px; }
+  .answer-body p:last-child { margin-bottom: 0; }
+  .answer-body strong { color: #4ade80; }
+  .source-note { font-size: 10.5px; color: #6b7280; margin-top: 40px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="topic-chapter-badge">Grade 9 · Unit 6 · Web Development</span>
+  <div class="topic-title">6.5-6.6 Images, Backgrounds &amp; Hyperlinks</div>
+  <div class="topic-subtitle">The &lt;img&gt; tag's attributes, page backgrounds, and linking pages together with &lt;a&gt;.</div>
+
+  <div class="theory-block">
+    <h4>Images — <code>&lt;img&gt;</code></h4>
+    <ul>
+      <li>An empty tag (no closing tag needed) — it only REFERENCES an image file, it doesn't copy it.</li>
+      <li><b>src</b> (required) — the image file's URL/path.</li>
+      <li><b>alt</b> (required) — alternate text shown if the image can't load.</li>
+      <li><b>width</b> / <b>height</b> (optional) — display size in pixels.</li>
+      <li><b>border</b> (optional) — border width around the image.</li>
+    </ul>
+    <pre class="codeblock">&lt;img src="bridge.jpg" alt="Bridge" width="600"&gt;</pre>
+  </div>
+
+  <div class="theory-block">
+    <h4>Backgrounds</h4>
+    <ul>
+      <li>By default, browsers show a white background. Change it with two <code>&lt;body&gt;</code> attributes:</li>
+      <li><b>bgcolor</b> — sets a background color (RGB code, hex code, or color name): <code>&lt;body bgcolor="green"&gt;</code></li>
+      <li><b>background</b> — sets a background IMAGE: <code>&lt;body background="image.jpg"&gt;</code></li>
+    </ul>
+  </div>
+
+  <div class="theory-block">
+    <h4>Hyperlinks — <code>&lt;a&gt;</code></h4>
+    <ul>
+      <li>Defined by the <code>&lt;a&gt;</code> tag and its <code>href</code> attribute — turns text/media into something clickable that navigates somewhere.</li>
+      <li><b>Linking to another page:</b> <code>&lt;a href="http://www.google.com"&gt;Goto Google&lt;/a&gt;</code></li>
+      <li><b>Linking within the SAME page</b> (two steps): give a section an <code>id</code>, then link to it with <code>href="#thatId"</code>.</li>
+      <li><b>target</b> attribute controls WHERE the link opens: <code>_blank</code> (new tab), <code>_self</code>, <code>_parent</code>, <code>_top</code>.</li>
+    </ul>
+    <pre class="codeblock">&lt;p id="navigate"&gt;Send user here on click&lt;/p&gt;
+&lt;a href="#navigate"&gt;Go to the linked paragraph&lt;/a&gt;</pre>
+  </div>
+
+  <div class="section-label">Practice — Test Yourself</div>
+  <p style="font-size:12px;color:#9ca3af;margin-top:-4px;margin-bottom:16px;">These questions only cover what this subsection taught — images, backgrounds, and hyperlinks.</p>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">1</span>
+    <div class="q-stem">Which two <code>&lt;img&gt;</code> attributes are REQUIRED, not optional?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>src (the image source) and alt (alternate text).</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">2</span>
+    <div class="q-stem">What are the two steps needed to link to a section WITHIN the same page?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>1. Give the target section an id attribute. 2. Create a link with href set to that id, prefixed with a hash (#) symbol.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Fill in the blank</span>
+    <span class="q-number-badge">3</span>
+    <div class="q-stem">Setting a link's target attribute to ______ opens the linked page in a new browser tab/window.</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>_blank.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Spot the error</span>
+    <span class="q-number-badge">4</span>
+    <div class="q-stem">A student says <code>&lt;img&gt;</code> copies the image file into the HTML document itself. What's wrong?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The <code>&lt;img&gt;</code> tag only creates a REFERENCE to the original image file stored elsewhere — it does not copy the image into the document.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Applied / scenario</span>
+    <span class="q-number-badge">5</span>
+    <div class="q-stem">A student wants their whole page background to be a specific shade of blue using a hex code. Which attribute, on which tag, should they use?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>The bgcolor attribute on the &lt;body&gt; tag — its value can be a hex code, RGB code, or color name.</p>
+    </div></details>
+  </div>
+
+  <div class="question-card">
+    <span class="q-type">Short answer</span>
+    <span class="q-number-badge">6</span>
+    <div class="q-stem">What does the alt attribute of an image do?</div>
+    <details class="answer-key"><summary class="answer-key-toggle">Reveal answer</summary><div class="answer-body">
+      <p>It defines alternate text shown if the image itself fails to load (or is read aloud by accessibility tools).</p>
+    </div></details>
+  </div>
+
+  <div class="source-note">
+    ByteForge — Grade 9 — Unit 6: Web Development — 6.5-6.6 Images, Backgrounds &amp; Hyperlinks<br>
+    Adapted from: The Textbook of Computer Science for Grade 9 (Sindh Textbook Board, Jamshoro) — Unit 6
+  </div>
+
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var classId = params.get('classId');
+  if (!classId) return;
+  var file = location.pathname.split('/').pop();
+  fetch('/api/class-lesson-overrides?classId=' + encodeURIComponent(classId) + '&lessonKey=grade9-book')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (!data || !Array.isArray(data.overrides)) return;
+      var row = data.overrides.find(function (o) { return o.scope === 'stage' && o.target_id === file; });
+      if (!row || !row.override_data) return;
+      if (row.override_data.html) document.body.innerHTML = row.override_data.html;
+      if (row.override_data.title) document.title = row.override_data.title;
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>
