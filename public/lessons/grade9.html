@@ -133,6 +133,7 @@
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
   <script src="../js/lang.js"></script>
+  <script src="grade9-content-ru.js"></script>
 </head>
 <body>
 
@@ -234,12 +235,12 @@
   <div style="display:flex;flex-direction:column;overflow:hidden;">
     <div class="lesson-wrap-header">
       <div class="lesson-wrap-title" id="lesson-wrap-title"></div>
-      <button class="btn btn-ghost" onclick="stepChallenge(-1)">← Back</button>
+      <button class="btn btn-ghost" id="lesson-wrap-back-btn" onclick="stepChallenge(-1)">← Back</button>
     </div>
     <div class="lesson-wrap-body"><iframe id="lesson-wrap-iframe"></iframe></div>
     <div class="lesson-wrap-footer">
       <span id="lesson-wrap-feedback"></span>
-      <button class="btn btn-brand" onclick="markLessonComplete()">✓ Mark Complete</button>
+      <button class="btn btn-brand" id="lesson-wrap-complete-btn" onclick="markLessonComplete()">✓ Mark Complete</button>
     </div>
   </div>
 </div>
@@ -1739,13 +1740,16 @@ function selectChallenge(i) {
     showMissionMain(false)
     document.getElementById('lesson-wrap-title').textContent = ch.mod + ' ' + ch.name
     document.getElementById('lesson-wrap-iframe').src = '/lessons/grade9-book/' + ch.bookFile
-    document.getElementById('lesson-wrap-feedback').textContent = completed.has(i) ? '✓ Already complete' : ''
+    const ruLesson = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+    document.getElementById('lesson-wrap-feedback').textContent = completed.has(i) ? (ruLesson ? '✓ Уже пройдено' : '✓ Already complete') : ''
     document.getElementById('lesson-wrap-feedback').style.color = '#4ade80'
+    document.getElementById('lesson-wrap-back-btn').textContent = ruLesson ? '← Назад' : '← Back'
+    document.getElementById('lesson-wrap-complete-btn').textContent = ruLesson ? '✓ Отметить пройденным' : '✓ Mark Complete'
     renderPills()
     return
   }
   showMissionMain(true)
-  document.getElementById('ch-text').innerHTML=ch.text
+  document.getElementById('ch-text').innerHTML=g9TrChallenge(ch).text
   document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
   // Restore whatever was last saved for THIS stage — correct or not, and even
   // if already passed — instead of always resetting to the starter.
@@ -1761,18 +1765,52 @@ function selectChallenge(i) {
     lessonEl.style.display = lesson ? 'block' : 'none'
   }
 }
+// Returns { text, hints } for a challenge in the current language — falls
+// back to the original English whenever no Russian entry exists (e.g. the
+// RU table hasn't reached that challenge yet), so nothing goes blank.
+function g9TrChallenge(ch) {
+  if (typeof BFLang === 'undefined' || BFLang.get() !== 'ru' || typeof G9_RU_TEXT === 'undefined') {
+    return { text: ch.text, hints: ch.hints }
+  }
+  const tr = G9_RU_TEXT[ch.mod + '/' + ch.name]
+  if (!tr) return { text: ch.text, hints: ch.hints }
+  if (typeof tr === 'string') return { text: tr, hints: ch.hints }
+  return { text: tr.text || ch.text, hints: tr.hints || ch.hints }
+}
+if (typeof BFLang !== 'undefined') {
+  // Re-draw the open challenge's text/hint in the new language. Doesn't touch
+  // the editor or output, so a student's in-progress code/run is never lost.
+  BFLang.onChange(() => {
+    const ch = CHALLENGES[activeIdx]
+    if (!ch) return
+    const ru = BFLang.get() === 'ru'
+    if (ch.type === 'lesson') {
+      document.getElementById('lesson-wrap-title').textContent = ch.mod + ' ' + ch.name
+      const backBtn = document.getElementById('lesson-wrap-back-btn')
+      if (backBtn) backBtn.textContent = ru ? '← Назад' : '← Back'
+      const completeBtn = document.getElementById('lesson-wrap-complete-btn')
+      if (completeBtn) completeBtn.textContent = ru ? '✓ Отметить пройденным' : '✓ Mark Complete'
+      const fb = document.getElementById('lesson-wrap-feedback')
+      if (fb && completed.has(activeIdx)) fb.textContent = ru ? '✓ Уже пройдено' : '✓ Already complete'
+      return
+    }
+    const chTextEl = document.getElementById('ch-text')
+    if (chTextEl) chTextEl.innerHTML = g9TrChallenge(ch).text
+  })
+}
 function markLessonComplete() {
   const ch = CHALLENGES[activeIdx]
   if (!ch || ch.type !== 'lesson') return
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
   const fb = document.getElementById('lesson-wrap-feedback')
-  if (completed.has(activeIdx)) { fb.textContent = '✓ Already marked complete.'; return }
+  if (completed.has(activeIdx)) { fb.textContent = ru ? '✓ Уже отмечено пройденным.' : '✓ Already marked complete.'; return }
   completed.add(activeIdx)
   renderPills()
-  showToast('Lesson complete! +' + ch.xp + ' XP')
+  showToast((ru ? 'Урок пройден! +' : 'Lesson complete! +') + ch.xp + ' XP')
   if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + activeIdx, { passed: true, score: 100 }) }
   LessonSaves.save('grade9', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code: 'self-check' })
   try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
-  fb.textContent = '✓ Marked complete!'
+  fb.textContent = ru ? '✓ Отмечено как пройденное!' : '✓ Marked complete!'
 }
 
 // ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
@@ -1868,8 +1906,10 @@ async function checkForeignFillAnswer(ch, ans) {
 
 function showHint() {
   const ch=CHALLENGES[activeIdx]; if(!ch) return
-  if(hintIdx<ch.hints.length) appendOut('Hint '+(hintIdx+1)+': '+ch.hints[hintIdx++],'out-ok')
-  else appendOut('No more hints!','out-ok')
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+  const hints = g9TrChallenge(ch).hints || []
+  if(hintIdx<hints.length) appendOut((ru?'Подсказка ':'Hint ')+(hintIdx+1)+': '+hints[hintIdx++],'out-ok')
+  else appendOut(ru?'Больше подсказок нет!':'No more hints!','out-ok')
 }
 
 function showToast(msg) {
