@@ -94,6 +94,11 @@ for (const cfg of PAGES) {
         document: doc, renderPills() {}, p2RenderPills() {}, p2ClearTrace() {}, clearTraceTable() {},
         showMissionMain() {}, renderChallengeLesson() {}, renderP2Lesson() {},
         G9_MOD_LESSON: {}, currentClassId: null,
+        // grade9.html/igcse-y2.html translate ch.text through these before
+        // display; stub them so the extracted selectChallenge body (which
+        // calls them unconditionally) doesn't throw in isolation.
+        g9TrChallenge: ch => ({ text: ch.text, hints: ch.hints }),
+        y2TrChallenge: ch => ({ text: ch.text, hints: ch.hints }),
       }
       const fn = new Function(...Object.keys(stub), body.replace(/function \w+\(i\)\s*{?\s*{?/, 'function go(i) {') + '\nreturn go')(...Object.values(stub))
       fn(0)

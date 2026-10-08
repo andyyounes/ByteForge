@@ -113,6 +113,7 @@
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
   <script src="../js/lang.js"></script>
+  <script src="igcse-y2-content-ru.js"></script>
 </head>
 <body>
 
@@ -141,7 +142,7 @@
     </div>
     <iframe id="lesson-wrap-iframe" style="width:100%;height:62vh;min-height:420px;border:0;border-radius:10px;background:#0d0f1a;" title="Lesson"></iframe>
     <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <button class="btn btn-brand" onclick="markLessonComplete()">✓ Mark lesson complete</button>
+      <button class="btn btn-brand" id="lesson-wrap-complete-btn" onclick="markLessonComplete()">✓ Mark lesson complete</button>
       <span id="lesson-wrap-feedback" style="font-size:13px;font-weight:700;"></span>
     </div>
   </div>
@@ -1734,13 +1735,16 @@ function selectChallenge(i){
     document.getElementById('lesson-wrap-title').textContent = ch.mod + ' ' + ch.name
     const qs = currentClassId ? ('?classId=' + encodeURIComponent(currentClassId)) : ''
     document.getElementById('lesson-wrap-iframe').src = '/lessons/igcse-y2-book/' + ch.bookFile + qs
-    document.getElementById('lesson-wrap-feedback').textContent = completed.has(i) ? '✓ Already complete' : ''
+    const ruLesson = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+    document.getElementById('lesson-wrap-feedback').textContent = completed.has(i) ? (ruLesson ? '✓ Уже пройдено' : '✓ Already complete') : ''
     document.getElementById('lesson-wrap-feedback').style.color = '#4ade80'
+    const completeBtn = document.getElementById('lesson-wrap-complete-btn')
+    if (completeBtn) completeBtn.textContent = ruLesson ? '✓ Отметить урок пройденным' : '✓ Mark lesson complete'
     renderPills()
     return
   }
   showMissionMain(true)
-  document.getElementById('ch-text').innerHTML=ch.text
+  document.getElementById('ch-text').innerHTML=y2TrChallenge(ch).text
   document.getElementById('xp-pill').textContent='+'+ch.xp+' XP'
   // Restore whatever was last saved for THIS stage — correct or not, and even
   // if already passed — instead of always resetting to the starter.
@@ -1752,15 +1756,45 @@ function selectChallenge(i){
 function markLessonComplete() {
   const ch = CHALLENGES[activeIdx]
   if (!ch || ch.type !== 'lesson') return
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
   const fb = document.getElementById('lesson-wrap-feedback')
-  if (completed.has(activeIdx)) { fb.textContent = '✓ Already marked complete.'; return }
+  if (completed.has(activeIdx)) { fb.textContent = ru ? '✓ Уже отмечено пройденным.' : '✓ Already marked complete.'; return }
   completed.add(activeIdx)
   renderPills()
-  showToast('Lesson complete! +' + ch.xp + ' XP')
+  showToast((ru ? 'Урок пройден! +' : 'Lesson complete! +') + ch.xp + ' XP')
   if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'gy2-c' + activeIdx, { passed: true, score: 100 }) }
   LessonSaves.save('igcse-y2', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code: 'self-check' })
   try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
-  fb.textContent = '✓ Marked complete!'
+  fb.textContent = ru ? '✓ Отмечено как пройденное!' : '✓ Marked complete!'
+}
+// Returns { text, hints } for a challenge in the current language — falls
+// back to the original English whenever no Russian entry exists, so
+// nothing goes blank.
+function y2TrChallenge(ch) {
+  if (typeof BFLang === 'undefined' || BFLang.get() !== 'ru' || typeof G9Y2_RU_TEXT === 'undefined') {
+    return { text: ch.text, hints: ch.hints }
+  }
+  const tr = G9Y2_RU_TEXT[ch.mod + '/' + ch.name]
+  if (!tr) return { text: ch.text, hints: ch.hints }
+  return { text: tr.text || ch.text, hints: tr.hints || ch.hints }
+}
+if (typeof BFLang !== 'undefined') {
+  // Re-draw the open challenge's text/hint in the new language. Doesn't touch
+  // the editor or output, so a student's in-progress code/run is never lost.
+  BFLang.onChange(() => {
+    const ch = CHALLENGES[activeIdx]
+    if (!ch) return
+    const ru = BFLang.get() === 'ru'
+    if (ch.type === 'lesson') {
+      const completeBtn = document.getElementById('lesson-wrap-complete-btn')
+      if (completeBtn) completeBtn.textContent = ru ? '✓ Отметить урок пройденным' : '✓ Mark lesson complete'
+      const fb = document.getElementById('lesson-wrap-feedback')
+      if (fb && completed.has(activeIdx)) fb.textContent = ru ? '✓ Уже пройдено' : '✓ Already complete'
+      return
+    }
+    const chTextEl = document.getElementById('ch-text')
+    if (chTextEl) chTextEl.innerHTML = y2TrChallenge(ch).text
+  })
 }
 
 // 📘 Full per-challenge lesson — CHALLENGE_LESSON defined after CHALLENGES,
@@ -1848,8 +1882,10 @@ async function checkForeignFillAnswer(ch, ans) {
 }
 function showHint(){
   const ch=CHALLENGES[activeIdx];if(!ch)return
-  if(hintIdx<ch.hints.length)appendOut('Hint '+(hintIdx+1)+': '+ch.hints[hintIdx++],'out-ok')
-  else appendOut('No more hints!','out-ok')
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+  const hints = y2TrChallenge(ch).hints || []
+  if(hintIdx<hints.length)appendOut((ru?'Подсказка ':'Hint ')+(hintIdx+1)+': '+hints[hintIdx++],'out-ok')
+  else appendOut(ru?'Больше подсказок нет!':'No more hints!','out-ok')
 }
 function showToast(msg){
   const t=document.getElementById('toast');t.textContent=msg
