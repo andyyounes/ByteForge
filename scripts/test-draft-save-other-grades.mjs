@@ -99,6 +99,7 @@ for (const cfg of PAGES) {
         // calls them unconditionally) doesn't throw in isolation.
         g9TrChallenge: ch => ({ text: ch.text, hints: ch.hints }),
         y2TrChallenge: ch => ({ text: ch.text, hints: ch.hints }),
+        p2TrChallenge: ch => ({ text: ch.text, hints: ch.hints }),
       }
       const fn = new Function(...Object.keys(stub), body.replace(/function \w+\(i\)\s*{?\s*{?/, 'function go(i) {') + '\nreturn go')(...Object.values(stub))
       fn(0)

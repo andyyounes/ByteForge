@@ -791,6 +791,7 @@
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
   <script src="../js/lang.js"></script>
+  <script src="p2-content-ru.js"></script>
   <script src="../js/lesson-quest.js"></script>
 </head>
 <body>
@@ -7533,7 +7534,7 @@ function p2SelectChallenge(i) {
   const chText = document.getElementById('p2-ch-text')
   const xpPill = document.getElementById('p2-xp-pill')
   const output = document.getElementById('p2-output')
-  if (chText) chText.innerHTML = ch.text
+  if (chText) chText.innerHTML = p2TrChallenge(ch).text
   if (xpPill) xpPill.textContent = '+' + ch.xp + ' XP'
   // Restore whatever was last saved for THIS stage — correct or not, and even
   // if already passed — instead of always resetting to the starter.
@@ -7565,12 +7566,35 @@ function p2ValidateChallenge(code, result) {
     p2AppendOut('✓ Challenge passed! +' + ch.xp + ' XP', 'out-ok')
   }
 }
+// Returns { text, hints } for a challenge in the current language — falls
+// back to the original English whenever no Russian entry exists, so
+// nothing goes blank.
+function p2TrChallenge(ch) {
+  if (typeof BFLang === 'undefined' || BFLang.get() !== 'ru' || typeof P2_RU_TEXT === 'undefined') {
+    return { text: ch.text, hints: ch.hints }
+  }
+  const tr = P2_RU_TEXT[ch.mod]
+  if (!tr) return { text: ch.text, hints: ch.hints }
+  return { text: tr.text || ch.text, hints: tr.hints || ch.hints }
+}
+if (typeof BFLang !== 'undefined') {
+  // Re-draw the open challenge's text in the new language. Doesn't touch
+  // the editor or output, so a student's in-progress code/run is never lost.
+  BFLang.onChange(() => {
+    const ch = P2_CHALLENGES[p2ActiveIdx]
+    if (!ch) return
+    const chText = document.getElementById('p2-ch-text')
+    if (chText) chText.innerHTML = p2TrChallenge(ch).text
+  })
+}
 function p2ShowHint() {
   const ch = P2_CHALLENGES[p2ActiveIdx]; if (!ch) return
-  if (p2HintIdx < ch.hints.length) {
-    p2AppendOut('💡 Hint ' + (p2HintIdx + 1) + ': ' + ch.hints[p2HintIdx++], 'out-ok')
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+  const hints = p2TrChallenge(ch).hints || []
+  if (p2HintIdx < hints.length) {
+    p2AppendOut((ru ? '💡 Подсказка ' : '💡 Hint ') + (p2HintIdx + 1) + ': ' + hints[p2HintIdx++], 'out-ok')
   } else {
-    p2AppendOut('— No more hints!', 'out-ok')
+    p2AppendOut(ru ? '— Больше подсказок нет!' : '— No more hints!', 'out-ok')
   }
 }
 function resetStarter() {
