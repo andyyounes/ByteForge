@@ -97,6 +97,7 @@
   <script src="../js/lesson-saves.js"></script>
   <script src="../js/quest-map.js"></script>
   <script src="../js/lang.js"></script>
+  <script src="igcse-y1-content-ru.js"></script>
 </head>
 <body>
 
@@ -1384,16 +1385,18 @@ function renderAnswerInput(ch) {
     // duplicating its content here.
     const qs = currentClassId ? ('?classId=' + encodeURIComponent(currentClassId)) : ''
     wrap.innerHTML = `<iframe src="/lessons/igcse-y1-book/${ch.bookFile}${qs}" style="width:100%;height:52vh;min-height:380px;border:0;border-radius:10px;background:#0d0f1a;" title="Lesson"></iframe>`
-    if (checkBtn) checkBtn.textContent = '✓ Mark lesson complete'
+    if (checkBtn) checkBtn.textContent = (typeof BFLang !== 'undefined' && BFLang.get() === 'ru') ? '✓ Отметить урок пройденным' : '✓ Mark lesson complete'
     if (hintFooterBtn) hintFooterBtn.style.display = 'none'
   } else {
+    const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
     const multiline = ch.type === 'theory' || ch.type === 'trace'
+    const placeholder = ru ? 'Введи ответ здесь…' : 'Type your answer here…'
     if (multiline) {
-      wrap.innerHTML = `<textarea class="ans-input" id="ans-field" placeholder="Type your answer here…" rows="8"></textarea>`
+      wrap.innerHTML = `<textarea class="ans-input" id="ans-field" placeholder="${placeholder}" rows="8"></textarea>`
     } else {
-      wrap.innerHTML = `<input class="ans-input" id="ans-field" type="text" placeholder="Type your answer here…" />`
+      wrap.innerHTML = `<input class="ans-input" id="ans-field" type="text" placeholder="${placeholder}" />`
     }
-    if (checkBtn) checkBtn.textContent = '✓ Check'
+    if (checkBtn) checkBtn.textContent = ru ? '✓ Проверить' : '✓ Check'
     if (hintFooterBtn) hintFooterBtn.style.display = ''
   }
   document.getElementById('ch-type-badge').textContent = ch.type.toUpperCase()
@@ -1430,14 +1433,27 @@ function toggleChallengeList() {
   if (tog) tog.textContent = expanded ? '✕ Hide list' : '☰ All challenges'
 }
 
+// Returns { text, hints } for a challenge in the current language — falls
+// back to the original English whenever no Russian entry exists, so
+// nothing goes blank.
+function y1TrChallenge(ch) {
+  if (typeof BFLang === 'undefined' || BFLang.get() !== 'ru' || typeof Y1_RU_TEXT === 'undefined') {
+    return { text: ch.text, hints: ch.hints }
+  }
+  const tr = Y1_RU_TEXT[ch.mod + '/' + ch.name]
+  if (!tr) return { text: ch.text, hints: ch.hints }
+  return { text: tr.text || ch.text, hints: tr.hints || ch.hints }
+}
 function selectChallenge(i) {
   activeIdx = i; hintIdx = 0; challengeStartedAt = Date.now()
   const ch = CHALLENGES[i]
-  document.getElementById('ch-text').innerHTML = ch.text
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+  const trText = y1TrChallenge(ch).text
+  document.getElementById('ch-text').innerHTML = trText
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
   document.getElementById('ans-prompt').innerHTML = ch.type === 'lesson'
-    ? 'Read through the lesson below, then mark it complete when you’re done.'
-    : ch.text
+    ? (ru ? 'Изучи урок ниже, затем отметь его пройденным, когда закончишь.' : 'Read through the lesson below, then mark it complete when you’re done.')
+    : trText
   document.getElementById('hint-log').innerHTML = ''
   document.getElementById('feedback').textContent = ''
   renderAnswerInput(ch)
@@ -1471,27 +1487,29 @@ function toggleChallengeLesson() {
 function markLessonComplete() {
   const ch = CHALLENGES[activeIdx]
   if (!ch) return
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
   if (completed.has(activeIdx)) {
     document.getElementById('feedback').className = 'feedback ok'
-    document.getElementById('feedback').textContent = '✓ Already marked complete.'
+    document.getElementById('feedback').textContent = ru ? '✓ Уже отмечено пройденным.' : '✓ Already marked complete.'
     return
   }
   completed.add(activeIdx)
   renderPills()
-  showToast('Lesson complete! +' + ch.xp + ' XP')
+  showToast((ru ? 'Урок пройден! +' : 'Lesson complete! +') + ch.xp + ' XP')
   if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'gy1-c' + activeIdx, { passed: true, score: 100 }) }
   LessonSaves.save('igcse-y1', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code: 'self-check' })
   try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
   document.getElementById('feedback').className = 'feedback ok'
-  document.getElementById('feedback').textContent = '✓ Marked complete!'
+  document.getElementById('feedback').textContent = ru ? '✓ Отмечено как пройденное!' : '✓ Marked complete!'
 }
 
 function checkAnswer() {
   const ch = CHALLENGES[activeIdx]
   if (!ch) return
   if (ch.type === 'lesson') { markLessonComplete(); return }
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
   const ans = getAnswer().trim()
-  if (!ans) { document.getElementById('feedback').className = 'feedback err'; document.getElementById('feedback').textContent = 'Please type an answer first.'; return }
+  if (!ans) { document.getElementById('feedback').className = 'feedback err'; document.getElementById('feedback').textContent = ru ? 'Сначала введи ответ.' : 'Please type an answer first.'; return }
 
   // An answer written in another language (Russian, ...) can't match the English
   // keyword rules in ch.check(), so a WORDED answer is marked by the AI marker
@@ -1506,7 +1524,7 @@ function checkAnswer() {
     passChallenge(ch, ans)
   } else {
     document.getElementById('feedback').className = 'feedback err'
-    document.getElementById('feedback').textContent = '✗ Not quite — check the hint for guidance.'
+    document.getElementById('feedback').textContent = ru ? '✗ Пока не совсем — посмотри подсказку.' : '✗ Not quite — check the hint for guidance.'
   }
 }
 
@@ -1558,18 +1576,44 @@ async function checkForeignAnswer(ch, ans) {
 
 function showHint() {
   const ch = CHALLENGES[activeIdx]; if (!ch) return
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+  const hints = y1TrChallenge(ch).hints || []
   const log = document.getElementById('hint-log')
-  if (hintIdx < ch.hints.length) {
+  if (hintIdx < hints.length) {
     const div = document.createElement('div')
     div.className = 'hint-line'
-    div.textContent = '💡 Hint ' + (hintIdx + 1) + ': ' + ch.hints[hintIdx++]
+    div.textContent = (ru ? '💡 Подсказка ' : '💡 Hint ') + (hintIdx + 1) + ': ' + hints[hintIdx++]
     log.appendChild(div)
   } else {
     const div = document.createElement('div')
     div.className = 'hint-line'
-    div.textContent = '— No more hints!'
+    div.textContent = ru ? '— Больше подсказок нет!' : '— No more hints!'
     log.appendChild(div)
   }
+}
+if (typeof BFLang !== 'undefined') {
+  // Re-draw the open challenge's text/prompt/button label in the new
+  // language WITHOUT calling selectChallenge() again — that would wipe
+  // whatever the student has already typed into the answer field and
+  // reset the hint log. Only the text nodes are touched.
+  BFLang.onChange(() => {
+    const ch = CHALLENGES[activeIdx]
+    if (!ch) return
+    const ru = BFLang.get() === 'ru'
+    const trText = y1TrChallenge(ch).text
+    const chTextEl = document.getElementById('ch-text')
+    if (chTextEl) chTextEl.innerHTML = trText
+    const ansPrompt = document.getElementById('ans-prompt')
+    if (ansPrompt) {
+      ansPrompt.innerHTML = ch.type === 'lesson'
+        ? (ru ? 'Изучи урок ниже, затем отметь его пройденным, когда закончишь.' : 'Read through the lesson below, then mark it complete when you’re done.')
+        : trText
+    }
+    const checkBtn = document.getElementById('check-btn')
+    if (checkBtn) checkBtn.textContent = ch.type === 'lesson' ? (ru ? '✓ Отметить урок пройденным' : '✓ Mark lesson complete') : (ru ? '✓ Проверить' : '✓ Check')
+    const ansField = document.getElementById('ans-field')
+    if (ansField) ansField.placeholder = ru ? 'Введи ответ здесь…' : 'Type your answer here…'
+  })
 }
 
 function showToast(msg) {
