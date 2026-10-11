@@ -1530,16 +1530,17 @@ function checkAnswer() {
 
 function passChallenge(ch, ans) {
   const idx = CHALLENGES.indexOf(ch)
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
   // The AI marker answers asynchronously — only touch the feedback line if the
   // student is still looking at this challenge.
   if (CHALLENGES[activeIdx] === ch) {
     document.getElementById('feedback').className = 'feedback ok'
-    document.getElementById('feedback').textContent = '✓ Correct!'
+    document.getElementById('feedback').textContent = ru ? '✓ Верно!' : '✓ Correct!'
   }
   if (!completed.has(idx)) {
     completed.add(idx)
     renderPills()
-    showToast('Challenge complete! +' + ch.xp + ' XP')
+    showToast((ru ? 'Задание пройдено! +' : 'Challenge complete! +') + ch.xp + ' XP')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'gy1-c' + idx, { passed: true, score: 100 }) }
     LessonSaves.save('igcse-y1', ch.mod + '/' + ch.name, { passed: true, xpEarned: ch.xp, code: ans })
     try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}

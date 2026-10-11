@@ -1867,7 +1867,7 @@ function validateChallenge(code, result) {
   if (firstPass) {
     completed.add(activeIdx); renderPills()
     document.getElementById('pass-badge')?.remove?.()
-    showToast('Challenge complete! +'+ch.xp+' XP')
+    showToast((typeof BFLang !== 'undefined' && BFLang.get() === 'ru' ? 'Задание пройдено! +' : 'Challenge complete! +')+ch.xp+' XP')
     if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + (ch.mod||'c') + activeIdx, { passed: true, score: 100 }); }
     reportRealProgress(ch, Date.now() - challengeStartedAt)
   }
@@ -1889,7 +1889,7 @@ async function checkForeignFillAnswer(ch, ans) {
     if (r.pass) {
       appendOut((r.feedback ? '✓ ' + r.feedback : '✓ Correct!'), 'out-ok')
       if (firstPass) {
-        completed.add(idx); renderPills(); showToast('Challenge complete! +'+ch.xp+' XP')
+        completed.add(idx); renderPills(); showToast((ru ? 'Задание пройдено! +' : 'Challenge complete! +')+ch.xp+' XP')
         if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'g9-' + (ch.mod||'c') + idx, { passed: true, score: 100 }) }
         reportRealProgress(ch, Date.now() - challengeStartedAt)
       }

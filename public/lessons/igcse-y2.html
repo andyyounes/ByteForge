@@ -1844,7 +1844,7 @@ function validateChallenge(code,result){
   // passed/xp are monotonic server-side, so this can't un-complete a stage.
   LessonSaves.save('igcse-y2', ch.mod + '/' + ch.name, {passed:passOk,xpEarned:firstPass?ch.xp:0,code})
   if (firstPass) {
-    completed.add(activeIdx);renderPills();showToast('Challenge complete! +'+ch.xp+' XP')
+    completed.add(activeIdx);renderPills();showToast((typeof BFLang !== 'undefined' && BFLang.get() === 'ru' ? 'Задание пройдено! +' : 'Challenge complete! +')+ch.xp+' XP')
     if(me){BF.addXP(me.id,ch.xp);BF.recordAttempt(me.id,'gy2-c'+activeIdx,{passed:true,score:100})}
     try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
   }
@@ -1866,7 +1866,7 @@ async function checkForeignFillAnswer(ch, ans) {
     if (r.pass) {
       appendOut((r.feedback ? '✓ ' + r.feedback : '✓ Correct!'), 'out-ok')
       if (firstPass) {
-        completed.add(idx);renderPills();showToast('Challenge complete! +'+ch.xp+' XP')
+        completed.add(idx);renderPills();showToast((ru ? 'Задание пройдено! +' : 'Challenge complete! +')+ch.xp+' XP')
         if(me){BF.addXP(me.id,ch.xp);BF.recordAttempt(me.id,'gy2-c'+idx,{passed:true,score:100})}
         try { reportRealProgress(ch, Date.now() - challengeStartedAt) } catch (e) {}
       }

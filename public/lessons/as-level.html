@@ -5419,13 +5419,14 @@ function p2ValidateChallenge(code, result) {
   // pass — so a draft (or further edits made after passing) is never lost.
   // passed/xp are monotonic server-side, so this can't un-complete a stage.
   LessonSaves.save('as-paper2', ch.mod, { passed: passOk, xpEarned: firstPass ? ch.xp : 0, code })
+  const ru = typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
   if (passOk) {
     if (firstPass) {
       p2Completed.add(p2ActiveIdx); p2RenderPills()
-      showToast('Challenge complete! +' + ch.xp + ' XP')
+      showToast((ru ? 'Задание пройдено! +' : 'Challenge complete! +') + ch.xp + ' XP')
       if (me) { BF.addXP(me.id, ch.xp); BF.recordAttempt(me.id, 'asp2-c' + p2ActiveIdx, { passed: true, score: 100 }) }
     }
-    p2AppendOut('✓ Challenge passed! +' + ch.xp + ' XP', 'out-ok')
+    p2AppendOut((ru ? '✓ Задание пройдено! +' : '✓ Challenge passed! +') + ch.xp + ' XP', 'out-ok')
   }
 }
 // Returns { text, hints } for a challenge in the current language — falls
