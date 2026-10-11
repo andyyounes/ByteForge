@@ -4656,6 +4656,46 @@ OUTPUT Pop()   // expected: 50
 OUTPUT Pop()   // expected: 20`,
     check:(code,res)=>res.output[0]?.trim()==='50'&&res.output[1]?.trim()==='20',
   },
+  // ── OPTIONAL bonus project, unlocked after STK1. Not required — plain
+  // check(code,res) through the same Interpreter every P2 challenge uses.
+  {
+    mod:'BONUS1',name:'Bank Account Simulator',xp:100,
+    text:`<strong>🌟 Bonus — Bank Account Simulator</strong><br>Combine OOP-style procedures (Challenge 4) with a stack (Challenge 6) into one real-world tool: a bank account that can UNDO its last transaction.<br>Write <code>Deposit(BYVAL amt)</code> and <code>Withdraw(BYVAL amt)</code> that update <code>balance</code> AND push the SIGNED amount onto a <code>history</code> stack (deposit pushes +amt, withdraw pushes -amt). Write <code>UndoLast() RETURNS INTEGER</code> that pops the last entry and reverses its effect on balance.<br>Deposit 100, Withdraw 30, Deposit 50 (balance should be 120), then UndoLast (balance should go back to 70).`,
+    hints:[
+      'Deposit: balance ← balance + amt, THEN push +amt: histTop ← histTop + 1, history[histTop] ← amt.',
+      'Withdraw: balance ← balance - amt, THEN push -amt (the NEGATIVE, so undoing it adds back correctly): history[histTop] ← -amt.',
+      'UndoLast: last ← history[histTop], histTop ← histTop - 1, balance ← balance - last, RETURN last — subtracting a pushed value reverses it (undoing a +50 deposit subtracts 50; undoing a -30 withdrawal subtracts -30, which ADDS 30 back).',
+    ],
+    starter:`// Bonus: Bank Account Simulator
+DECLARE balance : INTEGER
+DECLARE history : ARRAY[1:10] OF INTEGER
+DECLARE histTop  : INTEGER
+balance ← 0
+histTop ← 0
+
+PROCEDURE Deposit(BYVAL amt : INTEGER)
+   // TODO: balance ← balance + amt, then push +amt onto history
+ENDPROCEDURE
+
+PROCEDURE Withdraw(BYVAL amt : INTEGER)
+   // TODO: balance ← balance - amt, then push -amt onto history
+ENDPROCEDURE
+
+FUNCTION UndoLast() RETURNS INTEGER
+   DECLARE last : INTEGER
+   // TODO: pop the last history entry, reverse its effect on balance, RETURN it
+   RETURN 0
+ENDFUNCTION
+
+DECLARE undone : INTEGER
+CALL Deposit(100)
+CALL Withdraw(30)
+CALL Deposit(50)
+OUTPUT balance      // expected: 120
+undone ← UndoLast()
+OUTPUT balance      // expected: 70`,
+    check:(code,res)=>res.output[0]?.trim()==='120'&&res.output[1]?.trim()==='70',
+  },
 ]
 
 // mod is unique per challenge — stable identity for saves (survives new

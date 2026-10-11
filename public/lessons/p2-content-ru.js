@@ -93,4 +93,14 @@ window.P2_RU_TEXT = {
     text: '<strong>Процедуры — Параметры BYREF</strong> <em>(в стиле 9618 P4)</em><br>Напиши <code>Deposit(BYREF bal, BYVAL amt)</code> и <code>Withdraw(BYREF bal, BYVAL amt)</code>. Withdraw должна отказывать (OUTPUT "Insufficient funds"), если amt &gt; bal.<br>Начни с 100, внеси 250, выведи баланс, сними 500, выведи баланс.<br>Ожидается: <strong>350</strong>, <strong>Insufficient funds</strong>, <strong>350</strong> — именно BYREF позволяет вызывающему коду увидеть изменение.',
     hints: ['BYREF bal означает, что процедура изменяет переменную ВЫЗЫВАЮЩЕГО кода', 'Deposit: bal ← bal + amt — одна строка, но работает только через BYREF', 'Withdraw: IF amt > bal THEN OUTPUT "Insufficient funds" ELSE bal ← bal - amt'],
   },
+
+  // ── Optional bonus project (AS Level only) ───────────────────────────────
+  BONUS1: {
+    text: '<strong>🌟 Бонус — Симулятор банковского счёта</strong><br>Объедини процедуры в стиле ООП (Задание 4) со стеком (Задание 6) в один настоящий инструмент: банковский счёт, который может ОТМЕНИТЬ свою последнюю операцию.<br>Напиши <code>Deposit(BYVAL amt)</code> и <code>Withdraw(BYVAL amt)</code>, которые обновляют <code>balance</code> И помещают ЗНАКОВУЮ сумму в стек <code>history</code> (депозит помещает +amt, снятие помещает -amt). Напиши <code>UndoLast() RETURNS INTEGER</code>, которая извлекает последнюю запись и отменяет её эффект на balance.<br>Внеси 100, сними 30, внеси 50 (balance должен быть 120), затем UndoLast (balance должен вернуться к 70).',
+    hints: [
+      'Deposit: balance ← balance + amt, ПОТОМ помести +amt: histTop ← histTop + 1, history[histTop] ← amt.',
+      'Withdraw: balance ← balance - amt, ПОТОМ помести -amt (ОТРИЦАТЕЛЬНОЕ значение, чтобы отмена правильно добавляла обратно): history[histTop] ← -amt.',
+      'UndoLast: last ← history[histTop], histTop ← histTop - 1, balance ← balance - last, RETURN last — вычитание помещённого значения отменяет его (отмена депозита +50 вычитает 50; отмена снятия -30 вычитает -30, что ДОБАВЛЯЕТ 30 обратно).',
+    ],
+  },
 }
