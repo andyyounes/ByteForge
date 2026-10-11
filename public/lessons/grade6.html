@@ -2604,11 +2604,11 @@ function completeStage(stars) {
   p[activeStage.id] = { stars: Math.max(stars, prev.stars || 0), xp: (prev.xp || 0) + xp }
   saveProg(p)
 
-  // server best-effort — id-keyed (grade6's real completion state is the
-  // localStorage getProg()/saveProg() above, keyed by activeStage.id already;
-  // this DB mirror is never read back, but keeps it consistent with every
-  // other grade's move away from index-keyed saves).
-  try { LessonSaves.save('grade6-quest', activeStage.id, { passed: true, xpEarned: xp }) } catch (e) {}
+  // Server mirror — now actually read back on init (see below) to restore
+  // stars/xp on a different device or a cleared browser. The full record
+  // (not just passed/xpEarned) rides in `code`, since that's the one field
+  // LessonSaves already exposes a per-id getter for (codeFor).
+  try { LessonSaves.save('grade6-quest', activeStage.id, { passed: true, xpEarned: xp, code: JSON.stringify(p[activeStage.id]) }) } catch (e) {}
   try { if (typeof me !== 'undefined' && me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
   try { reportRealProgress(activeStage, firstTime) } catch (e) {}
 
@@ -2723,7 +2723,25 @@ BF.seed()
 const me = (() => { try { return BF.session() || null } catch (e) { return null } })()
 ;(async () => {
   await applyClassOverrides()
-  if (me) { try { await LessonSaves.load('grade6-quest') } catch (e) {} }
+  if (me) {
+    try {
+      await LessonSaves.load('grade6-quest')
+      // Pull back any stage completed on another device/browser — the local
+      // getProg() record is trusted whenever it already has an entry.
+      const p = getProg()
+      let changed = false
+      ALL_STAGES.forEach(s => {
+        if (p[s.id]) return
+        const raw = LessonSaves.codeFor(s.id, 'grade6-quest')
+        if (!raw) return
+        try {
+          const rec = JSON.parse(raw)
+          if (rec && typeof rec.stars === 'number') { p[s.id] = rec; changed = true }
+        } catch (e) {}
+      })
+      if (changed) saveProg(p)
+    } catch (e) {}
+  }
   showJourney()
 })()
 </script>
