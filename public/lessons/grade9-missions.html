@@ -620,9 +620,26 @@ CodeMirror.defineSimpleMode('pseudog9', {
 // ── Language bridge: the same mission, written in Python or pseudocode ────────
 let lang = (() => { try { return localStorage.getItem('bf-g9-lang') || 'py' } catch (e) { return 'py' } })()
 function draftKey(id, l) { return userKey('bf-g9-draft-' + id + '-' + l) }
-function loadDraft(id, l) { try { return localStorage.getItem(draftKey(id, l)) } catch (e) { return null } }
+// The server-side id for a draft — distinct from the plain mission id used
+// when a PASS is recorded (that one key stores the winning code; this one
+// stores whatever's currently in the editor, pass or fail, per language).
+function draftServerId(id, l) { return id + '-draft-' + l }
+function loadDraft(id, l) {
+  try {
+    const local = localStorage.getItem(draftKey(id, l))
+    if (local != null) return local
+  } catch (e) {}
+  // Nothing on this device (e.g. a different browser/computer) — fall back
+  // to the last draft synced to the server, if any.
+  try { return LessonSaves.codeFor(draftServerId(id, l), 'grade9-missions') } catch (e) { return null }
+}
 function saveDraft() {
-  if (activeMission && editor) try { localStorage.setItem(draftKey(activeMission.id, lang), editor.getValue()) } catch (e) {}
+  if (!activeMission || !editor) return
+  const code = editor.getValue()
+  try { localStorage.setItem(draftKey(activeMission.id, lang), code) } catch (e) {}
+  // Fire-and-forget — same pattern as every other LessonSaves.save() call on
+  // this page. Only called on Run/Submit/language-switch, not per keystroke.
+  if (me) { try { LessonSaves.save('grade9-missions', draftServerId(activeMission.id, lang), { passed: false, code }) } catch (e) {} }
 }
 function switchLang(l) {
   saveDraft()

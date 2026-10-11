@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
   const [{ data: profiles }, { data: saves }] = await Promise.all([
     admin.from('profiles').select('id, name').in('id', studentIds),
     admin.from('lesson_saves')
-      .select('student_id, challenge_idx, passed, code, xp_earned, save_data, saved_at')
+      .select('student_id, challenge_idx, challenge_id, passed, code, xp_earned, save_data, saved_at')
       .eq('lesson_key', 'grade9-missions')
       .in('student_id', studentIds),
   ])
@@ -70,7 +70,12 @@ export async function GET(req: NextRequest) {
     const missionRows = rows.filter(r => r.challenge_idx >= 0 && r.challenge_idx < TOTAL_MISSIONS)
     const passed = missionRows.filter(r => r.passed)
     const highestPassedIdx = passed.reduce((m, r) => Math.max(m, r.challenge_idx), -1)
-    const workspace = rows.find(r => r.challenge_idx === -1)
+    // The real workspace-autosave row (bracket/bot state) is the ONLY row with
+    // no challenge_id at all. Every id-keyed save (a mission pass, a code
+    // draft, ...) is ALSO stored at challenge_idx === -1 under the hood (see
+    // lesson-saves.js), so checking challenge_idx alone could pick one of
+    // those instead and read undefined bracket/bot fields from it.
+    const workspace = rows.find(r => r.challenge_idx === -1 && !r.challenge_id)
     const ws = (workspace?.save_data as Record<string, unknown>) ?? {}
     const lastAttempt = missionRows.reduce(
       (latest, r) => (!latest || r.saved_at > latest.saved_at ? r : latest),
