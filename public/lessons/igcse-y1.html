@@ -1227,6 +1227,31 @@ const CHALLENGES = [
     check: ans => /data/i.test(ans.trim()),
   },
   // ── BOOK-LESSONS-END ──
+  // ── OPTIONAL bonus project, unlocked after M7. Not required reading — no
+  // CHALLENGE_LESSON entry needed (it's type:'theory', free-response, same
+  // AI-marking path as Sound Digitisation above already handles Russian
+  // answers too). type:'theory' is already in checkAnswer's foreign-marking
+  // whitelist, so no engine change needed.
+  {
+    mod:'M7', name:'Bonus: Design an Automated System', xp:50, type:'theory',
+    text:`<strong>🌟 Bonus Project 1 — Design Your Own Automated System</strong><br>Pick a real everyday problem (a greenhouse, a pet feeder, a street light, anything) and design an automated system to solve it. Your answer must mention: <em>sensor</em>, a <em>decision</em> (what condition triggers the action), and an <em>actuator</em> (what physically happens as a result).`,
+    hints:['Pick ONE real problem first — being specific makes the rest easier.', 'A sensor measures something (light, moisture, motion). A decision is the IF: "when X happens, do Y." An actuator is the physical result (a motor, a light, a valve).', 'Example shape: "A soil moisture sensor measures dryness; when it drops below a threshold, the decision triggers a water pump (the actuator) to turn on."'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('sensor') && (a.includes('decision') || a.includes('if') || a.includes('condition') || a.includes('when') || a.includes('trigger')) &&
+             (a.includes('actuator') || a.includes('motor') || a.includes('pump') || a.includes('light') || a.includes('valve') || a.includes('turns on') || a.includes('turn on'))
+    },
+  },
+  {
+    mod:'M7', name:'Bonus: Smart Home Proposal', xp:70, type:'theory', boss:true,
+    text:`<strong>🌟 BONUS BOSS — Smart Home Proposal</strong><br>Write a short proposal for ONE smart home feature that combines an automated system with a simple AI/machine learning idea. Your answer must mention: <em>sensor</em>, a <em>decision</em>, AND how the system could <em>learn</em> or improve from <em>data</em> over time.`,
+    hints:['Start from Bonus Project 1\'s shape (sensor → decision → actuator), then add: how could the system get SMARTER the longer it runs?', 'e.g. "A thermostat with a temperature sensor decides when to heat — over time it learns the pattern of when you\'re usually home, from data it collects, and adjusts automatically."', 'The key new idea versus Bonus 1: not just reacting to ONE reading, but improving its own decisions by learning from past data.'],
+    check: ans => {
+      const a = ans.toLowerCase()
+      return a.includes('sensor') && (a.includes('decision') || a.includes('if') || a.includes('condition')) &&
+             (a.includes('learn') || a.includes('pattern')) && a.includes('data')
+    },
+  },
 ]
 
 // mod+name is the stable identity used for saves (no dedicated `id` field on
