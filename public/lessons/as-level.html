@@ -6687,25 +6687,42 @@ function getIdeState(tid) {
 }
 
 // ── Persistence helpers ───────────────────────────────────────────────────────
+// Was localStorage-only — invisible to /student/dashboard and lost on a
+// cleared browser or a different device, same bug class already fixed for
+// Paper 1 theory (markTopicDone) and the Code Lab (P2) on this same page.
+// Mirrored to LessonSaves under its own 'as-sql-exercises' lesson key so it
+// doesn't collide with either of those.
 function ideGetSaved(setId, exId) {
   const raw = localStorage.getItem('bf-ide-' + setId + '-' + exId)
-  if (!raw) return null
-  if (raw === '1') return { done:true, sql:'', completedAt:null }  // legacy format
-  try { return JSON.parse(raw) } catch { return { done:true, sql:'', completedAt:null } }
+  if (raw) {
+    if (raw === '1') return { done:true, sql:'', completedAt:null }  // legacy format
+    try { return JSON.parse(raw) } catch { return { done:true, sql:'', completedAt:null } }
+  }
+  // Nothing on this device — fall back to the server copy, if any.
+  try {
+    if (LessonSaves.completedIds('as-sql-exercises').has(setId + '/' + exId)) {
+      return { done:true, sql: LessonSaves.codeFor(setId + '/' + exId, 'as-sql-exercises') || '', completedAt:null }
+    }
+  } catch {}
+  return null
 }
 function ideGetDraft(setId, exId) {
-  return localStorage.getItem('bf-ide-draft-' + setId + '-' + exId) || ''
+  const local = localStorage.getItem('bf-ide-draft-' + setId + '-' + exId)
+  if (local) return local
+  try { return LessonSaves.codeFor(setId + '/' + exId + '-draft', 'as-sql-exercises') || '' } catch { return '' }
 }
 function ideSaveDraft(setId, exId, sql) {
   try { localStorage.setItem('bf-ide-draft-' + setId + '-' + exId, sql) } catch {}
+  if (typeof me !== 'undefined' && me) { try { LessonSaves.save('as-sql-exercises', setId + '/' + exId + '-draft', { passed:false, code: sql }) } catch {} }
 }
-function ideSaveCompletion(setId, exId, sql) {
+function ideSaveCompletion(setId, exId, sql, xp) {
   try {
     localStorage.setItem('bf-ide-' + setId + '-' + exId, JSON.stringify({
       done:true, sql, completedAt: new Date().toISOString()
     }))
     localStorage.removeItem('bf-ide-draft-' + setId + '-' + exId)  // draft no longer needed
   } catch {}
+  if (typeof me !== 'undefined' && me) { try { LessonSaves.save('as-sql-exercises', setId + '/' + exId, { passed:true, xpEarned: xp||0, code: sql }) } catch {} }
 }
 function ideProgress(setId) {
   const set = IDE_SETS[setId]
@@ -7179,7 +7196,7 @@ async function ideAutoCheck(tid, sql, rows, db) {
   const alreadySaved = !!ideGetSaved(tab.setId, ex.id)
   const prevXP = getLocalXP()
   if (!alreadySaved) {
-    ideSaveCompletion(tab.setId, ex.id, sql)
+    ideSaveCompletion(tab.setId, ex.id, sql, ex.xp)
     if (typeof me !== 'undefined' && me) BF.addXP(me.id, ex.xp)
     updateXPBar(prevXP)
   }
@@ -7308,7 +7325,7 @@ Reply ONLY as valid JSON (no markdown fences): {"correct":true/false,"feedback":
       const alreadySaved = !!ideGetSaved(tab.setId, ex.id)
       const prevXP = getLocalXP()
       if (!alreadySaved) {
-        ideSaveCompletion(tab.setId, ex.id, sql)
+        ideSaveCompletion(tab.setId, ex.id, sql, ex.xp)
         if (me) BF.addXP(me.id, ex.xp)
         updateXPBar(prevXP)
       }
@@ -7326,22 +7343,35 @@ Reply ONLY as valid JSON (no markdown fences): {"correct":true/false,"feedback":
 
 // ── Pseudocode Lab ────────────────────────────────────────────────────────────
 
+// Same localStorage-only gap as the SQL exercises above — mirrored to
+// LessonSaves under its own 'as-pseudo-lab' lesson key.
 function pseudoGetSaved(setId, exId) {
   const raw = localStorage.getItem('bf-pseudo-' + setId + '-' + exId)
-  if (!raw) return null
-  try { return JSON.parse(raw) } catch { return { done:true, sql:'', completedAt:null } }
+  if (raw) {
+    try { return JSON.parse(raw) } catch { return { done:true, sql:'', completedAt:null } }
+  }
+  try {
+    if (LessonSaves.completedIds('as-pseudo-lab').has(setId + '/' + exId)) {
+      return { done:true, code: LessonSaves.codeFor(setId + '/' + exId, 'as-pseudo-lab') || '', completedAt:null }
+    }
+  } catch {}
+  return null
 }
 function pseudoGetDraft(setId, exId) {
-  return localStorage.getItem('bf-pseudo-draft-' + setId + '-' + exId) || ''
+  const local = localStorage.getItem('bf-pseudo-draft-' + setId + '-' + exId)
+  if (local) return local
+  try { return LessonSaves.codeFor(setId + '/' + exId + '-draft', 'as-pseudo-lab') || '' } catch { return '' }
 }
 function pseudoSaveDraft(setId, exId, code) {
   try { localStorage.setItem('bf-pseudo-draft-' + setId + '-' + exId, code) } catch {}
+  if (typeof me !== 'undefined' && me) { try { LessonSaves.save('as-pseudo-lab', setId + '/' + exId + '-draft', { passed:false, code }) } catch {} }
 }
-function pseudoSaveCompletion(setId, exId, code) {
+function pseudoSaveCompletion(setId, exId, code, xp) {
   try {
     localStorage.setItem('bf-pseudo-' + setId + '-' + exId, JSON.stringify({ done:true, code, completedAt: new Date().toISOString() }))
     localStorage.removeItem('bf-pseudo-draft-' + setId + '-' + exId)
   } catch {}
+  if (typeof me !== 'undefined' && me) { try { LessonSaves.save('as-pseudo-lab', setId + '/' + exId, { passed:true, xpEarned: xp||0, code }) } catch {} }
   try { checkAsBadges() } catch(e){}
 }
 function pseudoProgress(setId) {
@@ -7577,7 +7607,7 @@ function pseudoLabAutoCheck(code, outputLines) {
   const alreadySaved = !!pseudoGetSaved(activeEx.setId, ex.id)
   const prevXP = getLocalXP()
   if (!alreadySaved) {
-    pseudoSaveCompletion(activeEx.setId, ex.id, pseudoLabEditor.getValue())
+    pseudoSaveCompletion(activeEx.setId, ex.id, pseudoLabEditor.getValue(), ex.xp)
     if (typeof me !== 'undefined' && me) BF.addXP(me.id, ex.xp)
     updateXPBar(prevXP)
   }
@@ -7616,7 +7646,7 @@ async function pseudoLabAiCheck() {
     out.style.color = result.correct ? '#4ade80' : '#e2e8f0'
     if (result.correct && !pseudoGetSaved(activeEx.setId, ex.id)) {
       const prevXP2 = getLocalXP()
-      pseudoSaveCompletion(activeEx.setId, ex.id, code)
+      pseudoSaveCompletion(activeEx.setId, ex.id, code, ex.xp)
       if (typeof me !== 'undefined' && me) BF.addXP(me.id, ex.xp)
       updateXPBar(prevXP2)
       _plUpdateLeft()
@@ -7980,6 +8010,13 @@ const me = (() => { try { return BF.session() || null } catch (_) { return null 
         try { localStorage.setItem('bf-as-p1-' + id, JSON.stringify({ completed: true, xpEarned: TOPIC_XP })) } catch (e) {}
       }
     })
+
+    // SQL exercises and the Pseudocode Lab were localStorage-only until now
+    // (see ideSaveCompletion/pseudoSaveCompletion) — load must happen before
+    // any ideGetSaved()/pseudoGetSaved() call so their server-fallback path
+    // has rows to check.
+    await LessonSaves.load('as-sql-exercises')
+    await LessonSaves.load('as-pseudo-lab')
 
     // Pre-fetch classId then check which chapter exams are approved
     fetchClassId().then(() => checkApprovedExams())
