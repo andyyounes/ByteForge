@@ -985,7 +985,22 @@ const W12_STAGES = [
     finalquest: { bossIds: ['w1boss','w2boss','w3boss','w4boss','w5boss','w6boss','w7boss','w8boss','w9boss','w10boss','w11boss'] } },
 ]
 
-const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES, ...W11_STAGES, ...W12_STAGES]
+// ══════════════════════════════════════════════════════════════════════════════
+// World 13 — OPTIONAL bonus world, unlocked after the Final Quest. Not part of
+// the required path (no G6_WORLD_CONCEPT entry, so it never reports to
+// /api/progress) — a real-world design task for students who want more,
+// reusing the same generic turtleCheck() every World 5 stage already uses.
+// ══════════════════════════════════════════════════════════════════════════════
+const W13_STAGES = [
+  { id: 'w13s1', title: 'Design a Flag', emoji: '🏳️', type: 'turtle', xp: 40,
+    goal: 'Real flags and logos use simple repeated shapes. Design your own flag emblem: at least 4 sides, at least 2 layers, your own colors.',
+    turtle: { minSides: 4, minLayers: 2, lockAngle: true, defaultSides: 4, defaultLayers: 1 } },
+  { id: 'w13boss', title: 'BOSS — Logo Design Studio', emoji: '🎯', boss: true, type: 'turtle', xp: 90,
+    goal: 'A real design studio brief: at least 6 sides, at least 3 layers, AND some growth for a spiral flourish — your own logo, unmistakably yours.',
+    turtle: { minSides: 6, minLayers: 3, needsGrowth: true, lockAngle: true, defaultSides: 6, defaultLayers: 1, defaultGrowth: 0 } },
+]
+
+const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES, ...W11_STAGES, ...W12_STAGES, ...W13_STAGES]
 
 // ══════════════════════════════════════════════════════════════════════════════
 // 📘 STAGE_LESSON — one real explainer per practice, not just the one-line
@@ -1364,6 +1379,7 @@ const WORLDS = [
   { id: 'w10', name: '🕹 Game Corner',        sub: 'Build your very own game',                  stages: W10_STAGES, live: true },
   { id: 'w11', name: '🧠 AI World',           sub: 'Teach a machine. Then trick it.',           stages: W11_STAGES, live: true },
   { id: 'w12', name: '🚀 The Final Quest',    sub: 'Your masterpiece. Any world. Go big.',      stages: W12_STAGES, live: true },
+  { id: 'w13', name: '🌟 Bonus: Design Studio', sub: 'Optional — design a real flag & logo',    stages: W13_STAGES, live: true, optional: true },
 ]
 
 // ── Real progress: bridge to the account's actual concept_mastery/profile.xp ──
