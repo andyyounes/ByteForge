@@ -7518,6 +7518,99 @@ except FileNotFoundError:
       check:(code, log) => /except\s+FileNotFoundError/.test(code) && log.texts >= 1,
     },
   ]},
+  // ── OPTIONAL bonus module, unlocked after the capstone. Not part of the
+  // required path (no g8-* concept mapping, so it never reports to
+  // /api/progress) — a real-world mini-project for students who want more,
+  // reusing exactly the same file-I/O/loop/guard patterns M10 already proved.
+  { id:'bonus1', name:'🌟 Bonus: Personal Budget Tracker', sub:'Optional — a real money-tracking app, built on everything from this year', live:true, optional:true, stages:[
+    {
+      id:'bonus1s1', name:'Load Your Expenses', xp:50,
+      files: { 'expenses.csv': 'category,amount\nFood,45\nTransport,20\nGames,15\nFood,12\n' },
+      text:`<strong>Bonus Challenge 1 — Load Your Expenses</strong> — A real budget app starts the same way your quiz capstone did: load the data first. Load <code>expenses.csv</code> into two parallel lists: one of categories, one of amounts (as numbers, not strings).`,
+      hints:[
+        'Skip the header row (index 0), same as every CSV challenge this year.',
+        'Split each line by comma into cat and amt, then categories.append(cat) and amounts.append(int(amt)).',
+        'len(categories) should equal len(amounts) once you\'re done.',
+      ],
+      starter:`# Bonus — Load Your Expenses
+file = open("expenses.csv")
+lines = file.readlines()
+file.close()
+
+categories = []
+amounts = []
+for line in lines[1:]:
+    cat, amt = line.strip().split(",")
+    # TODO: append cat to categories and int(amt) to amounts
+
+print(f"Loaded {len(categories)} expenses.")
+`,
+      check:(code) => {
+        const hasOpen  = /open\s*\(/.test(code)
+        const hasSplit = /\.split\s*\(/.test(code)
+        const appendCount = (code.match(/\.append\s*\(/g) || []).length
+        const hasIntConvert = /int\s*\(\s*amt\s*\)/.test(code)
+        return hasOpen && hasSplit && appendCount >= 2 && hasIntConvert
+      },
+    },
+    {
+      id:'bonus1s2', name:'Total Spend & Biggest Category', xp:55,
+      text:`<strong>Bonus Challenge 2 — Totals</strong> — With the expenses loaded, compute the TOTAL spent and find the single BIGGEST expense (the category with the highest amount). Guard against zero expenses, same lesson as the quiz scorer.`,
+      hints:[
+        'total = 0, then for amt in amounts: total += amt.',
+        'Track the biggest with a running max: if amounts[i] > biggest_amount: biggest_amount = amounts[i]; biggest_category = categories[i].',
+        'Guard: if len(amounts) == 0, skip the biggest-category search entirely instead of crashing.',
+      ],
+      starter:`# Bonus — Total Spend & Biggest Category
+categories = ["Food", "Transport", "Games", "Food"]
+amounts = [45, 20, 15, 12]
+
+total = 0
+for amt in amounts:
+    # TODO: add amt to total
+    pass
+
+biggest_amount = 0
+biggest_category = ""
+# TODO: guard against len(amounts) == 0, then loop with an index to find
+# the category with the highest amount
+
+print(f"Total spent: {total}")
+print(f"Biggest category: {biggest_category} ({biggest_amount})")
+`,
+      check:(code) => {
+        const hasTotal = /total\s*\+=\s*amt\b/.test(code) || /total\s*=\s*total\s*\+\s*amt\b/.test(code)
+        const hasGuard = /len\s*\(\s*amounts\s*\)\s*(==|>)\s*0/.test(code)
+        const hasCompare = /amounts\s*\[\s*i\s*\]\s*>\s*biggest_amount/.test(code)
+        const hasAssignBoth = /biggest_amount\s*=\s*amounts\s*\[\s*i\s*\]/.test(code) && /biggest_category\s*=\s*categories\s*\[\s*i\s*\]/.test(code)
+        return hasTotal && hasGuard && hasCompare && hasAssignBoth
+      },
+    },
+    {
+      id:'bonus1boss', name:'BOSS — Save the Budget Report', xp:80, boss:true,
+      text:`<strong>🌟 BONUS BOSS — Save the Budget Report</strong> — Bring it together like the capstone did: write a real budget report to <code>report.txt</code> (total spent + biggest category), then read it straight back to prove it saved. This is exactly how a real budgeting app remembers your report between sessions.`,
+      hints:[
+        'open("report.txt", "w") opens a file for WRITING.',
+        'file.write(f"Total: {total}\\nBiggest: {biggest_category}\\n") writes both lines at once. Always file.close() after writing.',
+        'Open it again with no mode (read mode) and print(file.read()) to prove it saved.',
+      ],
+      starter:`# Bonus Boss — Save the Budget Report
+total = 92
+biggest_category = "Food"
+
+file = open("report.txt", "w")
+# TODO: file.write(...) the total and biggest_category, then file.close()
+
+# TODO: open report.txt again (read mode) and print(file.read())
+`,
+      check:(code) => {
+        const hasWriteMode = /open\s*\(\s*["']report\.txt["']\s*,\s*["']w["']\s*\)/.test(code)
+        const hasWrite = /\.write\s*\(/.test(code)
+        const hasReadBack = /open\s*\(\s*["']report\.txt["']\s*\)/.test(code) && /\.read\s*\(\s*\)/.test(code)
+        return hasWriteMode && hasWrite && hasReadBack
+      },
+    },
+  ]},
 ]
 
 const CHALLENGES = MODULES.filter(m => m.live).flatMap(m => m.stages.map(s => ({ ...s, mod: m.id.toUpperCase() })))
@@ -8673,6 +8766,21 @@ const CHALLENGE_LESSON = {
       <p>Code that works perfectly but shows the player nothing isn't really finished — a clear title, drawn with <code>text()</code>, is a small thing that makes an app feel genuinely complete.</p></div>
     <div class="cl-block"><h4>Handling a missing file gracefully</h4>
       <p><code>except FileNotFoundError:</code> means your app survives even if <code>quiz.csv</code> is ever missing or renamed — real shipped software has to handle the world NOT being exactly as expected.</p></div>` },
+  bonus1s1: { title: 'Same CSV-loading pattern, a new real-world question', html: `
+    <div class="cl-block"><h4>int() matters here more than ever</h4>
+      <p>Every value read from a CSV line is TEXT, even "45" — without <code>int(amt)</code>, later totalling would concatenate strings ("45"+"20" = "4520") instead of adding numbers (65). This is exactly why the conversion step exists.</p></div>
+    <div class="cl-block"><h4>Two parallel lists, same length</h4>
+      <p>categories[i] and amounts[i] describe the SAME expense — that's why both lists grow together, one append per line, never one without the other.</p></div>` },
+  bonus1s2: { title: 'A running max is just a variable that only ever grows', html: `
+    <div class="cl-block"><h4>Tracking the biggest, one comparison at a time</h4>
+      <p>You don\'t need to sort anything to find the biggest — just remember the best one seen SO FAR, and replace it only when something bigger comes along. That\'s a running max, the same idea behind finding a high score.</p></div>
+    <div class="cl-block"><h4>Guard before you search</h4>
+      <p>Checking <code>len(amounts) == 0</code> first means an empty expense list never crashes the biggest-category search — the same zero-guard lesson from the quiz scorer, applied to a new problem.</p></div>` },
+  bonus1boss: { title: 'Writing AND reading back proves it really saved', html: `
+    <div class="cl-block"><h4>Why read it back at all?</h4>
+      <p>Writing a file and never reading it back only PROVES the write call ran — reading it afterward proves the data genuinely persisted, exactly like the capstone\'s high-score file.</p></div>
+    <div class="cl-block"><h4>One real project, every skill from the year</h4>
+      <p>File reading, file writing, loops, a running total, a running max, a zero-guard — this bonus project uses nearly everything Grade 8 taught, just pointed at a different real question than the capstone.</p></div>` },
 }
 const STAGE_INDEX = {}
 CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.id] = i })
