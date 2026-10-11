@@ -234,17 +234,29 @@ window.G9Y2_RU_TEXT = {
     hints: ['Полусумматор (half adder) может обрабатывать только ровно 2 входных бита, без входящего переноса.'],
   },
 
-  // ── Optional bonus project (added after the EN/RU toggle fix session) ────
-  'BONUS/Book Record (OOP)': {
-    text: '<strong>🌟 Бонус 1 — Построй библиотечный каталог</strong><br>Используй тот же приём из Модуля 6, что и для класса Animal. Напиши <code>Book_New(title, author)</code>, устанавливающую глобальные переменные, и <code>Book_Info()</code>, выводящую «<em>title</em> by <em>author</em>». Создай книгу «Dune» автора «Frank Herbert» и вызови Book_Info. Ожидается: <strong>Dune by Frank Herbert</strong>',
-    hints: ['Объяви глобальные переменные: bookTitle : STRING, bookAuthor : STRING', 'PROCEDURE Book_New(BYVAL t : STRING, BYVAL a : STRING) / bookTitle ← t / bookAuthor ← a / ENDPROCEDURE', 'PROCEDURE Book_Info() / OUTPUT bookTitle & " by " & bookAuthor / ENDPROCEDURE'],
+  // ── Optional bonus project (hardened after the "make it very hard" ask) ──
+  'BONUS/Book Catalog (OOP + Search)': {
+    text: '<strong>🌟 Бонус 1 — Построй библиотечный каталог с поиском</strong><br>Используй тот же приём из Модуля 6, что и для класса Animal, но для целого каталога. Напиши <code>Catalog_Add(title, author)</code>, добавляющую в параллельные массивы <code>titles</code>/<code>authors</code>, и <code>Catalog_Find(title) RETURNS STRING</code>, которая ищет совпадающее название и возвращает «<em>title</em> by <em>author</em>», или <strong>«Not found»</strong>, если совпадений нет. Добавь «Dune»/«Frank Herbert», «1984»/«George Orwell», «Emma»/«Jane Austen». Найди «1984», затем «Hobbit».<br>Ожидается: <strong>1984 by George Orwell</strong>, затем <strong>Not found</strong>',
+    hints: [
+      'DECLARE titles : ARRAY[1:10] OF STRING, authors : ARRAY[1:10] OF STRING, count : INTEGER (начни с 0)',
+      'Catalog_Add: count ← count + 1, titles[count] ← title, authors[count] ← author.',
+      'Catalog_Find: цикл с индексом i ← 1 TO count. IF titles[i] = title THEN RETURN titles[i] & " by " & authors[i]. Если цикл закончился без совпадения, RETURN "Not found".',
+    ],
   },
-  'BONUS/Sort by Pages': {
-    text: '<strong>🌟 Бонус 2 — Отсортируй каталог по объёму</strong><br>Каталог из 5 книг имеет количество страниц <code>[320, 180, 450, 275, 210]</code>. Используй сортировку пузырьком (из Модуля 5), чтобы отсортировать по возрастанию, затем выведи все 5.<br>Ожидается: <strong>180 210 275 320 450</strong>',
-    hints: ['Та же вложенная сортировка пузырьком, что в M5: внешний i от 1 до 4, внутренний j от 1 до 5-i.', 'IF arr[j] > arr[j+1] THEN поменяй местами через временную переменную.', 'temp ← arr[j] / arr[j] ← arr[j+1] / arr[j+1] ← temp'],
+  'BONUS/Parallel Sort by Pages': {
+    text: '<strong>🌟 Бонус 2 — Отсортируй каталог по объёму</strong><br>Параллельные массивы хранят 5 книг: <code>titles</code> и <code>pages</code>. Отсортируй ОБА вместе пузырьком по возрастанию числа страниц — при перестановке числа страниц переставляй и соответствующее название. Выведи каждое название с числом страниц, в отсортированном порядке.<br>Ожидаемый порядок: <strong>Emma (180), 1984 (210), Hobbit (275), Dune (320), War and Peace (450)</strong>',
+    hints: [
+      'Это ПАРАЛЛЕЛЬНАЯ сортировка пузырьком — когда pages[j] и pages[j+1] меняются местами, titles[j] и titles[j+1] ДОЛЖНЫ ТАКЖЕ поменяться местами в том же шаге, иначе пары развалятся.',
+      'Та же вложенная сортировка, что в M5: внешний i от 1 до 4, внутренний j от 1 до 5-i. IF pages[j] > pages[j+1] THEN поменяй местами ОБА массива.',
+      'OUTPUT titles[i] & " (" & pages[i] & ")" для каждого i после сортировки.',
+    ],
   },
-  'BONUS/Save the Catalog': {
-    text: '<strong>🌟 БОНУС-БОСС — Сохрани каталог</strong><br>Объедини всё: отсортируй те же 5 значений страниц (Бонус 2), ЗАПИШИ каждое в <code>catalog.txt</code> на отдельной строке, затем открой его заново FOR READ и выведи (OUTPUT) первую строку обратно, доказав, что всё сохранилось.',
-    hints: ['Используй свой отсортированный массив из Бонуса 2.', 'OPENFILE "catalog.txt" FOR WRITE, затем FOR i ← 1 TO 5: WRITEFILE "catalog.txt", pages[i]. NEXT i. CLOSEFILE "catalog.txt" — WRITEFILE сам преобразует число в строку.', 'OPENFILE "catalog.txt" FOR READ, DECLARE line : STRING, READFILE "catalog.txt", line, OUTPUT line, CLOSEFILE "catalog.txt"'],
+  'BONUS/Save & Reload the Full Catalog': {
+    text: '<strong>🌟 БОНУС-БОСС — Сохрани и перезагрузи полный каталог</strong><br>Объедини всё: параллельно отсортируй те же 5 книг по числу страниц (Бонус 2), ЗАПИШИ каждую в <code>catalog.txt</code> как <code>"title,pages"</code> (через запятую, по одной на строку), затем открой его заново FOR READ, прочитай ВТОРУЮ строку (книга со вторым наименьшим числом страниц) и выведи ТОЛЬКО её название — найдя позицию запятой самостоятельно (в этом псевдокоде нет встроенного разделения строк) и разрезав строку по обе стороны от неё с помощью <code>SUBSTR</code>.',
+    hints: [
+      'Сначала используй свою параллельную сортировку из Бонуса 2 — это работает только на правильно отсортированных данных.',
+      'WRITEFILE "catalog.txt", titles[i] & "," & pages[i] для каждого i — одна строка на книгу, название и страницы через запятую.',
+      'Встроенного «разделения» нет — найди запятую сам: FOR k ← 1 TO LENGTH(line): IF SUBSTR(line, k, 1) = "," THEN commaPos ← k. Тогда название — это SUBSTR(line, 1, commaPos - 1).',
+    ],
   },
 }
