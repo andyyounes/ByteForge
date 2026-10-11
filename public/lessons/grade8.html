@@ -7522,17 +7522,20 @@ except FileNotFoundError:
   // required path (no g8-* concept mapping, so it never reports to
   // /api/progress) — a real-world mini-project for students who want more,
   // reusing exactly the same file-I/O/loop/guard patterns M10 already proved.
-  { id:'bonus1', name:'🌟 Bonus: Personal Budget Tracker', sub:'Optional — a real money-tracking app, built on everything from this year', live:true, optional:true, stages:[
+  { id:'bonus1', name:'🌟 Bonus: Personal Budget Tracker', sub:'Optional — a real money-tracking app, harder than anything else this year', live:true, optional:true, stages:[
     {
-      id:'bonus1s1', name:'Load Your Expenses', xp:50,
-      files: { 'expenses.csv': 'category,amount\nFood,45\nTransport,20\nGames,15\nFood,12\n' },
-      text:`<strong>Bonus Challenge 1 — Load Your Expenses</strong> — A real budget app starts the same way your quiz capstone did: load the data first. Load <code>expenses.csv</code> into two parallel lists: one of categories, one of amounts (as numbers, not strings).`,
+      id:'bonus1s1', name:'Load Your Expenses — Robustly', xp:60,
+      // Harder than the original version: the CSV now has a genuinely
+      // malformed row (non-numeric amount), forcing real error handling
+      // instead of a clean append loop.
+      files: { 'expenses.csv': 'category,amount\nFood,45\nTransport,20\nGames,15\nOops,not_a_number\nFood,12\n' },
+      text:`<strong>Bonus Challenge 1 — Load Your Expenses, Robustly</strong> — Real data is messy. <code>expenses.csv</code> has a row with a BROKEN amount ("not_a_number") that would crash a plain <code>int()</code> conversion. Load every GOOD row into two parallel lists (categories, amounts), and skip the broken row WITHOUT crashing — print a warning for it instead.`,
       hints:[
-        'Skip the header row (index 0), same as every CSV challenge this year.',
-        'Split each line by comma into cat and amt, then categories.append(cat) and amounts.append(int(amt)).',
-        'len(categories) should equal len(amounts) once you\'re done.',
+        'int("not_a_number") raises ValueError — wrap the conversion in try/except ValueError.',
+        'try: amounts.append(int(amt)); categories.append(cat) except ValueError: print(f"Skipping bad row: {line.strip()}")',
+        'A correct run loads exactly 4 good expenses (45, 20, 15, 12) and prints one skip warning — never crashes.',
       ],
-      starter:`# Bonus — Load Your Expenses
+      starter:`# Bonus — Load Your Expenses, Robustly
 file = open("expenses.csv")
 lines = file.readlines()
 file.close()
@@ -7541,73 +7544,98 @@ categories = []
 amounts = []
 for line in lines[1:]:
     cat, amt = line.strip().split(",")
-    # TODO: append cat to categories and int(amt) to amounts
+    # TODO: try to int(amt) and append both cat/amt — except ValueError,
+    # print a skip warning instead of crashing
 
-print(f"Loaded {len(categories)} expenses.")
+print(f"Loaded {len(categories)} good expenses.")
 `,
       check:(code) => {
-        const hasOpen  = /open\s*\(/.test(code)
-        const hasSplit = /\.split\s*\(/.test(code)
+        const hasTry = /\btry\s*:/.test(code)
+        const hasExceptValueError = /except\s+ValueError/.test(code)
         const appendCount = (code.match(/\.append\s*\(/g) || []).length
         const hasIntConvert = /int\s*\(\s*amt\s*\)/.test(code)
-        return hasOpen && hasSplit && appendCount >= 2 && hasIntConvert
+        const printsInExcept = /except\s+ValueError\s*:[^]*?print\s*\(/.test(code)
+        return hasTry && hasExceptValueError && appendCount >= 2 && hasIntConvert && printsInExcept
       },
     },
     {
-      id:'bonus1s2', name:'Total Spend & Biggest Category', xp:55,
-      text:`<strong>Bonus Challenge 2 — Totals</strong> — With the expenses loaded, compute the TOTAL spent and find the single BIGGEST expense (the category with the highest amount). Guard against zero expenses, same lesson as the quiz scorer.`,
+      id:'bonus1s2', name:'Sort by Amount & Find Percentages', xp:70,
+      // Harder than "find the single biggest": a full parallel-array bubble
+      // sort (both lists must move together) PLUS a percentage-of-total
+      // calculation for every category, formatted to 1 decimal place.
+      text:`<strong>Bonus Challenge 2 — Sort &amp; Analyze</strong> — Don't just find the biggest: SORT both parallel lists together by amount, DESCENDING (biggest first) using bubble sort — swapping an amount means swapping its matching category too. Then compute what PERCENTAGE of the total each expense represents, rounded to 1 decimal place.`,
       hints:[
-        'total = 0, then for amt in amounts: total += amt.',
-        'Track the biggest with a running max: if amounts[i] > biggest_amount: biggest_amount = amounts[i]; biggest_category = categories[i].',
-        'Guard: if len(amounts) == 0, skip the biggest-category search entirely instead of crashing.',
+        'This is a PARALLEL bubble sort: whenever you swap amounts[j] and amounts[j+1], you must ALSO swap categories[j] and categories[j+1] — the pairing must stay correct.',
+        'Sort DESCENDING this time: swap when amounts[j] < amounts[j+1] (smaller first means out of order for descending).',
+        'percentage = round((amounts[i] / total) * 100, 1) for each i, once total is known.',
       ],
-      starter:`# Bonus — Total Spend & Biggest Category
+      starter:`# Bonus — Sort by Amount & Find Percentages
 categories = ["Food", "Transport", "Games", "Food"]
 amounts = [45, 20, 15, 12]
 
 total = 0
 for amt in amounts:
-    # TODO: add amt to total
+    total += amt
+
+# TODO: bubble sort BOTH categories and amounts together, DESCENDING by amount
+# (swap amounts[j]/amounts[j+1] AND categories[j]/categories[j+1] together)
+n = len(amounts)
+for i in range(n - 1):
+    for j in range(n - 1 - i):
+        pass  # TODO: compare and swap both arrays
+
+# TODO: print each category with its percentage of total, rounded to 1 decimal
+for i in range(len(amounts)):
     pass
-
-biggest_amount = 0
-biggest_category = ""
-# TODO: guard against len(amounts) == 0, then loop with an index to find
-# the category with the highest amount
-
-print(f"Total spent: {total}")
-print(f"Biggest category: {biggest_category} ({biggest_amount})")
 `,
       check:(code) => {
-        const hasTotal = /total\s*\+=\s*amt\b/.test(code) || /total\s*=\s*total\s*\+\s*amt\b/.test(code)
-        const hasGuard = /len\s*\(\s*amounts\s*\)\s*(==|>)\s*0/.test(code)
-        const hasCompare = /amounts\s*\[\s*i\s*\]\s*>\s*biggest_amount/.test(code)
-        const hasAssignBoth = /biggest_amount\s*=\s*amounts\s*\[\s*i\s*\]/.test(code) && /biggest_category\s*=\s*categories\s*\[\s*i\s*\]/.test(code)
-        return hasTotal && hasGuard && hasCompare && hasAssignBoth
+        const hasParallelSwap = /categories\s*\[\s*j\s*\]\s*,\s*categories\s*\[\s*j\s*\+\s*1\s*\]\s*=\s*categories\s*\[\s*j\s*\+\s*1\s*\]\s*,\s*categories\s*\[\s*j\s*\]/.test(code) ||
+          (/amounts\s*\[\s*j\s*\]\s*,\s*amounts\s*\[\s*j\s*\+\s*1\s*\]/.test(code) && /categories\s*\[\s*j\s*\]/.test(code) && /categories\s*\[\s*j\s*\+\s*1\s*\]/.test(code))
+        const hasDescendingCompare = /amounts\s*\[\s*j\s*\]\s*<\s*amounts\s*\[\s*j\s*\+\s*1\s*\]/.test(code)
+        const hasPercent = /\/\s*total\s*\)?\s*\*\s*100/.test(code)
+        const hasRound = /round\s*\(/.test(code)
+        return hasParallelSwap && hasDescendingCompare && hasPercent && hasRound
       },
     },
     {
-      id:'bonus1boss', name:'BOSS — Save the Budget Report', xp:80, boss:true,
-      text:`<strong>🌟 BONUS BOSS — Save the Budget Report</strong> — Bring it together like the capstone did: write a real budget report to <code>report.txt</code> (total spent + biggest category), then read it straight back to prove it saved. This is exactly how a real budgeting app remembers your report between sessions.`,
+      id:'bonus1boss', name:'BOSS — Full Report With Error Handling', xp:100, boss:true,
+      // Harder boss: combines the sorted/percentage data from stage 2 with
+      // BOTH a write-then-readback AND a try/except guard against the file
+      // simply not existing — the full M10-style "polish" requirement,
+      // applied to a report write instead of a read.
+      text:`<strong>🌟 BONUS BOSS — Full Report With Error Handling</strong> — Bring everything together: write EVERY category's name, amount, AND percentage (one line each, sorted biggest-first) to <code>report.txt</code>, then read it back inside a try/except — in case the file somehow failed to write, show a friendly message instead of crashing.`,
       hints:[
-        'open("report.txt", "w") opens a file for WRITING.',
-        'file.write(f"Total: {total}\\nBiggest: {biggest_category}\\n") writes both lines at once. Always file.close() after writing.',
-        'Open it again with no mode (read mode) and print(file.read()) to prove it saved.',
+        'Write one line per category: file.write(f"{categories[i]}: {amounts[i]} ({percentages[i]}%)\\n") inside a loop, THEN file.close().',
+        'Wrap the READ-BACK specifically in try/except FileNotFoundError — open("report.txt") again and print(file.read()).',
+        'All 4 sorted lines must appear in the file, in DESCENDING order by amount — reuse your sort from Challenge 2 first.',
       ],
-      starter:`# Bonus Boss — Save the Budget Report
-total = 92
-biggest_category = "Food"
+      starter:`# Bonus Boss — Full Report With Error Handling
+categories = ["Food", "Transport", "Games", "Food"]
+amounts = [45, 20, 12, 15]
+total = sum(amounts)
+
+# TODO: bubble sort both arrays together, DESCENDING by amount (from Challenge 2)
+n = len(amounts)
+for i in range(n - 1):
+    for j in range(n - 1 - i):
+        pass  # TODO
+
+# TODO: compute each percentage (rounded to 1 decimal) into a percentages list
+percentages = []
 
 file = open("report.txt", "w")
-# TODO: file.write(...) the total and biggest_category, then file.close()
+# TODO: write one line per category: "name: amount (percentage%)"
+file.close()
 
-# TODO: open report.txt again (read mode) and print(file.read())
+# TODO: wrap the read-back in try/except FileNotFoundError
 `,
       check:(code) => {
         const hasWriteMode = /open\s*\(\s*["']report\.txt["']\s*,\s*["']w["']\s*\)/.test(code)
-        const hasWrite = /\.write\s*\(/.test(code)
-        const hasReadBack = /open\s*\(\s*["']report\.txt["']\s*\)/.test(code) && /\.read\s*\(\s*\)/.test(code)
-        return hasWriteMode && hasWrite && hasReadBack
+        const hasWriteLoop = /\.write\s*\(/.test(code) && /for\s+\w+\s+in\s+range/.test(code)
+        const hasTryReadBack = /try\s*:[^]*?open\s*\(\s*["']report\.txt["']\s*\)[^]*?except\s+FileNotFoundError/.test(code)
+        const hasDescendingSort = /amounts\s*\[\s*j\s*\]\s*<\s*amounts\s*\[\s*j\s*\+\s*1\s*\]/.test(code)
+        const hasPercent = /\/\s*total\s*\)?\s*\*\s*100/.test(code) && /round\s*\(/.test(code)
+        return hasWriteMode && hasWriteLoop && hasTryReadBack && hasDescendingSort && hasPercent
       },
     },
   ]},
@@ -8766,21 +8794,21 @@ const CHALLENGE_LESSON = {
       <p>Code that works perfectly but shows the player nothing isn't really finished — a clear title, drawn with <code>text()</code>, is a small thing that makes an app feel genuinely complete.</p></div>
     <div class="cl-block"><h4>Handling a missing file gracefully</h4>
       <p><code>except FileNotFoundError:</code> means your app survives even if <code>quiz.csv</code> is ever missing or renamed — real shipped software has to handle the world NOT being exactly as expected.</p></div>` },
-  bonus1s1: { title: 'Same CSV-loading pattern, a new real-world question', html: `
-    <div class="cl-block"><h4>int() matters here more than ever</h4>
-      <p>Every value read from a CSV line is TEXT, even "45" — without <code>int(amt)</code>, later totalling would concatenate strings ("45"+"20" = "4520") instead of adding numbers (65). This is exactly why the conversion step exists.</p></div>
-    <div class="cl-block"><h4>Two parallel lists, same length</h4>
-      <p>categories[i] and amounts[i] describe the SAME expense — that's why both lists grow together, one append per line, never one without the other.</p></div>` },
-  bonus1s2: { title: 'A running max is just a variable that only ever grows', html: `
-    <div class="cl-block"><h4>Tracking the biggest, one comparison at a time</h4>
-      <p>You don\'t need to sort anything to find the biggest — just remember the best one seen SO FAR, and replace it only when something bigger comes along. That\'s a running max, the same idea behind finding a high score.</p></div>
-    <div class="cl-block"><h4>Guard before you search</h4>
-      <p>Checking <code>len(amounts) == 0</code> first means an empty expense list never crashes the biggest-category search — the same zero-guard lesson from the quiz scorer, applied to a new problem.</p></div>` },
-  bonus1boss: { title: 'Writing AND reading back proves it really saved', html: `
-    <div class="cl-block"><h4>Why read it back at all?</h4>
-      <p>Writing a file and never reading it back only PROVES the write call ran — reading it afterward proves the data genuinely persisted, exactly like the capstone\'s high-score file.</p></div>
-    <div class="cl-block"><h4>One real project, every skill from the year</h4>
-      <p>File reading, file writing, loops, a running total, a running max, a zero-guard — this bonus project uses nearly everything Grade 8 taught, just pointed at a different real question than the capstone.</p></div>` },
+  bonus1s1: { title: 'try/except turns a crash into a handled case', html: `
+    <div class="cl-block"><h4>Real data has bad rows — plan for it</h4>
+      <p><code>int("not_a_number")</code> raises a ValueError the instant it runs. Wrapping JUST the conversion (and the appends that depend on it) in <code>try/except ValueError</code> means one bad row gets skipped and reported, instead of crashing the entire load.</p></div>
+    <div class="cl-block"><h4>Only append on success</h4>
+      <p>Both appends live INSIDE the try block — if the int() conversion fails, Python jumps straight to except, and neither list grows for that row. That's why categories and amounts stay the same length even after a skip.</p></div>` },
+  bonus1s2: { title: 'A parallel sort moves BOTH arrays in lock-step', html: `
+    <div class="cl-block"><h4>Swapping one list isn\'t enough</h4>
+      <p>categories[i] and amounts[i] describe the SAME expense — the moment you swap amounts[j] and amounts[j+1], you MUST also swap categories[j] and categories[j+1], or the pairing breaks and amounts end up attached to the wrong category.</p></div>
+    <div class="cl-block"><h4>Descending just flips the comparison</h4>
+      <p>Every earlier bubble sort this year swapped when the LEFT value was bigger (ascending). Sorting biggest-first means swapping when the left value is SMALLER — <code>amounts[j] &lt; amounts[j+1]</code>, the exact opposite condition.</p></div>` },
+  bonus1boss: { title: 'Error handling belongs around the risky part, not everything', html: `
+    <div class="cl-block"><h4>try/except on the READ, not the write</h4>
+      <p>The write already has its own file right there — nothing about writing a NEW file can realistically fail here. The read-back is wrapped in try/except FileNotFoundError because THAT'S the operation that could plausibly fail (a missing or moved file), same principle as the M10 capstone\'s polish stage.</p></div>
+    <div class="cl-block"><h4>One real project, nearly every skill from the year</h4>
+      <p>Robust file reading, a parallel bubble sort, percentage calculations, file writing, and guarded error handling — this bonus brings together almost everything Grade 8 taught, at a harder level than any single required module demanded on its own.</p></div>` },
 }
 const STAGE_INDEX = {}
 CHALLENGES.forEach((s, i) => { STAGE_INDEX[s.id] = i })

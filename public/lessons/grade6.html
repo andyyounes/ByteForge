@@ -993,11 +993,14 @@ const W12_STAGES = [
 // ══════════════════════════════════════════════════════════════════════════════
 const W13_STAGES = [
   { id: 'w13s1', title: 'Design a Flag', emoji: '🏳️', type: 'turtle', xp: 40,
-    goal: 'Real flags and logos use simple repeated shapes. Design your own flag emblem: at least 4 sides, at least 2 layers, your own colors.',
-    turtle: { minSides: 4, minLayers: 2, lockAngle: true, defaultSides: 4, defaultLayers: 1 } },
-  { id: 'w13boss', title: 'BOSS — Logo Design Studio', emoji: '🎯', boss: true, type: 'turtle', xp: 90,
-    goal: 'A real design studio brief: at least 6 sides, at least 3 layers, AND some growth for a spiral flourish — your own logo, unmistakably yours.',
-    turtle: { minSides: 6, minLayers: 3, needsGrowth: true, lockAngle: true, defaultSides: 6, defaultLayers: 1, defaultGrowth: 0 } },
+    goal: 'Real flags and logos use simple repeated shapes. Design your own flag emblem: at least 5 sides, at least 3 layers, your own colors.',
+    turtle: { minSides: 5, minLayers: 3, lockAngle: true, defaultSides: 4, defaultLayers: 1 } },
+  { id: 'w13boss', title: 'BOSS — Logo Design Studio', emoji: '🎯', boss: true, type: 'turtle', xp: 120,
+    // The hardest combination this engine supports, all at once: unlock the
+    // angle AND find a genuine star formula AND stack layers AND add growth.
+    // Every earlier World 5/13 stage only asked for ONE or TWO of these.
+    goal: 'The toughest design brief yet: unlock the angle and find a real star formula (at least 7 sides, no shared factor with your skip), at least 4 layers, AND growth for a spiral flourish — a star-mandala logo, every trick combined.',
+    turtle: { minSides: 7, needsStarAngle: true, minLayers: 4, needsGrowth: true, lockAngle: false, allowUnlock: true, defaultSides: 7, defaultAngle: 360/7, defaultLayers: 1, defaultGrowth: 0 } },
 ]
 
 const ALL_STAGES = [...W1_STAGES, ...W2_STAGES, ...W3_STAGES, ...W4_STAGES, ...W5_STAGES, ...W6_STAGES, ...W7_STAGES, ...W8_STAGES, ...W9_STAGES, ...W10_STAGES, ...W11_STAGES, ...W12_STAGES, ...W13_STAGES]

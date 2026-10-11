@@ -2870,15 +2870,19 @@ const WORLDS = [
   // toward concept mastery) — reuses the exact same generic canvas-game log
   // fields as g10boss, just a different real-world creative brief.
   { id:'g11', name:'🌟 Bonus: Simulation Lab', sub:'Optional — simulate something real: weather, growth, day & night', live:true, optional:true, stages:[
-    { id:'g11boss', name:'BOSS — Build a Simulation', xp:90, boss:true,
-      text:`<strong>🌟 BONUS — Build a Simulation</strong> — Real programmers use the exact same tools you just learned to simulate real things: a plant growing, weather changing, day turning to night. Pick ONE real process and simulate it: a variable that changes a little every frame, an if that reacts when it crosses a threshold (e.g. "night" once it gets dark enough), and a function you define to draw the current state.`,
+    { id:'g11boss', name:'BOSS — Build a Simulation', xp:140, boss:true,
+      // Hardest version of this stage: every single drawing primitive the
+      // engine tracks must appear (not just "a shape OR another shape" like
+      // the easier version), on top of the full var/if/function combo —
+      // forces a genuinely complete scene, not a single floating circle.
+      text:`<strong>🌟 BONUS — Build a Full Simulation Scene</strong> — Real programmers use the exact same tools you just learned to simulate real things: a plant growing, weather changing, day turning to night. Pick ONE real process and build a COMPLETE scene for it: a variable that changes a little every frame, an if that reacts when it crosses a threshold, a function you define to draw the current state, AND the scene must use all four drawing tools together — a rect (e.g. ground/sky), a circle (e.g. sun/moon/flower head), a line (e.g. a horizon or stem), and text (e.g. a readout of the current value).`,
       hints:[
         'Pick something with a natural "slowly changes, then something happens" shape — a growing plant, a filling tank, a day/night cycle.',
         'A variable that increases (or decreases) by a small amount every frame IS the simulation — the if just reacts once it crosses a line.',
-        'Define a function like drawScene() that reads the current variable and draws accordingly — call it every frame.',
+        'Define a function like drawScene() that reads the current variable and draws accordingly — call it every frame. Use rect(), circle(), line() AND text() inside it, all four, every frame.',
       ],
       needsVar:true, needsIf:true, needsFrames:true, needsFunction:true,
-      check:(log) => log.frames >= 5 && log.hasVar && log.hasIf && log.hasFunction && (log.rects >= 1 || log.circles >= 1),
+      check:(log) => log.frames >= 5 && log.hasVar && log.hasIf && log.hasFunction && log.rects >= 1 && log.circles >= 1 && log.lines >= 1 && log.texts >= 1,
     },
   ]},
 ]
