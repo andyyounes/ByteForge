@@ -94,13 +94,13 @@ window.P2_RU_TEXT = {
     hints: ['BYREF bal означает, что процедура изменяет переменную ВЫЗЫВАЮЩЕГО кода', 'Deposit: bal ← bal + amt — одна строка, но работает только через BYREF', 'Withdraw: IF amt > bal THEN OUTPUT "Insufficient funds" ELSE bal ← bal - amt'],
   },
 
-  // ── Optional bonus project (AS Level only) ───────────────────────────────
+  // ── Optional bonus project (AS Level only, hardened) ─────────────────────
   BONUS1: {
-    text: '<strong>🌟 Бонус — Симулятор банковского счёта</strong><br>Объедини процедуры в стиле ООП (Задание 4) со стеком (Задание 6) в один настоящий инструмент: банковский счёт, который может ОТМЕНИТЬ свою последнюю операцию.<br>Напиши <code>Deposit(BYVAL amt)</code> и <code>Withdraw(BYVAL amt)</code>, которые обновляют <code>balance</code> И помещают ЗНАКОВУЮ сумму в стек <code>history</code> (депозит помещает +amt, снятие помещает -amt). Напиши <code>UndoLast() RETURNS INTEGER</code>, которая извлекает последнюю запись и отменяет её эффект на balance.<br>Внеси 100, сними 30, внеси 50 (balance должен быть 120), затем UndoLast (balance должен вернуться к 70).',
+    text: '<strong>🌟 Бонус — Симулятор банковского счёта</strong><br>Объедини процедуры в стиле ООП со стеком в один настоящий инструмент, который может отменить НЕСКОЛЬКО операций И отказывает в овердрафте. Напиши <code>Deposit(BYVAL amt)</code> и <code>Withdraw(BYVAL amt)</code>, которые обновляют <code>balance</code> и помещают ЗНАКОВУЮ сумму в стек <code>history</code> — но Withdraw должна ОТКАЗАТЬ (OUTPUT "Insufficient funds", balance БЕЗ ИЗМЕНЕНИЙ, ничего не помещается в стек), если amt &gt; balance. Напиши <code>UndoMultiple(BYVAL n : INTEGER) RETURNS INTEGER</code>, которая отменяет последние <code>n</code> операций за один вызов (не только одну) и возвращает общую отменённую сумму.<br>Внеси 100, сними 30, внеси 50, сними 200 (отказ — всё ещё 120), внеси 20 (balance 140), затем UndoMultiple(2) должна вернуть balance к 70.',
     hints: [
-      'Deposit: balance ← balance + amt, ПОТОМ помести +amt: histTop ← histTop + 1, history[histTop] ← amt.',
-      'Withdraw: balance ← balance - amt, ПОТОМ помести -amt (ОТРИЦАТЕЛЬНОЕ значение, чтобы отмена правильно добавляла обратно): history[histTop] ← -amt.',
-      'UndoLast: last ← history[histTop], histTop ← histTop - 1, balance ← balance - last, RETURN last — вычитание помещённого значения отменяет его (отмена депозита +50 вычитает 50; отмена снятия -30 вычитает -30, что ДОБАВЛЯЕТ 30 обратно).',
+      'Deposit: balance ← balance + amt, ПОТОМ помести +amt. Withdraw: IF amt > balance THEN OUTPUT "Insufficient funds" и завершись раньше (НЕ помещай в стек, НЕ изменяй balance) ELSE balance ← balance - amt, помести -amt.',
+      'UndoMultiple(n) — это просто логика одиночного извлечения UndoLast, повторённая n раз в цикле: FOR i ← 1 TO n: извлеки одну запись, отмени её эффект на balance, добавь её к общей сумме. NEXT i. RETURN общую сумму.',
+      'Трассировка: после Deposit 100, Withdraw 30, Deposit 50, Withdraw 200 (отказ), Deposit 20 → history = [100, -30, 50, 20], balance 140. UndoMultiple(2) извлекает 20, затем 50, balance ← 140 - 20 - 50 = 70.',
     ],
   },
 

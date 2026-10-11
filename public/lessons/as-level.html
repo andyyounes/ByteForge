@@ -4659,12 +4659,16 @@ OUTPUT Pop()   // expected: 20`,
   // ── OPTIONAL bonus project, unlocked after STK1. Not required — plain
   // check(code,res) through the same Interpreter every P2 challenge uses.
   {
-    mod:'BONUS1',name:'Bank Account Simulator',xp:100,
-    text:`<strong>🌟 Bonus — Bank Account Simulator</strong><br>Combine OOP-style procedures (Challenge 4) with a stack (Challenge 6) into one real-world tool: a bank account that can UNDO its last transaction.<br>Write <code>Deposit(BYVAL amt)</code> and <code>Withdraw(BYVAL amt)</code> that update <code>balance</code> AND push the SIGNED amount onto a <code>history</code> stack (deposit pushes +amt, withdraw pushes -amt). Write <code>UndoLast() RETURNS INTEGER</code> that pops the last entry and reverses its effect on balance.<br>Deposit 100, Withdraw 30, Deposit 50 (balance should be 120), then UndoLast (balance should go back to 70).`,
+    mod:'BONUS1',name:'Bank Account Simulator',xp:150,
+    // Hardened: Withdraw must now REFUSE an overdraft (and that refusal
+    // must NOT corrupt the undo history), and UndoLast is now UndoMultiple,
+    // reversing N transactions in one call via a loop around the original
+    // single-pop logic — real multi-step undo, not one pop.
+    text:`<strong>🌟 Bonus — Bank Account Simulator</strong><br>Combine OOP-style procedures with a stack into one real-world tool that can undo MULTIPLE transactions AND refuses an overdraft. Write <code>Deposit(BYVAL amt)</code> and <code>Withdraw(BYVAL amt)</code> that update <code>balance</code> and push the SIGNED amount onto a <code>history</code> stack — but Withdraw must REFUSE (OUTPUT "Insufficient funds", balance UNCHANGED, nothing pushed) if amt &gt; balance. Write <code>UndoMultiple(BYVAL n : INTEGER) RETURNS INTEGER</code> that undoes the last <code>n</code> transactions in one call (not just one) and returns the total amount reversed.<br>Deposit 100, Withdraw 30, Deposit 50, Withdraw 200 (refused — still 120), Deposit 20 (balance 140), then UndoMultiple(2) should bring balance back to 70.`,
     hints:[
-      'Deposit: balance ← balance + amt, THEN push +amt: histTop ← histTop + 1, history[histTop] ← amt.',
-      'Withdraw: balance ← balance - amt, THEN push -amt (the NEGATIVE, so undoing it adds back correctly): history[histTop] ← -amt.',
-      'UndoLast: last ← history[histTop], histTop ← histTop - 1, balance ← balance - last, RETURN last — subtracting a pushed value reverses it (undoing a +50 deposit subtracts 50; undoing a -30 withdrawal subtracts -30, which ADDS 30 back).',
+      'Deposit: balance ← balance + amt, THEN push +amt. Withdraw: IF amt > balance THEN OUTPUT "Insufficient funds" and RETURN early (do NOT push, do NOT change balance) ELSE balance ← balance - amt, push -amt.',
+      'UndoMultiple(n) is just UndoLast\'s single-pop logic, repeated n times in a loop: FOR i ← 1 TO n: pop one entry, reverse its effect on balance, add it to a running total. NEXT i. RETURN the running total.',
+      'Trace it: after Deposit 100, Withdraw 30, Deposit 50, Withdraw 200 (refused), Deposit 20 → history is [100, -30, 50, 20], balance 140. UndoMultiple(2) pops 20 then 50, balance ← 140 - 20 - 50 = 70.',
     ],
     starter:`// Bonus: Bank Account Simulator
 DECLARE balance : INTEGER
@@ -4678,23 +4682,30 @@ PROCEDURE Deposit(BYVAL amt : INTEGER)
 ENDPROCEDURE
 
 PROCEDURE Withdraw(BYVAL amt : INTEGER)
-   // TODO: balance ← balance - amt, then push -amt onto history
+   // TODO: IF amt > balance THEN OUTPUT "Insufficient funds" (and do nothing else)
+   // TODO: ELSE balance ← balance - amt, then push -amt onto history
 ENDPROCEDURE
 
-FUNCTION UndoLast() RETURNS INTEGER
-   DECLARE last : INTEGER
-   // TODO: pop the last history entry, reverse its effect on balance, RETURN it
-   RETURN 0
+FUNCTION UndoMultiple(BYVAL n : INTEGER) RETURNS INTEGER
+   DECLARE i     : INTEGER
+   DECLARE last  : INTEGER
+   DECLARE total : INTEGER
+   total ← 0
+   // TODO: loop n times — pop the last history entry, reverse its effect on
+   // balance, add it to total. Then RETURN total.
+   RETURN total
 ENDFUNCTION
 
 DECLARE undone : INTEGER
 CALL Deposit(100)
 CALL Withdraw(30)
 CALL Deposit(50)
-OUTPUT balance      // expected: 120
-undone ← UndoLast()
+CALL Withdraw(200)   // should be refused — "Insufficient funds"
+CALL Deposit(20)
+OUTPUT balance      // expected: 140
+undone ← UndoMultiple(2)
 OUTPUT balance      // expected: 70`,
-    check:(code,res)=>res.output[0]?.trim()==='120'&&res.output[1]?.trim()==='70',
+    check:(code,res)=>res.output.some(o=>o.trim()==='Insufficient funds')&&res.output.some(o=>o.trim()==='140')&&res.output.some(o=>o.trim()==='70'),
   },
 ]
 
