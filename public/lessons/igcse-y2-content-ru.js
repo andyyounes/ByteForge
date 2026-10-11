@@ -233,4 +233,18 @@ window.G9Y2_RU_TEXT = {
     text: '<strong>Определи — 10.3a Полусумматор и полный сумматор (дополнительно)</strong><br>Какая схема сумматора может принимать перенос (carry-in) от предыдущего разряда, что делает её подходящей для сложения настоящих многобитных чисел: <code>half adder</code> или <code>full adder</code>?',
     hints: ['Полусумматор (half adder) может обрабатывать только ровно 2 входных бита, без входящего переноса.'],
   },
+
+  // ── Optional bonus project (added after the EN/RU toggle fix session) ────
+  'BONUS/Book Record (OOP)': {
+    text: '<strong>🌟 Бонус 1 — Построй библиотечный каталог</strong><br>Используй тот же приём из Модуля 6, что и для класса Animal. Напиши <code>Book_New(title, author)</code>, устанавливающую глобальные переменные, и <code>Book_Info()</code>, выводящую «<em>title</em> by <em>author</em>». Создай книгу «Dune» автора «Frank Herbert» и вызови Book_Info. Ожидается: <strong>Dune by Frank Herbert</strong>',
+    hints: ['Объяви глобальные переменные: bookTitle : STRING, bookAuthor : STRING', 'PROCEDURE Book_New(BYVAL t : STRING, BYVAL a : STRING) / bookTitle ← t / bookAuthor ← a / ENDPROCEDURE', 'PROCEDURE Book_Info() / OUTPUT bookTitle & " by " & bookAuthor / ENDPROCEDURE'],
+  },
+  'BONUS/Sort by Pages': {
+    text: '<strong>🌟 Бонус 2 — Отсортируй каталог по объёму</strong><br>Каталог из 5 книг имеет количество страниц <code>[320, 180, 450, 275, 210]</code>. Используй сортировку пузырьком (из Модуля 5), чтобы отсортировать по возрастанию, затем выведи все 5.<br>Ожидается: <strong>180 210 275 320 450</strong>',
+    hints: ['Та же вложенная сортировка пузырьком, что в M5: внешний i от 1 до 4, внутренний j от 1 до 5-i.', 'IF arr[j] > arr[j+1] THEN поменяй местами через временную переменную.', 'temp ← arr[j] / arr[j] ← arr[j+1] / arr[j+1] ← temp'],
+  },
+  'BONUS/Save the Catalog': {
+    text: '<strong>🌟 БОНУС-БОСС — Сохрани каталог</strong><br>Объедини всё: отсортируй те же 5 значений страниц (Бонус 2), ЗАПИШИ каждое в <code>catalog.txt</code> на отдельной строке, затем открой его заново FOR READ и выведи (OUTPUT) первую строку обратно, доказав, что всё сохранилось.',
+    hints: ['Используй свой отсортированный массив из Бонуса 2.', 'OPENFILE "catalog.txt" FOR WRITE, затем FOR i ← 1 TO 5: WRITEFILE "catalog.txt", pages[i]. NEXT i. CLOSEFILE "catalog.txt" — WRITEFILE сам преобразует число в строку.', 'OPENFILE "catalog.txt" FOR READ, DECLARE line : STRING, READFILE "catalog.txt", line, OUTPUT line, CLOSEFILE "catalog.txt"'],
+  },
 }

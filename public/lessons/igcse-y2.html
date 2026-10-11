@@ -1606,6 +1606,68 @@ CALL Dog_Info()`,
     check: ans => /full/i.test(ans.trim()),
   },
   // ── BOOK-LESSONS-END ──
+  // ── OPTIONAL bonus project, unlocked after M10. Not required — plain
+  // check(code,res) through the real interpreter, same as every M1-M10 code
+  // challenge, so no engine change or AI-marking plumbing needed.
+  {
+    mod:'BONUS', name:'Book Record (OOP)', xp:50,
+    text:`<strong>🌟 Bonus 1 — Build a Library Catalog</strong><br>Reuse the Animal-class pattern from Module 6. Write <code>Book_New(title, author)</code> to set global variables, and <code>Book_Info()</code> to output "<em>title</em> by <em>author</em>". Create a book titled "Dune" by "Frank Herbert" and call Book_Info. Expected: <strong>Dune by Frank Herbert</strong>`,
+    hints:['Declare global variables: bookTitle : STRING, bookAuthor : STRING', 'PROCEDURE Book_New(BYVAL t : STRING, BYVAL a : STRING) / bookTitle ← t / bookAuthor ← a / ENDPROCEDURE', 'PROCEDURE Book_Info() / OUTPUT bookTitle & " by " & bookAuthor / ENDPROCEDURE'],
+    starter:`// Bonus 1: Book Record (OOP)
+DECLARE bookTitle  : STRING
+DECLARE bookAuthor : STRING
+
+PROCEDURE Book_New(BYVAL t : STRING, BYVAL a : STRING)
+   // TODO: assign bookTitle and bookAuthor
+ENDPROCEDURE
+
+PROCEDURE Book_Info()
+   // TODO: OUTPUT bookTitle & " by " & bookAuthor
+ENDPROCEDURE
+
+CALL Book_New("Dune", "Frank Herbert")
+CALL Book_Info()`,
+    check:(code,res) => res.output.some(o => o.trim() === 'Dune by Frank Herbert'),
+  },
+  {
+    mod:'BONUS', name:'Sort by Pages', xp:55,
+    text:`<strong>🌟 Bonus 2 — Sort the Catalog by Length</strong><br>A catalog of 5 books has page counts <code>[320, 180, 450, 275, 210]</code>. Use bubble sort (from Module 5) to sort them ascending, then OUTPUT all 5.<br>Expected: <strong>180 210 275 320 450</strong>`,
+    hints:['Same nested-FOR bubble sort as M5: outer i from 1 to 4, inner j from 1 to 5-i.', 'IF arr[j] > arr[j+1] THEN swap using a temp variable.', 'temp ← arr[j] / arr[j] ← arr[j+1] / arr[j+1] ← temp'],
+    starter:`// Bonus 2: Sort the Catalog by Length
+DECLARE pages : ARRAY[1:5] OF INTEGER
+DECLARE i     : INTEGER
+DECLARE j     : INTEGER
+DECLARE temp  : INTEGER
+
+pages[1]←320; pages[2]←180; pages[3]←450; pages[4]←275; pages[5]←210
+
+// TODO: bubble sort pages ascending
+
+FOR i ← 1 TO 5
+   OUTPUT pages[i]
+NEXT i`,
+    check:(code,res) => {
+      const nums = res.output.map(s => parseInt(s.trim()))
+      return JSON.stringify(nums) === JSON.stringify([180,210,275,320,450])
+    },
+  },
+  {
+    mod:'BONUS', name:'Save the Catalog', xp:80, boss:true,
+    text:`<strong>🌟 BONUS BOSS — Save the Catalog</strong><br>Bring it together: sort the same 5 page counts (Bonus 2), WRITE each one to <code>catalog.txt</code> on its own line, then OPEN it again FOR READ and OUTPUT the first line back, proving it saved.`,
+    hints:['Reuse your sorted array from Bonus 2.', 'OPENFILE "catalog.txt" FOR WRITE, then FOR i ← 1 TO 5: WRITEFILE "catalog.txt", pages[i]. NEXT i. CLOSEFILE "catalog.txt" — WRITEFILE converts the number for you.', 'OPENFILE "catalog.txt" FOR READ, DECLARE line : STRING, READFILE "catalog.txt", line, OUTPUT line, CLOSEFILE "catalog.txt"'],
+    starter:`// Bonus Boss: Save the Catalog
+DECLARE pages : ARRAY[1:5] OF INTEGER
+DECLARE i     : INTEGER
+DECLARE j     : INTEGER
+DECLARE temp  : INTEGER
+
+pages[1]←180; pages[2]←210; pages[3]←275; pages[4]←320; pages[5]←450
+
+// TODO: OPENFILE "catalog.txt" FOR WRITE, write each page count, CLOSEFILE
+
+// TODO: OPENFILE "catalog.txt" FOR READ, read the first line into a STRING, OUTPUT it, CLOSEFILE`,
+    check:(code,res) => res.output.some(o => o.trim() === '180'),
+  },
 ]
 
 // mod+name is the stable identity used for saves (no dedicated `id` field on
