@@ -1634,78 +1634,118 @@ CALL Search(nums, 5, 30)`,
   // reusing the exact same pseudocode check(code,res) pattern as every W6-M13
   // challenge.
   {
-    mod:'BONUS', name:'Load Class Scores', xp:50,
-    text:`<strong>🌟 Bonus 1 — Build a Grade Calculator</strong><br>Real teachers need this every term. Declare an array <code>scores : ARRAY[1:5] OF INTEGER</code>, fill it with <strong>78, 92, 65, 88, 71</strong>, then OUTPUT each score and the total.`,
+    mod:'BONUS', name:'Load & Validate Class Scores', xp:65,
+    // Harder than a plain fill-loop: one score is genuinely INVALID (150,
+    // impossible on a 0-100 scale) and must be rejected with a message
+    // rather than silently included in the total — real-world data
+    // validation, not just array mechanics.
+    text:`<strong>🌟 Bonus 1 — Build a Grade Calculator</strong><br>Real score data isn't always clean. Declare an array <code>scores : ARRAY[1:5] OF INTEGER</code> with <strong>78, 92, 65, 150, 71</strong> — one of these is IMPOSSIBLE on a 0-100 scale. Loop through, OUTPUT "Invalid score: X" for anything outside 0-100 (and exclude it from the total), OUTPUT every valid score, then OUTPUT the total of only the valid ones.`,
     hints:[
-      'DECLARE scores : ARRAY[1:5] OF INTEGER then fill scores[1] through scores[5] with 78, 92, 65, 88, 71.',
-      'FOR i ← 1 TO 5: OUTPUT scores[i]. NEXT i — then add a total variable and accumulate inside the same loop.',
-      'total should come out to 394.',
+      'DECLARE scores : ARRAY[1:5] OF INTEGER then fill scores[1] through scores[5] with 78, 92, 65, 150, 71.',
+      'Inside your FOR loop: IF scores[i] < 0 OR scores[i] > 100 THEN OUTPUT "Invalid score: " & scores[i] ELSE OUTPUT scores[i], total ← total + scores[i] ENDIF.',
+      'The valid total should come out to 306 (78+92+65+71 — 150 is excluded).',
     ],
-    starter:`// Bonus 1: Load Class Scores
+    starter:`// Bonus 1: Load & Validate Class Scores
 DECLARE scores : ARRAY[1:5] OF INTEGER
 DECLARE i      : INTEGER
 DECLARE total  : INTEGER
 
-// TODO: fill the array with 78, 92, 65, 88, 71
-// TODO: FOR loop to OUTPUT each score and accumulate total
-// TODO: OUTPUT total`,
+scores[1]←78; scores[2]←92; scores[3]←65; scores[4]←150; scores[5]←71
+total ← 0
+
+// TODO: FOR loop — IF a score is outside 0-100, OUTPUT "Invalid score: " & it
+// and skip it; ELSE OUTPUT the score and add it to total
+
+OUTPUT total`,
     check:(code,res) => {
-      const out = res.output.map(s => parseInt(s.trim()))
-      return out.includes(92) && out.includes(65) && out.some(v => v === 394)
+      const out = res.output.map(s => s.trim())
+      const hasInvalidMsg = out.some(o => /invalid score:\s*150/i.test(o))
+      const hasValidTotal = out.includes('306')
+      const doesNotIncludeBadTotal = !out.includes('456')
+      return hasInvalidMsg && hasValidTotal && doesNotIncludeBadTotal
     },
   },
   {
-    mod:'BONUS', name:'Average & Letter Grade', xp:55,
-    text:`<strong>🌟 Bonus 2 — Average &amp; Letter Grade</strong><br>Write a FUNCTION <code>LetterGrade(average : REAL) RETURNS STRING</code> that returns <strong>"A"</strong> if average ≥ 85, <strong>"B"</strong> if average ≥ 70, <strong>"C"</strong> if average ≥ 50, otherwise <strong>"F"</strong>.<br>Test with the class average from Bonus 1 (394 ÷ 5 = 78.8). Expected: <strong>B</strong>`,
+    mod:'BONUS', name:'Rank the Class (Sort + Letter Grade)', xp:75,
+    // Harder than a single-value letter-grade test: now requires sorting
+    // an array DESCENDING (bubble sort, reused skill) AND applying the
+    // grading function to EVERY element in ranked order — not one hardcoded
+    // average.
+    text:`<strong>🌟 Bonus 2 — Rank the Class</strong><br>Write a FUNCTION <code>LetterGrade(score : REAL) RETURNS STRING</code> that returns <strong>"A"</strong> if score ≥ 85, <strong>"B"</strong> if score ≥ 70, <strong>"C"</strong> if score ≥ 50, otherwise <strong>"F"</strong>. Using the 4 VALID scores from Bonus 1 (78, 92, 65, 71), bubble sort them DESCENDING (highest first), then OUTPUT each score with its letter grade, in ranked order.<br>Expected order: <strong>92 (A), 78 (B), 71 (B), 65 (C)</strong>`,
     hints:[
-      'FUNCTION LetterGrade(average : REAL) RETURNS STRING',
-      'IF average >= 85 THEN RETURN "A" ELSEIF average >= 70 THEN RETURN "B" ELSEIF average >= 50 THEN RETURN "C" ELSE RETURN "F" ENDIF',
-      'OUTPUT LetterGrade(78.8) — order the ELSEIFs from highest to lowest, or a high average could wrongly match a lower band first.',
+      'FUNCTION LetterGrade(score : REAL) RETURNS STRING — same IF/ELSEIF ladder as before, highest band first.',
+      'Bubble sort DESCENDING: swap when scores[j] < scores[j+1] (the smaller one is out of order for a highest-first ranking).',
+      'After sorting, FOR i ← 1 TO 4: OUTPUT scores[i] & " (" & LetterGrade(scores[i]) & ")". NEXT i',
     ],
-    starter:`// Bonus 2: Average & Letter Grade
-FUNCTION LetterGrade(average : REAL) RETURNS STRING
-   // TODO: return "A"/"B"/"C"/"F" based on the average
+    starter:`// Bonus 2: Rank the Class
+FUNCTION LetterGrade(score : REAL) RETURNS STRING
+   // TODO: return "A"/"B"/"C"/"F" based on score
    RETURN "F"
 ENDFUNCTION
 
-OUTPUT LetterGrade(78.8)   // expected: B`,
-    check:(code,res) => res.output.some(o => o.trim().toUpperCase() === 'B'),
+DECLARE scores : ARRAY[1:4] OF INTEGER
+DECLARE i      : INTEGER
+DECLARE j      : INTEGER
+DECLARE temp   : INTEGER
+scores[1]←78; scores[2]←92; scores[3]←65; scores[4]←71
+
+// TODO: bubble sort scores DESCENDING (highest first)
+
+// TODO: FOR loop to OUTPUT each score with its letter grade, e.g. "92 (A)"`,
+    check:(code,res) => {
+      const out = res.output.map(o => o.trim())
+      return out[0] === '92 (A)' && out[1] === '78 (B)' && out[2] === '71 (B)' && out[3] === '65 (C)'
+    },
   },
   {
-    mod:'BONUS', name:'Full Grade Report', xp:90, boss:true,
-    text:`<strong>🌟 BONUS BOSS — Full Grade Report</strong><br>Bring Bonus 1 and 2 together into one real report. Using the same 5 scores, compute the total, the average, and OUTPUT the letter grade for the WHOLE class using your <code>LetterGrade</code> function.`,
+    mod:'BONUS', name:'Full Grade Report', xp:120, boss:true,
+    // Hardest version: combines validation (Bonus 1) + descending sort +
+    // per-score grading (Bonus 2) into ONE pipeline, over PARALLEL arrays
+    // of names AND scores — the sort must move both arrays together, same
+    // "parallel sort" difficulty already established elsewhere this
+    // session, plus the earlier validation step.
+    text:`<strong>🌟 BONUS BOSS — Full Grade Report</strong><br>Bring everything together. Parallel arrays <code>names</code> and <code>scores</code> hold 5 students, but one score (150) is still invalid. Validate first (excluding the bad student entirely from BOTH arrays conceptually — skip them when sorting/printing), bubble sort the remaining students DESCENDING by score (moving names and scores together), THEN OUTPUT each student's rank report: "name: score (grade)".<br>Expected: <strong>Bob: 92 (A)</strong>, <strong>Amy: 78 (B)</strong>, <strong>Eve: 71 (B)</strong>, <strong>Cat: 65 (C)</strong> — Dan (150) never appears.`,
     hints:[
-      'Reuse your array-filling and total-accumulating loop from Bonus 1.',
-      'average ← total / 5 (as a REAL, so the division keeps its decimal part).',
-      'OUTPUT LetterGrade(average) — this is the same function from Bonus 2, now fed a value you calculated yourself instead of a hardcoded number.',
+      'Reuse your LetterGrade function from Bonus 2.',
+      'Validation first: build a NEW pair of arrays containing only the valid students (or mark Dan\'s score as impossible to sort-in, e.g. skip index 4 entirely when copying).',
+      'The parallel sort rule still applies: whenever you swap scores[j]/scores[j+1], you must ALSO swap names[j]/names[j+1] in the same step.',
     ],
     starter:`// Bonus Boss: Full Grade Report
-FUNCTION LetterGrade(average : REAL) RETURNS STRING
-   IF average >= 85 THEN
+FUNCTION LetterGrade(score : REAL) RETURNS STRING
+   IF score >= 85 THEN
       RETURN "A"
-   ELSEIF average >= 70 THEN
+   ELSEIF score >= 70 THEN
       RETURN "B"
-   ELSEIF average >= 50 THEN
+   ELSEIF score >= 50 THEN
       RETURN "C"
    ELSE
       RETURN "F"
    ENDIF
 ENDFUNCTION
 
+DECLARE names   : ARRAY[1:5] OF STRING
 DECLARE scores  : ARRAY[1:5] OF INTEGER
-DECLARE i       : INTEGER
-DECLARE total   : INTEGER
-DECLARE average : REAL
+DECLARE validNames  : ARRAY[1:4] OF STRING
+DECLARE validScores : ARRAY[1:4] OF INTEGER
+DECLARE i : INTEGER
+DECLARE j : INTEGER
+DECLARE k : INTEGER
+DECLARE tempN : STRING
+DECLARE tempS : INTEGER
 
-// Fill array: 78, 92, 65, 88, 71
-scores[1]←78; scores[2]←92; scores[3]←65; scores[4]←88; scores[5]←71
+names[1]←"Amy"; names[2]←"Bob"; names[3]←"Cat"; names[4]←"Dan"; names[5]←"Eve"
+scores[1]←78;   scores[2]←92;   scores[3]←65;   scores[4]←150;  scores[5]←71
 
-// TODO: FOR loop to accumulate total from scores
-// TODO: average ← total / 5
-// TODO: OUTPUT total, then OUTPUT average, then OUTPUT LetterGrade(average)`,
+// TODO: copy only valid (0-100) students from names/scores into
+// validNames/validScores (k keeps track of how many copied so far)
+
+// TODO: bubble sort validNames/validScores DESCENDING by score, together
+
+// TODO: FOR loop to OUTPUT "name: score (grade)" for each of the 4 valid students`,
     check:(code,res) => {
       const out = res.output.map(o => o.trim())
-      return out.includes('394') && out.some(o => o.toUpperCase() === 'B')
+      return out[0] === 'Bob: 92 (A)' && out[1] === 'Amy: 78 (B)' && out[2] === 'Eve: 71 (B)' && out[3] === 'Cat: 65 (C)' &&
+        !out.some(o => o.includes('Dan'))
     },
   },
 ]

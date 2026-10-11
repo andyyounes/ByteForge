@@ -246,29 +246,29 @@ window.G9_RU_TEXT = {
     ],
   },
 
-  // ── Optional bonus project (added after the EN/RU toggle fix session) ────
-  'BONUS/Load Class Scores': {
-    text: '<strong>🌟 Бонус 1 — Построй калькулятор оценок</strong><br>Это нужно каждому учителю каждую четверть. Объяви массив <code>scores : ARRAY[1:5] OF INTEGER</code>, заполни его значениями <strong>78, 92, 65, 88, 71</strong>, затем выведи (OUTPUT) каждую оценку и сумму.',
+  // ── Optional bonus project (hardened after the "make it very hard" ask) ──
+  'BONUS/Load & Validate Class Scores': {
+    text: '<strong>🌟 Бонус 1 — Построй калькулятор оценок</strong><br>Настоящие данные об оценках не всегда чистые. Объяви массив <code>scores : ARRAY[1:5] OF INTEGER</code> со значениями <strong>78, 92, 65, 150, 71</strong> — одно из них НЕВОЗМОЖНО по шкале 0-100. Пройди циклом, выведи (OUTPUT) «Invalid score: X» для всего вне диапазона 0-100 (и исключи это из суммы), выведи каждую корректную оценку, затем выведи сумму только корректных.',
     hints: [
-      'DECLARE scores : ARRAY[1:5] OF INTEGER, затем заполни scores[1] по scores[5] значениями 78, 92, 65, 88, 71.',
-      'FOR i ← 1 TO 5: OUTPUT scores[i]. NEXT i — затем добавь переменную total и накапливай сумму в том же цикле.',
-      'total должен получиться равным 394.',
+      'DECLARE scores : ARRAY[1:5] OF INTEGER, затем заполни scores[1] по scores[5] значениями 78, 92, 65, 150, 71.',
+      'Внутри цикла FOR: IF scores[i] < 0 OR scores[i] > 100 THEN OUTPUT "Invalid score: " & scores[i] ELSE OUTPUT scores[i], total ← total + scores[i] ENDIF.',
+      'Корректная сумма должна получиться равной 306 (78+92+65+71 — 150 исключается).',
     ],
   },
-  'BONUS/Average & Letter Grade': {
-    text: '<strong>🌟 Бонус 2 — Средний балл и буквенная оценка</strong><br>Напиши FUNCTION <code>LetterGrade(average : REAL) RETURNS STRING</code>, которая возвращает <strong>«A»</strong>, если average ≥ 85, <strong>«B»</strong>, если average ≥ 70, <strong>«C»</strong>, если average ≥ 50, иначе <strong>«F»</strong>.<br>Проверь на среднем балле класса из Бонуса 1 (394 ÷ 5 = 78.8). Ожидается: <strong>B</strong>',
+  'BONUS/Rank the Class (Sort + Letter Grade)': {
+    text: '<strong>🌟 Бонус 2 — Ранжируй класс</strong><br>Напиши FUNCTION <code>LetterGrade(score : REAL) RETURNS STRING</code>, которая возвращает <strong>«A»</strong>, если score ≥ 85, <strong>«B»</strong>, если score ≥ 70, <strong>«C»</strong>, если score ≥ 50, иначе <strong>«F»</strong>. Используя 4 корректные оценки из Бонуса 1 (78, 92, 65, 71), отсортируй их пузырьком по УБЫВАНИЮ (сначала самая высокая), затем выведи каждую оценку с её буквенной оценкой, в порядке рейтинга.<br>Ожидаемый порядок: <strong>92 (A), 78 (B), 71 (B), 65 (C)</strong>',
     hints: [
-      'FUNCTION LetterGrade(average : REAL) RETURNS STRING',
-      'IF average >= 85 THEN RETURN "A" ELSEIF average >= 70 THEN RETURN "B" ELSEIF average >= 50 THEN RETURN "C" ELSE RETURN "F" ENDIF',
-      'OUTPUT LetterGrade(78.8) — упорядочь ELSEIF от самого высокого к самому низкому, иначе высокий балл мог бы неверно попасть в более низкую категорию первой.',
+      'FUNCTION LetterGrade(score : REAL) RETURNS STRING — та же лестница IF/ELSEIF, что и раньше, сначала самая высокая категория.',
+      'Сортировка пузырьком по УБЫВАНИЮ: меняй местами, когда scores[j] < scores[j+1] (меньшее значение не на своём месте для рейтинга «сначала самое высокое»).',
+      'После сортировки: FOR i ← 1 TO 4: OUTPUT scores[i] & " (" & LetterGrade(scores[i]) & ")". NEXT i',
     ],
   },
   'BONUS/Full Grade Report': {
-    text: '<strong>🌟 БОНУС-БОСС — Полный отчёт об оценках</strong><br>Объедини Бонус 1 и 2 в один настоящий отчёт. Используя те же 5 оценок, вычисли сумму, средний балл и выведи (OUTPUT) буквенную оценку для ВСЕГО класса с помощью своей функции <code>LetterGrade</code>.',
+    text: '<strong>🌟 БОНУС-БОСС — Полный отчёт об оценках</strong><br>Объедини всё. Параллельные массивы <code>names</code> и <code>scores</code> хранят 5 студентов, но одна оценка (150) всё ещё некорректна. Сначала проверь (исключив некорректного студента из рассмотрения при сортировке/выводе), отсортируй оставшихся студентов пузырьком по УБЫВАНИЮ оценки (перемещая names и scores вместе), ПОТОМ выведи отчёт по рейтингу каждого студента: «name: score (grade)».<br>Ожидается: <strong>Bob: 92 (A)</strong>, <strong>Amy: 78 (B)</strong>, <strong>Eve: 71 (B)</strong>, <strong>Cat: 65 (C)</strong> — Dan (150) никогда не появляется.',
     hints: [
-      'Используй свой цикл заполнения массива и накопления суммы из Бонуса 1.',
-      'average ← total / 5 (как REAL, чтобы деление сохранило десятичную часть).',
-      'OUTPUT LetterGrade(average) — это та же функция из Бонуса 2, теперь получающая значение, которое ты вычислил сам, а не готовое число.',
+      'Используй свою функцию LetterGrade из Бонуса 2.',
+      'Сначала проверка: создай НОВУЮ пару массивов, содержащую только корректных студентов (или пропусти индекс 4 Дэна полностью при копировании).',
+      'Правило параллельной сортировки всё ещё действует: когда меняешь местами scores[j]/scores[j+1], ОБЯЗАТЕЛЬНО меняй местами и names[j]/names[j+1] в том же шаге.',
     ],
   },
 }
