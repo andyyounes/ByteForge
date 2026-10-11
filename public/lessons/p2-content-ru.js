@@ -103,4 +103,14 @@ window.P2_RU_TEXT = {
       'UndoLast: last ← history[histTop], histTop ← histTop - 1, balance ← balance - last, RETURN last — вычитание помещённого значения отменяет его (отмена депозита +50 вычитает 50; отмена снятия -30 вычитает -30, что ДОБАВЛЯЕТ 30 обратно).',
     ],
   },
+
+  // ── Optional bonus project (A Level only) ────────────────────────────────
+  BONUS2: {
+    text: '<strong>🌟 Бонус — Телефонная книга на хеш-таблице</strong><br>Настоящим телефонным приложениям нужен быстрый поиск по имени. Построй хеш-таблицу размера 7, хранящую имена И номера в параллельных массивах, используя <code>hash(name) = ASC(LEFT(name,1)) MOD 7</code> с <strong>линейным пробированием</strong> при коллизии (та же техника, что в задании Linear Probing).<br>Добавь «Amy»/«111», «Hank»/«222» (ASC("A")=65, ASC("H")=72 — ОБА MOD 7 = 2, настоящая коллизия), «Zoe»/«333». Напиши <code>FindContact(name) RETURNS STRING</code>, которая повторно хеширует и пробирует, чтобы найти нужный номер.<br>Выведи FindContact("Amy"), затем FindContact("Hank"). Ожидается: <strong>111</strong>, затем <strong>222</strong> — ОБА должны находиться правильно несмотря на коллизию, доказывая, что ни один контакт не потерян и не перепутан с другим.',
+    hints: [
+      'Сначала инициализируй имя каждого слота как "" (маркер пустоты) — тот же приём, что -1 в Linear Probing.',
+      'AddContact: idx ← ASC(LEFT(name,1)) MOD 7, ПОТОМ WHILE names[idx] <> "" → idx ← (idx + 1) MOD 7 (пробируй вперёд, как в Linear Probing). ПОТОМ names[idx] ← name, numbers[idx] ← number.',
+      'FindContact должна пробировать ТАК ЖЕ: idx ← ASC(LEFT(name,1)) MOD 7, ПОТОМ WHILE names[idx] <> name → idx ← (idx + 1) MOD 7 (остановись раньше, если встретишь "" — не найдено). RETURN numbers[idx].',
+    ],
+  },
 }

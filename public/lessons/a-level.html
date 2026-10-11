@@ -5689,6 +5689,47 @@ CALL Withdraw(balance, 500)   // expected: Insufficient funds
 OUTPUT balance   // expected: 350`,
     check:(code,res)=>res.output[0]?.trim()==='350'&&res.output[1]?.trim()==='Insufficient funds'&&res.output[2]?.trim()==='350',
   },
+  // ── OPTIONAL bonus project, unlocked after OOP3. Not required — plain
+  // check(code,res) through the same Interpreter every P2 challenge uses.
+  {
+    mod:'BONUS2',name:'Contact Book (Hash Table)',xp:150,
+    text:`<strong>🌟 Bonus — Contact Book with a Hash Table</strong><br>Real phone apps need fast lookup by name. Build a size-7 hash table storing names AND numbers in parallel arrays, using <code>hash(name) = ASC(LEFT(name,1)) MOD 7</code> with <strong>linear probing</strong> on collision (same technique as the Linear Probing challenge).<br>Add "Amy"/"111", "Hank"/"222" (ASC("A")=65, ASC("H")=72 — BOTH MOD 7 = 2, a genuine collision), "Zoe"/"333". Write <code>FindContact(name) RETURNS STRING</code> that re-hashes and probes to find the matching number.<br>OUTPUT FindContact("Amy") then FindContact("Hank"). Expected: <strong>111</strong> then <strong>222</strong> — BOTH must still be found correctly despite the collision, proving neither contact was lost or confused with the other.`,
+    hints:[
+      'Initialise every slot\'s name to "" (empty marker) first, same pattern as Linear Probing\'s -1.',
+      'AddContact: idx ← ASC(LEFT(name,1)) MOD 7, THEN WHILE names[idx] <> "" → idx ← (idx + 1) MOD 7 (probe forward, same as Linear Probing). THEN names[idx] ← name, numbers[idx] ← number.',
+      'FindContact must probe the SAME way: idx ← ASC(LEFT(name,1)) MOD 7, THEN WHILE names[idx] <> name → idx ← (idx + 1) MOD 7 (stop early if you hit "" — not found). RETURN numbers[idx].',
+    ],
+    starter:`// Bonus: Contact Book with a Hash Table
+DECLARE names   : ARRAY[0:6] OF STRING
+DECLARE numbers : ARRAY[0:6] OF STRING
+DECLARE i       : INTEGER
+
+FOR i ← 0 TO 6
+   names[i] ← ""
+NEXT i
+
+PROCEDURE AddContact(BYVAL name : STRING, BYVAL number : STRING)
+   DECLARE idx : INTEGER
+   idx ← ASC(LEFT(name,1)) MOD 7
+   // TODO: WHILE names[idx] <> "" → idx ← (idx + 1) MOD 7 (probe forward)
+   names[idx] ← name
+   numbers[idx] ← number
+ENDPROCEDURE
+
+FUNCTION FindContact(name : STRING) RETURNS STRING
+   DECLARE idx : INTEGER
+   idx ← ASC(LEFT(name,1)) MOD 7
+   // TODO: WHILE names[idx] <> name → idx ← (idx + 1) MOD 7 (probe forward to find it)
+   RETURN numbers[idx]
+ENDFUNCTION
+
+CALL AddContact("Amy", "111")
+CALL AddContact("Hank", "222")
+CALL AddContact("Zoe", "333")
+OUTPUT FindContact("Amy")    // expected: 111
+OUTPUT FindContact("Hank")   // expected: 222`,
+    check:(code,res)=>res.output.some(o=>o.trim()==='111')&&res.output.some(o=>o.trim()==='222'),
+  },
 ]
 
 // mod is unique per challenge — stable identity for saves (survives new
