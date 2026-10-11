@@ -4256,35 +4256,32 @@ let timer = setInterval(function() {
   // runWebCode/checkWebChallenge), not a code string — unlike this file's
   // Python stages below, which check(code) the raw Python source directly.
   { id:'ws1', name:'📗 Web Story 1 — Remembering the Reader', sub:'Arrays and objects — a story that tracks the reader\'s inventory and flags', live:true, stages:[
-    { id:'ws1sdiv', name:'What Is a <div>?', xp:20, type:'quiz',
-      // Every ws1 stage hands the student a bare `<div id="story"></div>`
-      // with zero prior explanation of what a div even IS or why the id is
-      // there — this was flagged as too vague. A div has no built-in look or
-      // meaning (unlike h1/p/a) — it's just a labeled, empty box JS can find
-      // and fill in. Diagram: a little "browser window" sketch showing the
-      // div as an empty, dashed-outline box with its id tag, plus an arrow
-      // showing document.getElementById("story") reaching in to change it.
-      text:`<strong>Every page in this project starts with one mysterious line:</strong> <code>&lt;div id="story"&gt;&lt;/div&gt;</code>. Before writing any JS, let's see exactly what that is.<br><br>
+    { id:'ws1sdiv', name:'Div Recap + Meet getElementById', xp:20, type:'quiz',
+      // Was a from-scratch "what is a div" lesson, but web4d's divq0 (earlier
+      // in the course) already teaches that thoroughly — this duplicated it.
+      // Reworked into a quick recap (1 question on what's already known) plus
+      // the genuinely NEW part this stage adds: id as a name tag and
+      // getElementById, neither of which web4d covers (that module never
+      // touches JS).
+      text:`<strong>Every page in this project starts with one mysterious line:</strong> <code>&lt;div id="story"&gt;&lt;/div&gt;</code>. You already know a div is an invisible grouping box from <b>Divs & Page Layout</b> — here's the new part: how JS reaches into one.<br><br>
         <div style="border:1px solid var(--border-hi);border-radius:10px;padding:14px;margin:10px 0;background:var(--bg-raised);">
           <div style="font-size:11px;color:var(--fg-faint);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase;">The page, as the browser sees it</div>
           <div style="border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--bg-card);">
-            <div style="font-size:13px;color:var(--fg-dim);margin-bottom:8px;">&lt;h1&gt;My Story&lt;/h1&gt; <span style="opacity:.6">— a heading. The browser KNOWS how to show this: bold, big text.</span></div>
             <div style="border:2px dashed var(--blue);border-radius:6px;padding:10px;background:transparent;">
-              <div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:4px;">&lt;div id="story"&gt;&lt;/div&gt; ← an empty BOX, with a name tag: id="story"</div>
-              <div style="font-size:12px;color:var(--fg-faint);">On its own this shows up as… nothing. No text, no border, no color. A div has NO built-in meaning — it's just a container.</div>
+              <div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:4px;">&lt;div id="story"&gt;&lt;/div&gt; ← the same invisible box, now with a name tag: id="story"</div>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--fg-dim);margin-top:10px;">📜 <code>document.getElementById("story")</code> is JS reaching into the page and grabbing THAT exact box, by its name tag — so it can put text inside it. That's the whole reason the div is there.</div>
+          <div style="font-size:12px;color:var(--fg-dim);margin-top:10px;">📜 <code>document.getElementById("story")</code> is JS reaching into the page and grabbing THAT exact box, by its name tag — so it can put text inside it. That's the whole reason the id is there.</div>
         </div>
-        A <code>&lt;p&gt;</code> or <code>&lt;h1&gt;</code> already means something to the browser. A <code>&lt;div&gt;</code> means nothing by itself — it's an empty, labeled box that YOUR code fills in.`,
+        A div's job hasn't changed. What's new is giving it a name so your JS code can find that exact one.`,
       hints:[
-        'A div is a blank box — it has no special look, unlike h1 (big bold text) or p (a paragraph).',
-        'The id is just a NAME TAG on one specific box, so JS can find that exact one out of possibly many boxes on the page.',
+        'A div is still a blank box — same as web4d. Nothing new there.',
+        'The id is a NAME TAG on one specific box, so JS can find that exact one out of possibly many boxes on the page.',
         'getElementById("story") means: "find the element whose id is story" — the string must match EXACTLY.',
       ],
       passCount:3,
       questions: [
-        { type:'match', prompt:'What does a plain <div> look like on the page, before any JS touches it?',
+        { type:'match', prompt:'Quick recap — what does a plain <div> look like on the page, before any JS touches it?',
           options: ['Nothing visible — an empty box', 'Bold, large text', 'A clickable button', 'A bulleted list'], answer: 'Nothing visible — an empty box' },
         { type:'match', prompt:'What is the id="story" attribute FOR?',
           options: ['A name tag so JS can find that exact element', 'It makes the text bigger', 'It\'s required on every tag', 'It changes the div\'s color'], answer: 'A name tag so JS can find that exact element' },
@@ -8162,9 +8159,9 @@ const CHALLENGE_LESSON = {
       <p>When an if\'s condition is false, its block doesn\'t just do nothing quietly in the background — it\'s genuinely skipped, as if that code wasn\'t even there for that run.</p></div>
     <div class="cl-block"><h4>else if checks IN ORDER</h4>
       <p>Only the FIRST true branch runs, even if a later else if would also technically be true — this is exactly why order matters when writing a chain of else if checks (like a grade band: check >=90 before >=80, not the other way round).</p></div>` },
-  ws1sdiv: { title: 'A <div> is a blank, labeled box', html: `
-    <div class="cl-block"><h4>No built-in meaning, on purpose</h4>
-      <p>Unlike &lt;h1&gt; or &lt;p&gt;, a &lt;div&gt; has no default look at all — it's just a container. That's exactly why every ws1 stage starts with one: it's a blank box JS can find and fill in, not a piece of content with its own style already decided.</p></div>
+  ws1sdiv: { title: 'id is a name tag, getElementById reads it', html: `
+    <div class="cl-block"><h4>Same div, new superpower</h4>
+      <p>The div itself is the same invisible grouping box from <b>Divs & Page Layout</b> — nothing about that changed. What's new here is giving it an <code>id</code> so JS can single it out from every other element on the page.</p></div>
     <div class="cl-block"><h4>id is a name tag, not decoration</h4>
       <p><code>id="story"</code> is what <code>document.getElementById("story")</code> actually searches for — the string has to match EXACTLY. Get the id wrong in either place and JS silently finds nothing.</p></div>` },
   ws1s1: { title: 'An array is an ordered list of values', html: `
