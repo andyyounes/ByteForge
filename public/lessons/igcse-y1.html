@@ -1233,23 +1233,45 @@ const CHALLENGES = [
   // answers too). type:'theory' is already in checkAnswer's foreign-marking
   // whitelist, so no engine change needed.
   {
-    mod:'M7', name:'Bonus: Design an Automated System', xp:50, type:'theory',
-    text:`<strong>🌟 Bonus Project 1 — Design Your Own Automated System</strong><br>Pick a real everyday problem (a greenhouse, a pet feeder, a street light, anything) and design an automated system to solve it. Your answer must mention: <em>sensor</em>, a <em>decision</em> (what condition triggers the action), and an <em>actuator</em> (what physically happens as a result).`,
-    hints:['Pick ONE real problem first — being specific makes the rest easier.', 'A sensor measures something (light, moisture, motion). A decision is the IF: "when X happens, do Y." An actuator is the physical result (a motor, a light, a valve).', 'Example shape: "A soil moisture sensor measures dryness; when it drops below a threshold, the decision triggers a water pump (the actuator) to turn on."'],
+    mod:'M7', name:'Bonus: Design an Automated System', xp:65, type:'theory',
+    // Harder than one sensor → one decision → one actuator: now requires
+    // TWO sensors combined with real AND/OR logic, PLUS a reliability
+    // consideration — genuine system design, not a single-condition toy.
+    text:`<strong>🌟 Bonus Project 1 — Design a Multi-Sensor Automated System</strong><br>Pick a real everyday problem and design an automated system that uses TWO different sensors combined with AND/OR logic (e.g. "water the plants only if soil is dry AND it is not currently raining"). Your answer must mention: TWO named <em>sensors</em>, how they combine (<em>and</em>/<em>or</em>), a <em>decision</em>, an <em>actuator</em>, AND one <em>reliability</em> problem that could occur if a sensor gives a false reading.`,
+    hints:[
+      'Pick ONE real problem, then think of a SECOND sensor that adds useful information the first one alone can\'t give.',
+      'AND means both conditions must be true to act; OR means either one alone is enough — pick whichever makes sense for your scenario and say which you used.',
+      'Reliability: what if the sensor is faulty or gives a false reading? e.g. a stuck moisture sensor could cause overwatering even when the soil is already wet — say what COULD go wrong, not just what normally happens.',
+    ],
     check: ans => {
       const a = ans.toLowerCase()
-      return a.includes('sensor') && (a.includes('decision') || a.includes('if') || a.includes('condition') || a.includes('when') || a.includes('trigger')) &&
-             (a.includes('actuator') || a.includes('motor') || a.includes('pump') || a.includes('light') || a.includes('valve') || a.includes('turns on') || a.includes('turn on'))
+      const sensorCount = (a.match(/sensor/g) || []).length
+      const hasLogic = a.includes(' and ') || a.includes(' or ')
+      const hasDecision = a.includes('decision') || a.includes('if') || a.includes('condition')
+      const hasActuator = a.includes('actuator') || a.includes('motor') || a.includes('pump') || a.includes('valve') || a.includes('turn on') || a.includes('turns on')
+      const hasReliability = a.includes('fault') || a.includes('false') || a.includes('fail') || a.includes('wrong') || a.includes('error') || a.includes('stuck') || a.includes('malfunction')
+      return sensorCount >= 2 && hasLogic && hasDecision && hasActuator && hasReliability
     },
   },
   {
-    mod:'M7', name:'Bonus: Smart Home Proposal', xp:70, type:'theory', boss:true,
-    text:`<strong>🌟 BONUS BOSS — Smart Home Proposal</strong><br>Write a short proposal for ONE smart home feature that combines an automated system with a simple AI/machine learning idea. Your answer must mention: <em>sensor</em>, a <em>decision</em>, AND how the system could <em>learn</em> or improve from <em>data</em> over time.`,
-    hints:['Start from Bonus Project 1\'s shape (sensor → decision → actuator), then add: how could the system get SMARTER the longer it runs?', 'e.g. "A thermostat with a temperature sensor decides when to heat — over time it learns the pattern of when you\'re usually home, from data it collects, and adjusts automatically."', 'The key new idea versus Bonus 1: not just reacting to ONE reading, but improving its own decisions by learning from past data.'],
+    mod:'M7', name:'Bonus: Smart Home Proposal', xp:90, type:'theory', boss:true,
+    // Hardest version: combines Bonus 1's multi-sensor AND/OR requirement
+    // with the AI/learning idea AND a genuine limitation/risk discussion —
+    // three distinct hard ideas in one answer, not one tacked onto the last.
+    text:`<strong>🌟 BONUS BOSS — Smart Home Proposal</strong><br>Write a proposal for ONE smart home feature that combines TWO sensors (with AND/OR logic) with an AI/machine learning idea that improves from data over time, AND one genuine LIMITATION or RISK of the system (e.g. privacy, a learning mistake, a sensor failure the AI can't detect). Your answer must mention: TWO <em>sensors</em>, <em>and</em>/<em>or</em> logic, a <em>decision</em>, how it <em>learns</em> from <em>data</em>, AND a specific <em>risk</em> or <em>limitation</em>.`,
+    hints:[
+      'Start from Bonus 1\'s two-sensor AND/OR shape, then add: how could the system get SMARTER the longer it runs, by learning from data?',
+      'e.g. "A thermostat combines a temperature sensor AND a motion sensor — it only heats if it\'s cold AND someone is home. Over time it learns the usual pattern of when you\'re home, from data it collects, and starts pre-heating in advance."',
+      'The genuinely hard new part: name a real RISK. e.g. "If the AI learns an unusual one-off pattern (e.g. you stayed home sick one week) it might wrongly adjust its normal schedule" — or a privacy concern about collecting data on when you\'re home.',
+    ],
     check: ans => {
       const a = ans.toLowerCase()
-      return a.includes('sensor') && (a.includes('decision') || a.includes('if') || a.includes('condition')) &&
-             (a.includes('learn') || a.includes('pattern')) && a.includes('data')
+      const sensorCount = (a.match(/sensor/g) || []).length
+      const hasLogic = a.includes(' and ') || a.includes(' or ')
+      const hasDecision = a.includes('decision') || a.includes('if') || a.includes('condition')
+      const hasLearning = (a.includes('learn') || a.includes('pattern')) && a.includes('data')
+      const hasRisk = a.includes('risk') || a.includes('limitation') || a.includes('privacy') || a.includes('mistake') || a.includes('wrong') || a.includes('fail') || a.includes('problem')
+      return sensorCount >= 2 && hasLogic && hasDecision && hasLearning && hasRisk
     },
   },
 ]

@@ -145,8 +145,8 @@ const ANSWERS = {
   'M7/Machine Learning Fill-In': 'data',
 
   // ── Optional bonus project (added after the ANSWERS-map gap closure) ────
-  'M7/Bonus: Design an Automated System': 'A soil moisture sensor measures dryness in a greenhouse; when it drops below a threshold, the decision triggers a water pump (the actuator) to turn on and water the plants automatically.',
-  'M7/Bonus: Smart Home Proposal': 'A thermostat with a temperature sensor decides when to turn on heating based on a condition. Over time it learns the pattern of when you are usually home, from data it collects, and adjusts its decisions automatically to save energy.',
+  'M7/Bonus: Design an Automated System': 'A soil moisture sensor AND a rain sensor combine in a greenhouse watering system: the decision only turns on a water pump (the actuator) if the soil moisture sensor shows dryness AND the rain sensor shows it is not currently raining. A reliability problem: if the moisture sensor gets stuck or gives a false reading, it could cause overwatering or no watering at all even when conditions change.',
+  'M7/Bonus: Smart Home Proposal': 'A thermostat combines a temperature sensor AND a motion sensor: the decision only heats the house if it is cold AND someone is home. Over time it learns the pattern of when you are usually home, from data it collects, and starts pre-heating in advance. A genuine risk: if the AI learns an unusual one-off pattern, like staying home sick one week, it might wrongly adjust its normal schedule, or there could be a privacy limitation from collecting data on when you are home.',
 }
 
 let pass = 0, fail = 0
