@@ -1628,6 +1628,86 @@ CALL Search(nums, 5, 30)`,
     hints:['It has four equal sides, rotated 45 degrees — like a kite shape.'],
     check: ans => /diamond/i.test(ans.trim()),
   },
+  // ── OPTIONAL bonus project, unlocked after Unit 7. Not part of the required
+  // path (omitted from G9_CHALLENGE_CONCEPT, so it never reports to
+  // /api/progress) — a real-world mini-project for students who want more,
+  // reusing the exact same pseudocode check(code,res) pattern as every W6-M13
+  // challenge.
+  {
+    mod:'BONUS', name:'Load Class Scores', xp:50,
+    text:`<strong>🌟 Bonus 1 — Build a Grade Calculator</strong><br>Real teachers need this every term. Declare an array <code>scores : ARRAY[1:5] OF INTEGER</code>, fill it with <strong>78, 92, 65, 88, 71</strong>, then OUTPUT each score and the total.`,
+    hints:[
+      'DECLARE scores : ARRAY[1:5] OF INTEGER then fill scores[1] through scores[5] with 78, 92, 65, 88, 71.',
+      'FOR i ← 1 TO 5: OUTPUT scores[i]. NEXT i — then add a total variable and accumulate inside the same loop.',
+      'total should come out to 394.',
+    ],
+    starter:`// Bonus 1: Load Class Scores
+DECLARE scores : ARRAY[1:5] OF INTEGER
+DECLARE i      : INTEGER
+DECLARE total  : INTEGER
+
+// TODO: fill the array with 78, 92, 65, 88, 71
+// TODO: FOR loop to OUTPUT each score and accumulate total
+// TODO: OUTPUT total`,
+    check:(code,res) => {
+      const out = res.output.map(s => parseInt(s.trim()))
+      return out.includes(92) && out.includes(65) && out.some(v => v === 394)
+    },
+  },
+  {
+    mod:'BONUS', name:'Average & Letter Grade', xp:55,
+    text:`<strong>🌟 Bonus 2 — Average &amp; Letter Grade</strong><br>Write a FUNCTION <code>LetterGrade(average : REAL) RETURNS STRING</code> that returns <strong>"A"</strong> if average ≥ 85, <strong>"B"</strong> if average ≥ 70, <strong>"C"</strong> if average ≥ 50, otherwise <strong>"F"</strong>.<br>Test with the class average from Bonus 1 (394 ÷ 5 = 78.8). Expected: <strong>B</strong>`,
+    hints:[
+      'FUNCTION LetterGrade(average : REAL) RETURNS STRING',
+      'IF average >= 85 THEN RETURN "A" ELSEIF average >= 70 THEN RETURN "B" ELSEIF average >= 50 THEN RETURN "C" ELSE RETURN "F" ENDIF',
+      'OUTPUT LetterGrade(78.8) — order the ELSEIFs from highest to lowest, or a high average could wrongly match a lower band first.',
+    ],
+    starter:`// Bonus 2: Average & Letter Grade
+FUNCTION LetterGrade(average : REAL) RETURNS STRING
+   // TODO: return "A"/"B"/"C"/"F" based on the average
+   RETURN "F"
+ENDFUNCTION
+
+OUTPUT LetterGrade(78.8)   // expected: B`,
+    check:(code,res) => res.output.some(o => o.trim().toUpperCase() === 'B'),
+  },
+  {
+    mod:'BONUS', name:'Full Grade Report', xp:90, boss:true,
+    text:`<strong>🌟 BONUS BOSS — Full Grade Report</strong><br>Bring Bonus 1 and 2 together into one real report. Using the same 5 scores, compute the total, the average, and OUTPUT the letter grade for the WHOLE class using your <code>LetterGrade</code> function.`,
+    hints:[
+      'Reuse your array-filling and total-accumulating loop from Bonus 1.',
+      'average ← total / 5 (as a REAL, so the division keeps its decimal part).',
+      'OUTPUT LetterGrade(average) — this is the same function from Bonus 2, now fed a value you calculated yourself instead of a hardcoded number.',
+    ],
+    starter:`// Bonus Boss: Full Grade Report
+FUNCTION LetterGrade(average : REAL) RETURNS STRING
+   IF average >= 85 THEN
+      RETURN "A"
+   ELSEIF average >= 70 THEN
+      RETURN "B"
+   ELSEIF average >= 50 THEN
+      RETURN "C"
+   ELSE
+      RETURN "F"
+   ENDIF
+ENDFUNCTION
+
+DECLARE scores  : ARRAY[1:5] OF INTEGER
+DECLARE i       : INTEGER
+DECLARE total   : INTEGER
+DECLARE average : REAL
+
+// Fill array: 78, 92, 65, 88, 71
+scores[1]←78; scores[2]←92; scores[3]←65; scores[4]←88; scores[5]←71
+
+// TODO: FOR loop to accumulate total from scores
+// TODO: average ← total / 5
+// TODO: OUTPUT total, then OUTPUT average, then OUTPUT LetterGrade(average)`,
+    check:(code,res) => {
+      const out = res.output.map(o => o.trim())
+      return out.includes('394') && out.some(o => o.toUpperCase() === 'B')
+    },
+  },
 ]
 
 const STAGE_INDEX = {}
@@ -1644,6 +1724,7 @@ const G9_MOD_NAME = {
   U5: '🔒 Unit 5 — Computer Security and Ethics',
   U6: '🕸️ Unit 6 — Web Development',
   U7: '🗄️ Unit 7 — Introduction to Database System',
+  BONUS: '🌟 Bonus: Grade Calculator (Optional)',
   W6: '🌡 Variables & Selection', W7: '🔐 Selection & Strings', W8: '⚙️ Procedures & Functions',
   W9: '🔍 Trace Tables', W11: '🫧 Sorting', W12: '🎯 Searching',
   M12: '⚙️ Procedures & Functions (extra)', M13: '🎯 Searching (extra)',

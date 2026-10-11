@@ -290,6 +290,67 @@ ENDPROCEDURE
 
 CALL Search(nums, 5, 30)`,
   },
+  'BONUS/Load Class Scores': {
+    inputs: [],
+    code: `DECLARE scores : ARRAY[1:5] OF INTEGER
+DECLARE i      : INTEGER
+DECLARE total  : INTEGER
+
+scores[1]←78; scores[2]←92; scores[3]←65; scores[4]←88; scores[5]←71
+
+total ← 0
+FOR i ← 1 TO 5
+   OUTPUT scores[i]
+   total ← total + scores[i]
+NEXT i
+OUTPUT total`,
+  },
+  'BONUS/Average & Letter Grade': {
+    inputs: [],
+    code: `FUNCTION LetterGrade(average : REAL) RETURNS STRING
+   IF average >= 85 THEN
+      RETURN "A"
+   ELSEIF average >= 70 THEN
+      RETURN "B"
+   ELSEIF average >= 50 THEN
+      RETURN "C"
+   ELSE
+      RETURN "F"
+   ENDIF
+ENDFUNCTION
+
+OUTPUT LetterGrade(78.8)`,
+  },
+  'BONUS/Full Grade Report': {
+    inputs: [],
+    code: `FUNCTION LetterGrade(average : REAL) RETURNS STRING
+   IF average >= 85 THEN
+      RETURN "A"
+   ELSEIF average >= 70 THEN
+      RETURN "B"
+   ELSEIF average >= 50 THEN
+      RETURN "C"
+   ELSE
+      RETURN "F"
+   ENDIF
+ENDFUNCTION
+
+DECLARE scores  : ARRAY[1:5] OF INTEGER
+DECLARE i       : INTEGER
+DECLARE total   : INTEGER
+DECLARE average : REAL
+
+scores[1]←78; scores[2]←92; scores[3]←65; scores[4]←88; scores[5]←71
+
+total ← 0
+FOR i ← 1 TO 5
+   total ← total + scores[i]
+NEXT i
+average ← total / 5
+OUTPUT total
+OUTPUT average
+OUTPUT LetterGrade(average)`,
+  },
 }
 
 // ── Run ──────────────────────────────────────────────────────────────────────

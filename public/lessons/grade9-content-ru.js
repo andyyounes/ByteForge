@@ -245,4 +245,30 @@ window.G9_RU_TEXT = {
       'CALL Search(nums, 5, 30). Убедись, что сначала объявил и заполнил массив nums.',
     ],
   },
+
+  // ── Optional bonus project (added after the EN/RU toggle fix session) ────
+  'BONUS/Load Class Scores': {
+    text: '<strong>🌟 Бонус 1 — Построй калькулятор оценок</strong><br>Это нужно каждому учителю каждую четверть. Объяви массив <code>scores : ARRAY[1:5] OF INTEGER</code>, заполни его значениями <strong>78, 92, 65, 88, 71</strong>, затем выведи (OUTPUT) каждую оценку и сумму.',
+    hints: [
+      'DECLARE scores : ARRAY[1:5] OF INTEGER, затем заполни scores[1] по scores[5] значениями 78, 92, 65, 88, 71.',
+      'FOR i ← 1 TO 5: OUTPUT scores[i]. NEXT i — затем добавь переменную total и накапливай сумму в том же цикле.',
+      'total должен получиться равным 394.',
+    ],
+  },
+  'BONUS/Average & Letter Grade': {
+    text: '<strong>🌟 Бонус 2 — Средний балл и буквенная оценка</strong><br>Напиши FUNCTION <code>LetterGrade(average : REAL) RETURNS STRING</code>, которая возвращает <strong>«A»</strong>, если average ≥ 85, <strong>«B»</strong>, если average ≥ 70, <strong>«C»</strong>, если average ≥ 50, иначе <strong>«F»</strong>.<br>Проверь на среднем балле класса из Бонуса 1 (394 ÷ 5 = 78.8). Ожидается: <strong>B</strong>',
+    hints: [
+      'FUNCTION LetterGrade(average : REAL) RETURNS STRING',
+      'IF average >= 85 THEN RETURN "A" ELSEIF average >= 70 THEN RETURN "B" ELSEIF average >= 50 THEN RETURN "C" ELSE RETURN "F" ENDIF',
+      'OUTPUT LetterGrade(78.8) — упорядочь ELSEIF от самого высокого к самому низкому, иначе высокий балл мог бы неверно попасть в более низкую категорию первой.',
+    ],
+  },
+  'BONUS/Full Grade Report': {
+    text: '<strong>🌟 БОНУС-БОСС — Полный отчёт об оценках</strong><br>Объедини Бонус 1 и 2 в один настоящий отчёт. Используя те же 5 оценок, вычисли сумму, средний балл и выведи (OUTPUT) буквенную оценку для ВСЕГО класса с помощью своей функции <code>LetterGrade</code>.',
+    hints: [
+      'Используй свой цикл заполнения массива и накопления суммы из Бонуса 1.',
+      'average ← total / 5 (как REAL, чтобы деление сохранило десятичную часть).',
+      'OUTPUT LetterGrade(average) — это та же функция из Бонуса 2, теперь получающая значение, которое ты вычислил сам, а не готовое число.',
+    ],
+  },
 }
