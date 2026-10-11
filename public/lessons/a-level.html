@@ -5692,14 +5692,19 @@ OUTPUT balance   // expected: 350`,
   // ── OPTIONAL bonus project, unlocked after OOP3. Not required — plain
   // check(code,res) through the same Interpreter every P2 challenge uses.
   {
-    mod:'BONUS2',name:'Contact Book (Hash Table)',xp:150,
-    text:`<strong>🌟 Bonus — Contact Book with a Hash Table</strong><br>Real phone apps need fast lookup by name. Build a size-7 hash table storing names AND numbers in parallel arrays, using <code>hash(name) = ASC(LEFT(name,1)) MOD 7</code> with <strong>linear probing</strong> on collision (same technique as the Linear Probing challenge).<br>Add "Amy"/"111", "Hank"/"222" (ASC("A")=65, ASC("H")=72 — BOTH MOD 7 = 2, a genuine collision), "Zoe"/"333". Write <code>FindContact(name) RETURNS STRING</code> that re-hashes and probes to find the matching number.<br>OUTPUT FindContact("Amy") then FindContact("Hank"). Expected: <strong>111</strong> then <strong>222</strong> — BOTH must still be found correctly despite the collision, proving neither contact was lost or confused with the other.`,
+    mod:'BONUS2',name:'Contact Book (Hash Table, with Deletion)',xp:200,
+    // Hardened with the classic HARD part of hash tables: deletion under
+    // linear probing. Setting a deleted slot back to "" breaks probing for
+    // anything that collided THROUGH it (a later lookup stops too early,
+    // thinking the chain ended) — the fix needs a tombstone marker that
+    // FindContact probes PAST but AddContact is allowed to overwrite.
+    text:`<strong>🌟 Bonus — Contact Book with Deletion</strong><br>Real contact books need to delete entries too — and that's the genuinely hard part of a hash table. Build the size-7 table as before (<code>hash(name) = ASC(LEFT(name,1)) MOD 7</code>, linear probing). Add "Amy"/"111", "Hank"/"222", AND "Opal"/"555" — ALL THREE hash to slot 2, so they chain 2 → 3 → 4. Add "Zoe"/"333" (hashes elsewhere, unaffected). Write <code>DeleteContact(name)</code> that removes an entry using a TOMBSTONE marker — NOT a plain "" — because setting a deleted slot back to "" would make <code>FindContact</code> think the probe chain ends there, losing anything that collided past it. Delete "Hank" (the MIDDLE of the chain, at slot 3), then look everyone up.<br>Expected, in order: <strong>111</strong> (Amy), <strong>Not found</strong> (Hank, deleted), <strong>555</strong> (Opal — the critical test: she's PAST the deleted slot in the chain, and must still be found), <strong>333</strong> (Zoe, unaffected).`,
     hints:[
-      'Initialise every slot\'s name to "" (empty marker) first, same pattern as Linear Probing\'s -1.',
-      'AddContact: idx ← ASC(LEFT(name,1)) MOD 7, THEN WHILE names[idx] <> "" → idx ← (idx + 1) MOD 7 (probe forward, same as Linear Probing). THEN names[idx] ← name, numbers[idx] ← number.',
-      'FindContact must probe the SAME way: idx ← ASC(LEFT(name,1)) MOD 7, THEN WHILE names[idx] <> name → idx ← (idx + 1) MOD 7 (stop early if you hit "" — not found). RETURN numbers[idx].',
+      'Use a literal string like "DELETED" as the tombstone — it marks "something used to be here, keep probing" without being a real name.',
+      'AddContact must treat BOTH "" AND "DELETED" as available slots: WHILE names[idx] <> "" AND names[idx] <> "DELETED" → idx ← (idx + 1) MOD 7.',
+      'FindContact must do the OPPOSITE: keep probing while the slot ISN\'T a true match (use a found flag, no short-circuit AND): WHILE names[idx] <> "" AND found = FALSE: IF names[idx] = name THEN found ← TRUE ELSE idx ← (idx + 1) MOD 7. A tombstone is neither "" nor a match, so the loop correctly keeps going past it — but a truly empty slot stops the search for real.',
     ],
-    starter:`// Bonus: Contact Book with a Hash Table
+    starter:`// Bonus: Contact Book with Deletion
 DECLARE names   : ARRAY[0:6] OF STRING
 DECLARE numbers : ARRAY[0:6] OF STRING
 DECLARE i       : INTEGER
@@ -5711,24 +5716,50 @@ NEXT i
 PROCEDURE AddContact(BYVAL name : STRING, BYVAL number : STRING)
    DECLARE idx : INTEGER
    idx ← ASC(LEFT(name,1)) MOD 7
-   // TODO: WHILE names[idx] <> "" → idx ← (idx + 1) MOD 7 (probe forward)
+   // TODO: probe forward while the slot is neither "" NOR "DELETED"
    names[idx] ← name
    numbers[idx] ← number
 ENDPROCEDURE
 
-FUNCTION FindContact(name : STRING) RETURNS STRING
-   DECLARE idx : INTEGER
+PROCEDURE DeleteContact(BYVAL name : STRING)
+   DECLARE idx  : INTEGER
+   DECLARE done : BOOLEAN
    idx ← ASC(LEFT(name,1)) MOD 7
-   // TODO: WHILE names[idx] <> name → idx ← (idx + 1) MOD 7 (probe forward to find it)
-   RETURN numbers[idx]
+   done ← FALSE
+   // TODO: WHILE names[idx] <> "" AND done = FALSE — if names[idx] = name,
+   // set names[idx] to "DELETED" (a tombstone, NOT ""), numbers[idx] to "",
+   // and done ← TRUE. Otherwise probe forward (idx + 1) MOD 7.
+ENDPROCEDURE
+
+FUNCTION FindContact(name : STRING) RETURNS STRING
+   DECLARE idx   : INTEGER
+   DECLARE found : BOOLEAN
+   idx ← ASC(LEFT(name,1)) MOD 7
+   found ← FALSE
+   // TODO: WHILE names[idx] <> "" AND found = FALSE — if names[idx] = name,
+   // found ← TRUE, ELSE probe forward (idx + 1) MOD 7. A tombstone is NOT ""
+   // and NOT a match, so this correctly keeps probing past it.
+   IF found THEN
+      RETURN numbers[idx]
+   ELSE
+      RETURN "Not found"
+   ENDIF
 ENDFUNCTION
 
 CALL AddContact("Amy", "111")
 CALL AddContact("Hank", "222")
+CALL AddContact("Opal", "555")
 CALL AddContact("Zoe", "333")
-OUTPUT FindContact("Amy")    // expected: 111
-OUTPUT FindContact("Hank")   // expected: 222`,
-    check:(code,res)=>res.output.some(o=>o.trim()==='111')&&res.output.some(o=>o.trim()==='222'),
+CALL DeleteContact("Hank")
+
+OUTPUT FindContact("Amy")
+OUTPUT FindContact("Hank")
+OUTPUT FindContact("Opal")
+OUTPUT FindContact("Zoe")`,
+    check:(code,res)=>{
+      const out = res.output.map(o=>o.trim())
+      return out[0]==='111' && out[1]==='Not found' && out[2]==='555' && out[3]==='333'
+    },
   },
 ]
 
