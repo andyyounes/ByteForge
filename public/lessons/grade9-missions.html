@@ -5325,12 +5325,11 @@ function completeMission(stats) {
     lang: lang,
   }
   saveProg(p)
-  // id-keyed (mission's own stable id, not array position) — same fix applied
-  // to every other grade's LessonSaves calls this session; this mirror row
-  // isn't read back anywhere yet (completion state is getProg()/localStorage,
-  // like grade6.html), but keeps it consistent and future-proof as missions
-  // are added toward the ~45-50 target.
-  try { LessonSaves.save('grade9-missions', activeMission.id, { passed: true, xpEarned: xp, code: editor.getValue() }) } catch (e) {}
+  // id-keyed (mission's own stable id, not array position). The full record
+  // rides in `code` as JSON (same fix as grade6.html's completeStage) so it
+  // can actually be read back on init below, restoring stars/xp/code/lang on
+  // a different device or a cleared browser instead of showing "not started".
+  try { LessonSaves.save('grade9-missions', activeMission.id, { passed: true, xpEarned: xp, code: JSON.stringify(p[activeMission.id]) }) } catch (e) {}
   try { if (me && xp > 0) BF.addXP(me.id, xp) } catch (e) {}
   try { reportRealProgress(activeMission, Date.now() - missionStartedAt) } catch (e) {}
 
@@ -5814,7 +5813,25 @@ async function applyClassOverrides() {
 BF.seed()
 ;(async () => {
   await applyClassOverrides()
-  if (me) { try { await LessonSaves.load('grade9-missions') } catch (e) {} }
+  if (me) {
+    try {
+      await LessonSaves.load('grade9-missions')
+      // Pull back any mission completed on another device/browser — the
+      // local getProg() record is trusted whenever one already exists.
+      const p = getProg()
+      let changed = false
+      MISSIONS.forEach(m => {
+        if (p[m.id]) return
+        const raw = LessonSaves.codeFor(m.id, 'grade9-missions')
+        if (!raw) return
+        try {
+          const rec = JSON.parse(raw)
+          if (rec && typeof rec.stars === 'number') { p[m.id] = rec; changed = true }
+        } catch (e) {}
+      })
+      if (changed) saveProg(p)
+    } catch (e) {}
+  }
   showJourney()
 })()
 </script>
