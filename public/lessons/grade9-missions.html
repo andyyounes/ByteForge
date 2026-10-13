@@ -1700,38 +1700,36 @@ const MISSIONS = [
     },
   },
   {
-    id: 'flow-p1', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart',
+    id: 'flow-p1', type: 'data', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart',
+    forceLang: 'ps',
     hints: [
-      "The Declare shape just needs a data type + a name, e.g. \"Integer age\" — the engine only reads the LAST word as the variable name.",
-      "The Assign shape needs \"variable = value\" exactly, e.g. age = 15 — that's how you set someone's age to 15.",
-      "An Output shape needs \"Output\" followed by what to print, e.g. Output \"Minor\" (with the quotes, since it's text).",
-      "Is 15 \"18 or over\"? No — so when you Run it, the flow should take the False branch down to the Minor output.",
+      "The Declare step just means \"this variable exists\" — age ← 15 both creates age AND stores 15 in it, no separate DECLARE line needed.",
+      "IF age >= 18 THEN ... ELSE ... ENDIF is the Decision diamond, turned into code — one arm per branch.",
+      "OUTPUT \"Minor\" prints exactly that text — the quotes matter, it's a string.",
+      "Is 15 \"18 or over\"? No — so your IF should take the ELSE branch and answer() \"Minor\".",
     ],
     xp: 30,
-    brief: 'The shapes and arrows are already built for you — this flowchart checks if someone\'s age makes them an Adult or a Minor. '
-      + 'Click each blank shape\'s text to fill it in: <b>declare</b> age as an Integer, <b>assign</b> it the value 15, then make each <b>Output</b> shape print the right word for its branch. '
-      + 'Press ▶ Run to test it and read the output — if it\'s wrong, the error (or the wrong result) tells you which shape to fix.',
-    flowchart: {
-      intro: 'Every shape and arrow is already placed and connected. Click a blank shape\'s text to fill it in, press ▶ Run to test, then Submit once it outputs the right thing.',
-      prebuilt: {
-        shapes: [
-          { id: 1, type: 'terminator', label: 'Start', x: 270, y: 10 },
-          { id: 2, type: 'declare', label: 'fill in: data type + name', x: 230, y: 80 },
-          { id: 3, type: 'process', label: 'fill in: variable = value', x: 230, y: 150 },
-          { id: 4, type: 'decision', label: 'age >= 18', x: 255, y: 220 },
-          { id: 5, type: 'io', label: 'fill in: Output ???', x: 60, y: 330 },
-          { id: 6, type: 'io', label: 'fill in: Output ???', x: 420, y: 330 },
-          { id: 7, type: 'terminator', label: 'End', x: 270, y: 400 },
-        ],
-        conns: [
-          { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 },
-          { from: 4, to: 5, label: 'True' }, { from: 4, to: 6, label: 'False' },
-          { from: 5, to: 7 }, { from: 6, to: 7 },
-        ],
-      },
-      minShapes: 7, minConnections: 7, requiresDecision: true,
-      expectedOutput: ['Minor'],
+    brief: 'Here\'s a finished flowchart: START → DECLARE age → age ← 15 → DECISION age &ge; 18? → YES: OUTPUT "Adult" / NO: OUTPUT "Minor" → END. '
+      + 'Your job is to <b>transform it into real pseudocode</b> — the Decision diamond becomes an IF/ELSE, each branch becomes one arm. '
+      + 'Assign <code>age</code> to <b>15</b>, then answer() whichever word the flowchart would actually output.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Trace', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(), fcShapeHTML('declare', 'Integer age'),
+      fcArrowHTML(), fcShapeHTML('process', 'age ← 15'),
+      fcArrowHTML(), fcShapeHTML('decision', 'age ≥ 18?'),
+      fcBranchHTML('YES', fcShapeHTML('io', 'Output "Adult"'), 'NO', fcShapeHTML('io', 'Output "Minor"')),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: '# TODO: turn this flowchart into code.\n# The Decision diamond becomes an IF/ELSE.\nage = 15\n\n# TODO: IF age >= 18, answer("Adult"), ELSE answer("Minor")\n',
+      ps: '// TODO: turn this flowchart into code.\nage ← 15\n\n// TODO: IF age >= 18 THEN answer("Adult") ELSE answer("Minor") ENDIF\n',
     },
+    requireCode: { re: /\bage\s*(>=|>|=|==)\s*18\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (age >= 18) in your code — don\'t hardcode the final word.' },
+    answer: 'Minor',
+    stars: { metric: 'pass' },
   },
   {
     id: 'flow-p2', type: 'data', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '💠', title: 'Which Shape?',
@@ -1748,114 +1746,239 @@ const MISSIONS = [
     stars: { metric: 'pass' },
   },
   {
-    id: 'flow-build', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🧩', title: 'Build It — Even or Odd',
-    hints: ["Use the palette buttons to drop shapes onto the canvas, then \"Connect Shapes\" and click two shapes in order to draw an arrow between them.", "A Decision shape needs exactly TWO outgoing arrows — one for each branch (Yes and No)."], xp: 60,
-    brief: 'Build a REAL flowchart: Start → Input a number → Decision (is it even?) → two branches (Yes/No), each leading to its own output step → End. Drag shapes onto the canvas, connect them with arrows, and label each one.',
-    api: [],
-    flowchart: {
-      intro: 'Use the palette to add a Start, an Input/Output step, a Decision, two more Process/Output steps for Yes and No, and an End — then connect them in order with arrows.',
-      minShapes: 5, minConnections: 5, requiresDecision: true,
-    },
-  },
-  {
-    // Transition mission: same exact flowchart the student just built (in
-    // shapes), now turned into real code. The Decision diamond becomes an
-    // IF/ELSE, the two branches become the two arms — directly matching
+    // Same bridge mission as before (diagram's Decision diamond becomes an
+    // IF/ELSE, each branch becomes one arm) but now the flowchart is shown
+    // already finished, like every other mission in this unit — matching
     // what learn-flowcharts' theory promised ("this is exactly what an
-    // IF/ELSE becomes"). This is the bridge from diagram to syntax.
+    // IF/ELSE becomes").
     id: 'flow-code', type: 'data', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🔁', title: 'From Flowchart to Code',
-    hints: ["The Decision diamond becomes an IF statement; each branch becomes what happens inside the IF or the ELSE.", "MOD 2 == 0 is how you check \"is it even?\" in code — the same test the flowchart's diamond represents."], xp: 35,
-    brief: 'You just BUILT this flowchart: Start → Input a number → Decision (is it even?) → Yes: output "Even" / No: output "Odd" → End. '
-      + 'Now write the SAME logic as real code. The <b>Decision diamond becomes an IF/ELSE</b> — each branch becomes one arm. '
+    forceLang: 'ps',
+    hints: ["The Decision diamond becomes an IF statement; each branch becomes what happens inside the IF or the ELSE.", "MOD 2 = 0 is how you check \"is it even?\" in pseudocode — the same test the flowchart's diamond represents."], xp: 35,
+    brief: 'Here\'s a finished flowchart: START → num ← 12 → DECISION is num even? → YES: OUTPUT "Even" / NO: OUTPUT "Odd" → END. '
+      + 'Transform it into real code. The <b>Decision diamond becomes an IF/ELSE</b> — each branch becomes one arm. '
       + 'Store the number 12 in <code>num</code>, then answer() "Even" or "Odd".',
     api: ['answer(value)'],
-    dataTitle: 'Flowchart → Code', dataFields: [],
+    dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(), fcShapeHTML('process', 'num ← 12'),
+      fcArrowHTML(), fcShapeHTML('decision', 'num MOD 2 = 0?'),
+      fcBranchHTML('YES', fcShapeHTML('io', 'Output "Even"'), 'NO', fcShapeHTML('io', 'Output "Odd"')),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
     starter: {
       py: 'num = 12\n\n# The Decision diamond ("is it even?") becomes an IF/ELSE here.\n# TODO: IF num is even, answer("Even"), ELSE answer("Odd")\n# Hint: num % 2 == 0 checks evenness\n',
       ps: 'num ← 12\n\n// The Decision diamond ("is it even?") becomes an IF/ELSE here.\n// TODO: IF num MOD 2 = 0 THEN answer("Even") ELSE answer("Odd") ENDIF\n',
     },
+    requireCode: { re: /\bnum\s+MOD\s+2\b|\bnum\s*%\s*2\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (num MOD 2 = 0 / num % 2 == 0) in your code — don\'t hardcode the final word.' },
     answer: 'Even',
     stars: { metric: 'pass' },
   },
 
-  // ── Foundations 6b · Flowgorithm — real execution, not just structure ──────
-  // The Flowchart Builder above only ever checked shape/connection COUNTS.
-  // These missions use the real engine (fcEval/runFlowchart) — build it,
-  // press ▶ Run, and the flowchart actually EXECUTES: Decision, For, While,
-  // Declare, Assign, and Output all do real work against real variables,
-  // graded on what it actually PRODUCES (flowchart.expectedOutput), exactly
-  // like Flowgorithm's own "run the diagram" workflow.
+  // ── Foundations 6b · Flowgorithm — the real diagram, turned into code ──────
+  // Every mission below shows a FINISHED flowchart (already drawn, never an
+  // interactive builder) and asks the student to transform it into real
+  // pseudocode/code, graded on what their code actually produces when run —
+  // the same "run the diagram" idea Flowgorithm itself teaches, just via
+  // real code instead of dragging shapes.
   {
-    id: 'flowg1', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🔀', title: 'Odd or Even?',
-    hints: ['Declare n, then Assign n = 7 — Declare just creates the variable (starts at 0), Assign gives it a real value.',
-      'Decision: n MOD 2 = 0 — the FIRST arrow out of a Decision is True, the SECOND is False (drawn in that order).',
+    id: 'flowg1', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🔀', title: 'Odd or Even?',
+    forceLang: 'ps',
+    hints: ['n ← 7 both creates n AND gives it a real value — no separate DECLARE line needed.',
+      'Decision: n MOD 2 = 0 — the flowchart\'s True branch is the IF, the False branch is the ELSE.',
       'True branch outputs "Even", False branch outputs "Odd" — both need their own Output shape, both lead to End.'],
     xp: 35,
-    brief: 'Build a REAL flowchart, then RUN it: Declare a number <code>n</code>, Assign it <b>7</b>, then a Decision checks <code>n MOD 2 = 0</code> — True outputs "Even", False outputs "Odd". Start → Declare → Assign → Decision → (two Output branches) → End.',
-    flowchart: { intro: 'Drag shapes onto the canvas: Start, Declare, Assign, Decision, two Outputs, End. Connect them, set n = 7, then press ▶ Run to test it before checking.',
-      minShapes: 6, minConnections: 6, requiresDecision: true, expectedOutput: ['Odd'] },
+    brief: 'Here\'s a finished flowchart: START → DECLARE n → n ← 7 → DECISION n MOD 2 = 0? → YES: OUTPUT "Even" / NO: OUTPUT "Odd" → END. '
+      + 'Transform it into real code — the Decision diamond becomes an IF/ELSE. Assign <code>n</code> to <b>7</b>, then answer() "Even" or "Odd".',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(), fcShapeHTML('declare', 'Integer n'),
+      fcArrowHTML(), fcShapeHTML('process', 'n ← 7'),
+      fcArrowHTML(), fcShapeHTML('decision', 'n MOD 2 = 0?'),
+      fcBranchHTML('YES', fcShapeHTML('io', 'Output "Even"'), 'NO', fcShapeHTML('io', 'Output "Odd"')),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'n = 7\n\n# TODO: IF n is even, answer("Even"), ELSE answer("Odd")\n',
+      ps: 'n ← 7\n\n// TODO: IF n MOD 2 = 0 THEN answer("Even") ELSE answer("Odd") ENDIF\n',
+    },
+    requireCode: { re: /\bn\s+MOD\s+2\b|\bn\s*%\s*2\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (n MOD 2 = 0 / n % 2 == 0) in your code — don\'t hardcode the final word.' },
+    answer: 'Odd',
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg2', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '📝', title: 'Pass or Fail?',
-    hints: ['Assign score = 82 (no Declare needed first if you assign it directly — Assign creates the variable too).',
+    id: 'flowg2', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '📝', title: 'Pass or Fail?',
+    forceLang: 'ps',
+    hints: ['score ← 82 — a real grade checker.',
       'A number comparison, not MOD this time: score >= 50.',
       'True → Output "Pass". False → Output "Fail".'],
     xp: 35,
-    brief: 'A real grade checker. Assign <code>score</code> to <b>82</b>, then Decision: <code>score >= 50</code> — True outputs "Pass", False outputs "Fail".',
-    flowchart: { intro: 'Same shape as Odd or Even, different condition — a comparison (>=) instead of MOD.',
-      minShapes: 5, minConnections: 5, requiresDecision: true, expectedOutput: ['Pass'] },
+    brief: 'Here\'s a finished flowchart: START → score ← 82 → DECISION score &ge; 50? → YES: OUTPUT "Pass" / NO: OUTPUT "Fail" → END. '
+      + 'Transform it into real code — assign <code>score</code> to <b>82</b>, then answer() "Pass" or "Fail".',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(), fcShapeHTML('process', 'score ← 82'),
+      fcArrowHTML(), fcShapeHTML('decision', 'score ≥ 50?'),
+      fcBranchHTML('YES', fcShapeHTML('io', 'Output "Pass"'), 'NO', fcShapeHTML('io', 'Output "Fail"')),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'score = 82\n\n# TODO: IF score >= 50, answer("Pass"), ELSE answer("Fail")\n',
+      ps: 'score ← 82\n\n// TODO: IF score >= 50 THEN answer("Pass") ELSE answer("Fail") ENDIF\n',
+    },
+    requireCode: { re: /\bscore\s*(>=|>)\s*50\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (score >= 50) in your code — don\'t hardcode the final word.' },
+    answer: 'Pass',
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg3', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🔢', title: 'Count to Five',
-    hints: ['A For shape\'s label is "var = start to end", e.g. i = 1 to 5.',
-      'The FIRST arrow out of a For (into the loop body) is Next; the SECOND (out of the loop) is Done.',
-      'Output i INSIDE the loop (on the Next branch), then loop back to the For shape itself — that\'s what makes it repeat.'],
+    id: 'flowg3', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🔢', title: 'Count to Five',
+    forceLang: 'ps',
+    hints: ['A For loop is the flowchart\'s loop-back arrow, turned into code: FOR i ← 1 TO 5 ... NEXT i.',
+      'Build up one result STRING as you go (result ← result + STR(i) + ","), since answer() can only report once.',
+      'Expected final text: "1,2,3,4,5," — don\'t trim the trailing comma, it\'s simplest to leave it.'],
     xp: 35,
-    brief: 'Your first REAL loop. A For shape (<code>i = 1 to 5</code>) with an Output <code>i</code> on its Next branch, looping back — outputs 1, 2, 3, 4, 5, one per line.',
-    flowchart: { intro: 'For shapes work like Decisions but with two special branch names: Next (keep looping) and Done (finished).',
-      minShapes: 4, minConnections: 4, expectedOutput: ['1', '2', '3', '4', '5'] },
+    brief: 'Here\'s a finished flowchart: a For loop (<code>i = 1 to 5</code>) with an Output <code>i</code> on its Next branch, looping back until Done. '
+      + 'Transform the loop into real code: build a result string of every number it would print, comma-separated (e.g. "1,2,3,4,5,"), then answer() it.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(),
+      fcLoopHTML('i = 1 TO 5', [fcShapeHTML('io', 'Output i')], 'Done'),
+      fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'result = ""\n# TODO: for i in range(1, 6): result = result + str(i) + ","\n\n# answer(result)\n',
+      ps: 'result ← ""\n// TODO: FOR i ← 1 TO 5\n//         result ← result + STR(i) + ","\n//       NEXT i\n\n// answer(result)\n',
+    },
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop (FOR i ← 1 TO 5 / for i in range(1, 6)) — don\'t hardcode the final string.' },
+    answer: '1,2,3,4,5,',
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg4', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '➕', title: 'Sum 1 to 10',
-    hints: ['Declare total BEFORE the loop starts (it needs to exist at 0 first).',
-      'Inside the loop (the For\'s Next branch): total = total + i, THEN loop back to the For shape.',
-      'Output total AFTER the loop is Done — not inside it, or you\'ll print a running total 10 times instead of once.'],
+    id: 'flowg4', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '➕', title: 'Sum 1 to 10',
+    forceLang: 'ps',
+    hints: ['Declare total and set it to 0 BEFORE the loop starts.',
+      'Inside the loop: total ← total + i.',
+      'answer(total) AFTER the loop ends — not inside it, or you\'ll report a running total instead of the final one.'],
     xp: 40,
-    brief: 'Add up 1 to 10 using a real loop. Declare <code>total</code>, a For shape <code>i = 1 to 10</code>, and inside it <code>total = total + i</code> — then Output <code>total</code> once the loop is Done.',
-    flowchart: { intro: 'The loop body needs an Assign shape (total = total + i) as well as an Output — build the whole chain: For -> Assign -> back to For -> (Done) -> Output -> End.',
-      minShapes: 5, minConnections: 5, expectedOutput: ['55'] },
+    brief: 'Here\'s a finished flowchart: a For loop (<code>i = 1 to 10</code>) accumulating into <code>total</code> each time round, Output once Done. '
+      + 'Transform it into real code: declare <code>total</code> as 0, loop i from 1 to 10 adding i to total, then answer() the final total.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(), fcShapeHTML('process', 'total ← 0'),
+      fcArrowHTML(),
+      fcLoopHTML('i = 1 TO 10', [fcShapeHTML('process', 'total ← total + i')], 'Done'),
+      fcShapeHTML('io', 'Output total'),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'total = 0\n# TODO: for i in range(1, 11): total = total + i\n\n# answer(total)\n',
+      ps: 'total ← 0\n// TODO: FOR i ← 1 TO 10\n//         total ← total + i\n//       NEXT i\n\n// answer(total)\n',
+    },
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop (FOR i ← 1 TO 10 / for i in range(1, 11)) — don\'t hardcode the final total.' },
+    answer: 55,
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg5', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🚀', title: 'Countdown',
-    hints: ['A While shape\'s label is just a condition, like a Decision: n > 0.',
-      'Loop body: Output n, then Assign n = n - 1, then loop back to the While shape.',
-      'After the loop is Done, one more Output — "Liftoff!" — outside the loop.'],
+    id: 'flowg5', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🚀', title: 'Countdown',
+    forceLang: 'ps',
+    hints: ['A While loop is a Decision that keeps looping back: WHILE n > 0 ... ENDWHILE.',
+      'Loop body: add n to the result, THEN subtract 1 from n.',
+      'After the loop ends, add "Liftoff!" to the result (outside the loop) before answer()ing it.'],
     xp: 40,
-    brief: 'Declare and Assign <code>n = 5</code>. While <code>n > 0</code>: Output <code>n</code>, then subtract 1 from it. When the loop is Done, Output "Liftoff!".',
-    flowchart: { intro: 'A While shape branches exactly like a For: Next (condition still true, keep looping) and Done (condition false, exit).',
-      minShapes: 6, minConnections: 6, expectedOutput: ['5', '4', '3', '2', '1', 'Liftoff!'] },
+    brief: 'Here\'s a finished flowchart: n ← 5, then WHILE n > 0: Output n, n ← n - 1 — and once Done, one more Output "Liftoff!". '
+      + 'Transform it into real code: build a comma-separated result string as you go, then answer() it (e.g. "5,4,3,2,1,Liftoff!").',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(), fcShapeHTML('process', 'n ← 5'),
+      fcArrowHTML(),
+      fcLoopHTML('WHILE n > 0', [fcShapeHTML('io', 'Output n'), fcArrowHTML(), fcShapeHTML('process', 'n ← n − 1')], 'Done'),
+      fcShapeHTML('io', 'Output "Liftoff!"'),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'n = 5\nresult = ""\n# TODO: while n > 0: result = result + str(n) + ","; n = n - 1\n# TODO: result = result + "Liftoff!"\n\n# answer(result)\n',
+      ps: 'n ← 5\nresult ← ""\n// TODO: WHILE n > 0\n//         result ← result + STR(n) + ","\n//         n ← n - 1\n//       ENDWHILE\n// TODO: result ← result + "Liftoff!"\n\n// answer(result)\n',
+    },
+    requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires a real loop (WHILE n > 0 / while n > 0) — don\'t hardcode the final string.' },
+    answer: '5,4,3,2,1,Liftoff!',
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg6', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '✌️', title: 'Evens Only',
+    id: 'flowg6', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '✌️', title: 'Evens Only',
+    forceLang: 'ps',
     hints: ['A For loop (i = 1 to 10) with a Decision INSIDE its body — a loop and a decision, working together.',
-      'Decision: i MOD 2 = 0 — True outputs i, False just loops back to the For with no output.',
-      'Both the True branch AND the False branch need to eventually connect back to the For shape.'],
+      'Decision: i MOD 2 = 0 — True adds i to the result, False does nothing, EITHER way the loop continues.',
+      'Only the even numbers 2,4,6,8,10 end up in the result.'],
     xp: 40,
-    brief: 'Combine a loop AND a decision: For <code>i = 1 to 10</code>, and inside it a Decision <code>i MOD 2 = 0</code> — only output <code>i</code> when it\'s even.',
-    flowchart: { intro: 'This is Count to Five and Odd or Even, combined — a Decision living inside a For loop\'s body.',
-      minShapes: 5, minConnections: 6, requiresDecision: true, expectedOutput: ['2', '4', '6', '8', '10'] },
+    brief: 'Here\'s a finished flowchart: a For loop (<code>i = 1 to 10</code>) with a Decision inside it (<code>i MOD 2 = 0</code>) — only even i gets Output. '
+      + 'Transform it into real code: loop i from 1 to 10, only add i to the result when it\'s even, then answer() the comma-separated result.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(),
+      fcLoopHTML('i = 1 TO 10', [fcShapeHTML('decision', 'i MOD 2 = 0?'), fcBranchHTML('YES', fcShapeHTML('io', 'Output i'), 'NO', '<div style="font-size:9px;color:#6b7280;">(skip)</div>')], 'Done'),
+      fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'result = ""\n# TODO: for i in range(1, 11):\n#         if i % 2 == 0: result = result + str(i) + ","\n\n# answer(result)\n',
+      ps: 'result ← ""\n// TODO: FOR i ← 1 TO 10\n//         IF i MOD 2 = 0 THEN result ← result + STR(i) + "," ENDIF\n//       NEXT i\n\n// answer(result)\n',
+    },
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop with a decision inside it — don\'t hardcode the final string.' },
+    answer: '2,4,6,8,10,',
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowgboss', type: 'flowchart', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🏆', boss: true, title: 'BOSS — FizzBuzz',
-    hints: ['Three nested Decisions, in this order: n MOD 15 = 0 first, then (on its False branch) n MOD 3 = 0, then (on THAT False branch) n MOD 5 = 0.',
-      'Every branch — all four possible outcomes — eventually needs to loop back to the For shape, or the loop will never continue.',
-      'Order matters: checking MOD 3 or MOD 5 before MOD 15 would never let "FizzBuzz" print at all, since 15 is also divisible by 3 and 5.'],
+    id: 'flowgboss', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🏆', boss: true, title: 'BOSS — FizzBuzz',
+    forceLang: 'ps',
+    hints: ['Three nested Decisions, in this order: n MOD 15 = 0 first, then (False) n MOD 3 = 0, then (False) n MOD 5 = 0, then else n itself.',
+      'Order matters: checking MOD 3 or MOD 5 before MOD 15 would never let "FizzBuzz" print at all, since 15 is divisible by both 3 and 5.',
+      'Build the result as a comma-separated string across all 20 numbers, same as the other loop missions.'],
     xp: 70,
-    brief: 'The real thing — build a genuine FizzBuzz flowchart. For <code>n = 1 to 20</code>: if <code>n MOD 15 = 0</code> output "FizzBuzz"; else if <code>n MOD 3 = 0</code> output "Fizz"; else if <code>n MOD 5 = 0</code> output "Buzz"; else output <code>n</code>.',
-    flowchart: { intro: 'Everything from this unit at once: a For loop with three Decisions nested inside its body, each False branch leading to the next check.',
-      minShapes: 9, minConnections: 12, requiresDecision: true,
-      expectedOutput: ['1','2','Fizz','4','Buzz','Fizz','7','8','Fizz','Buzz','11','Fizz','13','14','FizzBuzz','16','17','Fizz','19','Buzz'] },
+    brief: 'Here\'s the real thing — a finished FizzBuzz flowchart: For <code>n = 1 to 20</code>: if <code>n MOD 15 = 0</code> output "FizzBuzz"; else if <code>n MOD 3 = 0</code> output "Fizz"; else if <code>n MOD 5 = 0</code> output "Buzz"; else output <code>n</code>. '
+      + 'Transform the whole thing into real code, then answer() the comma-separated result.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'),
+      fcArrowHTML(),
+      fcLoopHTML('n = 1 TO 20', [
+        fcShapeHTML('decision', 'n MOD 15 = 0?'),
+        fcBranchHTML('YES', fcShapeHTML('io', 'Output "FizzBuzz"'), 'NO', fcDiagram([
+          fcShapeHTML('decision', 'n MOD 3 = 0?'),
+          fcBranchHTML('YES', fcShapeHTML('io', 'Output "Fizz"'), 'NO', fcDiagram([
+            fcShapeHTML('decision', 'n MOD 5 = 0?'),
+            fcBranchHTML('YES', fcShapeHTML('io', 'Output "Buzz"'), 'NO', fcShapeHTML('io', 'Output n')),
+          ])),
+        ])),
+      ], 'Done'),
+      fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'result = ""\n# TODO: for n in range(1, 21):\n#         if n % 15 == 0: result += "FizzBuzz,"\n#         elif n % 3 == 0: result += "Fizz,"\n#         elif n % 5 == 0: result += "Buzz,"\n#         else: result += str(n) + ","\n\n# answer(result)\n',
+      ps: 'result ← ""\n// TODO: FOR n ← 1 TO 20\n//         IF n MOD 15 = 0 THEN result ← result + "FizzBuzz,"\n//         ELSE IF n MOD 3 = 0 THEN result ← result + "Fizz,"\n//         ELSE IF n MOD 5 = 0 THEN result ← result + "Buzz,"\n//         ELSE result ← result + STR(n) + ","\n//         ENDIF\n//       NEXT n\n\n// answer(result)\n',
+    },
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop with the three nested MOD checks — don\'t hardcode the final string.' },
+    answer: '1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz,16,17,Fizz,19,Buzz,',
+    stars: { metric: 'pass' },
   },
 
   // ── Foundations 6c · Flowgorithm Practice — a second real-world round on ──
@@ -1866,84 +1989,224 @@ const MISSIONS = [
   // expectedOutput below was hand-verified against the real fcEval/
   // fcEvalCondition/fcExecAssign functions before being written here.
   {
-    id: 'flowg7', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '📮', title: 'Postage Cost by Weight',
-    hints: ['This engine only supports ONE comparison per Decision — chain three Decisions instead of writing one big compound condition.',
-      'Order them narrowest-first: weight <= 1, then (on False) weight <= 5, then (on False) weight <= 10, then a final else for anything heavier.',
-      'weight = 7 should land in the ">5 and <=10" band.'],
+    id: 'flowg7', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '📮', title: 'Postage Cost by Weight',
+    forceLang: 'ps',
+    hints: ['Chain three IF/ELSE IF/ELSE IF/ELSE — the flowchart\'s three Decisions, each only reached if the one before it was False.',
+      'Order them narrowest-first: weight <= 1, then weight <= 5, then weight <= 10, then else.',
+      'weight = 7 should land in the ">5 and <=10" band — "$12".'],
     xp: 45,
-    brief: 'Assign <code>weight</code> to <b>7</b>. Chain three Decisions to sort it into a postage band: <code>&le;1 &rarr; "$3"</code>, <code>&le;5 &rarr; "$6"</code>, <code>&le;10 &rarr; "$12"</code>, otherwise <code>"$20"</code>.',
-    flowchart: { intro: 'Three Decisions in a row, each only reached if the previous one was False — the same "narrow the range down" idea as a real IF/ELIF/ELIF/ELSE chain.',
-      minShapes: 8, minConnections: 9, requiresDecision: true, expectedOutput: ['$12'] },
+    brief: 'Here\'s a finished flowchart: weight ← 7, then three chained Decisions sort it into a postage band — &le;1 &rarr; "$3", &le;5 &rarr; "$6", &le;10 &rarr; "$12", else "$20". '
+      + 'Transform it into real code, then answer() the band it lands in.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'weight ← 7'),
+      fcArrowHTML(), fcShapeHTML('decision', 'weight ≤ 1?'),
+      fcBranchHTML('YES', fcShapeHTML('io', 'Output "$3"'), 'NO', fcDiagram([
+        fcShapeHTML('decision', 'weight ≤ 5?'),
+        fcBranchHTML('YES', fcShapeHTML('io', 'Output "$6"'), 'NO', fcDiagram([
+          fcShapeHTML('decision', 'weight ≤ 10?'),
+          fcBranchHTML('YES', fcShapeHTML('io', 'Output "$12"'), 'NO', fcShapeHTML('io', 'Output "$20"')),
+        ])),
+      ])),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'weight = 7\n\n# TODO: chain if/elif/elif/else for the four postage bands, answer() the result\n',
+      ps: 'weight ← 7\n\n// TODO: chain IF/ELSE IF/ELSE IF/ELSE for the four postage bands, answer() the result\n',
+    },
+    requireCode: { re: /\bweight\s*<=\s*1\b|\bweight\s*(≤|<=)\s*1\b/i, msg: 'this mission requires the flowchart\'s first real Decision (weight <= 1) in your code — don\'t hardcode the final price.' },
+    answer: '$12',
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg8', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '🥇', title: 'Largest of Three',
-    hints: ['No loop needed — just nested Decisions. First compare a > b, THEN (inside whichever branch) compare against c.',
-      'a=7, b=15, c=3 — work out on paper which one wins before you wire the diamonds.',
-      'Every branch of every Decision needs to lead somewhere — don\'t leave a branch dangling.'],
+    id: 'flowg8', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '🥇', title: 'Largest of Three',
+    forceLang: 'ps',
+    hints: ['No loop needed — just nested IFs. First compare a > b, THEN (inside whichever branch) compare against c.',
+      'a=7, b=15, c=3 — work out on paper which one wins before you write the IFs.',
+      'Every branch needs to answer() something — don\'t leave one without a result.'],
     xp: 45,
-    brief: 'Assign <code>a</code>=7, <code>b</code>=15, <code>c</code>=3. Using ONLY comparisons (no loop), output whichever of the three is largest.',
-    flowchart: { intro: 'Decision 1: a > b? Decision 2 (inside the True branch): a > c? Decision 3 (inside the False branch): b > c? — three simple comparisons find the winner.',
-      minShapes: 9, minConnections: 10, requiresDecision: true, expectedOutput: ['15'] },
+    brief: 'Here\'s a finished flowchart: a=7, b=15, c=3, then three nested Decisions (a&gt;b? then a&gt;c? / b&gt;c?) find the largest with comparisons only, no loop. '
+      + 'Transform it into real code, then answer() the largest value.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'a←7, b←15, c←3'),
+      fcArrowHTML(), fcShapeHTML('decision', 'a > b?'),
+      fcBranchHTML('YES', fcShapeHTML('decision', 'a > c?'), 'NO', fcShapeHTML('decision', 'b > c?')),
+      fcArrowHTML(), fcShapeHTML('io', 'Output the winner'),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'a = 7\nb = 15\nc = 3\n\n# TODO: nested if/else comparing a, b, c — answer() the largest\n',
+      ps: 'a ← 7\nb ← 15\nc ← 3\n\n// TODO: nested IF/ELSE comparing a, b, c — answer() the largest\n',
+    },
+    requireCode: { re: /\ba\s*>\s*b\b/i, msg: 'this mission requires the flowchart\'s actual comparisons (a > b, then a > c / b > c) in your code — don\'t hardcode the final value.' },
+    answer: 15,
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg9', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '🏧', title: 'ATM Withdrawal',
-    hints: ['Assign balance = 100 and amount = 40 first.',
-      'One Decision: amount <= balance. True branch: subtract, THEN output the new balance. False branch: output "Insufficient Funds" (balance unchanged).',
-      'The subtraction (Assign) has to happen BEFORE the Output in the True branch, not after.'],
+    id: 'flowg9', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '🏧', title: 'ATM Withdrawal',
+    forceLang: 'ps',
+    hints: ['balance ← 100, amount ← 40.',
+      'One Decision: amount <= balance. True branch: subtract, THEN answer() the new balance. False branch: answer() "Insufficient Funds".',
+      'The subtraction has to happen BEFORE you answer() the balance, not after.'],
     xp: 40,
-    brief: 'Assign <code>balance</code>=100, <code>amount</code>=40. If <code>amount &le; balance</code>, subtract it and output the new balance — otherwise output <code>"Insufficient Funds"</code>.',
-    flowchart: { intro: 'A Decision whose True branch does a Process (the subtraction) BEFORE its Output — the balance has to actually change before you print it.',
-      minShapes: 7, minConnections: 7, requiresDecision: true, expectedOutput: ['60'] },
+    brief: 'Here\'s a finished flowchart: balance ← 100, amount ← 40, Decision amount &le; balance? — True: subtract then Output the new balance. False: Output "Insufficient Funds". '
+      + 'Transform it into real code, then answer() the result.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'balance←100, amount←40'),
+      fcArrowHTML(), fcShapeHTML('decision', 'amount ≤ balance?'),
+      fcBranchHTML('YES', fcDiagram([fcShapeHTML('process', 'balance ← balance − amount'), fcArrowHTML(), fcShapeHTML('io', 'Output balance')]), 'NO', fcShapeHTML('io', 'Output "Insufficient Funds"')),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'balance = 100\namount = 40\n\n# TODO: IF amount <= balance, subtract then answer(balance), ELSE answer("Insufficient Funds")\n',
+      ps: 'balance ← 100\namount ← 40\n\n// TODO: IF amount <= balance THEN subtract then answer(balance) ELSE answer("Insufficient Funds") ENDIF\n',
+    },
+    requireCode: { re: /\bamount\s*(<=|≤)\s*balance\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (amount <= balance) in your code — don\'t hardcode the final value.' },
+    answer: 60,
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg10', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '📅', title: 'Weekday or Weekend',
-    hints: ['This engine can\'t write "day = 6 OR day = 7" in one Decision — chain two instead: check day=6 first, and only if that\'s False, check day=7.',
-      'Both Decisions\' True branches should reach the SAME "Weekend" Output shape — that\'s allowed, two arrows can point to one shape.',
-      'Assign day = 7 so your flowchart actually has to fall through the FIRST Decision to reach the second.'],
+    id: 'flowg10', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '📅', title: 'Weekday or Weekend',
+    forceLang: 'ps',
+    hints: ['Two chained Decisions build an OR: check day=6 first, and only if that\'s False, check day=7.',
+      'Both True branches answer() the SAME "Weekend" result.',
+      'day ← 7, so your code has to fall through the first check to reach the second.'],
     xp: 45,
-    brief: 'Assign <code>day</code>=7. Output <code>"Weekend"</code> if <code>day</code> is 6 OR 7 — otherwise output <code>"Weekday"</code>. Build the OR as two chained Decisions.',
-    flowchart: { intro: 'Chaining Decisions for OR: the first one\'s False branch flows into a second check, rather than giving up. Both True branches can lead to the same Output.',
-      minShapes: 6, minConnections: 7, requiresDecision: true, expectedOutput: ['Weekend'] },
+    brief: 'Here\'s a finished flowchart: day ← 7, then two chained Decisions (day=6? then day=7?) output "Weekend" if either is true, else "Weekday" — that chain IS how this engine builds OR. '
+      + 'Transform it into real code, then answer() the result.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'day ← 7'),
+      fcArrowHTML(), fcShapeHTML('decision', 'day = 6?'),
+      fcBranchHTML('YES', fcShapeHTML('io', 'Output "Weekend"'), 'NO', fcDiagram([
+        fcShapeHTML('decision', 'day = 7?'),
+        fcBranchHTML('YES', fcShapeHTML('io', 'Output "Weekend"'), 'NO', fcShapeHTML('io', 'Output "Weekday"')),
+      ])),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'day = 7\n\n# TODO: IF day == 6 or day == 7, answer("Weekend"), ELSE answer("Weekday")\n',
+      ps: 'day ← 7\n\n// TODO: IF day = 6 THEN answer("Weekend") ELSE IF day = 7 THEN answer("Weekend") ELSE answer("Weekday") ENDIF\n',
+    },
+    requireCode: { re: /\bday\s*(=|==)\s*6\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (day = 6 / day = 7) in your code — don\'t hardcode the final word.' },
+    answer: 'Weekend',
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg11', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '✖️', title: 'Times Table Generator',
-    hints: ['Assign n = 7, then a For loop i = 1 to 12.',
-      'One Output shape inside the loop, building a whole sentence: n + " x " + i + " = " + (n*i) — the parentheses matter for the multiplication.',
-      'This is exactly the same For-loop shape as Count to Five, just with a longer, formatted Output expression.'],
+    id: 'flowg11', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '✖️', title: 'Times Table Generator',
+    forceLang: 'ps',
+    hints: ['n ← 7, then a loop i from 1 to 12.',
+      'Build each line as "n x i = n*i" and append it (with a comma) to the result string.',
+      'This is the same For-loop shape as Count to Five, just with a longer, formatted line.'],
     xp: 45,
-    brief: 'Assign <code>n</code>=7. Using a For loop (<code>i = 1 to 12</code>), output all 12 lines of the 7 times table, in the form <code>"7 x 1 = 7"</code>.',
-    flowchart: { intro: 'String-building with +: joining a variable, literal text, and a calculation (in brackets) into one Output line.',
-      minShapes: 5, minConnections: 5, expectedOutput: ['7 x 1 = 7','7 x 2 = 14','7 x 3 = 21','7 x 4 = 28','7 x 5 = 35','7 x 6 = 42','7 x 7 = 49','7 x 8 = 56','7 x 9 = 63','7 x 10 = 70','7 x 11 = 77','7 x 12 = 84'] },
+    brief: 'Here\'s a finished flowchart: n ← 7, then a For loop (<code>i = 1 to 12</code>) Outputting a full line like "7 x 1 = 7" each time round. '
+      + 'Transform it into real code: build a comma-separated result string of all 12 lines, then answer() it.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'n ← 7'),
+      fcArrowHTML(),
+      fcLoopHTML('i = 1 TO 12', [fcShapeHTML('io', 'Output n + " x " + i + " = " + (n×i)')], 'Done'),
+      fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'n = 7\nresult = ""\n# TODO: for i in range(1, 13): result += n + " x " + i + " = " + (n*i) + ","\n\n# answer(result)\n',
+      ps: 'n ← 7\nresult ← ""\n// TODO: FOR i ← 1 TO 12\n//         result ← result + STR(n) + " x " + STR(i) + " = " + STR(n*i) + ","\n//       NEXT i\n\n// answer(result)\n',
+    },
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop (FOR i ← 1 TO 12 / for i in range(1, 13)) — don\'t hardcode the final string.' },
+    answer: '7 x 1 = 7,7 x 2 = 14,7 x 3 = 21,7 x 4 = 28,7 x 5 = 35,7 x 6 = 42,7 x 7 = 49,7 x 8 = 56,7 x 9 = 63,7 x 10 = 70,7 x 11 = 77,7 x 12 = 84,',
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg12', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '➗', title: 'Sum of Evens 1 to 50',
-    hints: ['This is Evens Only and Sum 1 to 10, combined — a Decision INSIDE a For loop, but accumulating instead of printing each one.',
-      'Declare/Assign total = 0 before the loop. Inside: Decision i MOD 2 = 0 — True adds i to total, False does nothing — EITHER way, loop back to the For.',
-      'Output total only ONCE, after the loop is Done — not inside it.'],
+    id: 'flowg12', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '➗', title: 'Sum of Evens 1 to 50',
+    forceLang: 'ps',
+    hints: ['This is Evens Only and Sum 1 to 10, combined — a Decision INSIDE a loop, accumulating instead of printing each one.',
+      'total ← 0 before the loop. Inside: IF i MOD 2 = 0 THEN total ← total + i — EITHER way, the loop continues.',
+      'answer(total) only ONCE, after the loop ends — not inside it.'],
     xp: 45,
-    brief: 'Assign <code>total</code>=0. Using a For loop (<code>i = 1 to 50</code>) with a Decision inside it, add up only the EVEN numbers and output the final total once.',
-    flowchart: { intro: 'Both branches of the inner Decision must eventually loop back to the For shape — the accumulation only happens on the True branch, but the LOOPING happens either way.',
-      minShapes: 7, minConnections: 8, requiresDecision: true, expectedOutput: ['650'] },
+    brief: 'Here\'s a finished flowchart: total ← 0, then a For loop (<code>i = 1 to 50</code>) with a Decision inside it adding only the even i\'s to total, Output once Done. '
+      + 'Transform it into real code, then answer() the final total.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'total ← 0'),
+      fcArrowHTML(),
+      fcLoopHTML('i = 1 TO 50', [fcShapeHTML('decision', 'i MOD 2 = 0?'), fcBranchHTML('YES', fcShapeHTML('process', 'total ← total + i'), 'NO', '<div style="font-size:9px;color:#6b7280;">(skip)</div>')], 'Done'),
+      fcShapeHTML('io', 'Output total'), fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'total = 0\n# TODO: for i in range(1, 51):\n#         if i % 2 == 0: total = total + i\n\n# answer(total)\n',
+      ps: 'total ← 0\n// TODO: FOR i ← 1 TO 50\n//         IF i MOD 2 = 0 THEN total ← total + i ENDIF\n//       NEXT i\n\n// answer(total)\n',
+    },
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop with a decision inside it — don\'t hardcode the final total.' },
+    answer: 650,
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg13', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '💰', title: 'Savings Growth',
-    hints: ['Assign balance = 1000, rate = 0.1, year = 1.',
-      'While year <= 3: balance = balance + balance * rate, THEN year = year + 1, THEN loop back to the While.',
-      'Multiplication happens before addition automatically — balance + balance * rate is safe to write directly, no extra brackets needed.'],
+    id: 'flowg13', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '💰', title: 'Savings Growth',
+    forceLang: 'ps',
+    hints: ['balance ← 1000, rate ← 0.1, year ← 1.',
+      'WHILE year <= 3: balance ← balance + balance*rate, THEN year ← year + 1.',
+      'Multiplication happens before addition automatically — balance + balance * rate is safe to write directly.'],
     xp: 50,
-    brief: 'Assign <code>balance</code>=1000, <code>rate</code>=0.1, <code>year</code>=1. While <code>year &le; 3</code>, grow the balance by its rate each year, then output the final balance.',
-    flowchart: { intro: 'A While loop whose body has TWO Assigns (grow the balance, then advance the year) before looping back — compounding growth, one year at a time.',
-      minShapes: 8, minConnections: 8, expectedOutput: ['1331'] },
+    brief: 'Here\'s a finished flowchart: balance ← 1000, rate ← 0.1, year ← 1, then WHILE year &le; 3: grow the balance by its rate, advance the year — Output the balance once Done. '
+      + 'Transform it into real code, then answer() the final balance.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'balance←1000, rate←0.1, year←1'),
+      fcArrowHTML(),
+      fcLoopHTML('WHILE year ≤ 3', [fcShapeHTML('process', 'balance ← balance + balance×rate'), fcArrowHTML(), fcShapeHTML('process', 'year ← year + 1')], 'Done'),
+      fcShapeHTML('io', 'Output balance'), fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'balance = 1000\nrate = 0.1\nyear = 1\n# TODO: while year <= 3: balance = balance + balance * rate; year = year + 1\n\n# answer(round(balance))\n',
+      ps: 'balance ← 1000\nrate ← 0.1\nyear ← 1\n// TODO: WHILE year <= 3\n//         balance ← balance + balance * rate\n//         year ← year + 1\n//       ENDWHILE\n\n// answer(balance)\n',
+    },
+    requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires a real loop (WHILE year <= 3 / while year <= 3) — don\'t hardcode the final balance.' },
+    answer: 1331,
+    stars: { metric: 'pass' },
   },
   {
-    id: 'flowg14', type: 'flowchart', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🔍', boss: true, title: 'BOSS — Prime Number Check',
-    hints: ['This engine has no True/False literal — Declare isPrime and Assign it to 1 (meaning true) or 0 (meaning false) instead, then Decision isPrime = 1 at the end.',
-      'While divisor < num: Decision num MOD divisor = 0 — True sets isPrime = 0. EITHER way, then divisor = divisor + 1, then loop back to the While.',
-      'After the While is Done: one more Decision (isPrime = 1?) picks between outputting "Prime" or "Not Prime".'],
+    id: 'flowg14', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🔍', boss: true, title: 'BOSS — Prime Number Check',
+    forceLang: 'ps',
+    hints: ['Set isPrime ← 1 (true) and divisor ← 2 before the loop.',
+      'WHILE divisor < num: IF num MOD divisor = 0 THEN isPrime ← 0 — EITHER way, divisor ← divisor + 1.',
+      'After the loop: IF isPrime = 1 THEN answer("Prime") ELSE answer("Not Prime").'],
     xp: 75,
-    brief: 'Assign <code>num</code>=17, <code>isPrime</code>=1, <code>divisor</code>=2. While <code>divisor &lt; num</code>, check whether <code>divisor</code> evenly divides <code>num</code> — if it ever does, <code>num</code> isn\'t prime. Output <code>"Prime"</code> or <code>"Not Prime"</code>.',
-    flowchart: { intro: 'The hardest one yet: a While loop with a Decision inside it (checking each divisor), PLUS a second Decision after the loop (reading the flag it built up). No real True/False — use 1 and 0.',
-      minShapes: 10, minConnections: 12, requiresDecision: true, expectedOutput: ['Prime'] },
+    brief: 'Here\'s the hardest flowchart yet: num ← 17, isPrime ← 1, divisor ← 2, then WHILE divisor &lt; num checks every possible divisor, clearing isPrime if one divides evenly — then a final Decision reads the flag. '
+      + 'Transform the whole thing into real code, then answer() "Prime" or "Not Prime".',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'num←17, isPrime←1, divisor←2'),
+      fcArrowHTML(),
+      fcLoopHTML('WHILE divisor < num', [fcShapeHTML('decision', 'num MOD divisor = 0?'), fcBranchHTML('YES', fcShapeHTML('process', 'isPrime ← 0'), 'NO', '<div style="font-size:9px;color:#6b7280;">(skip)</div>'), fcArrowHTML(), fcShapeHTML('process', 'divisor ← divisor + 1')], 'Done'),
+      fcShapeHTML('decision', 'isPrime = 1?'),
+      fcBranchHTML('YES', fcShapeHTML('io', 'Output "Prime"'), 'NO', fcShapeHTML('io', 'Output "Not Prime"')),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'num = 17\nisPrime = 1\ndivisor = 2\n# TODO: while divisor < num:\n#         if num % divisor == 0: isPrime = 0\n#         divisor = divisor + 1\n\n# TODO: answer("Prime") if isPrime == 1 else answer("Not Prime")\n',
+      ps: 'num ← 17\nisPrime ← 1\ndivisor ← 2\n// TODO: WHILE divisor < num\n//         IF num MOD divisor = 0 THEN isPrime ← 0 ENDIF\n//         divisor ← divisor + 1\n//       ENDWHILE\n\n// TODO: IF isPrime = 1 THEN answer("Prime") ELSE answer("Not Prime") ENDIF\n',
+    },
+    requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires a real loop checking every divisor — don\'t hardcode the final word.' },
+    answer: 'Prime',
+    stars: { metric: 'pass' },
   },
 
   // ── Phase 0B · Flight Computer — algorithmic thinking, before you fly ───────
@@ -3127,6 +3390,54 @@ const MISSIONS = [
   },
 ]
 
+// ── Static flowchart diagrams — the FOUNDATIONS 3 unit shows a finished,
+// already-drawn flowchart (never an interactive builder) and asks the
+// student to transform IT into real pseudocode/code. These small helpers
+// compose that diagram's HTML consistently (same shape/colour language as
+// the FOUNDATIONS 3 lesson's own diagrams) without hand-writing inline
+// styles in every single mission above. Declared as hoisted function
+// statements (not consts) so they're usable from inside the MISSIONS
+// array literal above despite being defined textually after it.
+function fcShapeHTML(type, label) {
+  const styles = {
+    start:    'border:2px solid #4ade80;border-radius:999px;padding:5px 16px;color:#4ade80;',
+    end:      'border:2px solid #4ade80;border-radius:999px;padding:5px 16px;color:#4ade80;',
+    declare:  'border:2px solid #facc15;border-radius:4px;padding:5px 14px;color:#facc15;',
+    process:  'border:2px solid #60a5fa;border-radius:4px;padding:5px 14px;color:#60a5fa;',
+    io:       'border:2px solid #e879f9;border-radius:4px;padding:5px 16px;color:#e879f9;transform:skewX(-12deg);',
+  }
+  if (type === 'decision') {
+    // A rotated square's visual bounding box is wider/taller than its
+    // pre-rotation layout box (88px side -> ~124px diagonal) — CSS
+    // transforms don't reserve that extra space in flow layout, so without
+    // generous margin here, stacked/chained decision diamonds visually
+    // overlap their neighbours (confirmed live: 3 chained diamonds inside
+    // a LOOP box collided until this margin was added).
+    return '<div style="display:flex;justify-content:center;padding:18px 0;"><div style="background:#111320;transform:rotate(45deg);width:88px;height:88px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px solid #fbbf24;"><span style="transform:rotate(-45deg);color:#fbbf24;font-size:9.5px;font-weight:700;text-align:center;width:92px;">' + label + '</span></div></div>'
+  }
+  return '<div style="display:flex;justify-content:center;"><div style="background:#111320;font-size:11.5px;font-weight:700;white-space:nowrap;' + (styles[type] || styles.process) + '">' + label + '</div></div>'
+}
+function fcArrowHTML(label) {
+  return '<div style="text-align:center;color:#6b7280;font-size:10px;line-height:1.8;">' + (label ? ('<span style="color:#9ca3af;">' + label + '</span> ') : '') + '↓</div>'
+}
+function fcDiagram(parts) {
+  return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin:14px 0;">' + parts.join('') + '</div>'
+}
+function fcBranchHTML(leftLabel, leftHTML, rightLabel, rightHTML) {
+  return '<div style="display:flex;gap:28px;justify-content:center;align-items:flex-start;margin:4px 0;">'
+    + '<div style="text-align:center;"><div style="color:#4ade80;font-size:9.5px;margin-bottom:2px;">' + leftLabel + ' ↓</div>' + leftHTML + '</div>'
+    + '<div style="text-align:center;"><div style="color:#f87171;font-size:9.5px;margin-bottom:2px;">' + rightLabel + ' ↓</div>' + rightHTML + '</div>'
+    + '</div>'
+}
+function fcLoopHTML(headerLabel, bodyParts, doneLabel) {
+  return '<div style="border:2px dashed #fb923c;border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:2px;">'
+    + '<div style="font-size:9.5px;color:#fb923c;font-weight:700;letter-spacing:.04em;margin-bottom:4px;">↻ LOOP — ' + headerLabel + '</div>'
+    + bodyParts.join('')
+    + '<div style="font-size:9px;color:#6b7280;margin-top:4px;">(loops back to the top until done)</div>'
+    + '</div>'
+    + (doneLabel ? '<div style="text-align:center;color:#6b7280;font-size:10px;line-height:1.8;"><span style="color:#9ca3af;">' + doneLabel + '</span> ↓</div>' : '')
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // 📘 MISSION_LESSON — one real, full explainer per mission (all 31), keyed by
 // mission id. Rendered by renderMissionLesson() from inside openMission().
@@ -3927,7 +4238,22 @@ function execPseudo(src, mission, battleEnv) {
         i = endif + 1
         continue
       }
-      if (up === 'ELSE' || up === 'ENDIF' || up === 'NEXT' || up.startsWith('NEXT '))
+      // WHILE condition … ENDWHILE — same pattern as FOR, but the condition
+      // is re-evaluated every pass instead of a fixed range. Real engine
+      // gap: WHILE/ENDWHILE were only ever syntax-highlighted keywords
+      // (editor coloring), never actually interpreted — confirmed by
+      // reading this function before adding this branch. The ops counter
+      // above already guards against an infinite WHILE the same way it
+      // guards a runaway FOR.
+      if (up.startsWith('WHILE ')) {
+        const m = t.match(/^WHILE\s+(.+)$/i)
+        if (!m) throw { message: 'Bad WHILE — expected: WHILE condition', ln }
+        const nxt = matchEnd(i, 'WHILE', 'ENDWHILE')
+        while (truthy(evalExpr(m[1], ln))) run(i + 1, nxt)
+        i = nxt + 1
+        continue
+      }
+      if (up === 'ELSE' || up === 'ENDIF' || up === 'NEXT' || up.startsWith('NEXT ') || up === 'ENDWHILE')
         throw { message: '"' + t + '" has no matching opener here', ln }
       if (up.startsWith('OUTPUT')) {
         const rest = t.slice(6).trim()
@@ -4566,6 +4892,11 @@ function showMissionMain(show) {
 function openMission(id) {
   activeMission = MISSIONS.find(m => m.id === id)
   if (!activeMission) return
+  // Missions that teach pseudocode-first (the flowchart-to-code unit) open
+  // in Pseudocode regardless of the student's last-used language — a
+  // deliberate in-session default, not a persisted preference, so leaving
+  // this mission for an ordinary Python one doesn't silently stick.
+  if (activeMission.forceLang) lang = activeMission.forceLang
   missionStartedAt = Date.now()
   g9HintIdx = 0
   document.querySelectorAll('.g9-hint-display').forEach(el => { el.innerHTML = '' })
@@ -5552,7 +5883,7 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   'learn-binary': 'g9-binary', 'cards-make': 'g9-binary', 'cards-add': 'g9-binary', 'cardsboss': 'g9-binary',
   'cards-byte': 'g9-binary', 'bits-needed': 'g9-binary',
   p0m1: 'g9-binary', p0m2: 'g9-binary', 'learn-images': 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
-  'learn-flowcharts': 'g9-flowcharts-loops', 'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops', 'flow-build': 'g9-flowcharts-loops', 'flow-code': 'g9-flowcharts-loops',
+  'learn-flowcharts': 'g9-flowcharts-loops', 'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops', 'flow-code': 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
   'learn-datatypes': 'g9-declarations',
   // Foundations 3 — Your First Code — also had NO mapping at all (same
@@ -5710,7 +6041,7 @@ const TIERS = [
   // is flowcharts/Flowgorithm (planning an algorithm, plus basic
   // arithmetic/IO/loops) FIRST, with real Python syntax taught right
   // after that — so FOUNDATIONS 3-7 below are now in that order instead.
-  { name: '📊 FOUNDATIONS 3 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'flow-p1', 'flow-p2', 'flow-build', 'flow-code'] },
+  { name: '📊 FOUNDATIONS 3 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'flow-p1', 'flow-p2', 'flow-code'] },
   // flowg1-6/flowgboss existed in MISSIONS but were never registered in
   // TIERS at all — a real bug: the map (built from TIERS.map(...)) had no
   // way to show them, so they were unreachable however the game normally

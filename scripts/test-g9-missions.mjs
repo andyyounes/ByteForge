@@ -460,6 +460,28 @@ const DATA_REF = {
     + '    IF dataCost[i] < lowCost THEN\n        cheapest ← dataRoute[i]\n        lowCost ← dataCost[i]\n    ENDIF\nNEXT i\n\nanswer(cheapest)',
   p3m4: 'count ← 0\nFOR i ← 1 TO dataCount\n    IF dataHp[i] > 50 THEN\n        count ← count + 1\n    ENDIF\nNEXT i\n\nanswer(count)',
   p3m5: 'budget ← 80\nFOR i ← 1 TO dataCount\n    budget ← budget - dataCost[i]\nNEXT i\n\nanswer(budget)',
+
+  // ── FOUNDATIONS 3 · flowchart-to-code unit (2026-10-13 rewrite) — every
+  // mission shows a FINISHED flowchart and asks for real pseudocode/code
+  // that reproduces it; these references are each mission's own diagram,
+  // hand-transcribed into pseudocode, verified against the real interpreter.
+  'flow-p1': 'age ← 15\nIF age >= 18 THEN\n    answer("Adult")\nELSE\n    answer("Minor")\nENDIF',
+  'flow-code': 'num ← 12\nIF num MOD 2 = 0 THEN\n    answer("Even")\nELSE\n    answer("Odd")\nENDIF',
+  flowg1: 'n ← 7\nIF n MOD 2 = 0 THEN\n    answer("Even")\nELSE\n    answer("Odd")\nENDIF',
+  flowg2: 'score ← 82\nIF score >= 50 THEN\n    answer("Pass")\nELSE\n    answer("Fail")\nENDIF',
+  flowg3: 'result ← ""\nFOR i ← 1 TO 5\n    result ← result + STR(i) + ","\nNEXT i\n\nanswer(result)',
+  flowg4: 'total ← 0\nFOR i ← 1 TO 10\n    total ← total + i\nNEXT i\n\nanswer(total)',
+  flowg5: 'n ← 5\nresult ← ""\nWHILE n > 0\n    result ← result + STR(n) + ","\n    n ← n - 1\nENDWHILE\nresult ← result + "Liftoff!"\n\nanswer(result)',
+  flowg6: 'result ← ""\nFOR i ← 1 TO 10\n    IF i MOD 2 = 0 THEN\n        result ← result + STR(i) + ","\n    ENDIF\nNEXT i\n\nanswer(result)',
+  flowgboss: 'result ← ""\nFOR n ← 1 TO 20\n    IF n MOD 15 = 0 THEN\n        result ← result + "FizzBuzz,"\n    ELSE\n        IF n MOD 3 = 0 THEN\n            result ← result + "Fizz,"\n        ELSE\n            IF n MOD 5 = 0 THEN\n                result ← result + "Buzz,"\n            ELSE\n                result ← result + STR(n) + ","\n            ENDIF\n        ENDIF\n    ENDIF\nNEXT n\n\nanswer(result)',
+  flowg7: 'weight ← 7\nIF weight <= 1 THEN\n    answer("$3")\nELSE\n    IF weight <= 5 THEN\n        answer("$6")\n    ELSE\n        IF weight <= 10 THEN\n            answer("$12")\n        ELSE\n            answer("$20")\n        ENDIF\n    ENDIF\nENDIF',
+  flowg8: 'a ← 7\nb ← 15\nc ← 3\nIF a > b THEN\n    IF a > c THEN\n        answer(a)\n    ELSE\n        answer(c)\n    ENDIF\nELSE\n    IF b > c THEN\n        answer(b)\n    ELSE\n        answer(c)\n    ENDIF\nENDIF',
+  flowg9: 'balance ← 100\namount ← 40\nIF amount <= balance THEN\n    balance ← balance - amount\n    answer(balance)\nELSE\n    answer("Insufficient Funds")\nENDIF',
+  flowg10: 'day ← 7\nIF day = 6 THEN\n    answer("Weekend")\nELSE\n    IF day = 7 THEN\n        answer("Weekend")\n    ELSE\n        answer("Weekday")\n    ENDIF\nENDIF',
+  flowg11: 'n ← 7\nresult ← ""\nFOR i ← 1 TO 12\n    result ← result + STR(n) + " x " + STR(i) + " = " + STR(n*i) + ","\nNEXT i\n\nanswer(result)',
+  flowg12: 'total ← 0\nFOR i ← 1 TO 50\n    IF i MOD 2 = 0 THEN\n        total ← total + i\n    ENDIF\nNEXT i\n\nanswer(total)',
+  flowg13: 'balance ← 1000\nrate ← 0.1\nyear ← 1\nWHILE year <= 3\n    balance ← balance + balance * rate\n    year ← year + 1\nENDWHILE\n\nanswer(balance)',
+  flowg14: 'num ← 17\nisPrime ← 1\ndivisor ← 2\nWHILE divisor < num\n    IF num MOD divisor = 0 THEN\n        isPrime ← 0\n    ENDIF\n    divisor ← divisor + 1\nENDWHILE\nIF isPrime = 1 THEN\n    answer("Prime")\nELSE\n    answer("Not Prime")\nENDIF',
 }
 for (const [id, src] of Object.entries(DATA_REF)) {
   const m = MISSIONS.find(x => x.id === id)
