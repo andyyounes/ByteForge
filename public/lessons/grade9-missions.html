@@ -870,10 +870,36 @@ const MISSIONS = [
       theory: `
         <h4>A variable is just a labeled box</h4>
         <p>Every program needs to remember things — a score, a name, a health total. A <code>variable</code> is a named place in memory holding one of those values, so your code can read it, change it, or reuse it later instead of retyping it every time.</p>
+        <div style="display:flex;justify-content:center;margin:14px 0;">
+          <div style="background:#111320;border:2px solid rgba(96,165,250,.5);border-radius:10px;padding:16px 28px;text-align:center;min-width:140px;">
+            <div style="font-size:10px;color:#60a5fa;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">score</div>
+            <div style="font-size:26px;font-weight:800;color:#e2e8f0;">10</div>
+          </div>
+        </div>
+        <p style="text-align:center;color:#9ca3af;font-size:11.5px;margin-top:-10px;">A box named <code>score</code>, currently holding the value <code>10</code>.</p>
         <h4>= means "store", not "equals"</h4>
         <p><code>score = 10</code> does NOT mean "score equals 10" the way maths uses =. It means "take the value 10, and STORE it in a box named score." Whatever was in score before is simply overwritten.</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0;font-size:13px;">
+          <div style="background:#111320;border:1px solid rgba(74,222,128,.4);border-radius:8px;padding:8px 14px;font-weight:800;color:#4ade80;">10</div>
+          <div style="color:#6b7280;font-size:20px;">→</div>
+          <div style="background:#111320;border:2px solid rgba(96,165,250,.5);border-radius:10px;padding:8px 18px;text-align:center;">
+            <div style="font-size:9px;color:#60a5fa;text-transform:uppercase;">score</div>
+            <div style="font-weight:800;color:#e2e8f0;">10</div>
+          </div>
+        </div>
+        <p style="text-align:center;color:#9ca3af;font-size:11.5px;margin-top:-10px;">The value 10 flows INTO the score box — nothing is being "compared".</p>
         <h4>Not every value is the same TYPE</h4>
-        <p><code>10</code> is a number (an <b>integer</b>) — no quotes. <code>"10"</code> looks similar but is actually <b>text</b> (a <b>string</b>) — the quotes are what make it text, not a number. Mixing these up is one of the most common real beginner mistakes.</p>`,
+        <p><code>10</code> is a number (an <b>integer</b>) — no quotes. <code>"10"</code> looks similar but is actually <b>text</b> (a <b>string</b>) — the quotes are what make it text, not a number. Mixing these up is one of the most common real beginner mistakes.</p>
+        <div style="display:flex;justify-content:center;gap:14px;margin:14px 0;flex-wrap:wrap;">
+          <div style="background:#111320;border:1px solid rgba(96,165,250,.4);border-radius:10px;padding:12px 18px;text-align:center;min-width:110px;">
+            <div style="font-size:20px;font-weight:800;color:#60a5fa;">10</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:4px;">integer<br>no quotes</div>
+          </div>
+          <div style="background:#111320;border:1px solid rgba(232,121,249,.4);border-radius:10px;padding:12px 18px;text-align:center;min-width:110px;">
+            <div style="font-size:20px;font-weight:800;color:#e879f9;">"10"</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:4px;">string<br>quotes = text</div>
+          </div>
+        </div>`,
     },
   },
   {
@@ -1198,12 +1224,37 @@ const MISSIONS = [
       theory: `
         <h4>Transistors — the real, physical reason for binary</h4>
         <p>Open up any computer chip and, underneath everything, you'd find billions of <b>transistors</b> — microscopic electronic switches. Each one is either letting electricity through, or not. That's it — just ON or OFF, nothing in between. Binary (0 and 1) is simply the number system that matches this exactly: 1 means "the switch is ON", 0 means "the switch is OFF". This is the actual physical reason computers use binary — it's not an arbitrary choice, it's the only thing the hardware itself can do.</p>
+        <div style="display:flex;justify-content:center;gap:20px;margin:14px 0;">
+          <div style="text-align:center;">
+            <div style="width:56px;height:56px;border-radius:50%;background:rgba(74,222,128,.15);border:2px solid #4ade80;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#4ade80;">1</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:6px;">switch ON<br>current flows</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:56px;height:56px;border-radius:50%;background:rgba(248,113,113,.1);border:2px dashed #6b7280;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#6b7280;">0</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:6px;">switch OFF<br>no current</div>
+          </div>
+        </div>
         <h4>Place values — the same idea as denary, just base 2</h4>
         <p>In denary, each digit's position is worth a power of 10 (1s, 10s, 100s...). In binary, each position is worth a power of 2 instead: <code>...32 16 8 4 2 1</code>. A binary digit only ADDS its place value if it's a 1 — a 0 in that position contributes nothing.</p>
+        <div style="display:flex;justify-content:center;gap:4px;margin:14px 0;">
+          ${[32,16,8,4,2,1].map(v => `<div style="background:#111320;border:1px solid rgba(251,191,36,.35);border-radius:6px;padding:6px 10px;text-align:center;min-width:34px;"><div style="font-size:9px;color:#6b7280;">place</div><div style="font-weight:800;color:#fbbf24;font-size:13px;">${v}</div></div>`).join('')}
+        </div>
         <h4>Worked example: 13 in binary</h4>
         <p>13 = 8 + 4 + 1 (using the place values 8, 4, 2, 1). So the 8s, 4s, and 1s places get a 1, and the 2s place gets a 0: <code>1101</code>. Checking it: 8+4+0+1 = 13. ✓</p>
+        <div style="display:flex;justify-content:center;gap:4px;margin:14px 0;">
+          ${[['8',1],['4',1],['2',0],['1',1]].map(([v,on]) => `<div style="background:${on?'rgba(74,222,128,.12)':'#111320'};border:1px solid ${on?'#4ade80':'rgba(255,255,255,.1)'};border-radius:6px;padding:6px 12px;text-align:center;min-width:34px;"><div style="font-size:9px;color:#6b7280;">${v}s place</div><div style="font-weight:800;font-size:16px;color:${on?'#4ade80':'#6b7280'};">${on}</div></div>`).join('')}
+        </div>
+        <p style="text-align:center;color:#9ca3af;font-size:11.5px;margin-top:-10px;">Reading left to right: <code>1101</code> — and 8+4+0+1 = 13.</p>
         <h4>Binary addition — carrying works exactly like denary</h4>
-        <p>Adding 1 + 1 in binary gives 10 (that's "two", not "ten") — the 1 "carries" into the next place value, exactly like 9 + 1 = 10 carries in denary. E.g. 0011 (3) + 0001 (1): the rightmost 1+1 carries, giving 0100 (4).</p>`,
+        <p>Adding 1 + 1 in binary gives 10 (that's "two", not "ten") — the 1 "carries" into the next place value, exactly like 9 + 1 = 10 carries in denary. E.g. 0011 (3) + 0001 (1): the rightmost 1+1 carries, giving 0100 (4).</p>
+        <div style="display:flex;justify-content:center;margin:14px 0;">
+          <div style="font-family:ui-monospace,monospace;font-size:16px;text-align:right;color:#e2e8f0;line-height:1.8;">
+            <div><span style="color:#6b7280;font-size:11px;">carry →</span> &nbsp;<span style="color:#fbbf24;">1</span></div>
+            <div>&nbsp;&nbsp;0011</div>
+            <div>+ 0001</div>
+            <div style="border-top:1px solid rgba(255,255,255,.3);">&nbsp;&nbsp;0100</div>
+          </div>
+        </div>`,
     },
   },
   {
@@ -1303,12 +1354,40 @@ const MISSIONS = [
       theory: `
         <h4>Boolean — the simplest possible data type</h4>
         <p>Where an integer can be any whole number, a <b>Boolean</b> can only ever be one of exactly two values: True or False. This isn't a limitation — it's exactly what's needed for a computer to make a decision.</p>
+        <div style="display:flex;justify-content:center;gap:16px;margin:14px 0;">
+          <div style="background:rgba(74,222,128,.1);border:2px solid #4ade80;border-radius:10px;padding:10px 24px;font-weight:800;color:#4ade80;">True</div>
+          <div style="background:rgba(248,113,113,.1);border:2px solid #f87171;border-radius:10px;padding:10px 24px;font-weight:800;color:#f87171;">False</div>
+        </div>
         <h4>AND vs. OR — the key difference</h4>
         <p><b>AND</b> is strict: BOTH sides must be true, or the result is false. <b>OR</b> is generous: just ONE true side is enough. "It's raining AND I have an umbrella" needs both; "It's raining OR it's cold" needs just one.</p>
+        <div style="display:flex;justify-content:center;gap:18px;margin:14px 0;flex-wrap:wrap;">
+          <div style="background:#111320;border:1px solid rgba(96,165,250,.4);border-radius:10px;padding:12px 16px;text-align:center;min-width:140px;">
+            <div style="font-weight:800;color:#60a5fa;font-size:13px;margin-bottom:6px;">AND — strict</div>
+            <div style="font-size:11px;color:#9ca3af;">raining <b style="color:#e2e8f0;">AND</b> have umbrella</div>
+            <div style="font-size:10px;color:#6b7280;margin-top:4px;">needs BOTH true</div>
+          </div>
+          <div style="background:#111320;border:1px solid rgba(74,222,128,.4);border-radius:10px;padding:12px 16px;text-align:center;min-width:140px;">
+            <div style="font-weight:800;color:#4ade80;font-size:13px;margin-bottom:6px;">OR — generous</div>
+            <div style="font-size:11px;color:#9ca3af;">raining <b style="color:#e2e8f0;">OR</b> it's cold</div>
+            <div style="font-size:10px;color:#6b7280;margin-top:4px;">needs just ONE true</div>
+          </div>
+        </div>
         <h4>NOT flips things</h4>
         <p><b>NOT</b> is the simplest operator of all — it just reverses whatever it's given. NOT True is False. NOT False is True. Nothing else.</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0;font-size:13px;">
+          <div style="background:rgba(74,222,128,.1);border:1px solid #4ade80;border-radius:8px;padding:6px 14px;color:#4ade80;font-weight:700;">True</div>
+          <div style="color:#e879f9;font-weight:800;">NOT →</div>
+          <div style="background:rgba(248,113,113,.1);border:1px solid #f87171;border-radius:8px;padding:6px 14px;color:#f87171;font-weight:700;">False</div>
+        </div>
         <h4>Worked example — a truth table for A AND B</h4>
-        <p>A=True,B=True → True. A=True,B=False → False. A=False,B=True → False. A=False,B=False → False. Notice ONLY the first row (both true) gives True — that's the whole definition of AND, laid out completely.</p>`,
+        <p>A=True,B=True → True. A=True,B=False → False. A=False,B=True → False. A=False,B=False → False. Notice ONLY the first row (both true) gives True — that's the whole definition of AND, laid out completely.</p>
+        <table style="width:100%;max-width:320px;margin:14px auto;border-collapse:collapse;font-size:12.5px;">
+          <tr style="background:rgba(255,255,255,.04);"><th style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);color:#9ca3af;">A</th><th style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);color:#9ca3af;">B</th><th style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);color:#9ca3af;">A AND B</th></tr>
+          <tr style="background:rgba(74,222,128,.08);"><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;">True</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;">True</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;color:#4ade80;font-weight:800;">True</td></tr>
+          <tr><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;">True</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;">False</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;color:#f87171;">False</td></tr>
+          <tr><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;">False</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;">True</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;color:#f87171;">False</td></tr>
+          <tr><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;">False</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;">False</td><td style="padding:6px 10px;border:1px solid rgba(255,255,255,.1);text-align:center;color:#f87171;">False</td></tr>
+        </table>`,
     },
   },
   {
@@ -1382,10 +1461,34 @@ const MISSIONS = [
         { term: 'Data type', def: 'What KIND of value something is — this decides what operations even make sense on it.' },
       ],
       theory: `
+        <h4>Four data types, side by side</h4>
+        <div style="display:flex;justify-content:center;gap:10px;margin:14px 0;flex-wrap:wrap;">
+          <div style="background:#111320;border:1px solid rgba(96,165,250,.4);border-radius:10px;padding:10px 14px;text-align:center;min-width:90px;">
+            <div style="font-weight:800;color:#60a5fa;">7</div><div style="font-size:9.5px;color:#9ca3af;margin-top:3px;">INTEGER</div>
+          </div>
+          <div style="background:#111320;border:1px solid rgba(251,191,36,.4);border-radius:10px;padding:10px 14px;text-align:center;min-width:90px;">
+            <div style="font-weight:800;color:#fbbf24;">3.14</div><div style="font-size:9.5px;color:#9ca3af;margin-top:3px;">REAL (float)</div>
+          </div>
+          <div style="background:#111320;border:1px solid rgba(232,121,249,.4);border-radius:10px;padding:10px 14px;text-align:center;min-width:90px;">
+            <div style="font-weight:800;color:#e879f9;">"hello"</div><div style="font-size:9.5px;color:#9ca3af;margin-top:3px;">STRING</div>
+          </div>
+          <div style="background:#111320;border:1px solid rgba(74,222,128,.4);border-radius:10px;padding:10px 14px;text-align:center;min-width:90px;">
+            <div style="font-weight:800;color:#4ade80;">True</div><div style="font-size:9.5px;color:#9ca3af;margin-top:3px;">BOOLEAN</div>
+          </div>
+        </div>
         <h4>Why data types matter — not every operation makes sense on every type</h4>
         <p>You can add two integers (5 + 3 = 8). You can join two strings ("cat" + "fish" = "catfish"). But adding an integer to a string directly usually causes a real error — the computer genuinely doesn't know what 5 + "cat" should mean.</p>
         <h4>Quotes decide the type — not how it looks</h4>
         <p>"7" and 7 look almost identical, but they are genuinely different types. <code>7</code> is an integer; <code>"7"</code> is a string that just happens to contain a digit. This single distinction causes a huge share of real beginner bugs.</p>
+        <div style="display:flex;justify-content:center;gap:14px;margin:14px 0;">
+          <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.4);border-radius:10px;padding:10px 18px;text-align:center;">
+            <div style="font-size:20px;font-weight:800;color:#60a5fa;">7</div><div style="font-size:10px;color:#9ca3af;">integer — can do maths</div>
+          </div>
+          <div style="color:#6b7280;align-self:center;font-size:18px;">≠</div>
+          <div style="background:rgba(232,121,249,.08);border:1px solid rgba(232,121,249,.4);border-radius:10px;padding:10px 18px;text-align:center;">
+            <div style="font-size:20px;font-weight:800;color:#e879f9;">"7"</div><div style="font-size:10px;color:#9ca3af;">string — just text</div>
+          </div>
+        </div>
         <h4>Real (float) vs. Integer</h4>
         <p>Both are numbers, but an integer can NEVER have a decimal part — 7 is an integer, 7.0 is a real/float, even though they represent the same value. Division between two integers can genuinely produce a real/float result (7 ÷ 2 = 3.5).</p>`,
     },
@@ -1487,8 +1590,19 @@ const MISSIONS = [
         <p>Zoom into ANY digital photo far enough and you'll see individual squares — <b>pixels</b>. Each one stores a value, and a computer displays the whole image by reading that grid of values and colouring each pixel accordingly. There's no picture "drawn" anywhere — it's genuinely just numbers.</p>
         <h4>Monochrome — the simplest case, 1 bit per pixel</h4>
         <p>A black-and-white (monochrome) image needs only ONE bit per pixel: 0 for dark, 1 for lit — exactly the binary you've already been using. A row like "0110" is four pixels: dark, lit, lit, dark.</p>
+        <div style="display:flex;justify-content:center;margin:14px 0;">
+          <div>
+            ${['0110','1001','1001','0110'].map(row => `<div style="display:flex;">${row.split('').map(c => `<div style="width:28px;height:28px;background:${c==='1'?'#e2e8f0':'#0d0f1a'};border:1px solid rgba(255,255,255,.12);"></div>`).join('')}</div>`).join('')}
+          </div>
+        </div>
+        <p style="text-align:center;color:#9ca3af;font-size:11.5px;margin-top:-10px;">The 4×4 bitmap <code>0110 / 1001 / 1001 / 0110</code> — 16 bits total, one per pixel.</p>
         <h4>More bits = more colours (bit depth)</h4>
-        <p>1 bit only allows 2 possibilities (0 or 1). Real colour images use far more bits per pixel — 8 bits allows 256 shades of grey; 24 bits (8 each for red/green/blue) allows over 16 million real colours. More bits per pixel = more possible values = more detail, at the cost of a bigger file.</p>`,
+        <p>1 bit only allows 2 possibilities (0 or 1). Real colour images use far more bits per pixel — 8 bits allows 256 shades of grey; 24 bits (8 each for red/green/blue) allows over 16 million real colours. More bits per pixel = more possible values = more detail, at the cost of a bigger file.</p>
+        <div style="display:flex;justify-content:center;gap:12px;margin:14px 0;flex-wrap:wrap;">
+          <div style="background:#111320;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 14px;text-align:center;"><div style="font-weight:800;color:#e2e8f0;">1 bit</div><div style="font-size:10px;color:#9ca3af;">2 values (B/W)</div></div>
+          <div style="background:#111320;border:1px solid rgba(251,191,36,.4);border-radius:8px;padding:8px 14px;text-align:center;"><div style="font-weight:800;color:#fbbf24;">8 bits</div><div style="font-size:10px;color:#9ca3af;">256 grey shades</div></div>
+          <div style="background:#111320;border:1px solid rgba(74,222,128,.4);border-radius:8px;padding:8px 14px;text-align:center;"><div style="font-weight:800;color:#4ade80;">24 bits</div><div style="font-size:10px;color:#9ca3af;">16M+ colours</div></div>
+        </div>`,
     },
   },
   {
@@ -1560,8 +1674,29 @@ const MISSIONS = [
         <p>Code has to be exactly right — perfect punctuation, perfect spelling. A flowchart lets you work out the LOGIC first, in plain shapes and arrows, before worrying about getting any syntax right at all. Get the flowchart correct, and turning it into real code becomes far easier.</p>
         <h4>The standard shapes each mean something specific</h4>
         <p>A flowchart isn't just "boxes and arrows" — each shape has an agreed meaning: ovals for start/end, rectangles for a single action, diamonds for a yes/no decision, and parallelograms for input/output. Using the wrong shape for the wrong job makes a flowchart genuinely harder to read, not just "stylistically off".</p>
+        <div style="display:flex;justify-content:center;gap:14px;margin:14px 0;flex-wrap:wrap;">
+          <div style="text-align:center;"><div style="background:#111320;border:2px solid #4ade80;border-radius:999px;padding:8px 18px;color:#4ade80;font-size:11px;font-weight:700;">START/END</div><div style="font-size:9.5px;color:#9ca3af;margin-top:4px;">oval</div></div>
+          <div style="text-align:center;"><div style="background:#111320;border:2px solid #60a5fa;border-radius:4px;padding:8px 18px;color:#60a5fa;font-size:11px;font-weight:700;">add 1 to total</div><div style="font-size:9.5px;color:#9ca3af;margin-top:4px;">rectangle (process)</div></div>
+          <div style="text-align:center;"><div style="background:#111320;border:2px solid #fbbf24;transform:rotate(45deg);width:70px;height:70px;display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(-45deg);color:#fbbf24;font-size:10px;font-weight:700;">age≥18?</span></div><div style="font-size:9.5px;color:#9ca3af;margin-top:4px;">diamond (decision)</div></div>
+          <div style="text-align:center;"><div style="background:#111320;border:2px solid #e879f9;padding:8px 24px;color:#e879f9;font-size:11px;font-weight:700;transform:skewX(-12deg);">INPUT age</div><div style="font-size:9.5px;color:#9ca3af;margin-top:4px;">parallelogram</div></div>
+        </div>
         <h4>Decisions create branches</h4>
-        <p>A decision diamond is the ONLY shape with two arrows leading out of it — one for "yes", one for "no". This is exactly what an IF/ELSE becomes once you turn the flowchart into real code: the diamond is the condition, and each arrow is one branch.</p>`,
+        <p>A decision diamond is the ONLY shape with two arrows leading out of it — one for "yes", one for "no". This is exactly what an IF/ELSE becomes once you turn the flowchart into real code: the diamond is the condition, and each arrow is one branch.</p>
+        <h4>Worked example — the exact flowchart you'll trace next</h4>
+        <p>START → INPUT age → is age 18 or over? → YES: OUTPUT "Adult" / NO: OUTPUT "Minor" → END. Drawn as real shapes, the branch looks like this:</p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin:14px 0;font-size:11px;">
+          <div style="background:#111320;border:2px solid #4ade80;border-radius:999px;padding:5px 16px;color:#4ade80;">START</div>
+          <div style="color:#6b7280;">↓</div>
+          <div style="background:#111320;border:2px solid #e879f9;padding:5px 20px;color:#e879f9;transform:skewX(-12deg);">INPUT age</div>
+          <div style="color:#6b7280;">↓</div>
+          <div style="background:#111320;border:2px solid #fbbf24;transform:rotate(45deg);width:64px;height:64px;display:flex;align-items:center;justify-content:center;margin:6px 0;"><span style="transform:rotate(-45deg);color:#fbbf24;font-size:9px;font-weight:700;text-align:center;">age ≥ 18?</span></div>
+          <div style="display:flex;gap:40px;">
+            <div style="text-align:center;"><div style="color:#4ade80;font-size:9.5px;margin-bottom:2px;">YES ↓</div><div style="background:#111320;border:2px solid #60a5fa;border-radius:4px;padding:5px 12px;color:#60a5fa;">OUTPUT "Adult"</div></div>
+            <div style="text-align:center;"><div style="color:#f87171;font-size:9.5px;margin-bottom:2px;">NO ↓</div><div style="background:#111320;border:2px solid #60a5fa;border-radius:4px;padding:5px 12px;color:#60a5fa;">OUTPUT "Minor"</div></div>
+          </div>
+          <div style="color:#6b7280;">↓</div>
+          <div style="background:#111320;border:2px solid #4ade80;border-radius:999px;padding:5px 16px;color:#4ade80;">END</div>
+        </div>`,
     },
   },
   {
