@@ -1700,6 +1700,96 @@ const MISSIONS = [
     },
   },
   {
+    // Every mission from flow-p1 onward asks the student to WRITE real
+    // pseudocode, but nothing before this point ever taught the syntax —
+    // confirmed gap: a student could reach flow-p1 having only ever seen
+    // real Python (learn-cb etc. use Python-style assignment, not ←/
+    // OUTPUT). This lesson exists specifically to close that gap before
+    // the flowchart-to-code unit assumes it.
+    id: 'learn-pseudo-why', type: 'learn', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '📘', title: 'Why Pseudocode?',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'Every mission from here on asks you to write real pseudocode, not just trace a diagram. Before that, learn what pseudocode actually IS, and why it\'s worth learning as its own thing.',
+    api: [],
+    learn: {
+      videoQuery: 'what is pseudocode GCSE computer science',
+      terms: [
+        { term: 'Pseudocode', def: 'A structured, English-like way of writing an algorithm\'s logic — not a real programming language, and not tied to any one.' },
+        { term: '←  (assignment arrow)', def: 'Stores a value in a variable. Read it as "gets the value of" — age ← 15 means "age gets 15", not "age equals 15".' },
+        { term: 'OUTPUT', def: 'Displays a value — pseudocode\'s version of Python\'s print().' },
+        { term: 'Exam board pseudocode', def: 'The specific style Cambridge (and others) use in real exam papers — it\'s what this whole unit teaches.' },
+      ],
+      theory: `
+        <h4>🎯 Learning objectives</h4>
+        <ul style="margin:0 0 14px 18px;padding:0;color:#c7d2e0;">
+          <li>Explain WHY algorithms are planned in pseudocode before being written in a real language</li>
+          <li>Write a pseudocode assignment statement (<code>←</code>) and an <code>OUTPUT</code> statement</li>
+        </ul>
+        <h4>Why not just write Python straight away?</h4>
+        <p>Every real language — Python, Java, C#, JavaScript — has its own exact punctuation: Python uses <code>=</code> and indentation, others use <code>{ }</code> and semicolons. Exam boards don't want to test whether you've memorised ONE language's exact rules — they want to test whether you can design correct LOGIC. Pseudocode is deliberately language-NEUTRAL: it reads like structured English, so it works as a universal way to describe an algorithm before committing to any one real language.</p>
+        <h4>It's also what real exam papers actually use</h4>
+        <p>This isn't a made-up teaching tool — Cambridge's own IGCSE and A Level exam papers are written in pseudocode exactly like this, graded on your LOGIC, not on whether you remembered a semicolon. Every mission from here on (and the rest of this course) uses this same style.</p>
+        <h4>Assignment: storing a value in a variable</h4>
+        <div style="display:flex;justify-content:center;margin:14px 0;">
+          <div style="background:#111320;border:2px solid #60a5fa;border-radius:6px;padding:8px 20px;color:#60a5fa;font-size:13px;font-weight:700;">age ← 15</div>
+        </div>
+        <p>Read this as "age GETS 15" — the value 15 flows INTO the box named <code>age</code>. It's the exact pseudocode equivalent of Python's <code>age = 15</code>.</p>
+        <h4>OUTPUT: displaying a value</h4>
+        <div style="display:flex;justify-content:center;margin:14px 0;">
+          <div style="background:#111320;border:2px solid #e879f9;border-radius:6px;padding:8px 20px;color:#e879f9;font-size:13px;font-weight:700;">OUTPUT age</div>
+        </div>
+        <p>This displays whatever <code>age</code> currently holds — the same job as Python's <code>print(age)</code>. Together, <code>←</code> and <code>OUTPUT</code> are enough to write your first real pseudocode: <code>age ← 15</code> then <code>OUTPUT age</code> displays <b>15</b>.</p>`,
+    },
+  },
+  {
+    id: 'learn-pseudo-control', type: 'learn', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '📘', title: 'Pseudocode: Decisions & Loops',
+    hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
+    brief: 'The flowchart missions ahead use Decision diamonds and loop-back arrows constantly — here\'s how those become real pseudocode: IF, FOR, and WHILE.',
+    api: [],
+    learn: {
+      videoQuery: 'pseudocode IF FOR WHILE loops GCSE computer science',
+      terms: [
+        { term: 'IF / THEN / ELSE / ENDIF', def: 'Pseudocode\'s Decision diamond, turned into code — one arm per branch, closed with ENDIF.' },
+        { term: 'FOR / TO / NEXT', def: 'A counting loop that repeats a fixed number of times, e.g. FOR i ← 1 TO 5 ... NEXT i.' },
+        { term: 'WHILE / ENDWHILE', def: 'A loop that keeps repeating WHILE a condition stays true — used when you don\'t know the exact count in advance.' },
+        { term: 'MOD', def: 'Gives the REMAINDER after dividing — n MOD 2 = 0 tests whether n is even.' },
+      ],
+      theory: `
+        <h4>🎯 Learning objectives</h4>
+        <ul style="margin:0 0 14px 18px;padding:0;color:#c7d2e0;">
+          <li>Write an IF/THEN/ELSE/ENDIF decision in pseudocode</li>
+          <li>Write a FOR/NEXT counting loop and a WHILE/ENDWHILE condition loop</li>
+          <li>Use MOD to test divisibility (e.g. "is this number even?")</li>
+        </ul>
+        <h4>IF/THEN/ELSE/ENDIF — the Decision diamond, as code</h4>
+        <p>A flowchart's Decision diamond has exactly two arrows out of it — YES and NO. In pseudocode, that's an IF: the condition goes on the IF line, the YES branch goes under THEN, the NO branch goes under ELSE, and ENDIF closes it off.</p>
+        ${fcDiagram([
+          fcShapeHTML('decision', 'age ≥ 18?'),
+          fcBranchHTML('YES', fcShapeHTML('io', 'Output "Adult"'), 'NO', fcShapeHTML('io', 'Output "Minor"')),
+        ])}
+        <div style="background:#111320;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:10px 14px;font-size:12px;color:#c7d2e0;margin:10px 0;white-space:pre;">IF age &ge; 18 THEN
+    OUTPUT "Adult"
+ELSE
+    OUTPUT "Minor"
+ENDIF</div>
+        <h4>FOR/TO/NEXT — a loop-back arrow with a KNOWN count</h4>
+        <p>When a flowchart's loop-back arrow repeats a FIXED number of times (e.g. "do this 5 times"), that's a FOR loop. <code>i</code> counts up automatically each time round, from the first number to the last.</p>
+        <div style="background:#111320;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:10px 14px;font-size:12px;color:#c7d2e0;margin:10px 0;white-space:pre;">FOR i ← 1 TO 5
+    OUTPUT i
+NEXT i</div>
+        <p style="color:#9ca3af;font-size:11.5px;">Outputs 1, 2, 3, 4, 5 — one per line.</p>
+        <h4>WHILE/ENDWHILE — a loop-back arrow with an UNKNOWN count</h4>
+        <p>When you DON'T know in advance how many times a loop repeats — it just keeps going while some condition stays true — that's a WHILE loop. The condition is checked BEFORE each pass; once it's false, the loop stops.</p>
+        <div style="background:#111320;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:10px 14px;font-size:12px;color:#c7d2e0;margin:10px 0;white-space:pre;">n ← 5
+WHILE n &gt; 0
+    OUTPUT n
+    n ← n - 1
+ENDWHILE</div>
+        <p style="color:#9ca3af;font-size:11.5px;">Outputs 5, 4, 3, 2, 1 — then stops, since n &gt; 0 is finally false.</p>
+        <h4>MOD — testing divisibility inside a Decision</h4>
+        <p><code>MOD</code> gives you the REMAINDER after division — <code>7 MOD 2</code> is <b>1</b> (7 ÷ 2 leaves 1 left over), <code>8 MOD 2</code> is <b>0</b> (divides evenly). That makes <code>n MOD 2 = 0</code> the standard way to test "is n even?", and it's exactly what most of the Decision diamonds ahead actually check.</p>`,
+    },
+  },
+  {
     id: 'flow-p1', type: 'data', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart',
     forceLang: 'ps',
     hints: [
@@ -5883,7 +5973,8 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   'learn-binary': 'g9-binary', 'cards-make': 'g9-binary', 'cards-add': 'g9-binary', 'cardsboss': 'g9-binary',
   'cards-byte': 'g9-binary', 'bits-needed': 'g9-binary',
   p0m1: 'g9-binary', p0m2: 'g9-binary', 'learn-images': 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
-  'learn-flowcharts': 'g9-flowcharts-loops', 'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops', 'flow-code': 'g9-flowcharts-loops',
+  'learn-flowcharts': 'g9-flowcharts-loops', 'learn-pseudo-why': 'g9-flowcharts-loops', 'learn-pseudo-control': 'g9-flowcharts-loops',
+  'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops', 'flow-code': 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
   'learn-datatypes': 'g9-declarations',
   // Foundations 3 — Your First Code — also had NO mapping at all (same
@@ -6041,7 +6132,7 @@ const TIERS = [
   // is flowcharts/Flowgorithm (planning an algorithm, plus basic
   // arithmetic/IO/loops) FIRST, with real Python syntax taught right
   // after that — so FOUNDATIONS 3-7 below are now in that order instead.
-  { name: '📊 FOUNDATIONS 3 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'flow-p1', 'flow-p2', 'flow-code'] },
+  { name: '📊 FOUNDATIONS 3 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'learn-pseudo-why', 'learn-pseudo-control', 'flow-p1', 'flow-p2', 'flow-code'] },
   // flowg1-6/flowgboss existed in MISSIONS but were never registered in
   // TIERS at all — a real bug: the map (built from TIERS.map(...)) had no
   // way to show them, so they were unreachable however the game normally
