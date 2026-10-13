@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/simple.min.js"></script>
   <style>
     body { padding-top:64px; background:var(--bg); color:var(--fg); }
     .layout { display:grid; grid-template-columns:260px 1fr 320px; height:calc(100vh - 64px); overflow:hidden; }
@@ -39,6 +40,9 @@
     #editor-wrap { flex:1; overflow:hidden; }
     .CodeMirror { height:100% !important; font-size:14px; font-family:var(--mono); background:#0a0c18; }
     .CodeMirror-scroll { overflow:auto !important; }
+    .cm-error-line { background:rgba(248,113,113,.14) !important; }
+    .cm-type    { color:#56b6c2 !important; }
+    .cm-builtin { color:#61afef !important; }
 
     /* ── Right: desc + output ── */
     .right-col { display:flex; flex-direction:column; border-left:1px solid var(--border); background:var(--bg-card); overflow:hidden; }
@@ -173,6 +177,22 @@
 
     let currentEx = null;
 
+    // ── Real syntax highlighting — this is what actually makes it feel like
+    // an IDE instead of a textarea. Covers every keyword/builtin this page's
+    // own PseudocodeInterpreter (below) actually understands.
+    CodeMirror.defineSimpleMode('cambridge-pseudocode', {
+      start: [
+        { regex: /\/\/.*|#.*/, token: 'comment' },
+        { regex: /"(?:[^"\\]|\\.)*"?|'(?:[^'\\]|\\.)*'?/, token: 'string' },
+        { regex: /\b(DECLARE|OUTPUT|INPUT|IF|THEN|ELSE|ENDIF|FOR|TO|STEP|NEXT|WHILE|DO|ENDWHILE|REPEAT|UNTIL|PROCEDURE|ENDPROCEDURE|CALL|FUNCTION|ENDFUNCTION|RETURNS|RETURN|ARRAY|OF|AND|OR|NOT|MOD|DIV|TRUE|FALSE)\b/i, token: 'keyword' },
+        { regex: /\b(INTEGER|REAL|STRING|BOOLEAN|CHAR|DATE)\b/i, token: 'type' },
+        { regex: /\b(LENGTH|INT|REAL|STRING|LCASE|UCASE|SUBSTR|ROUND|ABS|SQRT)(?=\s*\()/i, token: 'builtin' },
+        { regex: /[A-Za-z_]\w*(?=\s*\()/, token: 'def' },
+        { regex: /\d+\.?\d*/, token: 'number' },
+        { regex: /←|<-|:=|<>|<=|>=|&|[=<>+\-*/^]/, token: 'operator' },
+      ],
+    });
+
     // ── Editor ──
     const DEFAULT_CODE = `// Cambridge A-Level Pseudocode Sandbox
 // Try the exercises on the left, or write your own!
@@ -187,7 +207,7 @@ NEXT i`;
 
     const editor = CodeMirror(document.getElementById('editor-wrap'), {
       value: DEFAULT_CODE,
-      mode: 'text/plain',
+      mode: 'cambridge-pseudocode',
       theme: 'dracula',
       lineNumbers: true,
       indentUnit: 4,
@@ -196,6 +216,7 @@ NEXT i`;
       extraKeys: { 'Ctrl-Enter': runPseudocode, 'Cmd-Enter': runPseudocode },
     });
     editor.setSize('100%','100%');
+    editor.on('change', () => clearErrLine());
 
     // ── Tracks which exercises have been completed (populated from Supabase on load)
     const _pcCompleted = new Set()
@@ -240,8 +261,14 @@ NEXT i`;
     // ════════════════════════════════════════════════
     //  Cambridge Pseudocode Interpreter
     // ════════════════════════════════════════════════
+    let _errLine = null;
+    function clearErrLine() {
+      if (_errLine != null) editor.removeLineClass(_errLine, 'background', 'cm-error-line');
+      _errLine = null;
+    }
     function runPseudocode() {
       clearOutput();
+      clearErrLine();
       const code = editor.getValue();
       try {
         const interp = new PseudocodeInterpreter();
@@ -251,7 +278,16 @@ NEXT i`;
         else addOutput('(no output)','sys');
         addOutput('✓ Done','ok');
         checkTests(output);
-      } catch(e) { addOutput('Error: ' + e.message, 'err'); }
+      } catch(e) {
+        const ln = e && e.ln;
+        const msg = String(e.message || e);
+        const alreadyNamesLine = /\bline\s+\d+/i.test(msg);
+        addOutput('Error: ' + msg + (ln && !alreadyNamesLine ? ' (line ' + ln + ')' : ''), 'err');
+        if (ln && ln > 0 && ln <= editor.lineCount()) {
+          _errLine = ln - 1;
+          editor.addLineClass(_errLine, 'background', 'cm-error-line');
+        }
+      }
     }
 
     function checkTests(actualOutput) {
@@ -314,76 +350,92 @@ NEXT i`;
         while (i <= end) {
           const raw = lines[i];
           const line = raw.trim();
+          const lnIdx = i;
           i++;
 
           if (!line || line.startsWith('//') || line.startsWith('#')) continue;
 
+          try { this._execLine(lines, line, lnIdx, i, (newI) => { i = newI; }) }
+          catch (e) {
+            if (e && e.isReturn) throw e
+            if (e && e.ln === undefined) { try { e.ln = lnIdx + 1 } catch (_) {} }
+            throw e
+          }
+        }
+      }
+
+      // Every real statement's dispatch — pulled out of _exec() so the try/catch
+      // above can attach a line number to ANY error thrown from any branch
+      // (previously only _findBlock's own "Missing ENDIF..." messages carried
+      // one; a bad expression deep inside an IF/FOR body reported no line at
+      // all, just "Error: ..." with nothing for a student to go on).
+      _execLine(lines, line, lnIdx, iAfter, setI) {
+          const i = iAfter;
           // DECLARE
-          if (/^DECLARE\s+/i.test(line)) { this._declare(line); continue; }
+          if (/^DECLARE\s+/i.test(line)) { this._declare(line); return; }
 
           // OUTPUT
-          if (/^OUTPUT\s+/i.test(line)) { this._output(line); continue; }
+          if (/^OUTPUT\s+/i.test(line)) { this._output(line); return; }
 
           // INPUT
-          if (/^INPUT\s+/i.test(line)) { this._input(line); continue; }
+          if (/^INPUT\s+/i.test(line)) { this._input(line); return; }
 
           // Assignment: var ← expr or var := expr or var = expr
-          if (/^[A-Za-z_]\w*(\[[^\]]+\])?\s*(←|:=|=(?!=))\s*/.test(line)) { this._assign(line); continue; }
+          if (/^[A-Za-z_]\w*(\[[^\]]+\])?\s*(←|:=|=(?!=))\s*/.test(line)) { this._assign(line); return; }
 
           // IF / THEN
           if (/^IF\s+/i.test(line)) {
             const result = this._findBlock(lines, i-1, 'IF', 'ENDIF');
-            i = result.end + 1;
+            setI(result.end + 1);
             this._execIf(lines, result.start, result.end);
-            continue;
+            return;
           }
 
           // FOR
           if (/^FOR\s+/i.test(line)) {
             const result = this._findBlock(lines, i-1, 'FOR', 'NEXT');
-            i = result.end + 1;
+            setI(result.end + 1);
             this._execFor(lines, result.start, result.end);
-            continue;
+            return;
           }
 
           // WHILE
           if (/^WHILE\s+/i.test(line)) {
             const result = this._findBlock(lines, i-1, 'WHILE', 'ENDWHILE');
-            i = result.end + 1;
+            setI(result.end + 1);
             this._execWhile(lines, result.start, result.end);
-            continue;
+            return;
           }
 
           // REPEAT
           if (/^REPEAT$/i.test(line)) {
             const result = this._findBlock(lines, i-1, 'REPEAT', 'UNTIL');
-            i = result.end + 1;
+            setI(result.end + 1);
             this._execRepeat(lines, result.start, result.end);
-            continue;
+            return;
           }
 
           // PROCEDURE def
           if (/^PROCEDURE\s+/i.test(line)) {
             const result = this._findBlock(lines, i-1, 'PROCEDURE', 'ENDPROCEDURE');
-            i = result.end + 1;
+            setI(result.end + 1);
             this._defineProc(lines, result.start, result.end);
-            continue;
+            return;
           }
 
           // FUNCTION def
           if (/^FUNCTION\s+/i.test(line)) {
             const result = this._findBlock(lines, i-1, 'FUNCTION', 'ENDFUNCTION');
-            i = result.end + 1;
+            setI(result.end + 1);
             this._defineFunc(lines, result.start, result.end);
-            continue;
+            return;
           }
 
           // CALL proc
-          if (/^CALL\s+/i.test(line)) { this._callProc(line); continue; }
+          if (/^CALL\s+/i.test(line)) { this._callProc(line); return; }
 
           // RETURN (inside func)
           if (/^RETURN\s+/i.test(line)) { throw { isReturn: true, value: this._eval(line.replace(/^RETURN\s+/i,'')) }; }
-        }
       }
 
       _declare(line) {
