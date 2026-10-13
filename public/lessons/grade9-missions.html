@@ -1706,6 +1706,19 @@ const MISSIONS = [
     api: ['answer(value)'],
     dataTitle: 'Flowchart Trace', dataFields: [],
     data: [],
+    diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin:14px 0;font-size:12px;">
+        <div style="background:#111320;border:2px solid #4ade80;border-radius:999px;padding:5px 16px;color:#4ade80;">START</div>
+        <div style="color:#6b7280;">↓</div>
+        <div style="background:#111320;border:2px solid #e879f9;padding:5px 20px;color:#e879f9;transform:skewX(-12deg);">INPUT age</div>
+        <div style="color:#6b7280;">↓</div>
+        <div style="background:#111320;border:2px solid #fbbf24;transform:rotate(45deg);width:64px;height:64px;display:flex;align-items:center;justify-content:center;margin:6px 0;"><span style="transform:rotate(-45deg);color:#fbbf24;font-size:9px;font-weight:700;text-align:center;">age ≥ 18?</span></div>
+        <div style="display:flex;gap:40px;">
+          <div style="text-align:center;"><div style="color:#4ade80;font-size:9.5px;margin-bottom:2px;">YES ↓</div><div style="background:#111320;border:2px solid #60a5fa;border-radius:4px;padding:5px 12px;color:#60a5fa;">OUTPUT "Adult"</div></div>
+          <div style="text-align:center;"><div style="color:#f87171;font-size:9.5px;margin-bottom:2px;">NO ↓</div><div style="background:#111320;border:2px solid #60a5fa;border-radius:4px;padding:5px 12px;color:#60a5fa;">OUTPUT "Minor"</div></div>
+        </div>
+        <div style="color:#6b7280;">↓</div>
+        <div style="background:#111320;border:2px solid #4ade80;border-radius:999px;padding:5px 16px;color:#4ade80;">END</div>
+      </div>`,
     starter: {
       py: '# TODO: trace the flowchart by hand for age 15, then answer() what it outputs\n',
       ps: '// TODO: trace the flowchart by hand for age 15, then answer() what it outputs\n',
@@ -5270,12 +5283,16 @@ function renderInitial() {
 
 function drawDataTable(mission) {
   const fields = mission.dataFields
-  let html = '<h3>📋 ' + (mission.dataTitle || 'Data Report') + '</h3><table class="data-table"><thead><tr>'
-    + fields.map(f => '<th>' + f + '</th>').join('') + '</tr></thead><tbody>'
-  for (const row of mission.data) {
-    html += '<tr>' + fields.map(f => '<td>' + row[f] + '</td>').join('') + '</tr>'
+  let html = '<h3>📋 ' + (mission.dataTitle || 'Data Report') + '</h3>'
+  if (mission.diagram) html += mission.diagram
+  if (fields.length || mission.data.length) {
+    html += '<table class="data-table"><thead><tr>'
+      + fields.map(f => '<th>' + f + '</th>').join('') + '</tr></thead><tbody>'
+    for (const row of mission.data) {
+      html += '<tr>' + fields.map(f => '<td>' + row[f] + '</td>').join('') + '</tr>'
+    }
+    html += '</tbody></table>'
   }
-  html += '</tbody></table>'
   document.getElementById('data-wrap').innerHTML = html
 }
 
