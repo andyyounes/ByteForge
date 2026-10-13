@@ -1700,31 +1700,38 @@ const MISSIONS = [
     },
   },
   {
-    id: 'flow-p1', type: 'data', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart',
-    hints: ["Follow the arrows exactly as written: is 15 \"18 or over\"? No — so take the NO branch."], xp: 25,
-    brief: 'Follow this flowchart by hand: START → INPUT someone\'s age → DECISION: is age 18 or over? → YES: OUTPUT "Adult" → NO: OUTPUT "Minor" → END. With the age 15, what does it output? answer() the result.',
-    api: ['answer(value)'],
-    dataTitle: 'Flowchart Trace', dataFields: [],
-    data: [],
-    diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin:14px 0;font-size:12px;">
-        <div style="background:#111320;border:2px solid #4ade80;border-radius:999px;padding:5px 16px;color:#4ade80;">START</div>
-        <div style="color:#6b7280;">↓</div>
-        <div style="background:#111320;border:2px solid #e879f9;padding:5px 20px;color:#e879f9;transform:skewX(-12deg);">INPUT age</div>
-        <div style="color:#6b7280;">↓</div>
-        <div style="background:#111320;border:2px solid #fbbf24;transform:rotate(45deg);width:64px;height:64px;display:flex;align-items:center;justify-content:center;margin:6px 0;"><span style="transform:rotate(-45deg);color:#fbbf24;font-size:9px;font-weight:700;text-align:center;">age ≥ 18?</span></div>
-        <div style="display:flex;gap:40px;">
-          <div style="text-align:center;"><div style="color:#4ade80;font-size:9.5px;margin-bottom:2px;">YES ↓</div><div style="background:#111320;border:2px solid #60a5fa;border-radius:4px;padding:5px 12px;color:#60a5fa;">OUTPUT "Adult"</div></div>
-          <div style="text-align:center;"><div style="color:#f87171;font-size:9.5px;margin-bottom:2px;">NO ↓</div><div style="background:#111320;border:2px solid #60a5fa;border-radius:4px;padding:5px 12px;color:#60a5fa;">OUTPUT "Minor"</div></div>
-        </div>
-        <div style="color:#6b7280;">↓</div>
-        <div style="background:#111320;border:2px solid #4ade80;border-radius:999px;padding:5px 16px;color:#4ade80;">END</div>
-      </div>`,
-    starter: {
-      py: '# TODO: trace the flowchart by hand for age 15, then answer() what it outputs\n',
-      ps: '// TODO: trace the flowchart by hand for age 15, then answer() what it outputs\n',
+    id: 'flow-p1', type: 'flowchart', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart',
+    hints: [
+      "The Declare shape just needs a data type + a name, e.g. \"Integer age\" — the engine only reads the LAST word as the variable name.",
+      "The Assign shape needs \"variable = value\" exactly, e.g. age = 15 — that's how you set someone's age to 15.",
+      "An Output shape needs \"Output\" followed by what to print, e.g. Output \"Minor\" (with the quotes, since it's text).",
+      "Is 15 \"18 or over\"? No — so when you Run it, the flow should take the False branch down to the Minor output.",
+    ],
+    xp: 30,
+    brief: 'The shapes and arrows are already built for you — this flowchart checks if someone\'s age makes them an Adult or a Minor. '
+      + 'Click each blank shape\'s text to fill it in: <b>declare</b> age as an Integer, <b>assign</b> it the value 15, then make each <b>Output</b> shape print the right word for its branch. '
+      + 'Press ▶ Run to test it and read the output — if it\'s wrong, the error (or the wrong result) tells you which shape to fix.',
+    flowchart: {
+      intro: 'Every shape and arrow is already placed and connected. Click a blank shape\'s text to fill it in, press ▶ Run to test, then Submit once it outputs the right thing.',
+      prebuilt: {
+        shapes: [
+          { id: 1, type: 'terminator', label: 'Start', x: 270, y: 10 },
+          { id: 2, type: 'declare', label: 'fill in: data type + name', x: 230, y: 80 },
+          { id: 3, type: 'process', label: 'fill in: variable = value', x: 230, y: 150 },
+          { id: 4, type: 'decision', label: 'age >= 18', x: 255, y: 220 },
+          { id: 5, type: 'io', label: 'fill in: Output ???', x: 60, y: 330 },
+          { id: 6, type: 'io', label: 'fill in: Output ???', x: 420, y: 330 },
+          { id: 7, type: 'terminator', label: 'End', x: 270, y: 400 },
+        ],
+        conns: [
+          { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 },
+          { from: 4, to: 5, label: 'True' }, { from: 4, to: 6, label: 'False' },
+          { from: 5, to: 7 }, { from: 6, to: 7 },
+        ],
+      },
+      minShapes: 7, minConnections: 7, requiresDecision: true,
+      expectedOutput: ['Minor'],
     },
-    answer: 'Minor',
-    stars: { metric: 'pass' },
   },
   {
     id: 'flow-p2', type: 'data', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '💠', title: 'Which Shape?',
@@ -4908,6 +4915,29 @@ function clearFlowchart() {
   document.getElementById('fc-svg').innerHTML = ''
   document.getElementById('fc-status').textContent = 'Drag shapes to reposition. Click a shape\'s text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.'
   document.getElementById('fc-run-output').textContent = ''
+  const prebuilt = activeMission?.flowchart?.prebuilt
+  if (prebuilt) loadPrebuiltFlowchart(prebuilt)
+}
+// Trace-style missions (flow-p1) give the student the shapes and arrows
+// already placed and wired up — only the blank labels need filling in.
+// Reuses addShape() for the real DOM/shape bookkeeping, then overwrites
+// its default label and remaps the mission's own small ids to the ids
+// addShape assigned, so the mission's conns[] can be wired up correctly.
+function loadPrebuiltFlowchart(prebuilt) {
+  const idMap = {}
+  prebuilt.shapes.forEach(s => {
+    addShape(s.type, { x: s.x, y: s.y })
+    const newId = _fcNextId - 1
+    idMap[s.id] = newId
+    const shape = _fcShapes.find(sh => sh.id === newId)
+    shape.label = s.label
+    const labelEl = document.querySelector('.fc-shape[data-id="' + newId + '"] .fc-label')
+    if (labelEl) labelEl.textContent = s.label
+  })
+  prebuilt.conns.forEach(c => {
+    _fcConns.push({ from: idMap[c.from], to: idMap[c.to], label: c.label })
+  })
+  drawConnections()
 }
 // ── Right-click-to-add — records where on the canvas the menu was opened
 // (in canvas-local coordinates, matching how dragged/placed shapes are
