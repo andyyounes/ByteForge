@@ -936,6 +936,7 @@ const MISSIONS = [
       ps: '// A variable stores a value so your code can use it later.\n// The ← arrow means "store this value" — read it as "becomes".\nscore ← 10\n\n// TODO: answer() the value stored in score\n',
     },
     answer: 10,
+    requireCode: { re: /answer\s*\(\s*score\s*\)/i, msg: 'answer() must be called with the score VARIABLE, not a typed-in number — answer(score), not answer(10).' },
     stars: { metric: 'pass' },
   },
   {
@@ -950,6 +951,7 @@ const MISSIONS = [
       ps: '// Text values ("strings") need quotes around them — numbers don\'t.\ncallsign ← "Nova"\n\n// TODO: answer() the value stored in callsign\n',
     },
     answer: 'Nova',
+    requireCode: { re: /answer\s*\(\s*callsign\s*\)/i, msg: 'answer() must be called with the callsign VARIABLE, not a typed-in string — answer(callsign), not answer("Nova").' },
     stars: { metric: 'pass' },
   },
   {
@@ -964,6 +966,7 @@ const MISSIONS = [
       ps: 'a ← 4\nb ← 7\n// TODO: answer() a + b (add the two variables together)\n',
     },
     answer: 11,
+    requireCode: { re: /\ba\s*\+\s*b\b/, msg: 'this mission requires you to actually ADD a + b in your code — don\'t just type the final number into answer().' },
     stars: { metric: 'pass' },
   },
   {
@@ -978,6 +981,7 @@ const MISSIONS = [
       ps: 'first  ← "Systems "\nsecond ← "Online"\n// TODO: answer() first + second (joins the two pieces of text together)\n',
     },
     answer: 'Systems Online',
+    requireCode: { re: /first\s*\+\s*second/i, msg: 'this mission requires you to actually JOIN first + second in your code — don\'t just type the final text into answer().' },
     stars: { metric: 'pass' },
   },
   {
@@ -995,6 +999,7 @@ const MISSIONS = [
       ps: 'health ← 100\n// TODO: update health by subtracting 30, then answer() the new value\n',
     },
     answer: 70,
+    requireCode: { re: /health\s*[=←]\s*health\s*-\s*30/i, msg: 'this mission requires you to actually REASSIGN health (health = health - 30) — don\'t just type the final number into answer().' },
     stars: { metric: 'pass' },
   },
   {
@@ -1012,6 +1017,7 @@ const MISSIONS = [
       ps: 'score ← 85\n// TODO: passed ← score >= 50\n// TODO: answer() passed\n',
     },
     answer: 'True',
+    requireCode: { re: /score\s*>=\s*50/i, msg: 'this mission requires you to actually WRITE the comparison score >= 50 — don\'t just type True into answer().' },
     stars: { metric: 'pass' },
   },
   // ── Added 2026-10-13, real user report: this track taught variables,
@@ -1123,6 +1129,7 @@ const MISSIONS = [
       ps: 'callsign ← "Nova"\nhealth ← 100\nhealth ← health - 25\n// TODO: answer() callsign + " has " + health + " HP"\n// + joins text and a number automatically — no separate conversion needed\n',
     },
     answer: 'Nova has 75 HP',
+    requireCode: { re: /(?=.*callsign)(?=.*health)/is, msg: 'this mission requires you to actually BUILD the message from callsign and health — don\'t just type the final text into answer().' },
     stars: { metric: 'pass' },
   },
   {
@@ -1140,6 +1147,7 @@ const MISSIONS = [
       ps: 'callsign ← "Nova"\nscore ← 120\ncomplete ← score >= 100\n// TODO: msg ← callsign + ": " + score + " points, complete=" + complete\n// TODO: answer(msg)\n// + joins text, numbers, and True/False together automatically\n',
     },
     answer: 'Nova: 120 points, complete=True',
+    requireCode: { re: /(?=.*callsign)(?=.*score)(?=.*complete)/is, msg: 'this mission requires you to actually BUILD the message from callsign, score, and complete — don\'t just type the final text into answer().' },
     stars: { metric: 'pass' },
   },
   {
@@ -1157,6 +1165,11 @@ const MISSIONS = [
       ps: 'lives ← 3\n// BROKEN: this line would crash — you cannot join text and a number directly\n// TODO: fix it (convert lives to text first) then answer() "Lives: 3"\n',
     },
     answer: 'Lives: 3',
+    // Case-SENSITIVE on purpose: a hardcoded answer("Lives: 3") capitalizes
+    // "Lives" (it's the start of a sentence), so a case-sensitive match on
+    // the real lowercase `lives` variable correctly rejects that cheat
+    // without rejecting genuine uses of the variable.
+    requireCode: { re: /\blives\b/, msg: 'this mission requires you to actually use the lives variable — don\'t just type the final text into answer().' },
     stars: { metric: 'pass' },
   },
 
@@ -3417,7 +3430,6 @@ function evalDataSuccess(mission, val) {
 
 // Mission requirements — a route that "works" without the concept doesn't pass
 function checkRequire(mission, code) {
-  if (!mission.require) return null
   if (mission.require === 'loop' && !/\b(for|while)\b/i.test(code))
     return 'this mission requires a LOOP — rewrite the repeated commands with one.'
   if (mission.require === 'if' && !/\bif\b/i.test(code))
@@ -3432,6 +3444,14 @@ function checkRequire(mission, code) {
     if (matches.length < 2)
       return 'you defined ' + def[1] + '() but never called it — call your own function instead of just declaring it.'
   }
+  // requireCode: a generic structural guard independent of (and stackable
+  // with) the single `require` field above — added 2026-10-13 after a real
+  // user report that e.g. cb3 ("Do the Math") accepted a bare answer(11)
+  // with the actual a + b logic never written. Every mission below pairs
+  // its own { re, msg } so a hardcoded final value fails even though
+  // evalDataSuccess() would otherwise call it correct.
+  if (mission.requireCode && !mission.requireCode.re.test(code))
+    return mission.requireCode.msg
   return null
 }
 
