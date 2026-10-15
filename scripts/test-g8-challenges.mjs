@@ -182,6 +182,7 @@ const webMaximalLog = () => ({
   bgColor: 'rgb(255, 247, 230)', headingColor: 'rgb(47, 59, 82)',
   h2Color: 'rgb(124, 58, 237)', h3Color: 'rgb(5, 150, 105)', pColor: 'rgb(75, 85, 99)',
   linkColor: 'rgb(29, 78, 216)', buttonBg: 'rgb(230, 57, 70)', buttonColor: 'rgb(255, 255, 255)',
+  linkBg: 'rgb(79, 70, 229)', linkPadTop: 10, linkDecoration: 'none',
   hasVariable: true, imgCount: 1, imgAltOk: true, pageTitle: 'My Favorite Animal' })
 const webEmptyLog   = () => ({ html: '', js: '', globals: {}, bodyText: '', hasArray: false, hasObject: false, hasPush: false,
   hasFunction: false, functionCount: 0, hasReturn: false, hasIf: false,
@@ -193,6 +194,7 @@ const webEmptyLog   = () => ({ html: '', js: '', globals: {}, bodyText: '', hasA
   paragraphs: 0, buttons: 0, links: 0,
   headingText: [], paragraphText: [], bgColor: '', headingColor: '',
   h2Color: '', h3Color: '', pColor: '', linkColor: '', buttonBg: '', buttonColor: '',
+  linkBg: '', linkPadTop: 0, linkDecoration: '',
   hasVariable: false, imgCount: 0, imgAltOk: false, pageTitle: '',
   divs: [], landmarks: [], tables: [], media: { audio: [], video: [] },
   meta: { hasCharset: false, hasViewport: false, description: '', keywords: '', og: { title: '', description: '', image: '' } },

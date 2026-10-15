@@ -747,6 +747,13 @@ function buildWebLog(doc, win, html, css, js) {
     linkColor: doc.querySelector('a') ? getComputedStyle(doc.querySelector('a')).color : '',
     buttonColor: doc.querySelector('button') ? getComputedStyle(doc.querySelector('button')).color : '',
     buttonBg: doc.querySelector('button') ? getComputedStyle(doc.querySelector('button')).backgroundColor : '',
+    // "Link Styled Like a Button" (web4d) — a real link can't be nested
+    // inside a button (invalid HTML, interactive content can't nest), so
+    // the real-world technique is styling the <a> itself: a fill color, real
+    // padding (not just the inline default), and the underline removed.
+    linkBg:        doc.querySelector('a') ? getComputedStyle(doc.querySelector('a')).backgroundColor : '',
+    linkPadTop:    doc.querySelector('a') ? parseFloat(getComputedStyle(doc.querySelector('a')).paddingTop) || 0 : 0,
+    linkDecoration: doc.querySelector('a') ? getComputedStyle(doc.querySelector('a')).textDecorationLine : '',
     // "Your First Page" module — images. altOk requires a REAL, non-empty
     // alt on every single img (not just the first) — an image with a blank
     // alt="" is a common near-miss this specifically catches.
@@ -2695,6 +2702,39 @@ const MODULES = [
         { type:'match', prompt:'Which display value lets two boxes sit on one line AND keep a width and height?', options: ['inline', 'block', 'none', 'inline-block'], answer: 'inline-block' },
       ],
       check:(log) => log.quizCorrect >= 3,
+    },
+    // A genuinely different technique from everything else in this module:
+    // real sites make a PRIMARY action (Sign Up, Buy Now) look like a
+    // button even though it's really navigation — and it's done by styling
+    // the <a> itself, never by nesting a <button> inside it or an <a>
+    // inside a <button> (both are invalid HTML — interactive content can't
+    // nest inside other interactive content). Sits right after block vs
+    // inline, since it reuses that exact idea on a real <a>.
+    { id:'divs4b', name:'A Link Styled Like a Button', xp:30, lang:'web',
+      text:`<strong>Challenge</strong> — Real sites often make an important link (Sign Up, Buy Now) LOOK like a button, even though it's still really just navigation. Style the <code>.cta</code> link below so it looks like a real button: a <b>background-color</b>, <b>padding</b> (at least 8px), and <b>no underline</b>.
+        <h4>Why not just put a &lt;button&gt; around it?</h4>
+        <p>You can't — a link can't legally go INSIDE a button, or a button inside a link. Both count as "interactive content", and HTML doesn't allow nesting interactive content inside other interactive content. Styling the <code>&lt;a&gt;</code> itself is the real, correct technique.</p>
+        <h4>Do it in these steps</h4>
+        ${figStepList([
+          'Click the <b>CSS</b> tab. Find the grey TODO comment and the <code>.cta { }</code> rule below it.',
+          'Add the fill: <code>background-color: #4F46E5;</code>',
+          'Add the inside space: <code>padding: 10px 18px;</code> — this is what makes it feel like a real button, not just colored text.',
+          'Add <code>text-decoration: none;</code> — without this, the default underline makes it still look like a link.',
+          'Add <code>display: inline-block;</code> — this is the SAME idea from the last stage: padding on a plain inline <code>&lt;a&gt;</code> can look squashed, inline-block fixes that.',
+          'Press <b>▶ Run</b>. Your link should now look exactly like a button — but it\'s still a real <code>&lt;a&gt;</code> underneath.',
+        ])}
+        ${figCode('.cta {\n  background-color: #4F46E5;\n  padding: 10px 18px;\n  text-decoration: none;\n  display: inline-block;\n}')}`,
+      hints:[
+        'background-color + padding is what makes it LOOK like a button.',
+        'text-decoration: none; removes the link\'s default underline.',
+        'A link and a button can never be nested inside each other — style the <a>, don\'t try to wrap one.',
+      ],
+      webStarter: {
+        html: `<h1>My Page</h1>\n<p>Check out this link!</p>\n<a href="#" class="cta">Sign Up</a>\n`,
+        css: `body { font-family: sans-serif; }\n/* TODO: .cta { background-color: ...; padding: ...; text-decoration: none; display: inline-block; } */\n`,
+        js: ``,
+      },
+      check:(log) => hasFillColor(log.linkBg) && log.linkPadTop >= 6 && log.linkDecoration === 'none',
     },
     { id:'divs5', name:'Side by Side', xp:35, lang:'web',
       text:`<strong>Challenge</strong> — The two boxes below are stacked, because divs are block-level. Make them sit <b>side by side on the same row</b>. (The first CSS line, <code>* { box-sizing: border-box; }</code>, is already there: it makes a box's width include its padding and border, so two 45% boxes really do fit in one row.)
@@ -8153,6 +8193,11 @@ const CHALLENGE_LESSON = {
     <div class="cl-block"><h4>block stacks, inline-block sits in a row</h4>
       ${figBlockVsRow()}
       <p>Divs are block-level, so they start a new line and stack. Setting <code>display: inline-block</code> lets boxes sit next to each other while keeping their width and height. Inline elements like <code>&lt;span&gt;</code> and <code>&lt;a&gt;</code> flow inside text and ignore width and height.</p></div>` },
+  divs4b: { title: 'Styling a link so it LOOKS like a button', html: `
+    <div class="cl-block"><h4>Never nest — style instead</h4>
+      <p>A link can't legally go inside a button, and a button can't go inside a link — both are "interactive content", and HTML forbids nesting interactive content inside other interactive content. The real technique real sites use is styling the <code>&lt;a&gt;</code> directly: background-color + padding for the button look, text-decoration: none to drop the underline.</p></div>
+    <div class="cl-block"><h4>Why inline-block matters here too</h4>
+      <p>A plain <code>&lt;a&gt;</code> is inline by default (from the last stage) — padding on an inline element can look squashed or overlap neighbouring lines. display: inline-block keeps it in the flow of the page like inline does, but lets padding behave properly like a block does.</p></div>` },
   divs5: { title: 'Two boxes on one row', html: `
     <div class="cl-block"><h4>Change display, then check the result</h4>
       ${figBlockVsRow()}
