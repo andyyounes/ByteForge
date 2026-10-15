@@ -817,6 +817,17 @@ function buildWebLog(doc, win, html, css, js) {
       const target = doc.getElementById(l.getAttribute('for'))
       return target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')
     }),
+    // Advanced Forms, part 2 — checkboxes (pick ANY number, unlike radio's
+    // exactly-one), <select>/<option> dropdowns, and <fieldset>/<legend>
+    // grouping. legendInsideFieldsetOk mirrors labelForOk's correctness
+    // check: a <legend> floating outside any <fieldset> doesn't actually
+    // caption a group, it's just a stray tag.
+    checkboxCount: doc.querySelectorAll('input[type="checkbox"]').length,
+    selectCount:   doc.querySelectorAll('select').length,
+    optionCount:   doc.querySelectorAll('select option').length,
+    fieldsetCount: doc.querySelectorAll('fieldset').length,
+    legendCount:   doc.querySelectorAll('legend').length,
+    legendInsideFieldsetOk: doc.querySelectorAll('fieldset > legend, fieldset legend').length > 0,
     hasNumberConvert: /\bNumber\s*\(/.test(js),
     hasToFixed:       /\.toFixed\s*\(/.test(js),
     hasValueRead:     /\.value\b/.test(js),
@@ -957,7 +968,12 @@ function runClickTest(doc, log, mission) {
   if (mission && mission.testInputs) {
     for (const [id, val] of Object.entries(mission.testInputs)) {
       const el = doc.getElementById(id)
-      if (el) el.value = val
+      if (!el) continue
+      // Checkboxes/radios are read via .checked (a boolean), not .value —
+      // setting .value on one does nothing, so a checkbox-reading exercise
+      // could never be behaviorally tested without this branch.
+      if (el.type === 'checkbox' || el.type === 'radio') el.checked = !!val
+      else el.value = val
     }
   }
   const btn = mission && mission.testButtonId ? doc.getElementById(mission.testButtonId) : doc.querySelector('button')
@@ -5227,6 +5243,127 @@ let bill = billInput.value;</pre>
       },
       check:(log) => log.emailInputCount >= 1 && log.requiredCount >= 1 && log.dateInputCount >= 1 && log.textareaCount >= 1 && log.labelForOk,
     },
+    // ── Advanced Forms, part 2 — checkboxes, <select>/<option>, and
+    // <fieldset>/<legend>. A real gap: radio ("pick exactly one") was taught
+    // but checkbox ("pick any number") never was, and the dropdown is a
+    // whole separate element students hadn't met at all.
+    { id:'afq3', name:'Checkboxes — Pick ANY Number, Not Just One', xp:25, type:'quiz',
+      text:`<h4>Radio = exactly one. Checkbox = zero, one, or many.</h4>
+        <p>A radio group forces exactly ONE choice — picking a second one un-picks the first. A <code>&lt;input type="checkbox"&gt;</code> is different: each one is completely independent, so a visitor can tick none, one, or every single one.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">&lt;input type="checkbox" id="pepperoni" value="Pepperoni"&gt; Pepperoni
+&lt;input type="checkbox" id="mushroom" value="Mushroom"&gt; Mushroom</pre>
+        <h4>Reading it: .checked, not .value</h4>
+        <p>A checkbox's <code>.value</code> is just its fixed label text, always there whether it's ticked or not. What actually changed is <code>.checked</code> — <code>true</code> or <code>false</code> — read it on EACH checkbox separately, since (unlike radio) they don't share one single answer.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">if (document.getElementById("pepperoni").checked) {
+  // this ONE box is ticked
+}</pre>`,
+      hints:['Radio buttons: picking one un-picks the others in its group. Checkboxes: completely independent.', '.checked is the one that changes (true/false) — .value is just the fixed label text.', 'Check each checkbox separately — there\'s no single "the answer" like a radio group has.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'How many checkboxes out of a group of 5 can a visitor tick?', options: ['Any number — zero up to all five', 'Exactly one', 'Exactly two', 'At least one, forced'], answer: 'Any number — zero up to all five' },
+        { type:'match', prompt:'Which property tells you whether ONE SPECIFIC checkbox is ticked?', options: ['.checked', '.value', '.selected', '.active'], answer: '.checked' },
+        { type:'match', prompt:'Why read .checked on EACH checkbox separately, unlike a radio group?', options: ['Checkboxes are independent — there\'s no single shared answer', '.checked doesn\'t work on checkboxes', 'Checkboxes must share a name like radios do', 'You can only read the first checkbox'], answer: 'Checkboxes are independent — there\'s no single shared answer' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'afs4', name:'Build the Checkboxes', xp:35, lang:'web',
+      text:`<strong>Challenge 4</strong> — Three toppings are already there as checkboxes. When <code>#orderBtn</code> is clicked, show whichever ones are <code>.checked</code> in <code>#story</code> — skip the ones that aren't.`,
+      hints:[
+        'const pepperoni = document.getElementById("pepperoni"); — grab each checkbox once, outside the handler.',
+        'if (pepperoni.checked) { /* include "Pepperoni" */ } — check each box separately.',
+        'Build up a result string (or array) as you check each one, then show it in #story.',
+      ],
+      webStarter: {
+        html: `<h1>Pizza Toppings</h1>\n<input type="checkbox" id="pepperoni" value="Pepperoni"> Pepperoni<br>\n<input type="checkbox" id="mushroom" value="Mushroom"> Mushroom<br>\n<input type="checkbox" id="olives" value="Olives"> Olives<br>\n<button id="orderBtn">See My Order</button>\n<p id="story"></p>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `const pepperoni = document.getElementById("pepperoni");\nconst mushroom = document.getElementById("mushroom");\nconst olives = document.getElementById("olives");\nconst orderBtn = document.getElementById("orderBtn");\n\n// TODO: orderBtn click — show whichever of the three are .checked in #story\n`,
+      },
+      testInputs: { pepperoni: true, olives: true },
+      testButtonId: 'orderBtn',
+      check:(log) => log.checkboxCount >= 3 && log.hasClick
+        && /Pepperoni/.test(log.bodyTextAfterClick) && /Olives/.test(log.bodyTextAfterClick) && !/Mushroom/.test(log.bodyTextAfterClick),
+    },
+    { id:'afq4', name:'The Dropdown — <select> and <option>', xp:25, type:'quiz',
+      text:`<h4>A <select> is a whole different element from <input></h4>
+        <p>A dropdown is built from TWO tags working together: <code>&lt;select&gt;</code> is the box itself, and each <code>&lt;option&gt;</code> inside it is one choice. A visitor can only ever pick one — a dropdown behaves like a very compact radio group.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">&lt;select id="plan"&gt;
+  &lt;option value="Basic"&gt;Basic&lt;/option&gt;
+  &lt;option value="Premium"&gt;Premium&lt;/option&gt;
+&lt;/select&gt;</pre>
+        <h4>Reading it: exactly like any other .value</h4>
+        <p>The whole <code>&lt;select&gt;</code> has a single <code>.value</code> — whichever <code>&lt;option&gt;</code>'s value the visitor currently has selected. Read it off the <code>&lt;select&gt;</code> itself, never off an individual <code>&lt;option&gt;</code>.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">document.getElementById("plan").value   // "Basic", "Premium", whichever is picked</pre>`,
+      hints:['<select> is the dropdown box; each <option> inside it is one choice.', 'Only ONE option can ever be selected — same idea as a radio group, more compact.', 'Read .value on the <select> itself, not on any one <option>.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'Which tag is the dropdown box itself, with each choice written inside it?', options: ['<select>', '<option>', '<input>', '<dropdown>'], answer: '<select>' },
+        { type:'match', prompt:'How many <option>s can be selected in a <select> at once?', options: ['Exactly one', 'Any number', 'None by default', 'Two'], answer: 'Exactly one' },
+        { type:'match', prompt:'Where do you read .value to find out which option is currently picked?', options: ['On the <select> itself', 'On each <option> separately', 'On the <body>', 'On the <form>'], answer: 'On the <select> itself' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'afs5', name:'Build the Dropdown', xp:35, lang:'web',
+      text:`<strong>Challenge 5</strong> — Build a <code>&lt;select id="plan"&gt;</code> with three options — <b>Basic</b>, <b>Premium</b>, and <b>Pro</b> (use those exact words as both the value and the visible text). When <code>#chooseBtn</code> is clicked, show the selected plan in <code>#story</code>.`,
+      hints:[
+        '<select id="plan"><option value="Basic">Basic</option><option value="Premium">Premium</option><option value="Pro">Pro</option></select>',
+        'document.getElementById("plan").value gives whichever option is currently selected.',
+        'Show it in #story the same way earlier stages did.',
+      ],
+      webStarter: {
+        html: `<h1>Choose Your Plan</h1>\n<!-- TODO: a <select id="plan"> with 3 options: Basic, Premium, Pro -->\n<button id="chooseBtn">Confirm</button>\n<p id="story"></p>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: `const chooseBtn = document.getElementById("chooseBtn");\n\n// TODO: chooseBtn click — read the #plan select's value, show it in #story\n`,
+      },
+      testInputs: { plan: 'Premium' },
+      testButtonId: 'chooseBtn',
+      check:(log) => log.selectCount >= 1 && log.optionCount >= 3 && log.hasClick && /Premium/.test(log.bodyTextAfterClick),
+    },
+    { id:'afq5', name:'Fieldset & Legend — Grouping Related Controls', xp:20, type:'quiz',
+      text:`<h4>A visible box AND a real caption for a group</h4>
+        <p>Three loose radio buttons on a page don't visually say "these belong together" — <code>&lt;fieldset&gt;</code> draws a real box around a group of related controls, and <code>&lt;legend&gt;</code> gives that box a caption, sitting right on its border.</p>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">&lt;fieldset&gt;
+  &lt;legend&gt;Pick a season&lt;/legend&gt;
+  &lt;input type="radio" name="season" value="Summer"&gt; Summer
+  &lt;input type="radio" name="season" value="Winter"&gt; Winter
+&lt;/fieldset&gt;</pre>
+        <p><code>&lt;legend&gt;</code> only means something as the FIRST thing inside a <code>&lt;fieldset&gt;</code> — on its own it's just an unstyled piece of text, and a screen reader announces it before reading out the group, so a visitor using one hears "Pick a season" before the individual options.</p>`,
+      hints:['<fieldset> draws a box around a group of related controls.', '<legend> must be the first thing INSIDE a <fieldset> to actually caption it.', 'A <legend> outside any <fieldset> is just plain text — it does nothing.'],
+      passCount:3,
+      questions: [
+        { type:'match', prompt:'What does <fieldset> do?', options: ['Draws a box grouping related controls together', 'Validates a form', 'Submits the form', 'Changes an input\'s color'], answer: 'Draws a box grouping related controls together' },
+        { type:'match', prompt:'Where must a <legend> be written to actually caption its group?', options: ['As the first thing inside a <fieldset>', 'Anywhere at all on the page', 'After the closing </fieldset>', 'Inside each individual input'], answer: 'As the first thing inside a <fieldset>' },
+        { type:'match', prompt:'What does a screen reader do with a correctly-placed <legend>?', options: ['Announces it before reading the group\'s controls', 'Ignores it completely', 'Reads it after every single option', 'Only reads it if clicked'], answer: 'Announces it before reading the group\'s controls' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
+    { id:'afs6', name:'Group It With Fieldset', xp:30, lang:'web',
+      text:`<strong>Challenge 6</strong> — The three radio buttons below are loose. Wrap them in a <code>&lt;fieldset&gt;</code> with a <code>&lt;legend&gt;</code> captioning the group.`,
+      hints:[
+        '<fieldset> goes AROUND all three radio buttons — opening before the first, closing after the last.',
+        '<legend>Pick a season</legend> must be the very first thing inside the <fieldset>.',
+      ],
+      webStarter: {
+        html: `<h1>Survey</h1>\n<!-- TODO: wrap these three in a <fieldset> with a <legend> -->\n<input type="radio" name="season" value="Summer"> Summer<br>\n<input type="radio" name="season" value="Winter"> Winter<br>\n<input type="radio" name="season" value="Spring"> Spring<br>\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: ``,
+      },
+      check:(log) => log.fieldsetCount >= 1 && log.legendCount >= 1 && log.legendInsideFieldsetOk && log.radioInputCount >= 3,
+    },
+    { id:'afboss2', name:'BOSS — Dropdown, Checkboxes, and a Grouped Fieldset', xp:70, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Build an order form with: a <code>&lt;select id="size"&gt;</code> (3+ size options), at least TWO checkboxes for toppings, and a <code>&lt;fieldset&gt;</code> with a <code>&lt;legend&gt;</code> wrapping THREE radio buttons (<code>name="crust"</code>) for crust type.`,
+      hints:[
+        'This is genuinely just the last three challenges, combined on one page.',
+        'The <select> needs 3+ real <option>s; the radios need a shared name AND a fieldset/legend around them.',
+        'Count before you check: 1 select with 3+ options, 2+ checkboxes, 3 radios inside a captioned fieldset.',
+      ],
+      webStarter: {
+        html: `<!-- TODO: a <select id="size"> with 3+ options, 2+ topping checkboxes, and a <fieldset>+<legend> wrapping 3 crust radio buttons (name="crust") -->\n`,
+        css: `body { font-family: sans-serif; padding: 12px; }\n`,
+        js: ``,
+      },
+      check:(log) => log.selectCount >= 1 && log.optionCount >= 3 && log.checkboxCount >= 2
+        && log.fieldsetCount >= 1 && log.legendCount >= 1 && log.legendInsideFieldsetOk && log.radioInputCount >= 3,
+    },
   ]},
   { id:'web5e', name:'📱 Responsive Design — One Page, Every Screen', sub:'@media queries, mobile-first thinking, and making layout genuinely adapt to screen width', live:true, stages:[
     { id:'respq0', name:'The Same Page, a Different Screen Width', xp:25, type:'quiz',
@@ -8114,6 +8251,27 @@ const CHALLENGE_LESSON = {
   afsboss: { title: 'BOSS — every Advanced Forms idea in one form', html: `
     <div class="cl-block"><h4>Specific types + required + textarea + a real label link</h4>
       <p>A production signup form combines all of it at once: the right input type for each answer, required where an answer is mandatory, a textarea for anything longer than one line, and labels genuinely linked by for/id — not just placed nearby.</p></div>` },
+  afq3: { title: 'Independent boxes, each with their own true/false', html: `
+    <div class="cl-block"><h4>Radio shares an answer; checkboxes don\'t</h4>
+      <p>A radio group's buttons are connected by a shared name — only one can ever be true at once. Checkboxes have no such link: each one's .checked is its own independent true/false, which is exactly why "pick any number, including none" is possible.</p></div>` },
+  afs4: { title: 'Read each checkbox, build up the result', html: `
+    <div class="cl-block"><h4>if (box.checked) — one at a time</h4>
+      <p>There\'s no single ".value" for the whole group like radio has — you check each checkbox's .checked individually and only include the ones that are true, skipping the ones that aren\'t.</p></div>` },
+  afq4: { title: '<select> + <option> — one element made of many', html: `
+    <div class="cl-block"><h4>The box and its choices are different tags</h4>
+      <p><select> is the dropdown itself; each <option> inside it is one possible answer. Reading .value on the <select> always gives you whichever single option is currently picked — never read it off an <option> directly.</p></div>` },
+  afs5: { title: 'A dropdown is still just one .value to read', html: `
+    <div class="cl-block"><h4>Same reading pattern as every other input</h4>
+      <p>Once built, a <select> behaves exactly like any other input for reading purposes — document.getElementById(id).value gives you the picked option's value, same pattern as a text or number input.</p></div>` },
+  afq5: { title: 'A box AND a caption, together', html: `
+    <div class="cl-block"><h4>legend only works as the FIRST child of fieldset</h4>
+      <p>fieldset draws the visible grouping box; legend captions it — but only when legend is the very first thing inside that fieldset. Anywhere else, it\'s just inert text, which is why position (not just presence) is what\'s actually checked.</p></div>` },
+  afs6: { title: 'Wrapping existing controls, not rebuilding them', html: `
+    <div class="cl-block"><h4>fieldset goes AROUND, legend goes FIRST inside it</h4>
+      <p>The three radio buttons don\'t change at all — fieldset simply wraps around all three, and legend sits as the first line inside that wrapper, captioning the whole group at once.</p></div>` },
+  afboss2: { title: 'BOSS — every Advanced Forms Part 2 idea in one form', html: `
+    <div class="cl-block"><h4>Dropdown + checkboxes + a captioned radio group</h4>
+      <p>A real order form combines all three: a <select> for a single choice from a short list, checkboxes for "any number of these", and a fieldset/legend around a radio group so screen readers announce what the group of options is actually for.</p></div>` },
   // ── Responsive Design ────────────────────────────────────────────────────────
   respq0: { title: '@media rules only apply at a specific width', html: `
     <div class="cl-block"><h4>Same CSS file, screen-width-aware</h4>
