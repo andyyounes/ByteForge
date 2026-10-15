@@ -128,9 +128,12 @@ function getDashboardPath(role?: string, placementConfirmed?: boolean): string {
 }
 
 // ── Matcher: run middleware on all routes EXCEPT static assets ────────────────
-// /lessons is excluded so that static HTML lesson pages bypass auth.
+// /lessons is excluded so that static HTML lesson pages bypass auth. pdf was
+// added after a real bug: public/resources/*.pdf (e.g. a downloadable
+// project brief linked from inside a lesson) was being caught by this
+// matcher and redirected to /login for anyone not already signed in.
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|lessons|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|lessons|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?|pdf)$).*)',
   ],
 }

@@ -4111,6 +4111,30 @@ console.log(\`Hi, I'm \${name} and I'm \${age} years old.\`);</pre>
       },
       check:(log) => log.hasClick && log.bodyChangedOnClick,
     },
+    // Offline mini-project — everything needed (title, heading, paragraph,
+    // image, background, and now a click handler) is in place as of web5s3,
+    // so this sits right here rather than at the end of the module. Mirrors
+    // web0boss's "hands-on, teacher-reviewed" pattern: the real deliverable
+    // (an actual HTML file) can't be auto-checked, so a short comprehension
+    // quiz carries the XP/completion while the PDF brief carries the task.
+    { id:'web5proj', name:'ACTIVITY — Mini Project: A Page About Something You Love', xp:50, type:'quiz', boss:true,
+      text:`<h4>🎨 Build a real page, about something YOU care about</h4>
+        <p>Time to put the whole toolkit together — title, heading, a paragraph, an image, a background, and the button-click skill from last session — into one real page, about a topic you actually pick.</p>
+        <p><a href="/resources/grade8-html-css-mini-project.pdf" target="_blank" rel="noopener" style="color:var(--orange);font-weight:700;">📄 Download the full Project Brief (PDF)</a> — requirements checklist, a code hint for the button, stretch goals, and how it's marked.</p>
+        <span style="opacity:.8;font-size:12px;">🖐 Hands-on (teacher-reviewed, not auto-checked): build this as a real <code>index.html</code> file outside the Mission IDE, and hand it in the way your teacher tells you. The quiz below just checks you've understood the brief.</span>`,
+      hints:[
+        'The button has to actually DO something when clicked — changing color counts as "one click, one change", same idea as the last stage.',
+        'The &lt;title&gt; tag is invisible on the page itself — it only shows in the browser tab.',
+        'Pick a topic you actually know things about — the paragraph needs REAL content, not one filler sentence.',
+      ],
+      passCount:3,
+      questions:[
+        { type:'match', prompt:'Which tag sets the text shown in the browser TAB, not on the page itself?', options:['<title>','<h1>','<header>','<caption>'], answer:'<title>' },
+        { type:'match', prompt:'The brief asks for a button that changes your heading\'s colour on click. What does that actually require?', options:['A click handler that changes the heading\'s style', 'Just CSS, no JavaScript needed', 'A second page', 'An image'], answer:'A click handler that changes the heading\'s style' },
+        { type:'match', prompt:'The brief says your page needs "a background". Which of these satisfies that?', options:['A background colour OR a background image', 'Only a background image counts', 'Only a background colour counts', 'A border around the page'], answer:'A background colour OR a background image' },
+      ],
+      check:(log) => log.quizCorrect >= 3,
+    },
     { id:'web5qvar', name:'A Variable That Survives Between Clicks', xp:25, type:'quiz',
       text:`<h4>Where you declare a variable changes what it can do</h4>
         <p>So far, every variable inside a click handler only ever held a value for that ONE click. To build something like a click counter, the variable needs to REMEMBER its value from one click to the next — and that depends entirely on WHERE it's declared.</p>
@@ -7801,6 +7825,11 @@ const CHALLENGE_LESSON = {
   web5s3: { title: 'One click, one change — the first real JS idea', html: `
     <div class="cl-block"><h4>addEventListener("click", ...)</h4>
       <p>This is the exact same idea as Grade 7's onclick blocks, now in real JavaScript syntax. One button, one function that runs when it's clicked, one thing changes.</p></div>` },
+  web5proj: { title: 'Putting the whole toolkit together, on YOUR topic', html: `
+    <div class="cl-block"><h4>This isn't a new skill — it's every skill, combined</h4>
+      <p>Title, heading, paragraph, image, background, and a click handler — you've learned every single piece of this project separately across the last few weeks. The only new part is choosing a real topic and making all of it work together on one page.</p></div>
+    <div class="cl-block"><h4>Why it's not auto-checked</h4>
+      <p>Earlier stages could be graded automatically because they all asked for the exact same output. This project deliberately doesn't — your topic, your image, your wording are genuinely yours, so a teacher reads the real file instead of a script checking for one exact answer.</p></div>` },
   web5qvar: { title: 'WHERE a variable lives decides what it remembers', html: `
     <div class="cl-block"><h4>Created once vs. recreated every time</h4>
       <p>A variable declared OUTSIDE a function is set up exactly once, when the page loads — every later call to that function reaches out to the SAME variable. One declared INSIDE the function is rebuilt from scratch every single call, which is exactly why a counter placed there can never count past 1.</p></div>
