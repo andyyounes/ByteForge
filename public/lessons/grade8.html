@@ -1215,6 +1215,18 @@ function checkQuiz() {
   } else if (!pass) {
     clog('❌ Not quite — ' + correct + '/' + qs.length + ' correct, need ' + need, 'err')
   }
+  // Assessment-style stages (isAssessment: true) record the real score every
+  // single attempt — pass or fail — so a teacher can see how a student
+  // actually did, not just whether they eventually cleared the bar. Ordinary
+  // quiz stages deliberately don't do this (LessonSaves.save above already
+  // covers them, pass-gated, same as always) — scoped to isAssessment so this
+  // doesn't change behavior for the rest of the course's quiz stages.
+  if (ch.isAssessment && me) {
+    LessonSaves.save('grade8', ch.id, {
+      passed: pass,
+      saveData: { score: correct, total: qs.length, attemptedAt: Date.now() },
+    })
+  }
 }
 
 // Reads the web editor(s) exactly as the student currently has them, as one
@@ -2440,6 +2452,54 @@ const MODULES = [
         const buttonOk = Math.abs(colorBrightness(log.buttonBg) - colorBrightness(log.buttonColor)) > 30
         return allDistinct && allReadable && buttonOk
       },
+    },
+  ]},
+  // ── Knowledge Check — a real assessment, not a teaching stage. Covers
+  // everything from "What Is a Website?" through Colors & Shading (web0-
+  // web3). isAssessment:true on kcq1 makes checkQuiz() record the real
+  // score (not just pass/fail) on EVERY attempt, for the teacher dashboard —
+  // see the isAssessment branch in checkQuiz() above MODULES.
+  { id:'kc1', name:'📝 Knowledge Check — Skeleton to Colors', sub:'A real test, not a lesson — everything from "What Is a Website?" through Colors & Shading', live:true, stages:[
+    { id:'kcq1', name:'Part 1 — Multiple Choice', xp:40, type:'quiz', isAssessment:true,
+      text:`<strong>Knowledge Check</strong> — 18 questions covering everything so far: how the web works, the page skeleton, file paths, tags, and CSS colors. This is a real test — your actual score is recorded, not just pass/fail.`,
+      hints:[],
+      passCount:14,
+      questions: [
+        { type:'match', prompt:'What does a browser actually do?', options: ['Stores the website\'s files', 'Fetches and displays a page for you', 'Writes HTML', 'Hosts the server'], answer: 'Fetches and displays a page for you' },
+        { type:'match', prompt:'In https://example.com, what is https:// called?', options: ['Domain', 'Protocol', 'Path', 'Port'], answer: 'Protocol' },
+        { type:'match', prompt:'HTML is like a building\'s ___.', options: ['Paint', 'Electricity', 'Skeleton', 'Furniture'], answer: 'Skeleton' },
+        { type:'match', prompt:'Which is the correct order for a page\'s four basic parts?', options: ['html, DOCTYPE, head, body', 'DOCTYPE, html, head, body', 'head, DOCTYPE, html, body', 'DOCTYPE, head, html, body'], answer: 'DOCTYPE, html, head, body' },
+        { type:'match', prompt:'What\'s the real difference between <title> and <h1>?', options: ['No difference', '<title> shows in the browser tab, invisible on the page; <h1> is visible content', '<h1> is invisible, <title> is visible', 'Both show on the page'], answer: '<title> shows in the browser tab, invisible on the page; <h1> is visible content' },
+        { type:'match', prompt:'Why does an <img> need a real alt attribute?', options: ['It\'s required or the page won\'t load', 'It describes the image for screen readers and shows if the image fails to load', 'It makes the image load faster', 'It sets the image\'s file size'], answer: 'It describes the image for screen readers and shows if the image fails to load' },
+        { type:'match', prompt:'You\'re in index.html and want to link to about.html in the SAME folder. What\'s the path?', options: ['/about.html', '../about.html', 'about.html', './folder/about.html'], answer: 'about.html' },
+        { type:'match', prompt:'What does ../ mean in a file path?', options: ['The current folder', 'Go up one level, to the parent folder', 'The root of the whole website', 'A comment'], answer: 'Go up one level, to the parent folder' },
+        { type:'match', prompt:'Which heading is the BIGGEST / most important?', options: ['<h4>', '<h1>', '<h6>', 'They\'re all the same size by default'], answer: '<h1>' },
+        { type:'match', prompt:'What\'s the real difference between a link (<a>) and a button (<button>)?', options: ['No real difference', 'A link takes you elsewhere; a button does something on the current page', 'Buttons are always bigger', 'Links can\'t be styled'], answer: 'A link takes you elsewhere; a button does something on the current page' },
+        { type:'match', prompt:'Every <li> must be written inside a...', options: ['<p>', '<div>', '<ul> or <ol>', '<header>'], answer: '<ul> or <ol>' },
+        { type:'match', prompt:'What does the href attribute do on a link?', options: ['Changes its color', 'Sets the destination the link goes to', 'Makes it bold', 'Adds a border'], answer: 'Sets the destination the link goes to' },
+        { type:'match', prompt:'In h1 { color: #2F3B52; }, what is h1 called?', options: ['Property', 'Value', 'Selector', 'Comment'], answer: 'Selector' },
+        { type:'match', prompt:'In the same rule, what is color called?', options: ['Selector', 'Property', 'Value', 'Unit'], answer: 'Property' },
+        { type:'match', prompt:'What symbol ends every CSS declaration?', options: ['.', ',', ';', ':'], answer: ';' },
+        { type:'match', prompt:'#2F3B52 is an example of a...', options: ['Selector', 'Hex color value', 'Class name', 'Tag'], answer: 'Hex color value' },
+        { type:'match', prompt:'Which CSS rule would color every <p> on the page?', options: ['p.color { }', 'p { color: ...; }', 'color { p: ...; }', '<p color="...">'], answer: 'p { color: ...; }' },
+        { type:'match', prompt:'True or false: you can change an element\'s color without writing any JavaScript.', options: ['False — color always needs JavaScript', 'True — CSS alone can set color', 'Only for headings', 'Only for links'], answer: 'True — CSS alone can set color' },
+      ],
+      check:(log) => log.quizCorrect >= 14,
+    },
+    { id:'kchands', name:'Part 2 — Hands-On', xp:60, lang:'web', boss:true,
+      text:`<strong>Part 2 — Hands-On</strong> — Build a real page from scratch: a full skeleton, a page title, one heading and one paragraph, one link and one button, a list of at least 2 items, and CSS giving the page a background color and the heading a different color.`,
+      hints:[
+        'Start with the four basics: DOCTYPE, html, head (with a title), body.',
+        'One <h1>, one <p>, one <a>, one <button>, and a <ul> with 2+ <li> items — all in the body.',
+        'In the CSS: body { background-color: ...; } and h1 { color: ...; } — two separate rules.',
+      ],
+      webStarter: {
+        html: `<!-- TODO: a full skeleton (DOCTYPE/html/head/body), a title, one heading, one paragraph, one link, one button, and a list of 2+ items -->\n`,
+        css: `/* TODO: a background color for the page, and a different color for the heading */\n`,
+        js: ``,
+      },
+      check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1 && log.listItems >= 2
+        && hasFillColor(log.bgColor) && hasFillColor(log.headingColor) && normalizeRgb(log.bgColor) !== normalizeRgb(log.headingColor),
     },
   ]},
   // ── Semester 1, Week 5: Structure + Style, Together — checkpoint boss
@@ -7980,6 +8040,12 @@ const CHALLENGE_LESSON = {
   web3boss: { title: 'BOSS — seven CSS rules, one page', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>body background, h1 colour, paragraph colour, link colour, button fill + text colour, h2 colour, h3 colour — seven separate rules, every one from Challenges 1-5, combined onto one page.</p></div>` },
+  kcq1: { title: 'A real test — your actual score is what counts', html: `
+    <div class="cl-block"><h4>This isn\'t a teaching stage</h4>
+      <p>Every "learn" stage so far explained a new idea before testing it. This one doesn\'t teach anything new — it only checks what you can already recall, cold, across everything from how the web works to CSS colors. Your real score (not just pass/fail) is what your teacher sees.</p></div>` },
+  kchands: { title: 'Everything at once, from a blank page', html: `
+    <div class="cl-block"><h4>No starter structure this time</h4>
+      <p>Unlike most practice stages, nothing is pre-built for you here — the whole skeleton, every tag, and both CSS rules are entirely yours to write, the same way a real new page actually starts.</p></div>` },
   web4s1: { title: 'Structure first, style later', html: `
     <div class="cl-block"><h4>Why this checkpoint has no colors yet</h4>
       <p>The real boss asks for a LOT at once — structure AND six colour rules together. This checkpoint isolates just the structure half first (heading, paragraph, link, button, list) so you can get that solid before style gets layered back on top.</p></div>` },

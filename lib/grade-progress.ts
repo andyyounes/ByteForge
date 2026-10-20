@@ -11,11 +11,16 @@ import { readFileSync } from 'fs'
 import path from 'path'
 
 export interface StageInfo {
-  id:         string
-  name:       string
-  xp:         number
-  moduleId:   string
-  moduleName: string
+  id:           string
+  name:         string
+  xp:           number
+  moduleId:     string
+  moduleName:   string
+  isAssessment: boolean   // a real test (e.g. Grade 8's Knowledge Check) — its
+                          // actual score (not just pass/fail) is surfaced to
+                          // the teacher, read straight off the stage's own
+                          // isAssessment flag so nothing here is hardcoded to
+                          // one specific stage id.
 }
 
 export interface ModuleInfo {
@@ -37,18 +42,19 @@ function readHtml(file: string): string {
   return readFileSync(path.join(LESSONS_DIR, file), 'utf8')
 }
 
-function build(lessonKey: string, modulesRaw: { id: string; name: string; live?: boolean; stages: { id: string; name?: string; title?: string; xp?: number }[] }[]): GradeMeta {
+function build(lessonKey: string, modulesRaw: { id: string; name: string; live?: boolean; stages: { id: string; name?: string; title?: string; xp?: number; isAssessment?: boolean }[] }[]): GradeMeta {
   const modules: ModuleInfo[] = modulesRaw
     .filter(m => m.live !== false)
     .map(m => ({
       id:   m.id,
       name: m.name,
       stages: m.stages.map(s => ({
-        id:         s.id,
-        name:       s.name ?? s.title ?? s.id,
-        xp:         s.xp ?? 0,
-        moduleId:   m.id,
-        moduleName: m.name,
+        id:           s.id,
+        name:         s.name ?? s.title ?? s.id,
+        xp:           s.xp ?? 0,
+        moduleId:     m.id,
+        moduleName:   m.name,
+        isAssessment: s.isAssessment ?? false,
       })),
     }))
   const byId = new Map<string, StageInfo>()
@@ -104,6 +110,17 @@ export interface ModuleProgress {
   total: number
 }
 
+// A real test's actual result — distinct from ordinary pass/fail, since an
+// assessment's score matters even on a failed/incomplete attempt.
+export interface AssessmentResult {
+  stageId:     string
+  stageName:   string
+  score:       number
+  total:       number
+  passed:      boolean
+  attemptedAt: string | null   // ISO timestamp
+}
+
 export interface StudentGradeProgress {
   studentId:       string
   name:            string
@@ -113,15 +130,35 @@ export interface StudentGradeProgress {
   modules:         ModuleProgress[]   // per-chapter breakdown, in teaching order
   lastStageName:   string | null
   lastActive:      string | null   // ISO timestamp
+  assessments:     AssessmentResult[]   // real tests this student has attempted
 }
 
 export function summarizeStudent(
   meta: GradeMeta,
   studentId: string,
   name: string,
-  rows: { challenge_id: string | null; passed: boolean; saved_at: string }[]
+  rows: { challenge_id: string | null; passed: boolean; saved_at: string; save_data?: { score?: number; total?: number } | null }[]
 ): StudentGradeProgress {
   const passedIds = new Set(rows.filter(r => r.passed && r.challenge_id && meta.byId.has(r.challenge_id)).map(r => r.challenge_id!))
+
+  // Assessment stages record a real row on EVERY attempt (see grade8.html's
+  // isAssessment branch in checkQuiz()), so the LATEST row per stage id is
+  // this student's most recent real attempt, pass or fail.
+  const assessments: AssessmentResult[] = []
+  for (const [stageId, stage] of meta.byId) {
+    if (!stage.isAssessment) continue
+    const attempts = rows.filter(r => r.challenge_id === stageId && r.save_data && typeof r.save_data.score === 'number')
+    if (!attempts.length) continue
+    const latest = attempts.reduce((a, b) => (a.saved_at > b.saved_at ? a : b))
+    assessments.push({
+      stageId,
+      stageName:   stage.name,
+      score:       latest.save_data!.score!,
+      total:       latest.save_data!.total ?? 0,
+      passed:      latest.passed,
+      attemptedAt: latest.saved_at,
+    })
+  }
 
   let currentModule: string | null = null
   for (const m of meta.modules) {
@@ -151,5 +188,6 @@ export function summarizeStudent(
     modules,
     lastStageName: lastRow?.challenge_id ? (meta.byId.get(lastRow.challenge_id)?.name ?? null) : null,
     lastActive:    lastRow?.saved_at ?? null,
+    assessments,
   }
 }

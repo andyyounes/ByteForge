@@ -11,6 +11,15 @@ import { useState, useEffect, useCallback, Fragment } from 'react'
 
 interface ModuleProgress { id: string; name: string; done: number; total: number }
 
+interface AssessmentResult {
+  stageId:     string
+  stageName:   string
+  score:       number
+  total:       number
+  passed:      boolean
+  attemptedAt: string | null
+}
+
 interface StudentProgress {
   studentId:     string
   name:          string
@@ -20,6 +29,7 @@ interface StudentProgress {
   modules:       ModuleProgress[]
   lastStageName: string | null
   lastActive:    string | null
+  assessments:   AssessmentResult[]
 }
 
 const GRADE_META: Record<'grade6' | 'grade7' | 'grade8', { emoji: string; title: string }> = {
@@ -76,6 +86,7 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
               <th className="py-2 pr-3 font-medium">Progress</th>
               <th className="py-2 pr-3 font-medium">Chapters done</th>
               <th className="py-2 pr-3 font-medium">Current module</th>
+              <th className="py-2 pr-3 font-medium">Test score</th>
               <th className="py-2 pr-3 font-medium">Last stage</th>
               <th className="py-2 pr-3 font-medium">Last activity</th>
             </tr>
@@ -85,6 +96,7 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
               const pct = s.stagesTotal > 0 ? Math.round((s.stagesPassed / s.stagesTotal) * 100) : 0
               const finished = (s.modules ?? []).filter(m => m.total > 0 && m.done >= m.total).length
               const isOpen = open === s.studentId
+              const assessments = s.assessments ?? []
               return (
                 <Fragment key={s.studentId}>
                 <tr className="border-b border-b2/60">
@@ -105,12 +117,21 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                   <td className="py-2 pr-3 text-t2">
                     {s.currentModule ?? <span className="text-emerald font-semibold">🏆 complete</span>}
                   </td>
+                  <td className="py-2 pr-3 tabular-nums">
+                    {assessments.length === 0
+                      ? <span className="text-t3">not taken</span>
+                      : assessments.map(a => (
+                          <span key={a.stageId} className={`font-semibold ${a.passed ? 'text-emerald' : 'text-amber-400'}`} title={a.stageName}>
+                            {a.score}/{a.total}
+                          </span>
+                        ))}
+                  </td>
                   <td className="py-2 pr-3 text-t2">{s.lastStageName ?? '—'}</td>
                   <td className="py-2 pr-3 text-t3">{s.lastActive ? timeAgo(s.lastActive) : '—'}</td>
                 </tr>
                 {isOpen && (
                   <tr className="border-b border-b2/60 bg-s2/40">
-                    <td colSpan={6} className="py-3 px-3">
+                    <td colSpan={7} className="py-3 px-3">
                       <div className="grid gap-1.5 sm:grid-cols-2">
                         {(s.modules ?? []).map(m => {
                           const complete = m.total > 0 && m.done >= m.total
