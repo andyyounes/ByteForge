@@ -3150,11 +3150,12 @@ const MODULES = [
       hints:[
         '<aside> goes right after </main>, as a sibling — not inside it.',
         'Same side-by-side technique as the Divs boss: display: inline-block with widths, or display: flex on a wrapping element.',
+        'main is already 70% wide — keep aside\'s width under 30% (try 25%), not exactly 30%. inline-block elements leave a small gap for the whitespace between them in your HTML, so 70% + 30% (exactly 100%) still wraps to a new line — you need a LITTLE room to spare.',
         'Give <aside> a background-color so you can see it clearly next to <main>.',
       ],
       webStarter: {
         html: `<header><h1>My Site</h1></header>\n<main><p>Main content goes here.</p></main>\n<!-- TODO: add an <aside> with a heading and a link, next to main -->\n`,
-        css: `* { box-sizing: border-box; }\nbody { font-family: sans-serif; margin: 0; }\nheader { background-color: #2F3B52; color: #ffffff; padding: 12px; }\nmain { display: inline-block; width: 70%; vertical-align: top; }\n/* TODO: aside { display: inline-block; width: ...; vertical-align: top; background-color: ...; } */\n`,
+        css: `* { box-sizing: border-box; }\nbody { font-family: sans-serif; margin: 0; }\nheader { background-color: #2F3B52; color: #ffffff; padding: 12px; }\nmain { display: inline-block; width: 70%; vertical-align: top; }\n/* TODO: aside { display: inline-block; width: 25%; vertical-align: top; background-color: ...; } -- keep widths under 100% combined, e.g. 70% + 25%, not 70% + 30% */\n`,
         js: ``,
       },
       check:(log) => {
