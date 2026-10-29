@@ -3513,9 +3513,21 @@ function fcArrowHTML(label) {
 function fcDiagram(parts) {
   return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin:14px 0;">' + parts.join('') + '</div>'
 }
+// The RIGHT side is always the branch that keeps going (the chain's "NO",
+// continuing down to the next decision or further nesting); the LEFT side
+// is always a short terminal (an Output). Centering the pair AS A ROW (the
+// original approach) put the row's midpoint — not either diamond — on the
+// diagram's trunk, and since the right column gets WIDER at each nesting
+// level while the left stays a small fixed-width Output box, every level
+// of chaining visually dragged the whole diagram further right (confirmed
+// live: flowg7/flowg10/flowgboss's 2nd/3rd decision diamonds drifted right
+// of the one above them, a real user-reported bug). Fix: only the right
+// column participates in the parent fcDiagram's centering (via
+// display:inline-block, sized to itself) — the left column is positioned
+// relative to IT, outside the flow, so it never shifts the trunk's center.
 function fcBranchHTML(leftLabel, leftHTML, rightLabel, rightHTML) {
-  return '<div style="display:flex;gap:28px;justify-content:center;align-items:flex-start;margin:4px 0;">'
-    + '<div style="text-align:center;"><div style="color:#4ade80;font-size:9.5px;margin-bottom:2px;">' + leftLabel + ' ↓</div>' + leftHTML + '</div>'
+  return '<div style="position:relative;display:inline-block;margin:4px 0;">'
+    + '<div style="position:absolute;right:100%;top:0;margin-right:28px;width:max-content;text-align:center;"><div style="color:#4ade80;font-size:9.5px;margin-bottom:2px;">' + leftLabel + ' ↓</div>' + leftHTML + '</div>'
     + '<div style="text-align:center;"><div style="color:#f87171;font-size:9.5px;margin-bottom:2px;">' + rightLabel + ' ↓</div>' + rightHTML + '</div>'
     + '</div>'
 }
