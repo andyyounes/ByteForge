@@ -1331,7 +1331,14 @@ function checkWebChallenge(log) {
   // reasoning as isAssessment's quiz-score save above: a teacher reviewing
   // an exam wants the real record, not just whether the student eventually
   // passed. See startExamTracking() above currentWebCode().
-  if (ch.isExam && me) {
+  //
+  // No `&& me` guard here (unlike the BF.addXP/recordAttempt call above) —
+  // `me` is BF.session(), a legacy localStorage flag that setSession() never
+  // actually sets anywhere in this shipped site, so it's always null for
+  // every real student. Gating on it silently skipped this save (and the
+  // exam-result notification that reads its saveData) for every real exam
+  // attempt — found by testing an actual submission end-to-end.
+  if (ch.isExam) {
     const s = _examState
     LessonSaves.save('grade8', ch.id, {
       passed: passOk,
