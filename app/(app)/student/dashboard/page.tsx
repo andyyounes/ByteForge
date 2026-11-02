@@ -4,6 +4,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { suggestNext } from '@/lib/adaptive'
 import { masteryStatusCounts, initialMasteryMap, recalculateAvailability } from '@/lib/mastery'
 import { stageToGrade, CONCEPTS } from '@/lib/concepts'
+import { getGradeMeta, summarizeStudent } from '@/lib/grade-progress'
 import { XPBar } from '@/components/ui/XPBar'
 import { StatsRow } from '@/components/student/StatsRow'
 import { DailyChallengeCard } from '@/components/student/DailyChallengeCard'
@@ -12,7 +13,7 @@ import { LearningPath } from '@/components/student/LearningPath'
 import { AchievementsTeaser } from '@/components/student/AchievementsTeaser'
 import { JoinClassInput } from '@/components/student/JoinClassInput'
 import { Card } from '@/components/ui/Card'
-import { BookIcon, ChevronRightIcon, CodeIcon } from '@/components/ui/Icons'
+import { BookIcon, ChevronRightIcon, CodeIcon, TargetIcon } from '@/components/ui/Icons'
 import Link from 'next/link'
 import type { Profile, ConceptMastery, DailyChallenge, UserAchievement, MasteryMap } from '@/types'
 
@@ -205,6 +206,34 @@ export default async function StudentDashboardPage() {
     : studentGrade
   const firstLesson = GRADE_LESSONS[effectiveGrade] ?? null
 
+  // ── Grade 8 exam banner — available once every module before it is done,
+  // hidden again once the student has actually passed it. Reads the SAME
+  // lib/grade-progress.ts helpers the teacher dashboard uses (so "is the
+  // exam unlocked" can never silently drift from the real curriculum), but
+  // scoped to this student's own lesson_saves rows — never the teacher's
+  // admin-client/class-scoped route.
+  let grade8Exam: { available: boolean; passed: boolean } | null = null
+  if (effectiveGrade === 8) {
+    try {
+      const { data: g8Rows } = await supabase
+        .from('lesson_saves')
+        .select('challenge_id, passed, saved_at, save_data')
+        .eq('student_id', user.id)
+        .eq('lesson_key', 'grade8')
+      const meta = getGradeMeta('grade8')
+      const summary = summarizeStudent(meta, user.id, profile.name, (g8Rows ?? []) as never)
+      const examModuleIdx = meta.modules.findIndex(m => m.id === 'examGR8')
+      const priorModulesDone = examModuleIdx !== -1 && meta.modules.slice(0, examModuleIdx).every(m => {
+        const prog = summary.modules.find(mp => mp.id === m.id)
+        return !!prog && prog.total > 0 && prog.done >= prog.total
+      })
+      const examResult = summary.exams.find(e => e.stageId === 'examRecipe')
+      grade8Exam = { available: priorModulesDone, passed: examResult?.passed ?? false }
+    } catch {
+      grade8Exam = null   // never let a curriculum-parsing hiccup break the dashboard
+    }
+  }
+
   // If in a class with an incomplete exercise, show that as the primary CTA
   const showCurriculumCallout = hasClass && !!nextExercise
 
@@ -253,6 +282,34 @@ export default async function StudentDashboardPage() {
 
         {/* Left col ──────────────────────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-4">
+
+          {/* ── Grade 8 exam banner — above the lesson card, red/urgent ── */}
+          {grade8Exam?.available && !grade8Exam.passed && (
+            <Card className="border-rose-400/30 bg-rose-400/5">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-rose-400/10 text-rose-400 shrink-0">
+                    <TargetIcon size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-rose-400 uppercase tracking-wider">
+                      Grade 8 — Exam Ready
+                    </p>
+                    <h3 className="text-lg font-bold text-fg">Recipe Page Exam</h3>
+                    <p className="text-xs text-fg-faint mt-0.5">No starter code, no hints — build it from the picture alone</p>
+                  </div>
+                </div>
+                <Link
+                  href={membership?.class_id
+                    ? `/lessons/grade8.html?classId=${membership.class_id}`
+                    : '/lessons/grade8.html'}
+                  className="py-2 px-4 text-sm font-semibold rounded-lg flex items-center gap-2 shrink-0 bg-rose-400/10 border border-rose-400/30 text-rose-400 hover:bg-rose-400/20 transition-colors"
+                >
+                  Start Exam <ChevronRightIcon size={16} />
+                </Link>
+              </div>
+            </Card>
+          )}
 
           {/* ── Grade lesson quick-start (Grade 6–9 only) ────────────── */}
           {firstLesson && (
