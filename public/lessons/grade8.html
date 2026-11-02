@@ -9732,7 +9732,14 @@ initPyodide()
   LessonSaves.completedIds().forEach(id => { if (STAGE_INDEX[id] !== undefined) completed.add(STAGE_INDEX[id]) })
   LessonSaves.completedSet().forEach(idx => completed.add(idx))
   renderPills()
-  showJourney()   // land on the map — nothing else renders until a stage is picked
+  // A `?stage=<id>` link (e.g. the dashboard's "Start Exam" banner) jumps
+  // straight into that stage's editor instead of landing on the map — a
+  // student clicking "Start Exam" should see the exam immediately, not a
+  // map screen they then have to find the exam node on and click again.
+  const requestedStage = new URLSearchParams(location.search).get('stage')
+  const requestedIdx = requestedStage ? STAGE_INDEX[requestedStage] : undefined
+  if (requestedIdx !== undefined) selectChallenge(requestedIdx)
+  else showJourney()   // land on the map — nothing else renders until a stage is picked
 })()
 </script>
 </body>

@@ -301,8 +301,8 @@ export default async function StudentDashboardPage() {
                 </div>
                 <Link
                   href={membership?.class_id
-                    ? `/lessons/grade8.html?classId=${membership.class_id}`
-                    : '/lessons/grade8.html'}
+                    ? `/lessons/grade8.html?classId=${membership.class_id}&stage=examRecipe`
+                    : '/lessons/grade8.html?stage=examRecipe'}
                   className="py-2 px-4 text-sm font-semibold rounded-lg flex items-center gap-2 shrink-0 bg-rose-400/10 border border-rose-400/30 text-rose-400 hover:bg-rose-400/20 transition-colors"
                 >
                   Start Exam <ChevronRightIcon size={16} />
