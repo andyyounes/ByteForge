@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import { Avatar } from '@/components/ui/Avatar'
+import { NotificationBell } from '@/components/layout/NotificationBell'
 import { XPBar } from '@/components/ui/XPBar'
 import { xpToLevel, levelTitle } from '@/lib/xp'
 import { useSupabase } from '@/components/providers/SupabaseProvider'
@@ -89,6 +90,9 @@ export function NavBar({ profile, onMenuToggle }: NavBarProps) {
           <span>{profile.streak}</span>
         </div>
       )}
+
+      {/* Notifications — all roles */}
+      {profile && <NotificationBell />}
 
       {/* Avatar + dropdown */}
       {profile && (

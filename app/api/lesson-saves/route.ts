@@ -28,6 +28,63 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ saves: saves ?? [] })
 }
 
+// Notifies a student and their teacher of a real exam result. Runs as the
+// student's own session (RLS: notifications.send_notifications requires
+// created_by = auth.uid()), so it can insert a row for the teacher too —
+// same "write your own thing, targeted at someone else" pattern as
+// class_join_requests.
+async function notifyExamResult(
+  supabase: any,
+  studentId: string,
+  lesson: string,
+  challengeId: string,
+  passed: boolean,
+) {
+  const { data: profile } = await supabase.from('profiles').select('name').eq('id', studentId).single()
+  const studentName = profile?.name ?? 'A student'
+
+  const resultWord = passed ? 'passed' : 'did not pass'
+  const examLabel = `${lesson} exam`
+
+  await supabase.from('notifications').insert({
+    user_id: studentId,
+    created_by: studentId,
+    type: 'exam_result',
+    title: passed ? 'Exam passed' : 'Exam submitted',
+    body: passed
+      ? `You passed the ${examLabel}. Nice work!`
+      : `You submitted the ${examLabel} but it didn't pass yet — you can try again.`,
+    data: { lesson, challengeId, passed },
+  })
+
+  // Find this student's teacher(s) via their class membership.
+  const { data: memberships } = await supabase
+    .from('class_members')
+    .select('class_id')
+    .eq('student_id', studentId)
+
+  const classIds = (memberships ?? []).map((m: { class_id: string }) => m.class_id)
+  if (!classIds.length) return
+
+  const { data: classes } = await supabase
+    .from('classes')
+    .select('teacher_id')
+    .in('id', classIds)
+
+  const teacherIds = [...new Set((classes ?? []).map((c: { teacher_id: string }) => c.teacher_id))]
+
+  for (const teacherId of teacherIds) {
+    await supabase.from('notifications').insert({
+      user_id: teacherId,
+      created_by: studentId,
+      type: 'exam_result',
+      title: 'Student exam result',
+      body: `${studentName} ${resultWord} the ${examLabel}.`,
+      data: { lesson, challengeId, passed, studentId, studentName },
+    })
+  }
+}
+
 // ── POST /api/lesson-saves ────────────────────────────────────────────────────
 // Writes a save record. Called when a student passes a challenge or when the
 // workspace is autosaved.
@@ -108,6 +165,13 @@ export async function POST(request: NextRequest) {
     if (shouldAwardXp) {
       const { data: profile } = await supabase.from('profiles').select('xp').eq('id', user.id).single()
       if (profile) await supabase.from('profiles').update({ xp: profile.xp + xpEarned }).eq('id', user.id)
+    }
+
+    // Exam submissions (identified the same way grade-progress.ts does —
+    // tabSwitches only ever appears on an isExam save) notify both the
+    // student and their teacher with the result, once per real attempt.
+    if (saveData && typeof saveData.tabSwitches === 'number') {
+      await notifyExamResult(supabase, user.id, lesson, challengeId, !!passed)
     }
 
     return NextResponse.json({ ok: true, xpAwarded: shouldAwardXp ? xpEarned : 0 })

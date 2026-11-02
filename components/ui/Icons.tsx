@@ -367,6 +367,16 @@ export function CompressIcon({ size = defaults.size, strokeWidth = defaults.stro
   )
 }
 
+export function BellIcon({ size = defaults.size, strokeWidth = defaults.strokeWidth, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M6 9a6 6 0 0112 0c0 3.5 1 5.5 2 7H4c1-1.5 2-3.5 2-7z"
+        stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M10 19a2 2 0 004 0" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function SettingsIcon({ size = defaults.size, strokeWidth = defaults.strokeWidth, className }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
