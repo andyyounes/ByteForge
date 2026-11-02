@@ -20,6 +20,17 @@ interface AssessmentResult {
   attemptedAt: string | null
 }
 
+interface ExamResult {
+  stageId:             string
+  stageName:           string
+  passed:              boolean
+  tabSwitches:         number
+  awaySeconds:         number
+  snapshotCount:       number
+  examDurationSeconds: number
+  attemptedAt:         string | null
+}
+
 interface StudentProgress {
   studentId:     string
   name:          string
@@ -30,6 +41,7 @@ interface StudentProgress {
   lastStageName: string | null
   lastActive:    string | null
   assessments:   AssessmentResult[]
+  exams:         ExamResult[]
 }
 
 const GRADE_META: Record<'grade6' | 'grade7' | 'grade8', { emoji: string; title: string }> = {
@@ -87,6 +99,7 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
               <th className="py-2 pr-3 font-medium">Chapters done</th>
               <th className="py-2 pr-3 font-medium">Current module</th>
               <th className="py-2 pr-3 font-medium">Test score</th>
+              <th className="py-2 pr-3 font-medium">Exam</th>
               <th className="py-2 pr-3 font-medium">Last stage</th>
               <th className="py-2 pr-3 font-medium">Last activity</th>
             </tr>
@@ -97,6 +110,7 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
               const finished = (s.modules ?? []).filter(m => m.total > 0 && m.done >= m.total).length
               const isOpen = open === s.studentId
               const assessments = s.assessments ?? []
+              const exams = s.exams ?? []
               return (
                 <Fragment key={s.studentId}>
                 <tr className="border-b border-b2/60">
@@ -126,12 +140,34 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                           </span>
                         ))}
                   </td>
+                  <td className="py-2 pr-3">
+                    {exams.length === 0
+                      ? <span className="text-t3">not taken</span>
+                      : exams.map(ex => (
+                          <span key={ex.stageId} className={`font-semibold ${ex.passed ? 'text-emerald' : 'text-amber-400'}`} title={ex.stageName}>
+                            {ex.passed ? '✓ passed' : '✗ not yet'}
+                          </span>
+                        ))}
+                  </td>
                   <td className="py-2 pr-3 text-t2">{s.lastStageName ?? '—'}</td>
                   <td className="py-2 pr-3 text-t3">{s.lastActive ? timeAgo(s.lastActive) : '—'}</td>
                 </tr>
                 {isOpen && (
                   <tr className="border-b border-b2/60 bg-s2/40">
-                    <td colSpan={7} className="py-3 px-3">
+                    <td colSpan={8} className="py-3 px-3">
+                      {exams.length > 0 && (
+                        <div className="mb-3 space-y-1.5">
+                          <div className="text-[10px] font-semibold uppercase tracking-wide text-t3">Exam integrity</div>
+                          {exams.map(ex => (
+                            <div key={ex.stageId} className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-md bg-s1 border border-b2 text-t2">
+                              <span className="truncate">{ex.stageName}</span>
+                              <span className="shrink-0 tabular-nums text-t3">
+                                {ex.tabSwitches} tab switch{ex.tabSwitches === 1 ? '' : 'es'} &middot; {ex.awaySeconds}s away &middot; {ex.snapshotCount} code snapshot{ex.snapshotCount === 1 ? '' : 's'} &middot; {Math.round(ex.examDurationSeconds / 60)} min
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <div className="grid gap-1.5 sm:grid-cols-2">
                         {(s.modules ?? []).map(m => {
                           const complete = m.total > 0 && m.done >= m.total

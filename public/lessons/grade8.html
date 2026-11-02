@@ -722,6 +722,11 @@ function buildWebLog(doc, win, html, css, js) {
     paragraphs: doc.querySelectorAll('p').length,
     buttons: doc.querySelectorAll('button').length,
     listItems: doc.querySelectorAll('li').length,
+    // Distinguishes a bulleted list from a numbered one — listItems alone
+    // can't tell "6 <li>s in one <ul>" from "a real <ul> AND a real <ol>",
+    // which the Grade 8 exam specifically requires (ingredients vs method).
+    ulItems: doc.querySelectorAll('ul li').length,
+    olItems: doc.querySelectorAll('ol li').length,
     // Semester 1 (3-semester rebuild) — real typed HTML/CSS, checked the
     // same exact-value way Grade 7's rebuilt Story Studio checks page
     // blocks: link count, and REAL computed colors (getComputedStyle
@@ -1229,6 +1234,46 @@ function checkQuiz() {
   }
 }
 
+// ── Exam integrity tracking (isExam stages only) ────────────────────────────
+// A webpage genuinely cannot force or silently run screen recording — the
+// browser always shows the student a real "Share your screen?" prompt, and
+// recording identifiable minors raises real privacy/retention questions a
+// school needs to sign off on before it happens at all. This is the
+// alternative: two passive, low-cost signals a teacher can actually review
+// afterward — how many times the student left the tab (and for how long),
+// and a periodic snapshot of their code, so a solution that appears FULLY
+// FORMED in one jump (pasted) looks different from one that grew gradually
+// (typed). Active only while an isExam stage is the open challenge.
+let _examState = null
+let _examSnapshotTimer = null
+function startExamTracking() {
+  stopExamTracking()
+  _examState = { startedAt: Date.now(), tabSwitches: 0, awayMs: 0, awaySince: null, snapshots: [] }
+  _examSnapshotTimer = setInterval(() => {
+    if (!_examState) return
+    const code = currentWebCode()
+    const last = _examState.snapshots[_examState.snapshots.length - 1]
+    if (!last || last.code !== code) {
+      _examState.snapshots.push({ t: Math.round((Date.now() - _examState.startedAt) / 1000), code })
+      if (_examState.snapshots.length > 60) _examState.snapshots.shift() // cap ~20 min of history at the 20s interval below
+    }
+  }, 20000)
+}
+function stopExamTracking() {
+  if (_examSnapshotTimer) { clearInterval(_examSnapshotTimer); _examSnapshotTimer = null }
+  _examState = null
+}
+document.addEventListener('visibilitychange', () => {
+  if (!_examState) return
+  if (document.hidden) {
+    _examState.tabSwitches++
+    _examState.awaySince = Date.now()
+  } else if (_examState.awaySince) {
+    _examState.awayMs += Date.now() - _examState.awaySince
+    _examState.awaySince = null
+  }
+})
+
 // Reads the web editor(s) exactly as the student currently has them, as one
 // JSON string lesson_saves.code can hold — single-page {html,css,js} or
 // multi-page {pages,css,js}. This is what gets saved on every Run, pass or
@@ -1281,6 +1326,29 @@ function checkWebChallenge(log) {
   } else if (!passOk) {
     clog('❌ Not quite — check the task above and try the 💡 Hint button.', 'err')
     if (ch.palette) explainColorFailure(ch, log).forEach(line => clog(line, 'info'))
+  }
+  // Exam integrity signal — recorded on every attempt, pass or fail, same
+  // reasoning as isAssessment's quiz-score save above: a teacher reviewing
+  // an exam wants the real record, not just whether the student eventually
+  // passed. See startExamTracking() above currentWebCode().
+  if (ch.isExam && me) {
+    const s = _examState
+    LessonSaves.save('grade8', ch.id, {
+      passed: passOk,
+      // Must repeat `code` here — the server upsert overwrites the row
+      // written moments ago by the call above, and `code ?? null` in
+      // app/api/lesson-saves/route.ts means omitting it would silently
+      // null out the student's just-saved exam code. Caught live before
+      // shipping by inspecting the actual POST body this call sends.
+      code: currentWebCode(),
+      saveData: {
+        tabSwitches: s ? s.tabSwitches : 0,
+        awaySeconds: s ? Math.round(s.awayMs / 1000) : 0,
+        snapshotCount: s ? s.snapshots.length : 0,
+        snapshots: s ? s.snapshots : [],
+        examDurationSeconds: s ? Math.round((Date.now() - s.startedAt) / 1000) : 0,
+      },
+    })
   }
 }
 
@@ -3198,6 +3266,37 @@ const MODULES = [
           && about.hasHeading && proj.hasHeading
           && hasFillColor(h.bg) && hasFillColor(a.bg) && hasFillColor(f.bg)
           && hasFillColor(about.bg) && hasFillColor(proj.bg) && normalizeRgb(about.bg) !== normalizeRgb(proj.bg)
+      },
+    },
+  ]},
+  // ── EXAM — a real test, not a lesson. Everything up to this point
+  // (skeleton, headings h1-h4, <header>, divs with background colors,
+  // <ul>/<ol> lists, a link styled like a button) combined into one
+  // build-from-a-picture task. No starter code, no hints, no Lesson panel
+  // walkthrough — isExam:true (checkWebChallenge()) records tab-switch
+  // count and periodic code snapshots instead of a "real score" (that's
+  // isAssessment's job, for quiz stages) — a non-invasive integrity
+  // signal the teacher can review, since real screen recording can't be
+  // silent or forced by a webpage and raises real privacy concerns for
+  // minors. See startExamTracking/stopExamTracking above MODULES.
+  { id:'examGR8', name:'🎯 EXAM — Recipe Page', sub:'A real test — no starter code, no hints. Recreate the page exactly.', live:true, stages:[
+    { id:'examRecipe', name:'EXAM — Recreate the Recipe Page', xp:100, lang:'web', boss:true, isExam:true,
+      text:`<strong>EXAM</strong> — Recreate this page exactly, using everything you've learned: a skeleton, headings <code>h1</code>-<code>h4</code>, a <code>&lt;header&gt;</code> with a background colour, two <code>&lt;div&gt;</code>s with their own background colours, a bulleted list, a numbered list, a link styled to look like a button, and a <code>&lt;footer&gt;</code>.
+        <br><br>No starter code and no hints this time — this is a real test of what you remember.
+        <br><br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">`,
+      hints:[],
+      webStarter: { html: '', css: '', js: '' },
+      check:(log) => {
+        const h = landmark(log, 'header'), f = landmark(log, 'footer')
+        if (!h || !f) return false
+        if (!hasFillColor(h.bg)) return false
+        if (log.h1Count < 1 || log.h2Count < 2 || log.h3Count < 2 || log.h4Count < 2) return false
+        if (log.imgCount < 1) return false
+        if (log.ulItems < 4 || log.olItems < 4) return false
+        const coloredDivs = (log.divs || []).filter(d => hasFillColor(d.bg))
+        if (coloredDivs.length < 1) return false
+        if (!(hasFillColor(log.linkBg) && log.linkPadTop >= 6)) return false
+        return true
       },
     },
   ]},
@@ -8486,6 +8585,9 @@ const CHALLENGE_LESSON = {
       <p>Visually this can look identical to the Divs module's boss layout — the difference is invisible on screen and very real to a screen reader, a search engine, or anyone reading your HTML six months from now.</p></div>
     <div class="cl-block"><h4>The pattern, summarized</h4>
       <p>header (once) → nav (once, often inside header) → aside + main side by side → section×N inside main, each with its own id → footer (once). Every real website boils down to this same handful of tags, arranged differently.</p></div>` },
+  examRecipe: { title: 'EXAM — no walkthrough this time', html: `
+    <div class="cl-block"><h4>This is a test, not a lesson</h4>
+      <p>Every other stage in this course explains a new idea before testing it. This one doesn't — it only checks what you already know, from a picture alone, the same way a real exam works.</p></div>` },
   // ── Tables ────────────────────────────────────────────────────────────────────
   tabq0: { title: 'Tables are for grid DATA, not page layout', html: `
     <div class="cl-block"><h4>Four tags</h4>
@@ -9241,6 +9343,11 @@ function selectChallenge(i) {
   hintIdx   = 0
   challengeStartedAt = Date.now()
   const ch  = CHALLENGES[i]
+  // Exam integrity tracking only runs while an isExam stage is actually
+  // open — starts fresh every time one is opened (including reopening
+  // after a failed attempt), stops the moment the student navigates away.
+  if (ch.isExam) startExamTracking()
+  else stopExamTracking()
   document.getElementById('ch-row').style.display = ''
   document.getElementById('ch-text').innerHTML = ch.text
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'

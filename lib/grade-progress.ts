@@ -21,6 +21,13 @@ export interface StageInfo {
                           // the teacher, read straight off the stage's own
                           // isAssessment flag so nothing here is hardcoded to
                           // one specific stage id.
+  isExam:       boolean   // a real hands-on exam (e.g. Grade 8's Recipe Page
+                          // exam) — no screen recording (a page can't force
+                          // or silently run it, and it raises real privacy
+                          // questions for minors); instead the page itself
+                          // tracks tab-switch count and periodic code
+                          // snapshots as a lighter-weight integrity signal,
+                          // surfaced here the same stage-flag-driven way.
 }
 
 export interface ModuleInfo {
@@ -42,7 +49,7 @@ function readHtml(file: string): string {
   return readFileSync(path.join(LESSONS_DIR, file), 'utf8')
 }
 
-function build(lessonKey: string, modulesRaw: { id: string; name: string; live?: boolean; stages: { id: string; name?: string; title?: string; xp?: number; isAssessment?: boolean }[] }[]): GradeMeta {
+function build(lessonKey: string, modulesRaw: { id: string; name: string; live?: boolean; stages: { id: string; name?: string; title?: string; xp?: number; isAssessment?: boolean; isExam?: boolean }[] }[]): GradeMeta {
   const modules: ModuleInfo[] = modulesRaw
     .filter(m => m.live !== false)
     .map(m => ({
@@ -55,6 +62,7 @@ function build(lessonKey: string, modulesRaw: { id: string; name: string; live?:
         moduleId:     m.id,
         moduleName:   m.name,
         isAssessment: s.isAssessment ?? false,
+        isExam:       s.isExam ?? false,
       })),
     }))
   const byId = new Map<string, StageInfo>()
@@ -121,6 +129,23 @@ export interface AssessmentResult {
   attemptedAt: string | null   // ISO timestamp
 }
 
+// A hands-on exam's integrity signal — no screen recording (a page can't
+// force or silently run it, and recording minors raises real privacy
+// questions a school must sign off on first); instead the page itself
+// tracks tab-switch count/duration and how many distinct code snapshots
+// it saw, so a solution that appeared fully-formed in one jump reads
+// differently from one that was genuinely built up over the exam.
+export interface ExamResult {
+  stageId:             string
+  stageName:           string
+  passed:              boolean
+  tabSwitches:         number
+  awaySeconds:         number
+  snapshotCount:       number
+  examDurationSeconds: number
+  attemptedAt:         string | null   // ISO timestamp
+}
+
 export interface StudentGradeProgress {
   studentId:       string
   name:            string
@@ -131,13 +156,22 @@ export interface StudentGradeProgress {
   lastStageName:   string | null
   lastActive:      string | null   // ISO timestamp
   assessments:     AssessmentResult[]   // real tests this student has attempted
+  exams:           ExamResult[]        // real hands-on exams this student has attempted
 }
 
 export function summarizeStudent(
   meta: GradeMeta,
   studentId: string,
   name: string,
-  rows: { challenge_id: string | null; passed: boolean; saved_at: string; save_data?: { score?: number; total?: number } | null }[]
+  rows: {
+    challenge_id: string | null
+    passed: boolean
+    saved_at: string
+    save_data?: {
+      score?: number; total?: number
+      tabSwitches?: number; awaySeconds?: number; snapshotCount?: number; examDurationSeconds?: number
+    } | null
+  }[]
 ): StudentGradeProgress {
   const passedIds = new Set(rows.filter(r => r.passed && r.challenge_id && meta.byId.has(r.challenge_id)).map(r => r.challenge_id!))
 
@@ -157,6 +191,28 @@ export function summarizeStudent(
       total:       latest.save_data!.total ?? 0,
       passed:      latest.passed,
       attemptedAt: latest.saved_at,
+    })
+  }
+
+  // Exam stages — same "every attempt, pass or fail" rule as assessments
+  // (see grade8.html's isExam branch in checkWebChallenge()), identified
+  // by tabSwitches being a real number rather than score (assessments and
+  // exams can share a lesson_key/table without colliding on this check).
+  const exams: ExamResult[] = []
+  for (const [stageId, stage] of meta.byId) {
+    if (!stage.isExam) continue
+    const attempts = rows.filter(r => r.challenge_id === stageId && r.save_data && typeof r.save_data.tabSwitches === 'number')
+    if (!attempts.length) continue
+    const latest = attempts.reduce((a, b) => (a.saved_at > b.saved_at ? a : b))
+    exams.push({
+      stageId,
+      stageName:           stage.name,
+      passed:               latest.passed,
+      tabSwitches:          latest.save_data!.tabSwitches!,
+      awaySeconds:          latest.save_data!.awaySeconds ?? 0,
+      snapshotCount:        latest.save_data!.snapshotCount ?? 0,
+      examDurationSeconds:  latest.save_data!.examDurationSeconds ?? 0,
+      attemptedAt:          latest.saved_at,
     })
   }
 
@@ -189,5 +245,6 @@ export function summarizeStudent(
     lastStageName: lastRow?.challenge_id ? (meta.byId.get(lastRow.challenge_id)?.name ?? null) : null,
     lastActive:    lastRow?.saved_at ?? null,
     assessments,
+    exams,
   }
 }
