@@ -15,6 +15,28 @@ ByteForge is an interactive ICT/Computer Science learning platform for school st
 
 Each grade lives as a self-contained page under [public/lessons/](public/lessons/) (e.g. `grade8.html`), with its content defined in a `MODULES`/`MISSIONS` array and rendered by shared engine code in the same file.
 
+## Desktop app
+
+ByteForge is also packaged as a thin desktop shell around the live site — a
+real app with its own icon, no browser tab or URL to remember. It still
+needs an internet connection (it just opens the hosted site in its own
+window); it does **not** bundle the backend, since that would mean shipping
+Supabase's service-role key — full database access — inside every install.
+
+Each launch starts logged out rather than remembering the last login, since
+several students typically share one Windows account on a lab machine.
+
+- **Download:** see the [Releases](../../releases) page for the latest
+  Windows build.
+- **Build it yourself:**
+  ```bash
+  npm run electron:dev          # try it locally
+  npm run electron:build:win    # produce a Windows installer/app
+  npm run electron:build:mac    # must be run on an actual Mac
+  ```
+- Source lives in [electron/](electron/) — `main.js` is the whole app; it
+  just points a `BrowserWindow` at the deployed URL.
+
 ## Tech stack
 
 - **Framework:** Next.js 15 / React 19 / TypeScript
@@ -52,4 +74,5 @@ app/                 Next.js routes (dashboard, auth, teacher/student views)
 public/lessons/      One self-contained HTML file per grade/course
 lib/                 Shared concepts, Supabase client, utilities
 scripts/             Regression test suites (one per grade/course)
+electron/            Desktop app shell (see "Desktop app" above)
 ```
