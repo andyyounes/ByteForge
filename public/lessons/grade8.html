@@ -2638,7 +2638,14 @@ const MODULES = [
   // mechanism), checked via webLog's real element counts.
   { id:'web1', name:'🏷️ Your First Tags', sub:'Headings h1-h4, paragraphs — real HTML, typed', live:true, stages:[
     { id:'web1s1', name:'Heading + Paragraph', xp:25, lang:'web',
-      text:`<strong>Challenge 1</strong> — Type a real <code>&lt;h1&gt;</code> heading and a real <code>&lt;p&gt;</code> paragraph. Both need real, non-empty text — not left blank.`,
+      text:`<strong>Challenge 1</strong> — Every real page needs a main title and some real body text.
+        <div style="padding:14px;background:#fff;border:1px solid #ddd;border-radius:8px;margin:10px 0;color:#1a1a1a;">
+          <h1 style="margin:0 0 8px;font-size:28px;">My Page</h1>
+          <p style="margin:0;font-size:14px;">This is my page.</p>
+        </div>
+        1. One <code>&lt;h1&gt;</code> — real, non-empty text, not left blank<br>
+        2. One <code>&lt;p&gt;</code> — a real sentence underneath it<br><br>
+        <b>Why a heading tag and not just big bold text?</b> <code>&lt;h1&gt;</code> tells the browser (and screen readers, and search engines) "this IS the title" — not just that it looks big. Text you just made bold would look similar but carries none of that real meaning.`,
       hints:[
         'A tag has an opening AND closing half: &lt;h1&gt;My Page&lt;/h1&gt;.',
         'A page usually has exactly ONE heading — it\'s the title.',
@@ -2648,7 +2655,17 @@ const MODULES = [
                   && log.headingText.some(t => t.length > 0) && log.paragraphText.some(t => t.length > 0),
     },
     { id:'web1s2', name:'Subheadings — h2', xp:25, lang:'web',
-      text:`<strong>Challenge 2</strong> — Keep your <code>&lt;h1&gt;</code>, and add ONE <code>&lt;h2&gt;</code> subheading plus its own <code>&lt;p&gt;</code> paragraph underneath it. A subheading introduces a smaller SECTION inside the page — the h1 is still the one overall title.`,
+      text:`<strong>Challenge 2</strong> — Keep your <code>&lt;h1&gt;</code>, and add ONE <code>&lt;h2&gt;</code> subheading plus its own <code>&lt;p&gt;</code> underneath it.
+        <div style="padding:14px;background:#fff;border:1px solid #ddd;border-radius:8px;margin:10px 0;color:#1a1a1a;">
+          <h1 style="margin:0 0 6px;font-size:28px;">My Page</h1>
+          <p style="margin:0 0 14px;font-size:14px;">This is my page.</p>
+          <h2 style="margin:0 0 6px;font-size:21px;">About Me</h2>
+          <p style="margin:0;font-size:14px;">A section, smaller than the page title.</p>
+        </div>
+        1. Your existing <code>&lt;h1&gt;</code> + <code>&lt;p&gt;</code> — keep both<br>
+        2. One <code>&lt;h2&gt;</code> — a SECTION title, smaller than the page title<br>
+        3. A second <code>&lt;p&gt;</code>, under the h2<br><br>
+        <b>Why smaller, not just a second h1?</b> The browser's default size already tells a reader "h1 = the one main title, h2 = a section inside it" before they've read a single word — a page can have several h2s, but normally only one h1.`,
       hints:[
         '&lt;h2&gt;About Me&lt;/h2&gt; is a real subheading — a section title, smaller than the page title.',
         'A page can have several h2s (one per section), but usually only ONE h1.',
@@ -2657,7 +2674,14 @@ const MODULES = [
       check:(log) => log.h1Count >= 1 && log.h2Count >= 1 && log.paragraphs >= 2,
     },
     { id:'web1s3', name:'Even More Structure — h3 & h4', xp:30, lang:'web',
-      text:`<strong>Challenge 3</strong> — Headings nest, smallest to largest: h1 is the page title, h2 is a section, h3 is a sub-section INSIDE that section, h4 smaller still. Build a real 4-level outline: one h1, one h2, one h3, and one h4, each with a paragraph.`,
+      text:`<strong>Challenge 3</strong> — Headings nest, biggest to smallest, like a book: h1 = book title, h2 = chapter, h3 = a section INSIDE that chapter, h4 smaller still.
+        <div style="padding:14px;background:#fff;border:1px solid #ddd;border-radius:8px;margin:10px 0;color:#1a1a1a;">
+          <h1 style="margin:0 0 4px;font-size:26px;">1. h1 — the page title</h1>
+          <h2 style="margin:0 0 4px;font-size:20px;">2. h2 — a section</h2>
+          <h3 style="margin:0 0 4px;font-size:16px;">3. h3 — a sub-section inside it</h3>
+          <h4 style="margin:0;font-size:13px;">4. h4 — smaller still</h4>
+        </div>
+        Build a real 4-level outline: one <code>&lt;h1&gt;</code>, one <code>&lt;h2&gt;</code>, one <code>&lt;h3&gt;</code>, and one <code>&lt;h4&gt;</code> — IN THAT ORDER on the page — each with its own <code>&lt;p&gt;</code> underneath (4 headings, 4 paragraphs total).`,
       hints:[
         'Think of a book: h1 = book title, h2 = chapter, h3 = section within the chapter, h4 = a small point within that section.',
         'They must be in this ORDER on the page — h1, then h2, then h3, then h4 — not scrambled.',
@@ -2669,7 +2693,8 @@ const MODULES = [
       check:(log) => log.h1Count >= 1 && log.h2Count >= 1 && log.h3Count >= 1 && log.h4Count >= 1 && log.paragraphs >= 4,
     },
     { id:'web1s4', name:'One Level Deeper — h5', xp:30, lang:'web',
-      text:`<strong>Challenge 4</strong> — Headings can nest one level further still: add an <code>&lt;h5&gt;</code> INSIDE your h4's section, with its own paragraph — five heading levels in total, h1 through h5, in order.`,
+      text:`<strong>Challenge 4</strong> — One level deeper still: <code>&lt;h5&gt;</code> — a small point INSIDE your h4's section, same book analogy.
+        Add an <code>&lt;h5&gt;</code> with its own <code>&lt;p&gt;</code>, keeping the strict order: h1, h2, h3, h4, h5 — five heading levels, five paragraphs, in total.`,
       hints:[
         'Same book analogy, one level deeper: h5 = a small point within the h4 point.',
         'Keep the order strict: h1, h2, h3, h4, then h5 — each with its own paragraph underneath.',
@@ -2681,7 +2706,11 @@ const MODULES = [
       check:(log) => log.h1Count >= 1 && log.h2Count >= 1 && log.h3Count >= 1 && log.h4Count >= 1 && log.h5Count >= 1 && log.paragraphs >= 5,
     },
     { id:'web1boss', name:'BOSS — A Real Document Outline', xp:50, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — Nothing new: one full page using EVERY heading level together — h1, TWO h2 sections, and inside one of those sections a real h3, h4, AND h5 — each with its own paragraph. A real outline, not a flat list of headings.`,
+      text:`<strong>BOSS</strong> — Nothing new: one full page using EVERY heading level together.
+        1. One <code>&lt;h1&gt;</code>, with a <code>&lt;p&gt;</code><br>
+        2. TWO separate <code>&lt;h2&gt;</code> sections, each with its own <code>&lt;p&gt;</code><br>
+        3. Inside ONE of those h2 sections: a real <code>&lt;h3&gt;</code>, <code>&lt;h4&gt;</code>, and <code>&lt;h5&gt;</code> — each with its own <code>&lt;p&gt;</code><br><br>
+        That's 6 headings and 6 paragraphs total — a real outline, not a flat list of headings.`,
       hints:[
         'This is genuinely just Challenges 1-4 combined, with an extra h2 section.',
         'Count carefully: 1 h1, 2 h2s, 1 h3, 1 h4, 1 h5 — six headings total, six paragraphs.',
