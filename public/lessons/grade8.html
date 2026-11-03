@@ -832,6 +832,12 @@ function buildWebLog(doc, win, html, css, js) {
     // the Grade 8 exam's "has a link" check (no color/padding required
     // there, since styling it isn't taught yet — see examRecipe).
     linkHrefOk: [...doc.querySelectorAll('a')].some(a => (a.getAttribute('href') || '').trim().length > 0),
+    // Text styling module (web2b) — a real tag with REAL text inside it
+    // (not an empty <b></b>, which would technically match querySelectorAll
+    // but teaches nothing).
+    boldCount:      [...doc.querySelectorAll('b')].filter(e => e.textContent.trim().length > 0).length,
+    italicCount:    [...doc.querySelectorAll('i')].filter(e => e.textContent.trim().length > 0).length,
+    underlineCount: [...doc.querySelectorAll('u')].filter(e => e.textContent.trim().length > 0).length,
     // "Your First Page" module — images. altOk requires a REAL, non-empty
     // alt on every single img (not just the first) — an image with a blank
     // alt="" is a common near-miss this specifically catches.
@@ -1586,6 +1592,13 @@ function checkWebChallenge(log) {
     if (_examState && _examState.submitted) return
     if (!_examSubmitting) {
       renderExamChecklist(log)
+      // The console's last line before this was "Ran — checking your
+      // page…" with nothing ever following it (the pass/fail message used
+      // to go here, before the checklist panel replaced it) — looked
+      // exactly like a stuck/never-ending check even though it had already
+      // finished. Reported live; this closes that loop explicitly.
+      const allOk = examCriteria(log).every(c => c.ok)
+      clog(allOk ? '✅ Checked — see the checklist above.' : '👀 Checked — see which items are still missing above.', allOk ? 'ok' : 'info')
       LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code: currentWebCode(), saveData: examSaveData() })
       return
     }
@@ -2585,6 +2598,74 @@ const MODULES = [
       ],
       webStarter: { html: `<!-- TODO: heading + paragraph, 2 links, 2 buttons, and a <ul> with 3+ <li> items -->\n`, css: ``, js: `` },
       check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 2 && log.buttons >= 2 && log.listItems >= 3,
+    },
+  ]},
+  // ── Numbered lists + text styling — new module, one small step at a time
+  // (ported from the Grade 8 exam's own reference material — the exam
+  // explains these live, but students need a real hands-on lesson BEFORE
+  // the exam requires them, not just a reference card during it).
+  { id:'web2b', name:'📝 Numbered Lists & Text Styling', sub:'One new tag at a time: ol, then bold, then italic, then underline', live:true, stages:[
+    { id:'web2b1', name:'Ordered Lists — ol', xp:30, lang:'web',
+      text:`<strong>Challenge 1</strong> — You already know <code>&lt;ul&gt;</code> for a list where the order doesn't matter. <code>&lt;ol&gt;</code> (ordered list) is its numbered twin — use it when the order DOES matter, like steps in a recipe.
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;">
+          <div style="flex:1;min-width:150px;padding:10px 10px 10px 28px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">
+            <div style="font-size:10.5px;font-weight:700;color:#666;margin:-2px 0 6px -18px;">&lt;ul&gt; — order doesn't matter</div>
+            <ul style="margin:0;padding-left:16px;font-size:12px;line-height:1.7;"><li>Pizza</li><li>Tacos</li><li>Sushi</li></ul>
+          </div>
+          <div style="flex:1;min-width:150px;padding:10px 10px 10px 28px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">
+            <div style="font-size:10.5px;font-weight:700;color:#666;margin:-2px 0 6px -18px;">&lt;ol&gt; — order matters</div>
+            <ol style="margin:0;padding-left:16px;font-size:12px;line-height:1.7;"><li>Wake up</li><li>Get dressed</li><li>Eat breakfast</li></ol>
+          </div>
+        </div>
+        Add an <code>&lt;ol&gt;</code> with at least THREE <code>&lt;li&gt;</code> items below your list — real steps for doing something, in the order they actually happen.`,
+      hints:[
+        '&lt;ol&gt;&lt;li&gt;First step&lt;/li&gt;&lt;li&gt;Second step&lt;/li&gt;&lt;li&gt;Third step&lt;/li&gt;&lt;/ol&gt;',
+        'Everything about &lt;ol&gt; works exactly like &lt;ul&gt; — only the tag name changes, and the browser draws numbers instead of bullets.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<ul>\n  <li>Item one</li>\n  <li>Item two</li>\n  <li>Item three</li>\n</ul>\n<!-- TODO: add an <ol> with at least 3 <li> steps, in order -->\n`, css: ``, js: `` },
+      check:(log) => log.olItems >= 3,
+    },
+    { id:'web2b2', name:'Bold Text — b', xp:25, lang:'web',
+      text:`<strong>Challenge 2</strong> — <code>&lt;b&gt;</code> makes text <b>bold</b> — heavier, darker, stands out from the text around it. Use it to pull a reader's eye to one important word or phrase, without turning it into a whole new heading.
+        <div style="padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;margin:10px 0;color:#1a1a1a;font-size:14px;">Don't forget to bring your <b>water bottle</b> and <b>running shoes</b>.</div>
+        Add at least one <code>&lt;b&gt;</code> tag around a real word or phrase in your paragraph.`,
+      hints:[
+        '&lt;p&gt;I really love &lt;b&gt;chocolate cake&lt;/b&gt;.&lt;/p&gt;',
+        'The bold tag wraps AROUND existing words — it doesn\'t replace them.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<!-- TODO: add a <p> with a real sentence, with one word/phrase wrapped in <b> -->\n`, css: ``, js: `` },
+      check:(log) => log.boldCount >= 1,
+    },
+    { id:'web2b3', name:'Italic Text — i', xp:25, lang:'web',
+      text:`<strong>Challenge 3</strong> — <code>&lt;i&gt;</code> makes text <i>italic</i> — slanted. A different kind of emphasis than bold: often used for a book/movie title, a word in another language, or a quiet aside.
+        <div style="padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;margin:10px 0;color:#1a1a1a;font-size:14px;">My favorite book is <i>The Hobbit</i>, by J.R.R. Tolkien.</div>
+        Add at least one <code>&lt;i&gt;</code> tag around a real word or phrase.`,
+      hints:[
+        '&lt;p&gt;We watched &lt;i&gt;Finding Nemo&lt;/i&gt; last night.&lt;/p&gt;',
+        'Bold and italic can both exist on the same page, in different places — they\'re not alternatives to each other.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<!-- TODO: add a <p> with a real sentence, with one word/phrase wrapped in <i> -->\n`, css: ``, js: `` },
+      check:(log) => log.italicCount >= 1,
+    },
+    { id:'web2b4', name:'Underline Text — u', xp:25, lang:'web',
+      text:`<strong>Challenge 4</strong> — <code>&lt;u&gt;</code> draws a line <u>under</u> text. Use it sparingly — on the real web, underlined text usually MEANS "this is a clickable link," so underlining plain text can confuse a reader into clicking something that isn't there.
+        <div style="padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;margin:10px 0;color:#1a1a1a;font-size:14px;">Please read the <u>important notice</u> before you begin.</div>
+        Add at least one <code>&lt;u&gt;</code> tag around a real word or phrase.`,
+      hints:[
+        '&lt;p&gt;This is the &lt;u&gt;final&lt;/u&gt; step.&lt;/p&gt;',
+        'If you\'re tempted to underline a whole sentence, a real link (&lt;a&gt;) or bold (&lt;b&gt;) is usually the better tool.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>This is my page.</p>\n<!-- TODO: add a <p> with a real sentence, with one word/phrase wrapped in <u> -->\n`, css: ``, js: `` },
+      check:(log) => log.underlineCount >= 1,
+    },
+    { id:'web2bboss', name:'BOSS — ol, b, i, and u Together', xp:60, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Nothing new: a <code>&lt;ul&gt;</code> AND an <code>&lt;ol&gt;</code> (3+ items each), plus real text using <code>&lt;b&gt;</code>, <code>&lt;i&gt;</code>, and <code>&lt;u&gt;</code> somewhere on the page — every tag from Challenges 1-4, together.`,
+      hints:[
+        'This is genuinely just Challenges 1-4 combined onto one page.',
+        'Count before you check: a ul with 3+ items, an ol with 3+ items, one real b, one real i, one real u.',
+      ],
+      webStarter: { html: `<!-- TODO: a <ul> (3+ items), an <ol> (3+ items), and a paragraph using <b>, <i>, and <u> -->\n`, css: ``, js: `` },
+      check:(log) => log.ulItems >= 3 && log.olItems >= 3 && log.boldCount >= 1 && log.italicCount >= 1 && log.underlineCount >= 1,
     },
   ]},
   // ── Semester 1, Week 4: Colors & Shading — EXPANDED (was 6 stages of
@@ -3749,6 +3830,7 @@ const MODULES = [
           + '<b>Ingredients text color:</b> <code>#880E4F</code> (dark pink — readable on the pink background)<br>'
           + '<b>Steps text color:</b> <code>#555555</code> (gray — matches the picture\'s Method/Steps section)<br>'
           + '<b>"Finished cookies" caption text:</b> <code>#4A7C59</code> (green), <code>font-size: 12px;</code> — smaller than your other text, since it\'s a minor caption, not a heading<br>'
+          + '<b>"PREP 15 MIN &middot; BAKE 12 MIN" text:</b> <code>#777777</code> (gray), <code>font-size: 11px;</code> — even smaller than the caption above; it\'s the smallest, least important text on the whole page<br>'
           + '<b>Link button background:</b> <code>#2E7D32</code> (green), <code>padding: 10px 16px;</code><br><br>'
           + 'The exact numbers above are just one real option that works — any padding of <code>8px</code> or more on a colored box looks fine; the link specifically needs <code>padding-top</code> of at least <code>6px</code> (see the checklist above).'
           + '</div>')}
@@ -8584,6 +8666,21 @@ const CHALLENGE_LESSON = {
   web2boss: { title: 'BOSS — heading, paragraph, links, buttons, and a list', html: `
     <div class="cl-block"><h4>Nothing new</h4>
       <p>Heading + paragraph, TWO links, TWO buttons, and a 3+ item list — every tag from Challenges 1-3, together on one page.</p></div>` },
+  web2b1: { title: 'ol — a list where the order matters', html: `
+    <div class="cl-block"><h4>Same idea as ul, a different job</h4>
+      <p>&lt;ul&gt; and &lt;ol&gt; both hold &lt;li&gt; items and work exactly the same way in HTML — the only difference is which one the browser draws: bullets for ul, numbers for ol. Pick based on whether swapping two items would change the meaning: a shopping list (ul) doesn't care about order; the steps to bake cookies (ol) absolutely do.</p></div>` },
+  web2b2: { title: 'b — bold draws the eye', html: `
+    <div class="cl-block"><h4>One word, made heavier</h4>
+      <p>&lt;b&gt; wraps around existing text and makes it bold — it doesn't add new words, it changes how the words already there look. Real pages use it to make one important word or phrase stand out from a sentence around it, without turning it into a whole separate heading.</p></div>` },
+  web2b3: { title: 'i — italic for a different kind of emphasis', html: `
+    <div class="cl-block"><h4>Slanted, not heavier</h4>
+      <p>&lt;i&gt; wraps around text and slants it. It's a different KIND of emphasis than bold — commonly used for titles of books/movies, words borrowed from another language, or a quiet aside. Bold and italic aren't competing options; real pages often use both, in different places.</p></div>` },
+  web2b4: { title: 'u — underline, used carefully', html: `
+    <div class="cl-block"><h4>A line underneath — but it has a reputation</h4>
+      <p>&lt;u&gt; draws a line under text. The real-world catch: on the web, underlined text almost always MEANS "this is a link" — so underlining plain, non-clickable text can trick a reader into trying to click it. Use it sparingly, and reach for &lt;a&gt; or &lt;b&gt; first if you're not sure.</p></div>` },
+  web2bboss: { title: 'BOSS — ol, b, i, and u together', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>A ul AND an ol (3+ items each), plus real text using b, i, and u — every tag from Challenges 1-4, together on one page.</p></div>` },
   web3s1: { title: 'CSS decides how it looks, not what\'s there', html: `
     <div class="cl-block"><h4>Content vs. style, the Week 1 split, now concrete</h4>
       <p>HTML said WHAT is on the page. CSS says how it LOOKS — background-color, color, and more. Same page, two completely separate jobs.</p></div>
