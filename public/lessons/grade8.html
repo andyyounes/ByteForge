@@ -1427,24 +1427,32 @@ function stopExamTracking() {
   _examState = null
 }
 
-// ── Exam text translation ───────────────────────────────────────────────────
-// Ordinary lesson/exercise text (ch.text) is English-only across this whole
+// ── Exercise text translation ───────────────────────────────────────────────
+// Ordinary lesson/exercise text (ch.text) is English-only for most of this
 // file — only quiz prompts get translated (see window.G8_RU_QUIZ in
-// grade8-ru.js). The exam is the one exception: window.G8_RU_EXAM holds a
-// Russian version per stage id, as a FUNCTION (not a plain string) since it
-// calls figFrame()/figCode() — both defined in THIS file, loaded after
-// grade8-ru.js, so evaluating it at module-load time would throw.
+// grade8-ru.js) — except two Russian maps hand-written for specific stages:
+//   window.G8_RU_EXAM — the exam, as a FUNCTION per stage id (not a plain
+//     string) since it calls figFrame()/figCode() — both defined in THIS
+//     file, loaded after grade8-ru.js, so evaluating it at module-load time
+//     would throw.
+//   window.G8_RU_WEB — a handful of other stages translated alongside a
+//     content pass (plain strings — none of these use the deferred
+//     figFrame/figCode helpers, so no function wrapper needed).
 function examStageText(ch) {
-  if (ch && typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
-      && window.G8_RU_EXAM && typeof window.G8_RU_EXAM[ch.id] === 'function') {
-    return window.G8_RU_EXAM[ch.id]()
+  if (ch && typeof BFLang !== 'undefined' && BFLang.get() === 'ru') {
+    if (window.G8_RU_EXAM && typeof window.G8_RU_EXAM[ch.id] === 'function') {
+      return window.G8_RU_EXAM[ch.id]()
+    }
+    if (window.G8_RU_WEB && typeof window.G8_RU_WEB[ch.id] === 'string') {
+      return window.G8_RU_WEB[ch.id]
+    }
   }
   return ch ? ch.text : ''
 }
 if (typeof BFLang !== 'undefined') {
   BFLang.onChange(() => {
     const ch = CHALLENGES[activeIdx]
-    if (ch && ch.id === 'examRecipe') document.getElementById('ch-text').innerHTML = examStageText(ch)
+    if (ch) document.getElementById('ch-text').innerHTML = examStageText(ch)
   })
 }
 

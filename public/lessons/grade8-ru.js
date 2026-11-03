@@ -474,3 +474,98 @@ window.G8_RU_EXAM = {
       + '<div style="font-size:11px;color:var(--fg-faint);margin-top:4px;">👆 Нажмите на картинку, чтобы открыть её в полном размере в новой вкладке — это целая страница, она выше, чем эта панель.</div>'
   },
 }
+
+// window.G8_RU_WEB — plain-string Russian translations for a handful of
+// stages touched during the exam-level-detail content pass (see TODO.md).
+// Unlike G8_RU_EXAM these don't call figFrame()/figCode(), so a plain
+// string works fine — no function wrapper needed.
+window.G8_RU_WEB = {
+  web2s1: `<strong>Задание 1</strong> — Два тега, которые выглядят похоже, но делают совершенно разные вещи.
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;">
+          <div style="flex:1;min-width:150px;padding:12px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">
+            <div style="font-size:10.5px;font-weight:700;color:#666;margin-bottom:8px;">&lt;a&gt; — ведёт на другую страницу</div>
+            <a href="#" style="color:#2563eb;text-decoration:underline;font-size:14px;" onclick="return false">Перейти в магазин</a>
+          </div>
+          <div style="flex:1;min-width:150px;padding:12px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">
+            <div style="font-size:10.5px;font-weight:700;color:#666;margin-bottom:8px;">&lt;button&gt; — делает что-то ЗДЕСЬ</div>
+            <button style="padding:6px 14px;border-radius:6px;border:1px solid #bbb;background:#f3f4f6;font-size:13px;cursor:pointer;">В корзину</button>
+          </div>
+        </div>
+        <b>Почему нельзя просто оформить любой текст так, чтобы он выглядел кликабельным?</b> Настоящий <code>&lt;a&gt;</code> можно открыть в новой вкладке, добавить в закладки или навести на него курсор, чтобы увидеть, куда он ведёт — а настоящую <code>&lt;button&gt;</code> можно активировать с клавиатуры (перейти к ней клавишей Tab, затем нажать Enter), и программы чтения с экрана правильно объявляют её как кнопку. Текст, который просто ВЫГЛЯДИТ кликабельным, ничего из этого не умеет.
+        <ol style="margin:10px 0 0;padding-left:20px;">
+          <li>Сохрани свои <code>&lt;h1&gt;</code> и <code>&lt;p&gt;</code> с прошлого раза</li>
+          <li>Один настоящий <code>&lt;a&gt;</code> — с атрибутом <code>href</code>, любой адрес</li>
+          <li>Одна настоящая <code>&lt;button&gt;</code> — пока она ничего не будет ДЕЛАТЬ, это будет в следующем семестре</li>
+        </ol>`,
+
+  web2s2: `<strong>Задание 2</strong> — На настоящих страницах редко бывает только одна ссылка или кнопка.
+        <div style="padding:12px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;margin:10px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:10.5px;font-weight:700;color:#666;">навигация:</span>
+          <a href="#" style="color:#2563eb;text-decoration:underline;font-size:13px;" onclick="return false">Главная</a>
+          <a href="#" style="color:#2563eb;text-decoration:underline;font-size:13px;" onclick="return false">О нас</a>
+          <span style="font-size:10.5px;font-weight:700;color:#666;margin-left:10px;">панель кнопок:</span>
+          <button style="padding:5px 12px;border-radius:6px;border:1px solid #bbb;background:#f3f4f6;font-size:12px;">Нравится</button>
+          <button style="padding:5px 12px;border-radius:6px;border:1px solid #bbb;background:#f3f4f6;font-size:12px;">Поделиться</button>
+        </div>
+        Ссылка «Главная» и ссылка «О нас» — обе настоящие ссылки, просто ведущие в разные места — та же идея для кнопок «Нравится» и «Поделиться». Добавь ВТОРУЮ ссылку (с адресом, отличным от первой) и ВТОРУЮ кнопку, чтобы на странице было по 2 штуки каждого тега.`,
+
+  web2s3: `<strong>Задание 3</strong> — <code>&lt;ul&gt;</code> (маркированный список) группирует связанные пункты, когда ПОРЯДОК не важен — любимая еда, увлечения, список покупок.
+        <div style="padding:12px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;margin:10px 0;">
+          <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;"><li>Пицца</li><li>Тако</li><li>Суши</li></ul>
+        </div>
+        <b>Почему именно &lt;ul&gt;, а не просто три абзаца?</b> <code>&lt;ul&gt;</code> говорит браузеру, что эти пункты принадлежат к ОДНОЙ группе — он сам рисует маркеры, а программа чтения с экрана объявляет «список из 3 пунктов» вместо трёх несвязанных предложений.
+        <ol style="margin:10px 0 0;padding-left:20px;">
+          <li>Один <code>&lt;ul&gt;</code> — контейнер списка</li>
+          <li>Как минимум ТРИ элемента <code>&lt;li&gt;</code> внутри него, каждый — настоящее слово или короткая фраза</li>
+        </ol>`,
+
+  web2boss: `<strong>БОСС</strong> — Ничего нового, просто всё из заданий 1-3 на одной странице:
+        <ol style="margin:10px 0 0;padding-left:20px;">
+          <li>Твои <code>&lt;h1&gt;</code> + <code>&lt;p&gt;</code></li>
+          <li>ДВЕ ссылки <code>&lt;a&gt;</code> с разными адресами</li>
+          <li>ДВЕ кнопки <code>&lt;button&gt;</code></li>
+          <li>Один <code>&lt;ul&gt;</code> как минимум с ТРЕМЯ элементами <code>&lt;li&gt;</code></li>
+        </ol>`,
+
+  jsf1boss: `<strong>Задание: Всё обо мне в коде</strong> — Напиши программу, которая рассказывает о тебе, используя всё из этого модуля:
+        <ol style="margin:8px 0 0 18px;padding:0;">
+          <li>Комментарий в начале с твоим именем</li>
+          <li>Минимум 3 строковые переменные о себе (имя, любимое занятие, любимая еда, любимый эмодзи и т.д.)</li>
+          <li>Комментарий над КАЖДОЙ переменной, объясняющий, что она хранит</li>
+          <li>Сообщение, выведенное в консоль с помощью <code>console.log()</code></li>
+          <li>Сообщение, выведенное на страницу с помощью <code>document.write()</code></li>
+        </ol>
+        <h4>Как должно выглядеть правильное решение</h4>
+        <pre style="background:var(--bg-raised);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;overflow-x:auto;">// Информация об Алексе
+// хранит моё имя
+let myName = "Alex";
+// хранит мою любимую еду
+let favoriteFood = "tacos";
+// хранит мой любимый эмодзи
+let favoriteEmoji = "🌮";
+
+console.log("Скрипт «Всё обо мне» запущен!");
+document.write("Привет, я " + myName + ".&lt;br&gt;Я люблю " + favoriteFood + " " + favoriteEmoji);</pre>
+        Попробуй использовать <code>&lt;br&gt;</code> внутри строки document.write() для переноса строк.`,
+
+  jsf2boss: `<strong>Задание: Спланируй автопутешествие.</strong> Организуй и посчитай детали для автопутешествия:
+        <ol style="margin:8px 0 0 18px;padding:0;">
+          <li><b>Общая информация:</b> строка — имя водителя, строка — пункт назначения, булево значение — берём ли перекусы, число — расстояние (в милях), число — время (в часах)</li>
+          <li><b>3 достопримечательности:</b> найди 3 настоящих места по пути, каждое — отдельная строковая переменная</li>
+          <li><b>Вычисления:</b> speed = distance ÷ time; gasCost = (distance ÷ MPG) × gasPrice — используя <code>const MPG = 25;</code> и <code>const gasPrice = 3.50;</code> (эти значения никогда не меняются, поэтому здесь правильно использовать <code>const</code>, а не <code>let</code>)</li>
+          <li>Выведи сводку о поездке с помощью <code>console.log()</code> или <code>document.write()</code>, включая всю информацию, вычисления и 3 достопримечательности</li>
+          <li>Как минимум ОДИН комментарий, объясняющий часть твоего кода</li>
+        </ol>`,
+
+  py1s1: `<strong>Задание 1</strong> — Переменная — это всё то же самое, что было в блочном программировании 7 класса: именованная коробка, хранящая значение — просто теперь записанная настоящим синтаксисом: имя, знак <code>=</code> и значение (текст в кавычках, числа без них). Заполни 3 присваивания переменных и 2 вызова print() ниже.`,
+
+  py2s1: `<strong>Задание 1</strong> — <code>if</code>/<code>else</code> позволяет твоему коду принимать настоящее решение: один путь выполняется, если условие истинно, другой — если ложно, никогда оба сразу. Заполни пропущенное условие и ветку else ниже, чтобы программа определяла, чётное ли число <code>number</code>.`,
+
+  py3s1: `<strong>Задание 1</strong> — Цикл <code>for</code> повторяет код заданное количество раз, без того, чтобы самому набирать <code>print()</code> пять раз подряд. Заполни цикл так, чтобы он печатал 0, 1, 2, 3, 4 — пять чисел, используя <code>range()</code>.`,
+
+  py4s1: `<strong>Задание 1</strong> — Цикл <code>for</code> нужен, когда известно «ровно N раз». Цикл <code>while</code> нужен для «продолжай, ПОКА что-то не изменится» — ты не всегда заранее знаешь, сколько раз он выполнится. Заполни условие цикла while и его шаг обновления так, чтобы он отсчитывал от 5 до 1.`,
+
+  py5s1: `<strong>Задание 1</strong> — Список — это именованная коробка, которая хранит МНОГО значений, а не одно — та же идея, что и массивы в 7 классе. Добавь "sword" в список, затем выведи первый элемент.`,
+
+  m3s1: `<strong>Задание 1 — Функции и параметры</strong> — <code>def</code> — это многоразовый блок кода с ИМЕНЕМ: напиши шаги рисования один раз, а затем вызывай это имя сколько угодно раз, каждый раз с разными значениями (его <b>параметрами</b>), вместо того чтобы копировать одни и те же строки снова и снова. Допиши функцию <code>draw_smiley()</code>, добавив глаза и рот. Затем вызови её минимум дважды с разными цветами или размерами.`,
+}
