@@ -45,9 +45,9 @@ the SAME commit so the two never drift.
 
 - [x] web0 — What Is a Website? (3 stages) — mostly quiz/conceptual, revisit only if genuinely unclear
 - [x] web0b — Your First Page (6 stages)
-- [ ] web0c — Directories, Files & Paths (6 stages)
-- [ ] web1 — Your First Tags (5 stages)
-- [ ] web2 — More Tags (4 stages)
+- [x] web0c — Directories, Files & Paths (6 stages) — already detailed (live tree diagrams, WHY explanations); quiz-type, no numbered-checklist need
+- [x] web1 — Your First Tags (5 stages)
+- [x] web2 — More Tags (4 stages)
 - [x] web2b — Numbered Lists & Text Styling (5 stages) — built this session, already matches the pattern
 - [ ] web3 — Colors & Shading (18 stages) — large; already has some good explainers (explainColorFailure), check per-stage text depth
 - [ ] kc1 — Knowledge Check (2 stages) — real assessment, light-touch only (don't pad a test with teaching content)
@@ -97,3 +97,4 @@ the SAME commit so the two never drift.
 
 ## Log
 - 2026-11-XX: created this file. Converting web1 next (small, foundational, hands-on — a good first real conversion to set the pattern for the rest of Semester 1).
+- 2026-11-03: web1's checkbox was stale (already converted + committed earlier, just never ticked here) — fixed. web0c reviewed: already detailed (live tree diagrams, WHY), no rewrite needed, marked done. web2 converted: added live link-vs-button + navbar/toolbar + ul visuals, WHY explanations, numbered checklists on web2s1/s3/boss. Next: web3 (Colors & Shading, 18 stages, large — check per-stage depth, it may already be mostly there via explainColorFailure).

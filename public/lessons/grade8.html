@@ -2756,7 +2756,23 @@ const MODULES = [
   // ── Semester 1, Week 3: More Tags — links vs. buttons.
   { id:'web2', name:'🔗 More Tags', sub:'A link takes you elsewhere; a button does something here', live:true, stages:[
     { id:'web2s1', name:'Link & Button', xp:30, lang:'web',
-      text:`<strong>Challenge 1</strong> — Keep last week's heading + paragraph, and add a real <code>&lt;a&gt;</code> link (any destination) and a real <code>&lt;button&gt;</code> (does nothing yet — that's next semester).`,
+      text:`<strong>Challenge 1</strong> — Two tags that look similar but do very different jobs.
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;">
+          <div style="flex:1;min-width:150px;padding:12px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">
+            <div style="font-size:10.5px;font-weight:700;color:#666;margin-bottom:8px;">&lt;a&gt; — goes somewhere else</div>
+            <a href="#" style="color:#2563eb;text-decoration:underline;font-size:14px;" onclick="return false">Visit our store</a>
+          </div>
+          <div style="flex:1;min-width:150px;padding:12px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">
+            <div style="font-size:10.5px;font-weight:700;color:#666;margin-bottom:8px;">&lt;button&gt; — does something HERE</div>
+            <button style="padding:6px 14px;border-radius:6px;border:1px solid #bbb;background:#f3f4f6;font-size:13px;cursor:pointer;">Add to Cart</button>
+          </div>
+        </div>
+        <b>Why not just style anything to look clickable?</b> A real <code>&lt;a&gt;</code> can be opened in a new tab, bookmarked, or hovered to preview its destination — and a real <code>&lt;button&gt;</code> can be triggered with the keyboard (Tab to it, press Enter) and gets announced correctly to screen readers. Text that just LOOKS clickable gets none of that for free.
+        <ol style="margin:10px 0 0;padding-left:20px;">
+          <li>Keep your <code>&lt;h1&gt;</code> and <code>&lt;p&gt;</code> from before</li>
+          <li>One real <code>&lt;a&gt;</code> — with an <code>href</code>, any destination</li>
+          <li>One real <code>&lt;button&gt;</code> — it won't DO anything yet, that's next semester</li>
+        </ol>`,
       hints:[
         'A link needs an href: &lt;a href="https://example.com"&gt;Click here&lt;/a&gt;.',
         'A button on its own does nothing when clicked — that\'s expected this week.',
@@ -2765,7 +2781,16 @@ const MODULES = [
       check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1,
     },
     { id:'web2s2', name:'Several Links & Buttons', xp:30, lang:'web',
-      text:`<strong>Challenge 2</strong> — Real pages rarely have just ONE link or button. Add a SECOND link (a different destination) and a SECOND button, so there are 2 of each on the page.`,
+      text:`<strong>Challenge 2</strong> — Real pages rarely have just one of anything.
+        <div style="padding:12px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;margin:10px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:10.5px;font-weight:700;color:#666;">a navbar:</span>
+          <a href="#" style="color:#2563eb;text-decoration:underline;font-size:13px;" onclick="return false">Home</a>
+          <a href="#" style="color:#2563eb;text-decoration:underline;font-size:13px;" onclick="return false">About</a>
+          <span style="font-size:10.5px;font-weight:700;color:#666;margin-left:10px;">a toolbar:</span>
+          <button style="padding:5px 12px;border-radius:6px;border:1px solid #bbb;background:#f3f4f6;font-size:12px;">Like</button>
+          <button style="padding:5px 12px;border-radius:6px;border:1px solid #bbb;background:#f3f4f6;font-size:12px;">Share</button>
+        </div>
+        A "Home" link and an "About" link are both real links, just pointing somewhere different — same idea for a "Like" button and a "Share" button. Add a SECOND link (a different destination from your first) and a SECOND button, so there are 2 of each on the page.`,
       hints:[
         'Two &lt;a&gt; tags, two different href values — a navbar with "Home" and "About" is a real example.',
         'Two &lt;button&gt; tags — e.g. "Like" and "Share".',
@@ -2774,7 +2799,15 @@ const MODULES = [
       check:(log) => log.links >= 2 && log.buttons >= 2,
     },
     { id:'web2s3', name:'A Real List', xp:30, lang:'web',
-      text:`<strong>Challenge 3</strong> — Lists group related items together — a <code>&lt;ul&gt;</code> (unordered list) holding at least THREE <code>&lt;li&gt;</code> items. Add one under your heading, e.g. your three favourite games, foods, or hobbies.`,
+      text:`<strong>Challenge 3</strong> — A <code>&lt;ul&gt;</code> (unordered list) groups related items where the ORDER doesn't matter — favourite foods, hobbies, a shopping list.
+        <div style="padding:12px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;margin:10px 0;">
+          <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.8;"><li>Pizza</li><li>Tacos</li><li>Sushi</li></ul>
+        </div>
+        <b>Why a &lt;ul&gt; and not just three paragraphs?</b> A <code>&lt;ul&gt;</code> tells the browser these items belong TOGETHER as one group — it draws the bullets for you, and a screen reader announces "list of 3 items" instead of three unrelated sentences.
+        <ol style="margin:10px 0 0;padding-left:20px;">
+          <li>One <code>&lt;ul&gt;</code> — the list container</li>
+          <li>At least THREE <code>&lt;li&gt;</code> items inside it, each a real word or short phrase</li>
+        </ol>`,
       hints:[
         '&lt;ul&gt;&lt;li&gt;Item one&lt;/li&gt;&lt;li&gt;Item two&lt;/li&gt;&lt;li&gt;Item three&lt;/li&gt;&lt;/ul&gt;',
         'Every &lt;li&gt; must be INSIDE a &lt;ul&gt; — it doesn\'t work on its own.',
@@ -2783,7 +2816,13 @@ const MODULES = [
       check:(log) => log.listItems >= 3,
     },
     { id:'web2boss', name:'BOSS — A Real Page of Tags', xp:60, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — Nothing new: heading + paragraph, TWO links, TWO buttons, and a list of at least THREE items, all on one page.`,
+      text:`<strong>BOSS</strong> — Nothing new, just everything from Challenges 1-3 on one page:
+        <ol style="margin:10px 0 0;padding-left:20px;">
+          <li>Your <code>&lt;h1&gt;</code> + <code>&lt;p&gt;</code></li>
+          <li>TWO <code>&lt;a&gt;</code> links, different destinations</li>
+          <li>TWO <code>&lt;button&gt;</code> tags</li>
+          <li>One <code>&lt;ul&gt;</code> with at least THREE <code>&lt;li&gt;</code> items</li>
+        </ol>`,
       hints:[
         'This is genuinely just Challenges 1-3 combined.',
         'Count before you check: 2 links, 2 buttons, 3+ list items.',
