@@ -85,9 +85,9 @@ the SAME commit so the two never drift.
 - [x] cc5 — Bringing It Together (1 stage) — checkpoint, correctly terse
 - [x] cc — Ship a Combat Encounter (3 stages) — capstone, correctly terse
 - [x] m3 — Functions (5 stages) — reviewed; m3s3-s5 already explain WHY well (contrast with earlier stages), only m3s1 (the first function, genuinely new concept) was missing an upfront explanation — added
-- [ ] m4 — Lists (5 stages)
-- [ ] m5 — Strings & Validation (5 stages)
-- [ ] m6 — Files & Data (6 stages)
+- [x] m4 — Lists (5 stages) — application of py5's lists to graphics (bar chart, list of tuples); the one new bit (tuple unpacking) is already clearly explained in the hint — no changes needed
+- [x] m5 — Strings & Validation (5 stages) — reviewed, real-world framing ("a sign-up form just received a messy username", "real apps never trust user input blindly") already carries the WHY — no rewrite needed
+- [x] m6 — Files & Data (6 stages) — reviewed, real-world framing throughout (spreadsheet AVERAGE/MAX/MIN analogy, binary search's WHY explained) — no rewrite needed
 - [ ] m7 — Inside the Machine (5 stages)
 - [ ] m8 — The Connected World (5 stages)
 - [ ] cyber — Cyber Defense (4 stages)
