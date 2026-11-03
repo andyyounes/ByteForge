@@ -88,9 +88,9 @@ the SAME commit so the two never drift.
 - [x] m4 — Lists (5 stages) — application of py5's lists to graphics (bar chart, list of tuples); the one new bit (tuple unpacking) is already clearly explained in the hint — no changes needed
 - [x] m5 — Strings & Validation (5 stages) — reviewed, real-world framing ("a sign-up form just received a messy username", "real apps never trust user input blindly") already carries the WHY — no rewrite needed
 - [x] m6 — Files & Data (6 stages) — reviewed, real-world framing throughout (spreadsheet AVERAGE/MAX/MIN analogy, binary search's WHY explained) — no rewrite needed
-- [ ] m7 — Inside the Machine (5 stages)
-- [ ] m8 — The Connected World (5 stages)
-- [ ] cyber — Cyber Defense (4 stages)
+- [x] m7 — Inside the Machine (5 stages) — reviewed, excellent (real phone-storage framing, callbacks to Grade 6/7's binary cards and Pixel Caves, compiler-vs-interpreter explained with a Grade 9 preview) — no rewrite needed
+- [x] m8 — The Connected World (5 stages) — reviewed, excellent (TCP/IP/HTTP explained concretely, star topology tied to real school wifi, genuine online-safety note) — no rewrite needed
+- [x] cyber — Cyber Defense (4 stages) — reviewed, excellent (lookalike domains, hashing explained as easy-forwards/impractical-to-reverse, combining phishing red flags with real AND/OR logic) — no rewrite needed
 - [ ] m9w — Interactive Apps (6 stages)
 - [ ] m10 — Capstone: Data App (6 stages)
 - [ ] bonus1 — Bonus: Personal Budget Tracker (3 stages)
