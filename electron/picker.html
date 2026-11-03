@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ByteForge</title>
+<style>
+  html, body {
+    margin: 0; height: 100%;
+    background: #0b1220;
+    color: #e5e9f5;
+    font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wrap { text-align: center; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  p.sub { font-size: 13px; color: #9aa4c0; margin: 0 0 32px; }
+  .grid {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 22px; max-width: 560px;
+  }
+  .tile {
+    position: relative;
+    width: 96px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    cursor: pointer;
+    background: none; border: none; color: inherit;
+    font-family: inherit;
+  }
+  .avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 700;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .tile:hover .avatar { border-color: #6366f1; transform: translateY(-2px); }
+  .name { font-size: 12.5px; color: #c7cde3; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .remove {
+    position: absolute; top: -4px; right: 6px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #1b2340; border: 1px solid #333c63; color: #9aa4c0;
+    font-size: 12px; line-height: 1; display: none;
+    align-items: center; justify-content: center; cursor: pointer;
+  }
+  .tile:hover .remove { display: flex; }
+  .remove:hover { background: #e24a5f; color: #fff; border-color: #e24a5f; }
+  .add .avatar { background: #151c33; border: 2px dashed #333c63; font-size: 30px; color: #6b7399; }
+  .add:hover .avatar { border-color: #6366f1; color: #6366f1; }
+  .add .name { color: #8891b5; }
+  .hint { margin-top: 36px; font-size: 11.5px; color: #5c6487; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>ByteForge</h1>
+    <p class="sub">Who's learning today?</p>
+    <div class="grid" id="grid"></div>
+    <p class="hint">Up to 5 profiles can be saved on this computer. Signing in always still needs a password.</p>
+  </div>
+<script>
+  const PALETTE = ['#6366f1', '#22d3ee', '#f59e0b', '#ec4899', '#10b981']
+
+  function initials(name) {
+    const parts = name.trim().split(/\s+/)
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+    return (parts[0][0] + parts[1][0]).toUpperCase()
+  }
+
+  async function render() {
+    const grid = document.getElementById('grid')
+    grid.innerHTML = ''
+    const profiles = await window.bf.picker.list()
+
+    profiles.forEach((p, i) => {
+      const tile = document.createElement('button')
+      tile.className = 'tile'
+      tile.innerHTML = `
+        <div class="remove" title="Remove this profile">&times;</div>
+        <div class="avatar" style="background:${PALETTE[i % PALETTE.length]}22;color:${PALETTE[i % PALETTE.length]}">${initials(p.name)}</div>
+        <div class="name">${p.name}</div>
+      `
+      tile.querySelector('.remove').addEventListener('click', async (e) => {
+        e.stopPropagation()
+        await window.bf.picker.remove(p.id)
+        render()
+      })
+      tile.addEventListener('click', () => window.bf.picker.select(p.email))
+      grid.appendChild(tile)
+    })
+
+    if (profiles.length < 5) {
+      const add = document.createElement('button')
+      add.className = 'tile add'
+      add.innerHTML = `<div class="avatar">+</div><div class="name">Add profile</div>`
+      add.addEventListener('click', () => window.bf.picker.addNew())
+      grid.appendChild(add)
+    }
+  }
+
+  render()
+</script>
+</body>
+</html>

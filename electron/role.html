@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ByteForge</title>
+<style>
+  html, body {
+    margin: 0; height: 100%;
+    background: #0b1220;
+    color: #e5e9f5;
+    font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wrap { text-align: center; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  p.sub { font-size: 13px; color: #9aa4c0; margin: 0 0 32px; }
+  .row { display: flex; gap: 18px; justify-content: center; }
+  .card {
+    width: 180px; padding: 28px 18px;
+    background: #151c33; border: 1px solid #262f52; border-radius: 14px;
+    color: inherit; font-family: inherit; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .card:hover { border-color: #6366f1; transform: translateY(-2px); }
+  .emoji { font-size: 36px; }
+  .label { font-size: 14.5px; font-weight: 600; }
+  .desc { font-size: 11.5px; color: #8891b5; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>ByteForge</h1>
+    <p class="sub">Who's opening the app?</p>
+    <div class="row">
+      <button class="card" id="teacher">
+        <span class="emoji">🧑‍🏫</span>
+        <span class="label">Teacher</span>
+        <span class="desc">Stays signed in on this computer</span>
+      </button>
+      <button class="card" id="student">
+        <span class="emoji">🧑‍🎓</span>
+        <span class="label">Student</span>
+        <span class="desc">Pick your profile, type your password</span>
+      </button>
+    </div>
+  </div>
+<script>
+  document.getElementById('teacher').addEventListener('click', () => window.bf.chooseRole('teacher'))
+  document.getElementById('student').addEventListener('click', () => window.bf.chooseRole('student'))
+</script>
+</body>
+</html>
