@@ -149,6 +149,9 @@
     .ch-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
     .xp-pill { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
                background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); }
+    .exam-timer-pill { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; font-variant-numeric:tabular-nums;
+               background:rgba(96,165,250,.12); color:#60a5fa; border:1px solid rgba(96,165,250,.25); }
+    .exam-timer-pill.over-time { background:rgba(248,113,113,.12); color:#f87171; border-color:rgba(248,113,113,.3); }
     .hint-btn { font-size:11px; color:#fbbf24; cursor:pointer; }
     .ch-footer { flex-shrink:0; padding:10px 14px; background:var(--bg-card); border-bottom:1px solid var(--border); }
     .ch-footer-next { width:100%; padding:12px; border-radius:9px; border:none; font-size:13.5px; font-weight:800;
@@ -348,6 +351,7 @@
           <div class="ch-text" id="ch-text">Select a challenge to begin.</div>
           <div class="ch-meta">
             <span class="xp-pill" id="xp-pill">+40 XP</span>
+            <span class="exam-timer-pill" id="exam-timer" style="display:none;"></span>
             <span class="hint-btn" onclick="showHint()">💡 Hint</span>
           </div>
         </div>
@@ -1244,11 +1248,62 @@ function checkQuiz() {
 // and a periodic snapshot of their code, so a solution that appears FULLY
 // FORMED in one jump (pasted) looks different from one that grew gradually
 // (typed). Active only while an isExam stage is the open challenge.
+// 90 minutes total — a real two-sitting budget, not a wall-clock countdown.
+// Only time spent actually in the exam stage counts (see priorElapsedSeconds
+// below), so closing the tab and coming back a day or a week later doesn't
+// burn through the budget while the student is away. Soft limit: the pill
+// turns red at 0:00, nothing is auto-submitted or locked.
+const EXAM_BUDGET_SECONDS = 90 * 60
 let _examState = null
 let _examSnapshotTimer = null
-function startExamTracking() {
+let _examTimerDisplayInterval = null
+
+function examElapsedSeconds() {
+  if (!_examState) return 0
+  return _examState.priorElapsedSeconds + Math.floor((Date.now() - _examState.startedAt) / 1000)
+}
+function examSaveData() {
+  const s = _examState
+  return {
+    tabSwitches:         s ? s.tabSwitches : 0,
+    awaySeconds:         s ? Math.round(s.awayMs / 1000) : 0,
+    snapshotCount:       s ? s.snapshots.length : 0,
+    snapshots:           s ? s.snapshots : [],
+    examDurationSeconds: examElapsedSeconds(),
+  }
+}
+function updateExamTimerDisplay() {
+  const el = document.getElementById('exam-timer')
+  if (!el || !_examState) return
+  const remaining = EXAM_BUDGET_SECONDS - examElapsedSeconds()
+  const over = remaining <= 0
+  const abs  = Math.abs(remaining)
+  const mm = String(Math.floor(abs / 60)).padStart(2, '0')
+  const ss = String(abs % 60).padStart(2, '0')
+  // Kept short on purpose — this sits in a narrow right-panel badge column
+  // (see .ch-meta) alongside the XP pill; a longer "Time's up — MM:SS over"
+  // string overflowed past the panel's own right edge and got clipped by
+  // its overflow-x:hidden, cutting the text off. Color alone (over-time
+  // class) carries the "you're over budget" signal instead.
+  el.textContent = (over ? '⏰ ' : '⏱ ') + mm + ':' + ss
+  el.title = over ? "Time's up — you're over the 90 minute budget" : 'Time remaining on this exam'
+  el.classList.toggle('over-time', over)
+}
+function startExamTracking(ch) {
   stopExamTracking()
-  _examState = { startedAt: Date.now(), tabSwitches: 0, awayMs: 0, awaySince: null, snapshots: [] }
+  // Resume the student's real cumulative time-on-exam from their last save
+  // (if any) instead of resetting to 0 every time the page reopens — see the
+  // EXAM_BUDGET_SECONDS comment above.
+  const priorSaveData = LessonSaves.saveDataFor(ch.id, 'grade8')
+  _examState = {
+    startedAt: Date.now(),
+    priorElapsedSeconds: (priorSaveData && priorSaveData.examDurationSeconds) || 0,
+    tabSwitches: 0, awayMs: 0, awaySince: null, snapshots: [],
+  }
+  const timerEl = document.getElementById('exam-timer')
+  if (timerEl) timerEl.style.display = ''
+  updateExamTimerDisplay()
+  _examTimerDisplayInterval = setInterval(updateExamTimerDisplay, 1000)
   _examSnapshotTimer = setInterval(() => {
     if (!_examState) return
     const code = currentWebCode()
@@ -1257,10 +1312,17 @@ function startExamTracking() {
       _examState.snapshots.push({ t: Math.round((Date.now() - _examState.startedAt) / 1000), code })
       if (_examState.snapshots.length > 60) _examState.snapshots.shift() // cap ~20 min of history at the 20s interval below
     }
+    // Autosave — a student who closes the tab mid-typing (without ever
+    // pressing ▶ Run) must not lose their work. Never downgrades `passed`:
+    // the server keeps it monotonic (see app/api/lesson-saves/route.ts).
+    LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code, saveData: examSaveData() })
   }, 20000)
 }
 function stopExamTracking() {
-  if (_examSnapshotTimer) { clearInterval(_examSnapshotTimer); _examSnapshotTimer = null }
+  if (_examSnapshotTimer)        { clearInterval(_examSnapshotTimer);        _examSnapshotTimer = null }
+  if (_examTimerDisplayInterval) { clearInterval(_examTimerDisplayInterval); _examTimerDisplayInterval = null }
+  const timerEl = document.getElementById('exam-timer')
+  if (timerEl) timerEl.style.display = 'none'
   _examState = null
 }
 document.addEventListener('visibilitychange', () => {
@@ -1339,7 +1401,6 @@ function checkWebChallenge(log) {
   // exam-result notification that reads its saveData) for every real exam
   // attempt — found by testing an actual submission end-to-end.
   if (ch.isExam) {
-    const s = _examState
     LessonSaves.save('grade8', ch.id, {
       passed: passOk,
       // Must repeat `code` here — the server upsert overwrites the row
@@ -1348,13 +1409,9 @@ function checkWebChallenge(log) {
       // null out the student's just-saved exam code. Caught live before
       // shipping by inspecting the actual POST body this call sends.
       code: currentWebCode(),
-      saveData: {
-        tabSwitches: s ? s.tabSwitches : 0,
-        awaySeconds: s ? Math.round(s.awayMs / 1000) : 0,
-        snapshotCount: s ? s.snapshots.length : 0,
-        snapshots: s ? s.snapshots : [],
-        examDurationSeconds: s ? Math.round((Date.now() - s.startedAt) / 1000) : 0,
-      },
+      // examSaveData() reads the same cumulative-across-sessions elapsed
+      // time the timer pill shows — see startExamTracking().
+      saveData: examSaveData(),
     })
   }
 }
@@ -3289,8 +3346,24 @@ const MODULES = [
   { id:'examGR8', name:'🎯 EXAM — Recipe Page', sub:'A real test — no starter code, no hints. Recreate the page exactly.', live:true, stages:[
     { id:'examRecipe', name:'EXAM — Recreate the Recipe Page', xp:100, lang:'web', boss:true, isExam:true,
       text:`<strong>EXAM</strong> — Recreate this page exactly, using everything you've learned: a skeleton, headings <code>h1</code>-<code>h4</code>, a <code>&lt;header&gt;</code> with a background colour, two <code>&lt;div&gt;</code>s with their own background colours, a bulleted list, a numbered list, a link styled to look like a button, and a <code>&lt;footer&gt;</code>.
-        <br><br>No starter code and no hints this time — this is a real test of what you remember.
-        <br><br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">`,
+        <br><br>You have <b>90 minutes</b> total — the timer next to your XP badge counts down. It's fine to close the tab and come back later (even a different day); your time and your code are both saved, and only picks back up while you're actually working on this page.
+        <br><br>You may look at the real recipe for ideas: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Your "See Original Recipe" button should link to it.
+        ${figFrame('Three tags you haven\'t used yet', figCode(
+          '&lt;b&gt;bold text&lt;/b&gt;\n&lt;i&gt;italic text&lt;/i&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;First step&lt;/li&gt;\n  &lt;li&gt;Second step&lt;/li&gt;\n&lt;/ol&gt;'
+        ) + '<div style="font-size:12px;">An <code>&lt;ol&gt;</code> (ordered list) works exactly like <code>&lt;ul&gt;</code>, but the browser numbers the items 1, 2, 3… instead of using bullets. Use it for the numbered steps.</div>')}
+        ${figFrame('Reminder — styling one specific div', figCode('HTML:  &lt;div id="ingredients"&gt;…&lt;/div&gt;\nCSS:   #ingredients { background-color: #F8BBD0; }')
+          + '<div style="font-size:12px;">An id selector in CSS starts with <code>#</code> and matches the element\'s <code>id</code> attribute — same idea as the class selector (<code>.</code>), but for one specific element instead of a group.</div>')}
+        ${figFrame('Special characters you\'ll need', '<div style="font-size:12px;line-height:1.9;">'
+          + 'An arrow (→), like in "See Original Recipe →": type <code>&amp;rarr;</code><br>'
+          + 'A degree symbol (°), like in "180°C": type <code>&amp;deg;</code><br>'
+          + 'You can\'t just type → or ° directly in some editors — these codes always work.'
+          + '</div>')}
+        ${figFrame('Suggested colors (feel free to use your own instead)', '<div style="font-size:12px;line-height:1.8;">'
+          + '<b>Header background:</b> <code>#D32F2F</code> (red)<br>'
+          + '<b>Ingredients box background:</b> <code>#F8BBD0</code> (pink)<br>'
+          + '<b>Link button background:</b> <code>#2E7D32</code> (green)'
+          + '</div>')}
+        <br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">`,
       hints:[],
       webStarter: { html: '', css: '', js: '' },
       check:(log) => {
@@ -9353,7 +9426,7 @@ function selectChallenge(i) {
   // Exam integrity tracking only runs while an isExam stage is actually
   // open — starts fresh every time one is opened (including reopening
   // after a failed attempt), stops the moment the student navigates away.
-  if (ch.isExam) startExamTracking()
+  if (ch.isExam) startExamTracking(ch)
   else stopExamTracking()
   document.getElementById('ch-row').style.display = ''
   document.getElementById('ch-text').innerHTML = ch.text

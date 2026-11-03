@@ -159,5 +159,17 @@ const LessonSaves = (() => {
     return row ? row.code : null
   }
 
-  return { load, save, completedSet, completedIds, savedWorkspace, savedCode, codeFor }
+  // ── saveDataFor ─────────────────────────────────────────────────────────────
+  // Returns the save_data object for ONE specific challenge id, or null if
+  // nothing was ever saved for it. Used e.g. to resume a persisted exam timer
+  // budget across sessions (examDurationSeconds carried over from the last
+  // save, not reset to 0 on every reopen). Must call load() first.
+  function saveDataFor(challengeId, lessonKey) {
+    const rows = _rows(lessonKey)
+    if (!rows) return null
+    const row = rows.find(s => s.challenge_id === challengeId)
+    return row ? row.save_data : null
+  }
+
+  return { load, save, completedSet, completedIds, savedWorkspace, savedCode, codeFor, saveDataFor }
 })()
