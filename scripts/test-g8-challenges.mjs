@@ -182,7 +182,7 @@ const webMaximalLog = () => ({
   bgColor: 'rgb(255, 247, 230)', headingColor: 'rgb(47, 59, 82)',
   h2Color: 'rgb(124, 58, 237)', h3Color: 'rgb(5, 150, 105)', pColor: 'rgb(75, 85, 99)',
   linkColor: 'rgb(29, 78, 216)', buttonBg: 'rgb(230, 57, 70)', buttonColor: 'rgb(255, 255, 255)',
-  linkBg: 'rgb(79, 70, 229)', linkPadTop: 10, linkDecoration: 'none',
+  linkBg: 'rgb(79, 70, 229)', linkPadTop: 10, linkDecoration: 'none', linkHrefOk: true,
   checkboxCount: 999, selectCount: 999, optionCount: 999, fieldsetCount: 999, legendCount: 999, legendInsideFieldsetOk: true,
   ulItems: 999, olItems: 999,
   hasVariable: true, imgCount: 1, imgAltOk: true, pageTitle: 'My Favorite Animal' })
@@ -196,7 +196,7 @@ const webEmptyLog   = () => ({ html: '', js: '', globals: {}, bodyText: '', hasA
   paragraphs: 0, buttons: 0, links: 0,
   headingText: [], paragraphText: [], bgColor: '', headingColor: '',
   h2Color: '', h3Color: '', pColor: '', linkColor: '', buttonBg: '', buttonColor: '',
-  linkBg: '', linkPadTop: 0, linkDecoration: '',
+  linkBg: '', linkPadTop: 0, linkDecoration: '', linkHrefOk: false,
   checkboxCount: 0, selectCount: 0, optionCount: 0, fieldsetCount: 0, legendCount: 0, legendInsideFieldsetOk: false,
   ulItems: 0, olItems: 0,
   hasVariable: false, imgCount: 0, imgAltOk: false, pageTitle: '',

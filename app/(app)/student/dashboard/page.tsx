@@ -212,7 +212,7 @@ export default async function StudentDashboardPage() {
   // exam unlocked" can never silently drift from the real curriculum), but
   // scoped to this student's own lesson_saves rows — never the teacher's
   // admin-client/class-scoped route.
-  let grade8Exam: { available: boolean; passed: boolean } | null = null
+  let grade8Exam: { available: boolean; submitted: boolean } | null = null
   if (effectiveGrade === 8) {
     try {
       const { data: g8Rows } = await supabase
@@ -228,7 +228,11 @@ export default async function StudentDashboardPage() {
         return !!prog && prog.total > 0 && prog.done >= prog.total
       })
       const examResult = summary.exams.find(e => e.stageId === 'examRecipe')
-      grade8Exam = { available: priorModulesDone, passed: examResult?.passed ?? false }
+      // Once submitted (pass or fail), ✓ Submit Exam locks the editors for
+      // good — resubmitting isn't possible without a teacher re-opening it
+      // (see /api/teacher/exam-reopen), so the banner has nothing left to
+      // invite the student to do. Gated on submitted, not passed.
+      grade8Exam = { available: priorModulesDone, submitted: examResult?.submitted ?? false }
     } catch {
       grade8Exam = null   // never let a curriculum-parsing hiccup break the dashboard
     }
@@ -284,7 +288,7 @@ export default async function StudentDashboardPage() {
         <div className="lg:col-span-2 space-y-4">
 
           {/* ── Grade 8 exam banner — above the lesson card, red/urgent ── */}
-          {grade8Exam?.available && !grade8Exam.passed && (
+          {grade8Exam?.available && !grade8Exam.submitted && (
             <Card className="border-rose-400/30 bg-rose-400/5">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">

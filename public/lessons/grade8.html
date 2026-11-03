@@ -384,6 +384,11 @@
         <div id="exam-locked-banner" style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);color:#f87171;font-size:12.5px;font-weight:600;">
           ✓ Submitted — this exam is locked. Ask your teacher if you need more time.
         </div>
+        <!-- Live, per-item pass/fail — updated on every ▶ Run (see
+             renderExamChecklist()). Replaces one vague "not quite yet" with
+             exactly which of the 5 requirements are/aren't met yet, plus a
+             clear "you can submit" once all 5 are. -->
+        <div id="exam-checklist" style="display:none;margin-bottom:10px;padding:10px 12px;border-radius:8px;background:var(--bg-raised);border:1px solid var(--border-hi);font-size:12.5px;"></div>
         <div class="ch-row-inner">
           <div class="ch-text" id="ch-text">Select a challenge to begin.</div>
           <div class="ch-meta">
@@ -823,6 +828,10 @@ function buildWebLog(doc, win, html, css, js) {
     linkBg:        doc.querySelector('a') ? getComputedStyle(doc.querySelector('a')).backgroundColor : '',
     linkPadTop:    doc.querySelector('a') ? parseFloat(getComputedStyle(doc.querySelector('a')).paddingTop) || 0 : 0,
     linkDecoration: doc.querySelector('a') ? getComputedStyle(doc.querySelector('a')).textDecorationLine : '',
+    // A real, non-empty href — not just an <a> with nothing in it. Used by
+    // the Grade 8 exam's "has a link" check (no color/padding required
+    // there, since styling it isn't taught yet — see examRecipe).
+    linkHrefOk: [...doc.querySelectorAll('a')].some(a => (a.getAttribute('href') || '').trim().length > 0),
     // "Your First Page" module — images. altOk requires a REAL, non-empty
     // alt on every single img (not just the first) — an image with a blank
     // alt="" is a common near-miss this specifically catches.
@@ -1095,7 +1104,16 @@ async function runWebCode() {
   // ── Single page (the original, unchanged behavior every existing stage uses) ──
   const html = webEditors.html.getValue()
   const result = await loadWebPage(iframe, buildWebSrcdoc(html, css, js))
-  if (result.error) { clog(result.error, 'err'); return }
+  if (result.error) {
+    clog(result.error, 'err')
+    // Exam stages: surface this in the checklist area too — it's the main
+    // feedback surface there, and a plain console line is easy to miss.
+    if (mission && mission.isExam) {
+      const el = document.getElementById('exam-checklist')
+      if (el) { el.style.display = ''; el.innerHTML = '<div style="color:#f87171;">⚠ Something in your code is broken and the page can\'t run: <code>' + result.error.replace(/</g, '&lt;') + '</code></div>' }
+    }
+    return
+  }
   const webLog = buildWebLog(result.doc, result.win, html, css, js)
   runClickTest(result.doc, webLog, mission)
   clog('Ran — checking your page…', 'info')
@@ -1321,6 +1339,7 @@ function checkQuiz() {
 // and a periodic snapshot of their code, so a solution that appears FULLY
 // FORMED in one jump (pasted) looks different from one that grew gradually
 // (typed). Active only while an isExam stage is the open challenge.
+
 // No visible timer or time budget — a countdown pressures students instead
 // of giving them room to actually learn (teacher's call). Total time spent
 // is still recorded quietly in save_data, for the teacher's own exam
@@ -1566,9 +1585,7 @@ function checkWebChallenge(log) {
     // already-submitted exam even if something calls these directly.
     if (_examState && _examState.submitted) return
     if (!_examSubmitting) {
-      clog(passOk
-        ? "✅ This would pass right now — click ✓ Submit Exam when you're ready to hand it in."
-        : '❌ Not quite yet — check the task above.', passOk ? 'ok' : 'err')
+      renderExamChecklist(log)
       LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code: currentWebCode(), saveData: examSaveData() })
       return
     }
@@ -1964,6 +1981,48 @@ function examPaddingSwatch(px, note) {
     + '<div style="background:#F8BBD0;color:#880E4F;padding:' + px + 'px;width:70px;font-size:11px;font-weight:700;border-radius:4px;">text</div>'
     + '<div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;max-width:100px;">' + px + 'px<br>' + note + '</div>'
     + '</div>'
+}
+// Live-rendered font-SIZE comparison (separate from examFontSwatch, which
+// compares font-FAMILY) — same word, only the px number changes, aligned on
+// a shared baseline so the real size jump between values is visible at a
+// glance instead of just read as a number.
+function examFontSizeSwatch(px, note) {
+  return '<div style="text-align:center;flex:1;min-width:70px;">'
+    + '<div style="color:#1a1a1a;font-size:' + px + 'px;line-height:1;white-space:nowrap;">Aa</div>'
+    + '<div style="font-size:10.5px;color:#666;margin-top:6px;font-weight:700;">' + px + 'px</div>'
+    + '<div style="font-size:10.5px;color:#888;margin-top:2px;">' + note + '</div>'
+    + '</div>'
+}
+// ── Exam grading criteria ───────────────────────────────────────────────────
+// Five independent structural checks, no colors/padding/classes required —
+// classes specifically haven't been taught yet. Shared by examRecipe's
+// check() (every() over this) and renderExamChecklist() (shows each one
+// separately, live, on every ▶ Run) so the two can never drift apart.
+function examCriteria(log) {
+  return [
+    { label: 'A &lt;div&gt; somewhere on the page', ok: (log.divs || []).length >= 1 },
+    { label: 'An ordered list — &lt;ol&gt; with at least one &lt;li&gt;', ok: log.olItems >= 1 },
+    { label: 'An unordered list — &lt;ul&gt; with at least one &lt;li&gt;', ok: log.ulItems >= 1 },
+    { label: 'A link with a real address (&lt;a href="..."&gt;)', ok: !!log.linkHrefOk },
+    { label: 'An image — &lt;img&gt; (any picture, it doesn\'t matter which)', ok: log.imgCount >= 1 },
+  ]
+}
+// Live, per-item feedback instead of one vague "not quite yet" — the
+// student sees exactly which requirement(s) are still missing, and a clear
+// "you can submit" the moment all five are met. Only used for isExam
+// stages; see checkWebChallenge()'s practice branch below.
+function renderExamChecklist(log) {
+  const el = document.getElementById('exam-checklist')
+  if (!el) return
+  const items = examCriteria(log)
+  const allOk = items.every(i => i.ok)
+  el.style.display = ''
+  el.innerHTML = items.map(i =>
+    '<div style="display:flex;align-items:center;gap:7px;padding:2px 0;' + (i.ok ? 'color:#4ade80;' : 'color:var(--fg-dim);') + '">'
+      + '<span style="flex-shrink:0;">' + (i.ok ? '✅' : '⬜') + '</span><span>' + i.label + '</span></div>'
+  ).join('') + (allOk
+    ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:#4ade80;font-weight:700;">✅ Everything looks correct — you can click ✓ Submit Exam now.</div>'
+    : '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--fg-faint);">Not quite yet — the ⬜ items above are still missing. If something you wrote isn\'t showing up at all, double-check the tag is spelled correctly and properly closed.</div>')
 }
 // Steps with visible numbers (the badge holds the digit).
 function figStepList(items) {
@@ -3626,15 +3685,16 @@ const MODULES = [
       text:`<strong>EXAM</strong> — Recreate this page, using everything you've learned. When you're done, click <b>✓ Submit Exam</b>, above the HTML/CSS/JS tabs — ▶ Run just checks and saves your draft, it does NOT hand the exam in.
         <br><br>Take your time — there's no countdown. Your code is saved automatically, so it's fine to close the tab and come back later, even a different day.
         ${figFrame('Exactly what you need — nothing more', '<div style="font-size:12px;line-height:1.9;">'
-          + '1. A <code>&lt;header&gt;</code> with a background color, holding your <code>&lt;h1&gt;</code><br>'
-          + '2. One <code>&lt;h2&gt;</code>, one <code>&lt;h3&gt;</code>, one <code>&lt;h4&gt;</code> — in the picture: "Ingredients" is an <code>h2</code>, "You will need" is an <code>h3</code>, and the small "PREP 15 MIN &middot; BAKE 12 MIN" line is an <code>h4</code> (any one of each, anywhere, is enough — you don\'t need to match the picture\'s exact spots)<br>'
-          + '3. One <code>&lt;img&gt;</code> (the placeholder below is fine, or upload your own — see the <b>Files</b> tab)<br>'
-          + '4. A <code>&lt;ul&gt;</code> with at least 3 <code>&lt;li&gt;</code> items (your ingredients)<br>'
-          + '5. An <code>&lt;ol&gt;</code> with at least 3 <code>&lt;li&gt;</code> items (your steps)<br>'
-          + '6. <b>Two</b> <code>&lt;div&gt;</code> tags somewhere on the page — only <b>one</b> of them needs a background color (the example below colors both, but only one is required)<br>'
-          + '7. A <code>&lt;footer&gt;</code> (any content — a short line is enough)<br>'
-          + '8. A link styled to look like a button — background color + <code>padding-top: 6px;</code> or more<br><br>'
-          + 'Everything stacks top to bottom, normally — you do <b>not</b> need <code>display: inline-block</code> or side-by-side layout anywhere on this page.'
+          + '1. A <code>&lt;div&gt;</code> — anywhere on the page, holding anything<br>'
+          + '2. An <code>&lt;ol&gt;</code> (ordered list) with at least one <code>&lt;li&gt;</code> — your steps<br>'
+          + '3. A <code>&lt;ul&gt;</code> (unordered list) with at least one <code>&lt;li&gt;</code> — your ingredients<br>'
+          + '4. A real link — <code>&lt;a href="..."&gt;</code> with a genuine address, not left empty<br>'
+          + '5. An <code>&lt;img&gt;</code> — any picture at all, it does not matter which one<br><br>'
+          + '<b>That\'s the whole checklist.</b> No colors, no padding, no <code>class</code> are required — you haven\'t learned classes yet, so none of this grades on them. Everything stacks top to bottom, normally — you do <b>not</b> need <code>display: inline-block</code> or side-by-side layout anywhere on this page.'
+          + '<br><br>Press <b>▶ Run</b> any time to see exactly which of these 5 you still need — it checks each one separately and tells you precisely what\'s missing, not just "wrong."'
+          + '</div>')}
+        ${figFrame('Want it to actually look like the picture? (optional — not graded)', '<div style="font-size:12px;line-height:1.8;">'
+          + 'Headings (<code>h1</code>-<code>h4</code>), a colored <code>&lt;header&gt;</code>/<code>&lt;footer&gt;</code>, and a link styled like a button all make your page look like the real target — but none of them are required to pass. Use the reference cards below if you want to add them.'
           + '</div>')}
         <br>You may look at the real recipe for ideas: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Your "See Original Recipe" button's exact <code>href</code>:
         ${figCode('&lt;a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"&gt;\n  See the Original Recipe &amp;rarr;\n&lt;/a&gt;')}
@@ -3668,6 +3728,15 @@ const MODULES = [
             + examFontSwatch('\'Courier New\', monospace', 'Courier New', 'monospace — every letter the same width, like a typewriter')
           + '</div>'
           + '<div style="font-size:12px;">Always keep the second word (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) as a fallback — <b>why:</b> if the named font ever fails to load (a slow connection, an old browser), the browser still picks something from the same FAMILY instead of a totally different, possibly unreadable default.</div>')}
+        ${figFrame('Font sizes — see the actual difference', figCode('h1 { font-size: 32px; }\np  { font-size: 16px; }')
+          + '<div style="font-size:12px;">Same letters, only the <code>font-size</code> number changes — this is what each size really looks like next to the others:</div>'
+          + '<div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin:10px 0;padding:14px;background:#fff;border:1px solid #ddd;border-radius:8px;">'
+            + examFontSizeSwatch(11, 'tiny — a caption, like "Finished cookies"')
+            + examFontSizeSwatch(16, 'body text — paragraphs, list items')
+            + examFontSizeSwatch(24, 'a sub-heading — h2/h3')
+            + examFontSizeSwatch(34, 'a main heading — h1')
+          + '</div>'
+          + '<div style="font-size:12px;">Bigger numbers = bigger text — there\'s nothing more to it than that. Headings use bigger sizes BECAUSE they\'re more important and need to stand out; captions use small sizes because they\'re minor details.</div>')}
         ${figFrame('Padding — see what each amount actually does', '<div style="font-size:12px;">The three boxes below are the exact same pink box and text — only the <code>padding</code> number changes. <b>Why it matters:</b> padding is the breathing room between your content and the edge of its box; too little looks cramped, too much wastes space.</div>'
           + '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;">'
             + examPaddingSwatch(0, 'cramped — text touches the edge')
@@ -3687,24 +3756,12 @@ const MODULES = [
         <div style="font-size:11px;color:var(--fg-faint);margin-top:4px;">👆 Click the picture to open it full size in a new tab — it's a whole page, taller than this panel.</div>`,
       hints:[],
       webStarter: { html: '', css: '', js: '' },
-      // Loosened on purpose — the goal is "a real test someone who knows
-      // 20-30% of HTML can still pass," not "every single thing taught all
-      // at once": one of each heading level (not two), 3 list items (not
-      // 4), still every structural tag/color/padding mechanic that's
-      // actually taught. See the instructions' own numbered checklist,
-      // which matches this exactly.
-      check:(log) => {
-        const h = landmark(log, 'header'), f = landmark(log, 'footer')
-        if (!h || !f) return false
-        if (!hasFillColor(h.bg)) return false
-        if (log.h1Count < 1 || log.h2Count < 1 || log.h3Count < 1 || log.h4Count < 1) return false
-        if (log.imgCount < 1) return false
-        if (log.ulItems < 3 || log.olItems < 3) return false
-        const coloredDivs = (log.divs || []).filter(d => hasFillColor(d.bg))
-        if (coloredDivs.length < 1) return false
-        if (!(hasFillColor(log.linkBg) && log.linkPadTop >= 6)) return false
-        return true
-      },
+      // Five independent, structure-only requirements — no colors, padding
+      // or classes required (classes specifically haven't been taught yet).
+      // See examCriteria() — shared with the live per-item checklist shown
+      // on every ▶ Run, so this can never silently drift out of sync with
+      // what the student is actually told.
+      check:(log) => examCriteria(log).every(c => c.ok),
     },
   ]},
   // ── Tables — new module, right after Semantic HTML5. Grading reads the REAL

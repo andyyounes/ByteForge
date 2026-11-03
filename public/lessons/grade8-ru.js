@@ -398,15 +398,16 @@ window.G8_RU_EXAM = {
     return '<strong>ЭКЗАМЕН</strong> — Воссоздайте эту страницу, используя всё, что вы изучили. Когда закончите, нажмите <b>✓ Submit Exam</b> над вкладками HTML/CSS/JS — ▶ Run только проверяет и сохраняет черновик, это НЕ сдача экзамена.'
       + '<br><br>Не торопитесь — обратного отсчёта нет. Ваш код сохраняется автоматически, так что можно закрыть вкладку и вернуться позже, даже в другой день.'
       + figFrame('Что именно нужно — и не больше', '<div style="font-size:12px;line-height:1.9;">'
-          + '1. <code>&lt;header&gt;</code> с цветом фона, внутри — ваш <code>&lt;h1&gt;</code><br>'
-          + '2. Один <code>&lt;h2&gt;</code>, один <code>&lt;h3&gt;</code>, один <code>&lt;h4&gt;</code> — где угодно на странице, в любом порядке<br>'
-          + '3. Одно изображение <code>&lt;img&gt;</code> (картинка-заглушка ниже подойдёт, или загрузите своё — вкладка <b>Files</b>)<br>'
-          + '4. <code>&lt;ul&gt;</code> минимум с 3 пунктами <code>&lt;li&gt;</code> (ваши ингредиенты)<br>'
-          + '5. <code>&lt;ol&gt;</code> минимум с 3 пунктами <code>&lt;li&gt;</code> (ваши шаги)<br>'
-          + '6. <b>Два</b> тега <code>&lt;div&gt;</code> на странице — цвет фона нужен только <b>одному</b> из них (в примере ниже покрашены оба, но обязателен только один)<br>'
-          + '7. <code>&lt;footer&gt;</code> (любое содержимое — хватит одной короткой строки)<br>'
-          + '8. Ссылка, оформленная как кнопка — цвет фона + <code>padding-top: 6px;</code> или больше<br><br>'
-          + 'Всё идёт сверху вниз, обычным потоком — <code>display: inline-block</code> или расположение «бок о бок» на этой странице НЕ нужны.'
+          + '1. <code>&lt;div&gt;</code> — где угодно на странице, с любым содержимым<br>'
+          + '2. <code>&lt;ol&gt;</code> (нумерованный список) минимум с одним <code>&lt;li&gt;</code> — ваши шаги<br>'
+          + '3. <code>&lt;ul&gt;</code> (маркированный список) минимум с одним <code>&lt;li&gt;</code> — ваши ингредиенты<br>'
+          + '4. Настоящая ссылка — <code>&lt;a href="..."&gt;</code> с реальным адресом, не пустая<br>'
+          + '5. <code>&lt;img&gt;</code> — любая картинка, не важно какая<br><br>'
+          + '<b>Это весь список.</b> Цвета, padding и <code>class</code> не нужны — вы ещё не изучали классы, поэтому на них ничего не проверяется. Всё идёт сверху вниз, обычным потоком — <code>display: inline-block</code> или расположение «бок о бок» НЕ нужны.'
+          + '<br><br>Нажимайте <b>▶ Run</b> в любой момент, чтобы увидеть, какие из этих 5 пунктов ещё нужны — проверка идёт по каждому пункту отдельно и точно говорит, чего не хватает, а не просто «неправильно».'
+          + '</div>')
+      + figFrame('Хотите, чтобы было похоже на картинку? (необязательно — не проверяется)', '<div style="font-size:12px;line-height:1.8;">'
+          + 'Заголовки (<code>h1</code>-<code>h4</code>), цветной <code>&lt;header&gt;</code>/<code>&lt;footer&gt;</code> и ссылка, оформленная как кнопка, делают страницу похожей на настоящую картинку — но ничего из этого не обязательно для прохождения. Используйте карточки ниже, если хотите их добавить.'
           + '</div>')
       + '<br>Вы можете посмотреть настоящий рецепт для вдохновения: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Точный адрес для кнопки «See Original Recipe»:'
       + figCode('&lt;a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"&gt;\n  See the Original Recipe &amp;rarr;\n&lt;/a&gt;')
@@ -440,6 +441,15 @@ window.G8_RU_EXAM = {
             + examFontSwatch('\'Courier New\', monospace', 'Courier New', 'monospace — все буквы одной ширины, как у печатной машинки')
           + '</div>'
           + '<div style="font-size:12px;">Всегда оставляйте второе слово (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) как запасной вариант — <b>почему:</b> если указанный шрифт не загрузится (медленное соединение, старый браузер), браузер всё равно выберет что-то из той же СЕМЬИ, а не случайный, возможно нечитаемый шрифт по умолчанию.</div>')
+      + figFrame('Размер шрифта — наглядная разница', figCode('h1 { font-size: 32px; }\np  { font-size: 16px; }')
+          + '<div style="font-size:12px;">Одни и те же буквы, меняется только число <code>font-size</code> — вот как каждый размер выглядит рядом с другими:</div>'
+          + '<div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin:10px 0;padding:14px;background:#fff;border:1px solid #ddd;border-radius:8px;">'
+            + examFontSizeSwatch(11, 'крошечный — подпись, как «Finished cookies»')
+            + examFontSizeSwatch(16, 'обычный текст — абзацы, пункты списка')
+            + examFontSizeSwatch(24, 'подзаголовок — h2/h3')
+            + examFontSizeSwatch(34, 'главный заголовок — h1')
+          + '</div>'
+          + '<div style="font-size:12px;">Больше число = крупнее текст — больше тут ничего нет. Заголовки используют крупные размеры, ПОТОМУ ЧТО они важнее и должны выделяться; подписи используют маленькие размеры, потому что это второстепенные детали.</div>')
       + figFrame('Padding — что на самом деле делает каждое значение', '<div style="font-size:12px;">Три блока ниже — это один и тот же розовый блок с текстом, меняется только число <code>padding</code>. <b>Почему это важно:</b> padding — это свободное пространство между содержимым и краем блока; слишком мало выглядит тесно, слишком много впустую тратит место.</div>'
           + '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;">'
             + examPaddingSwatch(0, 'тесно — текст касается края')
