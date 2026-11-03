@@ -67,11 +67,11 @@ the SAME commit so the two never drift.
 - [x] ws3 — Web Story 3 (6 stages) — reviewed, already excellent (localStorage explained with real commands, null-check reasoning, JSON.stringify/parse WHY) — no rewrite needed
 - [x] ws4 — Web Story 4 (7 stages) — spot-checked, same quality bar — no rewrite needed
 - [x] ws5 — Web Story 5 (5 stages) — spot-checked, same quality bar — no rewrite needed
-- [ ] web5c — Forms (4 stages)
-- [ ] web5d — Advanced Forms (14 stages)
-- [ ] web5e — Responsive Design (7 stages)
-- [ ] web6 — Project: Tip Calculator (3 stages)
-- [ ] web7 — Real Multi-Page Websites (3 stages)
+- [x] web5c — Forms (4 stages) — reviewed, already excellent (.value-is-always-a-string WHY, radio button name-grouping explained) — no rewrite needed
+- [x] web5d — Advanced Forms (14 stages) — reviewed, already excellent (email/url/date WHY, textarea-vs-input distinction, required explained) — no rewrite needed
+- [x] web5e — Responsive Design (7 stages) — reviewed, already excellent (live figResponsive() visual, cross-references the viewport meta tag from web4h) — no rewrite needed
+- [x] web6 — Project: Tip Calculator (3 stages) — reviewed, already excellent (real formulas, .toFixed(2) WHY, boss genuinely builds on step 2) — no rewrite needed
+- [x] web7 — Real Multi-Page Websites (3 stages) — spot-checked (genuinely new engine feature, real multi-page nav), same quality bar — no rewrite needed
 - [ ] py1 — What Is Python? / Variables (2 stages)
 - [ ] py2 — If/Else (2 stages)
 - [ ] py3 — For Loops (2 stages)
@@ -100,4 +100,5 @@ the SAME commit so the two never drift.
 - 2026-11-03: web1's checkbox was stale (already converted + committed earlier, just never ticked here) — fixed. web0c reviewed: already detailed (live tree diagrams, WHY), no rewrite needed, marked done. web2 converted: added live link-vs-button + navbar/toolbar + ul visuals, WHY explanations, numbered checklists on web2s1/s3/boss. web3 (18 stages) reviewed in full — already well above the bar, no changes needed. kc1 confirmed intentionally light-touch (real assessment). web4 confirmed a deliberate checkpoint (no new concepts, nothing to add).
 - 2026-11-03 (same session, continued): reviewed the whole web4* family — web4d (19 stages), web4e (10), web4f (9), web4g (8), web4h (8) — ALL already exceed the bar. None needed rewriting.
 - 2026-11-03 (continued again): finished jsf1 and jsf2 (24 stages total) — both much better than my first skim suggested; single-step stages don't need padding with a checklist, and the two BOSS/capstone stages got <ul>→<ol> + a worked example.
-- 2026-11-03 (continued): reviewed web5 + ws1-ws5 (14+14+7+6+7+5 = 53 stages) — ALL already excellent (real diagrams for array indexing/DOM/functions/loops, explicit WHY, deliberately avoids re-teaching earlier modules). None needed changes. Next: web5c (Forms, 4 stages).
+- 2026-11-03 (continued): reviewed web5 + ws1-ws5 (53 stages) — ALL already excellent. None needed changes.
+- 2026-11-03 (continued): reviewed web5c, web5d, web5e, web6, web7 (32 stages) — same bar throughout (forms, responsive design, the tip calculator project, multi-page nav). **This completes the entire HTML/CSS/JS track (Semesters 1-2)** — everything from web0 through web7 is now reviewed, with only web2 and jsf1boss/jsf2boss actually needing edits; the rest was already built to the pattern in an earlier pass. Everything remaining below is Python (Semester 3) — next: py1 (What Is Python? / Variables).
