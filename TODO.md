@@ -72,11 +72,11 @@ the SAME commit so the two never drift.
 - [x] web5e — Responsive Design (7 stages) — reviewed, already excellent (live figResponsive() visual, cross-references the viewport meta tag from web4h) — no rewrite needed
 - [x] web6 — Project: Tip Calculator (3 stages) — reviewed, already excellent (real formulas, .toFixed(2) WHY, boss genuinely builds on step 2) — no rewrite needed
 - [x] web7 — Real Multi-Page Websites (3 stages) — spot-checked (genuinely new engine feature, real multi-page nav), same quality bar — no rewrite needed
-- [ ] py1 — What Is Python? / Variables (2 stages)
-- [ ] py2 — If/Else (2 stages)
-- [ ] py3 — For Loops (2 stages)
-- [ ] py4 — While Loops (2 stages)
-- [ ] py5 — Lists (2 stages)
+- [x] py1 — What Is Python? / Variables (2 stages) — WHY moved from hints into the visible text (pattern rule #4)
+- [x] py2 — If/Else (2 stages) — same fix
+- [x] py3 — For Loops (2 stages) — same fix
+- [x] py4 — While Loops (2 stages) — same fix
+- [x] py5 — Lists (2 stages) — same fix
 - [ ] adv — Build a Text Adventure (4 stages)
 - [ ] cc1 — Health & Attack Basics (1 stage)
 - [ ] cc2 — Win/Lose Conditions (1 stage)
@@ -101,4 +101,5 @@ the SAME commit so the two never drift.
 - 2026-11-03 (same session, continued): reviewed the whole web4* family — web4d (19 stages), web4e (10), web4f (9), web4g (8), web4h (8) — ALL already exceed the bar. None needed rewriting.
 - 2026-11-03 (continued again): finished jsf1 and jsf2 (24 stages total) — both much better than my first skim suggested; single-step stages don't need padding with a checklist, and the two BOSS/capstone stages got <ul>→<ol> + a worked example.
 - 2026-11-03 (continued): reviewed web5 + ws1-ws5 (53 stages) — ALL already excellent. None needed changes.
-- 2026-11-03 (continued): reviewed web5c, web5d, web5e, web6, web7 (32 stages) — same bar throughout (forms, responsive design, the tip calculator project, multi-page nav). **This completes the entire HTML/CSS/JS track (Semesters 1-2)** — everything from web0 through web7 is now reviewed, with only web2 and jsf1boss/jsf2boss actually needing edits; the rest was already built to the pattern in an earlier pass. Everything remaining below is Python (Semester 3) — next: py1 (What Is Python? / Variables).
+- 2026-11-03 (continued): reviewed web5c, web5d, web5e, web6, web7 (32 stages) — same bar throughout (forms, responsive design, the tip calculator project, multi-page nav). **This completes the entire HTML/CSS/JS track (Semesters 1-2)** — everything from web0 through web7 is now reviewed, with only web2 and jsf1boss/jsf2boss actually needing edits; the rest was already built to the pattern in an earlier pass.
+- 2026-11-03 (continued): py1-py5 (10 stages, the start of Semester 3/Python) — genuinely thinner than the web track: terse "Complete the missing X" text, real WHY only in the hints (second line of defense per the pattern's own rule #4, not a replacement for real instructions). Fixed by moving each module's core WHY sentence up into the main text of its teaching stage (boss stages left as "same idea, new numbers" — they already say that). check()/starter code untouched. Next: adv (Build a Text Adventure, 4 stages) — likely the same style gap, check it next.
