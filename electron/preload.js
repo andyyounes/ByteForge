@@ -48,7 +48,29 @@ function wireLoginPage() {
     })
   }
 
+  addBackLink()
   ipcRenderer.send('bf:login-page-ready')
+}
+
+// A small "go back" link on the REAL sign-in page itself — not just the
+// picker — for whoever picked the wrong mode (or just wants to switch who's
+// using the computer) without needing to know the Ctrl+Shift+Backspace
+// shortcut.
+function addBackLink() {
+  if (document.getElementById('bf-back-link')) return
+  const link = document.createElement('div')
+  link.id = 'bf-back-link'
+  link.textContent = '← Not a student? Go back'
+  link.style.cssText = [
+    'position:fixed', 'top:14px', 'left:14px', 'z-index:999999',
+    'font:600 12px -apple-system,Segoe UI,Roboto,sans-serif',
+    'color:#8891b5', 'cursor:pointer', 'padding:6px 10px', 'border-radius:6px',
+    'background:rgba(0,0,0,.25)', 'backdrop-filter:blur(4px)',
+  ].join(';')
+  link.addEventListener('mouseenter', () => { link.style.color = '#e5e9f5' })
+  link.addEventListener('mouseleave', () => { link.style.color = '#8891b5' })
+  link.addEventListener('click', () => ipcRenderer.send('bf:switch-mode'))
+  document.body.appendChild(link)
 }
 
 function startObserving() {
