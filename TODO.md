@@ -49,10 +49,10 @@ the SAME commit so the two never drift.
 - [x] web1 — Your First Tags (5 stages)
 - [x] web2 — More Tags (4 stages)
 - [x] web2b — Numbered Lists & Text Styling (5 stages) — built this session, already matches the pattern
-- [ ] web3 — Colors & Shading (18 stages) — large; already has some good explainers (explainColorFailure), check per-stage text depth
-- [ ] kc1 — Knowledge Check (2 stages) — real assessment, light-touch only (don't pad a test with teaching content)
+- [x] web3 — Colors & Shading (18 stages) — reviewed in full, already exceeds the bar (live swatches, progressive single-concept stages, warm/cool theory with real WHY, readability math in boss check) — no rewrite needed
+- [x] kc1 — Knowledge Check (2 stages) — real assessment, intentionally light-touch (don't pad a test with teaching content)
 - [x] web3p — Fonts & Sizes Playground (3 stages) — built this session
-- [ ] web4 — Structure + Style, Together (2 stages)
+- [x] web4 — Structure + Style, Together (2 stages) — deliberately a review checkpoint (web1+web2+web3 combined, no new concepts) — adding more visuals here would just duplicate what's already in those modules
 - [ ] web4d — Divs & Page Layout (19 stages) — divs3r1/r2/r3 already done, the other 16 stages aren't
 - [ ] web4e — Semantic HTML5 (10 stages)
 - [x] examGR8 — EXAM (1 stage) — the reference pattern itself
@@ -97,4 +97,4 @@ the SAME commit so the two never drift.
 
 ## Log
 - 2026-11-XX: created this file. Converting web1 next (small, foundational, hands-on — a good first real conversion to set the pattern for the rest of Semester 1).
-- 2026-11-03: web1's checkbox was stale (already converted + committed earlier, just never ticked here) — fixed. web0c reviewed: already detailed (live tree diagrams, WHY), no rewrite needed, marked done. web2 converted: added live link-vs-button + navbar/toolbar + ul visuals, WHY explanations, numbered checklists on web2s1/s3/boss. Next: web3 (Colors & Shading, 18 stages, large — check per-stage depth, it may already be mostly there via explainColorFailure).
+- 2026-11-03: web1's checkbox was stale (already converted + committed earlier, just never ticked here) — fixed. web0c reviewed: already detailed (live tree diagrams, WHY), no rewrite needed, marked done. web2 converted: added live link-vs-button + navbar/toolbar + ul visuals, WHY explanations, numbered checklists on web2s1/s3/boss. web3 (18 stages) reviewed in full — already well above the bar, no changes needed. kc1 confirmed intentionally light-touch (real assessment). web4 confirmed a deliberate checkpoint (no new concepts, nothing to add). Next: web4d (Divs & Page Layout, 19 stages — divs3r1/r2/r3 already done per earlier note, the other 16 stages need review).
