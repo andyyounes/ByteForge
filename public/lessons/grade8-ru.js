@@ -410,9 +410,19 @@ window.G8_RU_EXAM = {
           + '</div>')
       + '<br>Вы можете посмотреть настоящий рецепт для вдохновения: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Точный адрес для кнопки «See Original Recipe»:'
       + figCode('&lt;a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"&gt;\n  See the Original Recipe &amp;rarr;\n&lt;/a&gt;')
-      + figFrame('Три тега, которые вы ещё не использовали', figCode(
-          '&lt;b&gt;bold text&lt;/b&gt;\n&lt;i&gt;italic text&lt;/i&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;First step&lt;/li&gt;\n  &lt;li&gt;Second step&lt;/li&gt;\n&lt;/ol&gt;'
-        ) + '<div style="font-size:12px;">Тег <code>&lt;ol&gt;</code> (нумерованный список) работает точно так же, как <code>&lt;ul&gt;</code>, но браузер нумерует пункты 1, 2, 3… вместо точек. Используйте его для пронумерованных шагов.</div>')
+      + figFrame('&lt;ul&gt; и &lt;ol&gt; — наглядная разница', '<div style="font-size:12px;">Одинаковая структура HTML, одинаковые три пункта — разница ТОЛЬКО в названии тега. <b>Почему это важно:</b> используйте <code>&lt;ul&gt;</code>, когда ПОРЯДОК не важен (ингредиенты — их можно перечислить в любом порядке); используйте <code>&lt;ol&gt;</code>, когда порядок важен (шаги — шаг 3 имеет смысл только после шага 2).</div>'
+          + '<div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;">'
+            + '<div style="flex:1;min-width:150px;padding:10px 10px 10px 28px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">'
+              + '<div style="font-size:10.5px;font-weight:700;color:#666;margin:-2px 0 6px -18px;">&lt;ul&gt; — без порядка</div>'
+              + '<ul style="margin:0;padding-left:16px;font-size:12px;line-height:1.7;"><li>Мука</li><li>Сахар</li><li>Яйца</li></ul>'
+            + '</div>'
+            + '<div style="flex:1;min-width:150px;padding:10px 10px 10px 28px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">'
+              + '<div style="font-size:10.5px;font-weight:700;color:#666;margin:-2px 0 6px -18px;">&lt;ol&gt; — по порядку</div>'
+              + '<ol style="margin:0;padding-left:16px;font-size:12px;line-height:1.7;"><li>Смешать</li><li>Испечь</li><li>Остудить</li></ol>'
+            + '</div>'
+          + '</div>'
+          + figCode('&lt;ul&gt;\n  &lt;li&gt;Мука&lt;/li&gt;\n&lt;/ul&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;Смешать&lt;/li&gt;\n&lt;/ol&gt;')
+          + '<div style="font-size:12px;">Всё остальное у них одинаковое: оба содержат <code>&lt;li&gt;</code>, оба можно стилизовать одинаково через CSS — меняется только название тега (и то, что рисует браузер: точку • или цифру 1.).</div>')
       + figFrame('Напоминание — оформление одного конкретного div', figCode('HTML:  &lt;div id="ingredients"&gt;…&lt;/div&gt;\nCSS:   #ingredients { background-color: #F8BBD0; }')
           + '<div style="font-size:12px;">Селектор <code>id</code> в CSS начинается с <code>#</code> и соответствует атрибуту <code>id</code> элемента — та же идея, что и у селектора класса (<code>.</code>), но для ОДНОГО конкретного элемента, а не для группы.</div>')
       + figFrame('Размер изображения', figCode('img {\n  width: 100%;\n  height: auto;\n}')
@@ -422,17 +432,26 @@ window.G8_RU_EXAM = {
           + 'Знак градуса (°), как в «180°C»: напишите <code>&amp;deg;</code><br>'
           + 'В некоторых редакторах нельзя просто напечатать → или ° напрямую — эти коды работают всегда.'
           + '</div>')
-      + figFrame('Шрифты', figCode('body {\n  font-family: Georgia, serif;\n}')
-          + '<div style="font-size:12px;">Выберите <b>один</b> из них для <code>body</code> — это «веб-безопасные» шрифты, они уже есть в каждом браузере, поэтому ничего дополнительно загружать не нужно:<br><br>'
-          + '<code>Arial, sans-serif</code> — чистый, современный (без засечек на буквах)<br>'
-          + '<code>Georgia, serif</code> — классический, «поваренная книга» (у букв есть засечки)<br>'
-          + '<code>"Courier New", monospace</code> — стиль печатной машинки, все буквы одной ширины<br><br>'
-          + 'Всегда оставляйте второе слово (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) как запасной вариант — если указанный шрифт не загрузится, браузер всё равно выберет что-то из того же семейства, а не случайный шрифт по умолчанию.</div>')
+      + figFrame('Шрифты — наглядная разница', figCode('body {\n  font-family: Georgia, serif;\n}')
+          + '<div style="font-size:12px;">Выберите <b>один</b> из них для <code>body</code> — это «веб-безопасные» шрифты, они уже есть в каждом браузере, поэтому ничего дополнительно загружать не нужно. Вот как каждый из них выглядит на самом деле, а не просто название:</div>'
+          + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">'
+            + examFontSwatch('Arial, sans-serif', 'Arial', 'sans-serif — чистый, без засечек на буквах')
+            + examFontSwatch('Georgia, serif', 'Georgia', 'serif — классический, у букв есть засечки (как в заголовках на картинке)')
+            + examFontSwatch('\'Courier New\', monospace', 'Courier New', 'monospace — все буквы одной ширины, как у печатной машинки')
+          + '</div>'
+          + '<div style="font-size:12px;">Всегда оставляйте второе слово (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) как запасной вариант — <b>почему:</b> если указанный шрифт не загрузится (медленное соединение, старый браузер), браузер всё равно выберет что-то из той же СЕМЬИ, а не случайный, возможно нечитаемый шрифт по умолчанию.</div>')
+      + figFrame('Padding — что на самом деле делает каждое значение', '<div style="font-size:12px;">Три блока ниже — это один и тот же розовый блок с текстом, меняется только число <code>padding</code>. <b>Почему это важно:</b> padding — это свободное пространство между содержимым и краем блока; слишком мало выглядит тесно, слишком много впустую тратит место.</div>'
+          + '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;">'
+            + examPaddingSwatch(0, 'тесно — текст касается края')
+            + examPaddingSwatch(12, 'золотая середина — поэтому мы и предлагаем 12px выше')
+            + examPaddingSwatch(30, 'слишком много — впустую тратит место, выглядит несбалансированно')
+          + '</div>')
       + figFrame('Предлагаемые цвета (можно использовать и свои)', '<div style="font-size:12px;line-height:1.8;">'
           + '<b>Фон header:</b> <code>#D32F2F</code> (красный), <code>padding: 12px;</code><br>'
           + '<b>Фон блока с ингредиентами:</b> <code>#F8BBD0</code> (розовый), <code>padding: 12px;</code><br>'
           + '<b>Цвет текста в блоке с ингредиентами:</b> <code>#880E4F</code> (тёмно-розовый — хорошо читается на розовом фоне)<br>'
           + '<b>Цвет текста в Steps:</b> <code>#555555</code> (серый — как в разделе Method/Steps на картинке)<br>'
+          + '<b>Текст подписи «Finished cookies»:</b> <code>#4A7C59</code> (зелёный), <code>font-size: 12px;</code> — меньше остального текста, это маленькая подпись, а не заголовок<br>'
           + '<b>Фон кнопки-ссылки:</b> <code>#2E7D32</code> (зелёный), <code>padding: 10px 16px;</code><br><br>'
           + 'Эти числа — просто один рабочий вариант: любой <code>padding</code> от <code>8px</code> и больше на цветном блоке выглядит нормально; у ссылки конкретно нужен <code>padding-top</code> не меньше <code>6px</code> (см. список выше).'
           + '</div>')

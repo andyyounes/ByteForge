@@ -1944,6 +1944,27 @@ function figCode(code) {
 function figNum(n) {
   return '<span style="display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;margin-right:6px;">' + n + '</span>'
 }
+// Live-rendered (not a screenshot) side-by-side font comparison for the
+// exam's Fonts card — a real rendered sample teaches the serif/sans-serif/
+// monospace difference far better than just naming the fonts. White card
+// background on purpose: font differences (serifs especially) are hard to
+// judge against this page's own dark theme.
+function examFontSwatch(cssFamily, label, note) {
+  return '<div style="flex:1;min-width:150px;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;">'
+    + '<div style="font-family:' + cssFamily + ';font-size:17px;color:#1a1a1a;">Aa Bb Cc 123</div>'
+    + '<div style="font-size:10.5px;color:#666;margin-top:6px;font-weight:700;">' + label + '</div>'
+    + '<div style="font-size:10.5px;color:#888;margin-top:2px;">' + note + '</div>'
+    + '</div>'
+}
+// Live-rendered padding comparison for the exam's Padding card — same pink
+// box/text as the real target page, only the padding number changes, so
+// the effect of each value is seen directly instead of just stated.
+function examPaddingSwatch(px, note) {
+  return '<div style="text-align:center;">'
+    + '<div style="background:#F8BBD0;color:#880E4F;padding:' + px + 'px;width:70px;font-size:11px;font-weight:700;border-radius:4px;">text</div>'
+    + '<div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;max-width:100px;">' + px + 'px<br>' + note + '</div>'
+    + '</div>'
+}
 // Steps with visible numbers (the badge holds the digit).
 function figStepList(items) {
   return '<div style="margin:8px 0;">' + items.map(function (t, i) {
@@ -3617,9 +3638,19 @@ const MODULES = [
           + '</div>')}
         <br>You may look at the real recipe for ideas: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Your "See Original Recipe" button's exact <code>href</code>:
         ${figCode('&lt;a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"&gt;\n  See the Original Recipe &amp;rarr;\n&lt;/a&gt;')}
-        ${figFrame('Three tags you haven\'t used yet', figCode(
-          '&lt;b&gt;bold text&lt;/b&gt;\n&lt;i&gt;italic text&lt;/i&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;First step&lt;/li&gt;\n  &lt;li&gt;Second step&lt;/li&gt;\n&lt;/ol&gt;'
-        ) + '<div style="font-size:12px;">An <code>&lt;ol&gt;</code> (ordered list) works exactly like <code>&lt;ul&gt;</code>, but the browser numbers the items 1, 2, 3… instead of using bullets. Use it for the numbered steps.</div>')}
+        ${figFrame('&lt;ul&gt; vs &lt;ol&gt; — see the real difference', '<div style="font-size:12px;">Same HTML structure, same three items — the ONLY difference is the tag name. <b>Why it matters:</b> use <code>&lt;ul&gt;</code> when the ORDER doesn\'t matter (ingredients — you could list them in any order); use <code>&lt;ol&gt;</code> when it DOES (steps — step 3 only makes sense after step 2).</div>'
+          + '<div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;">'
+            + '<div style="flex:1;min-width:150px;padding:10px 10px 10px 28px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">'
+              + '<div style="font-size:10.5px;font-weight:700;color:#666;margin:-2px 0 6px -18px;">&lt;ul&gt; — unordered</div>'
+              + '<ul style="margin:0;padding-left:16px;font-size:12px;line-height:1.7;"><li>Flour</li><li>Sugar</li><li>Eggs</li></ul>'
+            + '</div>'
+            + '<div style="flex:1;min-width:150px;padding:10px 10px 10px 28px;background:#fff;color:#1a1a1a;border:1px solid #ddd;border-radius:8px;">'
+              + '<div style="font-size:10.5px;font-weight:700;color:#666;margin:-2px 0 6px -18px;">&lt;ol&gt; — ordered</div>'
+              + '<ol style="margin:0;padding-left:16px;font-size:12px;line-height:1.7;"><li>Mix</li><li>Bake</li><li>Cool</li></ol>'
+            + '</div>'
+          + '</div>'
+          + figCode('&lt;ul&gt;\n  &lt;li&gt;Flour&lt;/li&gt;\n&lt;/ul&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;Mix&lt;/li&gt;\n&lt;/ol&gt;')
+          + '<div style="font-size:12px;">Everything else about them is identical: both hold <code>&lt;li&gt;</code> items, both can be styled the same way in CSS — only the tag name (and what the browser draws: a bullet • or a number 1.) changes.</div>')}
         ${figFrame('Reminder — styling one specific div', figCode('HTML:  &lt;div id="ingredients"&gt;…&lt;/div&gt;\nCSS:   #ingredients { background-color: #F8BBD0; }')
           + '<div style="font-size:12px;">An id selector in CSS starts with <code>#</code> and matches the element\'s <code>id</code> attribute — same idea as the class selector (<code>.</code>), but for one specific element instead of a group.</div>')}
         ${figFrame('Sizing your image', figCode('img {\n  width: 100%;\n  height: auto;\n}')
@@ -3629,17 +3660,26 @@ const MODULES = [
           + 'A degree symbol (°), like in "180°C": type <code>&amp;deg;</code><br>'
           + 'You can\'t just type → or ° directly in some editors — these codes always work.'
           + '</div>')}
-        ${figFrame('Fonts', figCode('body {\n  font-family: Georgia, serif;\n}')
-          + '<div style="font-size:12px;">Pick <b>one</b> of these for <code>body</code> — they are web-safe, meaning every browser already has them, so you do not need to load anything extra:<br><br>'
-          + '<code>Arial, sans-serif</code> — clean, modern (no little feet on the letters)<br>'
-          + '<code>Georgia, serif</code> — classic, cookbook-style (letters have little feet)<br>'
-          + '<code>"Courier New", monospace</code> — typewriter style, every letter the same width<br><br>'
-          + 'Always keep the second word (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) as a fallback — if the named font ever fails to load, the browser still picks something in the same family instead of a random default.</div>')}
+        ${figFrame('Fonts — see the actual difference', figCode('body {\n  font-family: Georgia, serif;\n}')
+          + '<div style="font-size:12px;">Pick <b>one</b> of these for <code>body</code> — they are web-safe, meaning every browser already has them, so you do not need to load anything extra. This is what each one really looks like, not just the name:</div>'
+          + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">'
+            + examFontSwatch('Arial, sans-serif', 'Arial', 'sans-serif — clean, no little feet on the letters')
+            + examFontSwatch('Georgia, serif', 'Georgia', 'serif — classic, letters have little feet (like the picture\'s headings)')
+            + examFontSwatch('\'Courier New\', monospace', 'Courier New', 'monospace — every letter the same width, like a typewriter')
+          + '</div>'
+          + '<div style="font-size:12px;">Always keep the second word (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) as a fallback — <b>why:</b> if the named font ever fails to load (a slow connection, an old browser), the browser still picks something from the same FAMILY instead of a totally different, possibly unreadable default.</div>')}
+        ${figFrame('Padding — see what each amount actually does', '<div style="font-size:12px;">The three boxes below are the exact same pink box and text — only the <code>padding</code> number changes. <b>Why it matters:</b> padding is the breathing room between your content and the edge of its box; too little looks cramped, too much wastes space.</div>'
+          + '<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;">'
+            + examPaddingSwatch(0, 'cramped — text touches the edge')
+            + examPaddingSwatch(12, 'the sweet spot — this is why we suggest 12px above')
+            + examPaddingSwatch(30, 'too much — wastes space, looks unbalanced')
+          + '</div>')}
         ${figFrame('Suggested colors (feel free to use your own instead)', '<div style="font-size:12px;line-height:1.8;">'
           + '<b>Header background:</b> <code>#D32F2F</code> (red), <code>padding: 12px;</code><br>'
           + '<b>Ingredients box background:</b> <code>#F8BBD0</code> (pink), <code>padding: 12px;</code><br>'
           + '<b>Ingredients text color:</b> <code>#880E4F</code> (dark pink — readable on the pink background)<br>'
           + '<b>Steps text color:</b> <code>#555555</code> (gray — matches the picture\'s Method/Steps section)<br>'
+          + '<b>"Finished cookies" caption text:</b> <code>#4A7C59</code> (green), <code>font-size: 12px;</code> — smaller than your other text, since it\'s a minor caption, not a heading<br>'
           + '<b>Link button background:</b> <code>#2E7D32</code> (green), <code>padding: 10px 16px;</code><br><br>'
           + 'The exact numbers above are just one real option that works — any padding of <code>8px</code> or more on a colored box looks fine; the link specifically needs <code>padding-top</code> of at least <code>6px</code> (see the checklist above).'
           + '</div>')}
