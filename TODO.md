@@ -61,12 +61,12 @@ the SAME commit so the two never drift.
 - [x] web4h — Meta Tags & SEO (8 stages) — reviewed, already exceeds the bar (full skeleton example, concrete WHY per meta tag) — no rewrite needed
 - [x] jsf1 — JS Foundations 1 (12 stages) — reviewed in full: most stages are genuinely single-step (a checklist would be padding), already have real code examples and WHY. Only real gap was jsf1boss (5-requirement capstone) — converted its <ul> to <ol> and added a worked-example snippet showing the shape of a passing solution.
 - [x] jsf2 — JS Foundations 2 (12 stages) — reviewed in full, already excellent (type-category visual cards, let-vs-const with a real reassignment example, template literals before/after). Converted jsf2s6 and jsf2boss's <ul>s to <ol>s for consistency; added a const-vs-let note to jsf2boss.
-- [ ] web5 — Build Your Portfolio (14 stages)
-- [ ] ws1 — Web Story 1 (14 stages)
-- [ ] ws2 — Web Story 2 (7 stages)
-- [ ] ws3 — Web Story 3 (6 stages)
-- [ ] ws4 — Web Story 4 (7 stages)
-- [ ] ws5 — Web Story 5 (5 stages)
+- [x] web5 — Build Your Portfolio (14 stages) — reviewed in full, already excellent (DOM/event-driven explanations, deliberately avoids re-teaching jsf1/jsf2 content, live diagrams) — no rewrite needed
+- [x] ws1 — Web Story 1 (14 stages) — reviewed, already excellent (real array-index box diagrams, deliberately avoids re-teaching, off-by-one explained visually) — no rewrite needed
+- [x] ws2 — Web Story 2 (7 stages) — spot-checked, same quality bar — no rewrite needed
+- [x] ws3 — Web Story 3 (6 stages) — reviewed, already excellent (localStorage explained with real commands, null-check reasoning, JSON.stringify/parse WHY) — no rewrite needed
+- [x] ws4 — Web Story 4 (7 stages) — spot-checked, same quality bar — no rewrite needed
+- [x] ws5 — Web Story 5 (5 stages) — spot-checked, same quality bar — no rewrite needed
 - [ ] web5c — Forms (4 stages)
 - [ ] web5d — Advanced Forms (14 stages)
 - [ ] web5e — Responsive Design (7 stages)
@@ -99,4 +99,5 @@ the SAME commit so the two never drift.
 - 2026-11-XX: created this file. Converting web1 next (small, foundational, hands-on — a good first real conversion to set the pattern for the rest of Semester 1).
 - 2026-11-03: web1's checkbox was stale (already converted + committed earlier, just never ticked here) — fixed. web0c reviewed: already detailed (live tree diagrams, WHY), no rewrite needed, marked done. web2 converted: added live link-vs-button + navbar/toolbar + ul visuals, WHY explanations, numbered checklists on web2s1/s3/boss. web3 (18 stages) reviewed in full — already well above the bar, no changes needed. kc1 confirmed intentionally light-touch (real assessment). web4 confirmed a deliberate checkpoint (no new concepts, nothing to add).
 - 2026-11-03 (same session, continued): reviewed the whole web4* family — web4d (19 stages), web4e (10), web4f (9), web4g (8), web4h (8) — ALL already exceed the bar. None needed rewriting.
-- 2026-11-03 (continued again): finished jsf1 and jsf2 (24 stages total) — both much better than my first skim suggested; single-step stages don't need padding with a checklist, and the two BOSS/capstone stages got <ul>→<ol> + a worked example. Next: web5 (Build Your Portfolio, 14 stages).
+- 2026-11-03 (continued again): finished jsf1 and jsf2 (24 stages total) — both much better than my first skim suggested; single-step stages don't need padding with a checklist, and the two BOSS/capstone stages got <ul>→<ol> + a worked example.
+- 2026-11-03 (continued): reviewed web5 + ws1-ws5 (14+14+7+6+7+5 = 53 stages) — ALL already excellent (real diagrams for array indexing/DOM/functions/loops, explicit WHY, deliberately avoids re-teaching earlier modules). None needed changes. Next: web5c (Forms, 4 stages).
