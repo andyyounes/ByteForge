@@ -1679,6 +1679,7 @@ function checkWebChallenge(log) {
   } else if (!passOk) {
     clog('❌ Not quite — check the task above and try the 💡 Hint button.', 'err')
     if (ch.palette) explainColorFailure(ch, log).forEach(line => clog(line, 'info'))
+    explainStructuralFailure(ch, log).forEach(line => clog(line, 'info'))
   }
 }
 
@@ -1809,6 +1810,65 @@ function explainColorFailure(ch, log) {
 
   if (lines.length === 1) lines.push('• I couldn\'t spot one specific problem — re-read the task and check every color it asks for. Colors seen: ' + slots.map(([f, l]) => l + ' ' + rgbToHex(log[f])).join(', ') + '.')
   return lines
+}
+
+// ── Generic "what's actually missing" for every OTHER lang:'web' stage ──────
+// explainColorFailure above only covers color stages. The vast majority of
+// this file's check() functions follow the same simple shape — one or more
+// `log.someCount >= N` style comparisons ANDed together — so this reads
+// ch.check's own SOURCE TEXT (same reflection trick explainColorFailure
+// uses) to find those comparisons, then reports exactly which ones the
+// CURRENT attempt fails and by how much, instead of one flat "not quite."
+// Deliberately conservative: only known, named fields get a message; an
+// unrecognized field or a comparison against a variable (not a literal
+// number) is silently skipped rather than guessed at, so this only ever
+// ADDS real information, never a wrong or confusing one.
+// Plain angle brackets on purpose — this text goes through clog(), which
+// sets textContent (not innerHTML), so an HTML entity like &lt; would show
+// up as the literal four characters "&lt;" instead of "<". Caught live: a
+// real console readout showed "&lt;a&gt;" instead of "<a>".
+const STRUCTURAL_FIELD_LABELS = {
+  h1s: '<h1>-<h3> heading', h1Count: '<h1> heading', h2Count: '<h2> heading', h3Count: '<h3> heading',
+  h4Count: '<h4> heading', h5Count: '<h5> heading',
+  paragraphs: '<p> paragraph', links: '<a> link', buttons: '<button>',
+  listItems: '<li> list item', ulItems: '<li> inside a <ul>', olItems: '<li> inside an <ol>',
+  imgCount: '<img>', boldCount: '<b> (with real text inside)', italicCount: '<i> (with real text inside)',
+  underlineCount: '<u> (with real text inside)', inputCount: '<input>', numberInputCount: 'number <input>',
+  radioInputCount: 'radio <input>', emailInputCount: 'email <input>', urlInputCount: 'url <input>',
+  dateInputCount: 'date <input>', textareaCount: '<textarea>', requiredCount: 'required field',
+  checkboxCount: 'checkbox <input>', selectCount: '<select> dropdown', optionCount: '<option>',
+  fieldsetCount: '<fieldset>', legendCount: '<legend>', functionCount: 'function',
+}
+const STRUCTURAL_BOOL_LABELS = {
+  linkHrefOk: 'a link with a real, non-empty href', imgAltOk: 'a real, non-empty alt on every image',
+  hasArray: 'a real array — let/const/var x = [...]', hasObject: 'a real object — let/const/var x = {...}',
+  hasFunction: 'a real function', hasLoop: 'a real loop (for/while/.forEach)', hasClick: 'a real click handler',
+  hasReturn: 'a return statement', hasIf: 'an if statement', hasVariable: 'a real variable (let/const/var)',
+  hasPush: 'a .push() call', legendInsideFieldsetOk: 'a <legend> genuinely inside a <fieldset>',
+  labelForOk: 'a <label for="..."> that matches a real input\'s id',
+}
+function explainStructuralFailure(ch, log) {
+  const src = ch.check.toString()
+  const lines = []
+  const re = /log\.(\w+)\s*(>=|>|===|==)\s*(\d+)/g
+  const seen = new Set()
+  let m
+  while ((m = re.exec(src))) {
+    const [, field, op, numStr] = m
+    if (seen.has(field) || !(field in STRUCTURAL_FIELD_LABELS) || typeof log[field] !== 'number') continue
+    const required = Number(numStr)
+    const need = op === '>' ? required + 1 : required
+    const ok = op === '>=' ? log[field] >= required : op === '>' ? log[field] > required : log[field] === required
+    if (!ok) {
+      seen.add(field)
+      lines.push('Need at least ' + need + ' ' + STRUCTURAL_FIELD_LABELS[field] + (need === 1 ? '' : 's') + ' — found ' + log[field] + '.')
+    }
+  }
+  Object.entries(STRUCTURAL_BOOL_LABELS).forEach(([field, label]) => {
+    if (src.includes('log.' + field) && !log[field]) lines.push('Missing: ' + label + '.')
+  })
+  if (!lines.length) return []
+  return ['🔍 Here\'s what\'s still missing:', ...lines.map(l => '• ' + l)]
 }
 
 // ── Execution ─────────────────────────────────────────────────────────────────
