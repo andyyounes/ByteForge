@@ -109,26 +109,31 @@ function attachWindowBehaviour() {
   // did-navigate — handle both the same way.
   //
   // goToLogin()/goToSite() hop through a local splash.html file:// page on
-  // the way to the real site — that hop also fires did-navigate, so without
-  // this guard it (not the real login page) is what consumes
-  // suppressPickerRedirect, leaving the *real* login page's arrival looking
-  // unexpected and bouncing straight back to the picker.
+  // the way to the real site, and the real site can itself fire more than
+  // one navigation event for the very same /login arrival (e.g. once for
+  // the hard load, again once it hydrates and normalises the URL). So
+  // suppressPickerRedirect is a *sticky* "we just intentionally sent them
+  // to login" flag — it's set once up front and only cleared once we
+  // actually see a navigation to somewhere other than /login, not
+  // consumed by the first /login event we happen to observe. Without that,
+  // a second echo of the same arrival looks "unexpected" and bounces
+  // straight back to the picker before the student can even type anything.
   function handleNav(url) {
     if (!url.startsWith(APP_URL)) return
     let p
     try { p = new URL(url).pathname } catch { return }
 
-    const wasOurOwnNav = suppressPickerRedirect
-    suppressPickerRedirect = false
-
     if (p === '/login') {
-      if (wasOurOwnNav) return
+      if (suppressPickerRedirect) return
       // Logged out mid-session: students go back to the picker; a teacher
       // just sees the real (now-empty, prefilled) login form again.
       if (role === 'student') showProfilePicker()
       else pendingPrefillEmail = TEACHER_EMAIL
       return
     }
+
+    // Genuinely past /login now.
+    suppressPickerRedirect = false
 
     // Left /login for anything else while we had an attempted email in
     // flight → that's a successful student sign-in. Remember this email for
