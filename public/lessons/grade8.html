@@ -1370,7 +1370,10 @@ function examSaveData() {
     snapshotCount:       s ? s.snapshots.length : 0,
     snapshots:           s ? s.snapshots : [],
     examDurationSeconds: examElapsedSeconds(),
-    uploadedImages:      s && s.uploadedImages ? s.uploadedImages : [],
+    // Uploads are tracked generically for every lang:'web' stage now (see
+    // _currentUploads / saveCurrentUploads()), not just the exam — read
+    // the same shared variable here instead of a separate copy.
+    uploadedImages:      _currentUploads || [],
     // The server replaces the whole save_data column on every save, not a
     // merge (see app/api/lesson-saves/route.ts) — omitting this here would
     // silently erase a real submission's lock on the very next autosave.
@@ -1387,7 +1390,6 @@ function startExamTracking(ch) {
   _examState = {
     startedAt: Date.now(),
     priorElapsedSeconds: (priorSaveData && priorSaveData.examDurationSeconds) || 0,
-    uploadedImages: (priorSaveData && priorSaveData.uploadedImages) || [],
     submitted: !!(priorSaveData && priorSaveData.submitted),
     tabSwitches: 0, awayMs: 0, awaySince: null, snapshots: [],
   }
@@ -1441,18 +1443,28 @@ if (typeof BFLang !== 'undefined') {
   })
 }
 
-// ── Exam image uploads (ch.allowUpload stages only — see #web-tab-files) ───
-// A real photo makes the "recreate this page" task genuine instead of
-// reusing the same placeholder everyone gets; this is intentionally simple
-// (upload → copy the address → paste it into <img src="...">) rather than
+// ── Image uploads (every lang:'web' stage, course-wide — see #web-tab-files)
+// A real photo makes "build this page" genuine instead of reusing the same
+// placeholder image everyone gets; this is intentionally simple (upload →
+// copy the address → paste it into <img src="...">) rather than
 // auto-inserting into the HTML editor, since writing that tag themselves is
-// part of what's being tested.
+// usually part of the point. _currentUploads is seeded fresh per stage in
+// selectChallenge() — see showFilesTab there.
+let _currentUploads = []
+// Exam stages keep saving through examSaveData() (adds tab-switch/snapshot
+// tracking); every other stage just saves the upload list plainly.
+function saveCurrentUploads() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch) return
+  const saveData = ch.isExam ? examSaveData() : { uploadedImages: _currentUploads }
+  LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code: currentWebCode(), saveData })
+}
 function renderExamUploads(ch) {
   const list = document.getElementById('exam-uploaded-list')
   if (!list) return
   list.innerHTML = ''
-  if (!ch || !ch.allowUpload) return
-  const files = (_examState && _examState.uploadedImages) || []
+  if (!ch || ch.lang !== 'web') return
+  const files = _currentUploads || []
   if (!files.length) {
     const p = document.createElement('p')
     p.style.cssText = 'font-size:12px;color:var(--fg-faint);'
@@ -1481,8 +1493,7 @@ function renderExamUploads(ch) {
     nameInput.style.cssText = 'flex:1;min-width:0;font-size:12px;padding:4px 6px;background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;color:var(--fg);'
     nameInput.onchange = () => {
       f.name = nameInput.value.trim() || 'photo'
-      const ch = CHALLENGES[activeIdx]
-      LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code: currentWebCode(), saveData: examSaveData() })
+      saveCurrentUploads()
     }
 
     const copyBtn = document.createElement('button')
@@ -1523,16 +1534,15 @@ async function uploadExamImage() {
     const res = await fetch('/api/student/exam-upload', { method: 'POST', body: form })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Upload failed')
-    if (!_examState) _examState = { uploadedImages: [] }   // defensive — should already exist while this stage is open
-    if (!_examState.uploadedImages) _examState.uploadedImages = []
-    _examState.uploadedImages.push({ url: data.url, name: file.name })
+    if (!_currentUploads) _currentUploads = []
+    _currentUploads.push({ url: data.url, name: file.name })
     const ch = CHALLENGES[activeIdx]
     renderExamUploads(ch)
     statusEl.textContent = 'Uploaded — copy the address below into an <img src="...">.'
     input.value = ''
     // Save immediately rather than waiting for the next 20s autosave tick,
     // so a reload right after uploading doesn't lose the new image.
-    LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code: currentWebCode(), saveData: examSaveData() })
+    saveCurrentUploads()
   } catch (e) {
     statusEl.textContent = 'Upload failed: ' + e.message
   } finally {
@@ -1608,12 +1618,16 @@ function checkWebChallenge(log) {
       return
     }
     const firstPass = passOk && !completed.has(activeIdx)
+    // Stars (1-3) and XP (40/80/100) scale with how much was actually
+    // built, not a flat pass/fail — see examStars()/examXpForStars().
+    const stars = examStars(log)
+    const earnedXp = examXpForStars(stars)
     if (passOk) {
       completed.add(activeIdx)
       renderPills()
-      winShow(ch.xp)
-      showToast('Exam submitted — +' + ch.xp + ' XP 🎉')
-      clog('✅ Submitted — Exam passed! +' + ch.xp + ' XP', 'ok')
+      winShow(earnedXp)
+      showToast('Exam submitted — ' + '⭐'.repeat(stars) + ' +' + earnedXp + ' XP 🎉')
+      clog('✅ Submitted — Exam passed! ' + '⭐'.repeat(stars) + '☆'.repeat(3 - stars) + ' +' + earnedXp + ' XP', 'ok')
       reportRealProgress(ch, Date.now() - challengeStartedAt)
       updateFooterNext()
       renderModuleXPBar(findModuleForChallenge(ch))
@@ -1624,10 +1638,15 @@ function checkWebChallenge(log) {
     // record) includes submitted:true — examSaveData() reads it straight
     // off _examState, so the two can never disagree.
     if (_examState) _examState.submitted = true
+    // stars travels in saveData — showJourney()'s map node needs the REAL
+    // earned star count instead of the "every pass is worth 3 stars" default
+    // every other Grade 8 stage uses (see the comment in showJourney()).
+    const finalSaveData = examSaveData()
+    finalSaveData.stars = stars
     // The ONE save that notifies the student + teacher (see notifyExamResult
     // in app/api/lesson-saves/route.ts, gated on saveData.submitted === true
     // — Run's practice-autosave above must NOT trigger that notification).
-    LessonSaves.save('grade8', ch.id, { passed: passOk, code: currentWebCode(), xpEarned: firstPass ? ch.xp : 0, saveData: examSaveData() })
+    LessonSaves.save('grade8', ch.id, { passed: passOk, code: currentWebCode(), xpEarned: firstPass ? earnedXp : 0, saveData: finalSaveData })
     lockExamEditing()
     return
   }
@@ -2025,22 +2044,67 @@ function examCriteria(log) {
     { label: 'An image — &lt;img&gt; (any picture, it doesn\'t matter which)', ok: log.imgCount >= 1 },
   ]
 }
+// Polish — ungraded for PASSING (examCriteria alone decides that), but
+// decides how many of the 3 stars a passing attempt earns. Reuses the
+// richer checks the exam used to require outright, before that was
+// loosened to "someone who knows 20-30% of HTML can pass" — now they're
+// the difference between doing the minimum and doing it properly.
+function examPolishCriteria(log) {
+  const h = landmark(log, 'header')
+  return [
+    { label: 'Header has a background color', ok: !!(h && hasFillColor(h.bg)) },
+    { label: 'All four heading levels used (h1-h4)', ok: log.h1Count >= 1 && log.h2Count >= 1 && log.h3Count >= 1 && log.h4Count >= 1 },
+    { label: 'At least one div has a background color', ok: (log.divs || []).some(d => hasFillColor(d.bg)) },
+    { label: 'The link is styled like a button (background color + padding-top 6px+)', ok: hasFillColor(log.linkBg) && log.linkPadTop >= 6 },
+  ]
+}
+// 0 stars = didn't even pass (examCriteria not all met — not submittable/
+// never reaches this). 1 star = passed, little/no polish. 2 = passed, about
+// half the polish done. 3 = passed AND every polish item — "implemented
+// everything," full marks. XP mirrors it: 40 / 80 / 100.
+function examStars(log) {
+  if (!examCriteria(log).every(c => c.ok)) return 0
+  const polishDone = examPolishCriteria(log).filter(c => c.ok).length
+  const polishTotal = examPolishCriteria(log).length
+  if (polishDone >= polishTotal) return 3
+  if (polishDone >= Math.ceil(polishTotal / 2)) return 2
+  return 1
+}
+function examXpForStars(stars) {
+  return { 0: 0, 1: 40, 2: 80, 3: 100 }[stars] ?? 0
+}
 // Live, per-item feedback instead of one vague "not quite yet" — the
-// student sees exactly which requirement(s) are still missing, and a clear
-// "you can submit" the moment all five are met. Only used for isExam
-// stages; see checkWebChallenge()'s practice branch below.
+// student sees exactly which requirement(s) are still missing, a clear
+// "you can submit" the moment the 5 pass criteria are met, AND (once
+// passing) exactly which polish items are still costing them stars/XP —
+// transparent about why a passing attempt might only earn 1-2 stars, not
+// just that it's "not full marks." Only used for isExam stages; see
+// checkWebChallenge()'s practice branch below.
 function renderExamChecklist(log) {
   const el = document.getElementById('exam-checklist')
   if (!el) return
   const items = examCriteria(log)
   const allOk = items.every(i => i.ok)
   el.style.display = ''
-  el.innerHTML = items.map(i =>
+  let html = items.map(i =>
     '<div style="display:flex;align-items:center;gap:7px;padding:2px 0;' + (i.ok ? 'color:#4ade80;' : 'color:var(--fg-dim);') + '">'
       + '<span style="flex-shrink:0;">' + (i.ok ? '✅' : '⬜') + '</span><span>' + i.label + '</span></div>'
-  ).join('') + (allOk
-    ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:#4ade80;font-weight:700;">✅ Everything looks correct — you can click ✓ Submit Exam now.</div>'
-    : '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--fg-faint);">Not quite yet — the ⬜ items above are still missing. If something you wrote isn\'t showing up at all, double-check the tag is spelled correctly and properly closed.</div>')
+  ).join('')
+  if (!allOk) {
+    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--fg-faint);">Not quite yet — the ⬜ items above are still missing. If something you wrote isn\'t showing up at all, double-check the tag is spelled correctly and properly closed.</div>'
+  } else {
+    const stars = examStars(log)
+    const polishItems = examPolishCriteria(log)
+    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:#4ade80;font-weight:700;">✅ You can submit now — currently worth ' + '⭐'.repeat(stars) + '☆'.repeat(3 - stars) + ' (' + examXpForStars(stars) + ' XP)</div>'
+    if (stars < 3) {
+      html += '<div style="margin-top:6px;font-size:11.5px;color:var(--fg-faint);">Add these for more stars:</div>'
+        + polishItems.map(i =>
+            '<div style="display:flex;align-items:center;gap:7px;padding:1px 0;font-size:11.5px;' + (i.ok ? 'color:#4ade80;' : 'color:var(--fg-faint);') + '">'
+              + '<span style="flex-shrink:0;">' + (i.ok ? '✅' : '⬜') + '</span><span>' + i.label + '</span></div>'
+          ).join('')
+    }
+  }
+  el.innerHTML = html
 }
 // Steps with visible numbers (the badge holds the digit).
 function figStepList(items) {
@@ -3834,11 +3898,15 @@ const MODULES = [
           + '3. A <code>&lt;ul&gt;</code> (unordered list) with at least one <code>&lt;li&gt;</code> — your ingredients<br>'
           + '4. A real link — <code>&lt;a href="..."&gt;</code> with a genuine address, not left empty<br>'
           + '5. An <code>&lt;img&gt;</code> — any picture at all, it does not matter which one<br><br>'
-          + '<b>That\'s the whole checklist.</b> No colors, no padding, no <code>class</code> are required — you haven\'t learned classes yet, so none of this grades on them. Everything stacks top to bottom, normally — you do <b>not</b> need <code>display: inline-block</code> or side-by-side layout anywhere on this page.'
+          + '<b>This is everything you need to PASS.</b> No colors, no padding, no <code>class</code> are required for a pass — you haven\'t learned classes yet. Everything stacks top to bottom, normally — you do <b>not</b> need <code>display: inline-block</code> or side-by-side layout anywhere on this page.'
           + '<br><br>Press <b>▶ Run</b> any time to see exactly which of these 5 you still need — it checks each one separately and tells you precisely what\'s missing, not just "wrong."'
           + '</div>')}
-        ${figFrame('Want it to actually look like the picture? (optional — not graded)', '<div style="font-size:12px;line-height:1.8;">'
-          + 'Headings (<code>h1</code>-<code>h4</code>), a colored <code>&lt;header&gt;</code>/<code>&lt;footer&gt;</code>, and a link styled like a button all make your page look like the real target — but none of them are required to pass. Use the reference cards below if you want to add them.'
+        ${figFrame('⭐ Stars and XP — passing isn\'t the end of it', '<div style="font-size:12px;line-height:1.9;">'
+          + 'Passing the 5 items above always counts as a real pass — but how many stars (and how much XP) you earn depends on how much you actually built:<br><br>'
+          + '⭐☆☆ <b>1 star, 40 XP</b> — the 5 basics above, nothing more<br>'
+          + '⭐⭐☆ <b>2 stars, 80 XP</b> — the basics, plus about half of: a colored header, all 4 heading levels (h1-h4), a colored div, a styled link button<br>'
+          + '⭐⭐⭐ <b>3 stars, 100 XP</b> — the basics, plus ALL FOUR of those — this is what actually matches the picture<br><br>'
+          + 'Press <b>▶ Run</b> once you\'re passing and the checklist will show your CURRENT star count and exactly which extra items would earn you more — see the reference cards below for how to add each one.'
           + '</div>')}
         <br>You may look at the real recipe for ideas: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Your "See Original Recipe" button's exact <code>href</code>:
         ${figCode('&lt;a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"&gt;\n  See the Original Recipe &amp;rarr;\n&lt;/a&gt;')}
@@ -9881,6 +9949,14 @@ const NEW_STAGE_IDS = new Set([
   'respq0', 'resps1', 'respq1', 'resps2', 'respq2', 'resps3', 'respboss',
   // Earlier gap-closing additions from the same update
   'jsf2qtpl', 'ws1qobj', 'ws1qrand', 'web5qtoggle', 'web5s5', 'web5qinterval', 'web5s6',
+  // Numbered Lists & Text Styling — the whole new module (inserted into the
+  // middle of the curriculum, so a student who'd already passed LATER
+  // stages needs this glow to ever notice it — freeRoam mode means it's
+  // reachable, but nothing else would make them go looking for it)
+  'web2b1', 'web2b2', 'web2b3', 'web2b4', 'web2bboss',
+  // Rounded Corners — same reasoning, inserted after the existing card
+  // lesson
+  'divs3r1', 'divs3r2', 'divs3r3',
 ])
 
 function showJourney() {
@@ -9895,7 +9971,11 @@ function showJourney() {
       // actually set. Leaving it unset (as before) meant every completed
       // node fell back to quest-map.js's boss/plain-star default instead of
       // showing 3.
-      return { id: s.id, emoji: STAGE_EMO[i % STAGE_EMO.length], label: s.name, done, stars: done ? 3 : 0, isNew: NEW_STAGE_IDS.has(s.id) }
+      // EXCEPT the exam — it genuinely earns 1-3 stars based on how much
+      // was actually built (see examStars()), saved in save_data.stars at
+      // submit time. Every other stage keeps the flat "done = 3" rule.
+      const realStars = s.id === 'examRecipe' ? (LessonSaves.saveDataFor(s.id, 'grade8') || {}).stars : undefined
+      return { id: s.id, emoji: STAGE_EMO[i % STAGE_EMO.length], label: s.name, done, stars: done ? (realStars ?? 3) : 0, isNew: NEW_STAGE_IDS.has(s.id) }
     })
     // One Lesson bubble per module, same node style as exercises, placed
     // first (ported from Grade 7). done:true always -- see Grade 7's
@@ -9983,11 +10063,13 @@ function selectChallenge(i) {
   else stopExamTracking()
   document.getElementById('ch-row').style.display = ''
   document.getElementById('ch-text').innerHTML = examStageText(ch)
-  // Hidden by default (see the HTML comment above #web-tab-files) — only a
-  // stage that opts in shows it. The single-page isWeb branch below always
-  // calls switchWebTab('html'|'css'), so a Files tab left active on the
-  // PREVIOUS stage is never stuck active after switching away from it.
-  document.getElementById('web-tab-files').style.display = ch.allowUpload ? 'inline-block' : 'none'
+  // Shown on every real web-editor (lang:'web') stage, course-wide — not
+  // just the exam. The single-page isWeb branch below always calls
+  // switchWebTab('html'|'css'), so a Files tab left active on the PREVIOUS
+  // stage is never stuck active after switching away from it.
+  const showFilesTab = ch.lang === 'web'
+  document.getElementById('web-tab-files').style.display = showFilesTab ? 'inline-block' : 'none'
+  _currentUploads = showFilesTab ? ((LessonSaves.saveDataFor(ch.id, 'grade8') || {}).uploadedImages || []) : []
   renderExamUploads(ch)
   // webEditors are shared singletons reused by every lang:'web' stage, so a
   // readOnly left on from a submitted exam MUST be cleared before any other

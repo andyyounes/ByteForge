@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { sendEmail, examResultEmailHtml } from '@/lib/email'
 
 // ── GET /api/lesson-saves?lesson=<key> ───────────────────────────────────────
 // Returns all saves for the authenticated student for the given lesson key.
@@ -39,12 +40,15 @@ async function notifyExamResult(
   lesson: string,
   challengeId: string,
   passed: boolean,
+  stars: number,
 ) {
-  const { data: profile } = await supabase.from('profiles').select('name').eq('id', studentId).single()
+  const { data: profile } = await supabase.from('profiles').select('name, email').eq('id', studentId).single()
   const studentName = profile?.name ?? 'A student'
+  const studentEmail = profile?.email ?? ''
 
   const resultWord = passed ? 'passed' : 'did not pass'
   const examLabel = `${lesson} exam`
+  const starLine = passed ? ` — ${stars} star${stars === 1 ? '' : 's'} (${'⭐'.repeat(stars)}${'☆'.repeat(Math.max(0, 3 - stars))})` : ''
 
   await supabase.from('notifications').insert({
     user_id: studentId,
@@ -52,9 +56,9 @@ async function notifyExamResult(
     type: 'exam_result',
     title: passed ? 'Exam passed' : 'Exam submitted',
     body: passed
-      ? `You passed the ${examLabel}. Nice work!`
+      ? `You passed the ${examLabel}${starLine}. Nice work!`
       : `You submitted the ${examLabel} but it didn't pass yet — you can try again.`,
-    data: { lesson, challengeId, passed },
+    data: { lesson, challengeId, passed, stars },
   })
 
   // Find this student's teacher(s) via their class membership.
@@ -73,15 +77,40 @@ async function notifyExamResult(
 
   const teacherIds = [...new Set((classes ?? []).map((c: { teacher_id: string }) => c.teacher_id))]
 
+  // Teacher emails need the admin client — the student's own RLS-scoped
+  // session can't read another user's email address, even just to mail
+  // them (notifications themselves don't need this: that insert only
+  // writes a user_id, it never reads the teacher's row).
+  const admin = await createAdminClient()
+  const { data: teacherProfiles } = await admin.from('profiles').select('id, name, email').in('id', teacherIds)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+
   for (const teacherId of teacherIds) {
     await supabase.from('notifications').insert({
       user_id: teacherId,
       created_by: studentId,
       type: 'exam_result',
       title: 'Student exam result',
-      body: `${studentName} ${resultWord} the ${examLabel}.`,
-      data: { lesson, challengeId, passed, studentId, studentName },
+      body: `${studentName} ${resultWord} the ${examLabel}${starLine}.`,
+      data: { lesson, challengeId, passed, stars, studentId, studentName },
     })
+
+    const teacher = (teacherProfiles ?? []).find((t: { id: string }) => t.id === teacherId)
+    if (teacher?.email) {
+      await sendEmail({
+        to:      teacher.email,
+        subject: `${passed ? '🎯' : '📝'} ${studentName} ${resultWord} the ${lesson} exam`,
+        html:    examResultEmailHtml({
+          teacherName:  teacher.name ?? 'there',
+          studentName,
+          studentEmail,
+          examLabel,
+          passed,
+          stars,
+          dashboardUrl: `${appUrl}/teacher/dashboard`,
+        }),
+      })
+    }
   }
 }
 
@@ -174,7 +203,7 @@ export async function POST(request: NextRequest) {
     // grade-progress.ts to find exam attempts) but never submitted:true, so
     // they never re-trigger this notification.
     if (saveData && saveData.submitted === true) {
-      await notifyExamResult(supabase, user.id, lesson, challengeId, !!passed)
+      await notifyExamResult(supabase, user.id, lesson, challengeId, !!passed, Number(saveData.stars) || 0)
     }
 
     return NextResponse.json({ ok: true, xpAwarded: shouldAwardXp ? xpEarned : 0 })
