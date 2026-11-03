@@ -105,12 +105,14 @@ const webMaximalLog = () => ({
   // row, and header/main/sidebar/content/footer laid out as a real page.
   divs: (() => {
     const d = o => ({ id: '', cls: '', text: 20, nestedDivs: 0, hasHeading: false, hasPara: false, hasLink: false, bg: 'rgba(0, 0, 0, 0)',
-      display: 'block', padTop: 0, borderW: 0, left: 0, right: 480, top: 0, bottom: 50, width: 480, height: 50, ...o })
+      display: 'block', padTop: 0, borderW: 0, borderRadius: 0, left: 0, right: 480, top: 0, bottom: 50, width: 480, height: 50, ...o })
     const fill = 'rgb(255, 247, 230)'
     return [
       d({ nestedDivs: 1, hasHeading: true, hasPara: true, top: 0, bottom: 200 }),
-      d({ cls: 'card', hasHeading: true, hasPara: true, bg: fill, padTop: 12, borderW: 1, top: 0, bottom: 100 }),
-      d({ cls: 'card', hasHeading: true, hasPara: true, bg: fill, padTop: 12, borderW: 1, top: 116, bottom: 200 }),
+      // Real height here is 100/84 (bottom - top) — borderRadius 999 clears
+      // height/2 either way, same as the browser capping a too-big value.
+      d({ cls: 'card', hasHeading: true, hasPara: true, bg: fill, padTop: 12, borderW: 1, borderRadius: 999, top: 0, bottom: 100, height: 100 }),
+      d({ cls: 'card', hasHeading: true, hasPara: true, bg: fill, padTop: 12, borderW: 1, borderRadius: 999, top: 116, bottom: 200, height: 84 }),
       d({ cls: 'box', bg: fill, left: 0, right: 200, top: 300, bottom: 350, width: 200 }),
       d({ cls: 'box', bg: fill, left: 210, right: 410, top: 300, bottom: 350, width: 200 }),
       d({ id: 'header',  bg: fill, top: 500, bottom: 540 }),
@@ -118,6 +120,9 @@ const webMaximalLog = () => ({
       d({ id: 'sidebar', bg: fill, left: 0,   right: 120, width: 120, top: 540, bottom: 700 }),
       d({ id: 'content', left: 130, right: 400, width: 270, top: 540, bottom: 700 }),
       d({ id: 'footer',  bg: fill, top: 700, bottom: 740 }),
+      // Rounded Corners module — a real square (width === height) avatar,
+      // fully rounded, for divs3r3's circle check.
+      d({ cls: 'avatar', bg: fill, borderRadius: 40, left: 0, right: 80, top: 800, bottom: 880, width: 80, height: 80 }),
     ]
   })(),
   // Semantic HTML5 — one of each landmark, positioned/colored generously
@@ -330,7 +335,7 @@ for (const [id, label, code, log] of ACCEPT) {
 // the regex logic directly against a realistic log.js/log.bodyText.
 // A measured <div> for the layout stages — defaults to an invisible, full-width block.
 const dv = o => ({ id: '', cls: '', text: 20, nestedDivs: 0, hasHeading: false, hasPara: false, hasLink: false, bg: 'rgba(0, 0, 0, 0)',
-  display: 'block', padTop: 0, borderW: 0, left: 0, right: 480, top: 0, bottom: 50, width: 480, height: 50, ...o })
+  display: 'block', padTop: 0, borderW: 0, borderRadius: 0, left: 0, right: 480, top: 0, bottom: 50, width: 480, height: 50, ...o })
 const FILL = 'rgb(255, 247, 230)'
 const page = ({ header, main, sidebar, content, footer }) => ({ divs: [header, main, sidebar, content, footer].filter(Boolean) })
 const goodLayout = () => ({

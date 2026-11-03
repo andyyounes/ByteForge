@@ -928,6 +928,11 @@ function buildWebLog(doc, win, html, css, js) {
         hasHeading: !!d.querySelector('h1,h2,h3,h4,h5,h6'), hasPara: !!d.querySelector('p'), hasLink: !!d.querySelector('a'),
         bg: cs.backgroundColor, display: cs.display,
         padTop: parseFloat(cs.paddingTop) || 0, borderW: parseFloat(cs.borderTopWidth) || 0,
+        // Rounded Corners module — border-radius, up to a full circle (50%
+        // on an equal width/height box). getComputedStyle always returns a
+        // real px value, even for a % written in CSS, so "is this a real
+        // circle" compares the computed radius to the box's own half-width.
+        borderRadius: parseFloat(cs.borderTopLeftRadius) || 0,
         left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height,
       }
     }),
@@ -3257,6 +3262,64 @@ const MODULES = [
         js: ``,
       },
       check:(log) => (log.divs || []).some(d => /\bcard\b/.test(d.cls) && hasFillColor(d.bg) && d.padTop >= 8 && d.borderW >= 1),
+    },
+    { id:'divs3r1', name:'Rounded Corners', xp:25, lang:'web',
+      text:`<strong>Challenge</strong> — <code>border-radius</code> rounds the sharp corners of ANY box — a small value gives a soft, modern look.
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;">
+          <div style="text-align:center;"><div style="width:70px;height:50px;background:#93C5FD;border-radius:0px;"></div><div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;">0px — sharp</div></div>
+          <div style="text-align:center;"><div style="width:70px;height:50px;background:#93C5FD;border-radius:8px;"></div><div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;">8px — soft</div></div>
+          <div style="text-align:center;"><div style="width:70px;height:50px;background:#93C5FD;border-radius:20px;"></div><div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;">20px — very round</div></div>
+        </div>
+        Add <code>border-radius: 10px;</code> to your <code>.card</code> from the last challenge.`,
+      hints:[
+        '.card { ...everything you already have..., border-radius: 10px; }',
+        'It goes inside the same .card { } rule as background-color/padding/border — just one more line.',
+      ],
+      webStarter: {
+        html: `<div class="card">\n  <h2>My Card</h2>\n  <p>A div can look like a real card.</p>\n</div>\n`,
+        css: `body { font-family: sans-serif; background-color: #ffffff; }\n.card { background-color: #FFF7E6; padding: 14px; border: 2px solid #2F3B52;\n  /* TODO: border-radius: ...px; */\n}\n`,
+        js: ``,
+      },
+      check:(log) => (log.divs || []).some(d => /\bcard\b/.test(d.cls) && d.borderRadius >= 4),
+    },
+    { id:'divs3r2', name:'A Big Radius — the Pill Shape', xp:25, lang:'web',
+      text:`<strong>Challenge</strong> — Push <code>border-radius</code> MUCH higher than the box is tall (try <code>999px</code>) and something interesting happens: the browser can't round it any further than half the box's own height, so the ends just become perfect semicircles — a "pill" shape, exactly like a real button.
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;">
+          <div style="text-align:center;"><div style="width:100px;height:40px;background:#4ADE80;border-radius:20px;"></div><div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;">20px — getting there</div></div>
+          <div style="text-align:center;"><div style="width:100px;height:40px;background:#4ADE80;border-radius:999px;"></div><div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;">999px — a full pill</div></div>
+        </div>
+        Change your <code>.card</code>'s <code>border-radius</code> to <code>999px</code> and Run — the top and bottom edges become perfect curves.`,
+      hints:[
+        'Writing a number bigger than the box needs isn\'t an error — the browser just caps it at the maximum useful amount.',
+        'This is the real technique behind every rounded "pill" button you see on real websites.',
+      ],
+      webStarter: {
+        html: `<div class="card">\n  <h2>My Card</h2>\n  <p>A div can look like a real card.</p>\n</div>\n`,
+        css: `body { font-family: sans-serif; background-color: #ffffff; }\n.card { background-color: #FFF7E6; padding: 14px; border: 2px solid #2F3B52; border-radius: 10px;\n  /* TODO: change border-radius to 999px */\n}\n`,
+        js: ``,
+      },
+      check:(log) => (log.divs || []).some(d => /\bcard\b/.test(d.cls) && d.height > 0 && d.borderRadius >= d.height / 2 - 1),
+    },
+    { id:'divs3r3', name:'A Perfect Circle', xp:30, lang:'web',
+      text:`<strong>Challenge</strong> — One more step: give a box EQUAL width and height (a square), then set <code>border-radius: 50%</code> — now all four corners round in toward the center at once, and a square becomes a perfect circle. This is the real technique behind every round profile picture/avatar you've ever seen online.
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin:10px 0;">
+          <div style="text-align:center;"><div style="width:70px;height:70px;background:#F472B6;border-radius:0px;"></div><div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;">a square</div></div>
+          <div style="text-align:center;"><div style="width:70px;height:70px;background:#F472B6;border-radius:50%;"></div><div style="font-size:10.5px;color:var(--fg-faint);margin-top:6px;">50% — a circle</div></div>
+        </div>
+        Build a new, separate div: <code>width: 80px; height: 80px;</code> (equal — this part matters), a background color, and <code>border-radius: 50%;</code>.`,
+      hints:[
+        '.avatar { width: 80px; height: 80px; background-color: ...; border-radius: 50%; }',
+        'If width and height are NOT equal, 50% still rounds it — but into an oval/pill, not a true circle. Equal numbers are the key.',
+      ],
+      webStarter: {
+        html: `<div class="card">\n  <h2>My Card</h2>\n  <p>A div can look like a real card.</p>\n</div>\n<!-- TODO: a new div, class="avatar", square and round -->\n`,
+        css: `body { font-family: sans-serif; background-color: #ffffff; }\n.card { background-color: #FFF7E6; padding: 14px; border: 2px solid #2F3B52; border-radius: 10px; }\n/* TODO: .avatar { width: 80px; height: 80px; background-color: ...; border-radius: 50%; } */\n`,
+        js: ``,
+      },
+      check:(log) => (log.divs || []).some(d => {
+        const sizeOk = d.width > 0 && Math.abs(d.width - d.height) < 4
+        return sizeOk && d.borderRadius >= d.width / 2 - 2 && hasFillColor(d.bg)
+      }),
     },
     { id:'divs4', name:'Margin — Space BETWEEN Boxes', xp:30, lang:'web',
       text:`<strong>Challenge</strong> — <b>Padding</b> is space inside a box; <b>margin</b> is space OUTSIDE it, pushing other boxes away. The two cards below are touching. Add a <code>margin-bottom</code> to <code>.card</code> so there is at least 10px of space between them.
@@ -9066,6 +9129,15 @@ const CHALLENGE_LESSON = {
     <div class="cl-block"><h4>The finished rule</h4>
       ${figCode('.card {\n  background-color: #FFF7E6;\n  padding: 14px;\n  border: 2px solid #2F3B52;\n}')}
       <p>Common mistake: writing <code>card { … }</code> without the dot — that targets a tag called "card", which does not exist.</p></div>` },
+  divs3r1: { title: 'border-radius rounds sharp corners', html: `
+    <div class="cl-block"><h4>One property, a softer box</h4>
+      <p><code>border-radius</code> rounds every corner of a box by the same amount — a small number (4-12px) is a common, modern, subtle look. It goes in the same CSS rule as everything else you've already styled on that box.</p></div>` },
+  divs3r2: { title: 'A radius bigger than the box makes a pill', html: `
+    <div class="cl-block"><h4>The browser caps it for you</h4>
+      <p>Writing a huge border-radius (like 999px) on a short box isn't an error — the browser can only round a corner up to half the box's height, so it just rounds as far as it can, turning the two short ends into perfect semicircles. That's the real "pill button" shape.</p></div>` },
+  divs3r3: { title: 'Equal width + height + 50% = a circle', html: `
+    <div class="cl-block"><h4>Square first, then round it</h4>
+      <p>border-radius: 50% rounds in from all four corners toward the center. On a box that's already a perfect square (width equals height), that meets in the middle as a perfect circle — the exact technique behind every round profile picture online. Unequal width/height still rounds, but into an oval, not a circle.</p></div>` },
   divs4: { title: 'Margin pushes boxes apart', html: `
     <div class="cl-block"><h4>Inside vs outside</h4>
       ${figGap()}
