@@ -35,6 +35,7 @@ interface ExamResult {
 interface StudentProgress {
   studentId:     string
   name:          string
+  email:         string
   stagesPassed:  number
   stagesTotal:   number
   currentModule: string | null
@@ -136,8 +137,12 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                 <Fragment key={s.studentId}>
                 <tr className="border-b border-b2/60">
                   <td className="py-2 pr-3 font-medium text-fg">
-                    <button onClick={() => setOpen(isOpen ? null : s.studentId)} className="flex items-center gap-1.5 hover:text-accent transition-colors text-left" aria-expanded={isOpen}>
-                      <span className="text-t3 text-[10px]">{isOpen ? '▾' : '▸'}</span>{s.name}
+                    <button onClick={() => setOpen(isOpen ? null : s.studentId)} className="flex items-start gap-1.5 hover:text-accent transition-colors text-left" aria-expanded={isOpen}>
+                      <span className="text-t3 text-[10px] mt-0.5">{isOpen ? '▾' : '▸'}</span>
+                      <span>
+                        <div>{s.name}</div>
+                        <div className="text-[10px] font-normal text-t3">{s.email}</div>
+                      </span>
                     </button>
                   </td>
                   <td className="py-2 pr-3">
@@ -178,7 +183,7 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                     <td colSpan={8} className="py-3 px-3">
                       {exams.length > 0 && (
                         <div className="mb-3 space-y-1.5">
-                          <div className="text-[10px] font-semibold uppercase tracking-wide text-t3">Exam integrity</div>
+                          <div className="text-[10px] font-semibold uppercase tracking-wide text-t3">Exam integrity — {s.name} ({s.email})</div>
                           {exams.map(ex => {
                             const key = `${s.studentId}:${ex.stageId}`
                             const granting = grantingFor === key

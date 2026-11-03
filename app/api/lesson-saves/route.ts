@@ -2,6 +2,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { sendEmail, examResultEmailHtml } from '@/lib/email'
+import { ACHIEVEMENTS } from '@/lib/concepts'
 
 // ── GET /api/lesson-saves?lesson=<key> ───────────────────────────────────────
 // Returns all saves for the authenticated student for the given lesson key.
@@ -60,6 +61,36 @@ async function notifyExamResult(
       : `You submitted the ${examLabel} but it didn't pass yet — you can try again.`,
     data: { lesson, challengeId, passed, stars },
   })
+
+  // Award the "Recipe Master" badge on a real pass — see the comment on
+  // this achievement in lib/concepts.ts for why it's awarded directly here
+  // instead of through the mastery-based checkNewAchievements() every other
+  // achievement goes through (the hands-on web track isn't part of that
+  // system at all). Admin client: this write doesn't depend on the
+  // student's own RLS grants, same reasoning as the teacher email lookup
+  // below.
+  if (passed) {
+    const admin = await createAdminClient()
+    const { data: already } = await admin
+      .from('user_achievements')
+      .select('achievement_id')
+      .eq('student_id', studentId)
+      .eq('achievement_id', 'grade8-exam')
+      .maybeSingle()
+    if (!already) {
+      const badge = ACHIEVEMENTS.find(a => a.id === 'grade8-exam')
+      await admin.from('user_achievements').insert({
+        student_id: studentId,
+        achievement_id: 'grade8-exam',
+        unlocked_at: new Date().toISOString(),
+        xp_earned: badge?.xp ?? 0,
+      })
+      if (badge?.xp) {
+        const { data: p } = await admin.from('profiles').select('xp').eq('id', studentId).single()
+        if (p) await admin.from('profiles').update({ xp: p.xp + badge.xp }).eq('id', studentId)
+      }
+    }
+  }
 
   // Find this student's teacher(s) via their class membership.
   const { data: memberships } = await supabase

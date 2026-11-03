@@ -2487,7 +2487,13 @@ const MODULES = [
       check:(log) => log.quizCorrect >= 4,
     },
     { id:'web0bs2', name:'Build the Skeleton', xp:30, lang:'web',
-      text:`<strong>Challenge</strong> — Build the real skeleton every page needs, completely by hand: <code>&lt;!DOCTYPE html&gt;</code>, then <code>&lt;html&gt;</code>, then a <code>&lt;head&gt;&lt;/head&gt;</code>, then a <code>&lt;body&gt;</code> containing one heading — then close everything in the right order.`,
+      text:`<strong>Challenge</strong> — Build the real skeleton every page needs, completely by hand — in this exact order:
+        ${figCode('&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n  &lt;head&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n    &lt;h1&gt;...&lt;/h1&gt;\n  &lt;/body&gt;\n&lt;/html&gt;')}
+        1. <code>&lt;!DOCTYPE html&gt;</code> — on its own, first, never closed<br>
+        2. <code>&lt;html&gt;</code> ... <code>&lt;/html&gt;</code> — wraps everything else<br>
+        3. <code>&lt;head&gt;&lt;/head&gt;</code> — can stay empty for now<br>
+        4. <code>&lt;body&gt;</code> ... <code>&lt;/body&gt;</code> — with one real <code>&lt;h1&gt;</code> inside it<br><br>
+        <b>Why this exact order matters:</b> the browser reads top to bottom — DOCTYPE first tells it how to interpret everything that follows, and head always comes before body because "information about the page" logically comes before "the page itself."`,
       hints:[
         'Order: DOCTYPE, then <html>, then <head></head>, then <body>...</body>, then </html> at the very end.',
         'Every tag you open needs a matching closing tag, in REVERSE order — the last thing you opened is the first thing you close.',
@@ -2499,7 +2505,14 @@ const MODULES = [
                   && /<body[\s>]/i.test(log.html) && /<\/body>/i.test(log.html) && log.h1s >= 1,
     },
     { id:'web0bs3', name:'Your Page\'s Title — Two Different Things', xp:30, lang:'web',
-      text:`<strong>Challenge</strong> — "Title" actually means TWO different things: a real <code>&lt;title&gt;</code> tag inside <code>&lt;head&gt;</code> (shows in the BROWSER TAB, not on the page), and an <code>&lt;h1&gt;</code> inside <code>&lt;body&gt;</code> (the big visible heading ON the page). Add BOTH — they can even say different things.`,
+      text:`<strong>Challenge</strong> — "Title" actually means TWO completely different things:
+        <div style="display:flex;flex-direction:column;gap:2px;margin:10px 0;border:1px solid #ddd;border-radius:8px;overflow:hidden;">
+          <div style="background:#e5e5e5;color:#333;font-size:11px;padding:6px 10px;display:flex;align-items:center;gap:6px;"><span style="background:#fff;border:1px solid #ccc;border-radius:3px;padding:2px 8px;">📄 My Page</span><span style="color:#999;">← the browser TAB — this is &lt;title&gt;, inside &lt;head&gt;</span></div>
+          <div style="background:#fff;color:#1a1a1a;padding:14px;"><h1 style="margin:0;font-size:24px;">My Page</h1><div style="font-size:11px;color:#999;margin-top:4px;">↑ the visible page heading — this is &lt;h1&gt;, inside &lt;body&gt;</div></div>
+        </div>
+        1. A real <code>&lt;title&gt;</code> inside <code>&lt;head&gt;</code> — shows in the browser tab, NEVER on the page itself<br>
+        2. A real <code>&lt;h1&gt;</code> inside <code>&lt;body&gt;</code> — the big visible heading, completely separate<br><br>
+        They can even say different things — a short tab label vs. a fuller on-page title.`,
       hints:[
         '<title>My Page</title> goes INSIDE <head></head> — it never appears on the page itself, only in the browser tab.',
         '<h1>My Page</h1> goes INSIDE <body> — that\'s the visible heading, completely separate from <title>.',
@@ -2509,7 +2522,12 @@ const MODULES = [
       check:(log) => log.pageTitle.trim().length > 0 && log.h1s >= 1,
     },
     { id:'web0bs4', name:'Your Subtitle', xp:25, lang:'web',
-      text:`<strong>Challenge</strong> — Underneath your <code>&lt;h1&gt;</code> title, add an <code>&lt;h2&gt;</code> subtitle — a smaller heading that adds context under the main one (e.g. a tagline, or "Chapter 1"). Keep the full skeleton and your <title>/<h1> from before.`,
+      text:`<strong>Challenge</strong> — Underneath your <code>&lt;h1&gt;</code> title, add an <code>&lt;h2&gt;</code> subtitle — a smaller heading that adds context (a tagline, or "Chapter 1").
+        <div style="padding:14px;background:#fff;border:1px solid #ddd;border-radius:8px;margin:10px 0;color:#1a1a1a;">
+          <h1 style="margin:0 0 4px;font-size:26px;">My Page</h1>
+          <h2 style="margin:0;font-size:18px;color:#555;">A real subtitle goes here</h2>
+        </div>
+        Keep the full skeleton and your <code>&lt;title&gt;</code>/<code>&lt;h1&gt;</code> from before, and add the <code>&lt;h2&gt;</code> right after it.`,
       hints:[
         '<h2>Your subtitle here</h2> — same idea as h1, just one level smaller.',
         'A subtitle usually comes RIGHT after the title, before any other content.',
@@ -2518,7 +2536,11 @@ const MODULES = [
       check:(log) => log.pageTitle.trim().length > 0 && log.h1Count >= 1 && log.h2Count >= 1,
     },
     { id:'web0bs5', name:'Add an Image', xp:30, lang:'web',
-      text:`<strong>Challenge</strong> — Add a real image with <code>&lt;img src="..." alt="..."&gt;</code>. <code>src</code> is WHERE the image file is (a URL); <code>alt</code> is a text description — required for anyone using a screen reader, and shown if the image fails to load. An <code>&lt;img&gt;</code> has no closing tag.`,
+      text:`<strong>Challenge</strong> — Add a real image: <code>&lt;img src="..." alt="..."&gt;</code>.
+        ${figCode('&lt;img src="https://placehold.co/300x200" alt="A description of the image"&gt;')}
+        <code>src</code> — WHERE the image file actually is (a real URL)<br>
+        <code>alt</code> — a text description, required for two real reasons: screen readers read it aloud for visually impaired visitors, and the browser shows it if the image fails to load<br><br>
+        <b>Note:</b> <code>&lt;img&gt;</code> is self-closing — there's no separate <code>&lt;/img&gt;</code> tag.`,
       hints:[
         `<img src="https://placehold.co/300x200" alt="A description of the image">`,
         'alt is NOT optional — it must describe what the image actually shows, not be left empty ("").',
@@ -2528,7 +2550,14 @@ const MODULES = [
       check:(log) => log.imgCount >= 1 && log.imgAltOk,
     },
     { id:'web0bboss', name:'BOSS — Favorite Animal Page', xp:70, lang:'web', boss:true,
-      text:`<strong>BOSS</strong> — A complete, real page about your favorite animal, following an EXACT spec: a full skeleton (DOCTYPE/html/head/body), a real <code>&lt;title&gt;</code> in the head, an <code>&lt;h1&gt;</code> naming the animal, an <code>&lt;h2&gt;</code> subtitle, an <code>&lt;img&gt;</code> with a real <code>alt</code> description, and at least one <code>&lt;p&gt;</code> paragraph telling the reader something real about it.`,
+      text:`<strong>BOSS</strong> — A complete, real page about your favorite animal:
+        1. A full skeleton — <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, <code>&lt;body&gt;</code><br>
+        2. A real <code>&lt;title&gt;</code> inside <code>&lt;head&gt;</code><br>
+        3. An <code>&lt;h1&gt;</code> naming the animal<br>
+        4. An <code>&lt;h2&gt;</code> subtitle<br>
+        5. An <code>&lt;img&gt;</code> with a real <code>alt</code> description<br>
+        6. At least one <code>&lt;p&gt;</code> telling the reader something real about it<br><br>
+        Six requirements — nothing new, every stage from this module, combined onto one real page.`,
       hints:[
         'This is genuinely every stage from this module combined — nothing new, just all together on one real page.',
         'Checklist: DOCTYPE, html, head with title, body with h1 + h2 + img(alt) + p — six separate requirements.',

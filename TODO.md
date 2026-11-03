@@ -44,7 +44,7 @@ the SAME commit so the two never drift.
 ## Modules, in teaching order (51 total, 289 stages)
 
 - [x] web0 — What Is a Website? (3 stages) — mostly quiz/conceptual, revisit only if genuinely unclear
-- [ ] web0b — Your First Page (6 stages)
+- [x] web0b — Your First Page (6 stages)
 - [ ] web0c — Directories, Files & Paths (6 stages)
 - [ ] web1 — Your First Tags (5 stages)
 - [ ] web2 — More Tags (4 stages)

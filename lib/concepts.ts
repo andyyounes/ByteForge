@@ -361,6 +361,14 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id:'function-forge',   name:'Function Forge',           icon:'ƒ',  description:'Master Functions & Parameters',              xp:150,  check:(m)=>isMastered(m,'functions-params') },
   { id:'data-wizard',      name:'Data Wizard',              icon:'≡',  description:'Master Lists & Arrays',                      xp:150,  check:(m)=>isMastered(m,'lists-data') },
   { id:'pathway-systems',  name:'Systems Builder',          icon:'⊞',  description:'Complete the Systems Builder pathway',       xp:400,  check:(m)=>pathwayComplete(m,'path-systems') },
+  // Awarded directly by app/api/lesson-saves/route.ts the moment the Grade 8
+  // exam (examRecipe) is submitted AND passes — NOT via this file's own
+  // checkNewAchievements()/mastery-map mechanism, since the hands-on web
+  // track (CHALLENGES/lesson_saves, in grade8.html) is a completely separate
+  // progress system from concept_mastery, which every other check() here
+  // reads from. check() stays `() => false` so it can never double-award
+  // through the normal mastery-based path.
+  { id:'grade8-exam',      name:'Recipe Master',            icon:'🍪', description:'Pass the Grade 8 hands-on exam',             xp:50,   check:()=>false },
 
   // ── Theory / IGCSE ───────────────────────────────────────────────────────
   { id:'binary-beast',     name:'Binary Beast',             icon:'⚫', description:'Master all core number system concepts',        xp:200,  check:(m)=>['binary-intro','binary-to-decimal','decimal-to-binary','binary-addition','hex-intro'].every(id=>isMastered(m,id)) },

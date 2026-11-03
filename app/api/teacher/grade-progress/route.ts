@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
   }
 
   const [{ data: profiles }, { data: saves }] = await Promise.all([
-    admin.from('profiles').select('id, name').in('id', studentIds),
+    admin.from('profiles').select('id, name, email').in('id', studentIds),
     admin.from('lesson_saves')
       .select('student_id, challenge_id, passed, saved_at, save_data')
       .eq('lesson_key', meta.lessonKey)
@@ -70,9 +70,10 @@ export async function GET(req: NextRequest) {
     byStudent.set(row.student_id, list)
   }
 
-  const students = (profiles ?? []).map((p: { id: string; name: string }) =>
-    summarizeStudent(meta, p.id, p.name, byStudent.get(p.id) ?? [])
-  )
+  const students = (profiles ?? []).map((p: { id: string; name: string; email: string }) => ({
+    ...summarizeStudent(meta, p.id, p.name, byStudent.get(p.id) ?? []),
+    email: p.email,
+  }))
 
   return NextResponse.json({ students, totalStages: meta.total })
 }
