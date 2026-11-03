@@ -340,7 +340,7 @@ const QuestMap = (() => {
         // module inserted before a student's real position) stays fully
         // open so they can go back and fill it in; only content the
         // student hasn't reached yet gets locked.
-        const soon = cfg.softLock && !s.done && idx > currentIdx
+        const soon = cfg.softLock && !s.done && idx > currentIdx && !s.forceUnlock
         idx++
         // hardLock: unlike softLock (dimmed but still clickable — meant for
         // exam revision pages where jumping around is fine), a hard-locked

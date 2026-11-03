@@ -10156,7 +10156,12 @@ function showJourney() {
       // was actually built (see examStars()), saved in save_data.stars at
       // submit time. Every other stage keeps the flat "done = 3" rule.
       const realStars = s.id === 'examRecipe' ? (LessonSaves.saveDataFor(s.id, 'grade8') || {}).stars : undefined
-      return { id: s.id, emoji: STAGE_EMO[i % STAGE_EMO.length], label: s.name, done, stars: done ? (realStars ?? 3) : 0, isNew: NEW_STAGE_IDS.has(s.id) }
+      // The exam is rolled out to every student regardless of course
+      // progress (see the dashboard's "Start Exam" banner) — it shouldn't
+      // show 🔒 on the map just because a student hasn't naturally reached
+      // it yet.
+      const forceUnlock = s.id === 'examRecipe'
+      return { id: s.id, emoji: STAGE_EMO[i % STAGE_EMO.length], label: s.name, done, stars: done ? (realStars ?? 3) : 0, isNew: NEW_STAGE_IDS.has(s.id), forceUnlock }
     })
     // One Lesson bubble per module, same node style as exercises, placed
     // first (ported from Grade 7). done:true always -- see Grade 7's
