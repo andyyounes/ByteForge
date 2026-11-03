@@ -206,12 +206,13 @@ export default async function StudentDashboardPage() {
     : studentGrade
   const firstLesson = GRADE_LESSONS[effectiveGrade] ?? null
 
-  // ── Grade 8 exam banner — available once every module before it is done,
-  // hidden again once the student has actually passed it. Reads the SAME
-  // lib/grade-progress.ts helpers the teacher dashboard uses (so "is the
-  // exam unlocked" can never silently drift from the real curriculum), but
-  // scoped to this student's own lesson_saves rows — never the teacher's
-  // admin-client/class-scoped route.
+  // ── Grade 8 exam banner — available to every Grade 8 student regardless
+  // of how far through the course they are (rolled out on a deadline, not
+  // gated behind finishing every earlier module), hidden again once the
+  // student has actually submitted it. Reads the SAME lib/grade-progress.ts
+  // helpers the teacher dashboard uses (so results can never silently drift
+  // from the real curriculum), but scoped to this student's own
+  // lesson_saves rows — never the teacher's admin-client/class-scoped route.
   let grade8Exam: { available: boolean; submitted: boolean } | null = null
   if (effectiveGrade === 8) {
     try {
@@ -222,17 +223,12 @@ export default async function StudentDashboardPage() {
         .eq('lesson_key', 'grade8')
       const meta = getGradeMeta('grade8')
       const summary = summarizeStudent(meta, user.id, profile.name, (g8Rows ?? []) as never)
-      const examModuleIdx = meta.modules.findIndex(m => m.id === 'examGR8')
-      const priorModulesDone = examModuleIdx !== -1 && meta.modules.slice(0, examModuleIdx).every(m => {
-        const prog = summary.modules.find(mp => mp.id === m.id)
-        return !!prog && prog.total > 0 && prog.done >= prog.total
-      })
       const examResult = summary.exams.find(e => e.stageId === 'examRecipe')
       // Once submitted (pass or fail), ✓ Submit Exam locks the editors for
       // good — resubmitting isn't possible without a teacher re-opening it
       // (see /api/teacher/exam-reopen), so the banner has nothing left to
       // invite the student to do. Gated on submitted, not passed.
-      grade8Exam = { available: priorModulesDone, submitted: examResult?.submitted ?? false }
+      grade8Exam = { available: true, submitted: examResult?.submitted ?? false }
     } catch {
       grade8Exam = null   // never let a curriculum-parsing hiccup break the dashboard
     }
