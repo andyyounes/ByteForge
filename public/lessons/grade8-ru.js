@@ -386,3 +386,42 @@ window.G8_RU_QUIZ = {
     ["Почему страница, на которую есть ссылка, но нет ссылки обратно, считается плохим дизайном?", ["Посетитель оказывается в ловушке без пути назад", "Она медленнее загружается", "Она ломает CSS", "На самом деле это не проблема"]],
   ],
 }
+
+// Russian text for the Grade 8 exam's task panel (ch.text). This is the ONE
+// non-quiz stage whose lesson text gets translated — see examStageText() in
+// grade8.html. Each entry is a FUNCTION, not a plain string: it calls
+// figFrame()/figCode(), both defined later in grade8.html (loaded after
+// this file), so it must stay unevaluated until something actually calls
+// it — never run this at module-load time.
+window.G8_RU_EXAM = {
+  examRecipe: function () {
+    return '<strong>ЭКЗАМЕН</strong> — Воссоздайте эту страницу точно так же, используя всё, что вы изучили: скелет страницы, заголовки <code>h1</code>-<code>h4</code>, <code>&lt;header&gt;</code> с цветом фона, два <code>&lt;div&gt;</code>, у каждого свой цвет фона, маркированный список, нумерованный список, ссылку, оформленную как кнопка, и <code>&lt;footer&gt;</code>.'
+      + '<br><br>У вас есть <b>90 минут</b> в сумме — таймер рядом со значком XP показывает обратный отсчёт. Можно закрыть вкладку и вернуться позже (даже в другой день) — ваше время и ваш код сохраняются, и отсчёт продолжается только пока вы реально работаете над этой страницей.'
+      + '<br><br>Вы можете посмотреть настоящий рецепт для вдохновения: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Ваша кнопка «See Original Recipe» должна вести на этот адрес.'
+      + '<br><br>Нужна настоящая фотография? Используйте вкладку <b>Files</b> (рядом с HTML/CSS/JS), чтобы загрузить её, а затем скопируйте адрес в тег <code>&lt;img src="..."&gt;</code> — или оставьте картинку-заглушку ниже, это тоже нормально.'
+      + figFrame('Три тега, которые вы ещё не использовали', figCode(
+          '&lt;b&gt;bold text&lt;/b&gt;\n&lt;i&gt;italic text&lt;/i&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;First step&lt;/li&gt;\n  &lt;li&gt;Second step&lt;/li&gt;\n&lt;/ol&gt;'
+        ) + '<div style="font-size:12px;">Тег <code>&lt;ol&gt;</code> (нумерованный список) работает точно так же, как <code>&lt;ul&gt;</code>, но браузер нумерует пункты 1, 2, 3… вместо точек. Используйте его для пронумерованных шагов.</div>')
+      + figFrame('Напоминание — оформление одного конкретного div', figCode('HTML:  &lt;div id="ingredients"&gt;…&lt;/div&gt;\nCSS:   #ingredients { background-color: #F8BBD0; }')
+          + '<div style="font-size:12px;">Селектор <code>id</code> в CSS начинается с <code>#</code> и соответствует атрибуту <code>id</code> элемента — та же идея, что и у селектора класса (<code>.</code>), но для ОДНОГО конкретного элемента, а не для группы.</div>')
+      + figFrame('Специальные символы, которые вам понадобятся', '<div style="font-size:12px;line-height:1.9;">'
+          + 'Стрелка (→), как в «See Original Recipe →»: напишите <code>&amp;rarr;</code><br>'
+          + 'Знак градуса (°), как в «180°C»: напишите <code>&amp;deg;</code><br>'
+          + 'В некоторых редакторах нельзя просто напечатать → или ° напрямую — эти коды работают всегда.'
+          + '</div>')
+      + figFrame('Шрифты', figCode('body {\n  font-family: Georgia, serif;\n}')
+          + '<div style="font-size:12px;">Выберите <b>один</b> из них для <code>body</code> — это «веб-безопасные» шрифты, они уже есть в каждом браузере, поэтому ничего дополнительно загружать не нужно:<br><br>'
+          + '<code>Arial, sans-serif</code> — чистый, современный (без засечек на буквах)<br>'
+          + '<code>Georgia, serif</code> — классический, «поваренная книга» (у букв есть засечки)<br>'
+          + '<code>"Courier New", monospace</code> — стиль печатной машинки, все буквы одной ширины<br><br>'
+          + 'Всегда оставляйте второе слово (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) как запасной вариант — если указанный шрифт не загрузится, браузер всё равно выберет что-то из того же семейства, а не случайный шрифт по умолчанию.</div>')
+      + figFrame('Предлагаемые цвета (можно использовать и свои)', '<div style="font-size:12px;line-height:1.8;">'
+          + '<b>Фон header:</b> <code>#D32F2F</code> (красный)<br>'
+          + '<b>Фон блока с ингредиентами:</b> <code>#F8BBD0</code> (розовый)<br>'
+          + '<b>Цвет текста в блоке с ингредиентами:</b> <code>#880E4F</code> (тёмно-розовый — хорошо читается на розовом фоне)<br>'
+          + '<b>Фон кнопки-ссылки:</b> <code>#2E7D32</code> (зелёный)<br><br>'
+          + 'Напоминание: цветному блоку тоже нужен <code>padding</code>, иначе текст будет касаться краёв — например, <code>padding: 12px;</code>.'
+          + '</div>')
+      + '<br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">'
+  },
+}

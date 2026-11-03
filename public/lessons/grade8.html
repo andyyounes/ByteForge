@@ -302,12 +302,26 @@
       <div class="web-tab active" id="web-tab-html" onclick="switchWebTab('html')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:#fbbf24;border-bottom:2px solid #fbbf24;">HTML</div>
       <div class="web-tab" id="web-tab-css" onclick="switchWebTab('css')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">CSS</div>
       <div class="web-tab" id="web-tab-js" onclick="switchWebTab('js')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">JS</div>
+      <!-- Hidden unless the active stage opts in (ch.allowUpload) — most
+           stages use a placeholder image URL, so this stays out of their
+           way entirely. See switchWebTab('files') / uploadExamImage(). -->
+      <div class="web-tab" id="web-tab-files" onclick="switchWebTab('files')" style="display:none;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">Files</div>
     </div>
     <div id="palette-bar" style="display:none;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg-card);"></div>
     <div class="cm-outer" style="position:relative;">
       <textarea id="web-editor-html"></textarea>
       <textarea id="web-editor-css"  style="display:none;"></textarea>
       <textarea id="web-editor-js"   style="display:none;"></textarea>
+      <div id="web-files-panel" style="display:none;padding:16px;overflow-y:auto;height:100%;">
+        <p style="font-size:12.5px;color:var(--fg-dim);line-height:1.6;margin:0 0 12px;">
+          Upload a real photo to use in your page. After it uploads, copy its address and paste it into an
+          <code>&lt;img src="..."&gt;</code> tag on the <b>HTML</b> tab — same as any other image address.
+        </p>
+        <input type="file" id="exam-file-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display:block;margin-bottom:10px;font-size:12px;color:var(--fg-dim);">
+        <button class="btn btn-brand" id="exam-upload-btn" onclick="uploadExamImage()" style="margin-bottom:14px;">⬆ Upload</button>
+        <div id="exam-upload-status" style="font-size:12px;color:var(--fg-faint);margin-bottom:14px;"></div>
+        <div id="exam-uploaded-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
     </div>
   </div>
 
@@ -645,9 +659,19 @@ function switchWebTab(tab) {
   document.getElementById('web-tab-html').style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);' + (pageOrder.length ? 'display:none;' : '')
   document.getElementById('web-tab-css').style.cssText  = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
   document.getElementById('web-tab-js').style.cssText   = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
-  document.getElementById('web-tab-' + tab).style.cssText = 'padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid #fbbf24;color:#fbbf24;'
+  // The Files tab starts display:none and only a stage that opts in
+  // (ch.allowUpload) ever reveals it — reaching this function with
+  // tab === 'files' therefore means it's already visible, so (unlike
+  // web-tab-html above) there's no hidden display state to preserve here.
+  if (document.getElementById('web-tab-files').style.display !== 'none') {
+    document.getElementById('web-tab-files').style.cssText = 'display:inline-block;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--fg-faint);'
+  }
+  document.getElementById('web-tab-' + tab).style.cssText += 'border-bottom:2px solid #fbbf24;color:#fbbf24;'
+  // The Files tab isn't a code editor — it swaps in #web-files-panel instead
+  // of a CodeMirror instance (see uploadExamImage()).
   Object.entries(webEditors).forEach(([t, ed]) => { ed.getWrapperElement().style.display = (t === tab) ? '' : 'none' })
-  webEditors[tab].refresh()
+  document.getElementById('web-files-panel').style.display = (tab === 'files') ? '' : 'none'
+  if (tab !== 'files') webEditors[tab].refresh()
 }
 function resetWebToStarter() {
   const ch = CHALLENGES[activeIdx]
@@ -1270,6 +1294,7 @@ function examSaveData() {
     snapshotCount:       s ? s.snapshots.length : 0,
     snapshots:           s ? s.snapshots : [],
     examDurationSeconds: examElapsedSeconds(),
+    uploadedImages:      s && s.uploadedImages ? s.uploadedImages : [],
   }
 }
 function updateExamTimerDisplay() {
@@ -1298,6 +1323,7 @@ function startExamTracking(ch) {
   _examState = {
     startedAt: Date.now(),
     priorElapsedSeconds: (priorSaveData && priorSaveData.examDurationSeconds) || 0,
+    uploadedImages: (priorSaveData && priorSaveData.uploadedImages) || [],
     tabSwitches: 0, awayMs: 0, awaySince: null, snapshots: [],
   }
   const timerEl = document.getElementById('exam-timer')
@@ -1324,6 +1350,100 @@ function stopExamTracking() {
   const timerEl = document.getElementById('exam-timer')
   if (timerEl) timerEl.style.display = 'none'
   _examState = null
+}
+
+// ── Exam text translation ───────────────────────────────────────────────────
+// Ordinary lesson/exercise text (ch.text) is English-only across this whole
+// file — only quiz prompts get translated (see window.G8_RU_QUIZ in
+// grade8-ru.js). The exam is the one exception: window.G8_RU_EXAM holds a
+// Russian version per stage id, as a FUNCTION (not a plain string) since it
+// calls figFrame()/figCode() — both defined in THIS file, loaded after
+// grade8-ru.js, so evaluating it at module-load time would throw.
+function examStageText(ch) {
+  if (ch && typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+      && window.G8_RU_EXAM && typeof window.G8_RU_EXAM[ch.id] === 'function') {
+    return window.G8_RU_EXAM[ch.id]()
+  }
+  return ch ? ch.text : ''
+}
+if (typeof BFLang !== 'undefined') {
+  BFLang.onChange(() => {
+    const ch = CHALLENGES[activeIdx]
+    if (ch && ch.id === 'examRecipe') document.getElementById('ch-text').innerHTML = examStageText(ch)
+  })
+}
+
+// ── Exam image uploads (ch.allowUpload stages only — see #web-tab-files) ───
+// A real photo makes the "recreate this page" task genuine instead of
+// reusing the same placeholder everyone gets; this is intentionally simple
+// (upload → copy the address → paste it into <img src="...">) rather than
+// auto-inserting into the HTML editor, since writing that tag themselves is
+// part of what's being tested.
+function renderExamUploads(ch) {
+  const list = document.getElementById('exam-uploaded-list')
+  if (!list) return
+  list.innerHTML = ''
+  if (!ch || !ch.allowUpload) return
+  const files = (_examState && _examState.uploadedImages) || []
+  if (!files.length) {
+    const p = document.createElement('p')
+    p.style.cssText = 'font-size:12px;color:var(--fg-faint);'
+    p.textContent = 'No uploads yet.'
+    list.appendChild(p)
+    return
+  }
+  files.forEach(f => {
+    const row = document.createElement('div')
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);'
+    const img = document.createElement('img')
+    img.src = f.url
+    img.alt = ''
+    img.style.cssText = 'width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;'
+    const urlBox = document.createElement('div')
+    urlBox.style.cssText = 'flex:1;min-width:0;font-size:11.5px;color:var(--fg-dim);word-break:break-all;'
+    urlBox.textContent = f.url
+    const copyBtn = document.createElement('button')
+    copyBtn.className = 'btn'
+    copyBtn.style.cssText = 'font-size:11px;padding:4px 8px;flex-shrink:0;'
+    copyBtn.textContent = 'Copy'
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(f.url).then(() => { copyBtn.textContent = 'Copied!'; setTimeout(() => { copyBtn.textContent = 'Copy' }, 1500) })
+    }
+    row.append(img, urlBox, copyBtn)
+    list.appendChild(row)
+  })
+}
+async function uploadExamImage() {
+  const input    = document.getElementById('exam-file-input')
+  const statusEl = document.getElementById('exam-upload-status')
+  const btn      = document.getElementById('exam-upload-btn')
+  const file = input.files && input.files[0]
+  if (!file) { statusEl.textContent = 'Choose a file first.'; return }
+  if (!/^image\/(png|jpeg|gif|webp)$/.test(file.type)) { statusEl.textContent = 'Only PNG, JPEG, GIF or WebP images are allowed.'; return }
+  if (file.size > 4 * 1024 * 1024) { statusEl.textContent = 'That file is too large (max 4 MB).'; return }
+  statusEl.textContent = 'Uploading…'
+  btn.disabled = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await fetch('/api/student/exam-upload', { method: 'POST', body: form })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Upload failed')
+    if (!_examState) _examState = { uploadedImages: [] }   // defensive — should already exist while this stage is open
+    if (!_examState.uploadedImages) _examState.uploadedImages = []
+    _examState.uploadedImages.push({ url: data.url, name: file.name })
+    const ch = CHALLENGES[activeIdx]
+    renderExamUploads(ch)
+    statusEl.textContent = 'Uploaded — copy the address below into an <img src="...">.'
+    input.value = ''
+    // Save immediately rather than waiting for the next 20s autosave tick,
+    // so a reload right after uploading doesn't lose the new image.
+    LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code: currentWebCode(), saveData: examSaveData() })
+  } catch (e) {
+    statusEl.textContent = 'Upload failed: ' + e.message
+  } finally {
+    btn.disabled = false
+  }
 }
 document.addEventListener('visibilitychange', () => {
   if (!_examState) return
@@ -3344,10 +3464,11 @@ const MODULES = [
   // silent or forced by a webpage and raises real privacy concerns for
   // minors. See startExamTracking/stopExamTracking above MODULES.
   { id:'examGR8', name:'🎯 EXAM — Recipe Page', sub:'A real test — no starter code, no hints. Recreate the page exactly.', live:true, stages:[
-    { id:'examRecipe', name:'EXAM — Recreate the Recipe Page', xp:100, lang:'web', boss:true, isExam:true,
+    { id:'examRecipe', name:'EXAM — Recreate the Recipe Page', xp:100, lang:'web', boss:true, isExam:true, allowUpload:true,
       text:`<strong>EXAM</strong> — Recreate this page exactly, using everything you've learned: a skeleton, headings <code>h1</code>-<code>h4</code>, a <code>&lt;header&gt;</code> with a background colour, two <code>&lt;div&gt;</code>s with their own background colours, a bulleted list, a numbered list, a link styled to look like a button, and a <code>&lt;footer&gt;</code>.
         <br><br>You have <b>90 minutes</b> total — the timer next to your XP badge counts down. It's fine to close the tab and come back later (even a different day); your time and your code are both saved, and only picks back up while you're actually working on this page.
         <br><br>You may look at the real recipe for ideas: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Your "See Original Recipe" button should link to it.
+        <br><br>Need a real photo? Use the <b>Files</b> tab (next to HTML/CSS/JS) to upload one, then copy its address into an <code>&lt;img src="..."&gt;</code> tag — or keep the placeholder image below, that's fine too.
         ${figFrame('Three tags you haven\'t used yet', figCode(
           '&lt;b&gt;bold text&lt;/b&gt;\n&lt;i&gt;italic text&lt;/i&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;First step&lt;/li&gt;\n  &lt;li&gt;Second step&lt;/li&gt;\n&lt;/ol&gt;'
         ) + '<div style="font-size:12px;">An <code>&lt;ol&gt;</code> (ordered list) works exactly like <code>&lt;ul&gt;</code>, but the browser numbers the items 1, 2, 3… instead of using bullets. Use it for the numbered steps.</div>')}
@@ -3358,10 +3479,18 @@ const MODULES = [
           + 'A degree symbol (°), like in "180°C": type <code>&amp;deg;</code><br>'
           + 'You can\'t just type → or ° directly in some editors — these codes always work.'
           + '</div>')}
+        ${figFrame('Fonts', figCode('body {\n  font-family: Georgia, serif;\n}')
+          + '<div style="font-size:12px;">Pick <b>one</b> of these for <code>body</code> — they are web-safe, meaning every browser already has them, so you do not need to load anything extra:<br><br>'
+          + '<code>Arial, sans-serif</code> — clean, modern (no little feet on the letters)<br>'
+          + '<code>Georgia, serif</code> — classic, cookbook-style (letters have little feet)<br>'
+          + '<code>"Courier New", monospace</code> — typewriter style, every letter the same width<br><br>'
+          + 'Always keep the second word (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) as a fallback — if the named font ever fails to load, the browser still picks something in the same family instead of a random default.</div>')}
         ${figFrame('Suggested colors (feel free to use your own instead)', '<div style="font-size:12px;line-height:1.8;">'
           + '<b>Header background:</b> <code>#D32F2F</code> (red)<br>'
           + '<b>Ingredients box background:</b> <code>#F8BBD0</code> (pink)<br>'
-          + '<b>Link button background:</b> <code>#2E7D32</code> (green)'
+          + '<b>Ingredients text color:</b> <code>#880E4F</code> (dark pink — readable on the pink background)<br>'
+          + '<b>Link button background:</b> <code>#2E7D32</code> (green)<br><br>'
+          + 'Reminder: a colored box needs <code>padding</code> too, or the text will touch the edges — e.g. <code>padding: 12px;</code>.'
           + '</div>')}
         <br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">`,
       hints:[],
@@ -9429,7 +9558,13 @@ function selectChallenge(i) {
   if (ch.isExam) startExamTracking(ch)
   else stopExamTracking()
   document.getElementById('ch-row').style.display = ''
-  document.getElementById('ch-text').innerHTML = ch.text
+  document.getElementById('ch-text').innerHTML = examStageText(ch)
+  // Hidden by default (see the HTML comment above #web-tab-files) — only a
+  // stage that opts in shows it. The single-page isWeb branch below always
+  // calls switchWebTab('html'|'css'), so a Files tab left active on the
+  // PREVIOUS stage is never stuck active after switching away from it.
+  document.getElementById('web-tab-files').style.display = ch.allowUpload ? 'inline-block' : 'none'
+  renderExamUploads(ch)
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
   document.getElementById('pass-badge').style.display = 'none'
   document.getElementById('hint-display').innerHTML = ''
