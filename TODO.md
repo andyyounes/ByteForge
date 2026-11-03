@@ -53,14 +53,14 @@ the SAME commit so the two never drift.
 - [x] kc1 — Knowledge Check (2 stages) — real assessment, intentionally light-touch (don't pad a test with teaching content)
 - [x] web3p — Fonts & Sizes Playground (3 stages) — built this session
 - [x] web4 — Structure + Style, Together (2 stages) — deliberately a review checkpoint (web1+web2+web3 combined, no new concepts) — adding more visuals here would just duplicate what's already in those modules
-- [ ] web4d — Divs & Page Layout (19 stages) — divs3r1/r2/r3 already done, the other 16 stages aren't
-- [ ] web4e — Semantic HTML5 (10 stages)
+- [x] web4d — Divs & Page Layout (19 stages) — reviewed in full, already exceeds the bar throughout (figStepList walkthroughs, figWireframe/figNestTree diagrams, troubleshooting sections, a "5 common mistakes" debugging quiz) — no rewrite needed
+- [x] web4e — Semantic HTML5 (10 stages) — reviewed in full, already exceeds the bar (before/after tag-swap visuals, real accessibility/SEO WHY, figStepList walkthroughs) — no rewrite needed
 - [x] examGR8 — EXAM (1 stage) — the reference pattern itself
-- [ ] web4f — Tables (9 stages)
-- [ ] web4g — Audio & Video (8 stages)
-- [ ] web4h — Meta Tags & SEO (8 stages)
-- [ ] jsf1 — JS Foundations 1 (12 stages)
-- [ ] jsf2 — JS Foundations 2 (12 stages)
+- [x] web4f — Tables (9 stages) — reviewed, already exceeds the bar (figTable/figTableGrid visuals, figStepList walkthroughs) — no rewrite needed
+- [x] web4g — Audio & Video (8 stages) — reviewed, already exceeds the bar (side-by-side audio/video code comparison, real WHY per attribute) — no rewrite needed
+- [x] web4h — Meta Tags & SEO (8 stages) — reviewed, already exceeds the bar (full skeleton example, concrete WHY per meta tag) — no rewrite needed
+- [~] jsf1 — JS Foundations 1 (12 stages) — decent (real code examples, clear WHY) but lacks the figStepList step-by-step walkthroughs the web4* family has; multi-part stages (e.g. jsf1s4: 2 variables + concatenation) could use a numbered checklist
+- [~] jsf2 — JS Foundations 2 (12 stages) — not yet reviewed in detail; check against the same bar as jsf1
 - [ ] web5 — Build Your Portfolio (14 stages)
 - [ ] ws1 — Web Story 1 (14 stages)
 - [ ] ws2 — Web Story 2 (7 stages)
@@ -97,4 +97,5 @@ the SAME commit so the two never drift.
 
 ## Log
 - 2026-11-XX: created this file. Converting web1 next (small, foundational, hands-on — a good first real conversion to set the pattern for the rest of Semester 1).
-- 2026-11-03: web1's checkbox was stale (already converted + committed earlier, just never ticked here) — fixed. web0c reviewed: already detailed (live tree diagrams, WHY), no rewrite needed, marked done. web2 converted: added live link-vs-button + navbar/toolbar + ul visuals, WHY explanations, numbered checklists on web2s1/s3/boss. web3 (18 stages) reviewed in full — already well above the bar, no changes needed. kc1 confirmed intentionally light-touch (real assessment). web4 confirmed a deliberate checkpoint (no new concepts, nothing to add). Next: web4d (Divs & Page Layout, 19 stages — divs3r1/r2/r3 already done per earlier note, the other 16 stages need review).
+- 2026-11-03: web1's checkbox was stale (already converted + committed earlier, just never ticked here) — fixed. web0c reviewed: already detailed (live tree diagrams, WHY), no rewrite needed, marked done. web2 converted: added live link-vs-button + navbar/toolbar + ul visuals, WHY explanations, numbered checklists on web2s1/s3/boss. web3 (18 stages) reviewed in full — already well above the bar, no changes needed. kc1 confirmed intentionally light-touch (real assessment). web4 confirmed a deliberate checkpoint (no new concepts, nothing to add).
+- 2026-11-03 (same session, continued): reviewed the whole web4* family — web4d (19 stages), web4e (10), web4f (9), web4g (8), web4h (8) — ALL already exceed the bar (figStepList walkthroughs, figWireframe/figNestTree/figTable visuals, troubleshooting sections, before/after code comparisons). None needed rewriting — this family was clearly built thoroughly in an earlier pass. Started reviewing jsf1 (JS Foundations) — noticeably less polished than web4*, real content but missing step-by-step walkthroughs and numbered checklists on multi-part stages. Marked [~] partial rather than claiming done. Next: finish reviewing jsf1 stage-by-stage (12 stages, only s0/s1/printq/s2/s3/s4/s5 skimmed so far), decide which stages actually need the figStepList treatment, then jsf2.
