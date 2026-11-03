@@ -2,11 +2,15 @@
   "name": "byteforge",
   "version": "1.0.0",
   "private": true,
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "electron:dev": "electron .",
+    "electron:build:win": "electron-builder --win",
+    "electron:build:mac": "electron-builder --mac",
     "verify": "node scripts/check-lesson-js.mjs && node scripts/test-g6-maze.mjs && node scripts/test-g7-challenges.mjs && node scripts/test-g8-challenges.mjs && node scripts/test-g9-missions.mjs && node scripts/test-g9-challenges.mjs && node scripts/test-igcse-y1-challenges.mjs && node scripts/test-igcse-y2-challenges.mjs && node scripts/test-al-lab.mjs && node scripts/test-p4-challenges.mjs && node scripts/test-p4-starters.mjs && node scripts/test-al-practice.mjs && node scripts/test-cpu-pipeline.mjs && node scripts/test-as-pseudo.mjs && node scripts/test-as-sql.mjs && node scripts/test-theory-scoring.mjs && node scripts/test-tool-lessons.mjs && node scripts/test-algo-viz.mjs && node scripts/test-interpreters.mjs && node scripts/test-chest-rewards.mjs",
     "test": "node scripts/test-all.mjs",
     "test:list": "node scripts/test-all.mjs --list",
@@ -34,10 +38,20 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.20",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4"
+  },
+  "build": {
+    "appId": "com.byteforge.app",
+    "productName": "ByteForge",
+    "directories": { "output": "dist-electron" },
+    "files": ["electron/**/*", "package.json"],
+    "win": { "target": "nsis" },
+    "mac": { "target": "dmg", "category": "public.app-category.education" }
   }
 }
