@@ -91,9 +91,9 @@ the SAME commit so the two never drift.
 - [x] m7 — Inside the Machine (5 stages) — reviewed, excellent (real phone-storage framing, callbacks to Grade 6/7's binary cards and Pixel Caves, compiler-vs-interpreter explained with a Grade 9 preview) — no rewrite needed
 - [x] m8 — The Connected World (5 stages) — reviewed, excellent (TCP/IP/HTTP explained concretely, star topology tied to real school wifi, genuine online-safety note) — no rewrite needed
 - [x] cyber — Cyber Defense (4 stages) — reviewed, excellent (lookalike domains, hashing explained as easy-forwards/impractical-to-reverse, combining phishing red flags with real AND/OR logic) — no rewrite needed
-- [ ] m9w — Interactive Apps (6 stages)
-- [ ] m10 — Capstone: Data App (6 stages)
-- [ ] bonus1 — Bonus: Personal Budget Tracker (3 stages)
+- [x] m9w — Interactive Apps (6 stages) — reviewed, excellent (syntax/logic/runtime error taxonomy defined concretely, trace tables connected to the paper-based version) — no rewrite needed
+- [x] m10 — Capstone: Data App (6 stages) — reviewed, excellent (explicit callback to m9w's runtime-error guard, real planning framing) — no rewrite needed
+- [x] bonus1 — Bonus: Personal Budget Tracker (3 stages) — reviewed, excellent (real "data is messy" framing, try/except error handling, parallel bubble sort explained precisely) — no rewrite needed
 
 ## Log
 - 2026-11-XX: created this file. Converting web1 next (small, foundational, hands-on — a good first real conversion to set the pattern for the rest of Semester 1).
@@ -102,4 +102,24 @@ the SAME commit so the two never drift.
 - 2026-11-03 (continued again): finished jsf1 and jsf2 (24 stages total) — both much better than my first skim suggested; single-step stages don't need padding with a checklist, and the two BOSS/capstone stages got <ul>→<ol> + a worked example.
 - 2026-11-03 (continued): reviewed web5 + ws1-ws5 (53 stages) — ALL already excellent. None needed changes.
 - 2026-11-03 (continued): reviewed web5c, web5d, web5e, web6, web7 (32 stages) — same bar throughout (forms, responsive design, the tip calculator project, multi-page nav). **This completes the entire HTML/CSS/JS track (Semesters 1-2)** — everything from web0 through web7 is now reviewed, with only web2 and jsf1boss/jsf2boss actually needing edits; the rest was already built to the pattern in an earlier pass.
-- 2026-11-03 (continued): py1-py5 (10 stages) — WHY moved from hints into the main text (pattern rule #4). adv + cc1-cc5 + cc (10 stages) — all correctly terse: reinforcement/application of py1-5 concepts, re-explaining WHY would be the "teach it twice" bug. m3 (Functions, 5 stages) — m3s3-s5 already explain WHY well; only m3s1 (first function, genuinely new) needed an intro, added. Next: m4 (Lists, 5 stages — NB different from py5's lists, check what's actually new here vs. reinforcement).
+- 2026-11-03 (continued): py1-py5 (10 stages) — WHY moved from hints into the main text (pattern rule #4). adv + cc1-cc5 + cc (10 stages) — all correctly terse: reinforcement/application of py1-5 concepts, re-explaining WHY would be the "teach it twice" bug. m3 (Functions, 5 stages) — m3s3-s5 already explain WHY well; only m3s1 (first function, genuinely new) needed an intro, added.
+- 2026-11-03 (continued): m4 through bonus1 (m4, m5, m6, m7, m8, cyber, m9w, m10, bonus1 — 44 stages, the rest of the Python/Semester 3 track) — ALL already excellent on review: genuine real-world framing throughout (sign-up form validation, spreadsheet AVERAGE/MAX/MIN, phone storage sizes, TCP/IP packets, phishing red flags, syntax/logic/runtime error taxonomy, "real data is messy" for the bonus budget tracker), explicit callbacks between modules (m10 references m9w's runtime-error guard). None needed changes.
+
+## 🎉 TRACKER COMPLETE — every module reviewed (2026-11-03)
+
+All 51 modules / 289 stages have been reviewed against the exam-level-
+detail bar. Actual content changes were needed in only a handful:
+web2 (added live visuals + WHY + checklists), jsf1boss/jsf2boss
+(capstones got numbered checklists + worked examples), py1-py5 (WHY
+moved from hints into the main text), m3s1 (missing intro for a
+genuinely new concept). Everything else — the overwhelming majority
+of the course — was already built to the pattern or correctly terse
+as reinforcement/application content, from an earlier, more thorough
+build pass than this tracker initially assumed.
+
+`npm run verify` / `node scripts/test-g8-challenges.mjs` (1327 passed,
+0 failed) and `npx tsc --noEmit` both clean as of the final commit.
+
+If there's a next pass on this file, it's no longer "go module by
+module" — it's picking a SPECIFIC complaint (a student confused by a
+specific stage) and fixing that one thing, not a blanket sweep.
