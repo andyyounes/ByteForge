@@ -24,6 +24,7 @@ interface ExamResult {
   stageId:             string
   stageName:           string
   passed:              boolean
+  submitted:           boolean
   tabSwitches:         number
   awaySeconds:         number
   snapshotCount:       number
@@ -60,9 +61,10 @@ function timeAgo(iso: string): string {
 }
 
 export function GradeProgressPanel({ classId, grade }: { classId: string; grade: 'grade6' | 'grade7' | 'grade8' }) {
-  const [students, setStudents] = useState<StudentProgress[] | null>(null)
-  const [error,    setError]    = useState('')
-  const [open,     setOpen]     = useState<string | null>(null)   // student whose chapters are expanded
+  const [students, setStudents]   = useState<StudentProgress[] | null>(null)
+  const [error,    setError]      = useState('')
+  const [open,     setOpen]       = useState<string | null>(null)   // student whose chapters are expanded
+  const [grantingFor, setGrantingFor] = useState<string | null>(null)   // `${studentId}:${stageId}` while a request is in flight
 
   const load = useCallback(async () => {
     try {
@@ -76,6 +78,25 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
   }, [classId, grade])
 
   useEffect(() => { load() }, [load])
+
+  async function reopenExam(studentId: string, stageId: string) {
+    const key = `${studentId}:${stageId}`
+    setGrantingFor(key)
+    try {
+      const res = await fetch('/api/teacher/exam-reopen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId, lessonKey: grade, challengeId: stageId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Failed to re-open exam')
+      await load()
+    } catch (e: unknown) {
+      setError((e as Error).message ?? 'Failed to re-open exam')
+    } finally {
+      setGrantingFor(null)
+    }
+  }
 
   const meta = GRADE_META[grade]
 
@@ -158,14 +179,33 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                       {exams.length > 0 && (
                         <div className="mb-3 space-y-1.5">
                           <div className="text-[10px] font-semibold uppercase tracking-wide text-t3">Exam integrity</div>
-                          {exams.map(ex => (
-                            <div key={ex.stageId} className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-md bg-s1 border border-b2 text-t2">
-                              <span className="truncate">{ex.stageName}</span>
-                              <span className="shrink-0 tabular-nums text-t3">
-                                {ex.tabSwitches} tab switch{ex.tabSwitches === 1 ? '' : 'es'} &middot; {ex.awaySeconds}s away &middot; {ex.snapshotCount} code snapshot{ex.snapshotCount === 1 ? '' : 's'} &middot; {Math.round(ex.examDurationSeconds / 60)} min
-                              </span>
-                            </div>
-                          ))}
+                          {exams.map(ex => {
+                            const key = `${s.studentId}:${ex.stageId}`
+                            const granting = grantingFor === key
+                            return (
+                              <div key={ex.stageId} className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-md bg-s1 border border-b2 text-t2">
+                                <span className="truncate">{ex.stageName}</span>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <span className="tabular-nums text-t3">
+                                    {ex.tabSwitches} tab switch{ex.tabSwitches === 1 ? '' : 'es'} &middot; {ex.awaySeconds}s away &middot; {ex.snapshotCount} code snapshot{ex.snapshotCount === 1 ? '' : 's'} &middot; {Math.round(ex.examDurationSeconds / 60)} min
+                                  </span>
+                                  {ex.submitted && !ex.passed && (
+                                    <button
+                                      onClick={() => {
+                                        if (window.confirm(`Re-open "${ex.stageName}" for ${s.name}? They'll be able to keep editing and resubmit it.`)) {
+                                          reopenExam(s.studentId, ex.stageId)
+                                        }
+                                      }}
+                                      disabled={granting}
+                                      className="text-[10px] font-semibold px-2 py-1 rounded-md bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50"
+                                    >
+                                      {granting ? '…' : 'Allow resubmit'}
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
                       )}
                       <div className="grid gap-1.5 sm:grid-cols-2">

@@ -139,6 +139,7 @@ export interface ExamResult {
   stageId:             string
   stageName:           string
   passed:              boolean
+  submitted:           boolean   // locked via ✓ Submit Exam — see grade8.html's submitExam()
   tabSwitches:         number
   awaySeconds:         number
   snapshotCount:       number
@@ -170,6 +171,7 @@ export function summarizeStudent(
     save_data?: {
       score?: number; total?: number
       tabSwitches?: number; awaySeconds?: number; snapshotCount?: number; examDurationSeconds?: number
+      submitted?: boolean
     } | null
   }[]
 ): StudentGradeProgress {
@@ -208,6 +210,7 @@ export function summarizeStudent(
       stageId,
       stageName:           stage.name,
       passed:               latest.passed,
+      submitted:            latest.save_data!.submitted ?? false,
       tabSwitches:          latest.save_data!.tabSwitches!,
       awaySeconds:          latest.save_data!.awaySeconds ?? 0,
       snapshotCount:        latest.save_data!.snapshotCount ?? 0,

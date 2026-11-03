@@ -395,15 +395,28 @@ window.G8_RU_QUIZ = {
 // it — never run this at module-load time.
 window.G8_RU_EXAM = {
   examRecipe: function () {
-    return '<strong>ЭКЗАМЕН</strong> — Воссоздайте эту страницу точно так же, используя всё, что вы изучили: скелет страницы, заголовки <code>h1</code>-<code>h4</code>, <code>&lt;header&gt;</code> с цветом фона, два <code>&lt;div&gt;</code>, у каждого свой цвет фона, маркированный список, нумерованный список, ссылку, оформленную как кнопка, и <code>&lt;footer&gt;</code>.'
-      + '<br><br>У вас есть <b>90 минут</b> в сумме — таймер рядом со значком XP показывает обратный отсчёт. Можно закрыть вкладку и вернуться позже (даже в другой день) — ваше время и ваш код сохраняются, и отсчёт продолжается только пока вы реально работаете над этой страницей.'
-      + '<br><br>Вы можете посмотреть настоящий рецепт для вдохновения: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Ваша кнопка «See Original Recipe» должна вести на этот адрес.'
-      + '<br><br>Нужна настоящая фотография? Используйте вкладку <b>Files</b> (рядом с HTML/CSS/JS), чтобы загрузить её, а затем скопируйте адрес в тег <code>&lt;img src="..."&gt;</code> — или оставьте картинку-заглушку ниже, это тоже нормально.'
+    return '<strong>ЭКЗАМЕН</strong> — Воссоздайте эту страницу, используя всё, что вы изучили. Нажмите <b>✓ Submit Exam</b> (рядом с ▶ Run), когда закончите — ▶ Run только проверяет и сохраняет черновик, это НЕ сдача экзамена.'
+      + '<br><br>Не торопитесь — обратного отсчёта нет. Ваш код сохраняется автоматически, так что можно закрыть вкладку и вернуться позже, даже в другой день.'
+      + figFrame('Что именно нужно — и не больше', '<div style="font-size:12px;line-height:1.9;">'
+          + '1. <code>&lt;header&gt;</code> с цветом фона, внутри — ваш <code>&lt;h1&gt;</code><br>'
+          + '2. Один <code>&lt;h2&gt;</code>, один <code>&lt;h3&gt;</code>, один <code>&lt;h4&gt;</code> — где угодно на странице, в любом порядке<br>'
+          + '3. Одно изображение <code>&lt;img&gt;</code> (картинка-заглушка ниже подойдёт, или загрузите своё — вкладка <b>Files</b>)<br>'
+          + '4. <code>&lt;ul&gt;</code> минимум с 3 пунктами <code>&lt;li&gt;</code> (ваши ингредиенты)<br>'
+          + '5. <code>&lt;ol&gt;</code> минимум с 3 пунктами <code>&lt;li&gt;</code> (ваши шаги)<br>'
+          + '6. <b>Два</b> тега <code>&lt;div&gt;</code> на странице — цвет фона нужен только <b>одному</b> из них (в примере ниже покрашены оба, но обязателен только один)<br>'
+          + '7. <code>&lt;footer&gt;</code> (любое содержимое — хватит одной короткой строки)<br>'
+          + '8. Ссылка, оформленная как кнопка — цвет фона + <code>padding-top: 6px;</code> или больше<br><br>'
+          + 'Всё идёт сверху вниз, обычным потоком — <code>display: inline-block</code> или расположение «бок о бок» на этой странице НЕ нужны.'
+          + '</div>')
+      + '<br>Вы можете посмотреть настоящий рецепт для вдохновения: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Точный адрес для кнопки «See Original Recipe»:'
+      + figCode('&lt;a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"&gt;\n  See the Original Recipe &amp;rarr;\n&lt;/a&gt;')
       + figFrame('Три тега, которые вы ещё не использовали', figCode(
           '&lt;b&gt;bold text&lt;/b&gt;\n&lt;i&gt;italic text&lt;/i&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;First step&lt;/li&gt;\n  &lt;li&gt;Second step&lt;/li&gt;\n&lt;/ol&gt;'
         ) + '<div style="font-size:12px;">Тег <code>&lt;ol&gt;</code> (нумерованный список) работает точно так же, как <code>&lt;ul&gt;</code>, но браузер нумерует пункты 1, 2, 3… вместо точек. Используйте его для пронумерованных шагов.</div>')
       + figFrame('Напоминание — оформление одного конкретного div', figCode('HTML:  &lt;div id="ingredients"&gt;…&lt;/div&gt;\nCSS:   #ingredients { background-color: #F8BBD0; }')
           + '<div style="font-size:12px;">Селектор <code>id</code> в CSS начинается с <code>#</code> и соответствует атрибуту <code>id</code> элемента — та же идея, что и у селектора класса (<code>.</code>), но для ОДНОГО конкретного элемента, а не для группы.</div>')
+      + figFrame('Размер изображения', figCode('img {\n  width: 100%;\n  height: auto;\n}')
+          + '<div style="font-size:12px;"><code>width: 100%</code> растягивает изображение на ВСЮ ширину того, внутри чего оно находится (картинка выше сделана именно так). <code>width: 50%</code> сделало бы его вдвое уже. Всегда добавляйте <code>height: auto;</code> — без него изображение может выглядеть сжатым или растянутым; <code>auto</code> сохраняет настоящие пропорции картинки. <code>&lt;div&gt;</code> не нужен — тег <code>&lt;img&gt;</code> можно разместить прямо на странице, как любой другой тег; оборачивать в div нужно, только если вы хотите сгруппировать его с другими элементами или как-то особо расположить.</div>')
       + figFrame('Специальные символы, которые вам понадобятся', '<div style="font-size:12px;line-height:1.9;">'
           + 'Стрелка (→), как в «See Original Recipe →»: напишите <code>&amp;rarr;</code><br>'
           + 'Знак градуса (°), как в «180°C»: напишите <code>&amp;deg;</code><br>'
@@ -416,11 +429,12 @@ window.G8_RU_EXAM = {
           + '<code>"Courier New", monospace</code> — стиль печатной машинки, все буквы одной ширины<br><br>'
           + 'Всегда оставляйте второе слово (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) как запасной вариант — если указанный шрифт не загрузится, браузер всё равно выберет что-то из того же семейства, а не случайный шрифт по умолчанию.</div>')
       + figFrame('Предлагаемые цвета (можно использовать и свои)', '<div style="font-size:12px;line-height:1.8;">'
-          + '<b>Фон header:</b> <code>#D32F2F</code> (красный)<br>'
-          + '<b>Фон блока с ингредиентами:</b> <code>#F8BBD0</code> (розовый)<br>'
+          + '<b>Фон header:</b> <code>#D32F2F</code> (красный), <code>padding: 12px;</code><br>'
+          + '<b>Фон блока с ингредиентами:</b> <code>#F8BBD0</code> (розовый), <code>padding: 12px;</code><br>'
           + '<b>Цвет текста в блоке с ингредиентами:</b> <code>#880E4F</code> (тёмно-розовый — хорошо читается на розовом фоне)<br>'
-          + '<b>Фон кнопки-ссылки:</b> <code>#2E7D32</code> (зелёный)<br><br>'
-          + 'Напоминание: цветному блоку тоже нужен <code>padding</code>, иначе текст будет касаться краёв — например, <code>padding: 12px;</code>.'
+          + '<b>Цвет текста в Steps:</b> <code>#555555</code> (серый — как в разделе Method/Steps на картинке)<br>'
+          + '<b>Фон кнопки-ссылки:</b> <code>#2E7D32</code> (зелёный), <code>padding: 10px 16px;</code><br><br>'
+          + 'Эти числа — просто один рабочий вариант: любой <code>padding</code> от <code>8px</code> и больше на цветном блоке выглядит нормально; у ссылки конкретно нужен <code>padding-top</code> не меньше <code>6px</code> (см. список выше).'
           + '</div>')
       + '<br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">'
   },

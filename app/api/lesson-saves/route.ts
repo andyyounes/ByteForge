@@ -167,10 +167,13 @@ export async function POST(request: NextRequest) {
       if (profile) await supabase.from('profiles').update({ xp: profile.xp + xpEarned }).eq('id', user.id)
     }
 
-    // Exam submissions (identified the same way grade-progress.ts does —
-    // tabSwitches only ever appears on an isExam save) notify both the
-    // student and their teacher with the result, once per real attempt.
-    if (saveData && typeof saveData.tabSwitches === 'number') {
+    // Only a genuine ✓ Submit Exam click notifies anyone — saveData.submitted
+    // is set ONLY by that one save (see grade8.html's submitExam()); the
+    // practice ▶ Run autosave and the periodic 20s autosave both write the
+    // same isExam-shaped saveData (tabSwitches etc., still used by
+    // grade-progress.ts to find exam attempts) but never submitted:true, so
+    // they never re-trigger this notification.
+    if (saveData && saveData.submitted === true) {
       await notifyExamResult(supabase, user.id, lesson, challengeId, !!passed)
     }
 

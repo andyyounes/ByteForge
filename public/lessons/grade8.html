@@ -149,9 +149,6 @@
     .ch-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
     .xp-pill { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
                background:rgba(234,179,8,.12); color:#fbbf24; border:1px solid rgba(234,179,8,.25); }
-    .exam-timer-pill { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; font-variant-numeric:tabular-nums;
-               background:rgba(96,165,250,.12); color:#60a5fa; border:1px solid rgba(96,165,250,.25); }
-    .exam-timer-pill.over-time { background:rgba(248,113,113,.12); color:#f87171; border-color:rgba(248,113,113,.3); }
     .hint-btn { font-size:11px; color:#fbbf24; cursor:pointer; }
     .ch-footer { flex-shrink:0; padding:10px 14px; background:var(--bg-card); border-bottom:1px solid var(--border); }
     .ch-footer-next { width:100%; padding:12px; border-radius:9px; border:none; font-size:13.5px; font-weight:800;
@@ -294,8 +291,18 @@
       <div class="btn-row">
         <button class="btn btn-danger" onclick="resetWebToStarter()">↺ Starter code</button>
         <button class="btn btn-brand"  id="web-run-btn" onclick="runWebCode()">▶ Run</button>
+        <!-- Exam-only (ch.isExam) — hidden on every other stage. Run stays a
+             free, unlimited preview/check; this is the one action that
+             finalizes the exam. See submitExam()/lockExamEditing(). -->
+        <button class="btn btn-brand" id="exam-submit-btn" onclick="submitExam()" style="display:none;background:var(--rose,#f43f5e);">✓ Submit Exam</button>
         <button class="btn" id="expand-preview-btn" onclick="toggleExpandPreview()" title="See your page bigger, without leaving this screen">⤢ Expand</button>
         <button class="btn" onclick="openPreviewInNewTab()" title="Open your page in a real new browser tab">↗ New Tab</button>
+        <!-- Hint, duplicated here for every web-editor (lang:'web') stage so
+             it sits with the rest of the toolbar — the ORIGINAL hint-btn in
+             .ch-meta stays as-is and keeps serving Python/quiz stages, which
+             have no toolbar of their own; selectChallenge() shows exactly
+             one of the two depending on stage type. -->
+        <button class="btn" id="web-hint-btn" onclick="showHint()" style="display:none;">💡 Hint</button>
       </div>
     </div>
     <div style="flex-shrink:0;display:flex;border-bottom:1px solid var(--border);background:var(--bg-card);">
@@ -361,12 +368,22 @@
           <span class="ex-eyebrow">🎯 Exercise</span>
           <a href="#" class="review-lesson-link" id="review-lesson-link" onclick="return false;">📘 Review Lesson</a>
         </div>
+        <!-- Shown once the exam is submitted (see lockExamEditing()) — the
+             editors go read-only underneath, so this makes the "this is
+             final, you cannot keep editing" state explicit rather than a
+             student wondering why typing stopped working. -->
+        <div id="exam-locked-banner" style="display:none;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);color:#f87171;font-size:12.5px;font-weight:600;">
+          ✓ Submitted — this exam is locked. Ask your teacher if you need more time.
+        </div>
         <div class="ch-row-inner">
           <div class="ch-text" id="ch-text">Select a challenge to begin.</div>
           <div class="ch-meta">
             <span class="xp-pill" id="xp-pill">+40 XP</span>
-            <span class="exam-timer-pill" id="exam-timer" style="display:none;"></span>
-            <span class="hint-btn" onclick="showHint()">💡 Hint</span>
+            <!-- For lang:'web' stages this is hidden in favor of #web-hint-btn
+                 up in the toolbar (next to Expand/New Tab) — see
+                 selectChallenge(). Python/quiz stages have no toolbar of
+                 their own, so this stays their only Hint button. -->
+            <span class="hint-btn" id="side-hint-btn" onclick="showHint()">💡 Hint</span>
           </div>
         </div>
         <div id="hint-display"></div>
@@ -1272,15 +1289,12 @@ function checkQuiz() {
 // and a periodic snapshot of their code, so a solution that appears FULLY
 // FORMED in one jump (pasted) looks different from one that grew gradually
 // (typed). Active only while an isExam stage is the open challenge.
-// 90 minutes total — a real two-sitting budget, not a wall-clock countdown.
-// Only time spent actually in the exam stage counts (see priorElapsedSeconds
-// below), so closing the tab and coming back a day or a week later doesn't
-// burn through the budget while the student is away. Soft limit: the pill
-// turns red at 0:00, nothing is auto-submitted or locked.
-const EXAM_BUDGET_SECONDS = 90 * 60
+// No visible timer or time budget — a countdown pressures students instead
+// of giving them room to actually learn (teacher's call). Total time spent
+// is still recorded quietly in save_data, for the teacher's own exam
+// integrity review only — the student never sees it as a countdown.
 let _examState = null
 let _examSnapshotTimer = null
-let _examTimerDisplayInterval = null
 
 function examElapsedSeconds() {
   if (!_examState) return 0
@@ -1295,60 +1309,52 @@ function examSaveData() {
     snapshots:           s ? s.snapshots : [],
     examDurationSeconds: examElapsedSeconds(),
     uploadedImages:      s && s.uploadedImages ? s.uploadedImages : [],
+    // The server replaces the whole save_data column on every save, not a
+    // merge (see app/api/lesson-saves/route.ts) — omitting this here would
+    // silently erase a real submission's lock on the very next autosave.
+    // Always reflect whatever _examState.submitted currently is.
+    submitted:           !!(s && s.submitted),
   }
-}
-function updateExamTimerDisplay() {
-  const el = document.getElementById('exam-timer')
-  if (!el || !_examState) return
-  const remaining = EXAM_BUDGET_SECONDS - examElapsedSeconds()
-  const over = remaining <= 0
-  const abs  = Math.abs(remaining)
-  const mm = String(Math.floor(abs / 60)).padStart(2, '0')
-  const ss = String(abs % 60).padStart(2, '0')
-  // Kept short on purpose — this sits in a narrow right-panel badge column
-  // (see .ch-meta) alongside the XP pill; a longer "Time's up — MM:SS over"
-  // string overflowed past the panel's own right edge and got clipped by
-  // its overflow-x:hidden, cutting the text off. Color alone (over-time
-  // class) carries the "you're over budget" signal instead.
-  el.textContent = (over ? '⏰ ' : '⏱ ') + mm + ':' + ss
-  el.title = over ? "Time's up — you're over the 90 minute budget" : 'Time remaining on this exam'
-  el.classList.toggle('over-time', over)
 }
 function startExamTracking(ch) {
   stopExamTracking()
   // Resume the student's real cumulative time-on-exam from their last save
-  // (if any) instead of resetting to 0 every time the page reopens — see the
-  // EXAM_BUDGET_SECONDS comment above.
+  // (if any) — purely for the teacher's integrity review, never shown to
+  // the student.
   const priorSaveData = LessonSaves.saveDataFor(ch.id, 'grade8')
   _examState = {
     startedAt: Date.now(),
     priorElapsedSeconds: (priorSaveData && priorSaveData.examDurationSeconds) || 0,
     uploadedImages: (priorSaveData && priorSaveData.uploadedImages) || [],
+    submitted: !!(priorSaveData && priorSaveData.submitted),
     tabSwitches: 0, awayMs: 0, awaySince: null, snapshots: [],
   }
-  const timerEl = document.getElementById('exam-timer')
-  if (timerEl) timerEl.style.display = ''
-  updateExamTimerDisplay()
-  _examTimerDisplayInterval = setInterval(updateExamTimerDisplay, 1000)
-  _examSnapshotTimer = setInterval(() => {
-    if (!_examState) return
-    const code = currentWebCode()
-    const last = _examState.snapshots[_examState.snapshots.length - 1]
-    if (!last || last.code !== code) {
-      _examState.snapshots.push({ t: Math.round((Date.now() - _examState.startedAt) / 1000), code })
-      if (_examState.snapshots.length > 60) _examState.snapshots.shift() // cap ~20 min of history at the 20s interval below
-    }
-    // Autosave — a student who closes the tab mid-typing (without ever
-    // pressing ▶ Run) must not lose their work. Never downgrades `passed`:
-    // the server keeps it monotonic (see app/api/lesson-saves/route.ts).
-    LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code, saveData: examSaveData() })
-  }, 20000)
+  if (!_examState.submitted) {
+    _examSnapshotTimer = setInterval(() => {
+      if (!_examState || _examState.submitted) return
+      const code = currentWebCode()
+      const last = _examState.snapshots[_examState.snapshots.length - 1]
+      if (!last || last.code !== code) {
+        _examState.snapshots.push({ t: Math.round((Date.now() - _examState.startedAt) / 1000), code })
+        if (_examState.snapshots.length > 60) _examState.snapshots.shift() // cap ~20 min of history at the 20s interval below
+      }
+      // Autosave — a student who closes the tab mid-typing (without ever
+      // pressing ▶ Run) must not lose their work. Never downgrades `passed`:
+      // the server keeps it monotonic (see app/api/lesson-saves/route.ts).
+      // Never carries submitted:true — only submitExam()'s own save does,
+      // since that's what the server's notifyExamResult gates on, and this
+      // autosave must never re-trigger that notification.
+      LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code, saveData: examSaveData() })
+    }, 20000)
+  }
+}
+// Unlike stopExamTracking(), keeps _examState alive (so examSaveData() still
+// reports the right final duration on submit) but stops the autosave loop.
+function stopExamTimers() {
+  if (_examSnapshotTimer) { clearInterval(_examSnapshotTimer); _examSnapshotTimer = null }
 }
 function stopExamTracking() {
-  if (_examSnapshotTimer)        { clearInterval(_examSnapshotTimer);        _examSnapshotTimer = null }
-  if (_examTimerDisplayInterval) { clearInterval(_examTimerDisplayInterval); _examTimerDisplayInterval = null }
-  const timerEl = document.getElementById('exam-timer')
-  if (timerEl) timerEl.style.display = 'none'
+  stopExamTimers()
   _examState = null
 }
 
@@ -1392,16 +1398,31 @@ function renderExamUploads(ch) {
     list.appendChild(p)
     return
   }
-  files.forEach(f => {
+  files.forEach((f, i) => {
     const row = document.createElement('div')
-    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);'
+    row.style.cssText = 'display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);'
+
+    const top = document.createElement('div')
+    top.style.cssText = 'display:flex;align-items:center;gap:10px;'
     const img = document.createElement('img')
     img.src = f.url
     img.alt = ''
     img.style.cssText = 'width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;'
-    const urlBox = document.createElement('div')
-    urlBox.style.cssText = 'flex:1;min-width:0;font-size:11.5px;color:var(--fg-dim);word-break:break-all;'
-    urlBox.textContent = f.url
+
+    // The display name is editable (what the student calls it); the real
+    // storage path in the URL below never changes when you rename it here —
+    // same real-world distinction as renaming a file on your own computer:
+    // the FILE stays where it is, only its name/label changes.
+    const nameInput = document.createElement('input')
+    nameInput.type = 'text'
+    nameInput.value = f.name || 'photo'
+    nameInput.style.cssText = 'flex:1;min-width:0;font-size:12px;padding:4px 6px;background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;color:var(--fg);'
+    nameInput.onchange = () => {
+      f.name = nameInput.value.trim() || 'photo'
+      const ch = CHALLENGES[activeIdx]
+      LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code: currentWebCode(), saveData: examSaveData() })
+    }
+
     const copyBtn = document.createElement('button')
     copyBtn.className = 'btn'
     copyBtn.style.cssText = 'font-size:11px;padding:4px 8px;flex-shrink:0;'
@@ -1409,7 +1430,18 @@ function renderExamUploads(ch) {
     copyBtn.onclick = () => {
       navigator.clipboard.writeText(f.url).then(() => { copyBtn.textContent = 'Copied!'; setTimeout(() => { copyBtn.textContent = 'Copy' }, 1500) })
     }
-    row.append(img, urlBox, copyBtn)
+    top.append(img, nameInput, copyBtn)
+
+    // Where it's actually stored — the real address, broken down the same
+    // way the Directories/Files/Paths module explains folders: this file
+    // lives several folders deep, same idea as any folder on your own
+    // computer.
+    const pathBox = document.createElement('div')
+    pathBox.style.cssText = 'font-size:11px;color:var(--fg-faint);word-break:break-all;'
+    const urlParts = f.url.split('/student-exam/')
+    pathBox.textContent = urlParts.length > 1 ? 'Stored at: student-exam/' + urlParts[1] : f.url
+
+    row.append(top, pathBox)
     list.appendChild(row)
   })
 }
@@ -1481,10 +1513,58 @@ function parseWebDraft(raw) {
   return { js: raw }
 }
 
+// Set only while submitExam() is running its own runWebCode() pass — lets
+// checkWebChallenge() tell "the student clicked ▶ Run" (practice, never
+// finalizes) apart from "the student clicked ✓ Submit Exam" (final), without
+// duplicating runWebCode()'s whole async iframe-build/log pipeline.
+let _examSubmitting = false
+
 function checkWebChallenge(log) {
   const ch = CHALLENGES[activeIdx]
   if (!ch) return
   const passOk = ch.check(log)
+
+  // Exam stages: Run is practice only — live pass/fail feedback and a
+  // draft autosave (so closing the tab never loses work), but it never
+  // marks the stage complete, awards XP, or notifies anyone. Only
+  // submitExam() (the ✓ Submit Exam button) does that — see below.
+  if (ch.isExam) {
+    // Defense in depth — the UI already disables Run/Submit once locked
+    // (lockExamEditing()), but nothing here should ever act again on an
+    // already-submitted exam even if something calls these directly.
+    if (_examState && _examState.submitted) return
+    if (!_examSubmitting) {
+      clog(passOk
+        ? "✅ This would pass right now — click ✓ Submit Exam when you're ready to hand it in."
+        : '❌ Not quite yet — check the task above.', passOk ? 'ok' : 'err')
+      LessonSaves.save('grade8', ch.id, { passed: completed.has(activeIdx), code: currentWebCode(), saveData: examSaveData() })
+      return
+    }
+    const firstPass = passOk && !completed.has(activeIdx)
+    if (passOk) {
+      completed.add(activeIdx)
+      renderPills()
+      winShow(ch.xp)
+      showToast('Exam submitted — +' + ch.xp + ' XP 🎉')
+      clog('✅ Submitted — Exam passed! +' + ch.xp + ' XP', 'ok')
+      reportRealProgress(ch, Date.now() - challengeStartedAt)
+      updateFooterNext()
+      renderModuleXPBar(findModuleForChallenge(ch))
+    } else {
+      clog('Submitted — but this does not pass yet. Your teacher can see this result.', 'err')
+    }
+    // Set BEFORE examSaveData() so the save below (the one real submission
+    // record) includes submitted:true — examSaveData() reads it straight
+    // off _examState, so the two can never disagree.
+    if (_examState) _examState.submitted = true
+    // The ONE save that notifies the student + teacher (see notifyExamResult
+    // in app/api/lesson-saves/route.ts, gated on saveData.submitted === true
+    // — Run's practice-autosave above must NOT trigger that notification).
+    LessonSaves.save('grade8', ch.id, { passed: passOk, code: currentWebCode(), xpEarned: firstPass ? ch.xp : 0, saveData: examSaveData() })
+    lockExamEditing()
+    return
+  }
+
   const firstPass = passOk && !completed.has(activeIdx)
   // Always save whatever is in the editor right now — pass or fail, and even
   // on a stage the student already completed earlier (so coming back to
@@ -1509,31 +1589,51 @@ function checkWebChallenge(log) {
     clog('❌ Not quite — check the task above and try the 💡 Hint button.', 'err')
     if (ch.palette) explainColorFailure(ch, log).forEach(line => clog(line, 'info'))
   }
-  // Exam integrity signal — recorded on every attempt, pass or fail, same
-  // reasoning as isAssessment's quiz-score save above: a teacher reviewing
-  // an exam wants the real record, not just whether the student eventually
-  // passed. See startExamTracking() above currentWebCode().
-  //
-  // No `&& me` guard here (unlike the BF.addXP/recordAttempt call above) —
-  // `me` is BF.session(), a legacy localStorage flag that setSession() never
-  // actually sets anywhere in this shipped site, so it's always null for
-  // every real student. Gating on it silently skipped this save (and the
-  // exam-result notification that reads its saveData) for every real exam
-  // attempt — found by testing an actual submission end-to-end.
-  if (ch.isExam) {
-    LessonSaves.save('grade8', ch.id, {
-      passed: passOk,
-      // Must repeat `code` here — the server upsert overwrites the row
-      // written moments ago by the call above, and `code ?? null` in
-      // app/api/lesson-saves/route.ts means omitting it would silently
-      // null out the student's just-saved exam code. Caught live before
-      // shipping by inspecting the actual POST body this call sends.
-      code: currentWebCode(),
-      // examSaveData() reads the same cumulative-across-sessions elapsed
-      // time the timer pill shows — see startExamTracking().
-      saveData: examSaveData(),
-    })
+}
+
+// ── Exam submit/lock ────────────────────────────────────────────────────────
+async function submitExam() {
+  const ch = CHALLENGES[activeIdx]
+  if (!ch || !ch.isExam) return
+  if (_examState && _examState.submitted) return   // already locked — see lockExamEditing()
+  const btn = document.getElementById('exam-submit-btn')
+  btn.disabled = true
+  btn.textContent = 'Submitting…'
+  _examSubmitting = true
+  try {
+    await runWebCode()   // builds the log + calls checkWebChallenge(), which sees _examSubmitting
+  } finally {
+    _examSubmitting = false
+    // Only reset the button if checkWebChallenge() didn't already lock it
+    // via lockExamEditing() — otherwise this silently undid the lock
+    // (button stayed clickable, text reverted) right after a real
+    // submission. Caught live: "submit btn disabled" read back false.
+    if (!_examState || !_examState.submitted) {
+      btn.disabled = false
+      btn.textContent = '✓ Submit Exam'
+    }
   }
+}
+function lockExamEditing() {
+  stopExamTimers()   // freeze the pill at its final value instead of hiding it
+  Object.values(webEditors).forEach(ed => ed.setOption('readOnly', true))
+  document.getElementById('web-run-btn').disabled = true
+  document.getElementById('exam-submit-btn').disabled = true
+  document.getElementById('exam-submit-btn').textContent = '✓ Submitted'
+  const uploadBtn = document.getElementById('exam-upload-btn')
+  if (uploadBtn) uploadBtn.disabled = true
+  const existing = document.getElementById('exam-locked-banner')
+  if (existing) existing.style.display = ''
+}
+function unlockExamEditing() {
+  Object.values(webEditors).forEach(ed => ed.setOption('readOnly', false))
+  document.getElementById('web-run-btn').disabled = false
+  document.getElementById('exam-submit-btn').disabled = false
+  document.getElementById('exam-submit-btn').textContent = '✓ Submit Exam'
+  const uploadBtn = document.getElementById('exam-upload-btn')
+  if (uploadBtn) uploadBtn.disabled = false
+  const existing = document.getElementById('exam-locked-banner')
+  if (existing) existing.style.display = 'none'
 }
 
 // ── "Why isn't this passing?" for color stages ───────────────────────────────
@@ -3465,15 +3565,28 @@ const MODULES = [
   // minors. See startExamTracking/stopExamTracking above MODULES.
   { id:'examGR8', name:'🎯 EXAM — Recipe Page', sub:'A real test — no starter code, no hints. Recreate the page exactly.', live:true, stages:[
     { id:'examRecipe', name:'EXAM — Recreate the Recipe Page', xp:100, lang:'web', boss:true, isExam:true, allowUpload:true,
-      text:`<strong>EXAM</strong> — Recreate this page exactly, using everything you've learned: a skeleton, headings <code>h1</code>-<code>h4</code>, a <code>&lt;header&gt;</code> with a background colour, two <code>&lt;div&gt;</code>s with their own background colours, a bulleted list, a numbered list, a link styled to look like a button, and a <code>&lt;footer&gt;</code>.
-        <br><br>You have <b>90 minutes</b> total — the timer next to your XP badge counts down. It's fine to close the tab and come back later (even a different day); your time and your code are both saved, and only picks back up while you're actually working on this page.
-        <br><br>You may look at the real recipe for ideas: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Your "See Original Recipe" button should link to it.
-        <br><br>Need a real photo? Use the <b>Files</b> tab (next to HTML/CSS/JS) to upload one, then copy its address into an <code>&lt;img src="..."&gt;</code> tag — or keep the placeholder image below, that's fine too.
+      text:`<strong>EXAM</strong> — Recreate this page, using everything you've learned. Click <b>✓ Submit Exam</b> (next to ▶ Run) when you're done — ▶ Run just checks and saves your draft, it does NOT hand the exam in.
+        <br><br>Take your time — there's no countdown. Your code is saved automatically, so it's fine to close the tab and come back later, even a different day.
+        ${figFrame('Exactly what you need — nothing more', '<div style="font-size:12px;line-height:1.9;">'
+          + '1. A <code>&lt;header&gt;</code> with a background color, holding your <code>&lt;h1&gt;</code><br>'
+          + '2. One <code>&lt;h2&gt;</code>, one <code>&lt;h3&gt;</code>, one <code>&lt;h4&gt;</code> — in the picture: "Ingredients" is an <code>h2</code>, "You will need" is an <code>h3</code>, and the small "PREP 15 MIN &middot; BAKE 12 MIN" line is an <code>h4</code> (any one of each, anywhere, is enough — you don\'t need to match the picture\'s exact spots)<br>'
+          + '3. One <code>&lt;img&gt;</code> (the placeholder below is fine, or upload your own — see the <b>Files</b> tab)<br>'
+          + '4. A <code>&lt;ul&gt;</code> with at least 3 <code>&lt;li&gt;</code> items (your ingredients)<br>'
+          + '5. An <code>&lt;ol&gt;</code> with at least 3 <code>&lt;li&gt;</code> items (your steps)<br>'
+          + '6. <b>Two</b> <code>&lt;div&gt;</code> tags somewhere on the page — only <b>one</b> of them needs a background color (the example below colors both, but only one is required)<br>'
+          + '7. A <code>&lt;footer&gt;</code> (any content — a short line is enough)<br>'
+          + '8. A link styled to look like a button — background color + <code>padding-top: 6px;</code> or more<br><br>'
+          + 'Everything stacks top to bottom, normally — you do <b>not</b> need <code>display: inline-block</code> or side-by-side layout anywhere on this page.'
+          + '</div>')}
+        <br>You may look at the real recipe for ideas: <a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/" target="_blank" rel="noopener">joyfoodsunshine.com — The Most Amazing Chocolate Chip Cookies</a>. Your "See Original Recipe" button's exact <code>href</code>:
+        ${figCode('&lt;a href="https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies/"&gt;\n  See the Original Recipe &amp;rarr;\n&lt;/a&gt;')}
         ${figFrame('Three tags you haven\'t used yet', figCode(
           '&lt;b&gt;bold text&lt;/b&gt;\n&lt;i&gt;italic text&lt;/i&gt;\n\n&lt;ol&gt;\n  &lt;li&gt;First step&lt;/li&gt;\n  &lt;li&gt;Second step&lt;/li&gt;\n&lt;/ol&gt;'
         ) + '<div style="font-size:12px;">An <code>&lt;ol&gt;</code> (ordered list) works exactly like <code>&lt;ul&gt;</code>, but the browser numbers the items 1, 2, 3… instead of using bullets. Use it for the numbered steps.</div>')}
         ${figFrame('Reminder — styling one specific div', figCode('HTML:  &lt;div id="ingredients"&gt;…&lt;/div&gt;\nCSS:   #ingredients { background-color: #F8BBD0; }')
           + '<div style="font-size:12px;">An id selector in CSS starts with <code>#</code> and matches the element\'s <code>id</code> attribute — same idea as the class selector (<code>.</code>), but for one specific element instead of a group.</div>')}
+        ${figFrame('Sizing your image', figCode('img {\n  width: 100%;\n  height: auto;\n}')
+          + '<div style="font-size:12px;"><code>width: 100%</code> makes the image fill the FULL width of whatever it sits inside (the picture above does this). <code>width: 50%</code> would make it only half as wide. Always pair it with <code>height: auto;</code> — without it, the image can look squashed or stretched; <code>auto</code> tells the browser to keep the picture\'s own real proportions. No <code>&lt;div&gt;</code> needed — an <code>&lt;img&gt;</code> can sit directly on the page like any other tag; you only wrap it in a div if you want to group it WITH other elements or control its position specially.</div>')}
         ${figFrame('Special characters you\'ll need', '<div style="font-size:12px;line-height:1.9;">'
           + 'An arrow (→), like in "See Original Recipe →": type <code>&amp;rarr;</code><br>'
           + 'A degree symbol (°), like in "180°C": type <code>&amp;deg;</code><br>'
@@ -3486,22 +3599,29 @@ const MODULES = [
           + '<code>"Courier New", monospace</code> — typewriter style, every letter the same width<br><br>'
           + 'Always keep the second word (<code>sans-serif</code> / <code>serif</code> / <code>monospace</code>) as a fallback — if the named font ever fails to load, the browser still picks something in the same family instead of a random default.</div>')}
         ${figFrame('Suggested colors (feel free to use your own instead)', '<div style="font-size:12px;line-height:1.8;">'
-          + '<b>Header background:</b> <code>#D32F2F</code> (red)<br>'
-          + '<b>Ingredients box background:</b> <code>#F8BBD0</code> (pink)<br>'
+          + '<b>Header background:</b> <code>#D32F2F</code> (red), <code>padding: 12px;</code><br>'
+          + '<b>Ingredients box background:</b> <code>#F8BBD0</code> (pink), <code>padding: 12px;</code><br>'
           + '<b>Ingredients text color:</b> <code>#880E4F</code> (dark pink — readable on the pink background)<br>'
-          + '<b>Link button background:</b> <code>#2E7D32</code> (green)<br><br>'
-          + 'Reminder: a colored box needs <code>padding</code> too, or the text will touch the edges — e.g. <code>padding: 12px;</code>.'
+          + '<b>Steps text color:</b> <code>#555555</code> (gray — matches the picture\'s Method/Steps section)<br>'
+          + '<b>Link button background:</b> <code>#2E7D32</code> (green), <code>padding: 10px 16px;</code><br><br>'
+          + 'The exact numbers above are just one real option that works — any padding of <code>8px</code> or more on a colored box looks fine; the link specifically needs <code>padding-top</code> of at least <code>6px</code> (see the checklist above).'
           + '</div>')}
         <br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">`,
       hints:[],
       webStarter: { html: '', css: '', js: '' },
+      // Loosened on purpose — the goal is "a real test someone who knows
+      // 20-30% of HTML can still pass," not "every single thing taught all
+      // at once": one of each heading level (not two), 3 list items (not
+      // 4), still every structural tag/color/padding mechanic that's
+      // actually taught. See the instructions' own numbered checklist,
+      // which matches this exactly.
       check:(log) => {
         const h = landmark(log, 'header'), f = landmark(log, 'footer')
         if (!h || !f) return false
         if (!hasFillColor(h.bg)) return false
-        if (log.h1Count < 1 || log.h2Count < 2 || log.h3Count < 2 || log.h4Count < 2) return false
+        if (log.h1Count < 1 || log.h2Count < 1 || log.h3Count < 1 || log.h4Count < 1) return false
         if (log.imgCount < 1) return false
-        if (log.ulItems < 4 || log.olItems < 4) return false
+        if (log.ulItems < 3 || log.olItems < 3) return false
         const coloredDivs = (log.divs || []).filter(d => hasFillColor(d.bg))
         if (coloredDivs.length < 1) return false
         if (!(hasFillColor(log.linkBg) && log.linkPadTop >= 6)) return false
@@ -9565,6 +9685,12 @@ function selectChallenge(i) {
   // PREVIOUS stage is never stuck active after switching away from it.
   document.getElementById('web-tab-files').style.display = ch.allowUpload ? 'inline-block' : 'none'
   renderExamUploads(ch)
+  // webEditors are shared singletons reused by every lang:'web' stage, so a
+  // readOnly left on from a submitted exam MUST be cleared before any other
+  // stage (or a not-yet-submitted reopen of the exam itself) is usable.
+  document.getElementById('exam-submit-btn').style.display = ch.isExam ? 'inline-block' : 'none'
+  if (ch.isExam && _examState && _examState.submitted) lockExamEditing()
+  else unlockExamEditing()
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
   document.getElementById('pass-badge').style.display = 'none'
   document.getElementById('hint-display').innerHTML = ''
@@ -9576,6 +9702,10 @@ function selectChallenge(i) {
   document.body.classList.toggle('no-blocks-mode', isQuiz)
   document.getElementById('py-editor-panel').style.display  = (isWeb || isQuiz) ? 'none' : ''
   document.getElementById('web-editor-panel').style.display = (isWeb && !isQuiz) ? '' : 'none'
+  // Hint lives in the toolbar for web stages, in the side panel otherwise —
+  // see the comments by #web-hint-btn / #side-hint-btn.
+  document.getElementById('web-hint-btn').style.display  = (isWeb && !isQuiz) ? '' : 'none'
+  document.getElementById('side-hint-btn').style.display = (isWeb && !isQuiz) ? 'none' : ''
   document.getElementById('out-canvas').style.display = (isWeb || isQuiz) ? 'none' : 'block'
   document.getElementById('out-web').style.display    = (isWeb && !isQuiz) ? 'block' : 'none'
   document.getElementById('output-quiz').style.display = isQuiz ? 'block' : 'none'
@@ -9614,6 +9744,10 @@ function selectChallenge(i) {
   document.getElementById('ch-lesson').style.display = 'none'
   const mod = findModuleForChallenge(ch)
   const reviewLink = document.getElementById('review-lesson-link')
+  // The exam has no real lesson behind it (CHALLENGE_LESSON.examRecipe is
+  // just a one-line placeholder — see the module comment above examGR8), so
+  // "Review Lesson" has nothing real to show for this one stage.
+  reviewLink.style.display = ch.isExam ? 'none' : ''
   reviewLink.onclick = () => { openModuleLesson(mod ? mod.id : ''); return false }
   renderModuleXPBar(mod)
   updateFooterNext()
