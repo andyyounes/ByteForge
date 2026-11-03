@@ -289,12 +289,15 @@
         <span class="lang-badge">HTML/CSS/JS</span>
       </div>
       <div class="btn-row">
+        <!-- Exam-only (ch.isExam) — hidden on every other stage. Kept on the
+             FAR LEFT, away from ▶ Run, so a student reaching for Run can't
+             misclick Submit by mistake (also confirms before acting — see
+             submitExam()). Run stays a free, unlimited preview/check; this
+             is the one action that finalizes the exam. See
+             submitExam()/lockExamEditing(). -->
+        <button class="btn btn-brand" id="exam-submit-btn" onclick="submitExam()" style="display:none;background:var(--rose,#f43f5e);">✓ Submit Exam</button>
         <button class="btn btn-danger" onclick="resetWebToStarter()">↺ Starter code</button>
         <button class="btn btn-brand"  id="web-run-btn" onclick="runWebCode()">▶ Run</button>
-        <!-- Exam-only (ch.isExam) — hidden on every other stage. Run stays a
-             free, unlimited preview/check; this is the one action that
-             finalizes the exam. See submitExam()/lockExamEditing(). -->
-        <button class="btn btn-brand" id="exam-submit-btn" onclick="submitExam()" style="display:none;background:var(--rose,#f43f5e);">✓ Submit Exam</button>
         <button class="btn" id="expand-preview-btn" onclick="toggleExpandPreview()" title="See your page bigger, without leaving this screen">⤢ Expand</button>
         <button class="btn" onclick="openPreviewInNewTab()" title="Open your page in a real new browser tab">↗ New Tab</button>
         <!-- Hint, duplicated here for every web-editor (lang:'web') stage so
@@ -1623,6 +1626,11 @@ async function submitExam() {
   const ch = CHALLENGES[activeIdx]
   if (!ch || !ch.isExam) return
   if (_examState && _examState.submitted) return   // already locked — see lockExamEditing()
+  // Final submission locks the editors and can't be undone by the student
+  // (only a teacher can re-open it — see /api/teacher/exam-reopen), so a
+  // misclick here is costly. One extra confirmation, on top of moving this
+  // button away from ▶ Run (see the HTML comment above it).
+  if (!window.confirm("Submit your exam now? You won't be able to keep editing after this — make sure you're done.")) return
   const btn = document.getElementById('exam-submit-btn')
   btn.disabled = true
   btn.textContent = 'Submitting…'
