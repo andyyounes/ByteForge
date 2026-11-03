@@ -77,14 +77,14 @@ the SAME commit so the two never drift.
 - [x] py3 — For Loops (2 stages) — same fix
 - [x] py4 — While Loops (2 stages) — same fix
 - [x] py5 — Lists (2 stages) — same fix
-- [ ] adv — Build a Text Adventure (4 stages)
-- [ ] cc1 — Health & Attack Basics (1 stage)
-- [ ] cc2 — Win/Lose Conditions (1 stage)
-- [ ] cc3 — The Battle Loop (1 stage)
-- [ ] cc4 — Tracking the Enemy (1 stage)
-- [ ] cc5 — Bringing It Together (1 stage)
-- [ ] cc — Ship a Combat Encounter (3 stages)
-- [ ] m3 — Functions (5 stages)
+- [x] adv — Build a Text Adventure (4 stages) — correctly terse: an application/reinforcement module for if/elif (py2), lists (py5), while (py4) already taught — re-explaining WHY here would be the "teach it twice" bug, not a gap
+- [x] cc1 — Health & Attack Basics (1 stage) — reinforcement (subtraction from py1), correctly terse
+- [x] cc2 — Win/Lose Conditions (1 stage) — reinforcement (if/else from py2), correctly terse
+- [x] cc3 — The Battle Loop (1 stage) — reinforcement (while from py4), correctly terse
+- [x] cc4 — Tracking the Enemy (1 stage) — reinforcement (parallel variables from adv), correctly terse
+- [x] cc5 — Bringing It Together (1 stage) — checkpoint, correctly terse
+- [x] cc — Ship a Combat Encounter (3 stages) — capstone, correctly terse
+- [x] m3 — Functions (5 stages) — reviewed; m3s3-s5 already explain WHY well (contrast with earlier stages), only m3s1 (the first function, genuinely new concept) was missing an upfront explanation — added
 - [ ] m4 — Lists (5 stages)
 - [ ] m5 — Strings & Validation (5 stages)
 - [ ] m6 — Files & Data (6 stages)
@@ -102,4 +102,4 @@ the SAME commit so the two never drift.
 - 2026-11-03 (continued again): finished jsf1 and jsf2 (24 stages total) — both much better than my first skim suggested; single-step stages don't need padding with a checklist, and the two BOSS/capstone stages got <ul>→<ol> + a worked example.
 - 2026-11-03 (continued): reviewed web5 + ws1-ws5 (53 stages) — ALL already excellent. None needed changes.
 - 2026-11-03 (continued): reviewed web5c, web5d, web5e, web6, web7 (32 stages) — same bar throughout (forms, responsive design, the tip calculator project, multi-page nav). **This completes the entire HTML/CSS/JS track (Semesters 1-2)** — everything from web0 through web7 is now reviewed, with only web2 and jsf1boss/jsf2boss actually needing edits; the rest was already built to the pattern in an earlier pass.
-- 2026-11-03 (continued): py1-py5 (10 stages, the start of Semester 3/Python) — genuinely thinner than the web track: terse "Complete the missing X" text, real WHY only in the hints (second line of defense per the pattern's own rule #4, not a replacement for real instructions). Fixed by moving each module's core WHY sentence up into the main text of its teaching stage (boss stages left as "same idea, new numbers" — they already say that). check()/starter code untouched. Next: adv (Build a Text Adventure, 4 stages) — likely the same style gap, check it next.
+- 2026-11-03 (continued): py1-py5 (10 stages) — WHY moved from hints into the main text (pattern rule #4). adv + cc1-cc5 + cc (10 stages) — all correctly terse: reinforcement/application of py1-5 concepts, re-explaining WHY would be the "teach it twice" bug. m3 (Functions, 5 stages) — m3s3-s5 already explain WHY well; only m3s1 (first function, genuinely new) needed an intro, added. Next: m4 (Lists, 5 stages — NB different from py5's lists, check what's actually new here vs. reinforcement).
