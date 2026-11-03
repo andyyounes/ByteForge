@@ -289,13 +289,6 @@
         <span class="lang-badge">HTML/CSS/JS</span>
       </div>
       <div class="btn-row">
-        <!-- Exam-only (ch.isExam) — hidden on every other stage. Kept on the
-             FAR LEFT, away from ▶ Run, so a student reaching for Run can't
-             misclick Submit by mistake (also confirms before acting — see
-             submitExam()). Run stays a free, unlimited preview/check; this
-             is the one action that finalizes the exam. See
-             submitExam()/lockExamEditing(). -->
-        <button class="btn btn-brand" id="exam-submit-btn" onclick="submitExam()" style="display:none;background:var(--rose,#f43f5e);">✓ Submit Exam</button>
         <button class="btn btn-danger" onclick="resetWebToStarter()">↺ Starter code</button>
         <button class="btn btn-brand"  id="web-run-btn" onclick="runWebCode()">▶ Run</button>
         <button class="btn" id="expand-preview-btn" onclick="toggleExpandPreview()" title="See your page bigger, without leaving this screen">⤢ Expand</button>
@@ -308,7 +301,7 @@
         <button class="btn" id="web-hint-btn" onclick="showHint()" style="display:none;">💡 Hint</button>
       </div>
     </div>
-    <div style="flex-shrink:0;display:flex;border-bottom:1px solid var(--border);background:var(--bg-card);">
+    <div style="flex-shrink:0;display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg-card);">
       <div class="web-tab active" id="web-tab-html" onclick="switchWebTab('html')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:#fbbf24;border-bottom:2px solid #fbbf24;">HTML</div>
       <div class="web-tab" id="web-tab-css" onclick="switchWebTab('css')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">CSS</div>
       <div class="web-tab" id="web-tab-js" onclick="switchWebTab('js')" style="padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">JS</div>
@@ -316,6 +309,15 @@
            stages use a placeholder image URL, so this stays out of their
            way entirely. See switchWebTab('files') / uploadExamImage(). -->
       <div class="web-tab" id="web-tab-files" onclick="switchWebTab('files')" style="display:none;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--fg-faint);border-bottom:2px solid transparent;">Files</div>
+      <div style="flex:1;"></div>
+      <!-- Exam-only (ch.isExam) — hidden on every other stage. Moved here,
+           in its own row away from ▶ Run entirely (not just reordered next
+           to it), so a student reaching for Run or a tab can't misclick
+           Submit by mistake (also confirms before acting — see
+           submitExam()). Run stays a free, unlimited preview/check; this is
+           the one action that finalizes the exam. See
+           submitExam()/lockExamEditing(). -->
+      <button class="btn btn-brand" id="exam-submit-btn" onclick="submitExam()" style="display:none;margin:6px 10px;background:var(--rose,#f43f5e);">✓ Submit Exam</button>
     </div>
     <div id="palette-bar" style="display:none;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg-card);"></div>
     <div class="cm-outer" style="position:relative;">
@@ -3600,7 +3602,7 @@ const MODULES = [
   // minors. See startExamTracking/stopExamTracking above MODULES.
   { id:'examGR8', name:'🎯 EXAM — Recipe Page', sub:'A real test — no starter code, no hints. Recreate the page exactly.', live:true, stages:[
     { id:'examRecipe', name:'EXAM — Recreate the Recipe Page', xp:100, lang:'web', boss:true, isExam:true, allowUpload:true,
-      text:`<strong>EXAM</strong> — Recreate this page, using everything you've learned. Click <b>✓ Submit Exam</b> (next to ▶ Run) when you're done — ▶ Run just checks and saves your draft, it does NOT hand the exam in.
+      text:`<strong>EXAM</strong> — Recreate this page, using everything you've learned. When you're done, click <b>✓ Submit Exam</b>, above the HTML/CSS/JS tabs — ▶ Run just checks and saves your draft, it does NOT hand the exam in.
         <br><br>Take your time — there's no countdown. Your code is saved automatically, so it's fine to close the tab and come back later, even a different day.
         ${figFrame('Exactly what you need — nothing more', '<div style="font-size:12px;line-height:1.9;">'
           + '1. A <code>&lt;header&gt;</code> with a background color, holding your <code>&lt;h1&gt;</code><br>'
@@ -3641,7 +3643,8 @@ const MODULES = [
           + '<b>Link button background:</b> <code>#2E7D32</code> (green), <code>padding: 10px 16px;</code><br><br>'
           + 'The exact numbers above are just one real option that works — any padding of <code>8px</code> or more on a colored box looks fine; the link specifically needs <code>padding-top</code> of at least <code>6px</code> (see the checklist above).'
           + '</div>')}
-        <br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">`,
+        <br><a href="/images/exams/grade8-recipe-exam-target.png" target="_blank" rel="noopener" title="Click to open full size in a new tab"><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;cursor:zoom-in;"></a>
+        <div style="font-size:11px;color:var(--fg-faint);margin-top:4px;">👆 Click the picture to open it full size in a new tab — it's a whole page, taller than this panel.</div>`,
       hints:[],
       webStarter: { html: '', css: '', js: '' },
       // Loosened on purpose — the goal is "a real test someone who knows

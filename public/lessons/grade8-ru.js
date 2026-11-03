@@ -395,7 +395,7 @@ window.G8_RU_QUIZ = {
 // it — never run this at module-load time.
 window.G8_RU_EXAM = {
   examRecipe: function () {
-    return '<strong>ЭКЗАМЕН</strong> — Воссоздайте эту страницу, используя всё, что вы изучили. Нажмите <b>✓ Submit Exam</b> (рядом с ▶ Run), когда закончите — ▶ Run только проверяет и сохраняет черновик, это НЕ сдача экзамена.'
+    return '<strong>ЭКЗАМЕН</strong> — Воссоздайте эту страницу, используя всё, что вы изучили. Когда закончите, нажмите <b>✓ Submit Exam</b> над вкладками HTML/CSS/JS — ▶ Run только проверяет и сохраняет черновик, это НЕ сдача экзамена.'
       + '<br><br>Не торопитесь — обратного отсчёта нет. Ваш код сохраняется автоматически, так что можно закрыть вкладку и вернуться позже, даже в другой день.'
       + figFrame('Что именно нужно — и не больше', '<div style="font-size:12px;line-height:1.9;">'
           + '1. <code>&lt;header&gt;</code> с цветом фона, внутри — ваш <code>&lt;h1&gt;</code><br>'
@@ -436,6 +436,7 @@ window.G8_RU_EXAM = {
           + '<b>Фон кнопки-ссылки:</b> <code>#2E7D32</code> (зелёный), <code>padding: 10px 16px;</code><br><br>'
           + 'Эти числа — просто один рабочий вариант: любой <code>padding</code> от <code>8px</code> и больше на цветном блоке выглядит нормально; у ссылки конкретно нужен <code>padding-top</code> не меньше <code>6px</code> (см. список выше).'
           + '</div>')
-      + '<br><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;">'
+      + '<br><a href="/images/exams/grade8-recipe-exam-target.png" target="_blank" rel="noopener" title="Нажмите, чтобы открыть в полном размере в новой вкладке"><img src="/images/exams/grade8-recipe-exam-target.png" alt="Target page to recreate" style="max-width:100%;border:1px solid var(--border);border-radius:8px;margin-top:6px;cursor:zoom-in;"></a>'
+      + '<div style="font-size:11px;color:var(--fg-faint);margin-top:4px;">👆 Нажмите на картинку, чтобы открыть её в полном размере в новой вкладке — это целая страница, она выше, чем эта панель.</div>'
   },
 }
