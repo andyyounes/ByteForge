@@ -144,7 +144,7 @@
               background:rgba(251,191,36,.05); border:1.5px solid rgba(251,191,36,.22);
               border-radius:12px; padding:12px 14px; }
     .ch-row-inner { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-    .ch-text { font-size:12.5px; color:var(--fg-dim); line-height:1.6; flex:1; }
+    .ch-text { font-size:12.5px; color:var(--fg-dim); line-height:1.6; flex:1; min-width:0; }
     .ch-text strong { color:var(--fg); }
     .ch-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
     .xp-pill { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
@@ -367,6 +367,10 @@
         <div style="display:flex;align-items:center;gap:10px;">
           <span class="ex-eyebrow">🎯 Exercise</span>
           <a href="#" class="review-lesson-link" id="review-lesson-link" onclick="return false;">📘 Review Lesson</a>
+          <!-- Exam-only (ch.isExam) — the instructions got long (checklist +
+               several reference cards), so this opens them full-screen
+               instead of a cramped side panel. See toggleExpandInstructions(). -->
+          <a href="#" class="review-lesson-link" id="expand-instructions-btn" onclick="toggleExpandInstructions();return false;" style="display:none;">⤢ Expand Instructions</a>
         </div>
         <!-- Shown once the exam is submitted (see lockExamEditing()) — the
              editors go read-only underneath, so this makes the "this is
@@ -403,6 +407,16 @@
       <div id="web-preview-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9998;" onclick="toggleExpandPreview(false)"></div>
       <div id="output-quiz"></div>
       <div class="pass-badge" id="pass-badge">✓ Challenge complete!</div>
+    </div>
+
+    <!-- Full-screen instructions overlay — see #expand-instructions-btn /
+         toggleExpandInstructions(). Click-away-to-close, same pattern as
+         the preview's #web-preview-backdrop. -->
+    <div id="instructions-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 20px;" onclick="if(event.target===this)toggleExpandInstructions(false)">
+      <div style="background:var(--bg-raised);border:1px solid var(--border-hi);border-radius:14px;padding:28px;max-width:720px;width:100%;position:relative;">
+        <button onclick="toggleExpandInstructions(false)" style="position:absolute;top:16px;right:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;cursor:pointer;color:var(--fg-dim);font-size:16px;line-height:1;">✕</button>
+        <div id="instructions-overlay-text" style="font-size:14.5px;color:var(--fg-dim);line-height:1.8;padding-right:36px;"></div>
+      </div>
     </div>
 
     <!-- Always-visible Next control (ported from Grade 7) -->
@@ -1114,6 +1128,19 @@ function toggleExpandPreview(force) {
     iframe.style.zIndex = ''; iframe.style.boxShadow = ''
     backdrop.style.display = 'none'
     if (btn) btn.textContent = '⤢ Expand'
+  }
+}
+// Shows the current stage's instructions (same content as #ch-text) full
+// screen, with a bigger font — the exam's checklist + reference cards made
+// the normal side panel cramped. Click-away or ✕ to close.
+function toggleExpandInstructions(force) {
+  const overlay = document.getElementById('instructions-overlay')
+  const show = force !== undefined ? force : overlay.style.display === 'none'
+  if (show) {
+    document.getElementById('instructions-overlay-text').innerHTML = document.getElementById('ch-text').innerHTML
+    overlay.style.display = 'flex'
+  } else {
+    overlay.style.display = 'none'
   }
 }
 // Multi-page projects opened standalone (a real new tab, no relationship to
@@ -9749,6 +9776,8 @@ function selectChallenge(i) {
   // "Review Lesson" has nothing real to show for this one stage.
   reviewLink.style.display = ch.isExam ? 'none' : ''
   reviewLink.onclick = () => { openModuleLesson(mod ? mod.id : ''); return false }
+  document.getElementById('expand-instructions-btn').style.display = ch.isExam ? '' : 'none'
+  toggleExpandInstructions(false)   // closing any overlay left open from the previous stage
   renderModuleXPBar(mod)
   updateFooterNext()
   clog('Challenge: ' + ch.name, 'info')
