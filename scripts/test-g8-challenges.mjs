@@ -189,6 +189,7 @@ const webMaximalLog = () => ({
   linkColor: 'rgb(29, 78, 216)', buttonBg: 'rgb(230, 57, 70)', buttonColor: 'rgb(255, 255, 255)',
   linkBg: 'rgb(79, 70, 229)', linkPadTop: 10, linkDecoration: 'none', linkHrefOk: true,
   boldCount: 999, italicCount: 999, underlineCount: 999,
+  bodyFontFamily: 'Georgia, serif', h1FontSizePx: 48, captionFontSizePx: 10,
   checkboxCount: 999, selectCount: 999, optionCount: 999, fieldsetCount: 999, legendCount: 999, legendInsideFieldsetOk: true,
   ulItems: 999, olItems: 999,
   hasVariable: true, imgCount: 1, imgAltOk: true, pageTitle: 'My Favorite Animal' })
@@ -204,6 +205,7 @@ const webEmptyLog   = () => ({ html: '', js: '', globals: {}, bodyText: '', hasA
   h2Color: '', h3Color: '', pColor: '', linkColor: '', buttonBg: '', buttonColor: '',
   linkBg: '', linkPadTop: 0, linkDecoration: '', linkHrefOk: false,
   boldCount: 0, italicCount: 0, underlineCount: 0,
+  bodyFontFamily: 'Times New Roman, serif', h1FontSizePx: 32, captionFontSizePx: 0,
   checkboxCount: 0, selectCount: 0, optionCount: 0, fieldsetCount: 0, legendCount: 0, legendInsideFieldsetOk: false,
   ulItems: 0, olItems: 0,
   hasVariable: false, imgCount: 0, imgAltOk: false, pageTitle: '',

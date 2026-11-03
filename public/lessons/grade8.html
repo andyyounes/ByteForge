@@ -832,6 +832,11 @@ function buildWebLog(doc, win, html, css, js) {
     // the Grade 8 exam's "has a link" check (no color/padding required
     // there, since styling it isn't taught yet — see examRecipe).
     linkHrefOk: [...doc.querySelectorAll('a')].some(a => (a.getAttribute('href') || '').trim().length > 0),
+    // Fonts & Sizes Playground module — real computed values, not just
+    // "did they type the word Georgia somewhere".
+    bodyFontFamily: doc.body ? getComputedStyle(doc.body).fontFamily : '',
+    h1FontSizePx:   doc.querySelector('h1') ? parseFloat(getComputedStyle(doc.querySelector('h1')).fontSize) || 0 : 0,
+    captionFontSizePx: doc.querySelector('.caption') ? parseFloat(getComputedStyle(doc.querySelector('.caption')).fontSize) || 0 : 0,
     // Text styling module (web2b) — a real tag with REAL text inside it
     // (not an empty <b></b>, which would technically match querySelectorAll
     // but teaches nothing).
@@ -3119,6 +3124,53 @@ const MODULES = [
       },
       check:(log) => log.h1s >= 1 && log.paragraphs >= 1 && log.links >= 1 && log.buttons >= 1 && log.listItems >= 2
         && hasFillColor(log.bgColor) && hasFillColor(log.headingColor) && normalizeRgb(log.bgColor) !== normalizeRgb(log.headingColor),
+    },
+  ]},
+  // ── Fonts & Sizes Playground — new module. Low-pressure, hands-on: real
+  // computed font-family/font-size values, not "type this exact word" —
+  // the point is seeing what actually changes, same live-comparison style
+  // the exam's own reference cards use (examFontSwatch/examFontSizeSwatch,
+  // genuinely reused here, not exam-specific despite the name).
+  { id:'web3p', name:'🔤 Fonts & Sizes Playground', sub:'Try a real font, then a real size — see what actually changes', live:true, stages:[
+    { id:'web3p1', name:'Pick a Font', xp:25, lang:'web',
+      text:`<strong>Challenge 1</strong> — <code>font-family</code> changes the typeface of EVERY letter on the page. These three are "web-safe" — already installed in every browser, so nothing extra to load:
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;">
+          ${examFontSwatch('Arial, sans-serif', 'Arial', 'clean, no little feet on the letters')}
+          ${examFontSwatch('Georgia, serif', 'Georgia', 'classic, letters have little feet')}
+          ${examFontSwatch('\'Courier New\', monospace', 'Courier New', 'typewriter style, every letter the same width')}
+        </div>
+        Set <code>body</code>'s <code>font-family</code> to ONE of these three (keep the fallback word after the comma).`,
+      hints:[
+        'body { font-family: Georgia, serif; }',
+        'The fallback (sans-serif/serif/monospace) matters too — it\'s part of what this stage checks.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p>Change my font below and press Run.</p>\n`, css: `body {\n  /* TODO: font-family: ...; */\n}\n`, js: `` },
+      check:(log) => /arial|georgia|courier/i.test(log.bodyFontFamily) && /sans-serif|serif|monospace/i.test(log.bodyFontFamily),
+    },
+    { id:'web3p2', name:'Big Headline, Small Caption', xp:30, lang:'web',
+      text:`<strong>Challenge 2</strong> — <code>font-size</code> controls how big text is — bigger numbers draw more attention, smaller numbers fade into the background:
+        <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin:10px 0;padding:14px;background:#fff;border:1px solid #ddd;border-radius:8px;">
+          ${examFontSizeSwatch(11, 'a caption')}
+          ${examFontSizeSwatch(16, 'body text')}
+          ${examFontSizeSwatch(36, 'a big headline')}
+        </div>
+        Make your <code>&lt;h1&gt;</code> genuinely big (<code>font-size: 36px;</code> or more), AND add a <code>&lt;p class="caption"&gt;</code> that's genuinely small (<code>font-size: 12px;</code> or less) — a real size CONTRAST, not just "different".`,
+      hints:[
+        'h1 { font-size: 40px; }',
+        '.caption { font-size: 11px; } — remember the dot, since it\'s a class.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p class="caption">Photo by me</p>\n`, css: `/* TODO: h1 { font-size: ...px; } and .caption { font-size: ...px; } */\n`, js: `` },
+      check:(log) => log.h1FontSizePx >= 36 && log.captionFontSizePx > 0 && log.captionFontSizePx <= 12,
+    },
+    { id:'web3pboss', name:'BOSS — A Real Mini-Poster', xp:55, lang:'web', boss:true,
+      text:`<strong>BOSS</strong> — Nothing new: pick ONE font-family for the whole page, make your <code>h1</code> genuinely big, and add a genuinely small <code>.caption</code> — a real "poster" look, built from Challenges 1-2 together.`,
+      hints:[
+        'This is genuinely just Challenge 1 + Challenge 2, on the same page.',
+        'One font-family on body, a big h1, a small .caption — three rules total.',
+      ],
+      webStarter: { html: `<h1>My Page</h1>\n<p class="caption">A small caption</p>\n`, css: `body {\n  /* TODO: font-family: ...; */\n}\n/* TODO: h1 { font-size: ...px; } and .caption { font-size: ...px; } */\n`, js: `` },
+      check:(log) => /arial|georgia|courier/i.test(log.bodyFontFamily) && /sans-serif|serif|monospace/i.test(log.bodyFontFamily)
+        && log.h1FontSizePx >= 36 && log.captionFontSizePx > 0 && log.captionFontSizePx <= 12,
     },
   ]},
   // ── Semester 1, Week 5: Structure + Style, Together — checkpoint boss
@@ -8838,6 +8890,15 @@ const CHALLENGE_LESSON = {
   kchands: { title: 'Everything at once, from a blank page', html: `
     <div class="cl-block"><h4>No starter structure this time</h4>
       <p>Unlike most practice stages, nothing is pre-built for you here — the whole skeleton, every tag, and both CSS rules are entirely yours to write, the same way a real new page actually starts.</p></div>` },
+  web3p1: { title: 'font-family changes the typeface', html: `
+    <div class="cl-block"><h4>Three safe choices, three real looks</h4>
+      <p>Arial, Georgia, and Courier New are all "web-safe" — every browser already has them installed, so there's nothing to load or risk failing. Each looks genuinely different: clean sans-serif, classic serif, or typewriter monospace. Always keep the fallback word (serif/sans-serif/monospace) after the comma, in case the named font ever can't load.</p></div>` },
+  web3p2: { title: 'font-size is just a number, bigger = bigger', html: `
+    <div class="cl-block"><h4>Contrast is the whole point</h4>
+      <p>A heading at 40px next to a caption at 11px reads as "important thing, then a small detail" at a glance — that's not decoration, it's how real pages guide a reader's eye before they've read a single word. The bigger the size GAP, the stronger that signal.</p></div>` },
+  web3pboss: { title: 'BOSS — one font, one big headline, one small caption', html: `
+    <div class="cl-block"><h4>Nothing new</h4>
+      <p>Challenge 1's font-family plus Challenge 2's size contrast, on the same page — that combination is genuinely most of what a real "poster" or landing-page headline look actually is.</p></div>` },
   web4s1: { title: 'Structure first, style later', html: `
     <div class="cl-block"><h4>Why this checkpoint has no colors yet</h4>
       <p>The real boss asks for a LOT at once — structure AND six colour rules together. This checkpoint isolates just the structure half first (heading, paragraph, link, button, list) so you can get that solid before style gets layered back on top.</p></div>` },
@@ -9957,6 +10018,8 @@ const NEW_STAGE_IDS = new Set([
   // Rounded Corners — same reasoning, inserted after the existing card
   // lesson
   'divs3r1', 'divs3r2', 'divs3r3',
+  // Fonts & Sizes Playground — the whole new module
+  'web3p1', 'web3p2', 'web3pboss',
 ])
 
 function showJourney() {
