@@ -1,4 +1,5 @@
-const { app, BrowserWindow, shell, ipcMain } = require('electron')
+const { app, BrowserWindow, shell, ipcMain, dialog } = require('electron')
+const { autoUpdater } = require('electron-updater')
 const fs = require('fs')
 const pathLib = require('path')
 
@@ -221,7 +222,35 @@ ipcMain.on('retry-load', () => {
   else goToLogin()
 })
 
-app.whenReady().then(createInitialWindow)
+// ── Auto-update ───────────────────────────────────────────────────────────
+// Checks the GitHub release once at launch; if a newer installer is found
+// it downloads quietly in the background and only interrupts the user once
+// it's actually ready to install. No-op in dev (app.isPackaged is false
+// when running via `electron .` against source).
+autoUpdater.autoDownload = true
+
+autoUpdater.on('update-downloaded', (info) => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'ByteForge update ready',
+    message: `A new version (${info.version}) has been downloaded.`,
+    detail: 'Restart now to install it, or keep working and it\'ll install next time you close the app.',
+    buttons: ['Restart now', 'Later'],
+    defaultId: 0,
+    cancelId: 1,
+  }).then(({ response }) => {
+    if (response === 0) autoUpdater.quitAndInstall()
+  })
+})
+
+autoUpdater.on('error', (err) => {
+  console.error('[auto-update]', err?.message ?? err)
+})
+
+app.whenReady().then(() => {
+  createInitialWindow()
+  if (app.isPackaged) autoUpdater.checkForUpdates().catch(() => {})
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
