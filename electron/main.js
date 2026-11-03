@@ -93,11 +93,28 @@ function attachWindowBehaviour() {
     }
   })
 
+  // Ctrl+Shift+Backspace, from anywhere (role screen, picker, real site,
+  // logged in or not) — jumps back to the Teacher/Student question. Doesn't
+  // sign anyone out on its own; picking Student again afterwards still goes
+  // through a fresh in-memory session regardless.
+  win.webContents.on('before-input-event', (_event, input) => {
+    if (input.type === 'keyDown' && input.control && input.shift && input.key.toLowerCase() === 'backspace') {
+      showRolePicker()
+    }
+  })
+
 
   // The real site navigates client-side (Next.js router), so landing on
   // /login (e.g. after logout) fires did-navigate-in-page, not a full
   // did-navigate — handle both the same way.
+  //
+  // goToLogin()/goToSite() hop through a local splash.html file:// page on
+  // the way to the real site — that hop also fires did-navigate, so without
+  // this guard it (not the real login page) is what consumes
+  // suppressPickerRedirect, leaving the *real* login page's arrival looking
+  // unexpected and bouncing straight back to the picker.
   function handleNav(url) {
+    if (!url.startsWith(APP_URL)) return
     let p
     try { p = new URL(url).pathname } catch { return }
 
@@ -181,6 +198,8 @@ function createInitialWindow() {
 ipcMain.on('bf:choose-role', (_e, chosenRole) => {
   createWindowForRole(chosenRole === 'teacher' ? 'teacher' : 'student')
 })
+
+ipcMain.on('bf:switch-mode', () => showRolePicker())
 
 ipcMain.handle('bf:profiles:list', () => loadProfiles())
 

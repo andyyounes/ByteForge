@@ -6,6 +6,7 @@ const { contextBridge, ipcRenderer } = require('electron')
 contextBridge.exposeInMainWorld('bf', {
   retryLoad: () => ipcRenderer.send('retry-load'),
   chooseRole: (role) => ipcRenderer.send('bf:choose-role', role),
+  switchMode: () => ipcRenderer.send('bf:switch-mode'),
   picker: {
     list:      () => ipcRenderer.invoke('bf:profiles:list'),
     select:    (email) => ipcRenderer.send('bf:profiles:select', email),
