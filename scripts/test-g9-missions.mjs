@@ -482,6 +482,10 @@ const DATA_REF = {
   flowg12: 'total ← 0\nFOR i ← 1 TO 50\n    IF i MOD 2 = 0 THEN\n        total ← total + i\n    ENDIF\nNEXT i\n\nanswer(total)',
   flowg13: 'balance ← 1000\nrate ← 0.1\nyear ← 1\nWHILE year <= 3\n    balance ← balance + balance * rate\n    year ← year + 1\nENDWHILE\n\nanswer(balance)',
   flowg14: 'num ← 17\nisPrime ← 1\ndivisor ← 2\nWHILE divisor < num\n    IF num MOD divisor = 0 THEN\n        isPrime ← 0\n    ENDIF\n    divisor ← divisor + 1\nENDWHILE\nIF isPrime = 1 THEN\n    answer("Prime")\nELSE\n    answer("Not Prime")\nENDIF',
+  flowg15: 'a ← 48\nb ← 18\nWHILE b <> 0\n    temp ← b\n    b ← a MOD b\n    a ← temp\nENDWHILE\n\nanswer(a)',
+  flowg16: 'n ← 5\nresult ← 1\nFOR i ← 1 TO n\n    result ← result * i\nNEXT i\n\nanswer(result)',
+  flowg17: 'num ← 153\nsum ← 0\ntemp ← num\nWHILE temp > 0\n    digit ← temp MOD 10\n    sum ← sum + digit * digit * digit\n    temp ← temp DIV 10\nENDWHILE\nIF sum = num THEN\n    answer("Armstrong")\nELSE\n    answer("Not Armstrong")\nENDIF',
+  flowg18: 'num ← 13\nresult ← ""\nWHILE num > 0\n    digit ← num MOD 2\n    result ← STR(digit) + result\n    num ← num DIV 2\nENDWHILE\n\nanswer(result)',
 }
 for (const [id, src] of Object.entries(DATA_REF)) {
   const m = MISSIONS.find(x => x.id === id)

@@ -2299,6 +2299,137 @@ ENDWHILE</div>
     stars: { metric: 'pass' },
   },
 
+  // ── Foundations 6d · Flowgorithm Practice 2 — the classic algorithm set ────
+  // Four more real-world Flowgorithm staples (GCD, factorial, Armstrong
+  // numbers, decimal-to-binary), same engine/constraints as flowg1-14: one
+  // comparison per Decision, no string-indexing — DIV and STR() are both
+  // real execPseudo built-ins (confirmed by reading the interpreter's
+  // evalExpr directly), unlike MOD-only's earlier assumption. Every answer
+  // below was hand-traced against the real algorithm before being written.
+  {
+    id: 'flowg15', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2', emoji: '🔢', title: 'Greatest Common Divisor',
+    forceLang: 'ps',
+    hints: ['WHILE b ≠ 0: the loop body always does the SAME three lines, in this exact order — temp ← b, b ← a MOD b, a ← temp.',
+      'Each pass, b becomes the remainder of a MOD b — that remainder keeps shrinking until it hits 0.',
+      'Once the loop ends (b = 0), a already holds the GCD — answer(a) directly, no extra Decision needed.'],
+    xp: 45,
+    brief: 'Here\'s the Euclidean Algorithm — the fastest way to find the Greatest Common Divisor of two numbers, used everywhere from simplifying fractions to cryptography: a ← 48, b ← 18, then WHILE b &ne; 0 repeatedly swap in the remainder of a MOD b. '
+      + 'Transform the whole thing into real code, then answer() the GCD as a number.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'a←48, b←18'),
+      fcArrowHTML(),
+      fcLoopHTML('WHILE b ≠ 0', [
+        fcShapeHTML('process', 'temp ← b'),
+        fcArrowHTML(), fcShapeHTML('process', 'b ← a MOD b'),
+        fcArrowHTML(), fcShapeHTML('process', 'a ← temp'),
+      ], 'Done'),
+      fcShapeHTML('io', 'Output a'),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'a = 48\nb = 18\n# TODO: while b != 0:\n#         temp = b\n#         b = a % b\n#         a = temp\n\n# answer(a)\n',
+      ps: 'a ← 48\nb ← 18\n// TODO: WHILE b ≠ 0\n//         temp ← b\n//         b ← a MOD b\n//         a ← temp\n//       ENDWHILE\n\n// answer(a)\n',
+    },
+    requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires the real Euclidean loop (temp/b/a swapping with MOD) — don\'t hardcode the final number.' },
+    answer: '6',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'flowg16', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2', emoji: '❗', title: 'Factorial',
+    forceLang: 'ps',
+    hints: ['result ← 1 BEFORE the loop — starting it at 0 would make every multiplication give 0.',
+      'FOR i ← 1 TO n: result ← result × i — one multiplication per pass, i counts 1, 2, 3… up to n.',
+      '5! = 1×2×3×4×5 = 120 — trace it by hand if you want to double-check your loop.'],
+    xp: 40,
+    brief: 'Here\'s a finished flowchart for factorial: n ← 5, result ← 1, then FOR i ← 1 TO n multiply result by i each pass. '
+      + 'Transform it into real code, then answer() n! as a number.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'n←5, result←1'),
+      fcArrowHTML(),
+      fcLoopHTML('i = 1 TO n', [
+        fcShapeHTML('process', 'result ← result × i'),
+      ], 'Done'),
+      fcShapeHTML('io', 'Output result'),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'n = 5\nresult = 1\n# TODO: for i in range(1, n + 1):\n#         result = result * i\n\n# answer(result)\n',
+      ps: 'n ← 5\nresult ← 1\n// TODO: FOR i ← 1 TO n\n//         result ← result × i\n//       NEXT i\n\n// answer(result)\n',
+    },
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop multiplying result by i each pass — don\'t hardcode the final number.' },
+    answer: '120',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'flowg17', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2', emoji: '🔁', title: 'Armstrong Number Check',
+    forceLang: 'ps',
+    hints: ['An Armstrong number equals the sum of its own digits, each cubed: 153 → 1³+5³+3³ = 1+125+27 = 153.',
+      'Peel off one digit at a time: digit ← temp MOD 10 gets the last digit, temp ← temp DIV 10 removes it.',
+      'Keep a running sum of digit×digit×digit inside the loop — compare it to the ORIGINAL num only after the loop ends.'],
+    xp: 55,
+    brief: 'Here\'s a finished flowchart: num ← 153, sum ← 0, temp ← num, then WHILE temp &gt; 0 peels off one digit at a time (temp MOD 10), cubes it, and adds it to sum — finally a Decision compares sum to the ORIGINAL num. '
+      + 'Transform the whole thing into real code, then answer() "Armstrong" or "Not Armstrong".',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'num←153, sum←0, temp←num'),
+      fcArrowHTML(),
+      fcLoopHTML('WHILE temp > 0', [
+        fcShapeHTML('process', 'digit ← temp MOD 10'),
+        fcArrowHTML(), fcShapeHTML('process', 'sum ← sum + digit×digit×digit'),
+        fcArrowHTML(), fcShapeHTML('process', 'temp ← temp DIV 10'),
+      ], 'Done'),
+      fcShapeHTML('decision', 'sum = num?'),
+      fcBranchHTML('YES', fcShapeHTML('io', 'Output "Armstrong"'), 'NO', fcShapeHTML('io', 'Output "Not Armstrong"')),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'num = 153\nsum_val = 0\ntemp = num\n# TODO: while temp > 0:\n#         digit = temp % 10\n#         sum_val = sum_val + digit * digit * digit\n#         temp = temp // 10\n\n# TODO: answer("Armstrong") if sum_val == num else answer("Not Armstrong")\n',
+      ps: 'num ← 153\nsum ← 0\ntemp ← num\n// TODO: WHILE temp > 0\n//         digit ← temp MOD 10\n//         sum ← sum + digit × digit × digit\n//         temp ← temp DIV 10\n//       ENDWHILE\n\n// TODO: IF sum = num THEN answer("Armstrong") ELSE answer("Not Armstrong") ENDIF\n',
+    },
+    requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires the real digit-peeling loop (MOD 10 / DIV 10) — don\'t hardcode the final word.' },
+    answer: 'Armstrong',
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'flowg18', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2', emoji: '💾', title: 'Decimal to Binary',
+    forceLang: 'ps',
+    hints: ['Each pass: digit ← num MOD 2 gets the next binary digit, num ← num DIV 2 shifts everything else down.',
+      'Build the result BACKWARDS from the front: result ← STR(digit) + result — each new digit goes in FRONT, not behind.',
+      'The loop naturally stops once num reaches 0 — by then result already holds the full binary string.'],
+    xp: 50,
+    brief: 'Here\'s a finished flowchart that converts a decimal number to binary by repeated division: num ← 13, result ← "", then WHILE num &gt; 0 peels off the next binary digit (num MOD 2) and shrinks num (num DIV 2). '
+      + 'Transform the whole thing into real code, then answer() the binary result as a string.',
+    api: ['answer(value)'],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'num←13, result←""'),
+      fcArrowHTML(),
+      fcLoopHTML('WHILE num > 0', [
+        fcShapeHTML('process', 'digit ← num MOD 2'),
+        fcArrowHTML(), fcShapeHTML('process', 'result ← STR(digit) + result'),
+        fcArrowHTML(), fcShapeHTML('process', 'num ← num DIV 2'),
+      ], 'Done'),
+      fcShapeHTML('io', 'Output result'),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'num = 13\nresult = ""\n# TODO: while num > 0:\n#         digit = num % 2\n#         result = str(digit) + result\n#         num = num // 2\n\n# answer(result)\n',
+      ps: 'num ← 13\nresult ← ""\n// TODO: WHILE num > 0\n//         digit ← num MOD 2\n//         result ← STR(digit) + result\n//         num ← num DIV 2\n//       ENDWHILE\n\n// answer(result)\n',
+    },
+    requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires the real digit-peeling loop (MOD 2 / DIV 2) — don\'t hardcode the final string.' },
+    answer: '1101',
+    stars: { metric: 'pass' },
+  },
+
   // ── Phase 0B · Flight Computer — algorithmic thinking, before you fly ───────
   // Bridges Systems Check into Phase 1: the SAME real code + answer() format
   // as everything else here, not a separate disconnected sandbox tool — one
@@ -6154,6 +6285,7 @@ const TIERS = [
   { name: '🏆 FOUNDATIONS 3 FLOWGORITHM CAPSTONE', ids: ['flowgboss'] },
   { name: '🧮 FOUNDATIONS 3 · FLOWGORITHM PRACTICE — real-world scenarios, same engine', ids: ['flowg7', 'flowg8', 'flowg9', 'flowg10', 'flowg11', 'flowg12', 'flowg13'] },
   { name: '🏆 FOUNDATIONS 3 PRACTICE CAPSTONE', ids: ['flowg14'] },
+  { name: '🔢 FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2 — the classic algorithm set', ids: ['flowg15', 'flowg16', 'flowg17', 'flowg18'] },
   { name: '📘 FOUNDATIONS 4 · YOUR FIRST CODE — real Python, right after flowcharts/Flowgorithm', ids: ['learn-cb', 'learn-naming', 'naming-quiz', 'cb1', 'cb2', 'cb3', 'cb4', 'cb5', 'cb6', 'learn-forloop-cb', 'cb7', 'cb8', 'learn-io-cb', 'cb9'] },
   { name: '🏆 FOUNDATIONS 4 CAPSTONE', ids: ['cbboss', 'cbboss2', 'cbboss3'] },
   { name: '🔢 FOUNDATIONS 5 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'p0m4b', 'learn-datatypes', 'p0m5', 'learn-conversion', 'p0m5c', 'p0m6'] },
