@@ -60,7 +60,13 @@
     .btn-danger:hover { background:rgba(239,68,68,.18); }
     .btn-stop   { background:rgba(239,68,68,.1); color:#f87171; border:1px solid rgba(239,68,68,.25); display:none; }
     .btn-stop:hover { background:rgba(239,68,68,.18); }
-    #blockly-div { flex:1; min-height:0; }
+    /* touch-action:none keeps pinch-zoom/ctrl-wheel gestures over the
+       workspace from escalating into the BROWSER's own page-wide zoom
+       (which would scale the nav bar, challenge panel, everything) —
+       scoped to just this div so Blockly's own internal wheel-zoom
+       (scoped to its own SVG canvas) is the only "zoom" that ever fires
+       here, and the rest of the page is untouched either way. */
+    #blockly-div { flex:1; min-height:0; touch-action:none; }
 
     /* ── Right panel ── */
     .right-panel { display:flex; flex-direction:column; overflow:hidden; }
@@ -150,12 +156,19 @@
     /* Canvas */
     .canvas-wrap { flex-shrink:0; background:#030510; border-bottom:1px solid var(--border);
                    display:flex; align-items:center; justify-content:center; height:260px; position:relative; }
+    /* Expand/New Tab toolbar, floating over the top-right of the output —
+       same idea as Grade 8's web-preview Expand/New Tab, so Grade 7 gets
+       the same "see it bigger without losing your place" capability on
+       its own canvas/page/quiz/chat output. */
+    .canvas-toolbar { position:absolute; top:8px; right:8px; z-index:5; display:flex; gap:6px; }
+    .canvas-toolbar .btn { padding:4px 9px; font-size:10.5px; }
+    #canvas-expand-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:9998; }
     /* No-blocks mode — quiz/chat stages need no Blockly palette, no code
        editor, no sync bar: none of it applies when there's nothing to code. */
     body.no-blocks-mode .blocks-panel,
     body.no-blocks-mode .sync-bar,
     body.no-blocks-mode .editor-wrap,
-    body.no-blocks-mode .out-bar { display:none !important; }
+    body.no-blocks-mode .console-wrap { display:none !important; }
     body.no-blocks-mode .canvas-wrap { flex:1; height:auto; align-items:stretch; padding:24px; }
     body.no-blocks-mode #output-quiz { max-width:1400px; margin:0 auto; padding:24px 32px; }
     body.no-blocks-mode #output-chat { max-width:760px; margin:0 auto; padding:24px 32px; }
@@ -272,10 +285,20 @@
                            background:#060910 !important; }
     .cm-wrap .CodeMirror-scroll { background:#060910 !important; }
 
-    /* Output bar */
-    .out-bar { flex-shrink:0; padding:6px 14px; background:#040710; border-top:1px solid var(--border);
-               font-family:var(--mono); font-size:11px; max-height:72px; overflow-y:auto; }
-    .out-line { color:#6b7280; margin-bottom:2px; }
+    /* Output / Console — used to be a bare 72px strip glued directly under
+       the code editor with no header, which read as part of the editor
+       itself rather than its own panel, and was too short to actually show
+       a compiler error once it wrapped a line or two. Now a real labelled
+       panel (matching Grade 8's Output/Console), taller by default, with
+       its own Expand button for when an error still doesn't fit. */
+    .console-wrap { flex-shrink:0; border-top:1px solid var(--border); background:#040710; }
+    .console-hdr { display:flex; align-items:center; justify-content:space-between;
+                    padding:6px 14px; background:#0a0e1a; border-bottom:1px solid var(--border); }
+    .console-lbl { font-size:11px; font-weight:700; color:var(--fg-dim); }
+    .console-hdr .btn { padding:3px 9px; font-size:10.5px; }
+    .out-bar { padding:8px 14px; font-family:var(--mono); font-size:11px; max-height:150px; overflow-y:auto; }
+    .out-bar.expanded { max-height:60vh; }
+    .out-line { color:#6b7280; margin-bottom:2px; white-space:pre-wrap; word-break:break-word; }
     .out-line.ok   { color:#4ade80; }
     .out-line.err  { color:#f87171; }
     .out-line.info { color:#b8ef4a; }
@@ -418,7 +441,14 @@
     </div>
 
     <!-- Canvas -->
-    <div class="canvas-wrap">
+    <div class="canvas-wrap" id="canvas-wrap">
+      <!-- Expand/New Tab — same idea as Grade 8's web preview toolbar, so a
+           student can see their drawing/page/quiz bigger without losing
+           their place, or pop it into a real separate tab. -->
+      <div class="canvas-toolbar">
+        <button class="btn btn-ghost" id="canvas-expand-btn" onclick="toggleExpandCanvas()" title="See your output bigger, without leaving this screen">⤢ Expand</button>
+        <button class="btn btn-ghost" onclick="openOutputInNewTab()" title="Open your output in a real new browser tab">↗ New Tab</button>
+      </div>
       <canvas id="output-canvas" width="480" height="260"></canvas>
       <div id="output-page"></div>
       <div id="output-quiz"></div>
@@ -468,13 +498,21 @@
       </div>
     </div>
 
-    <!-- Output -->
-    <div class="out-bar" id="out-bar">
-      <div class="out-line info">Ready — build with blocks, then press Run.</div>
+    <!-- Output / Console -->
+    <div class="console-wrap">
+      <div class="console-hdr">
+        <span class="console-lbl">Output / Console</span>
+        <button class="btn btn-ghost" id="console-expand-btn" onclick="toggleExpandConsole()" title="See the full output/error log">⤢ Expand</button>
+      </div>
+      <div class="out-bar" id="out-bar">
+        <div class="out-line info">Ready — build with blocks, then press Run.</div>
+      </div>
     </div>
 
   </div>
 </div>
+
+<div id="canvas-expand-backdrop" onclick="toggleExpandCanvas(false)"></div>
 
 <div class="toast" id="toast"></div>
 
@@ -993,6 +1031,16 @@ const workspace = Blockly.inject('blockly-div', {
   zoom:        { controls:true, wheel:true, startScale:0.85 },
   grid:        { spacing:24, length:6, colour:'rgba(255,255,255,.05)', snap:true },
 })
+
+// A trackpad pinch-to-zoom gesture arrives as a wheel event with ctrlKey
+// set (that's how Chrome/Firefox/Safari all report it) — without this,
+// pinching over the workspace zooms the WHOLE PAGE (nav bar, challenge
+// panel, everything), not just Blockly's own canvas. Blockly's own
+// zoom:{wheel:true} only handles a plain scroll-wheel, not this ctrl-held
+// case, so the browser's native page zoom was still winning the race.
+document.getElementById('blockly-div').addEventListener('wheel', e => {
+  if (e.ctrlKey) e.preventDefault()
+}, { passive: false })
 
 // Force Blockly to recalculate its size after the flex layout has settled.
 // Without this, the flyout can be mis-sized (or clipped) on first open.
@@ -4240,6 +4288,72 @@ function logLine(msg, cls='') {
   bar.appendChild(el)
   bar.scrollTop = bar.scrollHeight
   if (bar.children.length > 40) bar.removeChild(bar.firstChild)
+}
+
+// Grows the Output/Console panel so a long error (or a wrapped line) is
+// actually readable, instead of being squeezed into a 72px strip — same
+// "see it bigger without leaving this screen" idea as the canvas Expand.
+function toggleExpandConsole(force) {
+  const bar = document.getElementById('out-bar')
+  const btn = document.getElementById('console-expand-btn')
+  const expand = force !== undefined ? force : !bar.classList.contains('expanded')
+  bar.classList.toggle('expanded', expand)
+  if (btn) btn.textContent = expand ? '⤢ Collapse' : '⤢ Expand'
+  bar.scrollTop = bar.scrollHeight
+}
+
+// Enlarges the whole output area (canvas, or page/quiz/chat — whichever is
+// currently visible) to a near-fullscreen overlay, same technique as Grade
+// 8's toggleExpandPreview for its web preview iframe.
+function toggleExpandCanvas(force) {
+  const wrap = document.getElementById('canvas-wrap')
+  const backdrop = document.getElementById('canvas-expand-backdrop')
+  const btn = document.getElementById('canvas-expand-btn')
+  const expand = force !== undefined ? force : wrap.style.position !== 'fixed'
+  if (expand) {
+    wrap.style.position = 'fixed'
+    wrap.style.top = '5vh'; wrap.style.left = '5vw'
+    wrap.style.width = '90vw'; wrap.style.height = '90vh'
+    wrap.style.zIndex = '9999'
+    wrap.style.boxShadow = '0 20px 60px rgba(0,0,0,.6)'
+    backdrop.style.display = 'block'
+    if (btn) btn.textContent = '✕ Close'
+  } else {
+    wrap.style.position = ''; wrap.style.top = ''; wrap.style.left = ''
+    wrap.style.width = ''; wrap.style.height = ''
+    wrap.style.zIndex = ''; wrap.style.boxShadow = ''
+    backdrop.style.display = 'none'
+    if (btn) btn.textContent = '⤢ Expand'
+  }
+}
+
+// Opens whichever output is currently visible (the drawing canvas, or a
+// Page/Quiz/Chat challenge's real HTML) in a genuine new browser tab — the
+// canvas has no DOM/HTML to clone, so it's snapshotted as an image first;
+// the other three are real elements, so their live markup is cloned as-is.
+function openOutputInNewTab() {
+  const canvas = document.getElementById('output-canvas')
+  const page   = document.getElementById('output-page')
+  const quiz   = document.getElementById('output-quiz')
+  const chat   = document.getElementById('output-chat')
+  let bodyHtml = ''
+  if (getComputedStyle(canvas).display !== 'none') {
+    bodyHtml = '<img src="' + canvas.toDataURL() + '" style="max-width:100%;image-rendering:pixelated;">'
+  } else if (getComputedStyle(page).display !== 'none' && page.innerHTML.trim()) {
+    bodyHtml = page.innerHTML
+  } else if (getComputedStyle(quiz).display !== 'none' && quiz.innerHTML.trim()) {
+    bodyHtml = quiz.outerHTML
+  } else if (getComputedStyle(chat).display !== 'none' && chat.innerHTML.trim()) {
+    bodyHtml = chat.outerHTML
+  } else {
+    showToast('Nothing to show yet — press ▶ Run first.')
+    return
+  }
+  const doc = '<!DOCTYPE html><html><head><meta charset="utf-8">'
+    + '<style>body{margin:0;padding:24px;background:#030510;color:#e5e7eb;font-family:system-ui,sans-serif;display:flex;justify-content:center;}</style>'
+    + '</head><body>' + bodyHtml + '</body></html>'
+  const url = URL.createObjectURL(new Blob([doc], { type: 'text/html' }))
+  window.open(url, '_blank')
 }
 
 function showToast(msg) {
