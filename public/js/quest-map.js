@@ -143,6 +143,21 @@ const QuestMap = (() => {
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;') }
 
+  // Self-contained — quest-map.js is shared across every grade, and can't
+  // assume whichever page embeds it has its own toast/notification system.
+  function showLockedToast() {
+    const existing = document.getElementById('qm-locked-toast')
+    if (existing) existing.remove()
+    const el = document.createElement('div')
+    el.id = 'qm-locked-toast'
+    el.textContent = '🔒 Complete the earlier stages first.'
+    el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);'
+      + 'background:#1f2937;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;'
+      + 'z-index:100000;box-shadow:0 8px 24px rgba(0,0,0,.3);'
+    document.body.appendChild(el)
+    setTimeout(() => el.remove(), 2800)
+  }
+
   // "New lesson" highlight persistence — a stage glows until the student opens
   // it once, then it's remembered as seen forever (localStorage, per newSeenKey).
   function seenSet() {
@@ -257,27 +272,21 @@ const QuestMap = (() => {
   // Duolingo-style single winding path: chapter banners, serpentine nodes,
   // one glowing "current" node with the avatar. Soft lock: future nodes are
   // dimmed but stay clickable (exam students revise out of order).
-  function renderPath() {
-    const OFF = [0, 52, 82, 52, 0, -52, -82, -52]
-    let html = '<div class="qm-path">'
-    // "Next up" used to mean "the first incomplete stage anywhere" — correct
-    // for a student progressing in order, but wrong the moment a stage gets
-    // inserted EARLIER than where a student already is (e.g. a new intro
-    // module added after some students had already finished later modules,
-    // during a later curriculum rebuild): it would send them all the way
-    // back to redo something new instead of resuming from their real
-    // position. Two-pass instead: find the student's FURTHEST completed
-    // stage first, then "next up" is the first incomplete stage AFTER that
-    // point — falling back to the old "first incomplete anywhere" only if
-    // literally everything past their furthest point is already done too
-    // (some earlier gap is all that's left), so a badge still shows up
-    // somewhere rather than never appearing.
-    // Grade 6/7/8's per-world "Lesson" bubble (id 'lesson-<world>') is always
-    // done:true unconditionally (see their showJourney() comments — it's a
-    // pure unlock-chain placeholder, never real progress), so it must never
-    // count as the student's "furthest real progress" or it drags
-    // maxDoneIdx all the way to whichever world's Lesson bubble sorts last.
-    const isRealStage = (s) => !(s.id && s.id.indexOf('lesson-') === 0)
+  // "Next up"/lock-gate position — the student's FURTHEST completed real
+  // stage, then the first incomplete one AFTER that point (falling back to
+  // "first incomplete anywhere" only if everything past their furthest
+  // point is already done too, e.g. some earlier gap is all that's left).
+  // Two-pass, not "first incomplete anywhere": a stage inserted EARLIER
+  // than where a student already is (a new intro module added after some
+  // students had finished later ones) must not send them all the way back.
+  // Shared by renderPath() (what to show as "Continue"/locked) AND
+  // isHardLocked() (what a direct open — map click OR a raw ?stage= URL —
+  // is actually allowed to open), so the two can never silently disagree.
+  // Grade 6/7/8's per-world "Lesson" bubble (id 'lesson-<world>') is always
+  // done:true unconditionally (a pure unlock-chain placeholder, never real
+  // progress) — it must never count as "furthest real progress".
+  const isRealStage = (s) => !(s.id && s.id.indexOf('lesson-') === 0)
+  function computeCurrentIdx() {
     let maxDoneIdx = -1, firstIncompleteIdx = -1, flatIdx = 0
     for (const w of cfg.worlds) {
       if (!w.live || !w.stages) continue
@@ -289,24 +298,51 @@ const QuestMap = (() => {
         flatIdx++
       }
     }
-    let currentIdx = -1, scanIdx = 0, currentStage = null
+    let currentIdx = -1, scanIdx = 0
     for (const w of cfg.worlds) {
       if (!w.live || !w.stages) continue
       for (const s of w.stages) {
-        if (isRealStage(s) && !s.done && scanIdx > maxDoneIdx && currentIdx === -1) { currentIdx = scanIdx; currentStage = s }
+        if (isRealStage(s) && !s.done && scanIdx > maxDoneIdx && currentIdx === -1) currentIdx = scanIdx
         scanIdx++
       }
     }
-    if (currentIdx === -1) {
-      currentIdx = firstIncompleteIdx
-      if (currentIdx !== -1) {
-        let fi = 0
-        find: for (const w of cfg.worlds) {
-          if (!w.live || !w.stages) continue
-          for (const s of w.stages) {
-            if (fi === currentIdx) { currentStage = s; break find }
-            fi++
-          }
+    if (currentIdx === -1) currentIdx = firstIncompleteIdx
+    return currentIdx
+  }
+  // True when a stage genuinely cannot be opened yet — same rule renderPath
+  // uses to draw its 🔒 (idx strictly past the student's current position,
+  // hardLock on, not forceUnlock), but checkable for ANY stage id directly,
+  // not just while rendering the whole map. cfg.layout must be 'path' (the
+  // only layout hardLock/the flat idx scheme applies to); freeRoam/non-path
+  // configs were never locked in the first place.
+  function isHardLocked(id) {
+    if (!cfg || cfg.layout !== 'path' || !cfg.hardLock || cfg.freeRoam) return false
+    const currentIdx = computeCurrentIdx()
+    let idx = 0
+    for (const w of cfg.worlds) {
+      if (!w.live || !w.stages) continue
+      for (const s of w.stages) {
+        if (s.id === id) {
+          return cfg.softLock && !s.done && idx > currentIdx && !s.forceUnlock
+        }
+        idx++
+      }
+    }
+    return false // unknown id (e.g. a 'lesson-' bubble) — never gated
+  }
+
+  function renderPath() {
+    const OFF = [0, 52, 82, 52, 0, -52, -82, -52]
+    let html = '<div class="qm-path">'
+    const currentIdx = computeCurrentIdx()
+    let currentStage = null
+    {
+      let fi = 0
+      find: for (const w of cfg.worlds) {
+        if (!w.live || !w.stages) continue
+        for (const s of w.stages) {
+          if (fi === currentIdx) { currentStage = s; break find }
+          fi++
         }
       }
     }
@@ -378,11 +414,27 @@ const QuestMap = (() => {
       const el = document.getElementById('qm-overlay')
       if (el) el.remove()
     },
+    // The SINGLE path every stage open goes through — a map-node click, the
+    // "Continue" button, AND a direct ?stage=<id> URL (see each grade's own
+    // init script) all call this, so the lock check applies no matter how a
+    // student got here. Before this, only the MAP's own rendering hid a
+    // locked node behind 🔒 — opening one directly by its id (a URL anyone
+    // can type or copy, e.g. from a "Start Exam" link's own ?stage=
+    // pattern) skipped that check entirely, letting a student jump straight
+    // into any later stage, prerequisites or not.
     _open(id) {
+      if (isHardLocked(id)) {
+        showLockedToast()
+        return
+      }
       const cb = cfg && cfg.onOpen
       markSeen(id)
       QuestMap.hide()
       if (cb) cb(id)
     },
+    // Exposed so a grade's own init script can check BEFORE even calling
+    // _open — e.g. to decide whether a ?stage= URL should land on that
+    // stage or just fall back to the map.
+    isLocked(id) { return isHardLocked(id) },
   }
 })()

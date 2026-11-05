@@ -10295,7 +10295,47 @@ function toggleChallengeList() {
 
 let challengeStartedAt = Date.now()
 
+// Stage ids that are deliberately reachable regardless of course progress
+// (the exam is rolled out to every student on a deadline, not gated behind
+// finishing every earlier module — see showJourney()'s own forceUnlock).
+const FORCE_UNLOCKED_IDS = new Set(['examRecipe'])
+
+// Is CHALLENGES[i] actually allowed to be opened right now? The single
+// source of truth is the live `completed` set (flat indices), not the
+// map's own cfg — QuestMap's internal state is only rebuilt when the map
+// itself re-renders, so checking against it here could use a stale
+// snapshot right after a stage is passed. Same two-pass rule the map
+// itself uses: open through the first not-yet-done stage past the
+// student's furthest real progress; anything later is locked.
+function isChallengeLocked(i) {
+  if (isTeacherPreview()) return false
+  const ch = CHALLENGES[i]
+  if (!ch || completed.has(i) || FORCE_UNLOCKED_IDS.has(ch.id)) return false
+  let maxDoneIdx = -1
+  completed.forEach(idx => { if (idx > maxDoneIdx) maxDoneIdx = idx })
+  let currentIdx = -1
+  for (let j = 0; j < CHALLENGES.length; j++) {
+    if (!completed.has(j) && j > maxDoneIdx) { currentIdx = j; break }
+  }
+  if (currentIdx === -1) {
+    for (let j = 0; j < CHALLENGES.length; j++) { if (!completed.has(j)) { currentIdx = j; break } }
+  }
+  return currentIdx !== -1 && i > currentIdx
+}
+
 function selectChallenge(i) {
+  // This is THE single chokepoint every way of opening a stage already
+  // funnels through — the "☰ All challenges" pill list, ←/→ stepping, the
+  // map, and a direct ?stage=<id> link all end up calling this. Before this
+  // check, only the map's own 🔒 rendering stopped a student from reaching
+  // locked content — clicking a pill (one tap from any lesson page, no URL
+  // tricks needed) opened ANY stage, including later JS modules, with zero
+  // prerequisite check. Confirmed live by a teacher: students were doing
+  // this, not maliciously, just by clicking around "All challenges".
+  if (isChallengeLocked(i)) {
+    if (typeof showToast === 'function') showToast('🔒 Complete the earlier stages first.')
+    return
+  }
   activeIdx = i
   hintIdx   = 0
   challengeStartedAt = Date.now()
@@ -10710,10 +10750,24 @@ initPyodide()
   // straight into that stage's editor instead of landing on the map — a
   // student clicking "Start Exam" should see the exam immediately, not a
   // map screen they then have to find the exam node on and click again.
+  //
+  // showJourney() runs FIRST, always — it's what builds the map's cfg.worlds
+  // (done/locked status for every stage), which QuestMap.isLocked() needs to
+  // actually check anything. Skipping straight to selectChallenge() used to
+  // mean a raw ?stage=<any-id> URL (typed, or copied from a legitimate link
+  // like examRecipe's own ?stage=examRecipe and then hand-edited) opened
+  // ANY stage with zero prerequisite check — the map's own 🔒 only ever
+  // protected clicks made FROM the map, not a direct link. Now the exact
+  // same lock check the map renders with is what a direct link has to pass
+  // too — a genuinely-unlocked deep link still jumps straight in as before,
+  // a locked one just leaves the student on the map instead.
   const requestedStage = new URLSearchParams(location.search).get('stage')
   const requestedIdx = requestedStage ? STAGE_INDEX[requestedStage] : undefined
-  if (requestedIdx !== undefined) selectChallenge(requestedIdx)
-  else showJourney()   // land on the map — nothing else renders until a stage is picked
+  showJourney()   // land on the map — nothing else renders until a stage is picked
+  if (requestedIdx !== undefined && !QuestMap.isLocked(requestedStage)) {
+    QuestMap.hide()
+    selectChallenge(requestedIdx)
+  }
 })()
 </script>
 </body>

@@ -3749,7 +3749,22 @@ function toggleChallengeLesson() {
   document.getElementById('cl-arrow').textContent = _clExpanded ? '▾' : '▸'
 }
 
+// renderPills()/stepChallenge() already check this before calling
+// selectChallenge(), but selectChallenge() itself didn't — meaning any
+// OTHER path to it (the map's onOpen, a future caller) had no guarantee of
+// being locked at all. Same "previous stage must be done" rule those two
+// already use, now enforced at the one function that actually opens a
+// stage, not just at some of its callers.
+function isChallengeLocked(i) {
+  if (isTeacherPreview()) return false
+  return i > 0 && !completed.has(i - 1) && !completed.has(i) && i !== activeIdx
+}
+
 function selectChallenge(i) {
+  if (isChallengeLocked(i)) {
+    if (typeof showToast === 'function') showToast('🔒 Complete the earlier stages first.')
+    return
+  }
   activeIdx = i
   hintIdx   = 0
   document.getElementById('hint-display').innerHTML = ''
