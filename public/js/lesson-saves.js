@@ -44,6 +44,129 @@ const LessonSaves = (() => {
   const _byLesson = {}   // lessonKey -> save rows (or undefined if never loaded)
   let _lastKey = null     // most recently load()ed lessonKey — the read-function default
 
+  // ── Offline save queue ────────────────────────────────────────────────────
+  // save() used to just log a warning and drop the write on a failed fetch —
+  // meaning a wifi drop mid-lesson silently lost whatever was being saved at
+  // that exact moment, with nothing to retry it later. Every failed save now
+  // goes into an IndexedDB queue instead (survives a reload, unlike an
+  // in-memory array) and gets replayed in order once the connection is back.
+  //
+  // Saves are monotonic by design (a challenge_id row's `passed` only ever
+  // goes true, `xp_earned` only ever increases via Math.max — see
+  // app/api/lesson-saves/route.ts) specifically so a queued save replaying
+  // late, possibly out of real-time order against OTHER devices' saves,
+  // can never silently undo real progress.
+  const DB_NAME = 'bf-offline-queue'
+  const STORE   = 'pending'
+  let _dbPromise = null
+
+  function _openDb() {
+    if (_dbPromise) return _dbPromise
+    _dbPromise = new Promise((resolve, reject) => {
+      if (typeof indexedDB === 'undefined') { reject(new Error('no indexedDB')); return }
+      const req = indexedDB.open(DB_NAME, 1)
+      req.onupgradeneeded = () => {
+        req.result.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true })
+      }
+      req.onsuccess = () => resolve(req.result)
+      req.onerror   = () => reject(req.error)
+    })
+    return _dbPromise
+  }
+
+  async function _queueSave(payload) {
+    try {
+      const db = await _openDb()
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite')
+        tx.objectStore(STORE).add({ payload, queuedAt: Date.now() })
+        tx.oncomplete = resolve
+        tx.onerror    = () => reject(tx.error)
+      })
+    } catch (e) {
+      // IndexedDB itself unavailable (very old browser, private-mode quota,
+      // etc.) — nothing left to do but accept the original silent-drop
+      // behaviour this is meant to improve on.
+      console.warn('[LessonSaves] could not queue offline save:', e.message)
+    }
+  }
+
+  async function _allQueued() {
+    try {
+      const db = await _openDb()
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly')
+        const req = tx.objectStore(STORE).getAll()
+        req.onsuccess = () => resolve(req.result)
+        req.onerror   = () => reject(req.error)
+      })
+    } catch {
+      return []
+    }
+  }
+
+  async function _removeQueued(id) {
+    try {
+      const db = await _openDb()
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite')
+        tx.objectStore(STORE).delete(id)
+        tx.oncomplete = resolve
+        tx.onerror    = () => reject(tx.error)
+      })
+    } catch (e) {
+      console.warn('[LessonSaves] could not remove a flushed queue entry:', e.message)
+    }
+  }
+
+  let _flushing = false
+  // Replays queued saves in order (oldest first) — stops at the first one
+  // that still fails rather than skipping it, so a genuinely-offline student
+  // doesn't have every single queued save race the network and fail one by
+  // one; the next trigger (an 'online' event, the periodic timer) just
+  // tries again from where it left off.
+  async function flushQueue() {
+    if (_flushing) return
+    _flushing = true
+    try {
+      const entries = await _allQueued()
+      for (const entry of entries) {
+        try {
+          const res = await fetch('/api/lesson-saves', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(entry.payload),
+          })
+          if (!res.ok && res.status !== 401) throw new Error('HTTP ' + res.status)
+          await _removeQueued(entry.id)
+        } catch (e) {
+          console.warn('[LessonSaves] flush stopped — still offline?', e.message)
+          break
+        }
+      }
+    } finally {
+      _flushing = false
+    }
+  }
+
+  // Returns how many saves are still waiting to reach the server — a page
+  // can poll this to show a small "N changes waiting to sync" indicator.
+  async function pendingCount() {
+    return (await _allQueued()).length
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('online', () => { flushQueue() })
+    // Also try shortly after every page load — covers the case where the
+    // student was back online for a while before ever opening this page
+    // again (the 'online' event only fires on the transition, not on load).
+    setTimeout(() => { flushQueue() }, 1500)
+    // Periodic safety net while the tab stays open and online — catches a
+    // save that failed for a reason OTHER than "offline" (a brief server
+    // blip), without needing a real online/offline transition to retry it.
+    setInterval(() => { if (navigator.onLine !== false) flushQueue() }, 30000)
+  }
+
   // ── load ────────────────────────────────────────────────────────────────────
   // Fetches all saves for this lesson from the server.
   // Call once per lesson key during page init; await it before restoring state.
@@ -85,21 +208,37 @@ const LessonSaves = (() => {
     xpEarned = 0,
   } = {}) {
     const isIdKeyed = typeof challengeKey === 'string'
+    const payload = {
+      lesson:       lessonKey,
+      // The API still requires challengeIdx to be present (back-compat);
+      // -1 there just means "not index-keyed" whenever challengeId is set.
+      challengeIdx: isIdKeyed ? -1 : challengeKey,
+      challengeId:  isIdKeyed ? challengeKey : null,
+      passed, code, saveData, xpEarned,
+    }
+    // navigator.onLine === false is a fast, reliable "definitely offline"
+    // signal — skip straight to queuing instead of waiting out a fetch that
+    // can take a while to time out on some browsers/OSes when there's
+    // genuinely no connection at all.
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      await _queueSave(payload)
+      return
+    }
     try {
-      await fetch('/api/lesson-saves', {
+      const res = await fetch('/api/lesson-saves', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lesson:       lessonKey,
-          // The API still requires challengeIdx to be present (back-compat);
-          // -1 there just means "not index-keyed" whenever challengeId is set.
-          challengeIdx: isIdKeyed ? -1 : challengeKey,
-          challengeId:  isIdKeyed ? challengeKey : null,
-          passed, code, saveData, xpEarned,
-        }),
+        body:    JSON.stringify(payload),
       })
+      // A real HTTP response (even an error one) means the request reached
+      // the server — nothing a retry would fix differently, so only a
+      // genuine network failure (the catch below) queues for later.
+      if (!res.ok && res.status !== 401) {
+        console.warn('[LessonSaves] save error', res.status)
+      }
     } catch (e) {
-      console.warn('[LessonSaves] save failed (silently ignoring):', e.message)
+      console.warn('[LessonSaves] save failed, queued for retry:', e.message)
+      await _queueSave(payload)
     }
   }
 
@@ -171,5 +310,5 @@ const LessonSaves = (() => {
     return row ? row.save_data : null
   }
 
-  return { load, save, completedSet, completedIds, savedWorkspace, savedCode, codeFor, saveDataFor }
+  return { load, save, completedSet, completedIds, savedWorkspace, savedCode, codeFor, saveDataFor, flushQueue, pendingCount }
 })()
