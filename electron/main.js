@@ -79,11 +79,20 @@ function attachWindowBehaviour() {
   win.removeMenu()
 
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (!url.startsWith(APP_URL)) {
-      shell.openExternal(url)
-      return { action: 'deny' }
+    // blob: URLs — used by the "New Tab" preview button on Grade 7/8's
+    // lesson pages (a student's own rendered HTML/canvas output, built via
+    // URL.createObjectURL) — only resolve inside the renderer/session that
+    // created them. They used to fall through to the "not our site" branch
+    // below and get handed to the OS's default browser via
+    // shell.openExternal(), which can't resolve a blob URL it never
+    // created — the tab would open but fail to load anything. Letting
+    // Electron open it as a normal new internal window (same session/
+    // partition as the opener) is what actually works.
+    if (url.startsWith('blob:') || url.startsWith(APP_URL)) {
+      return { action: 'allow' }
     }
-    return { action: 'allow' }
+    shell.openExternal(url)
+    return { action: 'deny' }
   })
 
   win.webContents.on('did-fail-load', (_event, errorCode, _desc, validatedURL) => {
