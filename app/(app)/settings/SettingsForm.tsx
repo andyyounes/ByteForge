@@ -5,8 +5,17 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 import { useToast } from '@/components/ui/Toast'
+import { useSupabase } from '@/components/providers/SupabaseProvider'
 import { STAGE_MAP } from '@/lib/stage-config'
 import type { Profile, StageId } from '@/types'
+
+const inputCls = [
+  'w-full h-10 px-3 rounded-md',
+  'bg-s2 border border-b2',
+  'text-fg text-sm placeholder:text-t3',
+  'focus:border-accent focus:outline-none',
+  'transition-colors',
+].join(' ')
 
 interface SettingsFormProps {
   profile: Profile
@@ -15,9 +24,37 @@ interface SettingsFormProps {
 export function SettingsForm({ profile }: SettingsFormProps) {
   const router      = useRouter()
   const { toast }   = useToast()
+  const { supabase } = useSupabase()
   const [name,      setName]      = useState(profile.name)
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? '')
   const [saving,    setSaving]    = useState(false)
+
+  // ── Change password ──────────────────────────────────────────────────────
+  // A student locked out used to need a teacher to reset their password for
+  // them (see /forgot-password's teacher-mediated flow) — this lets anyone
+  // already signed in just change it themselves. supabase.auth.updateUser()
+  // works off the current live session, no re-entered current password
+  // needed (standard Supabase behaviour — the active session IS the proof).
+  const [newPassword,     setNewPassword]     = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [changingPw,      setChangingPw]      = useState(false)
+
+  async function handleChangePassword() {
+    if (newPassword.length < 6) { toast.error('Password must be at least 6 characters.'); return }
+    if (newPassword !== confirmPassword) { toast.error('Passwords don\'t match.'); return }
+    setChangingPw(true)
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) throw error
+      toast.success('Password changed.')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (e) {
+      toast.error((e as Error).message ?? 'Could not change password. Please try again.')
+    } finally {
+      setChangingPw(false)
+    }
+  }
 
   const isDirty = name.trim() !== profile.name || avatarUrl.trim() !== (profile.avatar_url ?? '')
 
@@ -123,6 +160,48 @@ export function SettingsForm({ profile }: SettingsFormProps) {
         {isDirty && !saving && (
           <span className="text-xs text-fg-faint">Unsaved changes</span>
         )}
+      </div>
+
+      {/* Change password */}
+      <div className="pt-6 border-t border-b2">
+        <p className="label-caps mb-1.5">Password</p>
+        <p className="text-xs text-fg-faint mb-4">
+          Change your own password — no need to ask your teacher to reset it.
+        </p>
+        <div className="space-y-3 max-w-sm">
+          <div>
+            <label className="label-caps block mb-1.5" htmlFor="settings-new-password">New password</label>
+            <input
+              id="settings-new-password"
+              type="password"
+              minLength={6}
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              placeholder="••••••••"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="label-caps block mb-1.5" htmlFor="settings-confirm-password">Confirm new password</label>
+            <input
+              id="settings-confirm-password"
+              type="password"
+              minLength={6}
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              className={inputCls}
+            />
+          </div>
+          <Button
+            variant="secondary"
+            onClick={handleChangePassword}
+            loading={changingPw}
+            disabled={!newPassword || !confirmPassword}
+          >
+            Change password
+          </Button>
+        </div>
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense, type FormEvent } from 'react'
+import { useState, useEffect, useRef, Suspense, type FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { clsx } from 'clsx'
@@ -21,6 +21,38 @@ const inputCls = [
   'transition-colors',
 ].join(' ')
 
+// ── Saved login profiles ──────────────────────────────────────────────────
+// A shared/lab computer's browser remembers up to 5 {name, email} pairs so
+// returning to the login page shows "who's logging in?" instead of a blank
+// email field every time — same idea as the desktop app's profile picker,
+// just backed by localStorage (per-browser) instead of a file on disk.
+// Never stores a password; a saved profile still always needs one typed in.
+const PROFILES_KEY = 'bf_login_profiles'
+const MAX_PROFILES = 5
+
+interface SavedProfile { name: string; email: string }
+
+function loadSavedProfiles(): SavedProfile[] {
+  try {
+    const raw = localStorage.getItem(PROFILES_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+function addSavedProfile(name: string, email: string) {
+  try {
+    const profiles = loadSavedProfiles().filter(p => p.email !== email)
+    profiles.unshift({ name: name || email.split('@')[0], email })
+    localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles.slice(0, MAX_PROFILES)))
+  } catch { /* localStorage unavailable (private window, quota, etc.) — skip silently */ }
+}
+function removeSavedProfile(email: string) {
+  try {
+    localStorage.setItem(PROFILES_KEY, JSON.stringify(loadSavedProfiles().filter(p => p.email !== email)))
+  } catch { /* same as above */ }
+}
+
 // Inner component uses useSearchParams — must live inside <Suspense>
 function LoginContent() {
   const { supabase }  = useSupabase()
@@ -38,6 +70,25 @@ function LoginContent() {
   const [codeError, setCodeError] = useState<string | null>(null)
   const [loading,   setLoading]   = useState(false)
   const [error,     setError]     = useState<string | null>(null)
+
+  const [savedProfiles, setSavedProfiles] = useState<SavedProfile[]>([])
+  const [showPicker,    setShowPicker]    = useState(false)
+  const passwordRef = useRef<HTMLInputElement>(null)
+
+  // localStorage only exists client-side — read it after mount, and show
+  // the picker only when there's actually something to pick from.
+  useEffect(() => {
+    const profiles = loadSavedProfiles()
+    setSavedProfiles(profiles)
+    setShowPicker(profiles.length > 0)
+  }, [])
+
+  function pickProfile(p: SavedProfile) {
+    setEmail(p.email)
+    setShowPicker(false)
+    setError(null)
+    setTimeout(() => passwordRef.current?.focus(), 0)
+  }
 
   // Live join-code lookup
   useEffect(() => {
@@ -86,9 +137,11 @@ function LoginContent() {
         if (user) {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('role, placement_confirmed')
+            .select('name, role, placement_confirmed')
             .eq('id', user.id)
-            .single<{ role: string; placement_confirmed: boolean }>()
+            .single<{ name: string; role: string; placement_confirmed: boolean }>()
+
+          addSavedProfile(profile?.name ?? '', cleanEmail)
 
           if (profile?.role === 'teacher') {
             router.push('/teacher/dashboard')
@@ -111,6 +164,7 @@ function LoginContent() {
         if (role === 'student') {
           // Sign in immediately so we can call server-side APIs
           await supabase.auth.signInWithPassword({ email: cleanEmail, password })
+          addSavedProfile(name, cleanEmail)
 
           if (joinCode.trim() && classInfo) {
             // Arrived via a join link — the class grade sets their level
@@ -170,6 +224,57 @@ function LoginContent() {
         {/* Auth card */}
         <div className="bg-s1 border border-b2 rounded-lg p-6">
 
+          {mode === 'login' && showPicker ? (
+            // ── Saved profile picker — shown first whenever this browser has
+            // signed in before, so returning to a shared/lab computer shows
+            // "who's signing in?" instead of a blank email field. Picking a
+            // profile only pre-fills the email — a password is always still
+            // required, nothing here bypasses a real sign-in.
+            <div>
+              <p className="text-sm font-semibold text-fg mb-1">Who&#39;s signing in?</p>
+              <p className="text-xs text-t3 mb-4">Remembered on this device — you&#39;ll still need your password.</p>
+              <div className="flex flex-wrap gap-3 mb-2">
+                {savedProfiles.map(p => (
+                  <div key={p.email} className="relative group w-[76px]">
+                    <button
+                      type="button"
+                      onClick={() => pickProfile(p)}
+                      className="w-full flex flex-col items-center gap-1.5"
+                    >
+                      <span className="w-14 h-14 rounded-full bg-accent/15 border border-accent/30 text-accent
+                                        flex items-center justify-center text-base font-bold
+                                        group-hover:border-accent transition-colors">
+                        {(p.name || p.email).slice(0, 1).toUpperCase()}
+                      </span>
+                      <span className="text-xs text-t2 text-center truncate w-full">{p.name || p.email}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSavedProfiles(prev => { removeSavedProfile(p.email); return prev.filter(x => x.email !== p.email) })}
+                      title="Remove this profile"
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-s2 border border-b2 text-t3
+                                 flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity
+                                 hover:text-rose hover:border-rose/40"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => { setShowPicker(false); setEmail(''); setPassword('') }}
+                  className="w-[76px] flex flex-col items-center gap-1.5"
+                >
+                  <span className="w-14 h-14 rounded-full bg-s2 border border-dashed border-b3 text-t3
+                                    flex items-center justify-center text-xl hover:border-accent hover:text-accent transition-colors">
+                    +
+                  </span>
+                  <span className="text-xs text-t3 text-center">Add account</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+          <>
           {/* Mode tabs */}
           <div className="flex rounded-md bg-s2 border border-b2 p-0.5 mb-6">
             {(['login', 'register'] as const).map(m => (
@@ -265,9 +370,20 @@ function LoginContent() {
 
             {/* Email */}
             <div>
-              <label className="block text-xs font-medium text-t2 mb-1.5" htmlFor="email">
-                Email
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-medium text-t2" htmlFor="email">
+                  Email
+                </label>
+                {mode === 'login' && savedProfiles.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPicker(true)}
+                    className="text-xs text-t3 hover:text-accent transition-colors"
+                  >
+                    ← Switch profile
+                  </button>
+                )}
+              </div>
               <input
                 id="email" type="email" required
                 value={email} onChange={e => setEmail(e.target.value)}
@@ -289,6 +405,7 @@ function LoginContent() {
                 )}
               </div>
               <input
+                ref={passwordRef}
                 id="password" type="password" required minLength={6}
                 value={password} onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -300,6 +417,8 @@ function LoginContent() {
               {mode === 'login' ? 'Sign in' : 'Create account'}
             </Button>
           </form>
+          </>
+          )}
         </div>
 
         <p className="text-center text-xs text-t3 mt-4">
