@@ -1522,7 +1522,7 @@ const WORLDS = [
   // (matching + fill-in-the-blank), rendered by renderQuiz()/checkQuiz().
   { id:'cb1', name:'🖥️ Computer Basics — What Is a Computer?', sub:'CPU, RAM, storage, input, output — no code yet, just the real parts', live:true, stages:[
     { id:'cb1s1', name:'Match the Parts', xp:20, type:'quiz',
-      text:`<strong>Challenge 1</strong> — Match each description to the correct computer part.`,
+      text:`<strong>Challenge 1</strong> — Every computer — a phone, a laptop, a games console — is really just a handful of parts working together: one that THINKS (the CPU), one that REMEMBERS while it's switched on (RAM), one that remembers even with no power (Storage), and ways to get information IN and OUT. Match each description to the correct part.`,
       hints:['The CPU carries out instructions — it\'s the "brain".', 'RAM is memory that clears when the power turns off.', 'Storage keeps files saved even with the power off.'],
       passCount:5,
       questions:[
@@ -1536,7 +1536,7 @@ const WORLDS = [
       check:(log) => log.quizCorrect >= 5,
     },
     { id:'cb1s2', name:'Fill In: CPU, RAM, Input', xp:20, type:'quiz',
-      text:`<strong>Challenge 2</strong> — Fill in the blank for each sentence.`,
+      text:`<strong>Challenge 2</strong> — RAM and Storage both "remember" things, but very differently: RAM is fast but TEMPORARY — switch the power off and it's gone, which is exactly why unsaved work disappears in a power cut. Fill in the blank for each sentence.`,
       hints:['The CPU is the brain.', 'RAM clears when power turns off.', 'A keyboard brings information IN.'],
       passCount:3,
       questions:[
@@ -1547,7 +1547,7 @@ const WORLDS = [
       check:(log) => log.quizCorrect >= 3,
     },
     { id:'cb1s3', name:'Fill In: Output & Storage', xp:20, type:'quiz',
-      text:`<strong>Challenge 3</strong> — Fill in the blank for each sentence.`,
+      text:`<strong>Challenge 3</strong> — Input devices send information INTO the computer; output devices send it back OUT to you. Fill in the blank for each sentence.`,
       hints:['A monitor sends information OUT to you.', 'A microphone brings sound IN.', 'Storage keeps files even with no power.'],
       passCount:3,
       questions:[
@@ -3760,6 +3760,21 @@ function isChallengeLocked(i) {
   return i > 0 && !completed.has(i - 1) && !completed.has(i) && i !== activeIdx
 }
 
+// ── Exercise text translation ────────────────────────────────────────────
+// ch.text (the "Challenge N — ..." intro shown above a stage, any type) was
+// English-only before this — only the individual QUIZ questions had a
+// Russian version (see window.G7_RU_QUIZ), so a Russian-mode student saw an
+// English intro above Russian-translated questions. window.G7_RU_TEXT holds
+// a plain-string Russian version per stage id, filled in as stages are
+// converted (see TODO-GRADE7.md) — same idea as grade8.html's G8_RU_WEB.
+function stageText(ch) {
+  if (ch && typeof BFLang !== 'undefined' && BFLang.get() === 'ru'
+      && window.G7_RU_TEXT && typeof window.G7_RU_TEXT[ch.id] === 'string') {
+    return window.G7_RU_TEXT[ch.id]
+  }
+  return ch ? ch.text : ''
+}
+
 function selectChallenge(i) {
   if (isChallengeLocked(i)) {
     if (typeof showToast === 'function') showToast('🔒 Complete the earlier stages first.')
@@ -3771,7 +3786,7 @@ function selectChallenge(i) {
   challengeStartedAt = Date.now()
   const ch  = CHALLENGES[i]
   document.getElementById('ch-row').style.display = ''
-  document.getElementById('ch-text').innerHTML = ch.text
+  document.getElementById('ch-text').innerHTML = stageText(ch)
   document.getElementById('xp-pill').textContent = '+' + ch.xp + ' XP'
   document.getElementById('pass-badge').style.display = 'none'
   document.getElementById('fail-badge').style.display = 'none'
@@ -3980,6 +3995,10 @@ if (typeof BFLang !== 'undefined') {
     const ch = CHALLENGES[activeIdx]
     const box = document.getElementById('output-quiz')
     if (ch && ch.type === 'quiz' && box && box.style.display !== 'none') renderQuiz(ch)
+    if (ch) {
+      const textEl = document.getElementById('ch-text')
+      if (textEl) textEl.innerHTML = stageText(ch)
+    }
   })
 }
 

@@ -49,6 +49,10 @@ decent and verify before rewriting — don't churn working content.
 - [ ] cb4 — Phishing & Fake Logins (5 stages, quiz)
 - [ ] cb5 — Prompt Generation (stages, quiz)
 - [ ] cb6 — "Stay Smart Online" Guide (stages, project)
+- [x] cb1 — Computer Basics: What Is a Computer? (5 stages, quiz) — WHY
+      moved from hints into the visible text (same fix as Grade 8's
+      py1-py5); full Russian translation added for all 5 stages via the
+      new G7_RU_TEXT mechanism (built as part of this stage)
 - [~] st1 — Story Studio 1: Page Basics (6 stages) — already decent on
       review (specific requirements, real examples), needs a second look
       for live-visual additions and translation; not yet converted
@@ -82,8 +86,18 @@ numbers into this file.)
 - 2026-11-05: created this file, after closing the sequential-unlock
   bypass bug (separate fix, see the "Close the sequential-unlock
   bypass" commit). Spot-checked st1 — already reasonably good, not yet
-  converted. Translation mechanism for non-quiz stages doesn't exist
-  yet (quiz stages already have one via G7_RU_QUIZ) — needs building
-  as part of the first non-quiz stage actually touched. Not yet
-  started on real conversion work — this file is the tracker, picking
-  up cb1 next session.
+  converted.
+- 2026-11-05 (continued): built the missing ch.text translation layer
+  — turns out it was needed for EVERY stage type, not just non-quiz
+  ones as first assumed: G7_RU_QUIZ only ever translated quiz
+  QUESTIONS, never the stage's own intro text, so a Russian-mode
+  student was seeing an English intro above Russian questions even on
+  already-translated quiz stages. Added window.G7_RU_TEXT (plain
+  strings) + stageText() lookup wired into the render call and the
+  BFLang.onChange re-render hook, same pattern as grade8.html's
+  G8_RU_WEB/examStageText(). Converted cb1 (5 stages) as the first
+  real module: WHY pulled from hints into visible text, full Russian
+  translation for all 5. Verified live via a scripted CDP session —
+  English and Russian both render correctly via BFLang.set(). Full
+  npm run verify + npx tsc --noEmit clean. Next: st2 (or finish st1's
+  second pass), then continue down the module list.
