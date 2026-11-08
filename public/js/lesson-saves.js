@@ -83,6 +83,7 @@ const LessonSaves = (() => {
         tx.oncomplete = resolve
         tx.onerror    = () => reject(tx.error)
       })
+      _refreshIndicator()
     } catch (e) {
       // IndexedDB itself unavailable (very old browser, private-mode quota,
       // etc.) — nothing left to do but accept the original silent-drop
@@ -146,6 +147,7 @@ const LessonSaves = (() => {
       }
     } finally {
       _flushing = false
+      _refreshIndicator()
     }
   }
 
@@ -155,12 +157,41 @@ const LessonSaves = (() => {
     return (await _allQueued()).length
   }
 
+  // ── Pending-sync indicator ───────────────────────────────────────────────
+  // A small fixed badge, built once here so every lesson page gets it for
+  // free instead of each of the ~11 lesson HTML files wiring up its own copy.
+  // Shows "N changes waiting to sync" while the offline queue is non-empty,
+  // and removes itself the moment it drains.
+  let _indicatorEl = null
+  function _renderIndicator(count) {
+    if (typeof document === 'undefined' || !document.body) return
+    if (count <= 0) {
+      if (_indicatorEl) { _indicatorEl.remove(); _indicatorEl = null }
+      return
+    }
+    if (!_indicatorEl) {
+      _indicatorEl = document.createElement('div')
+      _indicatorEl.id = 'bf-sync-indicator'
+      _indicatorEl.style.cssText = `
+        position:fixed; bottom:14px; right:14px; z-index:9999;
+        background:#1b1f2b; color:#e8e8f0; font:12px/1.4 -apple-system,BlinkMacSystemFont,
+        'Segoe UI',sans-serif; padding:7px 13px; border-radius:20px;
+        box-shadow:0 2px 10px rgba(0,0,0,.25); pointer-events:none; opacity:.92;
+      `
+      document.body.appendChild(_indicatorEl)
+    }
+    _indicatorEl.textContent = `⏳ ${count} change${count === 1 ? '' : 's'} waiting to sync`
+  }
+  async function _refreshIndicator() {
+    _renderIndicator(await pendingCount())
+  }
+
   if (typeof window !== 'undefined') {
     window.addEventListener('online', () => { flushQueue() })
     // Also try shortly after every page load — covers the case where the
     // student was back online for a while before ever opening this page
     // again (the 'online' event only fires on the transition, not on load).
-    setTimeout(() => { flushQueue() }, 1500)
+    setTimeout(() => { flushQueue(); _refreshIndicator() }, 1500)
     // Periodic safety net while the tab stays open and online — catches a
     // save that failed for a reason OTHER than "offline" (a brief server
     // blip), without needing a real online/offline transition to retry it.
