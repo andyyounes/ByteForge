@@ -43,20 +43,24 @@ decent and verify before rewriting — don't churn working content.
 
 ## Modules, in teaching order (28 total)
 
-- [ ] cb1 — Computer Basics: What Is a Computer? (5 stages, quiz)
+- [x] cb1 — Computer Basics: What Is a Computer? (5 stages, quiz) — WHY
+      moved from hints into the visible text (same fix as Grade 8's
+      py1-py5); full Russian translation added for all 5 stages via the
+      new G7_RU_TEXT mechanism (built as part of this stage)
 - [ ] cb2 — Computer Basics: Files & Storage (5 stages, quiz)
 - [ ] cb3 — Spotting Scams (5 stages, quiz)
 - [ ] cb4 — Phishing & Fake Logins (5 stages, quiz)
 - [ ] cb5 — Prompt Generation (stages, quiz)
 - [ ] cb6 — "Stay Smart Online" Guide (stages, project)
-- [x] cb1 — Computer Basics: What Is a Computer? (5 stages, quiz) — WHY
-      moved from hints into the visible text (same fix as Grade 8's
-      py1-py5); full Russian translation added for all 5 stages via the
-      new G7_RU_TEXT mechanism (built as part of this stage)
-- [~] st1 — Story Studio 1: Page Basics (6 stages) — already decent on
-      review (specific requirements, real examples), needs a second look
-      for live-visual additions and translation; not yet converted
-- [ ] st2 — Story Studio 2: Style It (stages)
+- [x] st1 — Story Studio 1: Page Basics (6 stages: st1s1-5, st1boss) —
+      content already good on review (specific requirements, real
+      examples in hints, exact-text checks) — left as-is, not forced
+      into Grade 8's live-visual-comparison style since this is a
+      block-based page builder, not raw HTML/CSS; translated all 6
+      stages via G7_RU_TEXT
+- [x] st2 — Story Studio 2: Style It (5 stages: st2s1-4, st2boss) —
+      same verdict as st1 (already clear, left as-is); translated all
+      5 stages via G7_RU_TEXT
 - [ ] st3 — Story Studio 3: Make It Click (stages)
 - [ ] st4 — Story Studio 4: Remember Things (stages)
 - [ ] st5 — Story Studio 5: Choose a Path (stages)
@@ -101,3 +105,14 @@ numbers into this file.)
   English and Russian both render correctly via BFLang.set(). Full
   npm run verify + npx tsc --noEmit clean. Next: st2 (or finish st1's
   second pass), then continue down the module list.
+- 2026-11-08: reviewed st1 and st2 — both already clear and specific
+  (numbered challenges, real example text in hints, exact-text checks
+  spelled out), so left the English content as-is rather than forcing
+  in Grade 8-style live visual comparisons (st1/st2 use a block-based
+  page builder, not raw HTML/CSS, so that device doesn't map cleanly).
+  Added full G7_RU_TEXT Russian translations for all 6 st1 stages and
+  all 5 st2 stages, keeping exact-match literals ("My Story", "Read
+  the next chapter", "Start Reading") in English since the check
+  functions compare against those exact English strings. No engine
+  changes needed — stageText()/G7_RU_TEXT lookup was already generic.
+  npm run verify (all suites) + npx tsc --noEmit clean. Next: st3.
