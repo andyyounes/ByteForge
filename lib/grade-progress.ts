@@ -147,6 +147,25 @@ export interface ExamResult {
   attemptedAt:         string | null   // ISO timestamp
 }
 
+// One stage this student has at least one save row for — the actual code
+// they submitted, not just a pass/fail bit, so a teacher can see HOW they
+// solved it, not just whether they did. `code` mirrors whatever the
+// lesson's single shared editor held when they last saved (the
+// Blockly-generated JS/HTML for a block stage, typed code for a text
+// editor) — meaningful for page/Blockly/code stages across every grade.
+// Quiz-type stages never persist which option a student picked (only the
+// aggregate score, surfaced separately via `assessments`), so `code` is
+// often empty/placeholder for those — a real platform limitation, not a
+// bug here.
+export interface StageWork {
+  id:         string
+  name:       string
+  moduleName: string
+  passed:     boolean
+  code:       string | null
+  savedAt:    string
+}
+
 export interface StudentGradeProgress {
   studentId:       string
   name:            string
@@ -158,6 +177,7 @@ export interface StudentGradeProgress {
   lastActive:      string | null   // ISO timestamp
   assessments:     AssessmentResult[]   // real tests this student has attempted
   exams:           ExamResult[]        // real hands-on exams this student has attempted
+  stages:          StageWork[]         // every stage attempted, in teaching order, latest save per stage
 }
 
 export function summarizeStudent(
@@ -168,6 +188,7 @@ export function summarizeStudent(
     challenge_id: string | null
     passed: boolean
     saved_at: string
+    code?: string | null
     save_data?: {
       score?: number; total?: number
       tabSwitches?: number; awaySeconds?: number; snapshotCount?: number; examDurationSeconds?: number
@@ -238,6 +259,30 @@ export function summarizeStudent(
     total: m.stages.length,
   }))
 
+  // Latest row per attempted stage id, in teaching order — the student's
+  // most recent submission is what a teacher wants to see, not their
+  // first-ever attempt.
+  const latestByStage = new Map<string, (typeof rows)[number]>()
+  for (const r of relevantRows) {
+    const existing = latestByStage.get(r.challenge_id!)
+    if (!existing || r.saved_at > existing.saved_at) latestByStage.set(r.challenge_id!, r)
+  }
+  const stages: StageWork[] = []
+  for (const m of meta.modules) {
+    for (const s of m.stages) {
+      const row = latestByStage.get(s.id)
+      if (!row) continue
+      stages.push({
+        id:         s.id,
+        name:       s.name,
+        moduleName: m.name,
+        passed:     row.passed,
+        code:       row.code ?? null,
+        savedAt:    row.saved_at,
+      })
+    }
+  }
+
   return {
     studentId,
     name,
@@ -249,5 +294,6 @@ export function summarizeStudent(
     lastActive:    lastRow?.saved_at ?? null,
     assessments,
     exams,
+    stages,
   }
 }

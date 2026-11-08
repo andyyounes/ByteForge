@@ -32,6 +32,15 @@ interface ExamResult {
   attemptedAt:         string | null
 }
 
+interface StageWork {
+  id:         string
+  name:       string
+  moduleName: string
+  passed:     boolean
+  code:       string | null
+  savedAt:    string
+}
+
 interface StudentProgress {
   studentId:     string
   name:          string
@@ -44,6 +53,7 @@ interface StudentProgress {
   lastActive:    string | null
   assessments:   AssessmentResult[]
   exams:         ExamResult[]
+  stages:        StageWork[]
 }
 
 const GRADE_META: Record<'grade6' | 'grade7' | 'grade8', { emoji: string; title: string }> = {
@@ -65,6 +75,8 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
   const [students, setStudents]   = useState<StudentProgress[] | null>(null)
   const [error,    setError]      = useState('')
   const [open,     setOpen]       = useState<string | null>(null)   // student whose chapters are expanded
+  const [showWork, setShowWork]   = useState<string | null>(null)   // student whose stage-by-stage work list is shown
+  const [viewing,  setViewing]    = useState<{ studentName: string; stage: StageWork } | null>(null)   // stage whose solution is open in the modal
   const [grantingFor, setGrantingFor] = useState<string | null>(null)   // `${studentId}:${stageId}` while a request is in flight
 
   const load = useCallback(async () => {
@@ -227,6 +239,45 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                           )
                         })}
                       </div>
+
+                      <button
+                        onClick={() => setShowWork(showWork === s.studentId ? null : s.studentId)}
+                        className="mt-3 text-[11px] font-semibold text-accent hover:underline"
+                      >
+                        {showWork === s.studentId ? '▾ Hide stage-by-stage work' : `▸ See stage-by-stage work (${(s.stages ?? []).length} attempted)`}
+                      </button>
+
+                      {showWork === s.studentId && (
+                        <div className="mt-2 space-y-1 max-h-72 overflow-y-auto pr-1">
+                          {(s.stages ?? []).length === 0 && (
+                            <p className="text-[11px] text-t3">No stages attempted yet.</p>
+                          )}
+                          {(s.stages ?? []).map(st => {
+                            const hasCode = !!st.code && st.code.trim().length > 0
+                            return (
+                              <div key={st.id} className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-md bg-s1 border border-b2">
+                                <div className="min-w-0">
+                                  <div className="truncate text-t2">{st.name}</div>
+                                  <div className="text-[10px] text-t3 truncate">{st.moduleName} &middot; {timeAgo(st.savedAt)}</div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <span className={`font-semibold ${st.passed ? 'text-emerald' : 'text-amber-400'}`}>
+                                    {st.passed ? '✓ passed' : '✗ not yet'}
+                                  </span>
+                                  {hasCode && (
+                                    <button
+                                      onClick={() => setViewing({ studentName: s.name, stage: st })}
+                                      className="text-[10px] font-semibold px-2 py-1 rounded-md bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors"
+                                    >
+                                      View solution
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 )}
@@ -235,6 +286,58 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
             })}
           </tbody>
         </table>
+      </div>
+
+      {viewing && (
+        <StudentSolutionModal
+          studentName={viewing.studentName}
+          stage={viewing.stage}
+          onClose={() => setViewing(null)}
+        />
+      )}
+    </div>
+  )
+}
+
+// ── Solution viewer modal ──────────────────────────────────────────────────
+// Shows exactly what the shared editor held when this student last saved
+// this stage — the generated JS/HTML for a block stage, or typed code for
+// a text editor. Read-only; a teacher cannot edit a student's submission
+// from here.
+function StudentSolutionModal({
+  studentName, stage, onClose,
+}: {
+  studentName: string
+  stage:       StageWork
+  onClose:     () => void
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="card w-full max-w-2xl max-h-[80vh] flex flex-col p-0"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3 p-4 border-b border-b2">
+          <div className="min-w-0">
+            <div className="font-semibold text-fg text-sm truncate">{stage.name}</div>
+            <div className="text-xs text-fg-faint truncate">
+              {studentName} &middot; {stage.moduleName} &middot; {new Date(stage.savedAt).toLocaleString()}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-t3 hover:text-fg transition-colors shrink-0 text-lg leading-none px-1"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <pre className="flex-1 overflow-auto p-4 text-xs font-mono text-fg whitespace-pre-wrap break-words bg-s1">
+          {stage.code}
+        </pre>
       </div>
     </div>
   )
