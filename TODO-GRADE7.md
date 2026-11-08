@@ -74,11 +74,16 @@ decent and verify before rewriting — don't churn working content.
       already clear on review, left as-is; translated all 5 stages
 - [x] st5 — Story Studio 5: Choose a Path (5 stages: st5s1-4, st5boss) —
       already clear on review, left as-is; translated all 5 stages
-- [ ] sc1 — Block Arcade 1: Sprites & the Stage (stages)
-- [ ] sc2 — Block Arcade 2: Motion & Repeat (stages)
-- [ ] sc3 — Block Arcade 3: Events (stages)
-- [ ] sc4 — Block Arcade 4: Variables (stages)
-- [ ] sc5 — Block Arcade 5: If/Else (stages)
+- [x] sc1 — Block Arcade 1: Sprites & the Stage (4 stages: sc1s1-3,
+      sc1boss) — content already clear; translated all 4
+- [x] sc2 — Block Arcade 2: Motion & Repeat (4 stages: sc2s1-3,
+      sc2boss) — same, translated all 4
+- [x] sc3 — Block Arcade 3: Events (4 stages: sc3s1-3, sc3boss) —
+      same, translated all 4
+- [x] sc4 — Block Arcade 4: Variables (4 stages: sc4s1-3, sc4boss) —
+      same, translated all 4
+- [x] sc5 — Block Arcade 5: If/Else (4 stages: sc5s1-3, sc5boss) —
+      same, translated all 4
 - [ ] g1 — Sprite Start (stages)
 - [ ] g2 — Variables & State (stages)
 - [ ] g3 — Decisions (stages)
@@ -141,3 +146,9 @@ numbers into this file.)
   (cb1-cb6, st1-st5) is now fully converted + translated.
   node scripts/test-g7-challenges.mjs (514 passed) + npx tsc --noEmit
   clean. Next: sc1 (Block Arcade 1), start of Semester 2.
+- 2026-11-08 (continued): sc1-sc5 (Block Arcade, 20 stages) — all
+  already clear (coordinates, repeat loops, key events, variables,
+  if/else, well-scaffolded with worked hint examples), left as-is,
+  translated all 20 stages via G7_RU_TEXT. node scripts/test-g7-
+  challenges.mjs (514 passed) + npx tsc --noEmit clean. Next: g1
+  (Sprite Start), start of the Game Maker track (g1-g11).
