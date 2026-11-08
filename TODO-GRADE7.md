@@ -47,11 +47,18 @@ decent and verify before rewriting — don't churn working content.
       moved from hints into the visible text (same fix as Grade 8's
       py1-py5); full Russian translation added for all 5 stages via the
       new G7_RU_TEXT mechanism (built as part of this stage)
-- [ ] cb2 — Computer Basics: Files & Storage (5 stages, quiz)
-- [ ] cb3 — Spotting Scams (5 stages, quiz)
-- [ ] cb4 — Phishing & Fake Logins (5 stages, quiz)
-- [ ] cb5 — Prompt Generation (stages, quiz)
-- [ ] cb6 — "Stay Smart Online" Guide (stages, project)
+- [x] cb2 — Computer Basics: Files & Storage (5 stages, quiz) — content
+      already clear; quiz Q&A were already translated in G7_RU_QUIZ
+      from an earlier pass, only the ch.text intro was missing — added
+      via G7_RU_TEXT
+- [x] cb3 — Spotting Scams (5 stages, quiz) — same as cb2
+- [x] cb4 — Phishing & Fake Logins (5 stages, quiz) — same as cb2
+- [x] cb5 — Prompt Generation (5 stages, quiz) — same as cb2
+- [x] cb6 — "Stay Smart Online" Guide (5 stages: cb6s1-4/cb6boss,
+      chat+page project) — content already clear; added G7_RU_TEXT for
+      all 5 (chatTask, the separate free-text prompt instructions
+      panel, stays English — not translated anywhere on the platform,
+      same as grade8's equivalent chat stages)
 - [x] st1 — Story Studio 1: Page Basics (6 stages: st1s1-5, st1boss) —
       content already good on review (specific requirements, real
       examples in hints, exact-text checks) — left as-is, not forced
@@ -125,5 +132,12 @@ numbers into this file.)
   hints) — left English as-is, translated all 15 remaining stages
   (st3s1-4/st3boss, st4s1-4/st4boss, st5s1-4/st5boss) via G7_RU_TEXT.
   Story Studio (st1-st5, Semester 1) is now fully converted+translated.
+  node scripts/test-g7-challenges.mjs (514 passed) + npx tsc --noEmit
+  clean. Next: sc1 (Block Arcade 1), start of Semester 2.
+- 2026-11-08 (continued): cb2-cb6 — discovered their quiz Q&A were
+  already translated in G7_RU_QUIZ from an earlier session, just
+  never the ch.text intro (the exact gap cb1 had). Added G7_RU_TEXT
+  entries for all 25 remaining cb stages (cb2-cb6). All of Semester 1
+  (cb1-cb6, st1-st5) is now fully converted + translated.
   node scripts/test-g7-challenges.mjs (514 passed) + npx tsc --noEmit
   clean. Next: sc1 (Block Arcade 1), start of Semester 2.
