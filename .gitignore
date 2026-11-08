@@ -11,7 +11,13 @@ node_modules/
 /out/
 
 # production
-/build
+# ...except electron-builder's icon source (its own "buildResources"
+# convention, same folder name by coincidence) — that one file needs to
+# actually be committed for the desktop app's icon. (/build/* + a
+# negation, not /build + a negation — git can't un-ignore a path inside
+# a directory that's ignored as a whole.)
+/build/*
+!/build/icon.png
 
 # misc
 .DS_Store
