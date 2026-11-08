@@ -37,7 +37,12 @@ jobs:
         run: npm ci
 
       - name: Build the macOS .dmg
-        run: npm run electron:build:mac
+        # --publish=never: electron-builder auto-detects CI and tries to
+        # publish the build straight to GitHub Releases itself (its OWN
+        # mechanism, separate from the "Attach to a release" step below,
+        # and one that wants a GH_TOKEN it was never given) — upload is
+        # handled by this workflow's own step instead, so tell it not to.
+        run: npx electron-builder --mac --publish=never
         env:
           # No Apple Developer account configured — this builds an
           # unsigned .dmg. macOS Gatekeeper will show an "unidentified
