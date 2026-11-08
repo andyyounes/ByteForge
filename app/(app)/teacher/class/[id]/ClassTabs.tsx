@@ -16,6 +16,7 @@ import { BookLessonsPanel } from '@/components/teacher/BookLessonsPanel'
 import { PastPapersPanel } from '@/components/teacher/PastPapersPanel'
 import { G9MissionsPanel } from '@/components/teacher/G9MissionsPanel'
 import { GradeProgressPanel } from '@/components/teacher/GradeProgressPanel'
+import { StuckPointsPanel } from '@/components/teacher/StuckPointsPanel'
 import {
   UserIcon, BookIcon, ZapIcon, ChartBarIcon,
   FlameIcon, ArrowRightIcon,
@@ -239,7 +240,10 @@ export function ClassTabs({ cls, classType, studentData, topics, draftExercises,
           )}
           {classType.id === 'grade9' && <G9MissionsPanel classId={cls.id} />}
           {(classType.id === 'grade6' || classType.id === 'grade7' || classType.id === 'grade8') && (
-            <GradeProgressPanel classId={cls.id} grade={classType.id} />
+            <>
+              <GradeProgressPanel classId={cls.id} grade={classType.id} />
+              <StuckPointsPanel classId={cls.id} grade={classType.id} />
+            </>
           )}
           <ExercisesTab
             cls={cls}
