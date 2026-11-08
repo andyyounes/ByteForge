@@ -61,9 +61,12 @@ decent and verify before rewriting — don't churn working content.
 - [x] st2 — Story Studio 2: Style It (5 stages: st2s1-4, st2boss) —
       same verdict as st1 (already clear, left as-is); translated all
       5 stages via G7_RU_TEXT
-- [ ] st3 — Story Studio 3: Make It Click (stages)
-- [ ] st4 — Story Studio 4: Remember Things (stages)
-- [ ] st5 — Story Studio 5: Choose a Path (stages)
+- [x] st3 — Story Studio 3: Make It Click (5 stages: st3s1-4, st3boss) —
+      already clear on review, left as-is; translated all 5 stages
+- [x] st4 — Story Studio 4: Remember Things (5 stages: st4s1-4, st4boss) —
+      already clear on review, left as-is; translated all 5 stages
+- [x] st5 — Story Studio 5: Choose a Path (5 stages: st5s1-4, st5boss) —
+      already clear on review, left as-is; translated all 5 stages
 - [ ] sc1 — Block Arcade 1: Sprites & the Stage (stages)
 - [ ] sc2 — Block Arcade 2: Motion & Repeat (stages)
 - [ ] sc3 — Block Arcade 3: Events (stages)
@@ -116,3 +119,11 @@ numbers into this file.)
   functions compare against those exact English strings. No engine
   changes needed — stageText()/G7_RU_TEXT lookup was already generic.
   npm run verify (all suites) + npx tsc --noEmit clean. Next: st3.
+- 2026-11-08 (continued): st3, st4, st5 all reviewed — same verdict
+  (already clear, specific, well-scaffolded — onclick handlers,
+  variables, if/else all explained with real worked examples in the
+  hints) — left English as-is, translated all 15 remaining stages
+  (st3s1-4/st3boss, st4s1-4/st4boss, st5s1-4/st5boss) via G7_RU_TEXT.
+  Story Studio (st1-st5, Semester 1) is now fully converted+translated.
+  node scripts/test-g7-challenges.mjs (514 passed) + npx tsc --noEmit
+  clean. Next: sc1 (Block Arcade 1), start of Semester 2.
