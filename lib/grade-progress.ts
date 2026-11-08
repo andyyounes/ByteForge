@@ -298,8 +298,11 @@ export function summarizeStudent(
         passed:      row.passed,
         code:        row.code ?? null,
         savedAt:     row.saved_at,
-        quizScore:   hasQuizAnswers ? (row.save_data!.quizScore ?? null) : null,
-        quizTotal:   hasQuizAnswers ? (row.save_data!.quizTotal ?? null) : null,
+        // Grade 7 saves these as quizScore/quizTotal; Grade 8 saves them as
+        // score/total (kept under that name there since isAssessment
+        // detection already keys off save_data.score) — accept either.
+        quizScore:   hasQuizAnswers ? (row.save_data!.quizScore ?? row.save_data!.score ?? null) : null,
+        quizTotal:   hasQuizAnswers ? (row.save_data!.quizTotal ?? row.save_data!.total ?? null) : null,
         quizAnswers: hasQuizAnswers ? row.save_data!.answers! : null,
       })
     }

@@ -1292,9 +1292,15 @@ function checkQuiz() {
   const qs = ch.questions || []
   const pfx = 'quiz-' + ch.id + '-'
   let correct = 0
+  // One entry per question, saved alongside the score below — the actual
+  // answer a student gave, not just the aggregate "N/M correct" that was
+  // the only thing ever persisted before (and only for isAssessment
+  // stages at that; see the save below).
+  const answers = []
   qs.forEach((q, i) => {
+    const rawVal = document.getElementById(pfx + i + '-a')?.value || ''
     // norm(): trim + lower-case (Cyrillic too) + ё→е + collapsed spaces.
-    const a = typeof BFLang !== 'undefined' ? BFLang.norm(document.getElementById(pfx + i + '-a')?.value || '') : (document.getElementById(pfx + i + '-a')?.value || '').trim().toLowerCase()
+    const a = typeof BFLang !== 'undefined' ? BFLang.norm(rawVal) : rawVal.trim().toLowerCase()
     const bEl = document.getElementById(pfx + i + '-b')
     if (q.type === 'judge') {
       const okA = a === (q.answer || '').toLowerCase()
@@ -1302,12 +1308,14 @@ function checkQuiz() {
       const ok = okA && okB
       if (ok) correct++
       markQuestion(pfx, i, ok)
+      answers.push({ prompt: q.scenario || q.prompt || '', type: q.type, given: { verdict: rawVal, flag: bEl?.value || null }, expected: { verdict: q.answer || null, flagAnswers: q.flagAnswers || null }, correct: ok })
     } else {
       const acceptable = Array.isArray(q.answer) ? q.answer : [q.answer]
       const nrm = typeof BFLang !== 'undefined' ? BFLang.norm : (s => String(s).trim().toLowerCase())
       const ok = acceptable.some(ans => a === nrm(ans))
       if (ok) correct++
       markQuestion(pfx, i, ok)
+      answers.push({ prompt: q.prompt || '', type: q.type, given: rawVal, expected: q.answer ?? null, correct: ok })
     }
   })
   const need = ch.passCount != null ? ch.passCount : qs.length
@@ -1332,16 +1340,19 @@ function checkQuiz() {
   } else if (!pass) {
     clog('❌ Not quite — ' + correct + '/' + qs.length + ' correct, need ' + need, 'err')
   }
-  // Assessment-style stages (isAssessment: true) record the real score every
-  // single attempt — pass or fail — so a teacher can see how a student
-  // actually did, not just whether they eventually cleared the bar. Ordinary
-  // quiz stages deliberately don't do this (LessonSaves.save above already
-  // covers them, pass-gated, same as always) — scoped to isAssessment so this
-  // doesn't change behavior for the rest of the course's quiz stages.
-  if (ch.isAssessment && me) {
+  // Record this attempt's real per-question answers — pass or fail, for
+  // EVERY quiz stage, not just isAssessment ones. This used to be scoped to
+  // isAssessment only (a failed ordinary quiz attempt left no trace at all,
+  // and even a pass only ever stored the aggregate score); `score`/`total`
+  // are kept under those exact names since lib/grade-progress.ts's
+  // isAssessment detection already keys off `save_data.score` being a
+  // number — only `answers` is new. Runs after the pass-path save above
+  // (which carries no saveData), so this write is always the one that
+  // sticks for this stage.
+  if (me) {
     LessonSaves.save('grade8', ch.id, {
       passed: pass,
-      saveData: { score: correct, total: qs.length, attemptedAt: Date.now() },
+      saveData: { score: correct, total: qs.length, answers, attemptedAt: Date.now() },
     })
   }
 }
