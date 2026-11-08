@@ -84,13 +84,14 @@ decent and verify before rewriting — don't churn working content.
       same, translated all 4
 - [x] sc5 — Block Arcade 5: If/Else (4 stages: sc5s1-3, sc5boss) —
       same, translated all 4
-- [ ] g1 — Sprite Start (stages)
-- [ ] g2 — Variables & State (stages)
-- [ ] g3 — Decisions (stages)
-- [ ] g4 — My Blocks (stages)
-- [ ] g5 — Player Control (stages)
-- [ ] g6 — Collision & Physics (stages)
-- [ ] g7w — Game States (stages)
+- [x] g1 — Sprite Start (6 stages: g1s1-5, g1boss) — already clear,
+      translated all 6
+- [x] g2 — Variables & State (5 stages: g2s1-4, g2boss) — same
+- [x] g3 — Decisions (5 stages: g3s1-4, g3boss) — same
+- [x] g4 — My Blocks (5 stages: g4s1-4, g4boss) — same
+- [x] g5 — Player Control (5 stages: g5s1-4, g5boss) — same
+- [x] g6 — Collision & Physics (5 stages: g6s1-4, g6boss) — same
+- [x] g7w — Game States (5 stages: g7s1-4, g7boss) — same
 - [ ] g8 — Smart NPCs (stages)
 - [ ] g9w — Strings & Dialogue (stages)
 - [ ] gsafe — Security Lab: Spot the Scam (stages)
@@ -152,3 +153,10 @@ numbers into this file.)
   translated all 20 stages via G7_RU_TEXT. node scripts/test-g7-
   challenges.mjs (514 passed) + npx tsc --noEmit clean. Next: g1
   (Sprite Start), start of the Game Maker track (g1-g11).
+- 2026-11-08 (continued): g1-g7w (Game Maker, 36 stages) — all
+  already clear and well-scaffolded (coordinates, variables,
+  if/else-if/else, custom functions with parameters, collision via
+  distance formula and range checks, game-state machines), left as-is,
+  translated all 36 stages via G7_RU_TEXT. node scripts/test-g7-
+  challenges.mjs (514 passed) + npx tsc --noEmit clean. Next: g8
+  (Smart NPCs).
