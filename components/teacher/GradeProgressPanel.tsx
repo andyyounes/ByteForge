@@ -32,13 +32,24 @@ interface ExamResult {
   attemptedAt:         string | null
 }
 
+interface QuizAnswer {
+  prompt:   string
+  type:     string
+  given:    unknown
+  expected: unknown
+  correct:  boolean
+}
+
 interface StageWork {
-  id:         string
-  name:       string
-  moduleName: string
-  passed:     boolean
-  code:       string | null
-  savedAt:    string
+  id:          string
+  name:        string
+  moduleName:  string
+  passed:      boolean
+  code:        string | null
+  savedAt:     string
+  quizScore:   number | null
+  quizTotal:   number | null
+  quizAnswers: QuizAnswer[] | null
 }
 
 interface StudentProgress {
@@ -253,7 +264,8 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                             <p className="text-[11px] text-t3">No stages attempted yet.</p>
                           )}
                           {(s.stages ?? []).map(st => {
-                            const hasCode = !!st.code && st.code.trim().length > 0
+                            const hasCode        = !!st.code && st.code.trim().length > 0
+                            const hasQuizAnswers = !!st.quizAnswers && st.quizAnswers.length > 0
                             return (
                               <div key={st.id} className="flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-md bg-s1 border border-b2">
                                 <div className="min-w-0">
@@ -262,14 +274,14 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
                                 </div>
                                 <div className="flex items-center gap-2 shrink-0">
                                   <span className={`font-semibold ${st.passed ? 'text-emerald' : 'text-amber-400'}`}>
-                                    {st.passed ? '✓ passed' : '✗ not yet'}
+                                    {hasQuizAnswers ? `${st.quizScore}/${st.quizTotal}` : st.passed ? '✓ passed' : '✗ not yet'}
                                   </span>
-                                  {hasCode && (
+                                  {(hasCode || hasQuizAnswers) && (
                                     <button
                                       onClick={() => setViewing({ studentName: s.name, stage: st })}
                                       className="text-[10px] font-semibold px-2 py-1 rounded-md bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-colors"
                                     >
-                                      View solution
+                                      {hasQuizAnswers ? 'View answers' : 'View solution'}
                                     </button>
                                   )}
                                 </div>
@@ -299,11 +311,30 @@ export function GradeProgressPanel({ classId, grade }: { classId: string; grade:
   )
 }
 
+// Renders a given/expected value for display — these come straight off
+// each lesson's own checkQuiz() and shape differently per question type
+// (a plain string for match/fill, {verdict,flag} for judge, {text,...}
+// for prompt/any), so this stays generic rather than special-casing every
+// shape the platform might ever save.
+function formatAnswerValue(v: unknown): string {
+  if (v == null) return '—'
+  if (typeof v === 'string') return v.trim() || '—'
+  if (typeof v === 'object') {
+    const parts = Object.entries(v as Record<string, unknown>)
+      .filter(([, val]) => val !== null && val !== undefined && val !== '')
+      .map(([k, val]) => `${k}: ${typeof val === 'object' ? JSON.stringify(val) : String(val)}`)
+    return parts.length ? parts.join(', ') : '—'
+  }
+  return String(v)
+}
+
 // ── Solution viewer modal ──────────────────────────────────────────────────
-// Shows exactly what the shared editor held when this student last saved
-// this stage — the generated JS/HTML for a block stage, or typed code for
-// a text editor. Read-only; a teacher cannot edit a student's submission
-// from here.
+// Shows exactly what this student last saved for this stage. For a
+// quiz-type stage with recorded answers, that's each question's actual
+// given vs. expected answer — the real "how did they get it wrong" view.
+// For everything else, it's the generated JS/HTML a Blockly/text-editor
+// stage held when they last saved. Read-only; a teacher cannot edit a
+// student's submission from here.
 function StudentSolutionModal({
   studentName, stage, onClose,
 }: {
@@ -311,6 +342,7 @@ function StudentSolutionModal({
   stage:       StageWork
   onClose:     () => void
 }) {
+  const hasQuizAnswers = !!stage.quizAnswers && stage.quizAnswers.length > 0
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -325,6 +357,7 @@ function StudentSolutionModal({
             <div className="font-semibold text-fg text-sm truncate">{stage.name}</div>
             <div className="text-xs text-fg-faint truncate">
               {studentName} &middot; {stage.moduleName} &middot; {new Date(stage.savedAt).toLocaleString()}
+              {hasQuizAnswers && <> &middot; {stage.quizScore}/{stage.quizTotal} correct</>}
             </div>
           </div>
           <button
@@ -335,9 +368,23 @@ function StudentSolutionModal({
             ×
           </button>
         </div>
-        <pre className="flex-1 overflow-auto p-4 text-xs font-mono text-fg whitespace-pre-wrap break-words bg-s1">
-          {stage.code}
-        </pre>
+        {hasQuizAnswers ? (
+          <div className="flex-1 overflow-auto p-4 space-y-2 bg-s1">
+            {stage.quizAnswers!.map((a, i) => (
+              <div key={i} className={`rounded-md border p-2.5 text-xs ${a.correct ? 'border-emerald/30 bg-emerald/5' : 'border-rose/30 bg-rose/5'}`}>
+                <div className="font-medium text-fg mb-1">{a.correct ? '✓' : '✗'} {a.prompt || `Question ${i + 1}`}</div>
+                <div className="text-fg-dim">Answered: <span className="font-mono">{formatAnswerValue(a.given)}</span></div>
+                {!a.correct && a.expected != null && (
+                  <div className="text-fg-faint">Expected: <span className="font-mono">{formatAnswerValue(a.expected)}</span></div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <pre className="flex-1 overflow-auto p-4 text-xs font-mono text-fg whitespace-pre-wrap break-words bg-s1">
+            {stage.code}
+          </pre>
+        )}
       </div>
     </div>
   )

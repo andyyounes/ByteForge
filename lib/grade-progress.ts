@@ -157,13 +157,30 @@ export interface ExamResult {
 // aggregate score, surfaced separately via `assessments`), so `code` is
 // often empty/placeholder for those — a real platform limitation, not a
 // bug here.
+// One quiz question's actual answer, as recorded by the lesson's own
+// checkQuiz() — see grade7.html's checkQuiz() for the exact shape per
+// question type (judge/match/fill/prompt/any). Kept as `unknown` here
+// rather than a strict per-type union: each grade's quiz engine shapes
+// this slightly differently, and this is passed straight through to the
+// teacher UI for display, never branched on server-side.
+export interface QuizAnswer {
+  prompt:   string
+  type:     string
+  given:    unknown
+  expected: unknown
+  correct:  boolean
+}
+
 export interface StageWork {
-  id:         string
-  name:       string
-  moduleName: string
-  passed:     boolean
-  code:       string | null
-  savedAt:    string
+  id:          string
+  name:        string
+  moduleName:  string
+  passed:      boolean
+  code:        string | null
+  savedAt:     string
+  quizScore:   number | null       // present only for quiz-type stages that record per-question answers
+  quizTotal:   number | null
+  quizAnswers: QuizAnswer[] | null
 }
 
 export interface StudentGradeProgress {
@@ -193,6 +210,7 @@ export function summarizeStudent(
       score?: number; total?: number
       tabSwitches?: number; awaySeconds?: number; snapshotCount?: number; examDurationSeconds?: number
       submitted?: boolean
+      quizScore?: number; quizTotal?: number; answers?: QuizAnswer[]
     } | null
   }[]
 ): StudentGradeProgress {
@@ -272,13 +290,17 @@ export function summarizeStudent(
     for (const s of m.stages) {
       const row = latestByStage.get(s.id)
       if (!row) continue
+      const hasQuizAnswers = Array.isArray(row.save_data?.answers)
       stages.push({
-        id:         s.id,
-        name:       s.name,
-        moduleName: m.name,
-        passed:     row.passed,
-        code:       row.code ?? null,
-        savedAt:    row.saved_at,
+        id:          s.id,
+        name:        s.name,
+        moduleName:  m.name,
+        passed:      row.passed,
+        code:        row.code ?? null,
+        savedAt:     row.saved_at,
+        quizScore:   hasQuizAnswers ? (row.save_data!.quizScore ?? null) : null,
+        quizTotal:   hasQuizAnswers ? (row.save_data!.quizTotal ?? null) : null,
+        quizAnswers: hasQuizAnswers ? row.save_data!.answers! : null,
       })
     }
   }

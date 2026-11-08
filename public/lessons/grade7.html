@@ -4018,6 +4018,13 @@ function checkQuiz() {
   const qs = ch.questions || []
   const pfx = 'quiz-' + ch.id + '-'
   let correct = 0
+  // One entry per question, saved alongside the score (see the LessonSaves.save
+  // call at the end of this function) so a teacher can see WHICH answer a
+  // student actually gave, not just the aggregate "N/M correct" that was the
+  // only thing ever persisted before. Captures the raw (un-normalized) typed
+  // or selected value — what the student actually saw on screen — not the
+  // lower-cased comparison string used for grading.
+  const answers = []
   qs.forEach((q, i) => {
     const rawVal = document.getElementById(pfx + i + '-a')?.value || ''
     // norm(): trim + lower-case (Cyrillic too) + ё→е + collapsed spaces, so a
@@ -4030,6 +4037,7 @@ function checkQuiz() {
       const ok = okA && okB
       if (ok) correct++
       markQuestion(pfx, i, ok)
+      answers.push({ prompt: q.scenario || q.prompt || '', type: q.type, given: { verdict: rawVal, flag: bEl?.value || null }, expected: { verdict: q.answer || null, flagAnswers: q.flagAnswers || null }, correct: ok })
     } else if (q.type === 'prompt') {
       // A specific prompt needs all 3: a subject noun, a constraint word
       // (length/tone/audience), and a format word (list/paragraph/steps).
@@ -4068,6 +4076,7 @@ function checkQuiz() {
             : '<b>🤖 Simulated response:</b> Still too generic — try adding ' + missing.join(' and ') + '.'
         }
       }
+      answers.push({ prompt: q.prompt || '', type: q.type, given: { text: rawA, hasSubject, hasConstraint, hasFormat }, expected: null, correct: passed })
     } else if (q.type === 'any') {
       const rawA = document.getElementById(pfx + i + '-a')?.value || ''
       const written = rawA.trim().length > 0
@@ -4080,6 +4089,7 @@ function checkQuiz() {
       if (simEl && rawA.trim()) {
         simEl.innerHTML = '<b>🤖 Simulated response:</b> "Dogs are animals. People like dogs. Dogs make good pets." — vague and generic, because the prompt never said how long, what tone, or what shape the answer should take.'
       }
+      answers.push({ prompt: q.prompt || '', type: q.type, given: { text: rawA }, expected: null, correct: written })
     } else {
       // English answer(s) PLUS the Russian ones from G7_RU_QUIZ — accepted whichever
       // language the page is currently showing.
@@ -4089,6 +4099,7 @@ function checkQuiz() {
       const ok = acceptable.some(ans => a === nrm(ans))
       if (ok) correct++
       markQuestion(pfx, i, ok)
+      answers.push({ prompt: q.prompt || '', type: q.type, given: rawVal, expected: q.answer ?? null, correct: ok })
     }
   })
   const need = ch.passCount != null ? ch.passCount : qs.length
@@ -4100,6 +4111,19 @@ function checkQuiz() {
     : correct + ' / ' + qs.length + ' correct' + (pass ? ' — passed!' : ` — need ${need}`)
   resultEl.className = 'q-result ' + (pass ? 'ok' : 'bad')
   checkChallenge({ quizCorrect: correct, quizTotal: qs.length })
+  // Record this attempt's actual answers regardless of pass/fail — this was
+  // the real gap: before this, a failed quiz attempt left NO trace at all,
+  // and even a passing one only ever stored the aggregate score, never which
+  // answer was given. Runs AFTER checkChallenge() (whose own save on a pass
+  // doesn't carry saveData) so this write is always the one that sticks —
+  // re-sending the same code value so it isn't nulled out by this call.
+  if (me) {
+    LessonSaves.save('grade7', ch.id, {
+      passed:   completed.has(activeIdx),
+      code:     editor.getValue(),
+      saveData: { quizScore: correct, quizTotal: qs.length, answers, attemptedAt: Date.now() },
+    })
+  }
 }
 
 // ── Chat stages — a REAL AI connection (Semester 1 project). Submit a
