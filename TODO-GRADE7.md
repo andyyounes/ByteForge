@@ -1,5 +1,8 @@
 # Grade 7 — exam-level detail rewrite (+ Russian translation)
 
+**STATUS: ✅ COMPLETE (2026-11-08)** — all 28 modules (127 stages)
+reviewed and fully translated. See the Log for per-batch detail.
+
 Goal (user request, 2026-11-05): bring Grade 7's exercise descriptions up
 to the same bar Grade 8 got (see `TODO.md`, now complete) — live visual
 comparisons where it helps, numbered checklists, clear WHY, not just "do
@@ -92,11 +95,12 @@ decent and verify before rewriting — don't churn working content.
 - [x] g5 — Player Control (5 stages: g5s1-4, g5boss) — same
 - [x] g6 — Collision & Physics (5 stages: g6s1-4, g6boss) — same
 - [x] g7w — Game States (5 stages: g7s1-4, g7boss) — same
-- [ ] g8 — Smart NPCs (stages)
-- [ ] g9w — Strings & Dialogue (stages)
-- [ ] gsafe — Security Lab: Spot the Scam (stages)
-- [ ] g10 — Design & Capstone (stages)
-- [ ] g11 — Bonus: Simulation Lab (optional, stages)
+- [x] g8 — Smart NPCs (5 stages: g8s1-4, g8boss) — already clear, translated all 5
+- [x] g9w — Strings & Dialogue (5 stages: g9s1-4, g9boss) — same
+- [x] gsafe — Security Lab: Spot the Scam (4 stages: gsafes1-3,
+      gsafeboss) — same
+- [x] g10 — Design & Capstone (4 stages: g10s1-3, g10boss) — same
+- [x] g11 — Bonus: Simulation Lab (1 stage: g11boss, optional) — same
 
 (Exact stage counts to fill in as each module is actually opened —
 listed as "(stages)" where not yet counted, to avoid guessing wrong
@@ -160,3 +164,13 @@ numbers into this file.)
   translated all 36 stages via G7_RU_TEXT. node scripts/test-g7-
   challenges.mjs (514 passed) + npx tsc --noEmit clean. Next: g8
   (Smart NPCs).
+- 2026-11-08 (continued): g8, g9w, gsafe, g10, g11 (20 stages) — same
+  verdict throughout (rule-based NPC AI, string/dialogue handling,
+  online-safety judgment stages, the design capstone, and the
+  optional simulation bonus were all already clear and well-built),
+  left as-is, translated all 20 remaining stages via G7_RU_TEXT. This
+  closes the module list — all 28 modules / 127 stages are now
+  reviewed and translated. Cross-checked every stage id referenced in
+  grade7.html's WORLDS array against G7_RU_TEXT programmatically — no
+  stage id missing a Russian entry. npm run verify (full suite, all
+  20 scripts) + npx tsc --noEmit clean.
