@@ -1,0 +1,66 @@
+name: Build macOS desktop app
+
+# Builds the Mac .dmg on GitHub's own macOS runners — nobody here has a
+# physical Mac, and electron-builder can't produce a real .dmg from
+# Windows (Apple doesn't allow it), so this is how the Mac installer
+# actually gets made. Two ways to trigger it:
+#   1. Manually, from the Actions tab ("Run workflow") — always uploads
+#      the .dmg as a downloadable build artifact; optionally also attaches
+#      it to an existing release if you type that release's tag in.
+#   2. Automatically, whenever a GitHub Release is published — attaches
+#      the .dmg to that release directly, same as the Windows installer
+#      gets dragged in by hand today.
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing release tag to attach the .dmg to (optional — leave blank to just get a downloadable build artifact)'
+        required: false
+        default: ''
+  release:
+    types: [published]
+
+permissions:
+  contents: write   # needed to upload a release asset
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the macOS .dmg
+        run: npm run electron:build:mac
+        env:
+          # No Apple Developer account configured — this builds an
+          # unsigned .dmg. macOS Gatekeeper will show an "unidentified
+          # developer" warning on first open (right-click → Open, or
+          # allow it in System Settings → Privacy & Security, fixes it).
+          # Proper signing/notarization needs a paid ($99/yr) Apple
+          # Developer account — worth adding only if that becomes a real
+          # problem for how this gets distributed.
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload build artifact (always — downloadable from this run's page)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ByteForge-mac-dmg
+          path: dist-electron/*.dmg
+          retention-days: 30
+
+      - name: Attach to a release, if one was given or this ran from a published release
+        if: github.event_name == 'release' || inputs.release_tag != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.release_tag }}
+        run: |
+          for f in dist-electron/*.dmg; do
+            gh release upload "$TAG" "$f" --clobber
+          done
