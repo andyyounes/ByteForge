@@ -272,6 +272,14 @@
                  border:1px solid rgba(184,239,74,.25); font-size:12.5px; color:#c9d1e3; }
   .data-answer b { color:#b8ef4a; }
 
+  /* ── Variable Table — the real answer() replacement: shows exactly what
+     the student's own code set, read straight off the interpreter's
+     variable state after a Run. ── */
+  .vartable-wrap { margin-top:18px; padding-top:16px; border-top:1px solid rgba(255,255,255,.08); }
+  .vartable-empty { font-size:12px; color:#6b7280; font-style:italic; }
+  .var-table .var-name { color:#67e8f9; font-weight:700; }
+  .var-table .var-value { color:#b8ef4a; }
+
   /* ── Tournament Hub ── */
   .ty-wrap { max-width:900px; margin:0 auto 60px; padding:0 16px; display:flex; flex-direction:column; gap:16px; }
   .ty-card { background:#12141f; border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:18px 20px; }
@@ -4115,17 +4123,41 @@ function starsFor(mission, stats) {
   return v <= par ? 3 : v <= par + 2 ? 2 : 1
 }
 
-// A data mission's answer, checked with numeric tolerance or a case-insensitive
-// string match — the mission fails cleanly if answer() was never called.
-function evalDataSuccess(mission, val) {
-  if (val === undefined || val === null) return { ok: false, why: 'noanswer' }
-  const exp = mission.answer
+// A single expected value, checked with numeric tolerance or a
+// case-insensitive string match — shared by both check mechanics below.
+function _dataValMatches(got, exp) {
   if (typeof exp === 'number') {
-    const got = Number(val)
-    return (!isNaN(got) && Math.abs(got - exp) < 1e-6) ? { ok: true } : { ok: false, why: 'wrong', got: val }
+    const n = Number(got)
+    return !isNaN(n) && Math.abs(n - exp) < 1e-6
   }
-  return String(val).trim().toLowerCase() === String(exp).trim().toLowerCase()
-    ? { ok: true } : { ok: false, why: 'wrong', got: val }
+  return String(got).trim().toLowerCase() === String(exp).trim().toLowerCase()
+}
+
+// A data mission's result, checked one of two ways:
+//   - mission.checkVars: { varName: expectedValue, ... } — reads the
+//     student's own variable(s) straight out of res.vars (the Variable
+//     Table) after running. No special reporting call needed at all —
+//     the mission's starter code just assigns the variable naturally as
+//     its last real step. This is the current mechanic for new/migrated
+//     missions (see TODO-GRADE9.md Phase 1).
+//   - mission.answer (legacy): still supported for missions not yet
+//     migrated — checks whatever was passed to the old answer() call.
+// `val` is res.answer (legacy mechanic); `vars` is res.vars (the new one) —
+// kept as two separate params, rather than the whole `res` object, so this
+// stays a pure value-in/value-out function independent of the executor's
+// result shape (and so existing callers passing just `val` don't break).
+function evalDataSuccess(mission, val, vars) {
+  if (mission.checkVars) {
+    const v = vars || {}
+    for (const name in mission.checkVars) {
+      if (!(name in v)) return { ok: false, why: 'novar', varName: name }
+      if (!_dataValMatches(v[name], mission.checkVars[name]))
+        return { ok: false, why: 'wrong', varName: name, got: v[name] }
+    }
+    return { ok: true }
+  }
+  if (val === undefined || val === null) return { ok: false, why: 'noanswer' }
+  return _dataValMatches(val, mission.answer) ? { ok: true } : { ok: false, why: 'wrong', got: val }
 }
 
 // Mission requirements — a route that "works" without the concept doesn't pass
@@ -4225,6 +4257,11 @@ function execPseudo(src, mission, battleEnv) {
   const scopes = [Object.create(null)]
   if (mission.signals) scopes[0].signals = mission.signals.slice()
   if (battleEnv) for (const k in battleEnv) scopes[0][k] = battleEnv[k]
+  // Variable Table (data missions only) — snapshot the injected keys
+  // (datacount/data<field> from dataEnvFor) BEFORE the student's own lines
+  // run, so the final diff is exactly what the student declared/assigned —
+  // see the isData return below.
+  const _baselineKeys = isData ? new Set(Object.keys(scopes[0])) : null
   function getVar(name, ln) {
     for (let i = scopes.length - 1; i >= 0; i--) if (name in scopes[i]) return scopes[i][name]
     throw { message: 'Unknown variable "' + name + '"', ln }
@@ -4535,7 +4572,11 @@ function execPseudo(src, mission, battleEnv) {
     return { ok: false, error: err.message || String(err), line: err.ln || null }
   }
   if (isBattle) return { ok: true, action, outputs }
-  if (isData) return { ok: true, answer: answerVal, outputs }
+  if (isData) {
+    const vars = {}
+    for (const k in scopes[0]) if (!_baselineKeys.has(k)) vars[k] = scopes[0][k]
+    return { ok: true, answer: answerVal, outputs, vars }
+  }
   return { ok: true, cmds, outputs }
 }
 
@@ -4643,10 +4684,24 @@ async function execPythonData(code, mission) {
   const py = await ensurePyodide()
   py.runPython("_answer = None\ndef answer(v):\n    global _answer\n    _answer = v\n")
   py.globals.set('data', py.toPy(mission.data))
+  // Variable Table — snapshot the injected/builtin global names BEFORE the
+  // student's own code runs, so the final diff is exactly what the
+  // student declared/assigned (same approach as execPseudo's isData branch).
+  const baselineKeys = new Set(Object.keys(py.globals.toJs({ create_proxies: false, dict_converter: Object.fromEntries })))
   try {
     py.runPython(code)
     const val = py.globals.get('_answer')
-    return { ok: true, answer: val }
+    const allVars = py.globals.toJs({ create_proxies: false, dict_converter: Object.fromEntries })
+    const vars = {}
+    for (const k of Object.keys(allVars)) {
+      if (baselineKeys.has(k) || k.startsWith('__')) continue
+      const v = allVars[k]
+      // Skip anything that isn't plainly displayable (functions, modules) —
+      // a variable table shows data, not callables.
+      if (typeof v === 'function') continue
+      vars[k] = v
+    }
+    return { ok: true, answer: val, vars }
   } catch (e) {
     const msg = String(e.message || e)
     let line = null
@@ -5888,7 +5943,30 @@ function drawDataTable(mission) {
     }
     html += '</tbody></table>'
   }
+  // Variable Table placeholder — populated by renderVarTable() after each
+  // Run, so a student can see exactly what their own code set, instead of
+  // typing the result into answer() and trusting it blindly.
+  html += '<div id="data-wrap-vars" class="vartable-wrap"></div>'
   document.getElementById('data-wrap').innerHTML = html
+  renderVarTable(null)
+}
+
+// Renders the live "what did my code actually set?" table — the real
+// alternative to answer(): a student reads their own variables' final
+// values straight off this panel instead of typing a value into a
+// special function and hoping it's right. `vars` is the res.vars object
+// from execPseudo/execPythonData (undefined/null before the first Run).
+function renderVarTable(vars) {
+  const el = document.getElementById('data-wrap-vars')
+  if (!el) return
+  const names = vars ? Object.keys(vars) : []
+  if (!names.length) {
+    el.innerHTML = '<h3>🔎 Variables</h3><p class="vartable-empty">Press ▶ Run to see your variables\' values here.</p>'
+    return
+  }
+  el.innerHTML = '<h3>🔎 Variables</h3><table class="data-table var-table"><thead><tr><th>Name</th><th>Value</th></tr></thead><tbody>'
+    + names.map(n => '<tr><td class="var-name">' + n + '</td><td class="var-value">' + JSON.stringify(vars[n]) + '</td></tr>').join('')
+    + '</tbody></table>'
 }
 
 function setSubmit(on) {
@@ -6065,8 +6143,9 @@ async function runDataMission(isSubmit) {
     return
   }
 
-  const verdict = evalDataSuccess(mission, res.answer)
+  const verdict = evalDataSuccess(mission, res.answer, res.vars)
   const reqErr = verdict.ok ? checkRequire(mission, code) : null
+  renderVarTable(res.vars)
 
   if (isSubmit) {
     if (verdict.ok && !reqErr) completeMission({})
@@ -6078,12 +6157,22 @@ async function runDataMission(isSubmit) {
   if (res.outputs && res.outputs.length) logC('» ' + res.outputs.join('\n» '))
 
   if (verdict.ok && reqErr) {
-    logC('🟡 Correct answer… but ' + reqErr, 'warn')
+    logC('🟡 Correct… but ' + reqErr, 'warn')
     setSubmit(false)
   } else if (verdict.ok) {
-    logC('✅ Correct! answer(' + JSON.stringify(res.answer) + ') matches. Press ✓ Submit to claim your stars.', 'ok')
+    logC('✅ Correct! Check the Variables panel — press ✓ Submit to claim your stars.', 'ok')
     setSubmit(true)
+  } else if (mission.checkVars) {
+    // New mechanic: read the expected variable straight out of the Variable
+    // Table, no answer() call involved at all.
+    const name = verdict.varName
+    if (verdict.why === 'novar') {
+      logC('🤔 Your program ran but never set "' + name + '" — check the Variables panel to see what it has instead.', 'warn')
+    } else {
+      logC('✗ Not quite — "' + name + '" is ' + JSON.stringify(verdict.got) + ', expected ' + JSON.stringify(mission.checkVars[name]) + '. Check your logic and try again.', 'err')
+    }
   } else if (verdict.why === 'noanswer') {
+    // Legacy answer() mechanic — still supported for missions not yet migrated.
     logC('🤔 Your program ran but never called answer() — that\'s how you report your result.', 'warn')
   } else {
     logC('✗ Not quite — answer(' + JSON.stringify(res.answer) + ') doesn\'t match. Check your logic and try again.', 'err')
