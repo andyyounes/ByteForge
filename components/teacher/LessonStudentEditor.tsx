@@ -490,8 +490,10 @@ export function LessonStudentEditor({ topicKey, classId, backHref }: Props) {
                       </div>
                       {ytId(v.id) ? (
                         <iframe
-                          src={`https://www.youtube.com/embed/${ytId(v.id)}?rel=0&modestbranding=1`}
+                          src={`https://www.youtube.com/embed/${ytId(v.id)}?rel=0&modestbranding=1&playsinline=1`}
                           title={v.title || 'Video'}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
                           allowFullScreen
                           loading="lazy"
                         />
@@ -598,7 +600,7 @@ export function LessonStudentEditor({ topicKey, classId, backHref }: Props) {
                       const u = window.prompt('YouTube URL or video ID:')
                       if (!u) return
                       const id = ytId(u)
-                      setExample(x => (x ? x + '\n' : '') + `<div style="margin:10px 0;"><iframe src="https://www.youtube.com/embed/${id}?rel=0&modestbranding=1" style="width:100%;aspect-ratio:16/9;border:0;border-radius:8px;" allowfullscreen loading="lazy"></iframe></div>`)
+                      setExample(x => (x ? x + '\n' : '') + `<div style="margin:10px 0;"><iframe src="https://www.youtube.com/embed/${id}?rel=0&modestbranding=1&playsinline=1" style="width:100%;aspect-ratio:16/9;border:0;border-radius:8px;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe></div>`)
                       touch()
                     }}
                   >
