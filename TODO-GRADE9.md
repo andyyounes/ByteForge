@@ -170,9 +170,14 @@ as they are — this is additive, in the flowchart section specifically.
       REPEAT-UNTIL — not in any mission, not in the comparison lesson,
       and not in the interpreter itself. See the Log for what was
       actually built.
-- [ ] Phase 3 — final verification pass (re-run both G9 test suites +
-      full npm run verify once Phase 1.6 is also done — currently
-      done ad-hoc after each phase, not yet a single final pass)
+- [x] Phase 3 — final verification pass over everything built so far
+      (Phase 1 + Phase 2): `scripts/test-g9-missions.mjs`,
+      `test-g9-challenges.mjs`, `npx tsc --noEmit`, `npx eslint` on the
+      touched route file, full `npm run verify`, and a clean `git
+      status` — all pass, nothing uncommitted. This covers Phase 1's
+      engine work and Phase 2's REPEAT-UNTIL content; it does NOT yet
+      cover Phase 1.6 (migrating flowg1-18 onto checkVars), which is
+      still unstarted — re-run this pass again once that's done.
 
 - 2026-11-09: created this file after a full read-through of
   `grade9-missions.html` confirmed every point of the user's feedback
