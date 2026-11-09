@@ -143,11 +143,19 @@ as they are — this is additive, in the flowchart section specifically.
 - [ ] not started · [~] in progress · [x] done
 
 ## Work log
-- [ ] Phase 1.1 — expose `vars` from `execPseudo()` for data missions
-- [ ] Phase 1.2 — expose `vars` from `execPythonData()` (Pyodide globals)
-- [ ] Phase 1.3 — design `checkVars`-style mission check shape
-- [ ] Phase 1.4 — build the Variable Table UI component
-- [ ] Phase 1.5 — rework the split layout for `type:'data'` missions
+- [x] Phase 1.1 — expose `vars` from `execPseudo()` for data missions
+- [x] Phase 1.2 — expose `vars` from `execPythonData()` (Pyodide globals)
+- [x] Phase 1.3 — design `checkVars`-style mission check shape
+- [x] Phase 1.4 — build the Variable Table UI component
+- [~] Phase 1.5 — rework the split layout for `type:'data'` missions —
+      `.left` already had diagram+brief+console with `.right` as the
+      pure IDE (`.main{1fr 1fr}`); the Variable Table was added into
+      that existing `.left` flow (inside `#data-wrap`, below the
+      diagram) rather than a full layout rebuild, since the shape
+      asked for (IDE one side, output+variables+challenge the other)
+      was already close — judge whether this is sufficient once real
+      missions are migrated and it's seen with real content, before
+      doing further layout surgery.
 - [ ] Phase 1.6 — migrate flowg1-18 + cb1-9 off `answer()`
 - [ ] Phase 1.7 — fix `G9M_MISSION_CONCEPT_OVERRIDE` for flowg1-18
 - [ ] Phase 2 — new FOR/WHILE/REPEAT-UNTIL flowchart missions + trace tables
@@ -164,3 +172,25 @@ as they are — this is additive, in the flowchart section specifically.
   `answer()` with a real variable-inspection check. Not started yet —
   this is genuinely Grade-8-TODO-sized work; next step is Phase 1.1/1.2
   (the engine groundwork everything else depends on).
+- 2026-11-09 (continued): built Phase 1.1-1.4. `execPseudo()` and
+  `execPythonData()` both now return `vars` (a diff against each
+  mission's injected baseline keys) for `type:'data'` missions; a new
+  `#data-wrap-vars` Variable Table UI renders them; `evalDataSuccess()`
+  gained a `mission.checkVars: { name: expected }` path that reads the
+  table directly, no `answer()` needed, kept alongside the untouched
+  legacy `mission.answer` path (two separate params, not a reshaped
+  `res`, so no existing caller/test needed to change). Verified live via
+  scripted Electron/CDP against `flowg1`: pseudocode's Variable Table
+  correctly shows `n=7` after a legacy run, and the new `checkVars`
+  mechanic correctly handles right-answer/wrong-answer/never-set-the-
+  variable, each with real messaging naming the specific variable.
+  Could NOT live-verify the Python/Pyodide side in this sandbox
+  (dynamic WASM import failed under Electron/CDP for reasons unrelated
+  to this change — the same CDN URL is reachable by plain curl); the
+  Pyodide globals diff uses the same `py.globals.toJs()` API the
+  existing, already-working Python paths rely on, but treat it as
+  unverified live until checked in a real browser.
+  `node scripts/test-g9-missions.mjs` (all pass) + `test-g9-challenges.mjs`
+  (141 passed) + full `npm run verify` — all clean. No mission content
+  touched yet. Next: Phase 1.6 — migrate `flowg1`-`flowg18` onto
+  `checkVars`, batch by batch, verifying after each batch.
