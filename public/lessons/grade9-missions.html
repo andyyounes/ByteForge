@@ -619,7 +619,7 @@ CodeMirror.defineSimpleMode('pseudog9', {
   start: [
     { regex: /\/\/.*/, token: 'comment' },
     { regex: /'[^']*'|"[^"]*"/, token: 'string' },
-    { regex: /\b(FOR|TO|STEP|NEXT|IF|THEN|ELSE|ENDIF|MOD|AND|OR|NOT|OUTPUT|CALL|TRUE|FALSE|WHILE|ENDWHILE)\b/i, token: 'keyword' },
+    { regex: /\b(FOR|TO|STEP|NEXT|IF|THEN|ELSE|ENDIF|MOD|AND|OR|NOT|OUTPUT|CALL|TRUE|FALSE|WHILE|ENDWHILE|REPEAT|UNTIL)\b/i, token: 'keyword' },
     { regex: /\d+(\.\d+)?/, token: 'number' },
     { regex: /←|<-|<>|<=|>=|[=<>+\-*/]/, token: 'operator' },
     { regex: /[A-Za-z_]\w*(?=\s*\()/, token: 'def' },
@@ -1752,21 +1752,23 @@ const MISSIONS = [
   {
     id: 'learn-pseudo-control', type: 'learn', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '📘', title: 'Pseudocode: Decisions & Loops',
     hints: ["Re-watch the video or re-read the theory panel, then try the Match-Up again."], xp: 15,
-    brief: 'The flowchart missions ahead use Decision diamonds and loop-back arrows constantly — here\'s how those become real pseudocode: IF, FOR, and WHILE.',
+    brief: 'The flowchart missions ahead use Decision diamonds and loop-back arrows constantly — here\'s how those become real pseudocode: IF, FOR, WHILE, and REPEAT-UNTIL.',
     api: [],
     learn: {
-      videoQuery: 'pseudocode IF FOR WHILE loops GCSE computer science',
+      videoQuery: 'pseudocode IF FOR WHILE REPEAT UNTIL loops GCSE computer science',
       terms: [
         { term: 'IF / THEN / ELSE / ENDIF', def: 'Pseudocode\'s Decision diamond, turned into code — one arm per branch, closed with ENDIF.' },
         { term: 'FOR / TO / NEXT', def: 'A counting loop that repeats a fixed number of times, e.g. FOR i ← 1 TO 5 ... NEXT i.' },
-        { term: 'WHILE / ENDWHILE', def: 'A loop that keeps repeating WHILE a condition stays true — used when you don\'t know the exact count in advance.' },
+        { term: 'WHILE / ENDWHILE', def: 'A loop that keeps repeating WHILE a condition stays true, CHECKED BEFORE each pass — used when you don\'t know the exact count in advance.' },
+        { term: 'REPEAT / UNTIL', def: 'A loop that always runs AT LEAST ONCE, then checks its condition AFTER each pass — it keeps going UNTIL the condition becomes true (the opposite sense from WHILE).' },
         { term: 'MOD', def: 'Gives the REMAINDER after dividing — n MOD 2 = 0 tests whether n is even.' },
       ],
       theory: `
         <h4>🎯 Learning objectives</h4>
         <ul style="margin:0 0 14px 18px;padding:0;color:#c7d2e0;">
           <li>Write an IF/THEN/ELSE/ENDIF decision in pseudocode</li>
-          <li>Write a FOR/NEXT counting loop and a WHILE/ENDWHILE condition loop</li>
+          <li>Write a FOR/NEXT counting loop, a WHILE/ENDWHILE condition loop, and a REPEAT/UNTIL loop</li>
+          <li>Tell all three loop shapes apart: fixed count vs. checked-before vs. checked-after</li>
           <li>Use MOD to test divisibility (e.g. "is this number even?")</li>
         </ul>
         <h4>IF/THEN/ELSE/ENDIF — the Decision diamond, as code</h4>
@@ -1794,6 +1796,21 @@ WHILE n &gt; 0
     n ← n - 1
 ENDWHILE</div>
         <p style="color:#9ca3af;font-size:11.5px;">Outputs 5, 4, 3, 2, 1 — then stops, since n &gt; 0 is finally false.</p>
+        <h4>REPEAT/UNTIL — runs AT LEAST ONCE, checked AFTER each pass</h4>
+        <p>FOR and WHILE can both skip their body entirely if the starting condition already fails. REPEAT/UNTIL never does that — the body always runs once BEFORE the condition is even looked at, and it keeps repeating UNTIL that condition finally becomes true (not WHILE it's true — the opposite sense).</p>
+        <div style="background:#111320;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:10px 14px;font-size:12px;color:#c7d2e0;margin:10px 0;white-space:pre;">total ← 0
+n ← 1
+REPEAT
+    total ← total + n
+    n ← n + 1
+UNTIL n &gt; 5</div>
+        <p style="color:#9ca3af;font-size:11.5px;">Adds 1+2+3+4+5 = 15 into total, then stops once n &gt; 5 becomes true. Python has no REPEAT/UNTIL at all — the nearest equivalent is <code>while True:</code> with an <code>if ...: break</code> at the end of the loop body.</p>
+        <h4>Same loop, three different checks — which one and why?</h4>
+        <table class="data-table" style="margin:10px 0;"><thead><tr><th>Loop</th><th>Condition checked</th><th>Minimum runs</th><th>Use it when…</th></tr></thead><tbody>
+          <tr><td>FOR</td><td>n/a — fixed count</td><td>0 (if the range is empty)</td><td>you know exactly how many times in advance</td></tr>
+          <tr><td>WHILE</td><td>BEFORE each pass</td><td>0</td><td>you might not need to run it at all</td></tr>
+          <tr><td>REPEAT/UNTIL</td><td>AFTER each pass</td><td>1</td><td>the body must always happen at least once (e.g. "ask for input, validate it, re-ask if invalid")</td></tr>
+        </tbody></table>
         <h4>MOD — testing divisibility inside a Decision</h4>
         <p><code>MOD</code> gives you the REMAINDER after division — <code>7 MOD 2</code> is <b>1</b> (7 ÷ 2 leaves 1 left over), <code>8 MOD 2</code> is <b>0</b> (divides evenly). That makes <code>n MOD 2 = 0</code> the standard way to test "is n even?", and it's exactly what most of the Decision diamonds ahead actually check.</p>`,
     },
@@ -2436,6 +2453,82 @@ ENDWHILE</div>
     },
     requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires the real digit-peeling loop (MOD 2 / DIV 2) — don\'t hardcode the final string.' },
     answer: '1101',
+    stars: { metric: 'pass' },
+  },
+
+  // ── Foundations 6e · REPEAT-UNTIL — the third loop shape, genuinely
+  // missing until now: FOR (fixed count) and WHILE (checked BEFORE the
+  // first pass, may run zero times) were already covered by flowg15-18 +
+  // learn-pseudo-control's theory panel — REPEAT/UNTIL (checked AFTER
+  // each pass, ALWAYS runs at least once) never existed anywhere in this
+  // file, in either the content or the interpreter itself (execPseudo
+  // never parsed REPEAT/UNTIL at all before this). Both missions here use
+  // the new checkVars mechanic from TODO-GRADE9.md Phase 1 — the starter
+  // code just assigns the real variable as its natural last step, no
+  // answer() call needed.
+  {
+    id: 'flowg19', type: 'data', phase: 'FOUNDATIONS 3 · REPEAT-UNTIL', emoji: '🔂', title: 'Doubling Until Over',
+    forceLang: 'ps',
+    hints: ['REPEAT runs its body ONCE before ever checking the condition — unlike WHILE, which checks first and could skip the body entirely.',
+      'Double n AND increment count together, every single pass — then check UNTIL n > 100 at the end.',
+      '1 → 2 → 4 → 8 → 16 → 32 → 64 → 128 — that\'s 7 doublings before n finally exceeds 100.'],
+    xp: 45,
+    brief: 'Here\'s a finished flowchart: n ← 1, count ← 0, then REPEAT doubling n and counting the pass, UNTIL n exceeds 100. '
+      + 'Transform it into real code — no answer() needed, just let <code>count</code> and <code>n</code> hold their real final values and check the Variables panel.',
+    api: [],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'n←1, count←0'),
+      fcArrowHTML(),
+      fcLoopHTML('REPEAT … UNTIL n > 100', [
+        fcShapeHTML('process', 'n ← n × 2'),
+        fcArrowHTML(), fcShapeHTML('process', 'count ← count + 1'),
+      ], 'Done'),
+      fcShapeHTML('io', 'Output count'),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'n = 1\ncount = 0\n# Python has no REPEAT/UNTIL — the closest equivalent is:\n#   while True:\n#       ...\n#       if condition: break\n# TODO: while True:\n#         n = n * 2\n#         count = count + 1\n#         if n > 100: break\n',
+      ps: 'n ← 1\ncount ← 0\n// TODO: REPEAT\n//         n ← n * 2\n//         count ← count + 1\n//       UNTIL n > 100\n',
+    },
+    requireCode: { re: /\b(repeat|while\s+true)\b/i, msg: 'this mission requires a real REPEAT/UNTIL loop (or Python\'s while True: … if …: break) — don\'t hardcode the final count.' },
+    checkVars: { count: 7, n: 128 },
+    stars: { metric: 'pass' },
+  },
+  {
+    id: 'flowg20boss', type: 'data', phase: 'FOUNDATIONS 3 · REPEAT-UNTIL', emoji: '🔢', boss: true, title: 'BOSS — Digital Root',
+    forceLang: 'ps',
+    hints: ['The digital root keeps summing a number\'s digits until only ONE digit is left — e.g. 9875 → 29 → 11 → 2.',
+      'This needs TWO loops, nested: an inner WHILE that sums ONE number\'s digits (same digit-peeling as Armstrong/decimal-to-binary), and an outer REPEAT that re-runs the sum UNTIL the result is a single digit.',
+      'Set sum ← 0 and temp ← num fresh at the START of every outer pass, BEFORE the inner WHILE runs — otherwise digits from the previous pass leak into the next one.'],
+    xp: 65,
+    brief: 'Here\'s a finished flowchart for the <b>digital root</b> of num ← 9875: REPEAT summing all of num\'s digits (an inner WHILE, peeling digits with MOD 10 / DIV 10 — same trick as Armstrong/decimal-to-binary) and replacing num with that sum, UNTIL num is a single digit (num &lt; 10). '
+      + 'Transform the whole thing into real code — two loops, nested. No answer() needed, check the Variables panel for num\'s final value.',
+    api: [],
+    dataTitle: 'Flowchart to Code', dataFields: [],
+    data: [],
+    diagram: fcDiagram([
+      fcShapeHTML('start', 'Start'), fcArrowHTML(), fcShapeHTML('process', 'num←9875'),
+      fcArrowHTML(),
+      fcLoopHTML('REPEAT … UNTIL num &lt; 10', [
+        fcShapeHTML('process', 'sum←0, temp←num'),
+        fcArrowHTML(),
+        fcLoopHTML('WHILE temp > 0', [
+          fcShapeHTML('process', 'sum ← sum + (temp MOD 10)'),
+          fcArrowHTML(), fcShapeHTML('process', 'temp ← temp DIV 10'),
+        ]),
+        fcShapeHTML('process', 'num ← sum'),
+      ], 'Done'),
+      fcShapeHTML('io', 'Output num'),
+      fcArrowHTML(), fcShapeHTML('end', 'End'),
+    ]),
+    starter: {
+      py: 'num = 9875\n# TODO: while True:               (the outer REPEAT)\n#         total = 0\n#         temp = num\n#         while temp > 0:          (the inner WHILE — same digit-peeling as Armstrong)\n#             total = total + temp % 10\n#             temp = temp // 10\n#         num = total\n#         if num < 10: break      (the UNTIL condition)\n',
+      ps: 'num ← 9875\n// TODO: REPEAT                          (the outer loop)\n//         sum ← 0\n//         temp ← num\n//         WHILE temp > 0                (the inner loop — same digit-peeling as Armstrong)\n//           sum ← sum + (temp MOD 10)\n//           temp ← temp DIV 10\n//         ENDWHILE\n//         num ← sum\n//       UNTIL num < 10\n',
+    },
+    requireCode: { re: /\b(repeat|while\s+true)\b/i, msg: 'this mission requires the real nested loop (an outer REPEAT/while-True re-running the digit sum UNTIL a single digit remains) — don\'t hardcode the final root.' },
+    checkVars: { num: 2 },
     stars: { metric: 'pass' },
   },
 
@@ -4524,7 +4617,30 @@ function execPseudo(src, mission, battleEnv) {
         i = nxt + 1
         continue
       }
-      if (up === 'ELSE' || up === 'ENDIF' || up === 'NEXT' || up.startsWith('NEXT ') || up === 'ENDWHILE')
+      // REPEAT … UNTIL condition — the third loop shape, distinct from
+      // both FOR (fixed count) and WHILE (condition checked BEFORE the
+      // first pass): the body always runs at least ONCE, and the
+      // condition on the UNTIL line is checked AFTER each pass, with the
+      // loop continuing while it's still FALSE (stops once it becomes
+      // true — the opposite sense from WHILE's "continue while true").
+      // Did not exist at all before (confirmed by reading this function):
+      // REPEAT/UNTIL were never interpreted, matching flowg1-18 never
+      // using them and the FOR/WHILE comparison lesson never mentioning
+      // this third construct.
+      if (up === 'REPEAT') {
+        const nxt = matchEnd(i, 'REPEAT', 'UNTIL')
+        const untilLine = lines[nxt]
+        const um = untilLine.t.match(/^UNTIL\s+(.+)$/i)
+        if (!um) throw { message: 'Bad UNTIL — expected: UNTIL condition', ln: untilLine.ln }
+        let cond
+        do {
+          run(i + 1, nxt)
+          cond = truthy(evalExpr(um[1], untilLine.ln))
+        } while (!cond)
+        i = nxt + 1
+        continue
+      }
+      if (up === 'ELSE' || up === 'ENDIF' || up === 'NEXT' || up.startsWith('NEXT ') || up === 'ENDWHILE' || up.startsWith('UNTIL '))
         throw { message: '"' + t + '" has no matching opener here', ln }
       if (up.startsWith('OUTPUT')) {
         const rest = t.slice(6).trim()
@@ -6208,6 +6324,16 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   p0m1: 'g9-binary', p0m2: 'g9-binary', 'learn-images': 'g9-binary', p0m7: 'g9-binary', p0m8: 'g9-binary',
   'learn-flowcharts': 'g9-flowcharts-loops', 'learn-pseudo-why': 'g9-flowcharts-loops', 'learn-pseudo-control': 'g9-flowcharts-loops',
   'flow-p1': 'g9-flowcharts-loops', 'flow-p2': 'g9-flowcharts-loops', 'flow-code': 'g9-flowcharts-loops',
+  // flowg1-18 + the new REPEAT-UNTIL missions had NO mapping at all before
+  // this (same class of gap as the cards/cb missions elsewhere in this
+  // override) — every one of them is flowchart-to-code work, same concept
+  // as flow-p1/flow-p2/flow-code above.
+  flowg1: 'g9-flowcharts-loops', flowg2: 'g9-flowcharts-loops', flowg3: 'g9-flowcharts-loops', flowg4: 'g9-flowcharts-loops',
+  flowg5: 'g9-flowcharts-loops', flowg6: 'g9-flowcharts-loops', flowgboss: 'g9-flowcharts-loops',
+  flowg7: 'g9-flowcharts-loops', flowg8: 'g9-flowcharts-loops', flowg9: 'g9-flowcharts-loops', flowg10: 'g9-flowcharts-loops',
+  flowg11: 'g9-flowcharts-loops', flowg12: 'g9-flowcharts-loops', flowg13: 'g9-flowcharts-loops', flowg14: 'g9-flowcharts-loops',
+  flowg15: 'g9-flowcharts-loops', flowg16: 'g9-flowcharts-loops', flowg17: 'g9-flowcharts-loops', flowg18: 'g9-flowcharts-loops',
+  flowg19: 'g9-flowcharts-loops', flowg20boss: 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
   'learn-datatypes': 'g9-declarations',
   // Foundations 3 — Your First Code — also had NO mapping at all (same
@@ -6376,6 +6502,7 @@ const TIERS = [
   { name: '🧮 FOUNDATIONS 3 · FLOWGORITHM PRACTICE — real-world scenarios, same engine', ids: ['flowg7', 'flowg8', 'flowg9', 'flowg10', 'flowg11', 'flowg12', 'flowg13'] },
   { name: '🏆 FOUNDATIONS 3 PRACTICE CAPSTONE', ids: ['flowg14'] },
   { name: '🔢 FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2 — the classic algorithm set', ids: ['flowg15', 'flowg16', 'flowg17', 'flowg18'] },
+  { name: '🔂 FOUNDATIONS 3 · REPEAT-UNTIL — the third loop shape', ids: ['flowg19', 'flowg20boss'] },
   { name: '📘 FOUNDATIONS 4 · YOUR FIRST CODE — real Python, right after flowcharts/Flowgorithm', ids: ['learn-cb', 'learn-naming', 'naming-quiz', 'cb1', 'cb2', 'cb3', 'cb4', 'cb5', 'cb6', 'learn-forloop-cb', 'cb7', 'cb8', 'learn-io-cb', 'cb9'] },
   { name: '🏆 FOUNDATIONS 4 CAPSTONE', ids: ['cbboss', 'cbboss2', 'cbboss3'] },
   { name: '🔢 FOUNDATIONS 5 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'p0m4b', 'learn-datatypes', 'p0m5', 'learn-conversion', 'p0m5c', 'p0m6'] },

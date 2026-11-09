@@ -486,17 +486,28 @@ const DATA_REF = {
   flowg16: 'n ← 5\nresult ← 1\nFOR i ← 1 TO n\n    result ← result * i\nNEXT i\n\nanswer(result)',
   flowg17: 'num ← 153\nsum ← 0\ntemp ← num\nWHILE temp > 0\n    digit ← temp MOD 10\n    sum ← sum + digit * digit * digit\n    temp ← temp DIV 10\nENDWHILE\nIF sum = num THEN\n    answer("Armstrong")\nELSE\n    answer("Not Armstrong")\nENDIF',
   flowg18: 'num ← 13\nresult ← ""\nWHILE num > 0\n    digit ← num MOD 2\n    result ← STR(digit) + result\n    num ← num DIV 2\nENDWHILE\n\nanswer(result)',
+
+  // ── REPEAT-UNTIL (added alongside the interpreter support — see
+  // execPseudo's new REPEAT branch) — both use the checkVars mechanic
+  // (TODO-GRADE9.md Phase 1), no answer() call at all.
+  flowg19: 'n ← 1\ncount ← 0\nREPEAT\n    n ← n * 2\n    count ← count + 1\nUNTIL n > 100',
+  flowg20boss: 'num ← 9875\nREPEAT\n    sum ← 0\n    temp ← num\n    WHILE temp > 0\n        sum ← sum + (temp MOD 10)\n        temp ← temp DIV 10\n    ENDWHILE\n    num ← sum\nUNTIL num < 10',
 }
 for (const [id, src] of Object.entries(DATA_REF)) {
   const m = MISSIONS.find(x => x.id === id)
   if (!m) { bad(id + ' — mission not found'); continue }
   const res = runData(m, src)
   if (!res.ok) { bad(id + ' — ' + m.title + ': reference errored: ' + res.error); continue }
-  const v = evalDataSuccess(m, res.answer)
-  if (!v.ok) { bad(id + ' — ' + m.title + ': reference answer(' + JSON.stringify(res.answer) + ') != expected ' + JSON.stringify(m.answer)); continue }
+  const v = evalDataSuccess(m, res.answer, res.vars)
+  if (!v.ok) {
+    const expected = m.checkVars ? JSON.stringify(m.checkVars) : JSON.stringify(m.answer)
+    const got = m.checkVars ? JSON.stringify(res.vars) : JSON.stringify(res.answer)
+    bad(id + ' — ' + m.title + ': reference got ' + got + ' != expected ' + expected)
+    continue
+  }
   const reqErr = m.require === 'loop' ? checkRequire(m, src) : null
   if (reqErr) { bad(id + ' — ' + m.title + ': reference should satisfy its own require(loop) check: ' + reqErr); continue }
-  ok(id + ' — ' + m.title + ': reference computes ' + JSON.stringify(res.answer) + ' correctly, require satisfied')
+  ok(id + ' — ' + m.title + ': reference computes ' + (m.checkVars ? JSON.stringify(res.vars) : JSON.stringify(res.answer)) + ' correctly, require satisfied')
 }
 {
   // A hardcoded, non-loop "cheat" must fail p3m2's require check (loop is genuinely needed)
