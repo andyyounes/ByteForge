@@ -157,9 +157,22 @@ as they are — this is additive, in the flowchart section specifically.
       missions are migrated and it's seen with real content, before
       doing further layout surgery.
 - [ ] Phase 1.6 — migrate flowg1-18 + cb1-9 off `answer()`
-- [ ] Phase 1.7 — fix `G9M_MISSION_CONCEPT_OVERRIDE` for flowg1-18
-- [ ] Phase 2 — new FOR/WHILE/REPEAT-UNTIL flowchart missions + trace tables
-- [ ] Phase 3 — final verification pass
+- [x] Phase 1.7 — fix `G9M_MISSION_CONCEPT_OVERRIDE` for flowg1-18
+      (done alongside Phase 2, since the new missions needed mapping
+      too and flowg1-18 were sitting right there unmapped)
+- [x] Phase 2 — REPEAT-UNTIL interpreter support + 2 new missions —
+      **correction to this file's original Phase 2 plan**: flowg15-18
+      already contained real loops (WHILE for GCD/Armstrong/prime,
+      FOR for factorial) and `learn-pseudo-control` already compared
+      FOR vs WHILE — the first read of this file only checked
+      flowg1/flowg2 in full and wrongly generalized "no loops at all"
+      to all 18. What was genuinely, completely missing was
+      REPEAT-UNTIL — not in any mission, not in the comparison lesson,
+      and not in the interpreter itself. See the Log for what was
+      actually built.
+- [ ] Phase 3 — final verification pass (re-run both G9 test suites +
+      full npm run verify once Phase 1.6 is also done — currently
+      done ad-hoc after each phase, not yet a single final pass)
 
 - 2026-11-09: created this file after a full read-through of
   `grade9-missions.html` confirmed every point of the user's feedback
@@ -194,3 +207,42 @@ as they are — this is additive, in the flowchart section specifically.
   (141 passed) + full `npm run verify` — all clean. No mission content
   touched yet. Next: Phase 1.6 — migrate `flowg1`-`flowg18` onto
   `checkVars`, batch by batch, verifying after each batch.
+- 2026-11-09 (continued, Phase 2): re-reading flowg15-18 in full (not
+  just by title, the mistake the original Phase 2 plan made) found
+  they already use real WHILE/FOR loops with proper diagrams, and
+  `learn-pseudo-control` already teaches FOR vs WHILE. The real,
+  total gap was `REPEAT-UNTIL` — added it to `execPseudo()` (body
+  always runs ≥1 time, condition on the `UNTIL` line checked AFTER
+  each pass, opposite sense from WHILE), to CodeMirror's keyword
+  highlighting, and to `learn-pseudo-control`'s theory (a genuine
+  FOR/WHILE/REPEAT-UNTIL comparison table: checked-when, minimum
+  runs, when to use each). Added two new missions on the `checkVars`
+  mechanic from Phase 1 (no `answer()` at all): `flowg19` ("Doubling
+  Until Over" — a clean single-loop intro) and `flowg20boss`
+  ("Digital Root" — WHILE nested inside REPEAT-UNTIL, a real
+  capstone reusing the digit-peeling pattern from Armstrong/
+  decimal-to-binary). Caught a real bug while testing flowg19's own
+  reference solution: its starter code's commented-out TODO used the
+  display-only `×` symbol instead of the tokenizer's actual `*`
+  operator — would have thrown a cryptic "Cannot read: × 2" at any
+  student who uncommented it as written; fixed before it ever shipped.
+  Also closed Phase 1.7 while here: `flowg1`-`flowg20boss` (20
+  missions) were never in `G9M_MISSION_CONCEPT_OVERRIDE` — completing
+  any of them never counted toward `g9-flowcharts-loops` mastery; all
+  20 are mapped now. Bumped `TOTAL_MISSIONS` 126→128 in the
+  `g9-progress` API route. Verified: `execPseudo`'s new REPEAT branch
+  directly (basic loop, runs-at-least-once-even-if-already-true,
+  unmatched-UNTIL error), both new missions' reference solutions via
+  `scripts/test-g9-missions.mjs` (added to `DATA_REF`, plus a
+  hardcode-without-a-real-loop negative test), and the full UI flow
+  live via scripted Electron/CDP (diagram renders, hints show, the
+  Variable Table populates with real values, Submit unlocks on a
+  correct run) for both new missions. Full test suites + tsc + `npm
+  run verify` clean throughout.
+  **Known gap, not fixed**: `flowg15`-`flowg18` (and now `flowg19`/
+  `flowg20boss`) have no Russian translation in `grade9-ru.js` — a
+  pre-existing gap for this whole mission type, flagged rather than
+  silently expanding this task to cover it.
+  Next: Phase 1.6 (migrate `flowg1`-`flowg18` onto `checkVars`, which
+  is now also the established pattern Phase 2's new missions used) —
+  or user may redirect elsewhere first.
