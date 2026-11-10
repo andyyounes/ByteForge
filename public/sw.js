@@ -38,7 +38,9 @@
 // moved earlier, new fcw1-fcw6boss "design your own" tier added) — a big
 // enough mission-list/TIERS change that a returning browser must not serve
 // the old version from cache.
-const CACHE_NAME = 'bf-offline-v5'
+// Bumped v5 -> v6 (2026-11-10): collapsed 6 Flowgorithm sub-tiers into 1 —
+// map was showing 9 separate "FOUNDATIONS 3" world-cards instead of 4.
+const CACHE_NAME = 'bf-offline-v6'
 
 // Same-origin paths this service worker is allowed to cache. Everything
 // else same-origin (notably /api/*) is left completely alone — fetch
