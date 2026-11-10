@@ -34,9 +34,32 @@
                 padding:3px 10px; border-radius:99px; }
   .mbar-par { margin-left:auto; font-size:11.5px; font-weight:800; color:#fbbf24; }
 
-  /* ── Split layout ── */
+  /* ── Compact mission nav strip + always-visible Next footer — matches
+     Grade 8's ch-nav-strip/ch-footer convention: a Prev/Next stepper
+     scoped to the current phase/tier, and a persistent "complete this to
+     continue" prompt instead of the only way forward being the win
+     overlay after a pass. ── */
+  .m-nav-strip { display:flex; align-items:center; gap:10px; padding:10px 16px 0; flex-shrink:0; }
+  .m-nav-btn { padding:4px 12px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
+               background:#161927; border:1px solid rgba(255,255,255,.14); color:#9ca3af; }
+  .m-nav-btn:hover:not(:disabled) { color:#e2e8f0; border-color:#67e8f9; }
+  .m-nav-btn:disabled { opacity:.35; cursor:not-allowed; }
+  .m-nav-current { flex:1; font-size:12px; font-weight:700; color:#9ca3af; text-align:center; }
+  .m-nav-current b { color:#67e8f9; }
+  .m-footer { flex-shrink:0; padding:10px 16px; background:#111320; border-top:1px solid rgba(255,255,255,.08); }
+  .m-footer-next { width:100%; padding:11px; border-radius:9px; border:none; font-size:13px; font-weight:800; cursor:pointer; }
+  .m-footer-next:disabled { background:#161927; color:#6b7280; cursor:not-allowed; }
+  .m-footer-next:not(:disabled) { background:linear-gradient(135deg,#4ade80,#22c55e); color:#052e12; }
+  .m-footer-next:not(:disabled):hover { filter:brightness(1.08); }
+
+  /* ── Split layout ── matches Grade 8's convention: the CODE EDITOR on the
+     left (.right in the markup — kept as-is to avoid touching every JS
+     selector that already targets it; `order` alone swaps which SIDE it
+     renders on), challenge text + output/canvas + console stacked on the
+     right (.left in the markup). Grade 9 used to have this mirrored. */
   .main { flex:1; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; }
-  .left { display:flex; flex-direction:column; border-right:1px solid rgba(255,255,255,.1); overflow:hidden; }
+  .left { display:flex; flex-direction:column; border-left:1px solid rgba(255,255,255,.1); overflow:hidden; order:2; }
+  .right { order:1; border-right:1px solid rgba(255,255,255,.1); }
   .scene-wrap { flex:1; display:flex; align-items:center; justify-content:center; background:
     radial-gradient(ellipse at 30% 20%, rgba(103,232,249,.05), transparent 60%), #0b0d16; overflow:hidden; position:relative; }
   canvas { max-width:100%; max-height:100%; }
@@ -541,6 +564,16 @@
 
 <div class="main" id="mission-main">
   <div class="left">
+    <!-- Compact Prev/Next stepper, scoped to the current TIERS group —
+         matches Grade 8's "Challenge N of 31" strip. The mission map
+         screen (☰ Missions) remains the place to jump around freely; this
+         is just quick stepping through what's already right in front of
+         the student. -->
+    <div class="m-nav-strip">
+      <button class="m-nav-btn" id="m-nav-prev" onclick="stepMission(-1)" title="Previous mission">←</button>
+      <div class="m-nav-current" id="m-nav-current"></div>
+      <button class="m-nav-btn" id="m-nav-next" onclick="stepMission(1)" title="Next mission">→</button>
+    </div>
     <div class="scene-wrap">
       <canvas id="scene" width="640" height="480"></canvas>
       <div class="data-wrap" id="data-wrap" style="display:none;"></div>
@@ -560,6 +593,16 @@
     <div class="m-lesson" id="m-lesson" style="display:none;">
       <div class="ml-toggle" id="ml-toggle" onclick="toggleMissionLesson()">📘 <span id="ml-title"></span> <span id="ml-arrow">▾</span></div>
       <div class="ml-body" id="ml-body"></div>
+    </div>
+    <!-- Always-visible Next control (matches Grade 8's ch-footer) — the win
+         overlay (after a real Submit) still shows too, but a student no
+         longer has to wait for that to see a path forward: this enables
+         the moment the mission is already complete (reopening a past
+         mission) and stays disabled otherwise. -->
+    <div class="m-footer" id="m-footer">
+      <button class="m-footer-next" id="m-footer-next" onclick="footerNextMission()" disabled>
+        Complete the mission to continue →
+      </button>
     </div>
     <div class="console" id="console">// Mission console — Run your code to see what happens.</div>
   </div>
@@ -5529,6 +5572,8 @@ function openMission(id) {
   document.getElementById('m-title').textContent = activeMission.emoji + ' ' + activeMission.title
   document.getElementById('m-phase').textContent = activeMission.phase
   document.getElementById('m-par').textContent = parLabel(activeMission)
+  updateMissionNavStrip()
+  updateFooterNext()
   document.getElementById('m-brief').innerHTML = activeMission.brief
   document.getElementById('m-api').innerHTML =
     activeMission.api.map(a => '<span class="api-chip">' + a + '</span>').join('')
@@ -5561,6 +5606,60 @@ function openMission(id) {
     ? '// Mission loaded. Write your tactics and press ▶ Run.'
     : '// Mission loaded. Write your flight plan and press ▶ Run.')
   setTimeout(() => editor.refresh(), 50)
+}
+
+// ── Compact Prev/Next stepper + always-visible footer (Grade 8 parity) ─────
+// Scoped to the current TIERS group — the same named groupings the mission
+// MAP already uses — so "Mission N of M" means something (this phase's own
+// missions), not a raw position in the full 134-mission array.
+function missionTierGroup(id) {
+  return TIERS.find(t => t.ids.includes(id))
+}
+function updateMissionNavStrip() {
+  const prevBtn = document.getElementById('m-nav-prev')
+  const nextBtn = document.getElementById('m-nav-next')
+  const curEl = document.getElementById('m-nav-current')
+  if (!prevBtn || !activeMission) return
+  const tier = missionTierGroup(activeMission.id)
+  if (!tier) { curEl.innerHTML = ''; prevBtn.disabled = true; nextBtn.disabled = true; return }
+  const idx = tier.ids.indexOf(activeMission.id)
+  curEl.innerHTML = 'Mission <b>' + (idx + 1) + '</b> of ' + tier.ids.length
+  prevBtn.disabled = idx <= 0
+  nextBtn.disabled = idx >= tier.ids.length - 1
+}
+function stepMission(dir) {
+  if (!activeMission) return
+  const tier = missionTierGroup(activeMission.id)
+  if (!tier) return
+  const idx = tier.ids.indexOf(activeMission.id)
+  const newIdx = idx + dir
+  if (newIdx < 0 || newIdx >= tier.ids.length) return
+  openMission(tier.ids[newIdx])
+}
+// Enabled once THIS mission already has stars recorded (reopening a past
+// mission) — a fresh pass flips it on via the same call from
+// completeMission(). The win overlay (after a real Submit) still shows
+// too; this just means a student isn't stuck waiting for that to be the
+// only way forward, matching Grade 8's always-visible ch-footer.
+function updateFooterNext() {
+  const btn = document.getElementById('m-footer-next')
+  if (!btn || !activeMission) return
+  const p = getProg()
+  const done = !!(p[activeMission.id] || {}).stars
+  btn.disabled = !done
+  btn.textContent = done ? 'Continue →' : 'Complete the mission to continue →'
+}
+function footerNextMission() {
+  if (!activeMission) return
+  const tier = missionTierGroup(activeMission.id)
+  if (tier) {
+    const idx = tier.ids.indexOf(activeMission.id)
+    if (idx < tier.ids.length - 1) { openMission(tier.ids[idx + 1]); return }
+  }
+  // End of this tier (or no tier found at all) — same fallback winNext() uses.
+  const gidx = MISSIONS.indexOf(activeMission)
+  if (MISSIONS[gidx + 1]) openMission(MISSIONS[gidx + 1].id)
+  else showJourney()
 }
 
 // ── Language (EN / РУ) for quiz + learn bubbles ─────────────────────────────
@@ -6867,6 +6966,7 @@ function completeMission(stats) {
     lang: lang,
   }
   saveProg(p)
+  updateFooterNext()
   // id-keyed (mission's own stable id, not array position). The full record
   // rides in `code` as JSON (same fix as grade6.html's completeStage) so it
   // can actually be read back on init below, restoring stars/xp/code/lang on
