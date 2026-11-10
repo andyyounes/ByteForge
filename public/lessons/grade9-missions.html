@@ -530,7 +530,7 @@
         <div onclick="fcContextAdd('repeat')">⬡ Repeat</div>
         <div onclick="fcContextAdd('io')">▱ Output</div>
       </div>
-      <div class="fc-status" id="fc-status">Drag shapes to reposition. Double-click a shape to edit it properly (variable name, data type, loop range, condition…), or click its text to rename it directly. Right-click the canvas (or use the buttons above) to add a shape. Use "Connect Shapes" then click two shapes in order to draw an arrow between them — from a Decision/For/While/Repeat, the FIRST arrow you draw is True/Next, the SECOND is False/Done.</div>
+      <div class="fc-status" id="fc-status">Drag shapes to reposition. Double-click a shape to edit it properly (variable name, data type, loop range, condition…), or click its text to rename it directly. Right-click the canvas (or use the buttons above) to add a shape, or click any connector arrow to insert a shape right into it. Use "Connect Shapes" then click two shapes in order to draw an arrow between them — from a Decision/For/While/Repeat, the FIRST arrow you draw is True/Next, the SECOND is False/Done.</div>
       <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
       <div class="g9-hint-display" id="g9-hint-display-flow"></div>
       <div class="btn-row" style="display:flex;gap:8px;">
@@ -6078,7 +6078,7 @@ function clearFlowchart(wipe) {
   const canvas = document.getElementById('fc-canvas-wrap')
   canvas.querySelectorAll('.fc-shape').forEach(el => el.remove())
   document.getElementById('fc-svg').innerHTML = ''
-  document.getElementById('fc-status').textContent = 'Drag shapes to reposition. Double-click a shape to edit it properly (variable name, data type, loop range, condition…), or click its text to rename it directly. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.'
+  document.getElementById('fc-status').textContent = 'Drag shapes to reposition. Double-click a shape to edit it properly (variable name, data type, loop range, condition…), or click its text to rename it directly. Click any connector arrow to insert a shape into it, or use "Connect Shapes" then click two shapes in order to draw an arrow between them.'
   document.getElementById('fc-run-output').textContent = ''
   if (wipe) { fcSaveDraft(); return }
   // Restore the student's own in-progress build first — losing a half-built
@@ -6088,7 +6088,27 @@ function clearFlowchart(wipe) {
   const draft = activeMission ? fcLoadDraft(activeMission.id) : null
   if (draft && Array.isArray(draft.shapes) && draft.shapes.length) { loadPrebuiltFlowchart(draft); return }
   const prebuilt = activeMission?.flowchart?.prebuilt
-  if (prebuilt) loadPrebuiltFlowchart(prebuilt)
+  if (prebuilt) { loadPrebuiltFlowchart(prebuilt); return }
+  // Real user report: a totally empty canvas (no Start, no End, nothing)
+  // left students unsure where to even begin. Every blank-canvas builder
+  // mission now starts with Start and End already placed and connected —
+  // the connector between them can be clicked to insert a shape right
+  // into the middle of it (see insertShapeIntoConnector), so this never
+  // gets in the way of building the real flowchart.
+  if (activeMission?.type === 'flowchart') seedStartEnd()
+}
+function seedStartEnd() {
+  addShape('terminator', { x: 170, y: 20 })
+  const startId = _fcNextId - 1
+  addShape('terminator', { x: 170, y: 230 })
+  const endId = _fcNextId - 1
+  const endShape = _fcShapes.find(s => s.id === endId)
+  endShape.label = 'End'
+  const endLabelEl = document.querySelector('.fc-shape[data-id="' + endId + '"] .fc-label')
+  if (endLabelEl) endLabelEl.textContent = 'End'
+  _fcConns.push({ from: startId, to: endId })
+  drawConnections()
+  fcSaveDraft()
 }
 // ── Save the student's in-progress flowchart build — mirrors the existing
 // code-draft pattern (draftKey/loadDraft/saveDraft above) exactly, just for
@@ -6138,8 +6158,14 @@ function loadPrebuiltFlowchart(prebuilt) {
 // (in canvas-local coordinates, matching how dragged/placed shapes are
 // already positioned) so the chosen shape drops exactly there.
 let _fcContextPos = null
+// Set when the SAME palette menu was opened by clicking a connector (see
+// drawConnections' hit-line below) instead of right-clicking the canvas —
+// fcContextAdd then SPLITS that connector around the new shape instead of
+// just dropping it loose on the canvas.
+let _fcInsertConnIdx = null
 function showFcContextMenu(e) {
   e.preventDefault()
+  _fcInsertConnIdx = null
   const canvas = document.getElementById('fc-canvas-wrap')
   const rect = canvas.getBoundingClientRect()
   _fcContextPos = { x: e.clientX - rect.left, y: e.clientY - rect.top }
@@ -6149,9 +6175,39 @@ function showFcContextMenu(e) {
   menu.classList.add('open')
   return false
 }
+function showConnectorInsertMenu(e, idx) {
+  e.stopPropagation()
+  e.preventDefault()
+  _fcInsertConnIdx = idx
+  const canvas = document.getElementById('fc-canvas-wrap')
+  const rect = canvas.getBoundingClientRect()
+  _fcContextPos = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+  const menu = document.getElementById('fc-context-menu')
+  menu.style.left = e.clientX + 'px'
+  menu.style.top = e.clientY + 'px'
+  menu.classList.add('open')
+}
 function fcContextAdd(type) {
   document.getElementById('fc-context-menu').classList.remove('open')
+  if (_fcInsertConnIdx !== null) {
+    insertShapeIntoConnector(type, _fcInsertConnIdx)
+    _fcInsertConnIdx = null
+    return
+  }
   addShape(type, _fcContextPos || undefined)
+}
+function insertShapeIntoConnector(type, idx) {
+  const conn = _fcConns[idx]
+  if (!conn) return
+  addShape(type, _fcContextPos || undefined)
+  const newId = _fcNextId - 1
+  // The original connector's label (True/False/Next/Done) belongs to the
+  // branch it LEFT, so it stays on the first half; the second half (new
+  // shape → the old destination) is a plain, unlabelled "next step."
+  _fcConns[idx] = { from: conn.from, to: newId, label: conn.label }
+  _fcConns.push({ from: newId, to: conn.to })
+  drawConnections()
+  fcSaveDraft()
 }
 document.addEventListener('click', (e) => {
   const menu = document.getElementById('fc-context-menu')
@@ -6241,6 +6297,20 @@ function fcParseOutput(label) {
   const m = (label || '').match(/^\s*Output\s+(.+)$/i)
   return { expr: m ? m[1].trim() : '' }
 }
+// Real gap this closes: Assign/Output/Decision targets were free-text with
+// nothing connecting them back to what a Declare shape actually named —
+// easy to retype a variable slightly wrong with no warning at all (a typo
+// in Assign used to silently create a brand-new ghost variable; see
+// fcExecAssign's own check above for that half of the fix). This is the
+// other half: suggest the names that actually exist, instead of asking a
+// student to remember them exactly.
+function fcDeclaredVars() {
+  return _fcShapes.filter(s => s.type === 'declare').map(s => fcParseDeclare(s.label).name).filter(Boolean)
+}
+function fcVarDatalistHTML() {
+  const names = fcDeclaredVars()
+  return '<datalist id="fe-known-vars">' + names.map(n => `<option value="${n}">`).join('') + '</datalist>'
+}
 
 function openShapeEditor(id) {
   const shape = _fcShapes.find(s => s.id === id)
@@ -6264,8 +6334,9 @@ function openShapeEditor(id) {
   } else if (shape.type === 'process') {
     const a = fcParseAssign(shape.label)
     body.innerHTML = `
-      <div class="fc-edit-row"><label>Variable (or array[index])</label><input type="text" id="fe-target" value="${a.target}" placeholder="e.g. total or arr[i]"></div>
-      <div class="fc-edit-row"><label>Expression</label><input type="text" id="fe-expr" value="${a.expr}" placeholder="e.g. total + n"></div>`
+      <div class="fc-edit-row"><label>Variable (or array[index])</label><input type="text" id="fe-target" value="${a.target}" placeholder="e.g. total or arr[i]" list="fe-known-vars"></div>
+      <div class="fc-edit-row"><label>Expression</label><input type="text" id="fe-expr" value="${a.expr}" placeholder="e.g. total + n" list="fe-known-vars"></div>
+      ${fcVarDatalistHTML()}`
   } else if (shape.type === 'decision' || shape.type === 'while' || shape.type === 'repeat') {
     const c = fcParseCondition(shape.label)
     const hint = shape.type === 'repeat'
@@ -6275,21 +6346,24 @@ function openShapeEditor(id) {
       ${hint}
       <div class="fc-edit-row"><label>Condition</label>
         <div class="fc-edit-cond">
-          <input type="text" id="fe-left" value="${c.left}" placeholder="e.g. n">
+          <input type="text" id="fe-left" value="${c.left}" placeholder="e.g. n" list="fe-known-vars">
           <select id="fe-op">${FC_COMPARISONS.map(o => `<option value="${o.v}" ${o.v === c.op ? 'selected' : ''}>${o.t}</option>`).join('')}</select>
-          <input type="text" id="fe-right" value="${c.right}" placeholder="e.g. 10">
+          <input type="text" id="fe-right" value="${c.right}" placeholder="e.g. 10" list="fe-known-vars">
         </div>
-      </div>`
+      </div>
+      ${fcVarDatalistHTML()}`
   } else if (shape.type === 'for') {
     const f = fcParseFor(shape.label)
     body.innerHTML = `
       <div class="fc-edit-row"><label>Loop variable</label><input type="text" id="fe-var" value="${f.varName}" placeholder="e.g. i"></div>
-      <div class="fc-edit-row"><label>Start value</label><input type="text" id="fe-start" value="${f.start}" placeholder="e.g. 1"></div>
-      <div class="fc-edit-row"><label>End value</label><input type="text" id="fe-end" value="${f.end}" placeholder="e.g. 10"></div>`
+      <div class="fc-edit-row"><label>Start value</label><input type="text" id="fe-start" value="${f.start}" placeholder="e.g. 1" list="fe-known-vars"></div>
+      <div class="fc-edit-row"><label>End value</label><input type="text" id="fe-end" value="${f.end}" placeholder="e.g. 10" list="fe-known-vars"></div>
+      ${fcVarDatalistHTML()}`
   } else if (shape.type === 'io') {
     const o = fcParseOutput(shape.label)
     body.innerHTML = `
-      <div class="fc-edit-row"><label>Output this expression</label><input type="text" id="fe-expr" value="${o.expr}" placeholder="e.g. total or arr[i]"></div>`
+      <div class="fc-edit-row"><label>Output this expression</label><input type="text" id="fe-expr" value="${o.expr}" placeholder="e.g. total or arr[i]" list="fe-known-vars"></div>
+      ${fcVarDatalistHTML()}`
   } else {
     body.innerHTML = `<div class="fc-edit-row"><label>Label</label><input type="text" id="fe-label" value="${shape.label}"></div>`
   }
@@ -6396,9 +6470,23 @@ function drawConnections() {
   const svg = document.getElementById('fc-svg')
   svg.innerHTML = '<defs><marker id="fc-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">'
     + '<path d="M0,0 L8,4 L0,8 Z" fill="#67e8f9"/></marker></defs>'
-  _fcConns.forEach(c => {
+  _fcConns.forEach((c, idx) => {
     const a = shapeCenter(c.from), b = shapeCenter(c.to)
     if (!a || !b) return
+    // Invisible, wide hit-area UNDER the visible line — click anywhere
+    // along a connector to insert a shape right into it (real-editor-style)
+    // instead of only being able to drop a loose shape and wire it by hand.
+    // #fc-svg itself is pointer-events:none (so right-click-to-add still
+    // reaches the canvas underneath); an element can still opt back IN to
+    // receiving events by setting its own pointer-events, which this does.
+    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+    hit.setAttribute('x1', a.x); hit.setAttribute('y1', a.y)
+    hit.setAttribute('x2', b.x); hit.setAttribute('y2', b.y)
+    hit.setAttribute('stroke', 'transparent'); hit.setAttribute('stroke-width', '16')
+    hit.setAttribute('pointer-events', 'stroke')
+    hit.style.cursor = 'pointer'
+    hit.addEventListener('click', e => showConnectorInsertMenu(e, idx))
+    svg.appendChild(hit)
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
     line.setAttribute('x1', a.x); line.setAttribute('y1', a.y)
     line.setAttribute('x2', b.x); line.setAttribute('y2', b.y)
@@ -6538,6 +6626,17 @@ function fcExecAssign(text, vars) {
     if (idx < 1 || idx > arr.length) throw new Error('Index ' + idx + ' is outside ' + idxMatch[1] + ' (1..' + arr.length + ')')
     arr[idx - 1] = value
     return
+  }
+  // A real, reported gap: Assign used to accept ANY target name, so a typo
+  // (toal instead of total) silently created a brand-new variable instead
+  // of erroring — the ACTUAL total stayed 0 forever with no warning at all,
+  // the most confusing possible failure mode for a student to debug. Now it
+  // has to match something a Declare step already ran (same rule the READ
+  // side already enforced — see "Unknown variable" in fcParseExpr above).
+  if (!(target in vars)) {
+    const known = Object.keys(vars)
+    throw new Error('Assign target "' + target + '" was never Declared'
+      + (known.length ? ' — declared variables: ' + known.join(', ') : ' — add a Declare shape for it first'))
   }
   vars[target] = value
 }

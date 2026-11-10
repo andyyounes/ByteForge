@@ -43,7 +43,10 @@
 // Bumped v6 -> v7 (2026-11-10): Foundations 3's intro tier now interleaves
 // lesson->exercise->lesson->lesson->exercise instead of 3 lessons in a row
 // then both exercises.
-const CACHE_NAME = 'bf-offline-v7'
+// Bumped v7 -> v8 (2026-11-10): flowchart builder usability fixes — default
+// Start/End skeleton, click-a-connector-to-insert-a-shape, Assign-target
+// validation against Declared variables, variable-name autocomplete.
+const CACHE_NAME = 'bf-offline-v8'
 
 // Same-origin paths this service worker is allowed to cache. Everything
 // else same-origin (notably /api/*) is left completely alone — fetch
