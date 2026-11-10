@@ -661,7 +661,7 @@ CodeMirror.defineSimpleMode('pseudog9', {
   start: [
     { regex: /\/\/.*/, token: 'comment' },
     { regex: /'[^']*'|"[^"]*"/, token: 'string' },
-    { regex: /\b(FOR|TO|STEP|NEXT|IF|THEN|ELSE|ENDIF|MOD|AND|OR|NOT|OUTPUT|CALL|TRUE|FALSE|WHILE|ENDWHILE|REPEAT|UNTIL)\b/i, token: 'keyword' },
+    { regex: /\b(DECLARE|INTEGER|REAL|STRING|BOOLEAN|CHAR|FOR|TO|STEP|NEXT|IF|THEN|ELSE|ENDIF|MOD|AND|OR|NOT|OUTPUT|CALL|TRUE|FALSE|WHILE|ENDWHILE|REPEAT|UNTIL)\b/i, token: 'keyword' },
     { regex: /\d+(\.\d+)?/, token: 'number' },
     { regex: /←|<-|<>|<=|>=|[=<>+\-*/]/, token: 'operator' },
     { regex: /[A-Za-z_]\w*(?=\s*\()/, token: 'def' },
@@ -1859,18 +1859,18 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flow-p1', type: 'data', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🔀', title: 'Trace the Flowchart',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: [
-      "The Declare step just means \"this variable exists\" — age ← 15 both creates age AND stores 15 in it, no separate DECLARE line needed.",
+      "The Declare shape is a real step — DECLARE age : INTEGER creates it with a starting value of 0; age ← 15 is a SEPARATE line that then stores 15 in it.",
       "IF age >= 18 THEN ... ELSE ... ENDIF is the Decision diamond, turned into code — one arm per branch.",
-      "OUTPUT \"Minor\" prints exactly that text — the quotes matter, it's a string.",
-      "Is 15 \"18 or over\"? No — so your IF should take the ELSE branch and answer() \"Minor\".",
+      "OUTPUT \"Minor\" prints exactly that text — the quotes matter, it's a string. This mission is graded on what your code actually OUTPUTS, not a special reporting function.",
+      "Is 15 \"18 or over\"? No — so your IF should take the ELSE branch and OUTPUT \"Minor\".",
     ],
     xp: 30,
     brief: 'Here\'s a finished flowchart: START → DECLARE age → age ← 15 → DECISION age &ge; 18? → YES: OUTPUT "Adult" / NO: OUTPUT "Minor" → END. '
       + 'Your job is to <b>transform it into real pseudocode</b> — the Decision diamond becomes an IF/ELSE, each branch becomes one arm. '
-      + 'Assign <code>age</code> to <b>15</b>, then answer() whichever word the flowchart would actually output.',
-    api: ['answer(value)'],
+      + 'Declare <code>age</code> for real, assign it <b>15</b>, then OUTPUT whichever word the flowchart would actually print.',
+    api: [],
     dataTitle: 'Flowchart to Trace', dataFields: [],
     data: [],
     diagram: fcDiagram([
@@ -1882,11 +1882,11 @@ UNTIL n &gt; 5</div>
       fcArrowHTML(), fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: '# TODO: turn this flowchart into code.\n# The Decision diamond becomes an IF/ELSE.\nage = 15\n\n# TODO: IF age >= 18, answer("Adult"), ELSE answer("Minor")\n',
-      ps: '// TODO: turn this flowchart into code.\nage ← 15\n\n// TODO: IF age >= 18 THEN answer("Adult") ELSE answer("Minor") ENDIF\n',
+      py: '# TODO: turn this flowchart into code.\n# The Decision diamond becomes an IF/ELSE.\nage = 15\n\n# TODO: check whether age is 18 or over, and print the matching word from the flowchart.\n',
+      ps: '// TODO: turn this flowchart into code — DECLARE age first, same as the flowchart\'s own Declare shape.\nDECLARE age : INTEGER\nage ← 15\n\n// TODO: check whether age is 18 or over, and OUTPUT the matching word from the flowchart.\n',
     },
     requireCode: { re: /\bage\s*(>=|>|=|==)\s*18\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (age >= 18) in your code — don\'t hardcode the final word.' },
-    answer: 'Minor',
+    expectedOutput: ['Minor'],
     stars: { metric: 'pass' },
   },
   {
@@ -1910,27 +1910,28 @@ UNTIL n &gt; 5</div>
     // what learn-flowcharts' theory promised ("this is exactly what an
     // IF/ELSE becomes").
     id: 'flow-code', type: 'data', phase: 'FOUNDATIONS 3 · FLOWCHARTS', emoji: '🔁', title: 'From Flowchart to Code',
-    forceLang: 'ps',
-    hints: ["The Decision diamond becomes an IF statement; each branch becomes what happens inside the IF or the ELSE.", "MOD 2 = 0 is how you check \"is it even?\" in pseudocode — the same test the flowchart's diamond represents."], xp: 35,
-    brief: 'Here\'s a finished flowchart: START → num ← 12 → DECISION is num even? → YES: OUTPUT "Even" / NO: OUTPUT "Odd" → END. '
+    forceLang: 'ps', requireDeclare: true,
+    hints: ["DECLARE num : INTEGER first — the flowchart's own Declare step — THEN num ← 12 assigns it.", "The Decision diamond becomes an IF statement; each branch becomes what happens inside the IF or the ELSE.", "MOD 2 = 0 is how you check \"is it even?\" in pseudocode — the same test the flowchart's diamond represents."], xp: 35,
+    brief: 'Here\'s a finished flowchart: START → DECLARE num → num ← 12 → DECISION is num even? → YES: OUTPUT "Even" / NO: OUTPUT "Odd" → END. '
       + 'Transform it into real code. The <b>Decision diamond becomes an IF/ELSE</b> — each branch becomes one arm. '
-      + 'Store the number 12 in <code>num</code>, then answer() "Even" or "Odd".',
-    api: ['answer(value)'],
+      + 'Declare and store the number 12 in <code>num</code>, then OUTPUT "Even" or "Odd".',
+    api: [],
     dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
     diagram: fcDiagram([
       fcShapeHTML('start', 'Start'),
+      fcArrowHTML(), fcShapeHTML('declare', 'Integer num'),
       fcArrowHTML(), fcShapeHTML('process', 'num ← 12'),
       fcArrowHTML(), fcShapeHTML('decision', 'num MOD 2 = 0?'),
       fcBranchHTML('YES', fcShapeHTML('io', 'Output "Even"'), 'NO', fcShapeHTML('io', 'Output "Odd"')),
       fcArrowHTML(), fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'num = 12\n\n# The Decision diamond ("is it even?") becomes an IF/ELSE here.\n# TODO: IF num is even, answer("Even"), ELSE answer("Odd")\n# Hint: num % 2 == 0 checks evenness\n',
-      ps: 'num ← 12\n\n// The Decision diamond ("is it even?") becomes an IF/ELSE here.\n// TODO: IF num MOD 2 = 0 THEN answer("Even") ELSE answer("Odd") ENDIF\n',
+      py: 'num = 12\n\n# The Decision diamond ("is it even?") becomes an IF/ELSE here.\n# TODO: check whether num is even, and print the matching word from the flowchart.\n',
+      ps: 'DECLARE num : INTEGER\nnum ← 12\n\n// The Decision diamond ("is it even?") becomes an IF/ELSE here.\n// TODO: check whether num is even, and OUTPUT the matching word from the flowchart.\n',
     },
     requireCode: { re: /\bnum\s+MOD\s+2\b|\bnum\s*%\s*2\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (num MOD 2 = 0 / num % 2 == 0) in your code — don\'t hardcode the final word.' },
-    answer: 'Even',
+    expectedOutput: ['Even'],
     stars: { metric: 'pass' },
   },
 
@@ -1942,14 +1943,14 @@ UNTIL n &gt; 5</div>
   // real code instead of dragging shapes.
   {
     id: 'flowg1', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🔀', title: 'Odd or Even?',
-    forceLang: 'ps',
-    hints: ['n ← 7 both creates n AND gives it a real value — no separate DECLARE line needed.',
+    forceLang: 'ps', requireDeclare: true,
+    hints: ['DECLARE n : INTEGER first — the flowchart\'s own Declare step — THEN n ← 7 assigns it.',
       'Decision: n MOD 2 = 0 — the flowchart\'s True branch is the IF, the False branch is the ELSE.',
-      'True branch outputs "Even", False branch outputs "Odd" — both need their own Output shape, both lead to End.'],
+      'True branch OUTPUTs "Even", False branch OUTPUTs "Odd" — both need their own Output shape, both lead to End.'],
     xp: 35,
     brief: 'Here\'s a finished flowchart: START → DECLARE n → n ← 7 → DECISION n MOD 2 = 0? → YES: OUTPUT "Even" / NO: OUTPUT "Odd" → END. '
-      + 'Transform it into real code — the Decision diamond becomes an IF/ELSE. Assign <code>n</code> to <b>7</b>, then answer() "Even" or "Odd".',
-    api: ['answer(value)'],
+      + 'Transform it into real code — the Decision diamond becomes an IF/ELSE. Declare and assign <code>n</code> to <b>7</b>, then OUTPUT "Even" or "Odd".',
+    api: [],
     dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
     diagram: fcDiagram([
@@ -1961,50 +1962,51 @@ UNTIL n &gt; 5</div>
       fcArrowHTML(), fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'n = 7\n\n# TODO: IF n is even, answer("Even"), ELSE answer("Odd")\n',
-      ps: 'n ← 7\n\n// TODO: IF n MOD 2 = 0 THEN answer("Even") ELSE answer("Odd") ENDIF\n',
+      py: 'n = 7\n\n# TODO: check whether n is even, and print the matching word from the flowchart.\n',
+      ps: 'DECLARE n : INTEGER\nn ← 7\n\n// TODO: check whether n is even, and OUTPUT the matching word from the flowchart.\n',
     },
     requireCode: { re: /\bn\s+MOD\s+2\b|\bn\s*%\s*2\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (n MOD 2 = 0 / n % 2 == 0) in your code — don\'t hardcode the final word.' },
-    answer: 'Odd',
+    expectedOutput: ['Odd'],
     stars: { metric: 'pass' },
   },
   {
     id: 'flowg2', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '📝', title: 'Pass or Fail?',
-    forceLang: 'ps',
-    hints: ['score ← 82 — a real grade checker.',
+    forceLang: 'ps', requireDeclare: true,
+    hints: ['DECLARE score : INTEGER, then score ← 82 — a real grade checker.',
       'A number comparison, not MOD this time: score >= 50.',
-      'True → Output "Pass". False → Output "Fail".'],
+      'True → OUTPUT "Pass". False → OUTPUT "Fail".'],
     xp: 35,
-    brief: 'Here\'s a finished flowchart: START → score ← 82 → DECISION score &ge; 50? → YES: OUTPUT "Pass" / NO: OUTPUT "Fail" → END. '
-      + 'Transform it into real code — assign <code>score</code> to <b>82</b>, then answer() "Pass" or "Fail".',
-    api: ['answer(value)'],
+    brief: 'Here\'s a finished flowchart: START → DECLARE score → score ← 82 → DECISION score &ge; 50? → YES: OUTPUT "Pass" / NO: OUTPUT "Fail" → END. '
+      + 'Transform it into real code — declare and assign <code>score</code> to <b>82</b>, then OUTPUT "Pass" or "Fail".',
+    api: [],
     dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
     diagram: fcDiagram([
       fcShapeHTML('start', 'Start'),
+      fcArrowHTML(), fcShapeHTML('declare', 'Integer score'),
       fcArrowHTML(), fcShapeHTML('process', 'score ← 82'),
       fcArrowHTML(), fcShapeHTML('decision', 'score ≥ 50?'),
       fcBranchHTML('YES', fcShapeHTML('io', 'Output "Pass"'), 'NO', fcShapeHTML('io', 'Output "Fail"')),
       fcArrowHTML(), fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'score = 82\n\n# TODO: IF score >= 50, answer("Pass"), ELSE answer("Fail")\n',
-      ps: 'score ← 82\n\n// TODO: IF score >= 50 THEN answer("Pass") ELSE answer("Fail") ENDIF\n',
+      py: 'score = 82\n\n# TODO: check whether score is 50 or above, and print the matching word from the flowchart.\n',
+      ps: 'DECLARE score : INTEGER\nscore ← 82\n\n// TODO: check whether score is 50 or above, and OUTPUT the matching word from the flowchart.\n',
     },
     requireCode: { re: /\bscore\s*(>=|>)\s*50\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (score >= 50) in your code — don\'t hardcode the final word.' },
-    answer: 'Pass',
+    expectedOutput: ['Pass'],
     stars: { metric: 'pass' },
   },
   {
     id: 'flowg3', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🔢', title: 'Count to Five',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['A For loop is the flowchart\'s loop-back arrow, turned into code: FOR i ← 1 TO 5 ... NEXT i.',
-      'Build up one result STRING as you go (result ← result + STR(i) + ","), since answer() can only report once.',
-      'Expected final text: "1,2,3,4,5," — don\'t trim the trailing comma, it\'s simplest to leave it.'],
+      'The Output shape is INSIDE the loop body — that means OUTPUT i fires once per pass, not once at the very end.',
+      'Expect 5 separate output lines: 1, 2, 3, 4, 5 — one per time round the loop.'],
     xp: 35,
     brief: 'Here\'s a finished flowchart: a For loop (<code>i = 1 to 5</code>) with an Output <code>i</code> on its Next branch, looping back until Done. '
-      + 'Transform the loop into real code: build a result string of every number it would print, comma-separated (e.g. "1,2,3,4,5,"), then answer() it.',
-    api: ['answer(value)'],
+      + 'Transform the loop into real code: OUTPUT i once every pass through the loop — five separate prints, not one combined string.',
+    api: [],
     dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
     diagram: fcDiagram([
@@ -2014,79 +2016,79 @@ UNTIL n &gt; 5</div>
       fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'result = ""\n# TODO: for i in range(1, 6): result = result + str(i) + ","\n\n# answer(result)\n',
-      ps: 'result ← ""\n// TODO: FOR i ← 1 TO 5\n//         result ← result + STR(i) + ","\n//       NEXT i\n\n// answer(result)\n',
+      py: '# TODO: loop i from 1 to 5, printing i each time round.\n',
+      ps: '// TODO: loop i from 1 to 5 (FOR i ← 1 TO 5 ... NEXT i), OUTPUTting i each time round.\n',
     },
-    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop (FOR i ← 1 TO 5 / for i in range(1, 6)) — don\'t hardcode the final string.' },
-    answer: '1,2,3,4,5,',
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop (FOR i ← 1 TO 5 / for i in range(1, 6)) — don\'t hardcode the output.' },
+    expectedOutput: ['1', '2', '3', '4', '5'],
     stars: { metric: 'pass' },
   },
   {
     id: 'flowg4', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '➕', title: 'Sum 1 to 10',
-    forceLang: 'ps',
-    hints: ['Declare total and set it to 0 BEFORE the loop starts.',
+    forceLang: 'ps', requireDeclare: true,
+    hints: ['DECLARE total : INTEGER, then set it to 0 BEFORE the loop starts.',
       'Inside the loop: total ← total + i.',
-      'answer(total) AFTER the loop ends — not inside it, or you\'ll report a running total instead of the final one.'],
+      'OUTPUT total AFTER the loop ends — not inside it, or you\'ll print a running total instead of the final one.'],
     xp: 40,
-    brief: 'Here\'s a finished flowchart: a For loop (<code>i = 1 to 10</code>) accumulating into <code>total</code> each time round, Output once Done. '
-      + 'Transform it into real code: declare <code>total</code> as 0, loop i from 1 to 10 adding i to total, then answer() the final total.',
-    api: ['answer(value)'],
+    brief: 'Here\'s a finished flowchart: total ← 0, then a For loop (<code>i = 1 to 10</code>) accumulating into <code>total</code> each time round, Output once Done. '
+      + 'Transform it into real code: declare <code>total</code>, loop i from 1 to 10 adding i to total, then OUTPUT the final total ONCE, after the loop.',
+    api: [],
     dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
     diagram: fcDiagram([
       fcShapeHTML('start', 'Start'),
-      fcArrowHTML(), fcShapeHTML('process', 'total ← 0'),
+      fcArrowHTML(), fcShapeHTML('declare', 'Integer total'), fcArrowHTML(), fcShapeHTML('process', 'total ← 0'),
       fcArrowHTML(),
       fcLoopHTML('i = 1 TO 10', [fcShapeHTML('process', 'total ← total + i')], 'Done'),
       fcShapeHTML('io', 'Output total'),
       fcArrowHTML(), fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'total = 0\n# TODO: for i in range(1, 11): total = total + i\n\n# answer(total)\n',
-      ps: 'total ← 0\n// TODO: FOR i ← 1 TO 10\n//         total ← total + i\n//       NEXT i\n\n// answer(total)\n',
+      py: 'total = 0\n# TODO: loop i from 1 to 10, adding i to total each time round.\n\n# TODO: print total AFTER the loop finishes.\n',
+      ps: 'DECLARE total : INTEGER\ntotal ← 0\n// TODO: loop i from 1 to 10 (FOR i ← 1 TO 10 ... NEXT i), adding i to total each time round.\n\n// TODO: OUTPUT total AFTER the loop finishes.\n',
     },
     requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop (FOR i ← 1 TO 10 / for i in range(1, 11)) — don\'t hardcode the final total.' },
-    answer: 55,
+    expectedOutput: ['55'],
     stars: { metric: 'pass' },
   },
   {
     id: 'flowg5', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '🚀', title: 'Countdown',
-    forceLang: 'ps',
-    hints: ['A While loop is a Decision that keeps looping back: WHILE n > 0 ... ENDWHILE.',
-      'Loop body: add n to the result, THEN subtract 1 from n.',
-      'After the loop ends, add "Liftoff!" to the result (outside the loop) before answer()ing it.'],
+    forceLang: 'ps', requireDeclare: true,
+    hints: ['DECLARE n : INTEGER, then n ← 5. A While loop is a Decision that keeps looping back: WHILE n > 0 ... ENDWHILE.',
+      'Loop body: OUTPUT n, THEN subtract 1 from n — in that order.',
+      'After the loop ends, one more OUTPUT "Liftoff!" (outside the loop, once).'],
     xp: 40,
-    brief: 'Here\'s a finished flowchart: n ← 5, then WHILE n > 0: Output n, n ← n - 1 — and once Done, one more Output "Liftoff!". '
-      + 'Transform it into real code: build a comma-separated result string as you go, then answer() it (e.g. "5,4,3,2,1,Liftoff!").',
-    api: ['answer(value)'],
+    brief: 'Here\'s a finished flowchart: DECLARE n, n ← 5, then WHILE n > 0: Output n, n ← n - 1 — and once Done, one more Output "Liftoff!". '
+      + 'Transform it into real code: OUTPUT n every pass through the loop, then OUTPUT "Liftoff!" once the loop ends.',
+    api: [],
     dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
     diagram: fcDiagram([
       fcShapeHTML('start', 'Start'),
-      fcArrowHTML(), fcShapeHTML('process', 'n ← 5'),
+      fcArrowHTML(), fcShapeHTML('declare', 'Integer n'), fcArrowHTML(), fcShapeHTML('process', 'n ← 5'),
       fcArrowHTML(),
       fcLoopHTML('WHILE n > 0', [fcShapeHTML('io', 'Output n'), fcArrowHTML(), fcShapeHTML('process', 'n ← n − 1')], 'Done'),
       fcShapeHTML('io', 'Output "Liftoff!"'),
       fcArrowHTML(), fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'n = 5\nresult = ""\n# TODO: while n > 0: result = result + str(n) + ","; n = n - 1\n# TODO: result = result + "Liftoff!"\n\n# answer(result)\n',
-      ps: 'n ← 5\nresult ← ""\n// TODO: WHILE n > 0\n//         result ← result + STR(n) + ","\n//         n ← n - 1\n//       ENDWHILE\n// TODO: result ← result + "Liftoff!"\n\n// answer(result)\n',
+      py: 'n = 5\n# TODO: while n > 0, print n THEN subtract 1 from it.\n\n# TODO: print "Liftoff!" once the loop ends.\n',
+      ps: 'DECLARE n : INTEGER\nn ← 5\n// TODO: WHILE n > 0, OUTPUT n THEN subtract 1 from it (ENDWHILE closes the loop).\n\n// TODO: OUTPUT "Liftoff!" once the loop ends.\n',
     },
-    requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires a real loop (WHILE n > 0 / while n > 0) — don\'t hardcode the final string.' },
-    answer: '5,4,3,2,1,Liftoff!',
+    requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires a real loop (WHILE n > 0 / while n > 0) — don\'t hardcode the output.' },
+    expectedOutput: ['5', '4', '3', '2', '1', 'Liftoff!'],
     stars: { metric: 'pass' },
   },
   {
     id: 'flowg6', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM', emoji: '✌️', title: 'Evens Only',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['A For loop (i = 1 to 10) with a Decision INSIDE its body — a loop and a decision, working together.',
-      'Decision: i MOD 2 = 0 — True adds i to the result, False does nothing, EITHER way the loop continues.',
-      'Only the even numbers 2,4,6,8,10 end up in the result.'],
+      'Decision: i MOD 2 = 0 — True OUTPUTs i, False does nothing, EITHER way the loop continues.',
+      'Only the even numbers 2,4,6,8,10 should ever get printed.'],
     xp: 40,
     brief: 'Here\'s a finished flowchart: a For loop (<code>i = 1 to 10</code>) with a Decision inside it (<code>i MOD 2 = 0</code>) — only even i gets Output. '
-      + 'Transform it into real code: loop i from 1 to 10, only add i to the result when it\'s even, then answer() the comma-separated result.',
-    api: ['answer(value)'],
+      + 'Transform it into real code: loop i from 1 to 10, OUTPUT i only when it\'s even.',
+    api: [],
     dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
     diagram: fcDiagram([
@@ -2096,23 +2098,23 @@ UNTIL n &gt; 5</div>
       fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'result = ""\n# TODO: for i in range(1, 11):\n#         if i % 2 == 0: result = result + str(i) + ","\n\n# answer(result)\n',
-      ps: 'result ← ""\n// TODO: FOR i ← 1 TO 10\n//         IF i MOD 2 = 0 THEN result ← result + STR(i) + "," ENDIF\n//       NEXT i\n\n// answer(result)\n',
+      py: '# TODO: loop i from 1 to 10. Each time round, check if i is even, and only then print it.\n',
+      ps: '// TODO: loop i from 1 to 10 (FOR i ← 1 TO 10 ... NEXT i). Each time round, check IF i MOD 2 = 0, and only then OUTPUT i.\n',
     },
-    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop with a decision inside it — don\'t hardcode the final string.' },
-    answer: '2,4,6,8,10,',
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop with a decision inside it — don\'t hardcode the output.' },
+    expectedOutput: ['2', '4', '6', '8', '10'],
     stars: { metric: 'pass' },
   },
   {
     id: 'flowgboss', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🏆', boss: true, title: 'BOSS — FizzBuzz',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['Three nested Decisions, in this order: n MOD 15 = 0 first, then (False) n MOD 3 = 0, then (False) n MOD 5 = 0, then else n itself.',
       'Order matters: checking MOD 3 or MOD 5 before MOD 15 would never let "FizzBuzz" print at all, since 15 is divisible by both 3 and 5.',
-      'Build the result as a comma-separated string across all 20 numbers, same as the other loop missions.'],
+      'OUTPUT whichever word/number applies, once per number, same as every other loop-with-decision mission.'],
     xp: 70,
     brief: 'Here\'s the real thing — a finished FizzBuzz flowchart: For <code>n = 1 to 20</code>: if <code>n MOD 15 = 0</code> output "FizzBuzz"; else if <code>n MOD 3 = 0</code> output "Fizz"; else if <code>n MOD 5 = 0</code> output "Buzz"; else output <code>n</code>. '
-      + 'Transform the whole thing into real code, then answer() the comma-separated result.',
-    api: ['answer(value)'],
+      + 'Transform the whole thing into real code — 20 separate OUTPUT lines.',
+    api: [],
     dataTitle: 'Flowchart to Code', dataFields: [],
     data: [],
     diagram: fcDiagram([
@@ -2131,11 +2133,11 @@ UNTIL n &gt; 5</div>
       fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'result = ""\n# TODO: for n in range(1, 21):\n#         if n % 15 == 0: result += "FizzBuzz,"\n#         elif n % 3 == 0: result += "Fizz,"\n#         elif n % 5 == 0: result += "Buzz,"\n#         else: result += str(n) + ","\n\n# answer(result)\n',
-      ps: 'result ← ""\n// TODO: FOR n ← 1 TO 20\n//         IF n MOD 15 = 0 THEN result ← result + "FizzBuzz,"\n//         ELSE IF n MOD 3 = 0 THEN result ← result + "Fizz,"\n//         ELSE IF n MOD 5 = 0 THEN result ← result + "Buzz,"\n//         ELSE result ← result + STR(n) + ","\n//         ENDIF\n//       NEXT n\n\n// answer(result)\n',
+      py: '# TODO: loop n from 1 to 20. Each time round, check MOD 15, then MOD 3, then MOD 5 (in that order), and print the matching word — or n itself if none match.\n',
+      ps: '// TODO: loop n from 1 to 20 (FOR n ← 1 TO 20 ... NEXT n). Each time round, check n MOD 15, then n MOD 3, then n MOD 5 (in that order — order matters!), and OUTPUT the matching word — or n itself if none match.\n',
     },
-    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop with the three nested MOD checks — don\'t hardcode the final string.' },
-    answer: '1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz,16,17,Fizz,19,Buzz,',
+    requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop with the three nested MOD checks — don\'t hardcode the output.' },
+    expectedOutput: ['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', 'Buzz', '11', 'Fizz', '13', '14', 'FizzBuzz', '16', '17', 'Fizz', '19', 'Buzz'],
     stars: { metric: 'pass' },
   },
 
@@ -2148,7 +2150,7 @@ UNTIL n &gt; 5</div>
   // fcEvalCondition/fcExecAssign functions before being written here.
   {
     id: 'flowg7', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '📮', title: 'Postage Cost by Weight',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['Chain three IF/ELSE IF/ELSE IF/ELSE — the flowchart\'s three Decisions, each only reached if the one before it was False.',
       'Order them narrowest-first: weight <= 1, then weight <= 5, then weight <= 10, then else.',
       'weight = 7 should land in the ">5 and <=10" band — "$12".'],
@@ -2172,7 +2174,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'weight = 7\n\n# TODO: chain if/elif/elif/else for the four postage bands, answer() the result\n',
-      ps: 'weight ← 7\n\n// TODO: chain IF/ELSE IF/ELSE IF/ELSE for the four postage bands, answer() the result\n',
+      ps: 'DECLARE weight : INTEGER\nweight ← 7\n\n// TODO: chain IF/ELSE IF/ELSE IF/ELSE for the four postage bands, answer() the result\n',
     },
     requireCode: { re: /\bweight\s*<=\s*1\b|\bweight\s*(≤|<=)\s*1\b/i, msg: 'this mission requires the flowchart\'s first real Decision (weight <= 1) in your code — don\'t hardcode the final price.' },
     answer: '$12',
@@ -2180,7 +2182,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg8', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '🥇', title: 'Largest of Three',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['No loop needed — just nested IFs. First compare a > b, THEN (inside whichever branch) compare against c.',
       'a=7, b=15, c=3 — work out on paper which one wins before you write the IFs.',
       'Every branch needs to answer() something — don\'t leave one without a result.'],
@@ -2199,7 +2201,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'a = 7\nb = 15\nc = 3\n\n# TODO: nested if/else comparing a, b, c — answer() the largest\n',
-      ps: 'a ← 7\nb ← 15\nc ← 3\n\n// TODO: nested IF/ELSE comparing a, b, c — answer() the largest\n',
+      ps: 'DECLARE a : INTEGER\nDECLARE b : INTEGER\nDECLARE c : INTEGER\na ← 7\nb ← 15\nc ← 3\n\n// TODO: nested IF/ELSE comparing a, b, c — answer() the largest\n',
     },
     requireCode: { re: /\ba\s*>\s*b\b/i, msg: 'this mission requires the flowchart\'s actual comparisons (a > b, then a > c / b > c) in your code — don\'t hardcode the final value.' },
     answer: 15,
@@ -2207,7 +2209,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg9', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '🏧', title: 'ATM Withdrawal',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['balance ← 100, amount ← 40.',
       'One Decision: amount <= balance. True branch: subtract, THEN answer() the new balance. False branch: answer() "Insufficient Funds".',
       'The subtraction has to happen BEFORE you answer() the balance, not after.'],
@@ -2225,7 +2227,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'balance = 100\namount = 40\n\n# TODO: IF amount <= balance, subtract then answer(balance), ELSE answer("Insufficient Funds")\n',
-      ps: 'balance ← 100\namount ← 40\n\n// TODO: IF amount <= balance THEN subtract then answer(balance) ELSE answer("Insufficient Funds") ENDIF\n',
+      ps: 'DECLARE balance : INTEGER\nDECLARE amount : INTEGER\nbalance ← 100\namount ← 40\n\n// TODO: IF amount <= balance, subtract amount from balance then answer(balance), ELSE answer("Insufficient Funds")\n',
     },
     requireCode: { re: /\bamount\s*(<=|≤)\s*balance\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (amount <= balance) in your code — don\'t hardcode the final value.' },
     answer: 60,
@@ -2233,7 +2235,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg10', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '📅', title: 'Weekday or Weekend',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['Two chained Decisions build an OR: check day=6 first, and only if that\'s False, check day=7.',
       'Both True branches answer() the SAME "Weekend" result.',
       'day ← 7, so your code has to fall through the first check to reach the second.'],
@@ -2254,7 +2256,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'day = 7\n\n# TODO: IF day == 6 or day == 7, answer("Weekend"), ELSE answer("Weekday")\n',
-      ps: 'day ← 7\n\n// TODO: IF day = 6 THEN answer("Weekend") ELSE IF day = 7 THEN answer("Weekend") ELSE answer("Weekday") ENDIF\n',
+      ps: 'DECLARE day : INTEGER\nday ← 7\n\n// TODO: check if day is 6 OR 7 (two chained IFs — this engine has no OR keyword), answer() "Weekend" or "Weekday"\n',
     },
     requireCode: { re: /\bday\s*(=|==)\s*6\b/i, msg: 'this mission requires the flowchart\'s actual Decision condition (day = 6 / day = 7) in your code — don\'t hardcode the final word.' },
     answer: 'Weekend',
@@ -2262,7 +2264,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg11', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '✖️', title: 'Times Table Generator',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['n ← 7, then a loop i from 1 to 12.',
       'Build each line as "n x i = n*i" and append it (with a comma) to the result string.',
       'This is the same For-loop shape as Count to Five, just with a longer, formatted line.'],
@@ -2280,7 +2282,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'n = 7\nresult = ""\n# TODO: for i in range(1, 13): result += n + " x " + i + " = " + (n*i) + ","\n\n# answer(result)\n',
-      ps: 'n ← 7\nresult ← ""\n// TODO: FOR i ← 1 TO 12\n//         result ← result + STR(n) + " x " + STR(i) + " = " + STR(n*i) + ","\n//       NEXT i\n\n// answer(result)\n',
+      ps: 'DECLARE n : INTEGER\nDECLARE result : STRING\nn ← 7\nresult ← ""\n// TODO: loop i from 1 to 12, appending a line like "7 x 1 = 7," onto result each time round.\n\n// answer(result)\n',
     },
     requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop (FOR i ← 1 TO 12 / for i in range(1, 13)) — don\'t hardcode the final string.' },
     answer: '7 x 1 = 7,7 x 2 = 14,7 x 3 = 21,7 x 4 = 28,7 x 5 = 35,7 x 6 = 42,7 x 7 = 49,7 x 8 = 56,7 x 9 = 63,7 x 10 = 70,7 x 11 = 77,7 x 12 = 84,',
@@ -2288,7 +2290,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg12', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '➗', title: 'Sum of Evens 1 to 50',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['This is Evens Only and Sum 1 to 10, combined — a Decision INSIDE a loop, accumulating instead of printing each one.',
       'total ← 0 before the loop. Inside: IF i MOD 2 = 0 THEN total ← total + i — EITHER way, the loop continues.',
       'answer(total) only ONCE, after the loop ends — not inside it.'],
@@ -2306,7 +2308,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'total = 0\n# TODO: for i in range(1, 51):\n#         if i % 2 == 0: total = total + i\n\n# answer(total)\n',
-      ps: 'total ← 0\n// TODO: FOR i ← 1 TO 50\n//         IF i MOD 2 = 0 THEN total ← total + i ENDIF\n//       NEXT i\n\n// answer(total)\n',
+      ps: 'DECLARE total : INTEGER\ntotal ← 0\n// TODO: loop i from 1 to 50, adding i to total only when it\'s even.\n\n// answer(total)\n',
     },
     requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop with a decision inside it — don\'t hardcode the final total.' },
     answer: 650,
@@ -2314,7 +2316,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg13', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE', emoji: '💰', title: 'Savings Growth',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['balance ← 1000, rate ← 0.1, year ← 1.',
       'WHILE year <= 3: balance ← balance + balance*rate, THEN year ← year + 1.',
       'Multiplication happens before addition automatically — balance + balance * rate is safe to write directly.'],
@@ -2332,7 +2334,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'balance = 1000\nrate = 0.1\nyear = 1\n# TODO: while year <= 3: balance = balance + balance * rate; year = year + 1\n\n# answer(round(balance))\n',
-      ps: 'balance ← 1000\nrate ← 0.1\nyear ← 1\n// TODO: WHILE year <= 3\n//         balance ← balance + balance * rate\n//         year ← year + 1\n//       ENDWHILE\n\n// answer(balance)\n',
+      ps: 'DECLARE balance : REAL\nDECLARE rate : REAL\nDECLARE year : INTEGER\nbalance ← 1000\nrate ← 0.1\nyear ← 1\n// TODO: WHILE year <= 3, grow balance by its rate THEN advance year (ENDWHILE closes the loop).\n\n// answer(balance)\n',
     },
     requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires a real loop (WHILE year <= 3 / while year <= 3) — don\'t hardcode the final balance.' },
     answer: 1331,
@@ -2340,7 +2342,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg14', type: 'data', phase: 'FOUNDATIONS 3 · CAPSTONE', emoji: '🔍', boss: true, title: 'BOSS — Prime Number Check',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['Set isPrime ← 1 (true) and divisor ← 2 before the loop.',
       'WHILE divisor < num: IF num MOD divisor = 0 THEN isPrime ← 0 — EITHER way, divisor ← divisor + 1.',
       'After the loop: IF isPrime = 1 THEN answer("Prime") ELSE answer("Not Prime").'],
@@ -2360,7 +2362,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'num = 17\nisPrime = 1\ndivisor = 2\n# TODO: while divisor < num:\n#         if num % divisor == 0: isPrime = 0\n#         divisor = divisor + 1\n\n# TODO: answer("Prime") if isPrime == 1 else answer("Not Prime")\n',
-      ps: 'num ← 17\nisPrime ← 1\ndivisor ← 2\n// TODO: WHILE divisor < num\n//         IF num MOD divisor = 0 THEN isPrime ← 0 ENDIF\n//         divisor ← divisor + 1\n//       ENDWHILE\n\n// TODO: IF isPrime = 1 THEN answer("Prime") ELSE answer("Not Prime") ENDIF\n',
+      ps: 'DECLARE num : INTEGER\nDECLARE isPrime : INTEGER\nDECLARE divisor : INTEGER\nnum ← 17\nisPrime ← 1\ndivisor ← 2\n// TODO: WHILE divisor < num, check IF num MOD divisor = 0 (clear isPrime if so), THEN advance divisor either way.\n\n// TODO: once the loop ends, answer() "Prime" or "Not Prime" based on isPrime.\n',
     },
     requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires a real loop checking every divisor — don\'t hardcode the final word.' },
     answer: 'Prime',
@@ -2376,7 +2378,7 @@ UNTIL n &gt; 5</div>
   // below was hand-traced against the real algorithm before being written.
   {
     id: 'flowg15', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2', emoji: '🔢', title: 'Greatest Common Divisor',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['WHILE b ≠ 0: the loop body always does the SAME three lines, in this exact order — temp ← b, b ← a MOD b, a ← temp.',
       'Each pass, b becomes the remainder of a MOD b — that remainder keeps shrinking until it hits 0.',
       'Once the loop ends (b = 0), a already holds the GCD — answer(a) directly, no extra Decision needed.'],
@@ -2399,7 +2401,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'a = 48\nb = 18\n# TODO: while b != 0:\n#         temp = b\n#         b = a % b\n#         a = temp\n\n# answer(a)\n',
-      ps: 'a ← 48\nb ← 18\n// TODO: WHILE b ≠ 0\n//         temp ← b\n//         b ← a MOD b\n//         a ← temp\n//       ENDWHILE\n\n// answer(a)\n',
+      ps: 'DECLARE a : INTEGER\nDECLARE b : INTEGER\nDECLARE temp : INTEGER\na ← 48\nb ← 18\n// TODO: WHILE b ≠ 0, swap in the remainder (temp ← b, b ← a MOD b, a ← temp — in that exact order).\n\n// answer(a)\n',
     },
     requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires the real Euclidean loop (temp/b/a swapping with MOD) — don\'t hardcode the final number.' },
     answer: '6',
@@ -2407,7 +2409,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg16', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2', emoji: '❗', title: 'Factorial',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['result ← 1 BEFORE the loop — starting it at 0 would make every multiplication give 0.',
       'FOR i ← 1 TO n: result ← result × i — one multiplication per pass, i counts 1, 2, 3… up to n.',
       '5! = 1×2×3×4×5 = 120 — trace it by hand if you want to double-check your loop.'],
@@ -2428,7 +2430,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'n = 5\nresult = 1\n# TODO: for i in range(1, n + 1):\n#         result = result * i\n\n# answer(result)\n',
-      ps: 'n ← 5\nresult ← 1\n// TODO: FOR i ← 1 TO n\n//         result ← result × i\n//       NEXT i\n\n// answer(result)\n',
+      ps: 'DECLARE n : INTEGER\nDECLARE result : INTEGER\nn ← 5\nresult ← 1\n// TODO: loop i from 1 to n, multiplying result by i each time round.\n\n// answer(result)\n',
     },
     requireCode: { re: /\b(for|FOR)\b/, msg: 'this mission requires a real loop multiplying result by i each pass — don\'t hardcode the final number.' },
     answer: '120',
@@ -2436,7 +2438,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg17', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2', emoji: '🔁', title: 'Armstrong Number Check',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['An Armstrong number equals the sum of its own digits, each cubed: 153 → 1³+5³+3³ = 1+125+27 = 153.',
       'Peel off one digit at a time: digit ← temp MOD 10 gets the last digit, temp ← temp DIV 10 removes it.',
       'Keep a running sum of digit×digit×digit inside the loop — compare it to the ORIGINAL num only after the loop ends.'],
@@ -2460,7 +2462,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'num = 153\nsum_val = 0\ntemp = num\n# TODO: while temp > 0:\n#         digit = temp % 10\n#         sum_val = sum_val + digit * digit * digit\n#         temp = temp // 10\n\n# TODO: answer("Armstrong") if sum_val == num else answer("Not Armstrong")\n',
-      ps: 'num ← 153\nsum ← 0\ntemp ← num\n// TODO: WHILE temp > 0\n//         digit ← temp MOD 10\n//         sum ← sum + digit × digit × digit\n//         temp ← temp DIV 10\n//       ENDWHILE\n\n// TODO: IF sum = num THEN answer("Armstrong") ELSE answer("Not Armstrong") ENDIF\n',
+      ps: 'DECLARE num : INTEGER\nDECLARE sum : INTEGER\nDECLARE temp : INTEGER\nDECLARE digit : INTEGER\nnum ← 153\nsum ← 0\ntemp ← num\n// TODO: WHILE temp > 0, peel off one digit at a time (MOD 10) and add its cube to sum, shrinking temp (DIV 10).\n\n// TODO: once the loop ends, answer() "Armstrong" or "Not Armstrong" by comparing sum to the ORIGINAL num.\n',
     },
     requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires the real digit-peeling loop (MOD 10 / DIV 10) — don\'t hardcode the final word.' },
     answer: 'Armstrong',
@@ -2468,7 +2470,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg18', type: 'data', phase: 'FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2', emoji: '💾', title: 'Decimal to Binary',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['Each pass: digit ← num MOD 2 gets the next binary digit, num ← num DIV 2 shifts everything else down.',
       'Build the result BACKWARDS from the front: result ← STR(digit) + result — each new digit goes in FRONT, not behind.',
       'The loop naturally stops once num reaches 0 — by then result already holds the full binary string.'],
@@ -2491,7 +2493,7 @@ UNTIL n &gt; 5</div>
     ]),
     starter: {
       py: 'num = 13\nresult = ""\n# TODO: while num > 0:\n#         digit = num % 2\n#         result = str(digit) + result\n#         num = num // 2\n\n# answer(result)\n',
-      ps: 'num ← 13\nresult ← ""\n// TODO: WHILE num > 0\n//         digit ← num MOD 2\n//         result ← STR(digit) + result\n//         num ← num DIV 2\n//       ENDWHILE\n\n// answer(result)\n',
+      ps: 'DECLARE num : INTEGER\nDECLARE result : STRING\nDECLARE digit : INTEGER\nnum ← 13\nresult ← ""\n// TODO: WHILE num > 0, peel off the next binary digit (MOD 2) and put it in FRONT of result, shrinking num (DIV 2).\n\n// answer(result)\n',
     },
     requireCode: { re: /\b(while|WHILE)\b/, msg: 'this mission requires the real digit-peeling loop (MOD 2 / DIV 2) — don\'t hardcode the final string.' },
     answer: '1101',
@@ -2510,7 +2512,7 @@ UNTIL n &gt; 5</div>
   // answer() call needed.
   {
     id: 'flowg19', type: 'data', phase: 'FOUNDATIONS 3 · REPEAT-UNTIL', emoji: '🔂', title: 'Doubling Until Over',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['REPEAT runs its body ONCE before ever checking the condition — unlike WHILE, which checks first and could skip the body entirely.',
       'Double n AND increment count together, every single pass — then check UNTIL n > 100 at the end.',
       '1 → 2 → 4 → 8 → 16 → 32 → 64 → 128 — that\'s 7 doublings before n finally exceeds 100.'],
@@ -2531,8 +2533,8 @@ UNTIL n &gt; 5</div>
       fcArrowHTML(), fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'n = 1\ncount = 0\n# Python has no REPEAT/UNTIL — the closest equivalent is:\n#   while True:\n#       ...\n#       if condition: break\n# TODO: while True:\n#         n = n * 2\n#         count = count + 1\n#         if n > 100: break\n',
-      ps: 'n ← 1\ncount ← 0\n// TODO: REPEAT\n//         n ← n * 2\n//         count ← count + 1\n//       UNTIL n > 100\n',
+      py: 'n = 1\ncount = 0\n# Python has no REPEAT/UNTIL — the closest equivalent is:\n#   while True:\n#       ...\n#       if condition: break\n# TODO: use that pattern to double n and count the pass, every loop, UNTIL n exceeds 100.\n',
+      ps: 'DECLARE n : INTEGER\nDECLARE count : INTEGER\nn ← 1\ncount ← 0\n// TODO: REPEAT doubling n and counting the pass, UNTIL n exceeds 100.\n',
     },
     requireCode: { re: /\b(repeat|while\s+true)\b/i, msg: 'this mission requires a real REPEAT/UNTIL loop (or Python\'s while True: … if …: break) — don\'t hardcode the final count.' },
     checkVars: { count: 7, n: 128 },
@@ -2540,7 +2542,7 @@ UNTIL n &gt; 5</div>
   },
   {
     id: 'flowg20boss', type: 'data', phase: 'FOUNDATIONS 3 · REPEAT-UNTIL', emoji: '🔢', boss: true, title: 'BOSS — Digital Root',
-    forceLang: 'ps',
+    forceLang: 'ps', requireDeclare: true,
     hints: ['The digital root keeps summing a number\'s digits until only ONE digit is left — e.g. 9875 → 29 → 11 → 2.',
       'This needs TWO loops, nested: an inner WHILE that sums ONE number\'s digits (same digit-peeling as Armstrong/decimal-to-binary), and an outer REPEAT that re-runs the sum UNTIL the result is a single digit.',
       'Set sum ← 0 and temp ← num fresh at the START of every outer pass, BEFORE the inner WHILE runs — otherwise digits from the previous pass leak into the next one.'],
@@ -2566,8 +2568,8 @@ UNTIL n &gt; 5</div>
       fcArrowHTML(), fcShapeHTML('end', 'End'),
     ]),
     starter: {
-      py: 'num = 9875\n# TODO: while True:               (the outer REPEAT)\n#         total = 0\n#         temp = num\n#         while temp > 0:          (the inner WHILE — same digit-peeling as Armstrong)\n#             total = total + temp % 10\n#             temp = temp // 10\n#         num = total\n#         if num < 10: break      (the UNTIL condition)\n',
-      ps: 'num ← 9875\n// TODO: REPEAT                          (the outer loop)\n//         sum ← 0\n//         temp ← num\n//         WHILE temp > 0                (the inner loop — same digit-peeling as Armstrong)\n//           sum ← sum + (temp MOD 10)\n//           temp ← temp DIV 10\n//         ENDWHILE\n//         num ← sum\n//       UNTIL num < 10\n',
+      py: 'num = 9875\n# Python has no REPEAT/UNTIL — use while True / if ...: break for the OUTER loop.\n# TODO: outer loop (while True ... break): reset total/temp each pass, THEN an inner while-loop\n#       peels and sums temp\'s digits (same digit-peeling as Armstrong), THEN num = total,\n#       THEN break once num < 10.\n',
+      ps: 'DECLARE num : INTEGER\nDECLARE sum : INTEGER\nDECLARE temp : INTEGER\nnum ← 9875\n// TODO: outer REPEAT…UNTIL num < 10: reset sum/temp each pass, THEN an inner WHILE loop\n//       peels and sums temp\'s digits (same digit-peeling as Armstrong), THEN num ← sum.\n',
     },
     requireCode: { re: /\b(repeat|while\s+true)\b/i, msg: 'this mission requires the real nested loop (an outer REPEAT/while-True re-running the digit sum UNTIL a single digit remains) — don\'t hardcode the final root.' },
     checkVars: { num: 2 },
@@ -3480,7 +3482,7 @@ UNTIL n &gt; 5</div>
     },
   },
   {
-    id: 'p3m1', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '📦', title: 'Cargo Count',
+    id: 'p3m1', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '📦', title: 'Cargo Count', requireDeclare: true,
     hints: ["Loop through every record in data, adding each one's weight to a running total — then answer() the total ONCE, after the loop."], xp: 40,
     brief: 'NEW MISSION TYPE. No battle this time — just a <b>data table</b>. Loop through <b>data</b> '
       + '(a list of records) and call <b>answer(value)</b> ONCE to report the total cargo weight.',
@@ -3490,14 +3492,14 @@ UNTIL n &gt; 5</div>
     starter: {
       py: "# data is a list of dicts — data[i]['item'], data[i]['weight']\ntotal = 0\nfor row in data:\n"
         + "    # TODO: add row['weight'] to total\n    pass\n\nanswer(total)\n",
-      ps: '// dataItem[i], dataWeight[i] — 1-based, dataCount rows total\ntotal ← 0\nFOR i ← 1 TO dataCount\n'
+      ps: '// dataItem[i], dataWeight[i] — 1-based, dataCount rows total\nDECLARE total : INTEGER\ntotal ← 0\nFOR i ← 1 TO dataCount\n'
         + '    // TODO: total ← total + dataWeight[i]\nNEXT i\n\nanswer(total)\n',
     },
     answer: 41,
     stars: { metric: 'pass' },
   },
   {
-    id: 'p3m2', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '👩‍🚀', title: 'Crew Roster',
+    id: 'p3m2', type: 'data', phase: 'PHASE 3 · READ & REPORT', emoji: '👩‍🚀', title: 'Crew Roster', requireDeclare: true,
     hints: ["Loop through the crew, tracking whichever record has the highest skill seen so far — answer() that person's NAME, not their skill number."], xp: 45,
     brief: 'Find the crew member with the <b>highest skill rating</b> and report their name. This mission '
       + '<b>requires a LOOP</b> — hardcoding "the third one" doesn\'t scale to a bigger crew.',
@@ -3508,7 +3510,7 @@ UNTIL n &gt; 5</div>
     starter: {
       py: "best = data[0]['name']\nbestSkill = data[0]['skill']\nfor row in data:\n"
         + "    # TODO: if row['skill'] > bestSkill, update best and bestSkill\n    pass\n\nanswer(best)\n",
-      ps: 'best ← dataName[1]\nbestSkill ← dataSkill[1]\nFOR i ← 1 TO dataCount\n'
+      ps: 'DECLARE best : STRING\nDECLARE bestSkill : INTEGER\nbest ← dataName[1]\nbestSkill ← dataSkill[1]\nFOR i ← 1 TO dataCount\n'
         + '    // TODO: IF dataSkill[i] > bestSkill THEN update best and bestSkill\nNEXT i\n\nanswer(best)\n',
     },
     answer: 'Bex',
@@ -3517,7 +3519,7 @@ UNTIL n &gt; 5</div>
 
   // ── Phase 3 · One Decision — the data determines a single choice ────────────
   {
-    id: 'p3m3', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '🗺️', title: 'Route Planner',
+    id: 'p3m3', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '🗺️', title: 'Route Planner', requireDeclare: true,
     hints: ["Loop through the three routes, tracking whichever has the LOWEST fuel cost seen so far — answer() its name."], xp: 45,
     brief: 'Three hyperspace routes, three fuel costs. Report the name of the <b>CHEAPEST</b> route.',
     api: ['answer(value)'],
@@ -3527,14 +3529,14 @@ UNTIL n &gt; 5</div>
     starter: {
       py: "cheapest = data[0]['route']\nlowCost = data[0]['cost']\nfor row in data:\n"
         + "    # TODO: if row['cost'] < lowCost, update cheapest and lowCost\n    pass\n\nanswer(cheapest)\n",
-      ps: 'cheapest ← dataRoute[1]\nlowCost ← dataCost[1]\nFOR i ← 1 TO dataCount\n'
+      ps: 'DECLARE cheapest : STRING\nDECLARE lowCost : INTEGER\ncheapest ← dataRoute[1]\nlowCost ← dataCost[1]\nFOR i ← 1 TO dataCount\n'
         + '    // TODO: IF dataCost[i] < lowCost THEN update cheapest and lowCost\nNEXT i\n\nanswer(cheapest)\n',
     },
     answer: 'Beta',
     stars: { metric: 'pass' },
   },
   {
-    id: 'p3m4', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '📡', title: 'Threat Count',
+    id: 'p3m4', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '📡', title: 'Threat Count', requireDeclare: true,
     hints: ["Loop through the 5 contacts, adding 1 to a counter every time a contact's hp is above 50."], xp: 50,
     brief: 'Sensor sweep picked up 5 contacts. Report <b>how many</b> have more than <b>50 hp</b> — '
       + 'that\'s your real threat count for the mission ahead.',
@@ -3544,13 +3546,13 @@ UNTIL n &gt; 5</div>
     data: [{ contact: 'C1', hp: 45 }, { contact: 'C2', hp: 82 }, { contact: 'C3', hp: 30 }, { contact: 'C4', hp: 95 }, { contact: 'C5', hp: 60 }],
     starter: {
       py: "count = 0\nfor row in data:\n    # TODO: if row['hp'] > 50, add 1 to count\n    pass\n\nanswer(count)\n",
-      ps: 'count ← 0\nFOR i ← 1 TO dataCount\n    // TODO: IF dataHp[i] > 50 THEN count ← count + 1\nNEXT i\n\nanswer(count)\n',
+      ps: 'DECLARE count : INTEGER\ncount ← 0\nFOR i ← 1 TO dataCount\n    // TODO: IF dataHp[i] > 50 THEN count ← count + 1\nNEXT i\n\nanswer(count)\n',
     },
     answer: 3,
     stars: { metric: 'pass' },
   },
   {
-    id: 'p3m5', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '⛽', title: 'Fuel Budget',
+    id: 'p3m5', type: 'data', phase: 'PHASE 3 · ONE DECISION', emoji: '⛽', title: 'Fuel Budget', requireDeclare: true,
     hints: ["Start with the full budget (80), then subtract each leg's cost one at a time as you go through the loop."], xp: 50,
     brief: 'Budget: <b>80 fuel</b>. Four legs of the journey, each with a cost. Report how much fuel '
       + '<b>remains</b> after every leg.',
@@ -3561,7 +3563,7 @@ UNTIL n &gt; 5</div>
     starter: {
       py: 'budget = 80\nfor row in data:\n'
         + "    # TODO: subtract row['cost'] from budget\n    pass\n\nanswer(budget)\n",
-      ps: 'budget ← 80\nFOR i ← 1 TO dataCount\n    // TODO: budget ← budget - dataCost[i]\nNEXT i\n\nanswer(budget)\n',
+      ps: 'DECLARE budget : INTEGER\nbudget ← 80\nFOR i ← 1 TO dataCount\n    // TODO: budget ← budget - dataCost[i]\nNEXT i\n\nanswer(budget)\n',
     },
     answer: 18,
     stars: { metric: 'pass' },
@@ -4351,20 +4353,35 @@ function _dataValMatches(got, exp) {
   return String(got).trim().toLowerCase() === String(exp).trim().toLowerCase()
 }
 
-// A data mission's result, checked one of two ways:
-//   - mission.checkVars: { varName: expectedValue, ... } — reads the
-//     student's own variable(s) straight out of res.vars (the Variable
-//     Table) after running. No special reporting call needed at all —
-//     the mission's starter code just assigns the variable naturally as
-//     its last real step. This is the current mechanic for new/migrated
-//     missions (see TODO-GRADE9.md Phase 1).
+// A data mission's result, checked one of three ways:
+//   - mission.expectedOutput: [...] — compares against res.outputs, i.e.
+//     whatever the student's own OUTPUT statements actually printed. This
+//     is the PREFERRED mechanic for any mission whose own flowchart
+//     diagram literally ends in an Output shape (which is every one of
+//     flow-p1/flow-p2/flow-code and flowg1-20boss — their diagrams always
+//     show "Output X" as the final step, so checking the real output is
+//     the honest, natural fit — exactly how the drag-and-drop flowchart
+//     BUILDER's checkFlowchart() already grades a built flowchart, so
+//     this makes the two engines consistent with each other too). No
+//     special reporting call needed — the student just writes a real
+//     OUTPUT statement, same as the flowchart diagram shows.
+//   - mission.checkVars: { varName: expectedValue, ... } — reads a
+//     variable straight out of res.vars (the Variable Table) instead,
+//     for missions that end by computing and HOLDING a value rather than
+//     printing it.
 //   - mission.answer (legacy): still supported for missions not yet
-//     migrated — checks whatever was passed to the old answer() call.
-// `val` is res.answer (legacy mechanic); `vars` is res.vars (the new one) —
-// kept as two separate params, rather than the whole `res` object, so this
-// stays a pure value-in/value-out function independent of the executor's
-// result shape (and so existing callers passing just `val` don't break).
-function evalDataSuccess(mission, val, vars) {
+//     migrated off the original answer() mechanic.
+// val/vars/outputs are passed as separate params (not the whole `res`
+// object) so this stays a pure value-in/value-out function independent of
+// the executor's result shape, and so existing callers don't break.
+function evalDataSuccess(mission, val, vars, outputs) {
+  if (mission.expectedOutput) {
+    const want = mission.expectedOutput.map(String)
+    const got = (outputs || []).map(String)
+    if (!got.length) return { ok: false, why: 'nooutput' }
+    const matches = got.length === want.length && got.every((v, i) => v === want[i])
+    return matches ? { ok: true } : { ok: false, why: 'wrongoutput', got, want }
+  }
   if (mission.checkVars) {
     const v = vars || {}
     for (const name in mission.checkVars) {
@@ -4480,13 +4497,48 @@ function execPseudo(src, mission, battleEnv) {
   // run, so the final diff is exactly what the student declared/assigned —
   // see the isData return below.
   const _baselineKeys = isData ? new Set(Object.keys(scopes[0])) : null
+  // Real DECLARE enforcement — data missions ONLY (the "transform this
+  // flowchart into code" missions whose diagrams always show a Declare
+  // shape as part of the taught method; turtle/battle missions have a
+  // completely different style with no Declare step in their own
+  // pedagogy, so leaving them exactly as lenient as before keeps this
+  // change from having a much bigger, unrelated blast radius). Further
+  // scoped to mission.requireDeclare specifically (not every isData
+  // mission) — turns out "Foundations 4: Your First Code" (cb1 etc.)
+  // deliberately TEACHES the informal "assignment alone creates it"
+  // model as its own first lesson on variables ("A variable is created
+  // with a name, then =, then its value" — cb1's own hint), so making
+  // this universal for every data mission would have broken that
+  // content's actual teaching point, not just its syntax. Opt-in via
+  // requireDeclare, set on the flowchart-to-code missions (flow-p1/
+  // flow-code/flowg1-20boss/p3m1-5) whose own diagrams show a real
+  // Declare step — confirmed by actually running the full DATA_REF
+  // suite with this on everywhere first and seeing cb1 fail for
+  // exactly this reason before narrowing it. Tracked as a SEPARATE
+  // set, not a key on the scope objects themselves — the Variable
+  // Table's own `for (const k in scopes[0])` diff would otherwise show
+  // a stray fake "variable". Deliberately flat (not re-scoped per
+  // FUNCTION/PROCEDURE call) rather than threading it through
+  // callUserFn's own push/pop — a declare "leaking" visibility into a
+  // sibling call is a far smaller issue than getting that threading
+  // wrong, for content where recursion is a narrow, late Tier.
+  const declaredNames = mission.requireDeclare ? new Set(_baselineKeys) : null
   function getVar(name, ln) {
     for (let i = scopes.length - 1; i >= 0; i--) if (name in scopes[i]) return scopes[i][name]
     throw { message: 'Unknown variable "' + name + '"', ln }
   }
-  function setVar(name, val) {
+  function setVar(name, val, ln) {
+    if (declaredNames && !declaredNames.has(name))
+      throw { message: 'Variable "' + name + '" was never declared — add DECLARE ' + name + ' : INTEGER (or the right type — REAL/STRING/BOOLEAN/CHAR) before assigning to it.', ln }
     for (let i = scopes.length - 1; i >= 0; i--) if (name in scopes[i]) { scopes[i][name] = val; return }
     scopes[scopes.length - 1][name] = val
+  }
+  // Used by FOR's own loop variable and DECLARE itself — both are
+  // legitimate ways a variable comes into existence, so they bypass the
+  // "already declared" check setVar enforces for ordinary assignment.
+  function declareVar(name, val) {
+    scopes[scopes.length - 1][name] = val
+    if (declaredNames) declaredNames.add(name)
   }
 
   // ── FUNCTION/PROCEDURE — pre-scanned so a call can appear before its
@@ -4711,7 +4763,7 @@ function execPseudo(src, mission, battleEnv) {
         if (st === 0) throw { message: 'STEP 0 never ends', ln }
         const vn = m[1].toLowerCase()
         for (let v = a; st > 0 ? v <= b : v >= b; v += st) {
-          setVar(vn, v)
+          declareVar(vn, v)
           run(i + 1, nxt)
         }
         i = nxt + 1
@@ -4773,6 +4825,30 @@ function execPseudo(src, mission, battleEnv) {
         i++
         continue
       }
+      // DECLARE name : Type  /  DECLARE name[size] : Type — real Cambridge
+      // pseudocode syntax, newly parsed (previously not recognized at all;
+      // every mission's own hints instead said "no separate DECLARE line
+      // needed", which is exactly what let a student skip the step their
+      // own flowchart diagram shows). Only matters where setVar's
+      // declaredNames check is active (isData missions) — elsewhere this
+      // still runs harmlessly (declareVar always succeeds), so a DECLARE
+      // line in a non-data mission's pseudocode doesn't break anything
+      // either, it just isn't REQUIRED there.
+      if (up.startsWith('DECLARE ')) {
+        const dm = t.match(/^DECLARE\s+([A-Za-z_]\w*)\s*(?:\[\s*(.+?)\s*\])?\s*:\s*(\w+)\s*$/i)
+        if (!dm) throw { message: 'Bad DECLARE — expected: DECLARE name : INTEGER (or name[size] : INTEGER for an array)', ln }
+        const name = dm[1].toLowerCase()
+        const typeDefault = { integer: 0, real: 0, string: '', boolean: false, char: '' }[dm[3].toLowerCase()]
+        if (typeDefault === undefined) throw { message: 'Unknown type "' + dm[3] + '" — use INTEGER, REAL, STRING, BOOLEAN, or CHAR.', ln }
+        if (dm[2]) {
+          const size = evalExpr(dm[2], ln)
+          declareVar(name, Array.from({ length: size }, () => typeDefault))
+        } else {
+          declareVar(name, typeDefault)
+        }
+        i++
+        continue
+      }
       // Array-index assignment (dataWeight[j] ← ...) — did not exist at
       // all before (confirmed real gap: bubble sort, whose own hint
       // explicitly says "compare neighbours, swap if out of order", is
@@ -4790,7 +4866,7 @@ function execPseudo(src, mission, battleEnv) {
         i++; continue
       }
       const am = t.match(/^([A-Za-z_]\w*)\s*(?:←|<-)\s*(.+)$/)
-      if (am) { setVar(am[1].toLowerCase(), evalExpr(am[2], ln)); i++; continue }
+      if (am) { setVar(am[1].toLowerCase(), evalExpr(am[2], ln), ln); i++; continue }
       const cm = t.match(/^(?:CALL\s+)?([A-Za-z_]\w*)\s*\((.*)\)$/i)
       if (cm) {
         const nm = cm[1].toLowerCase()
@@ -4925,6 +5001,15 @@ async function execPythonData(code, mission) {
   const py = await ensurePyodide()
   py.runPython("_answer = None\ndef answer(v):\n    global _answer\n    _answer = v\n")
   py.globals.set('data', py.toPy(mission.data))
+  // Captured print() output — the OUTPUT-based check mechanic (preferred
+  // over answer()/checkVars for any mission whose own flowchart diagram
+  // ends in an Output shape, see evalDataSuccess) needs this on the
+  // Python side too. Pyodide's stdout redirect is global on the shared
+  // `_pyodide` instance, so this is reset back to default in a `finally`
+  // regardless of outcome — otherwise a LATER, unrelated Python run (a
+  // turtle or battle mission) would keep silently feeding this capture.
+  const outputs = []
+  py.setStdout({ batched: line => outputs.push(line) })
   // Variable Table — snapshot the injected/builtin global names BEFORE the
   // student's own code runs, so the final diff is exactly what the
   // student declared/assigned (same approach as execPseudo's isData branch).
@@ -4942,7 +5027,7 @@ async function execPythonData(code, mission) {
       if (typeof v === 'function') continue
       vars[k] = v
     }
-    return { ok: true, answer: val, vars }
+    return { ok: true, answer: val, vars, outputs }
   } catch (e) {
     const msg = String(e.message || e)
     let line = null
@@ -4950,6 +5035,8 @@ async function execPythonData(code, mission) {
     if (matches.length) line = parseInt(matches[matches.length - 1][1])
     const lastLine = msg.trim().split('\n').pop()
     return { ok: false, error: lastLine, line: line && line > 0 ? line : null }
+  } finally {
+    py.setStdout({})
   }
 }
 
@@ -6602,7 +6689,7 @@ async function runDataMission(isSubmit) {
     return
   }
 
-  const verdict = evalDataSuccess(mission, res.answer, res.vars)
+  const verdict = evalDataSuccess(mission, res.answer, res.vars, res.outputs)
   const reqErr = verdict.ok ? checkRequire(mission, code) : null
   renderVarTable(res.vars)
 
@@ -6619,8 +6706,20 @@ async function runDataMission(isSubmit) {
     logC('🟡 Correct… but ' + reqErr, 'warn')
     setSubmit(false)
   } else if (verdict.ok) {
-    logC('✅ Correct! Check the Variables panel — press ✓ Submit to claim your stars.', 'ok')
+    logC(mission.expectedOutput
+      ? '✅ Correct! Your OUTPUT matches — press ✓ Submit to claim your stars.'
+      : '✅ Correct! Check the Variables panel — press ✓ Submit to claim your stars.', 'ok')
     setSubmit(true)
+  } else if (mission.expectedOutput) {
+    // Preferred mechanic — the mission's own flowchart diagram ends in an
+    // Output shape, so this checks the student's real printed output
+    // (res.outputs), the same honest signal the drag-and-drop flowchart
+    // BUILDER's checkFlowchart() already grades a built flowchart by.
+    if (verdict.why === 'nooutput') {
+      logC('🤔 Your program ran but never OUTPUT anything — the flowchart ends in an Output step, so your code needs a real OUTPUT (or print) statement.', 'warn')
+    } else {
+      logC('✗ Not quite — your output was ' + JSON.stringify(verdict.got) + ', expected ' + JSON.stringify(verdict.want) + '. Check your logic and try again.', 'err')
+    }
   } else if (mission.checkVars) {
     // New mechanic: read the expected variable straight out of the Variable
     // Table, no answer() call involved at all.
