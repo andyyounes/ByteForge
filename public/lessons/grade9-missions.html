@@ -202,7 +202,7 @@
   .fc-shape[data-type="io"] { transform:skewX(-12deg); border-color:#a78bfa; }
   .fc-shape[data-type="io"] .fc-label { transform:skewX(12deg); }
   .fc-shape[data-type="declare"] { border-radius:2px; border-color:#facc15; background:#1a1810; }
-  .fc-shape[data-type="for"], .fc-shape[data-type="while"] {
+  .fc-shape[data-type="for"], .fc-shape[data-type="while"], .fc-shape[data-type="repeat"] {
     clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);
     border-color:#fb923c; min-width:150px;
   }
@@ -216,6 +216,26 @@
                        align-items:center; justify-content:center; cursor:pointer; }
   .fc-status { text-align:center; font-size:13px; font-weight:700; margin-bottom:14px; color:#c7d2e0; }
   #fc-check-btn { width:100%; }
+
+  /* ── Shape property editor (double-click a shape) ── */
+  .fc-edit-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:300;
+                      display:flex; align-items:center; justify-content:center; }
+  .fc-edit-modal { background:#161927; border:1px solid rgba(255,255,255,.12); border-radius:12px;
+                   width:380px; max-width:92vw; max-height:85vh; overflow-y:auto; }
+  .fc-edit-hdr { display:flex; justify-content:space-between; align-items:center; padding:14px 18px;
+                 border-bottom:1px solid rgba(255,255,255,.08); font-size:13.5px; font-weight:800; color:#e2e8f0; }
+  .fc-edit-body { padding:16px 18px; display:flex; flex-direction:column; gap:12px; }
+  .fc-edit-row { display:flex; flex-direction:column; gap:5px; }
+  .fc-edit-row label { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#9ca3af; }
+  .fc-edit-row select, .fc-edit-row input[type="text"], .fc-edit-row input[type="number"] {
+    background:#0e1020; border:1px solid rgba(255,255,255,.14); border-radius:6px; color:#e2e8f0;
+    font-size:13px; padding:7px 10px; font-family:inherit;
+  }
+  .fc-edit-cond { display:grid; grid-template-columns:1fr auto 1fr; gap:6px; align-items:center; }
+  .fc-edit-checkrow { display:flex; align-items:center; gap:8px; }
+  .fc-edit-checkrow label { font-size:12px; color:#c7d2e0; text-transform:none; letter-spacing:0; font-weight:600; }
+  .fc-edit-foot { display:flex; gap:8px; padding:14px 18px; border-top:1px solid rgba(255,255,255,.08); }
+  .fc-edit-foot button { flex:1; }
 
   .mlist { position:fixed; inset:0; z-index:50; background:#0d0f1a; overflow-y:auto; display:none; }
   .mlist.open { display:block; }
@@ -464,9 +484,10 @@
         <div class="fc-palette-btn" onclick="addShape('decision')">◇ Decision</div>
         <div class="fc-palette-btn" onclick="addShape('for')">⬡ For</div>
         <div class="fc-palette-btn" onclick="addShape('while')">⬡ While</div>
+        <div class="fc-palette-btn" onclick="addShape('repeat')">⬡ Repeat</div>
         <div class="fc-palette-btn" onclick="addShape('io')">▱ Output</div>
         <div class="fc-palette-btn" id="fc-connect-btn" onclick="toggleConnectMode()">🔗 Connect Shapes</div>
-        <div class="fc-palette-btn" onclick="clearFlowchart()">🗑 Clear</div>
+        <div class="fc-palette-btn" onclick="if (confirm('Clear the whole flowchart? This also deletes your saved progress on it.')) clearFlowchart(true)">🗑 Clear</div>
       </div>
       <div class="fc-canvas-wrap" id="fc-canvas-wrap" oncontextmenu="return showFcContextMenu(event)">
         <svg id="fc-svg"></svg>
@@ -483,9 +504,10 @@
         <div onclick="fcContextAdd('decision')">◇ Decision (If)</div>
         <div onclick="fcContextAdd('for')">⬡ For</div>
         <div onclick="fcContextAdd('while')">⬡ While</div>
+        <div onclick="fcContextAdd('repeat')">⬡ Repeat</div>
         <div onclick="fcContextAdd('io')">▱ Output</div>
       </div>
-      <div class="fc-status" id="fc-status">Drag shapes to reposition. Click a shape's text to edit its label. Right-click the canvas (or use the buttons above) to add a shape. Use "Connect Shapes" then click two shapes in order to draw an arrow between them — from a Decision/For/While, the FIRST arrow you draw is True/Next, the SECOND is False/Done.</div>
+      <div class="fc-status" id="fc-status">Drag shapes to reposition. Double-click a shape to edit it properly (variable name, data type, loop range, condition…), or click its text to rename it directly. Right-click the canvas (or use the buttons above) to add a shape. Use "Connect Shapes" then click two shapes in order to draw an arrow between them — from a Decision/For/While/Repeat, the FIRST arrow you draw is True/Next, the SECOND is False/Done.</div>
       <span class="g9-hint-btn" onclick="showG9Hint()">💡 Hint</span>
       <div class="g9-hint-display" id="g9-hint-display-flow"></div>
       <div class="btn-row" style="display:flex;gap:8px;">
@@ -493,6 +515,26 @@
         <button class="btn btn-run" id="fc-check-btn" onclick="checkFlowchart()">✓ Check My Flowchart</button>
       </div>
       <div class="fc-run-output" id="fc-run-output"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Shape property editor — opened by double-clicking a shape. The real
+     Flowgorithm desktop app edits a shape through a proper dialog (pick the
+     variable name, pick the data type, tick "array" and give it a size,
+     etc.) instead of typing exact syntax into a text box; this is that
+     same idea, rendered per shape type. Saving still just writes a plain
+     label string in the SAME format the single-click-to-edit text field
+     always accepted (e.g. "Integer n", "n = 1 to 10") — the dialog is a
+     friendlier way to PRODUCE that string, not a second data format the
+     execution engine has to understand. -->
+<div class="fc-edit-overlay" id="fc-edit-overlay" style="display:none;" onclick="if (event.target === this) closeShapeEditor()">
+  <div class="fc-edit-modal">
+    <div class="fc-edit-hdr"><span id="fc-edit-title"></span><span class="toolkit-close" onclick="closeShapeEditor()">✕</span></div>
+    <div class="fc-edit-body" id="fc-edit-body"></div>
+    <div class="fc-edit-foot">
+      <button class="btn btn-reset" onclick="closeShapeEditor()">Cancel</button>
+      <button class="btn btn-run" onclick="saveShapeEdit()">Save</button>
     </div>
   </div>
 </div>
@@ -2530,6 +2572,89 @@ UNTIL n &gt; 5</div>
     requireCode: { re: /\b(repeat|while\s+true)\b/i, msg: 'this mission requires the real nested loop (an outer REPEAT/while-True re-running the digit sum UNTIL a single digit remains) — don\'t hardcode the final root.' },
     checkVars: { num: 2 },
     stars: { metric: 'pass' },
+  },
+
+  // ── Foundations 6f · BUILD YOUR OWN FLOWCHART — TODO-GRADE9.md Phase 4.
+  // Every flowg mission above gave a FINISHED flowchart and asked for code;
+  // these ask for the opposite direction — build the flowchart itself with
+  // the drag-and-drop canvas (type:'flowchart', see renderFlowchartBubble()/
+  // runFlowchart() et al.). This engine already existed in the file but was
+  // completely unused by any mission before this — every one of these walk-
+  // throughs is the first real content it's ever run. Each mission is
+  // checked by what the student's OWN flowchart actually produces when run
+  // (req.expectedOutput), not just shape/connection counts, the same real
+  // Flowgorithm-style grading the flowg series already uses for code.
+  {
+    id: 'fcb1', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🗄', title: 'Declare, Assign, Output',
+    hints: ['Double-click the Declare shape — name it age, type Integer.', 'Double-click the Assign shape — target "age", expression "15".', 'Double-click the Output shape — expression "age". Connect Start → Declare → Assign → Output → End, in that order.'],
+    xp: 40,
+    brief: 'Build a flowchart from scratch: Start, a Declare shape for an Integer called age, an Assign shape setting age to 15, an Output shape printing age, then End. Double-click each shape to set it up properly instead of typing raw syntax.',
+    api: [],
+    flowchart: {
+      intro: 'Drag out the shapes below, connect them in order, then double-click each one to configure it — no code, just the flowchart itself.',
+      minShapes: 5, minConnections: 4,
+      expectedOutput: ['15'],
+    },
+  },
+  {
+    id: 'fcb2', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🗂', title: 'Arrays',
+    hints: ['Double-click Declare, tick "This is an array", name it scores, size 3.', 'Three separate Assign shapes: scores[1] = 10, scores[2] = 20, scores[3] = 30 — array indices here start at 1, same as pseudocode elsewhere.', 'Output scores[2] should print 20.'],
+    xp: 45,
+    brief: 'An array is one Declare shape, ticked as an array, with a size — not three separate variables. Build: Declare an Integer array scores[3], Assign each of its 3 slots a different number, then Output scores[2] (the MIDDLE one).',
+    api: [],
+    flowchart: {
+      intro: 'Double-click Declare and tick "This is an array" to give it a size. Assign shapes can target scores[1], scores[2], scores[3] individually.',
+      minShapes: 6, minConnections: 5,
+      expectedOutput: ['20'],
+    },
+  },
+  {
+    id: 'fcb3', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🔁', title: 'For Loop',
+    hints: ['Double-click the For shape: variable i, start 1, end 5.', 'The loop body (an Output shape printing i) connects back to the SAME For shape — that\'s what makes it repeat.', 'A For shape has TWO outgoing arrows: the first one you draw is "Next" (into the loop body), the second is "Done" (out of the loop, once finished).'],
+    xp: 45,
+    brief: 'Build a For loop that prints 1, 2, 3, 4, 5 — one Output per line. One For shape (i = 1 to 5), one Output shape (prints i) wired as its loop body, looping back to the For shape itself.',
+    api: [],
+    flowchart: {
+      intro: 'The For shape\'s FIRST outgoing arrow is "Next" (goes into the loop body); connect the loop body back to the SAME For shape to make it repeat. The SECOND arrow out of the For shape is "Done".',
+      minShapes: 4, minConnections: 4, requiresDecision: false,
+      expectedOutput: ['1', '2', '3', '4', '5'],
+    },
+  },
+  {
+    id: 'fcb4', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '⬡', title: 'While Loop',
+    hints: ['Declare n and total, Assign n = 1 and total = 0 BEFORE the While shape.', 'While condition: n <= 5. Loop body: total = total + n, then n = n + 1, looping back to the SAME While shape.', 'A While shape\'s FIRST arrow is "Next" (checked TRUE — into the body), the SECOND is "Done" (checked FALSE — out of the loop). Output total AFTER the loop, not inside it.'],
+    xp: 50,
+    brief: 'Build a While loop that adds up 1+2+3+4+5. Set up n=1 and total=0 first, then a While shape (n <= 5) whose body adds n to total and increments n, looping back to itself — then Output total once the loop finishes.',
+    api: [],
+    flowchart: {
+      intro: 'While checks its condition BEFORE each pass — wire the loop body back to the SAME While shape so it re-checks every time round.',
+      minShapes: 7, minConnections: 7,
+      expectedOutput: ['15'],
+    },
+  },
+  {
+    id: 'fcb5', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🔂', title: 'Repeat-Until Loop',
+    hints: ['Same sum-1-to-5 idea as the While mission — but Repeat checks its condition AFTER the body, not before.', 'A Repeat shape\'s FIRST arrow is "Next" (condition still FALSE — loop again), the SECOND is "Done" (condition finally TRUE — exit).', 'Condition this time is n > 5 (the OPPOSITE sense from While\'s n <= 5) — Repeat keeps going UNTIL it becomes true.'],
+    xp: 50,
+    brief: 'Rebuild the same running-total idea as the While mission, but with a Repeat shape instead: the condition (n > 5) is checked AFTER the body runs, and the loop keeps going UNTIL it becomes true — the opposite sense from While.',
+    api: [],
+    flowchart: {
+      intro: 'Repeat checks its condition AFTER the loop body — wire Start → setup → loop body → Repeat shape, with the Repeat shape\'s "Next" branch looping back to the body, and "Done" leading to Output.',
+      minShapes: 7, minConnections: 7,
+      expectedOutput: ['15'],
+    },
+  },
+  {
+    id: 'fcb6boss', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🏆', boss: true, title: 'BOSS — Even Numbers Only',
+    hints: ['One For loop, i = 1 to 10, with a Decision INSIDE its body: i MOD 2 = 0?', 'Decision\'s True branch Outputs i, then continues back to the For shape either way (True and False both eventually loop back).', 'This combines everything: For, Decision/If, and Output, all wired together — exactly like flowg6/flowg12\'s "print only the even ones" code missions, but built as a real flowchart.'],
+    xp: 75,
+    brief: 'The capstone: build a flowchart that prints only the EVEN numbers from 1 to 10 (2, 4, 6, 8, 10). One For loop (i = 1 to 10) with a Decision inside its body (i MOD 2 = 0?) — only Output i on the True branch, but BOTH branches must lead back to the For loop to keep it going.',
+    api: [],
+    flowchart: {
+      intro: 'A Decision INSIDE a loop body needs BOTH its branches to eventually rejoin the loop — True goes through Output first, False skips straight back — so the For shape keeps getting re-checked either way.',
+      minShapes: 5, minConnections: 6, requiresDecision: true,
+      expectedOutput: ['2', '4', '6', '8', '10'],
+    },
   },
 
   // ── Phase 0B · Flight Computer — algorithmic thinking, before you fly ───────
@@ -5643,16 +5768,50 @@ function renderFlowchartBubble() {
   document.getElementById('fc-intro').textContent = m.flowchart.intro
   clearFlowchart()
 }
-function clearFlowchart() {
+// `wipe` distinguishes the two real callers: opening a flowchart mission
+// (wipe=false — restore the student's saved work if there is any) vs. the
+// student clicking the "🗑 Clear" button themselves (wipe=true — a genuine
+// reset, including the saved draft, not just the visible canvas).
+function clearFlowchart(wipe) {
   _fcShapes = []; _fcConns = []; _fcConnectMode = false; _fcConnectFrom = null; _fcNextId = 1
   document.getElementById('fc-canvas-wrap').classList.remove('connecting')
   const canvas = document.getElementById('fc-canvas-wrap')
   canvas.querySelectorAll('.fc-shape').forEach(el => el.remove())
   document.getElementById('fc-svg').innerHTML = ''
-  document.getElementById('fc-status').textContent = 'Drag shapes to reposition. Click a shape\'s text to edit its label. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.'
+  document.getElementById('fc-status').textContent = 'Drag shapes to reposition. Double-click a shape to edit it properly (variable name, data type, loop range, condition…), or click its text to rename it directly. Use "Connect Shapes" then click two shapes in order to draw an arrow between them.'
   document.getElementById('fc-run-output').textContent = ''
+  if (wipe) { fcSaveDraft(); return }
+  // Restore the student's own in-progress build first — losing a half-built
+  // flowchart on every reload/navigation-away was a real gap (this engine
+  // never persisted anything before a Submit at all). Only fall back to the
+  // mission's own starting scaffold if there's genuinely nothing saved yet.
+  const draft = activeMission ? fcLoadDraft(activeMission.id) : null
+  if (draft && Array.isArray(draft.shapes) && draft.shapes.length) { loadPrebuiltFlowchart(draft); return }
   const prebuilt = activeMission?.flowchart?.prebuilt
   if (prebuilt) loadPrebuiltFlowchart(prebuilt)
+}
+// ── Save the student's in-progress flowchart build — mirrors the existing
+// code-draft pattern (draftKey/loadDraft/saveDraft above) exactly, just for
+// the shapes+connections graph instead of a text editor's contents. Debounced
+// so a drag or a fast run of clicks doesn't fire a write per event.
+function fcDraftKey(id) { return userKey('bf-g9-fcdraft-' + id) }
+function fcDraftServerId(id) { return id + '-fcdraft' }
+function fcLoadDraft(id) {
+  try {
+    const local = localStorage.getItem(fcDraftKey(id))
+    if (local != null) return JSON.parse(local)
+  } catch (e) {}
+  try { return LessonSaves.saveDataFor(fcDraftServerId(id), 'grade9-missions') } catch (e) { return null }
+}
+let _fcSaveT = null
+function fcSaveDraft() {
+  if (!activeMission) return
+  clearTimeout(_fcSaveT)
+  _fcSaveT = setTimeout(() => {
+    const data = { shapes: _fcShapes, conns: _fcConns }
+    try { localStorage.setItem(fcDraftKey(activeMission.id), JSON.stringify(data)) } catch (e) {}
+    if (me) { try { LessonSaves.save('grade9-missions', fcDraftServerId(activeMission.id), { passed: false, saveData: data }) } catch (e) {} }
+  }, 500)
 }
 // Trace-style missions (flow-p1) give the student the shapes and arrows
 // already placed and wired up — only the blank labels need filling in.
@@ -5703,7 +5862,7 @@ function addShape(type, pos) {
   const id = _fcNextId++
   const labelDefault = {
     terminator: 'Start', process: 'n = n + 1', decision: 'n > 10',
-    declare: 'Integer n', for: 'n = 1 to 10', while: 'n < 10', io: 'Output n',
+    declare: 'Integer n', for: 'n = 1 to 10', while: 'n < 10', repeat: 'n > 10', io: 'Output n',
   }[type]
   // Spread new shapes out based on how many currently exist, not `id`
   // (which keeps climbing even after deletions) — avoids everything
@@ -5724,10 +5883,149 @@ function addShape(type, pos) {
   el.innerHTML = '<span class="fc-label" contenteditable="true">' + labelDefault + '</span><span class="fc-del" onclick="deleteShape(' + id + ', event)">×</span>'
   const canvas = document.getElementById('fc-canvas-wrap')
   canvas.appendChild(el)
-  el.querySelector('.fc-label').addEventListener('input', e => { shape.label = e.target.textContent })
+  el.querySelector('.fc-label').addEventListener('input', e => { shape.label = e.target.textContent; fcSaveDraft() })
   el.querySelector('.fc-label').addEventListener('mousedown', e => e.stopPropagation())
   el.addEventListener('click', e => { if (_fcConnectMode && !e.target.classList.contains('fc-del')) handleConnectClick(id, el) })
+  el.addEventListener('dblclick', e => {
+    if (_fcConnectMode || e.target.classList.contains('fc-del')) return
+    e.preventDefault()
+    openShapeEditor(id)
+  })
   makeShapeDraggable(el, shape)
+  fcSaveDraft()
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Shape property editor — double-click a shape to get a real Flowgorithm-style
+// dialog (pick the variable name, pick the data type, tick "array" and give
+// it a size, pick the comparison operator, etc.) instead of typing exact
+// syntax by hand into the freeform label. Saving still just writes the SAME
+// plain label string runFlowchart()/fcEval*() already parse — this is a
+// friendlier way to PRODUCE that string, not a second format the engine
+// needs to understand.
+// ══════════════════════════════════════════════════════════════════════════════
+const FC_DATA_TYPES = ['Integer', 'Real', 'String', 'Boolean', 'Char']
+const FC_COMPARISONS = [
+  { v: '=',  t: '= (equals)' }, { v: '<>', t: '≠ (not equal)' },
+  { v: '<',  t: '< (less than)' }, { v: '>',  t: '> (greater than)' },
+  { v: '<=', t: '≤ (less or equal)' }, { v: '>=', t: '≥ (greater or equal)' },
+]
+let _fcEditingId = null
+
+// Parses a declare shape's label — "Integer n" or "Integer arr[10]" —
+// back into its parts, for pre-filling the editor when reopening an
+// already-set-up shape. Defaults to Integer/no-array for anything that
+// doesn't match yet (a freshly-added shape, or one hand-typed oddly).
+function fcParseDeclare(label) {
+  const m = (label || '').match(/^\s*(\w+)\s+(\w+)(?:\s*\[\s*(\d+)\s*\])?\s*$/)
+  if (!m) return { type: 'Integer', name: '', isArray: false, size: 10 }
+  const type = FC_DATA_TYPES.find(t => t.toLowerCase() === m[1].toLowerCase()) || 'Integer'
+  return { type, name: m[2], isArray: !!m[3], size: m[3] ? parseInt(m[3], 10) : 10 }
+}
+function fcParseCondition(label) {
+  const m = (label || '').match(/^(.+?)(>=|<=|<>|=|>|<)(.+)$/)
+  if (!m) return { left: '', op: '=', right: '' }
+  return { left: m[1].trim(), op: m[2], right: m[3].trim() }
+}
+function fcParseFor(label) {
+  const m = (label || '').match(/^\s*(\w+)\s*=\s*(.+?)\s+to\s+(.+)$/i)
+  if (!m) return { varName: 'i', start: '1', end: '10' }
+  return { varName: m[1], start: m[2].trim(), end: m[3].trim() }
+}
+function fcParseAssign(label) {
+  const eq = (label || '').indexOf('=')
+  if (eq === -1) return { target: '', expr: '' }
+  return { target: label.slice(0, eq).trim(), expr: label.slice(eq + 1).trim() }
+}
+function fcParseOutput(label) {
+  const m = (label || '').match(/^\s*Output\s+(.+)$/i)
+  return { expr: m ? m[1].trim() : '' }
+}
+
+function openShapeEditor(id) {
+  const shape = _fcShapes.find(s => s.id === id)
+  if (!shape) return
+  _fcEditingId = id
+  const titleByType = {
+    declare: '🗄 Declare a Variable', process: '▭ Assign a Value', decision: '◇ Decision (If)',
+    for: '⬡ For Loop', while: '⬡ While Loop', repeat: '⬡ Repeat … Until Loop',
+    io: '▱ Output', terminator: '⬭ Start / End',
+  }
+  document.getElementById('fc-edit-title').textContent = titleByType[shape.type] || 'Edit Shape'
+  const body = document.getElementById('fc-edit-body')
+
+  if (shape.type === 'declare') {
+    const d = fcParseDeclare(shape.label)
+    body.innerHTML = `
+      <div class="fc-edit-row"><label>Variable name</label><input type="text" id="fe-name" value="${d.name}" placeholder="e.g. score"></div>
+      <div class="fc-edit-row"><label>Data type</label><select id="fe-type">${FC_DATA_TYPES.map(t => `<option value="${t}" ${t === d.type ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+      <div class="fc-edit-checkrow"><input type="checkbox" id="fe-isarray" ${d.isArray ? 'checked' : ''} onchange="document.getElementById('fe-size-row').style.display = this.checked ? '' : 'none'"><label for="fe-isarray">This is an array</label></div>
+      <div class="fc-edit-row" id="fe-size-row" style="display:${d.isArray ? '' : 'none'}"><label>Array size</label><input type="number" id="fe-size" value="${d.size}" min="1" max="1000"></div>`
+  } else if (shape.type === 'process') {
+    const a = fcParseAssign(shape.label)
+    body.innerHTML = `
+      <div class="fc-edit-row"><label>Variable (or array[index])</label><input type="text" id="fe-target" value="${a.target}" placeholder="e.g. total or arr[i]"></div>
+      <div class="fc-edit-row"><label>Expression</label><input type="text" id="fe-expr" value="${a.expr}" placeholder="e.g. total + n"></div>`
+  } else if (shape.type === 'decision' || shape.type === 'while' || shape.type === 'repeat') {
+    const c = fcParseCondition(shape.label)
+    const hint = shape.type === 'repeat'
+      ? '<p style="font-size:11px;color:#9ca3af;margin:0;">Checked AFTER each pass — the loop keeps going while this is FALSE, and stops once it becomes true.</p>'
+      : shape.type === 'while' ? '<p style="font-size:11px;color:#9ca3af;margin:0;">Checked BEFORE each pass — the loop keeps going while this is TRUE.</p>' : ''
+    body.innerHTML = `
+      ${hint}
+      <div class="fc-edit-row"><label>Condition</label>
+        <div class="fc-edit-cond">
+          <input type="text" id="fe-left" value="${c.left}" placeholder="e.g. n">
+          <select id="fe-op">${FC_COMPARISONS.map(o => `<option value="${o.v}" ${o.v === c.op ? 'selected' : ''}>${o.t}</option>`).join('')}</select>
+          <input type="text" id="fe-right" value="${c.right}" placeholder="e.g. 10">
+        </div>
+      </div>`
+  } else if (shape.type === 'for') {
+    const f = fcParseFor(shape.label)
+    body.innerHTML = `
+      <div class="fc-edit-row"><label>Loop variable</label><input type="text" id="fe-var" value="${f.varName}" placeholder="e.g. i"></div>
+      <div class="fc-edit-row"><label>Start value</label><input type="text" id="fe-start" value="${f.start}" placeholder="e.g. 1"></div>
+      <div class="fc-edit-row"><label>End value</label><input type="text" id="fe-end" value="${f.end}" placeholder="e.g. 10"></div>`
+  } else if (shape.type === 'io') {
+    const o = fcParseOutput(shape.label)
+    body.innerHTML = `
+      <div class="fc-edit-row"><label>Output this expression</label><input type="text" id="fe-expr" value="${o.expr}" placeholder="e.g. total or arr[i]"></div>`
+  } else {
+    body.innerHTML = `<div class="fc-edit-row"><label>Label</label><input type="text" id="fe-label" value="${shape.label}"></div>`
+  }
+  document.getElementById('fc-edit-overlay').style.display = 'flex'
+}
+function closeShapeEditor() {
+  document.getElementById('fc-edit-overlay').style.display = 'none'
+  _fcEditingId = null
+}
+function saveShapeEdit() {
+  const shape = _fcShapes.find(s => s.id === _fcEditingId)
+  if (!shape) return closeShapeEditor()
+  const val = sel => document.getElementById(sel)?.value ?? ''
+  let label = shape.label
+  if (shape.type === 'declare') {
+    const name = val('fe-name').trim() || 'n'
+    const type = val('fe-type')
+    const isArray = document.getElementById('fe-isarray').checked
+    const size = parseInt(val('fe-size'), 10) || 10
+    label = isArray ? `${type} ${name}[${size}]` : `${type} ${name}`
+  } else if (shape.type === 'process') {
+    label = `${val('fe-target').trim() || 'n'} = ${val('fe-expr').trim() || '0'}`
+  } else if (shape.type === 'decision' || shape.type === 'while' || shape.type === 'repeat') {
+    label = `${val('fe-left').trim() || 'n'} ${val('fe-op')} ${val('fe-right').trim() || '0'}`
+  } else if (shape.type === 'for') {
+    label = `${val('fe-var').trim() || 'i'} = ${val('fe-start').trim() || '1'} to ${val('fe-end').trim() || '10'}`
+  } else if (shape.type === 'io') {
+    label = `Output ${val('fe-expr').trim() || ''}`
+  } else {
+    label = val('fe-label')
+  }
+  shape.label = label
+  const labelEl = document.querySelector('.fc-shape[data-id="' + shape.id + '"] .fc-label')
+  if (labelEl) labelEl.textContent = label
+  closeShapeEditor()
+  fcSaveDraft()
 }
 function deleteShape(id, e) {
   e.stopPropagation()
@@ -5735,6 +6033,7 @@ function deleteShape(id, e) {
   _fcConns = _fcConns.filter(c => c.from !== id && c.to !== id)
   document.querySelector('.fc-shape[data-id="' + id + '"]')?.remove()
   drawConnections()
+  fcSaveDraft()
 }
 function makeShapeDraggable(el, shape) {
   let dragging = false, offX = 0, offY = 0
@@ -5754,7 +6053,7 @@ function makeShapeDraggable(el, shape) {
     el.style.top = shape.y + 'px'
     drawConnections()
   })
-  document.addEventListener('mouseup', () => { dragging = false })
+  document.addEventListener('mouseup', () => { if (dragging) fcSaveDraft(); dragging = false })
 }
 function toggleConnectMode() {
   _fcConnectMode = !_fcConnectMode
@@ -5764,13 +6063,13 @@ function toggleConnectMode() {
   document.querySelectorAll('.fc-shape').forEach(el => el.classList.remove('selected-for-connect'))
   document.getElementById('fc-status').textContent = _fcConnectMode
     ? 'Connect mode ON — click a FROM shape, then a TO shape, to draw an arrow between them.'
-    : 'Drag shapes to reposition. Click a shape\'s text to edit its label.'
+    : 'Drag shapes to reposition. Double-click a shape to edit it properly, or click its text to rename it directly.'
 }
 // Decision/For/While shapes branch — the first outgoing arrow drawn from
 // one is the "primary" branch (True / Next), the second is the
 // "secondary" branch (False / Done). Anything else (terminator, declare,
 // process, io) only ever has ONE outgoing arrow, so it needs no label.
-const BRANCH_LABELS = { decision: ['True', 'False'], for: ['Next', 'Done'], while: ['Next', 'Done'] }
+const BRANCH_LABELS = { decision: ['True', 'False'], for: ['Next', 'Done'], while: ['Next', 'Done'], repeat: ['Next', 'Done'] }
 function handleConnectClick(id, el) {
   if (_fcConnectFrom === null) {
     _fcConnectFrom = id
@@ -5784,6 +6083,7 @@ function handleConnectClick(id, el) {
     document.querySelectorAll('.fc-shape').forEach(e => e.classList.remove('selected-for-connect'))
     _fcConnectFrom = null
     drawConnections()
+    fcSaveDraft()
   }
 }
 function shapeCenter(id) {
@@ -5852,6 +6152,11 @@ function fcTokenize(s) {
       continue
     }
     if (c === '(' || c === ')') { toks.push({ type: c === '(' ? 'lparen' : 'rparen', value: c }); i++; continue }
+    // Array indexing — arr[i] — added alongside Declare's array support
+    // (TODO-GRADE9.md Phase 4): the pseudocode interpreter elsewhere on
+    // this page already treats array indices as 1-based, so this engine
+    // matches that convention rather than JS's native 0-based indexing.
+    if (c === '[' || c === ']') { toks.push({ type: c === '[' ? 'lbracket' : 'rbracket', value: c }); i++; continue }
     if ('+-*/'.includes(c)) { toks.push({ type: 'op', value: c }); i++; continue }
     i++ // skip anything unrecognised rather than crash on stray punctuation
   }
@@ -5867,6 +6172,16 @@ function fcParseExpr(tokens, vars) {
     if (t.type === 'num' || t.type === 'str') return t.value
     if (t.type === 'id') {
       if (!(t.value in vars)) throw new Error('Unknown variable: ' + t.value)
+      if (peek() && peek().type === 'lbracket') {
+        next() // consume '['
+        const idx = parseAdd()
+        if (!peek() || peek().type !== 'rbracket') throw new Error('Missing closing ] for ' + t.value + '[...]')
+        next() // consume ']'
+        const arr = vars[t.value]
+        if (!Array.isArray(arr)) throw new Error(t.value + ' is not an array')
+        if (idx < 1 || idx > arr.length) throw new Error('Index ' + idx + ' is outside ' + t.value + ' (1..' + arr.length + ')')
+        return arr[idx - 1]
+      }
       return vars[t.value]
     }
     if (t.type === 'lparen') { const v = parseAdd(); next(); return v }
@@ -5911,7 +6226,20 @@ function fcEvalCondition(text, vars) {
 function fcExecAssign(text, vars) {
   const eq = text.indexOf('=')
   if (eq === -1) throw new Error('An Assign shape needs "variable = expression" — got: "' + text + '"')
-  vars[text.slice(0, eq).trim()] = fcEval(text.slice(eq + 1).trim(), vars)
+  const target = text.slice(0, eq).trim()
+  const value = fcEval(text.slice(eq + 1).trim(), vars)
+  // arr[i] = expr — an array-element assignment, same 1-based indexing as
+  // the array READ path above.
+  const idxMatch = target.match(/^(\w+)\s*\[\s*(.+?)\s*\]$/)
+  if (idxMatch) {
+    const arr = vars[idxMatch[1]]
+    if (!Array.isArray(arr)) throw new Error(idxMatch[1] + ' is not an array')
+    const idx = fcEval(idxMatch[2], vars)
+    if (idx < 1 || idx > arr.length) throw new Error('Index ' + idx + ' is outside ' + idxMatch[1] + ' (1..' + arr.length + ')')
+    arr[idx - 1] = value
+    return
+  }
+  vars[target] = value
 }
 function runFlowchart() {
   const outEl = document.getElementById('fc-run-output')
@@ -5933,7 +6261,12 @@ function runFlowchart() {
         continue
       }
       if (shape.type === 'declare') {
-        vars[shape.label.trim().split(/\s+/).pop()] = 0
+        // "Integer n" or "Integer arr[10]" — the data type and array size
+        // are now real (previously every declare just set the LAST word to
+        // 0, regardless of what type or array size was written).
+        const d = fcParseDeclare(shape.label)
+        const defaultFor = { Integer: 0, Real: 0, String: '', Boolean: false, Char: '' }[d.type] ?? 0
+        vars[d.name] = d.isArray ? Array.from({ length: d.size }, () => defaultFor) : defaultFor
       } else if (shape.type === 'process') {
         fcExecAssign(shape.label, vars)
       } else if (shape.type === 'io') {
@@ -5963,6 +6296,16 @@ function runFlowchart() {
         const result = fcEvalCondition(shape.label, vars)
         const branch = outs.find(o => o.label === (result ? 'Next' : 'Done'))
         if (!branch) throw new Error('While "' + shape.label + '" is missing its ' + (result ? 'Next' : 'Done') + ' branch.')
+        current = branch.to
+        continue
+      } else if (shape.type === 'repeat') {
+        // The opposite sense from While: this checks AFTER the body already
+        // ran (the student wires the body to loop back INTO this shape),
+        // and it keeps going (Next) while the condition is still FALSE,
+        // stopping (Done) once it finally becomes TRUE.
+        const result = fcEvalCondition(shape.label, vars)
+        const branch = outs.find(o => o.label === (result ? 'Done' : 'Next'))
+        if (!branch) throw new Error('Repeat "' + shape.label + '" is missing its ' + (result ? 'Done' : 'Next') + ' branch.')
         current = branch.to
         continue
       }
@@ -6334,6 +6677,8 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   flowg11: 'g9-flowcharts-loops', flowg12: 'g9-flowcharts-loops', flowg13: 'g9-flowcharts-loops', flowg14: 'g9-flowcharts-loops',
   flowg15: 'g9-flowcharts-loops', flowg16: 'g9-flowcharts-loops', flowg17: 'g9-flowcharts-loops', flowg18: 'g9-flowcharts-loops',
   flowg19: 'g9-flowcharts-loops', flowg20boss: 'g9-flowcharts-loops',
+  fcb1: 'g9-flowcharts-loops', fcb2: 'g9-flowcharts-loops', fcb3: 'g9-flowcharts-loops',
+  fcb4: 'g9-flowcharts-loops', fcb5: 'g9-flowcharts-loops', fcb6boss: 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
   'learn-datatypes': 'g9-declarations',
   // Foundations 3 — Your First Code — also had NO mapping at all (same
@@ -6503,6 +6848,7 @@ const TIERS = [
   { name: '🏆 FOUNDATIONS 3 PRACTICE CAPSTONE', ids: ['flowg14'] },
   { name: '🔢 FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2 — the classic algorithm set', ids: ['flowg15', 'flowg16', 'flowg17', 'flowg18'] },
   { name: '🔂 FOUNDATIONS 3 · REPEAT-UNTIL — the third loop shape', ids: ['flowg19', 'flowg20boss'] },
+  { name: '🗄 FOUNDATIONS 3 · BUILD A FLOWCHART — drag, drop, double-click to configure', ids: ['fcb1', 'fcb2', 'fcb3', 'fcb4', 'fcb5', 'fcb6boss'] },
   { name: '📘 FOUNDATIONS 4 · YOUR FIRST CODE — real Python, right after flowcharts/Flowgorithm', ids: ['learn-cb', 'learn-naming', 'naming-quiz', 'cb1', 'cb2', 'cb3', 'cb4', 'cb5', 'cb6', 'learn-forloop-cb', 'cb7', 'cb8', 'learn-io-cb', 'cb9'] },
   { name: '🏆 FOUNDATIONS 4 CAPSTONE', ids: ['cbboss', 'cbboss2', 'cbboss3'] },
   { name: '🔢 FOUNDATIONS 5 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'p0m4b', 'learn-datatypes', 'p0m5', 'learn-conversion', 'p0m5c', 'p0m6'] },
