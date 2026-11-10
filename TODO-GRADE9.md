@@ -304,3 +304,75 @@ as they are — this is additive, in the flowchart section specifically.
   Still outstanding, unchanged: Phase 1.6 (migrate `flowg1`-`flowg18`
   onto `checkVars`), and these 6 new missions have no Russian
   translation either (same flagged gap as flowg15-20).
+
+## Phase 5 — OUTPUT checking + enforced DECLARE (2026-11-10, user feedback on a screenshot)
+
+User was looking at `flow-p1` live and reported three things in one
+message: don't use `answer()`, there's no button to reach the next
+mission, and we don't enforce declaring a variable. A later message
+added: don't bake the answer into starter-code TODO comments, and
+Flowgorithm's own source/sample files are a legitimate place to pull
+real flowchart examples from for future content. All real, and the
+first three turned out to share one root cause — see the Phase 5
+commit ("Grade 9 Phase 5: real OUTPUT checking + enforced DECLARE, 23
+missions") for the full detail. Summary:
+
+- **OUTPUT-based checking** (`mission.expectedOutput`) replaces
+  `answer()` for all 23 flowchart-to-code missions whose own diagrams
+  end in a real Output shape (`flow-p1`, `flow-code`, `flowg1`-
+  `flowg20boss`) — checks `res.outputs` (real `OUTPUT`/`print()`
+  output, Python's added via a new Pyodide `setStdout` capture)
+  instead of a special reporting function. `flowg3`/`5`/`6`/`flowgboss`
+  were also redesigned to OUTPUT once per loop iteration instead of
+  building one comma-joined string — simpler AND more honest to their
+  own diagrams.
+- **Real DECLARE enforcement** — `execPseudo()` now actually parses
+  `DECLARE name : TYPE` (scalar) and `DECLARE name[size] : TYPE`
+  (array) as real syntax, and assignment now requires the variable to
+  already be declared. Scoped via `mission.requireDeclare` (NOT a
+  blanket change) after measuring the real blast radius first: turning
+  it on globally broke `cb1` ("Foundations 4: Your First Code"), which
+  deliberately teaches the informal "assignment alone creates it"
+  model as its own first lesson on variables — so a blanket change
+  would have broken that content's actual teaching point, not just
+  syntax. Set on the 23 migrated missions + `p3m1`-`p3m5`.
+- **The "no next mission button" report wasn't a separate bug** — the
+  win overlay and its buttons already worked; the student just never
+  reached that screen because the old `answer()`/skip-declare
+  combination never let them genuinely pass. Confirmed live: once
+  `flow-p1` is solved correctly, Submit shows a working win screen
+  with a real, visible "Next mission →" button.
+- Rewrote every touched starter's TODO comments to describe WHAT to do
+  instead of the literal solution commented out (several had been
+  giving the whole answer away).
+
+**Deferred, not silently dropped** — tracked here for whoever picks
+this back up:
+1. **Russian translation for `type:'data'` missions** — `openMission()`
+   never had any RU lookup for `m.brief`/hints/diagram at all (a
+   structural gap predating this session, affecting ALL `flow-p1`
+   through `flowg20boss` plus the new `fcb1`-`fcb6boss` builder
+   missions), unlike the `learn`/`quiz`/`cards` bubble types which
+   already have real RU wiring via `g9Ru()`/`applyBubbleLang`. Needs
+   the same kind of mechanism (a `G9_RU_DATA`-shaped map in
+   `grade9-ru.js` + a lookup wired into `openMission`'s `m-brief`
+   assignment) before any of this content can actually be translated.
+2. **The "commented-out full answer" TODO style still exists** on the
+   ~40 other `type:'data'` missions this phase didn't touch (`cb1`-
+   `cb9`, `cbboss`/`cbboss2`/`cbboss3`, `p0m1`-`p0m8`/`p0m5c`,
+   `p0bm1`-`p0bm6`/`p0bboss`, `p0boss`, `p4m1`-`p4m5`/`p4m7`/`p4boss`)
+   — same fix pattern as Phase 5, just not applied there yet.
+3. **A function reference/guide** — there's no panel anywhere listing
+   what `MOD`/`DIV`/`STR`/`INT`/`REAL`/`LENGTH`/`ROUND`/`SUM` etc.
+   actually do; a student has to infer it from hints alone.
+4. **FOR-loop content needs a genuine easy→hard progression** — user's
+   own words: "start simple, like printing numbers, for 1 to 5, then
+   printing more numbers, then printing only even or odd numbers from
+   1 to 100 — progressive, not jumping straight to a harder mission."
+   `flowg3` (1-5) → `flowg4`/`flowg6` (1-10) → `flowg12` (1-50) is
+   already somewhat graded, but hasn't been reviewed specifically
+   against this ask.
+5. **Flowgorithm's own source/sample files** are a real, legitimate
+   source for future flowchart content — worth using instead of
+   hand-designing every new mission from scratch, per the user's own
+   suggestion.
