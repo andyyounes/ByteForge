@@ -3934,11 +3934,21 @@ function fcBranchHTML(leftLabel, leftHTML, rightLabel, rightHTML) {
     + '<div style="text-align:center;"><div style="color:#f87171;font-size:9.5px;margin-bottom:2px;">' + rightLabel + ' ↓</div>' + rightHTML + '</div>'
     + '</div>'
 }
+// Real Flowgorithm draws FOR/WHILE/REPEAT with the exact same hexagon
+// (chevron) shape — confirmed against Flowgorithm's own shapes legend, which
+// has no "Yes"/"No" on it anywhere (that labelling belongs only to the
+// separate diamond "If" decision shape). This mirrors that hexagon exactly —
+// same clip-path as the drag-and-drop builder's .fc-shape[data-type="for"] —
+// instead of the old generic dashed text box, with no Yes/No added.
 function fcLoopHTML(headerLabel, bodyParts, doneLabel) {
-  return '<div style="border:2px dashed #fb923c;border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:2px;">'
-    + '<div style="font-size:9.5px;color:#fb923c;font-weight:700;letter-spacing:.04em;margin-bottom:4px;">↻ LOOP — ' + headerLabel + '</div>'
+  return '<div style="display:flex;flex-direction:column;align-items:center;">'
+    + '<div style="background:#111320;clip-path:polygon(12% 0,88% 0,100% 50%,88% 100%,12% 100%,0 50%);border:2px solid #fb923c;color:#fb923c;font-size:10.5px;font-weight:700;text-align:center;padding:9px 30px;">' + headerLabel + '</div>'
+    + '<div style="color:#6b7280;font-size:10px;line-height:1.5;">↓</div>'
+    + '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;border-left:2px solid rgba(251,146,60,.3);border-right:2px solid rgba(251,146,60,.3);padding:6px 18px;">'
     + bodyParts.join('')
-    + '<div style="font-size:9px;color:#6b7280;margin-top:4px;">(loops back to the top until done)</div>'
+    + '</div>'
+    + '<div style="color:#fb923c;font-size:15px;line-height:1;margin-top:-1px;">↻</div>'
+    + '<div style="color:#6b7280;font-size:9px;margin-top:-3px;">back to top</div>'
     + '</div>'
     + (doneLabel ? '<div style="text-align:center;color:#6b7280;font-size:10px;line-height:1.8;"><span style="color:#9ca3af;">' + doneLabel + '</span> ↓</div>' : '')
 }
