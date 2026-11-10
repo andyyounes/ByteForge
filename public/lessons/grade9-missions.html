@@ -260,6 +260,89 @@
   .fc-edit-foot { display:flex; gap:8px; padding:14px 18px; border-top:1px solid rgba(255,255,255,.08); }
   .fc-edit-foot button { flex:1; }
 
+  /* ── "How It Works" animated flowchart-builder guide ───────────────── */
+  .fct-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:310;
+                 display:flex; align-items:center; justify-content:center; }
+  .fct-modal { background:#161927; border:1px solid rgba(255,255,255,.12); border-radius:12px;
+               width:420px; max-width:92vw; max-height:88vh; overflow-y:auto; }
+  .fct-body { position:relative; height:170px; margin:14px 18px 0; background:#0a0c18;
+              border:1px solid rgba(255,255,255,.08); border-radius:10px; overflow:hidden; }
+  .fct-stage { position:absolute; inset:0; display:none; }
+  .fct-stage.active { display:block; }
+  .fct-caption { padding:10px 18px 0; font-size:12.5px; color:#c7d2e0; min-height:34px; line-height:1.5; }
+  .fct-dots { display:flex; justify-content:center; gap:6px; padding:10px 0 2px; }
+  .fct-dots span { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.18); }
+  .fct-dots span.active { background:#67e8f9; }
+
+  .fct-pill { position:absolute; left:50%; transform:translateX(-50%); padding:4px 14px;
+              border-radius:999px; border:2px solid #4ade80; color:#4ade80; font-size:11px; font-weight:800;
+              background:#0a0c18; z-index:2; }
+  .fct-line { position:absolute; left:50%; width:2px; background:#3a3f55; transform:translateX(-50%); }
+  .fct-plus { position:absolute; left:50%; top:62px; transform:translate(-50%,-50%); color:#67e8f9;
+              font-size:16px; font-weight:900; animation:fctPulse 1.6s ease-in-out infinite; }
+  @keyframes fctPulse { 0%,100% { opacity:.35; } 50% { opacity:1; } }
+
+  .fct-newshape { position:absolute; left:50%; top:62px; transform:translate(-50%,-50%) scale(.5);
+                  padding:4px 10px; border-radius:6px; border:2px solid #facc15; color:#facc15;
+                  background:#0a0c18; font-size:10.5px; font-weight:700; opacity:0; white-space:nowrap;
+                  animation:fctAddShape 3s ease-in-out infinite; }
+  @keyframes fctAddShape {
+    0%, 55%   { opacity:0; transform:translate(-50%,-50%) scale(.5); }
+    75%, 100% { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  }
+  .fct-cursor { position:absolute; width:14px; height:14px; border-radius:50%;
+                background:#67e8f9; box-shadow:0 0 0 2px rgba(103,232,249,.3); z-index:3; }
+  .fct-cursor-1 { left:50%; top:8px; animation:fctCursor1 3s ease-in-out infinite; }
+  @keyframes fctCursor1 {
+    0%   { transform:translate(-50%,-50%) scale(1);   opacity:1; }
+    45%  { transform:translate(-50%,calc(62px - 8px)) scale(1); opacity:1; }
+    55%  { transform:translate(-50%,calc(62px - 8px)) scale(.6); opacity:1; }
+    65%, 100% { transform:translate(-50%,calc(62px - 8px)) scale(1); opacity:0; }
+  }
+  .fct-shape-box { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+                   padding:6px 14px; border-radius:6px; border:2px solid #facc15; color:#facc15;
+                   background:#0a0c18; font-size:11px; font-weight:700; }
+  .fct-dialog { position:absolute; left:50%; bottom:14px; transform:translate(-50%,16px); width:140px;
+                padding:8px; border-radius:8px; background:#161927; border:1px solid rgba(255,255,255,.14);
+                display:flex; flex-direction:column; gap:6px; opacity:0;
+                animation:fctDialog 3s ease-in-out infinite; }
+  @keyframes fctDialog {
+    0%, 60%   { opacity:0; transform:translate(-50%,16px); }
+    80%, 100% { opacity:1; transform:translate(-50%,0); }
+  }
+  .fct-dialog-row { height:9px; border-radius:3px; background:rgba(255,255,255,.14); }
+  .fct-cursor-2 { left:50%; top:50%; animation:fctCursor2 3s ease-in-out infinite; }
+  @keyframes fctCursor2 {
+    0%   { transform:translate(-50%,-50%) scale(1); opacity:1; }
+    25%  { transform:translate(-50%,-50%) scale(.6); opacity:1; }
+    35%  { transform:translate(-50%,-50%) scale(1); opacity:1; }
+    45%  { transform:translate(-50%,-50%) scale(.6); opacity:1; }
+    55%, 100% { transform:translate(-50%,-50%) scale(1); opacity:0; }
+  }
+  .fct-shape-a { left:60px; top:30px; }
+  .fct-shape-b { left:200px; top:30px; }
+  .fct-wire-svg { position:absolute; inset:0; width:100%; height:100%; }
+  .fct-wire { stroke:#67e8f9; stroke-width:2; stroke-dasharray:140; stroke-dashoffset:140;
+              animation:fctWire 3s ease-in-out infinite; }
+  @keyframes fctWire { 0%, 40% { stroke-dashoffset:140; } 70%, 100% { stroke-dashoffset:0; } }
+  .fct-run-btn { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); padding:5px 16px;
+                 border:none; border-radius:7px; background:#161927; color:#6b7280; font-size:11px;
+                 font-weight:800; animation:fctRun 3s ease-in-out infinite; }
+  @keyframes fctRun {
+    0%, 75%  { background:#161927; color:#6b7280; }
+    90%, 100% { background:linear-gradient(135deg,#4ade80,#22c55e); color:#052e12; }
+  }
+  .fct-cursor-3 { left:60px; top:30px; animation:fctCursor3 3s ease-in-out infinite; }
+  @keyframes fctCursor3 {
+    0%   { transform:translate(-50%,-50%) scale(1); opacity:1; }
+    15%  { transform:translate(-50%,-50%) scale(.6); opacity:1; }
+    25%  { transform:translate(140px,-50%) scale(1); opacity:1; }
+    40%  { transform:translate(140px,-50%) scale(.6); opacity:1; }
+    55%  { transform:translate(140px,calc(-50% + 54px)) scale(1); opacity:1; }
+    70%  { transform:translate(140px,calc(-50% + 54px)) scale(.6); opacity:1; }
+    85%, 100% { transform:translate(140px,calc(-50% + 54px)) scale(1); opacity:0; }
+  }
+
   .mlist { position:fixed; inset:0; z-index:50; background:#0d0f1a; overflow-y:auto; display:none; }
   .mlist.open { display:block; }
   .mlist-hero { text-align:center; padding:30px 16px 10px; }
@@ -511,6 +594,7 @@
         <div class="fc-palette-btn" onclick="addShape('io')">▱ Output</div>
         <div class="fc-palette-btn" id="fc-connect-btn" onclick="toggleConnectMode()">🔗 Connect Shapes</div>
         <div class="fc-palette-btn" onclick="if (confirm('Clear the whole flowchart? This also deletes your saved progress on it.')) clearFlowchart(true)">🗑 Clear</div>
+        <div class="fc-palette-btn" onclick="showFcTutorial(0)">❓ How It Works</div>
       </div>
       <div class="fc-canvas-wrap" id="fc-canvas-wrap" oncontextmenu="return showFcContextMenu(event)">
         <svg id="fc-svg"></svg>
@@ -558,6 +642,56 @@
     <div class="fc-edit-foot">
       <button class="btn btn-reset" onclick="closeShapeEditor()">Cancel</button>
       <button class="btn btn-run" onclick="saveShapeEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Animated "How It Works" guide for the flowchart builder — shown
+     automatically the first time a student ever opens one of these
+     missions (real user report: a blank canvas with no walkthrough left
+     students unsure where to even begin), and replayable any time via the
+     ❓ How It Works palette button. Each step is a small looping CSS
+     animation (a mock cursor performing the actual gesture), not text
+     alone — real Flowgorithm's own editor is learned by watching someone
+     use it, and this is the closest a static lesson page can get to that. -->
+<div class="fct-overlay" id="fct-overlay" style="display:none;" onclick="if (event.target === this) closeFcTutorial()">
+  <div class="fct-modal">
+    <div class="fc-edit-hdr"><span>❓ How to Build a Flowchart</span><span class="toolkit-close" onclick="closeFcTutorial()">✕</span></div>
+    <div class="fct-body">
+      <div class="fct-stage" data-step="0">
+        <div class="fct-pill fct-pill-start" style="top:8px;">Start</div>
+        <div class="fct-line" style="top:38px;height:64px;"></div>
+        <div class="fct-plus">+</div>
+        <div class="fct-pill fct-pill-end" style="top:104px;">End</div>
+      </div>
+      <div class="fct-stage" data-step="1">
+        <div class="fct-pill fct-pill-start" style="top:8px;">Start</div>
+        <div class="fct-line" style="top:38px;height:64px;"></div>
+        <div class="fct-newshape">🗄 Declare</div>
+        <div class="fct-pill fct-pill-end" style="top:104px;">End</div>
+        <div class="fct-cursor fct-cursor-1"></div>
+      </div>
+      <div class="fct-stage" data-step="2">
+        <div class="fct-shape-box">🗄 Declare n</div>
+        <div class="fct-dialog">
+          <div class="fct-dialog-row"></div>
+          <div class="fct-dialog-row" style="width:60%;"></div>
+        </div>
+        <div class="fct-cursor fct-cursor-2"></div>
+      </div>
+      <div class="fct-stage" data-step="3">
+        <div class="fct-shape-box fct-shape-a">🗄 Declare</div>
+        <div class="fct-shape-box fct-shape-b">▭ Assign</div>
+        <svg class="fct-wire-svg" viewBox="0 0 260 60"><line class="fct-wire" x1="60" y1="30" x2="200" y2="30"/></svg>
+        <button class="fct-run-btn">▶ Run</button>
+        <div class="fct-cursor fct-cursor-3"></div>
+      </div>
+    </div>
+    <div class="fct-caption" id="fct-caption"></div>
+    <div class="fct-dots" id="fct-dots"></div>
+    <div class="fc-edit-foot">
+      <button class="btn btn-reset" onclick="fcTutorialStep(-1)" id="fct-back">Back</button>
+      <button class="btn btn-run" onclick="fcTutorialStep(1)" id="fct-next">Next</button>
     </div>
   </div>
 </div>
@@ -6067,6 +6201,51 @@ function renderFlowchartBubble() {
   document.getElementById('fc-title').textContent = m.emoji + ' ' + m.title
   document.getElementById('fc-intro').textContent = m.flowchart.intro
   clearFlowchart()
+  // Auto-play the animated guide once, the very first time a student ever
+  // opens ANY flowchart-builder mission — real user report asked for
+  // something closer to "watch someone do it" than hint text alone.
+  // Replayable any time afterwards via the ❓ How It Works palette button.
+  try {
+    if (!localStorage.getItem('bf-g9-fc-tutorial-seen')) {
+      localStorage.setItem('bf-g9-fc-tutorial-seen', '1')
+      showFcTutorial(0)
+    }
+  } catch (e) {}
+}
+
+// ── "How It Works" animated guide — 4 looping CSS mini-scenes (see the
+// .fct-* styles) each showing the actual gesture: the Start/End connector
+// you can click into, adding a shape, double-clicking to configure it for
+// real, then wiring two shapes and pressing Run. ───────────────────────────
+const FC_TUTORIAL_CAPTIONS = [
+  'Every flowchart here already starts with Start and End, connected — you\'re never staring at a truly empty canvas.',
+  'Click that connector arrow anywhere along its length to insert a new shape right into it, instead of dropping one loose and wiring it up by hand.',
+  'Double-click any shape to configure it properly — pick the real variable name, its data type, tick "array" if it needs one — instead of typing exact syntax yourself.',
+  'Use "Connect Shapes," click a FROM shape then a TO shape to wire them, then press ▶ Run any time to see what your flowchart actually does so far.',
+]
+let _fcTutorialIdx = 0
+function showFcTutorial(startIdx) {
+  _fcTutorialIdx = startIdx || 0
+  document.getElementById('fct-overlay').style.display = 'flex'
+  renderFcTutorialStep()
+}
+function closeFcTutorial() {
+  document.getElementById('fct-overlay').style.display = 'none'
+}
+function fcTutorialStep(delta) {
+  const next = _fcTutorialIdx + delta
+  if (next < 0) return
+  if (next >= FC_TUTORIAL_CAPTIONS.length) { closeFcTutorial(); return }
+  _fcTutorialIdx = next
+  renderFcTutorialStep()
+}
+function renderFcTutorialStep() {
+  document.querySelectorAll('.fct-stage').forEach(el => el.classList.toggle('active', +el.dataset.step === _fcTutorialIdx))
+  document.getElementById('fct-caption').textContent = FC_TUTORIAL_CAPTIONS[_fcTutorialIdx]
+  document.getElementById('fct-dots').innerHTML = FC_TUTORIAL_CAPTIONS.map((_, i) =>
+    '<span class="' + (i === _fcTutorialIdx ? 'active' : '') + '"></span>').join('')
+  document.getElementById('fct-back').style.visibility = _fcTutorialIdx === 0 ? 'hidden' : 'visible'
+  document.getElementById('fct-next').textContent = _fcTutorialIdx === FC_TUTORIAL_CAPTIONS.length - 1 ? 'Got it, let\'s build!' : 'Next'
 }
 // `wipe` distinguishes the two real callers: opening a flowchart mission
 // (wipe=false — restore the student's saved work if there is any) vs. the

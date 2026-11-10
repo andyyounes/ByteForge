@@ -46,7 +46,9 @@
 // Bumped v7 -> v8 (2026-11-10): flowchart builder usability fixes — default
 // Start/End skeleton, click-a-connector-to-insert-a-shape, Assign-target
 // validation against Declared variables, variable-name autocomplete.
-const CACHE_NAME = 'bf-offline-v8'
+// Bumped v8 -> v9 (2026-11-10): animated "How It Works" guide for the
+// flowchart builder, auto-played once per browser, replayable any time.
+const CACHE_NAME = 'bf-offline-v9'
 
 // Same-origin paths this service worker is allowed to cache. Everything
 // else same-origin (notably /api/*) is left completely alone — fetch
