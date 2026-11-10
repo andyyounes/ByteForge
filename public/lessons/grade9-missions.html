@@ -203,9 +203,16 @@
   .fc-palette-btn { padding:8px 14px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;
                      background:#161927; border:1px solid rgba(255,255,255,.15); color:#e2e8f0; }
   .fc-palette-btn:hover { border-color:#67e8f9; }
-  .fc-canvas-wrap { position:relative; width:100%; height:420px; background:#0a0c18;
+  .fc-canvas-wrap { position:relative; width:100%; height:420px; background-color:#0a0c18;
+                    background-image:radial-gradient(rgba(255,255,255,.1) 1px, transparent 1px);
+                    background-size:20px 20px;
                     border:1px solid rgba(255,255,255,.1); border-radius:10px; overflow:hidden; margin-bottom:14px; }
   .fc-canvas-wrap.connecting { cursor:crosshair; }
+  /* Dragged shape snaps to this same 20px grid (see FC_GRID/fcSnap) — the
+     dots ARE the snap points, not just decoration, so letting go near one
+     actually lands on it. A slight lift/scale while dragging makes the
+     snapping itself feel deliberate rather than merely jumpy. */
+  .fc-shape.dragging { box-shadow:0 0 0 2px #67e8f9, 0 6px 18px rgba(0,0,0,.45); z-index:5; }
   .fc-context-menu { position:fixed; display:none; flex-direction:column; z-index:200;
     background:#161927; border:1px solid rgba(255,255,255,.18); border-radius:8px; padding:4px;
     box-shadow:0 8px 24px rgba(0,0,0,.4); min-width:170px; }
@@ -6277,17 +6284,23 @@ function clearFlowchart(wipe) {
   if (activeMission?.type === 'flowchart') seedStartEnd()
 }
 function seedStartEnd() {
-  addShape('terminator', { x: 170, y: 20 })
+  addShape('terminator', { x: 160, y: 20 })
   const startId = _fcNextId - 1
-  addShape('terminator', { x: 170, y: 230 })
+  addShape('terminator', { x: 160, y: 240 })
   const endId = _fcNextId - 1
   const endShape = _fcShapes.find(s => s.id === endId)
   endShape.label = 'End'
   const endLabelEl = document.querySelector('.fc-shape[data-id="' + endId + '"] .fc-label')
   if (endLabelEl) endLabelEl.textContent = 'End'
   _fcConns.push({ from: startId, to: endId })
-  drawConnections()
-  fcSaveDraft()
+  // shapeCenter() reads the shape elements' own offsetWidth/offsetHeight —
+  // right after appendChild() the browser hasn't laid them out yet, so
+  // calling drawConnections() in the SAME tick read 0x0 and drew a bent
+  // line from the canvas's top-left corner instead of a straight one
+  // between the two pills (a real bug this surfaced, not cosmetic: every
+  // other drawConnections() call already had a frame to settle in first,
+  // via a real mouse event in between — this was the one path that didn't).
+  requestAnimationFrame(() => { drawConnections(); fcSaveDraft() })
 }
 // ── Save the student's in-progress flowchart build — mirrors the existing
 // code-draft pattern (draftKey/loadDraft/saveDraft above) exactly, just for
@@ -6331,7 +6344,9 @@ function loadPrebuiltFlowchart(prebuilt) {
   prebuilt.conns.forEach(c => {
     _fcConns.push({ from: idMap[c.from], to: idMap[c.to], label: c.label })
   })
-  drawConnections()
+  // Same layout-timing issue as seedStartEnd()/insertShapeIntoConnector() —
+  // every shape here was just appendChild()'d this same tick.
+  requestAnimationFrame(drawConnections)
 }
 // ── Right-click-to-add — records where on the canvas the menu was opened
 // (in canvas-local coordinates, matching how dragged/placed shapes are
@@ -6385,8 +6400,9 @@ function insertShapeIntoConnector(type, idx) {
   // shape → the old destination) is a plain, unlabelled "next step."
   _fcConns[idx] = { from: conn.from, to: newId, label: conn.label }
   _fcConns.push({ from: newId, to: conn.to })
-  drawConnections()
-  fcSaveDraft()
+  // Same layout-timing issue as seedStartEnd() — the new shape needs one
+  // frame to lay out before shapeCenter() can read its real size.
+  requestAnimationFrame(() => { drawConnections(); fcSaveDraft() })
 }
 document.addEventListener('click', (e) => {
   const menu = document.getElementById('fc-context-menu')
@@ -6588,6 +6604,13 @@ function deleteShape(id, e) {
   drawConnections()
   fcSaveDraft()
 }
+// Real user report: free-pixel dragging felt "not very flexible to move" —
+// nothing helped a student line shapes up neatly. Snaps to a 20px grid
+// while dragging (visible as the canvas's own faint dot grid, see
+// .fc-canvas-wrap's background below), so letting go near "straight"
+// actually lands straight instead of 3-4px off.
+const FC_GRID = 20
+function fcSnap(v) { return Math.round(v / FC_GRID) * FC_GRID }
 function makeShapeDraggable(el, shape) {
   let dragging = false, offX = 0, offY = 0
   el.addEventListener('mousedown', e => {
@@ -6595,18 +6618,23 @@ function makeShapeDraggable(el, shape) {
     dragging = true
     const rect = el.getBoundingClientRect()
     offX = e.clientX - rect.left; offY = e.clientY - rect.top
+    el.classList.add('dragging')
     e.preventDefault()
   })
   document.addEventListener('mousemove', e => {
     if (!dragging) return
     const canvasRect = document.getElementById('fc-canvas-wrap').getBoundingClientRect()
-    shape.x = e.clientX - canvasRect.left - offX
-    shape.y = e.clientY - canvasRect.top - offY
+    shape.x = fcSnap(e.clientX - canvasRect.left - offX)
+    shape.y = fcSnap(e.clientY - canvasRect.top - offY)
     el.style.left = shape.x + 'px'
     el.style.top = shape.y + 'px'
     drawConnections()
   })
-  document.addEventListener('mouseup', () => { if (dragging) fcSaveDraft(); dragging = false })
+  document.addEventListener('mouseup', () => {
+    if (dragging) fcSaveDraft()
+    dragging = false
+    el.classList.remove('dragging')
+  })
 }
 function toggleConnectMode() {
   _fcConnectMode = !_fcConnectMode

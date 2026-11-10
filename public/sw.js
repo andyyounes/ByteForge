@@ -48,7 +48,11 @@
 // validation against Declared variables, variable-name autocomplete.
 // Bumped v8 -> v9 (2026-11-10): animated "How It Works" guide for the
 // flowchart builder, auto-played once per browser, replayable any time.
-const CACHE_NAME = 'bf-offline-v9'
+// Bumped v9 -> v10 (2026-11-10): 20px grid-snap while dragging flowchart
+// shapes (with a visible dot grid), plus a real layout-timing bug fix —
+// a newly-seeded/inserted/restored connector line was drawn bent because
+// drawConnections() ran before the browser laid out the just-added shape.
+const CACHE_NAME = 'bf-offline-v10'
 
 // Same-origin paths this service worker is allowed to cache. Everything
 // else same-origin (notably /api/*) is left completely alone — fetch
