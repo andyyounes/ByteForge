@@ -401,3 +401,65 @@ missions, 141 challenge tests, tsc, `npm run verify`) clean.
 collapsible full challenge-list toggle, its per-challenge lesson-panel
 visual chrome, and its exam-specific UI (not applicable to Grade 9's
 mission model).
+
+## Phase 7 — Flowgorithm visual fidelity + functions (2026-11-10, IN PROGRESS)
+
+User flagged two real gaps after seeing the live site next to the
+actual Flowgorithm desktop app:
+
+1. **No "challenge words → design your own flowchart" step.** Today
+   `flowg1`-`flowg20` give a FINISHED flowchart and ask the student to
+   transform it into code; `fcb1`-`fcb6boss` (the drag-and-drop
+   builder) give a spec so prescriptive it already names every shape
+   to use. Neither one is "here's a problem in English, you decide
+   the structure." Scoped via AskUserQuestion: add a NEW tier of
+   builder missions after `fcb6boss` that are genuine word problems
+   (no shapes/structure given away) — `fcb1`-`fcb6boss` stay as-is
+   (they teach the TOOL). NOT STARTED — still need to design ~6
+   missions (single decision → for-only → while-only → nested
+   decision → decision-in-loop → boss combining all three), remembering
+   the builder has no Input shape (only Output), so values must be
+   hardcoded via Assign, and grading is real execution
+   (`req.expectedOutput` against `runFlowchart()`'s actual output, not
+   just a shape/connection count) — see `checkFlowchart()`.
+
+2. **The static "Flowchart to Code" diagrams didn't look like real
+   Flowgorithm.** Confirmed against Flowgorithm's own shapes legend
+   (a Wikimedia reference image) that For/While/Do share one hexagon
+   shape (not a diamond), and that the legend has no Yes/No text
+   anywhere — only the separate If/decision diamond implies that.
+   Fixed so far:
+   - `fcLoopHTML` now draws the real hexagon (same clip-path as the
+     builder's own `.fc-shape[data-type="for"]`), with a "↻ back to
+     top" loop-back instead of invented Yes/No text.
+   - `fcBranchHTML` now draws real connector lines (a tick out of the
+     diamond, down into each branch column) instead of floating
+     "YES ↓" text — verified live on `flowg7`'s 3-chained-decision
+     diagram, reads as an actual flowchart now, not a vertical list.
+   Both changes are shared rendering functions, so they apply to
+   every mission that calls them with no per-mission edits needed.
+   Each change needs a `public/sw.js` `CACHE_NAME` bump in the SAME
+   commit (confirmed via `TODO-GRADE9.md`'s own Phase-change-tracking:
+   forgot it once already on the very first of these edits) —
+   currently at `bf-offline-v4`.
+
+User explicitly asked for this in stages (AskUserQuestion). Still
+open, in priority order:
+- **Run-and-animate**: add a ▶ Run button to these static diagrams
+  that steps through the ALREADY-FINISHED flowchart shape by shape,
+  highlighting the active shape and showing variable values live —
+  like Flowgorithm's own playback. Blocked on a real design decision:
+  today's diagrams are composed HTML strings (`fcShapeHTML`/
+  `fcDiagram`/`fcBranchHTML`/`fcLoopHTML`), not an executable
+  `{shapes, connections}` graph like the builder's `_fcShapes`/
+  `_fcConns` — animating step-by-step needs that structured form (or
+  a parallel data model) so `runFlowchart()`'s logic can drive it.
+- **Drag-and-drop puzzle conversion** (later, user's own words: "in
+  stages"): turn the hardest of these static-diagram missions into
+  assembly puzzles instead, reusing the builder.
+- **Functions/procedures reinforcement**, scoped via AskUserQuestion
+  to BOTH: (a) a proper Call/Procedure shape in the drag-and-drop
+  builder (double-bar box, matching Flowgorithm's own legend) with
+  new missions that define-and-call a function, and (b) separate
+  function-focused missions in the regular Python/Pseudocode code
+  track (parameters, return values) — neither started yet.

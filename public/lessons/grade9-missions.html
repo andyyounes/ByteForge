@@ -3928,11 +3928,33 @@ function fcDiagram(parts) {
 // column participates in the parent fcDiagram's centering (via
 // display:inline-block, sized to itself) — the left column is positioned
 // relative to IT, outside the flow, so it never shifts the trunk's center.
-function fcBranchHTML(leftLabel, leftHTML, rightLabel, rightHTML) {
-  return '<div style="position:relative;display:inline-block;margin:4px 0;">'
-    + '<div style="position:absolute;right:100%;top:0;margin-right:28px;width:max-content;text-align:center;"><div style="color:#4ade80;font-size:9.5px;margin-bottom:2px;">' + leftLabel + ' ↓</div>' + leftHTML + '</div>'
-    + '<div style="text-align:center;"><div style="color:#f87171;font-size:9.5px;margin-bottom:2px;">' + rightLabel + ' ↓</div>' + rightHTML + '</div>'
+// Real connector lines (a stem down from the diamond, a tick out to each
+// branch, then down into the branch's own content) instead of the old
+// floating "YES ↓" text — matches real Flowgorithm's look of an actual
+// arrow leaving each side of a decision, not a decorative label. Colours
+// and left/right meaning are unchanged (driven entirely by the caller's
+// own leftLabel/rightLabel/leftHTML/rightHTML — this never assumes which
+// side is True/False, since callers differ on that).
+function fcConnectorTick() {
+  return '<div style="display:flex;flex-direction:column;align-items:center;">'
+    + '<div style="width:2px;height:7px;background:#3a3f55;"></div>'
+    + '<div style="width:44px;height:2px;background:#3a3f55;"></div>'
+    + '<div style="width:2px;height:7px;background:#3a3f55;"></div>'
     + '</div>'
+}
+function fcBranchHTML(leftLabel, leftHTML, rightLabel, rightHTML) {
+  return '<div style="position:relative;display:inline-block;margin:0 0 4px;">'
+    + '<div style="position:absolute;right:100%;top:0;margin-right:30px;width:max-content;display:flex;flex-direction:column;align-items:center;">'
+      + fcConnectorTick()
+      + '<div style="color:#4ade80;font-size:9.5px;font-weight:800;margin:3px 0 4px;">' + leftLabel + '</div>'
+      + leftHTML
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;align-items:center;">'
+      + fcConnectorTick()
+      + '<div style="color:#f87171;font-size:9.5px;font-weight:800;margin:3px 0 4px;">' + rightLabel + '</div>'
+      + rightHTML
+    + '</div>'
+  + '</div>'
 }
 // Real Flowgorithm draws FOR/WHILE/REPEAT with the exact same hexagon
 // (chevron) shape — confirmed against Flowgorithm's own shapes legend, which

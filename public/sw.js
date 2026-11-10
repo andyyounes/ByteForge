@@ -32,7 +32,9 @@
 // Bumped v2 -> v3 (2026-11-10): forgot this step on the very next
 // grade9-missions.html edit (the Flowgorithm-hexagon loop-diagram redesign)
 // right after writing the note above — proof it really isn't automatic.
-const CACHE_NAME = 'bf-offline-v3'
+// Bumped v3 -> v4 (2026-11-10): real connector lines (ticks/branches) for
+// the Decision diamond in the same file's static flowchart diagrams.
+const CACHE_NAME = 'bf-offline-v4'
 
 // Same-origin paths this service worker is allowed to cache. Everything
 // else same-origin (notably /api/*) is left completely alone — fetch
