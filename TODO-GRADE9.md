@@ -251,3 +251,56 @@ as they are — this is additive, in the flowchart section specifically.
   Next: Phase 1.6 (migrate `flowg1`-`flowg18` onto `checkVars`, which
   is now also the established pattern Phase 2's new missions used) —
   or user may redirect elsewhere first.
+- 2026-11-10 (Phase 4, new — user request): "add flowgorithm exercises,
+  drag and drop, and editing like double-click → select variable name,
+  select data type or array size, for loops, while/do loops, if else."
+  Reading the file for this surfaced something unplanned: a COMPLETE
+  drag-and-drop flowchart builder already existed (`type:'flowchart'`,
+  `renderFlowchartBubble`/`addShape`/`runFlowchart`/`checkFlowchart`,
+  real execution + Flowgorithm-style output grading) — just never used
+  by a single mission. Built:
+  - The double-click structured editor itself (the actual ask): a
+    modal per shape type — Declare gets variable name + data type
+    select + an "is array" checkbox revealing a size field; Assign
+    gets target + expression; Decision/While/Repeat get a left/
+    operator/right condition composer; For gets variable/start/end;
+    Output gets an expression field. Saving writes the SAME label
+    string format `runFlowchart()` already parsed (e.g. "Integer n",
+    "n = 1 to 10") — no engine rewrite needed, just a friendlier way
+    to produce the existing format.
+  - A `repeat` shape type (checked-after, opposite sense from While),
+    matching Phase 2's interpreter-level REPEAT-UNTIL.
+  - Real array support in the shape-graph's OWN expression engine
+    (`fcEval`/`fcExecAssign` gained `arr[i]` read/write, 1-based) —
+    previously nonexistent; Declare now actually respects its type
+    and array size (every declare used to hardcode `vars[name] = 0`
+    regardless of what was written).
+  - Draft persistence (second half of this request, "don't forget to
+    save their work") — a built-but-unfinished flowchart had NEVER
+    been saved anywhere before this; closing the mission or reloading
+    just lost it. Added `fcSaveDraft()`/`fcLoadDraft()` mirroring the
+    existing code-draft pattern exactly (localStorage + LessonSaves,
+    debounced), called after every mutation (add/delete/drag-end/
+    connect/structured-edit-save). Reopening now restores the
+    student's real work; Clear now confirms and genuinely wipes the
+    saved draft too.
+  - Six new missions ("different walkthroughs"), phase "BUILD A
+    FLOWCHART": `fcb1` (declare/assign/output), `fcb2` (arrays),
+    `fcb3` (For), `fcb4` (While), `fcb5` (Repeat-Until — same sum,
+    inverted condition, reinforcing the checked-after distinction),
+    `fcb6boss` (For+Decision nested, even-numbers-only capstone).
+    Registered in TIERS + concept mapping; `TOTAL_MISSIONS` 128→134.
+  Verified live via scripted Electron/CDP: the array engine (declare+
+  FOR-fill+nested-FOR-read), While vs Repeat on the IDENTICAL graph
+  shape with only the condition inverted (both give the same correct
+  sum — confirms the semantic is really opposite, not just relabeled),
+  the editor's prefill/save roundtrip for every shape type, graceful
+  out-of-bounds array errors, the full save/restore/wipe draft cycle,
+  and all 6 new missions built from their own minimal solution and
+  checked via the real `checkFlowchart()` — caught and fixed one real
+  bug this way (`fcb6boss`'s shape/connection minimums were set higher
+  than its own correct minimal solution). Full G9 suites + tsc +
+  eslint + `npm run verify` clean throughout.
+  Still outstanding, unchanged: Phase 1.6 (migrate `flowg1`-`flowg18`
+  onto `checkVars`), and these 6 new missions have no Russian
+  translation either (same flagged gap as flowg15-20).
