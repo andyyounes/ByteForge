@@ -6333,7 +6333,7 @@ function fcSaveDraft() {
 function loadPrebuiltFlowchart(prebuilt) {
   const idMap = {}
   prebuilt.shapes.forEach(s => {
-    addShape(s.type, { x: s.x, y: s.y })
+    addShape(s.type, { x: s.x, y: s.y }, true) // true = restoring; don't pop a dialog per shape
     const newId = _fcNextId - 1
     idMap[s.id] = newId
     const shape = _fcShapes.find(sh => sh.id === newId)
@@ -6409,11 +6409,20 @@ document.addEventListener('click', (e) => {
   if (menu && menu.classList.contains('open') && !menu.contains(e.target)) menu.classList.remove('open')
 })
 
-function addShape(type, pos) {
+function addShape(type, pos, restoring) {
   const id = _fcNextId++
+  // Real user report: this used to pre-fill a GUESSED, fully-formed-looking
+  // value ("n = n + 1" for a brand-new Assign, "Integer n" for a brand-new
+  // Declare) as if a real decision had already been made — misleading,
+  // since that variable usually doesn't even exist yet. Real Flowgorithm's
+  // own editor asks you to name/configure a symbol the moment you add it,
+  // rather than guessing on your behalf; these start genuinely blank
+  // instead (openShapeEditor below opens on top immediately), except the
+  // For loop's numeric range, which is a sensible starting point to tweak
+  // rather than a value that could be mistaken for an actual decision.
   const labelDefault = {
-    terminator: 'Start', process: 'n = n + 1', decision: 'n > 10',
-    declare: 'Integer n', for: 'n = 1 to 10', while: 'n < 10', repeat: 'n > 10', io: 'Output n',
+    terminator: 'Start', process: '', decision: '',
+    declare: '', for: 'n = 1 to 10', while: '', repeat: '', io: '',
   }[type]
   // Spread new shapes out based on how many currently exist, not `id`
   // (which keeps climbing even after deletions) — avoids everything
@@ -6444,6 +6453,12 @@ function addShape(type, pos) {
   })
   makeShapeDraggable(el, shape)
   fcSaveDraft()
+  // Real Flowgorithm opens a symbol's own dialog the MOMENT you add it —
+  // name it, pick its type, right there — rather than dropping something
+  // pre-guessed on the canvas for you to notice and fix later. Matches
+  // that here for every type with a real dialog (everything except the
+  // plain Start/End terminator, whose only field is a freeform label).
+  if (type !== 'terminator' && !restoring) openShapeEditor(id)
 }
 
 // ══════════════════════════════════════════════════════════════════════════════

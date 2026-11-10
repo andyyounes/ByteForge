@@ -52,7 +52,11 @@
 // shapes (with a visible dot grid), plus a real layout-timing bug fix —
 // a newly-seeded/inserted/restored connector line was drawn bent because
 // drawConnections() ran before the browser laid out the just-added shape.
-const CACHE_NAME = 'bf-offline-v10'
+// Bumped v10 -> v11 (2026-11-10): adding any shape (Declare, Assign,
+// Decision...) now opens its real configuration dialog immediately with
+// blank fields, matching real Flowgorithm, instead of pre-filling a
+// guessed value ("n = n + 1") that looked like a real decision already made.
+const CACHE_NAME = 'bf-offline-v11'
 
 // Same-origin paths this service worker is allowed to cache. Everything
 // else same-origin (notably /api/*) is left completely alone — fetch
