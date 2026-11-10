@@ -376,3 +376,28 @@ this back up:
    source for future flowchart content — worth using instead of
    hand-designing every new mission from scratch, per the user's own
    suggestion.
+
+## Phase 6 — layout/navigation parity with Grade 8 (2026-11-10)
+
+User asked to make Grade 9's mission screen look/work like Grade 8's
+instead of its own mirrored layout. Scoped via AskUserQuestion to
+"layout + key navigation pieces," not a full pixel-for-pixel port.
+
+- Editor moved to the LEFT (Grade 8's side), challenge/output/console
+  stacked on the right — done via CSS `order` on the grid items, no
+  DOM reorder, so no JS selector needed to change.
+- Added a compact "Mission N of M" Prev/Next stepper scoped to the
+  current TIERS group, matching Grade 8's `ch-nav-strip`.
+- Added an always-visible "Complete the mission to continue →"
+  footer, matching Grade 8's `ch-footer` — enables once the mission
+  has real stars, falls back to `winNext()`'s tier-boundary logic.
+
+Verified live: editor bounding rect confirmed at x=0 (left), nav
+strip reads correctly for a mid-tier mission, footer starts disabled
+and `stepMission()` genuinely navigates. Full regression (134
+missions, 141 challenge tests, tsc, `npm run verify`) clean.
+
+**Deliberately not ported** (outside the confirmed scope): Grade 8's
+collapsible full challenge-list toggle, its per-challenge lesson-panel
+visual chrome, and its exam-specific UI (not applicable to Grade 9's
+mission model).
