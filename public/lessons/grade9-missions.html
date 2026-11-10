@@ -1946,6 +1946,88 @@ UNTIL n &gt; 5</div>
     answer: 'Decision',
     stars: { metric: 'pass' },
   },
+
+  // ── FOUNDATIONS 3 · BUILD A FLOWCHART — drag-and-drop canvas, right after
+  // the shapes/tracing intro and BEFORE flow-code/flowg1-20boss (moved here
+  // 2026-11-10 — used to sit at the very end of Foundations 3, after 20+
+  // read-a-finished-flowchart missions, so a student never built one with
+  // their own hands until the whole unit was nearly over). Each mission is
+  // checked by what the student's OWN flowchart actually produces when run
+  // (req.expectedOutput), not just shape/connection counts — the same real
+  // Flowgorithm-style grading the flowg series uses for code.
+  {
+    id: 'fcb1', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🗄', title: 'Declare, Assign, Output',
+    hints: ['Double-click the Declare shape — name it age, type Integer.', 'Double-click the Assign shape — target "age", expression "15".', 'Double-click the Output shape — expression "age". Connect Start → Declare → Assign → Output → End, in that order.'],
+    xp: 40,
+    brief: 'Build a flowchart from scratch: Start, a Declare shape for an Integer called age, an Assign shape setting age to 15, an Output shape printing age, then End. Double-click each shape to set it up properly instead of typing raw syntax.',
+    api: [],
+    flowchart: {
+      intro: 'Drag out the shapes below, connect them in order, then double-click each one to configure it — no code, just the flowchart itself.',
+      minShapes: 5, minConnections: 4,
+      expectedOutput: ['15'],
+    },
+  },
+  {
+    id: 'fcb2', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🗂', title: 'Arrays',
+    hints: ['Double-click Declare, tick "This is an array", name it scores, size 3.', 'Three separate Assign shapes: scores[1] = 10, scores[2] = 20, scores[3] = 30 — array indices here start at 1, same as pseudocode elsewhere.', 'Output scores[2] should print 20.'],
+    xp: 45,
+    brief: 'An array is one Declare shape, ticked as an array, with a size — not three separate variables. Build: Declare an Integer array scores[3], Assign each of its 3 slots a different number, then Output scores[2] (the MIDDLE one).',
+    api: [],
+    flowchart: {
+      intro: 'Double-click Declare and tick "This is an array" to give it a size. Assign shapes can target scores[1], scores[2], scores[3] individually.',
+      minShapes: 6, minConnections: 5,
+      expectedOutput: ['20'],
+    },
+  },
+  {
+    id: 'fcb3', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🔁', title: 'For Loop',
+    hints: ['Double-click the For shape: variable i, start 1, end 5.', 'The loop body (an Output shape printing i) connects back to the SAME For shape — that\'s what makes it repeat.', 'A For shape has TWO outgoing arrows: the first one you draw is "Next" (into the loop body), the second is "Done" (out of the loop, once finished).'],
+    xp: 45,
+    brief: 'Build a For loop that prints 1, 2, 3, 4, 5 — one Output per line. One For shape (i = 1 to 5), one Output shape (prints i) wired as its loop body, looping back to the For shape itself.',
+    api: [],
+    flowchart: {
+      intro: 'The For shape\'s FIRST outgoing arrow is "Next" (goes into the loop body); connect the loop body back to the SAME For shape to make it repeat. The SECOND arrow out of the For shape is "Done".',
+      minShapes: 4, minConnections: 4, requiresDecision: false,
+      expectedOutput: ['1', '2', '3', '4', '5'],
+    },
+  },
+  {
+    id: 'fcb4', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '⬡', title: 'While Loop',
+    hints: ['Declare n and total, Assign n = 1 and total = 0 BEFORE the While shape.', 'While condition: n <= 5. Loop body: total = total + n, then n = n + 1, looping back to the SAME While shape.', 'A While shape\'s FIRST arrow is "Next" (checked TRUE — into the body), the SECOND is "Done" (checked FALSE — out of the loop). Output total AFTER the loop, not inside it.'],
+    xp: 50,
+    brief: 'Build a While loop that adds up 1+2+3+4+5. Set up n=1 and total=0 first, then a While shape (n <= 5) whose body adds n to total and increments n, looping back to itself — then Output total once the loop finishes.',
+    api: [],
+    flowchart: {
+      intro: 'While checks its condition BEFORE each pass — wire the loop body back to the SAME While shape so it re-checks every time round.',
+      minShapes: 7, minConnections: 7,
+      expectedOutput: ['15'],
+    },
+  },
+  {
+    id: 'fcb5', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🔂', title: 'Repeat-Until Loop',
+    hints: ['Same sum-1-to-5 idea as the While mission — but Repeat checks its condition AFTER the body, not before.', 'A Repeat shape\'s FIRST arrow is "Next" (condition still FALSE — loop again), the SECOND is "Done" (condition finally TRUE — exit).', 'Condition this time is n > 5 (the OPPOSITE sense from While\'s n <= 5) — Repeat keeps going UNTIL it becomes true.'],
+    xp: 50,
+    brief: 'Rebuild the same running-total idea as the While mission, but with a Repeat shape instead: the condition (n > 5) is checked AFTER the body runs, and the loop keeps going UNTIL it becomes true — the opposite sense from While.',
+    api: [],
+    flowchart: {
+      intro: 'Repeat checks its condition AFTER the loop body — wire Start → setup → loop body → Repeat shape, with the Repeat shape\'s "Next" branch looping back to the body, and "Done" leading to Output.',
+      minShapes: 7, minConnections: 7,
+      expectedOutput: ['15'],
+    },
+  },
+  {
+    id: 'fcb6boss', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🏆', boss: true, title: 'BOSS — Even Numbers Only',
+    hints: ['One For loop, i = 1 to 10, with a Decision INSIDE its body: i MOD 2 = 0?', 'Decision\'s True branch Outputs i, then continues back to the For shape either way (True and False both eventually loop back).', 'This combines everything: For, Decision/If, and Output, all wired together — exactly like flowg6/flowg12\'s "print only the even ones" code missions, but built as a real flowchart.'],
+    xp: 75,
+    brief: 'The capstone: build a flowchart that prints only the EVEN numbers from 1 to 10 (2, 4, 6, 8, 10). One For loop (i = 1 to 10) with a Decision inside its body (i MOD 2 = 0?) — only Output i on the True branch, but BOTH branches must lead back to the For loop to keep it going.',
+    api: [],
+    flowchart: {
+      intro: 'A Decision INSIDE a loop body needs BOTH its branches to eventually rejoin the loop — True goes through Output first, False skips straight back — so the For shape keeps getting re-checked either way.',
+      minShapes: 5, minConnections: 6, requiresDecision: true,
+      expectedOutput: ['2', '4', '6', '8', '10'],
+    },
+  },
+
   {
     // Same bridge mission as before (diagram's Decision diamond becomes an
     // IF/ELSE, each branch becomes one arm) but now the flowchart is shown
@@ -2619,86 +2701,86 @@ UNTIL n &gt; 5</div>
     stars: { metric: 'pass' },
   },
 
-  // ── Foundations 6f · BUILD YOUR OWN FLOWCHART — TODO-GRADE9.md Phase 4.
-  // Every flowg mission above gave a FINISHED flowchart and asked for code;
-  // these ask for the opposite direction — build the flowchart itself with
-  // the drag-and-drop canvas (type:'flowchart', see renderFlowchartBubble()/
-  // runFlowchart() et al.). This engine already existed in the file but was
-  // completely unused by any mission before this — every one of these walk-
-  // throughs is the first real content it's ever run. Each mission is
-  // checked by what the student's OWN flowchart actually produces when run
-  // (req.expectedOutput), not just shape/connection counts, the same real
-  // Flowgorithm-style grading the flowg series already uses for code.
+  // ── FOUNDATIONS 3 · DESIGN YOUR OWN — the real gap every earlier mission
+  // in this unit left open: flowg1-20boss hand the student a FINISHED
+  // flowchart; fcb1-fcb6boss (moved earlier now, see above) hand over a
+  // spec so prescriptive it already names every shape to drag out. Neither
+  // one is "here's a problem in plain English, YOU decide the structure."
+  // These are genuine word problems — no shapes, no structure given away —
+  // built in the same drag-and-drop canvas, graded the same way (actual
+  // execution output, via req.expectedOutput/runFlowchart(), not a shape
+  // checklist). The canvas has no Input shape (only Output — see the
+  // palette), so every value here is a fixed Assign, never read at runtime.
   {
-    id: 'fcb1', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🗄', title: 'Declare, Assign, Output',
-    hints: ['Double-click the Declare shape — name it age, type Integer.', 'Double-click the Assign shape — target "age", expression "15".', 'Double-click the Output shape — expression "age". Connect Start → Declare → Assign → Output → End, in that order.'],
+    id: 'fcw1', type: 'flowchart', phase: 'FOUNDATIONS 3 · DESIGN YOUR OWN', emoji: '🎟️', title: 'Cinema Ticket Price',
+    hints: ['No loop needed here — just one yes/no question.', 'The age cutoff is 12 — under 12 is a Child ticket, 12 or over is an Adult ticket.', 'Pick ONE variable to hold the age, set it with Assign before you ever check it.'],
     xp: 40,
-    brief: 'Build a flowchart from scratch: Start, a Declare shape for an Integer called age, an Assign shape setting age to 15, an Output shape printing age, then End. Double-click each shape to set it up properly instead of typing raw syntax.',
+    brief: 'A cinema charges a Child ticket for anyone under 12, and an Adult ticket for anyone 12 or older. Design a flowchart for a 10-year-old: it should decide which ticket applies and print it. You choose the shapes and how they connect — nothing is given.',
     api: [],
     flowchart: {
-      intro: 'Drag out the shapes below, connect them in order, then double-click each one to configure it — no code, just the flowchart itself.',
-      minShapes: 5, minConnections: 4,
-      expectedOutput: ['15'],
+      intro: 'No finished flowchart this time — read the problem above, then build your OWN from scratch. Think: what has to be true/false to pick the right ticket?',
+      minShapes: 5, minConnections: 5, requiresDecision: true,
+      expectedOutput: ['Child'],
     },
   },
   {
-    id: 'fcb2', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🗂', title: 'Arrays',
-    hints: ['Double-click Declare, tick "This is an array", name it scores, size 3.', 'Three separate Assign shapes: scores[1] = 10, scores[2] = 20, scores[3] = 30 — array indices here start at 1, same as pseudocode elsewhere.', 'Output scores[2] should print 20.'],
-    xp: 45,
-    brief: 'An array is one Declare shape, ticked as an array, with a size — not three separate variables. Build: Declare an Integer array scores[3], Assign each of its 3 slots a different number, then Output scores[2] (the MIDDLE one).',
+    id: 'fcw2', type: 'flowchart', phase: 'FOUNDATIONS 3 · DESIGN YOUR OWN', emoji: '🔢', title: 'The First 5 Square Numbers',
+    hints: ['No decision needed here — just repetition.', 'A square number is a number multiplied by itself (3 squared is 3 × 3 = 9).', 'One loop variable counting 1 to 5, one Output each time round printing that count multiplied by itself.'],
+    xp: 40,
+    brief: 'Print the first 5 square numbers: 1, 4, 9, 16, 25 — one per line. Design the flowchart yourself; nothing is given but the goal.',
     api: [],
     flowchart: {
-      intro: 'Double-click Declare and tick "This is an array" to give it a size. Assign shapes can target scores[1], scores[2], scores[3] individually.',
-      minShapes: 6, minConnections: 5,
-      expectedOutput: ['20'],
-    },
-  },
-  {
-    id: 'fcb3', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🔁', title: 'For Loop',
-    hints: ['Double-click the For shape: variable i, start 1, end 5.', 'The loop body (an Output shape printing i) connects back to the SAME For shape — that\'s what makes it repeat.', 'A For shape has TWO outgoing arrows: the first one you draw is "Next" (into the loop body), the second is "Done" (out of the loop, once finished).'],
-    xp: 45,
-    brief: 'Build a For loop that prints 1, 2, 3, 4, 5 — one Output per line. One For shape (i = 1 to 5), one Output shape (prints i) wired as its loop body, looping back to the For shape itself.',
-    api: [],
-    flowchart: {
-      intro: 'The For shape\'s FIRST outgoing arrow is "Next" (goes into the loop body); connect the loop body back to the SAME For shape to make it repeat. The SECOND arrow out of the For shape is "Done".',
+      intro: 'Build your own flowchart for this from scratch. Think: what repeats, and what changes each time it does?',
       minShapes: 4, minConnections: 4, requiresDecision: false,
-      expectedOutput: ['1', '2', '3', '4', '5'],
+      expectedOutput: ['1', '4', '9', '16', '25'],
     },
   },
   {
-    id: 'fcb4', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '⬡', title: 'While Loop',
-    hints: ['Declare n and total, Assign n = 1 and total = 0 BEFORE the While shape.', 'While condition: n <= 5. Loop body: total = total + n, then n = n + 1, looping back to the SAME While shape.', 'A While shape\'s FIRST arrow is "Next" (checked TRUE — into the body), the SECOND is "Done" (checked FALSE — out of the loop). Output total AFTER the loop, not inside it.'],
+    id: 'fcw3', type: 'flowchart', phase: 'FOUNDATIONS 3 · DESIGN YOUR OWN', emoji: '🔋', title: 'Battery Drain',
+    hints: ['This keeps going only WHILE something is still true — figure out what that something is.', 'A phone battery starts at 100% and drops by 25 every time you check it.', 'Output the battery level BEFORE draining it each round, and stop once it would go to 0 or below.'],
+    xp: 45,
+    brief: 'A phone battery starts at 100% and drops by 25% every time it\'s checked. Print its level every time it\'s checked, for as long as it still has charge left (100, 75, 50, 25 — then stop, since 0 has no charge left to report). Design the whole flowchart yourself.',
+    api: [],
+    flowchart: {
+      intro: 'Build your own flowchart for this. Think about which loop shape checks its condition BEFORE running its body, versus AFTER.',
+      minShapes: 6, minConnections: 6, requiresDecision: false,
+      expectedOutput: ['100', '75', '50', '25'],
+    },
+  },
+  {
+    id: 'fcw4', type: 'flowchart', phase: 'FOUNDATIONS 3 · DESIGN YOUR OWN', emoji: '🎓', title: 'Grade Band',
+    hints: ['No loop needed — just decisions, one after another.', 'Three bands: 70 or above is "Distinction", 50 or above (but under 70) is "Pass", anything else is "Fail".', 'A second Decision only matters if the first one was False — chain them so the second is only reached when the first says no.'],
     xp: 50,
-    brief: 'Build a While loop that adds up 1+2+3+4+5. Set up n=1 and total=0 first, then a While shape (n <= 5) whose body adds n to total and increments n, looping back to itself — then Output total once the loop finishes.',
+    brief: 'A score of 72 should be classified into a grade band: 70+ is "Distinction", 50-69 is "Pass", anything below 50 is "Fail". Design the whole flowchart yourself for a score of 72 (which should print "Distinction").',
     api: [],
     flowchart: {
-      intro: 'While checks its condition BEFORE each pass — wire the loop body back to the SAME While shape so it re-checks every time round.',
-      minShapes: 7, minConnections: 7,
-      expectedOutput: ['15'],
+      intro: 'Build your own flowchart for this — three possible outcomes from ONE starting score.',
+      minShapes: 6, minConnections: 6, requiresDecision: true,
+      expectedOutput: ['Distinction'],
     },
   },
   {
-    id: 'fcb5', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🔂', title: 'Repeat-Until Loop',
-    hints: ['Same sum-1-to-5 idea as the While mission — but Repeat checks its condition AFTER the body, not before.', 'A Repeat shape\'s FIRST arrow is "Next" (condition still FALSE — loop again), the SECOND is "Done" (condition finally TRUE — exit).', 'Condition this time is n > 5 (the OPPOSITE sense from While\'s n <= 5) — Repeat keeps going UNTIL it becomes true.'],
-    xp: 50,
-    brief: 'Rebuild the same running-total idea as the While mission, but with a Repeat shape instead: the condition (n > 5) is checked AFTER the body runs, and the loop keeps going UNTIL it becomes true — the opposite sense from While.',
+    id: 'fcw5', type: 'flowchart', phase: 'FOUNDATIONS 3 · DESIGN YOUR OWN', emoji: '🧮', title: 'Count the Multiples of 4',
+    hints: ['One loop checking every number from 1 to 20, one running counter that only goes up SOMETIMES.', 'MOD tells you the remainder after dividing — a number is a multiple of 4 exactly when dividing it by 4 leaves no remainder.', 'Only Output the counter ONCE, right at the very end, after the loop has finished — not inside it.'],
+    xp: 55,
+    brief: 'How many whole numbers from 1 to 20 are multiples of 4? Design a flowchart that counts them (checking each one, one at a time) and prints the final count once it\'s done. (The real answer is 5: 4, 8, 12, 16, 20.)',
     api: [],
     flowchart: {
-      intro: 'Repeat checks its condition AFTER the loop body — wire Start → setup → loop body → Repeat shape, with the Repeat shape\'s "Next" branch looping back to the body, and "Done" leading to Output.',
-      minShapes: 7, minConnections: 7,
-      expectedOutput: ['15'],
+      intro: 'Build your own flowchart for this — a loop with a decision INSIDE it, plus something that keeps a running total across every pass.',
+      minShapes: 7, minConnections: 8, requiresDecision: true,
+      expectedOutput: ['5'],
     },
   },
   {
-    id: 'fcb6boss', type: 'flowchart', phase: 'FOUNDATIONS 3 · BUILD A FLOWCHART', emoji: '🏆', boss: true, title: 'BOSS — Even Numbers Only',
-    hints: ['One For loop, i = 1 to 10, with a Decision INSIDE its body: i MOD 2 = 0?', 'Decision\'s True branch Outputs i, then continues back to the For shape either way (True and False both eventually loop back).', 'This combines everything: For, Decision/If, and Output, all wired together — exactly like flowg6/flowg12\'s "print only the even ones" code missions, but built as a real flowchart.'],
-    xp: 75,
-    brief: 'The capstone: build a flowchart that prints only the EVEN numbers from 1 to 10 (2, 4, 6, 8, 10). One For loop (i = 1 to 10) with a Decision inside its body (i MOD 2 = 0?) — only Output i on the True branch, but BOTH branches must lead back to the For loop to keep it going.',
+    id: 'fcw6boss', type: 'flowchart', phase: 'FOUNDATIONS 3 · DESIGN YOUR OWN', emoji: '🏆', boss: true, title: 'BOSS — Multiples of 3, Classified',
+    hints: ['Two separate jobs: first ADD UP every multiple of 3 from 1 to 30 (one loop, one running total, one decision inside it) — THEN, once that\'s done, make ONE more decision about the final total.', 'The real total is 165 (3 + 6 + 9 + ... + 30).', '165 is over 100, so the final classification should print "High" — if the total had been 100 or under, it would print "Low" instead.'],
+    xp: 80,
+    brief: 'The capstone: add up every multiple of 3 from 1 to 30, then classify that total as "High" (over 100) or "Low" (100 or under). This needs TWO things you\'ve built separately before, combined into one flowchart: a loop that totals up only some of the numbers it sees, followed by a single decision on the result. Print the total, then print the classification.',
     api: [],
     flowchart: {
-      intro: 'A Decision INSIDE a loop body needs BOTH its branches to eventually rejoin the loop — True goes through Output first, False skips straight back — so the For shape keeps getting re-checked either way.',
-      minShapes: 5, minConnections: 6, requiresDecision: true,
-      expectedOutput: ['2', '4', '6', '8', '10'],
+      intro: 'Build your own flowchart for this, from a blank canvas. No shapes are given — combine what fcw5 and fcw4 each taught separately.',
+      minShapes: 8, minConnections: 9, requiresDecision: true,
+      expectedOutput: ['165', 'High'],
     },
   },
 
@@ -6909,6 +6991,8 @@ const G9M_MISSION_CONCEPT_OVERRIDE = {
   flowg19: 'g9-flowcharts-loops', flowg20boss: 'g9-flowcharts-loops',
   fcb1: 'g9-flowcharts-loops', fcb2: 'g9-flowcharts-loops', fcb3: 'g9-flowcharts-loops',
   fcb4: 'g9-flowcharts-loops', fcb5: 'g9-flowcharts-loops', fcb6boss: 'g9-flowcharts-loops',
+  fcw1: 'g9-flowcharts-loops', fcw2: 'g9-flowcharts-loops', fcw3: 'g9-flowcharts-loops',
+  fcw4: 'g9-flowcharts-loops', fcw5: 'g9-flowcharts-loops', fcw6boss: 'g9-flowcharts-loops',
   'learn-logic': 'g9-flowcharts', p0m3: 'g9-flowcharts', p0m4: 'g9-flowcharts',
   'learn-datatypes': 'g9-declarations',
   // Foundations 3 — Your First Code — also had NO mapping at all (same
@@ -7067,19 +7151,31 @@ const TIERS = [
   // is flowcharts/Flowgorithm (planning an algorithm, plus basic
   // arithmetic/IO/loops) FIRST, with real Python syntax taught right
   // after that — so FOUNDATIONS 3-7 below are now in that order instead.
-  { name: '📊 FOUNDATIONS 3 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'learn-pseudo-why', 'learn-pseudo-control', 'flow-p1', 'flow-p2', 'flow-code'] },
+  { name: '📊 FOUNDATIONS 3 · FLOWCHARTS — planning an algorithm before writing it', ids: ['learn-flowcharts', 'learn-pseudo-why', 'learn-pseudo-control', 'flow-p1', 'flow-p2'] },
+  // Re-sequenced (2026-11-10, real user report): BUILD A FLOWCHART (the
+  // drag-and-drop canvas) used to sit at the very END of Foundations 3,
+  // AFTER 20+ read-a-finished-flowchart-and-transform-it missions — so a
+  // student spent the whole unit reading other people's flowcharts before
+  // ever building one with their own hands. Moved here instead: right
+  // after the basic shapes/tracing intro, BEFORE flow-code/flowg1-20boss.
+  { name: '🗄 FOUNDATIONS 3 · BUILD A FLOWCHART — drag, drop, double-click to configure', ids: ['fcb1', 'fcb2', 'fcb3', 'fcb4', 'fcb5', 'fcb6boss'] },
   // flowg1-6/flowgboss existed in MISSIONS but were never registered in
   // TIERS at all — a real bug: the map (built from TIERS.map(...)) had no
   // way to show them, so they were unreachable however the game normally
   // routes students between missions. Fixed here while adding the new
   // flowg7-14 practice/capstone batch.
-  { name: '🔀 FOUNDATIONS 3 · FLOWGORITHM — real execution, not just structure', ids: ['flowg1', 'flowg2', 'flowg3', 'flowg4', 'flowg5', 'flowg6'] },
+  { name: '🔀 FOUNDATIONS 3 · FLOWGORITHM — real execution, not just structure', ids: ['flow-code', 'flowg1', 'flowg2', 'flowg3', 'flowg4', 'flowg5', 'flowg6'] },
   { name: '🏆 FOUNDATIONS 3 FLOWGORITHM CAPSTONE', ids: ['flowgboss'] },
   { name: '🧮 FOUNDATIONS 3 · FLOWGORITHM PRACTICE — real-world scenarios, same engine', ids: ['flowg7', 'flowg8', 'flowg9', 'flowg10', 'flowg11', 'flowg12', 'flowg13'] },
   { name: '🏆 FOUNDATIONS 3 PRACTICE CAPSTONE', ids: ['flowg14'] },
   { name: '🔢 FOUNDATIONS 3 · FLOWGORITHM PRACTICE 2 — the classic algorithm set', ids: ['flowg15', 'flowg16', 'flowg17', 'flowg18'] },
   { name: '🔂 FOUNDATIONS 3 · REPEAT-UNTIL — the third loop shape', ids: ['flowg19', 'flowg20boss'] },
-  { name: '🗄 FOUNDATIONS 3 · BUILD A FLOWCHART — drag, drop, double-click to configure', ids: ['fcb1', 'fcb2', 'fcb3', 'fcb4', 'fcb5', 'fcb6boss'] },
+  // NEW (2026-11-10): every flowg/fcb mission so far either gives a
+  // finished flowchart to transform, or a spec so prescriptive it already
+  // names every shape — none of them are "here's a problem in English,
+  // YOU decide the structure." This closes that gap: real word problems,
+  // no shapes/structure handed over, built in the same drag-and-drop tool.
+  { name: '🧩 FOUNDATIONS 3 · DESIGN YOUR OWN — word problem, you decide the flowchart', ids: ['fcw1', 'fcw2', 'fcw3', 'fcw4', 'fcw5', 'fcw6boss'] },
   { name: '📘 FOUNDATIONS 4 · YOUR FIRST CODE — real Python, right after flowcharts/Flowgorithm', ids: ['learn-cb', 'learn-naming', 'naming-quiz', 'cb1', 'cb2', 'cb3', 'cb4', 'cb5', 'cb6', 'learn-forloop-cb', 'cb7', 'cb8', 'learn-io-cb', 'cb9'] },
   { name: '🏆 FOUNDATIONS 4 CAPSTONE', ids: ['cbboss', 'cbboss2', 'cbboss3'] },
   { name: '🔢 FOUNDATIONS 5 · BINARY IN CODE & LOGIC — data types, Boolean logic, real binary conversion', ids: ['p0m1', 'p0m2', 'learn-logic', 'p0m3', 'p0m4', 'p0m4b', 'learn-datatypes', 'p0m5', 'learn-conversion', 'p0m5c', 'p0m6'] },

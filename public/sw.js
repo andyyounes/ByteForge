@@ -34,7 +34,11 @@
 // right after writing the note above — proof it really isn't automatic.
 // Bumped v3 -> v4 (2026-11-10): real connector lines (ticks/branches) for
 // the Decision diamond in the same file's static flowchart diagrams.
-const CACHE_NAME = 'bf-offline-v4'
+// Bumped v4 -> v5 (2026-11-10): Foundations 3 resequenced (Build-a-Flowchart
+// moved earlier, new fcw1-fcw6boss "design your own" tier added) — a big
+// enough mission-list/TIERS change that a returning browser must not serve
+// the old version from cache.
+const CACHE_NAME = 'bf-offline-v5'
 
 // Same-origin paths this service worker is allowed to cache. Everything
 // else same-origin (notably /api/*) is left completely alone — fetch

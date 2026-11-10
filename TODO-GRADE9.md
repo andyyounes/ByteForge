@@ -443,8 +443,34 @@ actual Flowgorithm desktop app:
    forgot it once already on the very first of these edits) —
    currently at `bf-offline-v4`.
 
-User explicitly asked for this in stages (AskUserQuestion). Still
-open, in priority order:
+**Resequencing + new word-problem tier — DONE (2026-11-10).** User
+asked directly: "why don't we have flowchart exercises before that?"
+(i.e. before the 20-mission read-a-finished-flowchart gauntlet), then
+"rewrite foundations 3 all 3-4 of them." Shipped in one pass:
+- `fcb1`-`fcb6boss` (the drag-and-drop builder) **moved** from dead
+  last in Foundations 3 to right after the shapes/tracing intro
+  (`flow-p1`/`flow-p2`), before `flow-code`/`flowg1`-`20boss` — a
+  student now builds one with their own hands before reading 20+.
+- New tier **`fcw1`-`fcw6boss`** ("DESIGN YOUR OWN"): genuine word
+  problems with NO structure handed over (unlike `fcb1`-`6boss`'s
+  prescriptive specs), built in the same canvas, placed at the very
+  end of Foundations 3. Progression: single decision (`fcw1`) → for
+  loop only (`fcw2`) → while loop only (`fcw3`) → chained decisions
+  (`fcw4`) → decision-inside-loop + counter (`fcw5`) → boss combining
+  all of it (`fcw6boss`). Every one of these 6 solutions was verified
+  for real by hand-building its shape/connection graph and running it
+  through the actual `runFlowchart()` engine in a Node vm sandbox
+  (not just eyeballing the expected numbers) — all 6 match their
+  `expectedOutput` exactly.
+- `TIERS` updated to match (tier split + 2 new entries); `app/api/
+  teacher/g9-progress/route.ts`'s `TOTAL_MISSIONS` bumped 134→140 (6
+  new real missions) — `test-g9-missions.mjs` catches this drift on
+  its own if it's ever missed again.
+- `public/sw.js` bumped to `bf-offline-v5` (same cache-bump discipline
+  as every other change in this phase).
+
+User explicitly asked for the OTHER THREE items below in stages
+(AskUserQuestion). Still open, in priority order:
 - **Run-and-animate**: add a ▶ Run button to these static diagrams
   that steps through the ALREADY-FINISHED flowchart shape by shape,
   highlighting the active shape and showing variable values live —
