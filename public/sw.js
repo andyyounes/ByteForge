@@ -20,7 +20,16 @@
  *    (the auth middleware's own network dependency), not this file's job
  */
 
-const CACHE_NAME = 'bf-offline-v1'
+// Bumped v1 -> v2 (2026-11-10): a real student/teacher hit this directly —
+// the live server had every Grade 9 fix deployed (confirmed via a direct
+// curl fetch), but a browser that had already cached grade9-missions.html
+// under cache-first kept serving the old copy indefinitely, since nothing
+// ever invalidated it. Bumping this string is what actually fixes that:
+// activate() below already deletes any cache NOT matching CACHE_NAME, so a
+// version bump here evicts every old cached file on next load. This needs
+// to happen again any time a cached lesson/js file changes in a way
+// students need immediately — it is not automatic.
+const CACHE_NAME = 'bf-offline-v2'
 
 // Same-origin paths this service worker is allowed to cache. Everything
 // else same-origin (notably /api/*) is left completely alone — fetch
